@@ -15,8 +15,6 @@ V_SLICES = 480
 
 def setup():
     size(640, 480)
-
-def draw():
     background(0)
     noStroke()
     dx = width * 1.0 / H_SLICES
@@ -29,3 +27,6 @@ def draw():
             y_color = my_lerp(C3, x_color, y_alpha)
             fill(color(y_color.x, y_color.y, y_color.z))
             rect(x * dx, y * dy, dx, dy)
+            
+def draw():
+    pass
