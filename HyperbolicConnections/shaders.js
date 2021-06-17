@@ -23,6 +23,12 @@ uniform vec4 primitives[PAIR_COUNT];
 // (should_fill, interior);
 uniform vec2 fill_flags[PAIR_COUNT];
 
+// colors for each circle
+uniform vec3 colors[PAIR_COUNT];
+
+// background color is configurable
+uniform vec3 background_color;
+
 // [-1, 1] x [-1, 1]
 varying vec2 uv;
 
@@ -54,8 +60,7 @@ float half_plane_outline(vec2 point, vec2 normal) {
 #define CIRCLE 0.0
 #define LINE 1.0
 void main() {
-  const vec3 BACKGROUND = vec3(1.0);
-  vec3 color = BACKGROUND;
+  vec3 color = background_color;
   
   for (int i = 0; i < PAIR_COUNT; i++) {
     vec4 primitive = primitives[i];
@@ -76,8 +81,8 @@ void main() {
     }
     
     float actual_mask = mix(outline, mask, should_fill);
-    const vec3 ORANGE = vec3(1.0, 0.5, 0.0);
-    vec3 fill_color = mix(BACKGROUND, ORANGE, should_fill);
+    vec3 circle_color = colors[i];
+    vec3 fill_color = mix(background_color, circle_color, should_fill);
     color = mix(color, fill_color, mask);
   }
   

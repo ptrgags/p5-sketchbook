@@ -1,7 +1,16 @@
 const BOUNDARY_START = 'START';
 const BOUNDARY_END = 'END';
 const SIZE = 512;
-const PAIR_COUNT = 100;
+const PAIR_COUNT = 10;
+const BACKGROUND_COLOR = [0.2, 0.2, 0.2];
+const COLORS = [
+  // orange
+  [1, 154/255, 0],
+  // blue
+  [0, 162/255, 1],
+  // violet
+  //[0.5, 0.0, 1.0],
+];
 
 class Boundary {
   constructor(type) {
@@ -11,6 +20,8 @@ class Boundary {
     this.point = undefined;
     this.fill = undefined;
     this.pair = undefined;
+    this.color = undefined;
+    this.label = undefined;
   }
 }
 
@@ -28,6 +39,15 @@ function make_connection_string(pairCount) {
     start.pair = end;
     end.pair = start;
     
+    const color_index = rand_int(COLORS.length);
+    const pair_color = COLORS[color_index];
+    start.color = pair_color;
+    end.color = pair_color;
+    const LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    const label = LABELS[color_index % LABELS.length];
+    start.label = label;
+    end.label = label;
+    
     connection_string.splice(
       index,
       0,
@@ -42,6 +62,7 @@ function make_connection_string(pairCount) {
 function print_connection_string(connection_string) {
   let brackets = '';
   let fill = '';
+  let labels = '';
   for (const boundary of connection_string) {
     if (boundary.type === BOUNDARY_START) {
       brackets += '[';
@@ -50,8 +71,9 @@ function print_connection_string(connection_string) {
     }
     
     fill += (boundary.fill && boundary.type === BOUNDARY_START) ? '.' : ' ';
+    labels += boundary.label;
   }
-  console.log(brackets + '\n' + fill);
+  console.log(`${brackets}\n${fill}\n${labels}`);
 }
 
 function label_connections(connection_string) {
@@ -95,7 +117,11 @@ function orthogonal_circle(boundary_start) {
     // nx x + ny y = 0
     const n_dot_p1 = 0.0;
     
-    return [nx, ny, n_dot_p1, PRIMITIVE_LINE, boundary_start.fill, true];
+    return {
+      primitive: [nx, ny, n_dot_p1, PRIMITIVE_LINE],
+      fill: [boundary_start.fill, true],
+      color: boundary_start.color,
+    };
   }
   
   // if we take the two boundary points as vectors from the origin, what is the
@@ -170,7 +196,11 @@ function orthogonal_circle(boundary_start) {
   const cx = diag * cos(angle_bisector);
   const cy = diag * sin(angle_bisector);
   
-  return [cx, cy, radius, PRIMITIVE_CIRCLE, boundary_start.fill, interior];
+  return {
+    primitive: [cx, cy, radius, PRIMITIVE_CIRCLE], 
+    fill: [boundary_start.fill, interior],
+    color: boundary_start.color
+  };
 }
 
 function compute_geometry(connection_string) {
@@ -189,18 +219,19 @@ function compute_geometry(connection_string) {
 function set_uniforms(shader, geometry) {
   const primitive_buffer = [];
   const fill_buffer = [];
+  const color_buffer = [];
   
   for (let i = 0; i < PAIR_COUNT; i++) {
-    const primitive = geometry[i];
-    primitive_buffer.push(...primitive.slice(0, 4));
-    fill_buffer.push(...primitive.slice(4));
+    const geom = geometry[i];
+    primitive_buffer.push(...geom.primitive);
+    fill_buffer.push(...geom.fill);
+    color_buffer.push(...geom.color);
   }
   
   shader.setUniform('primitives', primitive_buffer);
   shader.setUniform('fill_flags', fill_buffer);
-  
-  console.log(primitive_buffer);
-  console.log(fill_buffer);
+  shader.setUniform('colors', color_buffer);
+  shader.setUniform('background_color', BACKGROUND_COLOR);
 }
 
 let geometry;
@@ -211,7 +242,6 @@ function setup() {
   label_connections(connection_string);
   print_connection_string(connection_string);
   const geometry = compute_geometry(connection_string);
-  console.log(geometry);
   createCanvas(SIZE, SIZE, WEBGL);
   
   poincare_shader = createShader(VERTEX_SHADER, FRAGMENT_SHADER(PAIR_COUNT));
@@ -223,39 +253,4 @@ function draw() {
   background(128);
   shader(poincare_shader);
   quad(-1, -1, 1, -1, 1, 1, -1, 1);
-  
-  /*
-  background(0);
-  push();
-  translate(width / 2, height / 2);
-  const scale_factor = width / 2;
-  scale(scale_factor, -scale_factor);
-  
-  // Draw the canvas
-  noStroke();
-  fill(255);
-  circle(0, 0, 2);
-  
-  noFill();
-  const DARK_GRAY = 64;
-  stroke(DARK_GRAY);
-  strokeWeight(1/scale_factor);
-  for (const [type, ...args] of geometry) {
-    if (type === 'line') {
-      noFill();
-      const [[x1, y1], [x2, y2]] = args;
-      line(x1, y1, x2, y2);
-    } else {
-      const[[cx, cy], radius, should_fill] = args;
-      if (should_fill) {
-        fill(255, 127, 0);
-      } else {
-        fill(255);
-      }
-      circle(cx, cy, 2 * radius);
-    }
-  }
-  
-  pop();
-  */
 }
