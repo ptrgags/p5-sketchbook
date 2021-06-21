@@ -1,15 +1,19 @@
 const BOUNDARY_START = 'START';
 const BOUNDARY_END = 'END';
 const SIZE = 512;
-const PAIR_COUNT = 10;
-const BACKGROUND_COLOR = [0.2, 0.2, 0.2];
-const COLORS = [
-  // orange
-  [1, 154/255, 0],
-  // blue
-  [0, 162/255, 1],
-  // violet
-  //[0.5, 0.0, 1.0],
+const PAIR_COUNT = 50;
+
+function rgb8(r, g, b) {
+  return [r / 255, g / 255, b / 255];
+}
+
+// palette from coolors.co: https://coolors.co/5f0f40-9a031e-fb8b24-e36414-0f4c5c
+const BACKGROUND_COLOR = rgb8(15, 76, 92);
+const COLORS = [  
+  rgb8(95, 15, 64),
+  rgb8(154, 3, 30),
+  rgb8(251, 139, 36),
+  rgb8(227, 100, 20)
 ];
 
 class Boundary {
@@ -76,11 +80,30 @@ function print_connection_string(connection_string) {
   console.log(`${brackets}\n${fill}\n${labels}`);
 }
 
+function compute_fill(connection_string) {
+  const fill_stack = [true];
+  
+  for (var i = 0; i < connection_string.length; i++) {
+    const boundary = connection_string[i];
+    boundary.fill = fill_stack[fill_stack.length - 1];
+    
+    const next_boundary = connection_string[(i + 1) % connection_string.length];
+    const colors_match = boundary.label === next_boundary.label;
+    
+    if (next_boundary.type === BOUNDARY_START) {
+      const fill = colors_match ? !boundary.fill : true;
+      fill_stack.push(fill);
+    } else {
+      fill_stack.pop();
+    }
+  }
+}
+
 function label_connections(connection_string) {
   const connectionCount = connection_string.length;
   for (const [i, boundary] of connection_string.entries()) {
     // for monochrome images, the fill is a simple odd/even coloring.
-    boundary.fill = i % 2 == 0;
+    //boundary.fill = i % 2 == 0;
     
     const angle = i / connectionCount * TWO_PI;
     boundary.index = i;
@@ -228,6 +251,7 @@ function set_uniforms(shader, geometry) {
     color_buffer.push(...geom.color);
   }
   
+  shader.setUniform('mouse_uv', [0.0, 0.0]);
   shader.setUniform('primitives', primitive_buffer);
   shader.setUniform('fill_flags', fill_buffer);
   shader.setUniform('colors', color_buffer);
@@ -240,6 +264,7 @@ let poincare_shader;
 function setup() {
   const connection_string = make_connection_string(PAIR_COUNT);
   label_connections(connection_string);
+  compute_fill(connection_string);
   print_connection_string(connection_string);
   const geometry = compute_geometry(connection_string);
   createCanvas(SIZE, SIZE, WEBGL);
@@ -253,4 +278,8 @@ function draw() {
   background(128);
   shader(poincare_shader);
   quad(-1, -1, 1, -1, 1, 1, -1, 1);
+}
+
+function mouseDragged() {
+  poincare_shader.setUniform('mouse_uv', [mouseX / (width - 1), mouseY / (height - 1)]);
 }
