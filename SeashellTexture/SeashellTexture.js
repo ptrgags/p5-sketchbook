@@ -36,6 +36,7 @@ const hormone = [
 const CONVERSION_RATE = new Array(W);
 const FLUCTUATION_SCALE = 0.1;
 
+// TODO: Explore other ways to seed the activator.
 function initial_conditions() {
   for (let i = 0; i < W; i++) {
     CONVERSION_RATE[i] = FLUCTUATION_SCALE * (0.96 + 0.08 * random());
@@ -54,7 +55,6 @@ function initial_conditions() {
   }
 }
 
-
 function setup() {
   createCanvas(W, H);
   
@@ -62,21 +62,7 @@ function setup() {
   background(0);
 }
 
-const ITERS_PER_UPDATE = 12; // iterations per call of draw();
-const DELTA_TIME = 1;
-const DELTA_X = 1;
-const ACTIVATOR_DIFFUSION = 0.015; // Diffusion of the activator (D_a)
-const ACTIVATOR_DECAY = 0.1; // Decay rate of the activator (mu)
-const INITIAL_CATALYZATION = 0; // Initial amount of catalyzation (rho_0)
-const INHIBITOR_PRODUCTION = 0; // Basic production of the inhibitor (rho)
-const INHIBITOR_DIFFUSION = 0; // Diffusion of inhibitor (D_h)
-const INHIBITOR_CONSTANT = 0.1; // Michaelis-Menten constant of inhibition (h_0)
-const INHIBITOR_DECAY = 0.014; // Decay rate of the inhibitor (nu)
-const HORMONE_PRODUCTION = 0.1; // Production rate of the hormone (rho') 
-const HORMONE_DECAY = 0.1; // Decay rate of the hormone (eta)
-const SATURATION = 0.25; // Saturation of the autocatalysis (k)
-
-function update() {
+function update(seashell) {
   // for the summation term in the hormone equation
   let activator_sum = 0;
   
@@ -104,32 +90,36 @@ function update() {
     const laplacian_h = h_left + h_right - 2 * h;
     
     const catalysis_rate = CONVERSION_RATE[i];
-    const saturation_factor = a * a / (1 + SATURATION * a * a);
+    const saturation_factor = a * a / (1 + seashell.saturation * a * a);
     
+    // change in activator da/dt
+    // See equations (9) in the paper (http://algorithmicbotany.org/papers/shells.sig92.pdf)
     const da =
-      catalysis_rate / (h + INHIBITOR_CONSTANT) * (saturation_factor + INITIAL_CATALYZATION) +
-      -ACTIVATOR_DECAY * a +
-      ACTIVATOR_DIFFUSION * laplacian_a;
+      catalysis_rate / (h + seashell.inhibitor_constant) * (saturation_factor + seashell.initial_catalysis) +
+      -seashell.activator_decay * a +
+      seashell.activator_diffusion * laplacian_a;
+      
+    // change in inhibitor dh/dt
     const dh =
-      INHIBITOR_PRODUCTION +
+      seashell.inhibitor_production +
       catalysis_rate * saturation_factor +
-      -INHIBITOR_DECAY / c * h +
-      INHIBITOR_DIFFUSION * laplacian_h;
+      -seashell.inhibitor_decay / c * h +
+      seashell.inhibitor_diffusion * laplacian_h;
     
     // write the new values of the activator and inhibitor
-    activator[WRITE][i + 1] = a + da * DELTA_TIME;
-    inhibitor[WRITE][i + 1] = h + dh * DELTA_TIME;
+    activator[WRITE][i + 1] = a + da * seashell.delta_time;
+    inhibitor[WRITE][i + 1] = h + dh * seashell.delta_time;
     
     // update the total activator for the hormone equation
-    activator_sum += a * DELTA_X;
+    activator_sum += a * seashell.delta_x;
   } 
   
   // The hormone increases if there is a lot of activator
   // around, and decays over time.
   const dc = 
-    HORMONE_PRODUCTION * activator_sum / W +
-    -HORMONE_DECAY * c;
-  hormone[WRITE] = c + dc * DELTA_TIME;
+    seashell.hormone_production * activator_sum / W +
+    -seashell.hormone_decay * c;
+  hormone[WRITE] = c + dc * seashell.delta_time;
 }
 
 function ping_pong() {
@@ -138,6 +128,8 @@ function ping_pong() {
   [hormone[READ], hormone[WRITE]] = [hormone[WRITE], hormone[READ]];
 }
 
+const SEASHELL = SeashellParameters.OLIVIA_PORPHYRIA;
+//const SEASHELL = SeashellParameters.CONSTANT;
 
 function draw() {
   const row = frameCount - 1;
@@ -145,11 +137,11 @@ function draw() {
     return;
   }
   
-  stroke(255);
+  stroke(...SEASHELL.substrate_color);
   strokeWeight(2);
   line(0, row, width, row);
   
-  stroke(255, 0, 0);
+  stroke(...SEASHELL.pigment_color);
   for (let i = 0; i < W; i++) {
     const a = activator[READ][i + 1];
     if (a > 0.5) {
@@ -157,8 +149,8 @@ function draw() {
     }
   }
   
-  for (let i = 0; i < ITERS_PER_UPDATE; i++) {
-    update();
+  for (let i = 0; i < SEASHELL.iters_per_update; i++) {
+    update(SEASHELL);
     ping_pong();
   }
 }
