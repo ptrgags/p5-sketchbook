@@ -55,6 +55,31 @@ function initial_conditions() {
   }
 }
 
+//const seashell = SeashellParameters.CONSTANT;
+//const seashell = SeashellParameters.OLIVIA_PORPHYRIA;
+const seashell = SeashellParameters.BLOCKY;
+
+// for prototyping:
+/*
+const seashell = new SeashellParameters({
+  iters_per_update: 2,
+  initial_catalysis: 0.01,
+  activator_diffusion: 0.01,
+  activator_decay: 0.02,
+  inhibitor_production: 0.01,
+  inhibitor_diffusion: 0.2,
+  inhibitor_decay: 0.01,
+  inhibitor_constant: 0.1,
+  hormone_production: 0.1,
+  hormone_decay: 0.1,
+  // olive green
+  substrate_color: [0xF4, 0x74, 0x3B], 
+  // somewhere between purple and navy
+  pigment_color: [0x88, 0x16, 0x00], 
+  //saturation: 0.001
+});
+*/
+
 function setup() {
   createCanvas(W, H);
   
@@ -128,20 +153,17 @@ function ping_pong() {
   [hormone[READ], hormone[WRITE]] = [hormone[WRITE], hormone[READ]];
 }
 
-const SEASHELL = SeashellParameters.OLIVIA_PORPHYRIA;
-//const SEASHELL = SeashellParameters.CONSTANT;
-
 function draw() {
   const row = frameCount - 1;
   if (row >= H) {
     return;
   }
   
-  stroke(...SEASHELL.substrate_color);
+  stroke(...seashell.substrate_color);
   strokeWeight(2);
   line(0, row, width, row);
   
-  stroke(...SEASHELL.pigment_color);
+  stroke(...seashell.pigment_color);
   for (let i = 0; i < W; i++) {
     const a = activator[READ][i + 1];
     if (a > 0.5) {
@@ -149,8 +171,8 @@ function draw() {
     }
   }
   
-  for (let i = 0; i < SEASHELL.iters_per_update; i++) {
-    update(SEASHELL);
+  for (let i = 0; i < seashell.iters_per_update; i++) {
+    update(seashell);
     ping_pong();
   }
 }

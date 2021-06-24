@@ -56,3 +56,37 @@ SeashellParameters.OLIVIA_PORPHYRIA = new SeashellParameters({
   substrate_color: [255, 231, 179], // tan
   pigment_color: [133, 78, 44] // brown
 });
+
+SeashellParameters.LUMPY_STRIPES = new SeashellParameters({
+  iters_per_update: 6,
+  initial_catalysis: 0.01,
+  activator_diffusion: 0.1,
+  activator_decay: 0.01,
+  inhibitor_production: 0.01,
+  inhibitor_diffusion: 0.3,
+  inhibitor_decay: 0.01,
+  inhibitor_constant: 0.1,
+  hormone_production: 0.1,
+  hormone_decay: 0.1,
+  // olive green
+  substrate_color: [0x8E, 0x93, 0x6D],
+  // somewhere between purple and navy
+  pigment_color: [0x41, 0x3F, 0x54] 
+});
+
+SeashellParameters.BLOCKY = new SeashellParameters({
+  iters_per_update: 2,
+  initial_catalysis: 0.01,
+  activator_diffusion: 0.01,
+  activator_decay: 0.02,
+  inhibitor_production: 0.01,
+  inhibitor_diffusion: 0.2,
+  inhibitor_decay: 0.01,
+  inhibitor_constant: 0.1,
+  hormone_production: 0.1,
+  hormone_decay: 0.1,
+  // Orange
+  substrate_color: [0xF4, 0x74, 0x3B], 
+  // Maroon
+  pigment_color: [0x88, 0x16, 0x00], 
+});

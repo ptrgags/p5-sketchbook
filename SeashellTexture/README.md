@@ -12,6 +12,13 @@ how the differential equations are simulated. It's a little unusual, the
 simulation only happens on a line, but every few iterations, the line is
 added as a row of the image to simulate a growing shell.
 
-Example output (the _Olivia porphyria_ shell described in the paper)
+Example output for presets:
 
-![Example Seashell](figures/example-pattern.png)
+`OLIVIA_PORPHYRIA`  - (the _Olivia porphyria_ shell described in the paper)
+![Olivia Porphyria Shell](figures/olivia-porphyria.png)
+
+`LUMPY_STRIPES`:
+![Lumpy Stripes](figures/lumpy-stripes.png)
+
+`BLOCKY`:
+![Blocky](figures/blocky.png)

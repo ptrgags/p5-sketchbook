@@ -26,3 +26,30 @@ Possible Next Steps:
 * Experiment with the initial conditions
 * Experiment with varying the parameters over time
 * Try the other activator/substrate model for comparison
+
+# 2021-07-24 First Couple Experiments
+
+This morning I spent a little time experimenting with the parameters.
+Still don't have much intuition of how the patterns will look, but made
+a few interesting designs:
+
+`LUMPY_STRIPES`:
+![Lumpy Stripes](figures/lumpy-stripes.png)
+
+`BLOCKY`:
+![Blocky](figures/blocky.png)
+
+One thing I've noticed is that the boundaries tend to be rather pixely. The
+original BASIC program did a simple thresholding of the activator value when
+picking colors. it might be good to introduce a `smoothstep` function and use
+that to blend between the substrate and activator.
+
+Another thing I'm wondering is what would happen if I mixed in the color
+when the hormone value is large? Might be helpful to understand the dynamics
+here.
+
+Possible Next Steps:
+* More experiments with parameters
+* Try the smoothstep idea
+* Try visualizing the hormone levels
+* Adjust the image dimensions for a shell texture (which would be longer) and/or standalone images (I like making trading-card sized artworks)
