@@ -1,20 +1,46 @@
 const BOUNDARY_START = 'START';
 const BOUNDARY_END = 'END';
 const SIZE = 512;
-const PAIR_COUNT = 50;
+const PAIR_COUNT = 20;
 
 function rgb8(r, g, b) {
   return [r / 255, g / 255, b / 255];
 }
 
-// palette from coolors.co: https://coolors.co/5f0f40-9a031e-fb8b24-e36414-0f4c5c
-const BACKGROUND_COLOR = rgb8(15, 76, 92);
-const COLORS = [  
-  rgb8(95, 15, 64),
-  rgb8(154, 3, 30),
-  rgb8(251, 139, 36),
-  rgb8(227, 100, 20)
-];
+function hex_color(hex_string) {
+  const red_string = hex_string.slice(0, 2);
+  const green_string = hex_string.slice(2, 4);
+  const blue_string = hex_string.slice(4);
+  
+  const red = parseInt(red_string, 16);
+  const green = parseInt(green_string, 16);
+  const blue = parseInt(blue_string, 16);
+  
+  return rgb8(red, green, blue);
+}
+
+class Palette {
+  constructor(coolors_url) {
+    const colors = Palette.parse_url(coolors_url);
+    this.background_color = colors.shift();
+    this.colors = colors;
+  }
+  
+  static parse_url(coolors_url) {
+    const color_string = coolors_url.split('/').pop();
+    const hex_codes = color_string.split('-');
+    return hex_codes.map(hex_color);
+  }
+}
+
+// desert
+//const PALETTE = new Palette("https://coolors.co/5f0f40-9a031e-fb8b24-e36414-0f4c5c");
+
+// rainbow
+//const PALETTE = new Palette("https://coolors.co/f94144-f3722c-f8961e-f9844a-f9c74f-90be6d-43aa8b-4d908e-577590-277da1");
+
+// nautical
+const PALETTE = new Palette("https://coolors.co/0081a7-00afb9-fdfcdc-fed9b7-f07167");
 
 class Boundary {
   constructor(type) {
@@ -43,8 +69,8 @@ function make_connection_string(pairCount) {
     start.pair = end;
     end.pair = start;
     
-    const color_index = rand_int(COLORS.length);
-    const pair_color = COLORS[color_index];
+    const color_index = rand_int(PALETTE.colors.length);
+    const pair_color = PALETTE.colors[color_index];
     start.color = pair_color;
     end.color = pair_color;
     const LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
@@ -255,7 +281,7 @@ function set_uniforms(shader, geometry) {
   shader.setUniform('primitives', primitive_buffer);
   shader.setUniform('fill_flags', fill_buffer);
   shader.setUniform('colors', color_buffer);
-  shader.setUniform('background_color', BACKGROUND_COLOR);
+  shader.setUniform('background_color', PALETTE.background_color);
 }
 
 let geometry;

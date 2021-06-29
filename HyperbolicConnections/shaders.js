@@ -39,7 +39,7 @@ varying vec2 v_uv;
 
 float circle(vec2 point, vec2 center, float radius, float interior) {
   float dist = length(point - center);
-  float mask = smoothstep(radius + 0.01, radius, dist);
+  float mask = smoothstep(radius + 0.005, radius, dist);
   
   return mix(1.0 - mask, mask, interior);
 }
