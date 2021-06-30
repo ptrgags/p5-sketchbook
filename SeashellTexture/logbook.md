@@ -52,4 +52,32 @@ Possible Next Steps:
 * More experiments with parameters
 * Try the smoothstep idea
 * Try visualizing the hormone levels
-* Adjust the image dimensions for a shell texture (which would be longer) and/or standalone images (I like making trading-card sized artworks)
+* Adjust the image dimensions for a shell texture (which would be longer) and/or
+    standalone images (I like making trading-card sized artworks)
+
+## 2021-06-30 Smoothstep Experiment
+
+Today I tried the smoothstep idea to blend the colors. Then I realized since
+the sketch is rendered line-by-line, it would be fun to vary the threshold
+over time with a sine wave. Results were interesting:
+
+Threshold: `0.5 + amp * sin(2 * pi * freq * y_percent)`
+
+| `amp=0` | `amp=1, freq=5` | `amp=1, freq=100` | `amp=1, freq=1000` |
+|-------|---------------|-----------------|------------------|
+| ![original](figures/wavy-stripes.png) | ![freq 5](figures/amp-1-freq-5.png) | ![freq 100](figures/amp-1-freq-100.png) | ![freq 100](figures/amp-1-freq-1000.png) |
+
+When the threshold gets close to 0 or negative, all the activator values
+pass the threshold so you get a horizontal stripe of pigment (the yellow lines
+in this case). When the threshold is high, things taper off so there's mostly
+substrate (the thin horizontal navy lines in this case).
+
+This was a neat effect, something I should play with more. Maybe it should
+vary a bit with horizontal position too to look more organic?
+
+I should think about this more before I add any more parameters to the
+seashell.
+
+Next Steps:
+* Try other methods of visualizing the levels of activator/substrate/hormone
+* Think about how to parameterize this stripe effect

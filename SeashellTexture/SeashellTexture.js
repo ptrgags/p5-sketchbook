@@ -9,8 +9,8 @@
  * variables.
  */
 
-const W = 640;
-const H = 480;
+const W = 500;
+const H = 700;
 
 // the activator and inhibitor buffers
 // span the width of the canvas
@@ -57,25 +57,29 @@ function initial_conditions() {
 
 //const seashell = SeashellParameters.CONSTANT;
 //const seashell = SeashellParameters.OLIVIA_PORPHYRIA;
-const seashell = SeashellParameters.BLOCKY;
+//const seashell = SeashellParameters.BLOCKY;
+const seashell = SeashellParameters.WAVY_STRIPES;
 
 // for prototyping:
 /*
 const seashell = new SeashellParameters({
-  iters_per_update: 2,
+  iters_per_update: 15,
   initial_catalysis: 0.01,
-  activator_diffusion: 0.01,
-  activator_decay: 0.02,
-  inhibitor_production: 0.01,
-  inhibitor_diffusion: 0.2,
-  inhibitor_decay: 0.01,
-  inhibitor_constant: 0.1,
-  hormone_production: 0.1,
-  hormone_decay: 0.1,
-  // olive green
-  substrate_color: [0xF4, 0x74, 0x3B], 
+  activator_diffusion: 0.1,
+  activator_decay: 0.01,
+  inhibitor_production: 0.1,
+  inhibitor_diffusion: 0.3,
+  inhibitor_decay: 0.05,
+  inhibitor_constant: 0.01,
+  hormone_production: 0.05,
+  hormone_decay: 0.01,
+  // navy
+  substrate_color: [20, 33, 61],
+  // gold
+  pigment_color: [252, 163, 17]
+  //substrate_color: [0xF4, 0x74, 0x3B], 
   // somewhere between purple and navy
-  pigment_color: [0x88, 0x16, 0x00], 
+  //pigment_color: [0x88, 0x16, 0x00], 
   //saturation: 0.001
 });
 */
@@ -153,22 +157,40 @@ function ping_pong() {
   [hormone[READ], hormone[WRITE]] = [hormone[WRITE], hormone[READ]];
 }
 
+function clamp(x, a, b) {
+  return max(min(x, b), a);
+}
+
+// from https://en.wikipedia.org/wiki/Smoothstep
+function smoothstep(a, b, t) {
+  // scale, bias, and saturate to [0, 1] range
+  t = clamp((t - a) / (b - a), 0, 1);
+  return t * t * (3 - 2 * t);
+}
+
 function draw() {
   const row = frameCount - 1;
   if (row >= H) {
     return;
   }
   
-  stroke(...seashell.substrate_color);
-  strokeWeight(2);
-  line(0, row, width, row);
+  const substrate_color = color(...seashell.substrate_color);
+  const pigment_color = color(...seashell.pigment_color);
   
-  stroke(...seashell.pigment_color);
+  // Varying the threshold over time is fun, though I need to plan this more.
+  // set the amp to 0 for now.
+  const amp = 0.0;
+  const freq = 10;
+  const percent = row / (H - 1);
+  const threshold = 0.5 + amp * sin(TWO_PI * freq * percent);
+  const half_width = 0.05;
+  
   for (let i = 0; i < W; i++) {
     const a = activator[READ][i + 1];
-    if (a > 0.5) {
-      point(i, row);  
-    }
+    const t = smoothstep(threshold - half_width, threshold + half_width, a);
+    const stroke_color = lerpColor(substrate_color, pigment_color, t);
+    stroke(stroke_color);
+    point(i, row);  
   }
   
   for (let i = 0; i < seashell.iters_per_update; i++) {

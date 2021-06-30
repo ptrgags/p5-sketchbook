@@ -90,3 +90,20 @@ SeashellParameters.BLOCKY = new SeashellParameters({
   // Maroon
   pigment_color: [0x88, 0x16, 0x00], 
 });
+
+SeashellParameters.WAVY_STRIPES = new SeashellParameters({
+  iters_per_update: 15,
+  initial_catalysis: 0.01,
+  activator_diffusion: 0.1,
+  activator_decay: 0.01,
+  inhibitor_production: 0.1,
+  inhibitor_diffusion: 0.3,
+  inhibitor_decay: 0.05,
+  inhibitor_constant: 0.01,
+  hormone_production: 0.05,
+  hormone_decay: 0.01,
+  // navy
+  substrate_color: [20, 33, 61],
+  // gold
+  pigment_color: [252, 163, 17]
+});
