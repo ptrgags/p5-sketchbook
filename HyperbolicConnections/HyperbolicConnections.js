@@ -1,18 +1,18 @@
 // Need 2 for a stereographic projection, but this sketch
 // will generate more for you if you want.
-const IMAGE_COUNT = 4;
+const IMAGE_COUNT = 2;
 
 // Images are square IMAGE_SIZE x IMAGE_SIZE
 const IMAGE_SIZE = 512;
 
 // How many pairs of boundary points around the edge of the circle
-const PAIR_COUNT = 50;
+const PAIR_COUNT = 40;
 
 // The boundary pattern is generated randomly in chunks of the same
 // color. This is the largest number of boundary point pairs generated
 // in a single chunk. Smaller means more color variation but less shape
 // variation. Larger means more shape variation but less color variation.
-const MAX_CHUNK_LENGTH = 9;
+const MAX_CHUNK_LENGTH = 8;
 
 // Choose your colors
 // desert
@@ -21,14 +21,13 @@ const MAX_CHUNK_LENGTH = 9;
 //const PALETTE = new Palette("https://coolors.co/f94144-f3722c-f8961e-f9844a-f9c74f-90be6d-43aa8b-4d908e-577590-277da1");
 // nautical
 //const PALETTE = new Palette("https://coolors.co/0081a7-00afb9-fdfcdc-fed9b7-f07167");
-
 // Simple - black, red & white
 //const PALETTE = new Palette("https://coolors.co/000000-ff0000-ffffff");
-
+// lemon-lime
 //const PALETTE = new Palette("https://coolors.co/007f5f-2b9348-55a630-80b918-aacc00-bfd200-d4d700-dddf00-eeef20-ffff3f")
-
-//const PALETTE = new Palette("https://coolors.co/000000-7400b8-6930c3-5e60ce-5390d9-4ea8de-48bfe3-56cfe1-64dfdf-72efdd-80ffdb");
-
+// blues
+const PALETTE = new Palette("https://coolors.co/000000-7400b8-6930c3-5e60ce-5390d9-4ea8de-48bfe3-56cfe1-64dfdf-72efdd-80ffdb");
+// maroon and blue
 //const PALETTE = new Palette("https://coolors.co/780000-c1121f-fdf0d5-003049-669bbc");
 
 // Elephant-like
@@ -38,7 +37,7 @@ const MAX_CHUNK_LENGTH = 9;
 //const PALETTE = new Palette("https://coolors.co/49306b-635380-90708c-ace4aa-e1cdb5");
 
 // Pistachio
-const PALETTE = new Palette("https://coolors.co/c9cba3-ffe1a8-e26d5c-723d46-472d30");
+//const PALETTE = new Palette("https://coolors.co/c9cba3-ffe1a8-e26d5c-723d46-472d30");
 
 function make_sketch(sketch_index, boundary, hemisphere) {
   return (p5) => {
