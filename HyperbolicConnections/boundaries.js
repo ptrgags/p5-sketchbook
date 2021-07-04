@@ -242,7 +242,7 @@ class Boundary {
       const chunk_length = rand_int(1, max_length + 1);
       const color_index = rand_int(0, palette.colors.length);
       const chunk_color = palette.colors[color_index];
-      const insert_index = rand_int(0, boundaries[0].length);
+      const insert_index = 2 * rand_int(0, boundaries[0].length / 2);
       for (let i = 0; i < boundary_count; i++) {
         const chunk = this.generate_boundary_chunk(chunk_length, chunk_color, color_index);
         boundaries[i].insert_chunk(insert_index, chunk);
