@@ -20,10 +20,10 @@ const MAX_CHUNK_LENGTH = 3;
 // rainbow
 //const PALETTE = new Palette("https://coolors.co/f94144-f3722c-f8961e-f9844a-f9c74f-90be6d-43aa8b-4d908e-577590-277da1");
 // nautical
-//const PALETTE = new Palette("https://coolors.co/0081a7-00afb9-fdfcdc-fed9b7-f07167");
+const PALETTE = new Palette("https://coolors.co/0081a7-00afb9-fdfcdc-fed9b7-f07167");
 
 // Simple - black, red & white
-const PALETTE = new Palette("https://coolors.co/000000-ff0000-ffffff");
+//const PALETTE = new Palette("https://coolors.co/000000-ff0000-ffffff");
 
 //const PALETTE = new Palette("https://coolors.co/007f5f-2b9348-55a630-80b918-aacc00-bfd200-d4d700-dddf00-eeef20-ffff3f");
 
