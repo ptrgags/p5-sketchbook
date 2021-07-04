@@ -1,3 +1,6 @@
+const PRIMITIVE_CIRCLE = 0.0;
+const PRIMITIVE_LINE = 1.0;
+
 const VERTEX_SHADER = `
 attribute vec3 aPosition;
 attribute vec2 aTexCoord;
@@ -13,9 +16,10 @@ void main() {
 `;
 
 const FRAGMENT_SHADER = (pair_count) => `
+#line 0
 #define PAIR_COUNT ${pair_count}
-#define CIRCLE 0.0
-#define LINE 1.0
+#define CIRCLE ${PRIMITIVE_CIRCLE.toFixed(1)}
+#define LINE ${PRIMITIVE_LINE.toFixed(1)}
 #define PI ${Math.PI}
 
 precision highp float;
@@ -33,6 +37,10 @@ uniform vec3 colors[PAIR_COUNT];
 uniform vec3 background_color;
 
 uniform vec2 mouse_uv;
+
+// +1 for north hemisphere or -1 for south hemisphere. This
+// is used to reverse twists for the southern hemisphere
+uniform float hemisphere;
 
 // [-1, 1] x [-1, 1]
 varying vec2 v_uv;
@@ -77,13 +85,13 @@ vec3 fill_circles(vec2 uv) {
     float outline = 0.0;
     if (primitive_type == CIRCLE) {
       mask = circle(uv, primitive.xy, primitive.z, interior);
-      outline = circle_outline(uv, primitive.xy, primitive.z);
+      //outline = circle_outline(uv, primitive.xy, primitive.z);
     } else {
       mask = half_plane(uv, primitive.xy);
-      outline = half_plane_outline(uv, primitive.xy);
+      //outline = half_plane_outline(uv, primitive.xy);
     }
     
-    float actual_mask = mix(outline, mask, should_fill);
+    //float actual_mask = mix(outline, mask, should_fill);
     vec3 circle_color = colors[i];
     vec3 fill_color = mix(background_color, circle_color, should_fill);
     color = mix(color, fill_color, mask);
@@ -107,7 +115,9 @@ vec2 to_rect(vec2 polar) {
 }
 
 vec2 twist(vec2 polar, float twist_amount) {
-  return vec2(polar.x, polar.y + twist_amount);
+  // for the southern hemisphere, reverse the twist direction so
+  // when projected to a sphere, the tangents at the edges match up.
+  return vec2(polar.x, polar.y + hemisphere * twist_amount);
 }
 
 vec2 radial_stretch(vec2 polar, float control_point) {
