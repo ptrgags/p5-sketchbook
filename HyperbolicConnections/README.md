@@ -22,7 +22,7 @@ in the code. At present, these settings are not exposed at runtime.
 
 This idea came from patterns I draw by hand like these:
 
-TODO: Diagram
+![Original Patterns](figures/original-patterns.png)
 
 These patterns work as long as there are an even number of boundary points,
 since you always connect two points at a time. When choosing connections,
@@ -30,7 +30,7 @@ you can only connect two boundary points if there are an even number
 of other boundary points in between, otherwise you make it impossible to
 finish the diagram without crossing lines:
 
-TODO: Diagram
+![Boundary Rules](figures/boundary-conditions.png)
 
 How would I make a digital version? Given that the shape of the boundary
 doesn't matter (just how many boundary points and how they're connected), 
@@ -39,7 +39,7 @@ with a circle that is orthogonal to the boundary. Another way to think about
 this is I'm drawing geodesics in the [Poincaré disk model](https://en.wikipedia.org/wiki/Poincar%C3%A9_disk_model) of the hyperbolic plane. That
 would look something like this:
 
-TODO: Diagram
+![Orthogonal Circles](figures/orthogonal-circles.png)
 
 From there, I just needed a way to randomly generate these circles.
 
@@ -47,10 +47,11 @@ From there, I just needed a way to randomly generate these circles.
 
 One observation is that the circle fill patterns act like pairs of balanced
 brackets when you walk around the boundary counterclockwise. 
-This even works with multiple colors, just treat each color like a different
-kind of bracket/brace/parenthesis.
+This even works with multiple colors, just treat each color as a different
+type of bracket/brace/parenthesis, or just color them differently like I did
+in this diagram:
 
-TODO: Diagram
+![Nested Brackets](figures/nested-brackets.png)
 
 ### Structure of the Strings
 
@@ -61,9 +62,11 @@ sure they line up at the equator. This requires:
 2. The colors must match up on the boundary.
 3. Colors should be filled the same way on both spheres.
 4. Wherever the pattern has lines that touch the boundary, the angle must be
-    reversed between northern and southern hemispheres.
+    reversed between northern and southern hemispheres. This way, when
+    unprojected back to the sphere, the curve is at least C1 continuous
+    at the equator:
 
-TODO: Diagram of point 4
+![Constraint 4](figures/angle-constraint.png)
 
 We need to adhere to these rules, but otherwise we want to make the patterns
 as varied as possible.
@@ -117,20 +120,42 @@ Pairs remaing:  5
 
 ## Computing Orthogonal Circles
 
-I didn't know how to compute orthogonal circles going into this. I found
-two ways:
+I didn't know how to compute orthogonal circles going through two of the
+boundary points. After some research and playing around on paper, I found not
+one but two ways, see the subsections below.
+
+Also note that if the two boundary parts are opposite
+each other on the circle, the "orthogonal circle" is
+the line connecting the two points. Think of it as a circle
+through infinity.
 
 ### Method 1: Intersect Tangents
 
-TODO: Explain
+The first method I had to look up. I found [This GeoGebra example](https://www.geogebra.org/m/S5xyRmtZ)
+that shows how this works. Essentially, make tangent lines through the two
+boundary points. The intersection of these will be the center of the circle.
+The distance from that to one of the boundary points will be the radius:
+
+![Tangent Method](figures/tangent-method.png)
 
 ### Method 2: Kite Analysis
 
-TODO: Explain
+While learning about the above, I realized that the geometry
+forms a kite shape with nice side lengths and angles. Since
+the main circle is the unit circle, two sides are length 1,
+two sides are the radius I'm trying to find, and
+two of the angles are 90 degrees! I looked up some math
+about kites and found [Two area formulas](https://en.wikipedia.org/wiki/Kite_(geometry)#Area). I used both here
+to derive another method for computing the orthogonal circles. It makes use of polar coordinates
 
-## Rendering
+Here's a diagram and derivation:
 
-TODO: Explain
+![Kite Method](figures/kite-method.png)
+
+This is the method I use in the code, and the derivation
+is also listed there in comments. I think this method is
+slightly less efficient, as it uses more trig functions,
+but it was nifty and it's fast enough for my use case.
 
 ## Beyond the Sketch
 
