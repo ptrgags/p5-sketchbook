@@ -141,7 +141,8 @@ void main() {
   // the images via image warping.
   float radius = 1.0 + 0.001;
   float interior = 1.0;
-  float unit_circle = circle(v_uv, vec2(0.0), radius, interior, 0.0025);
+  float feather_amount = 0.0025;
+  float unit_circle = circle(v_uv, vec2(0.0), radius, interior, feather_amount);
   color = mix(vec3(0.0), color, unit_circle);
   
   gl_FragColor = vec4(color, 1.0);
