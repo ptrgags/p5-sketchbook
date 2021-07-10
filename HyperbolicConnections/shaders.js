@@ -1,3 +1,6 @@
+const PRIMITIVE_CIRCLE = 0.0;
+const PRIMITIVE_LINE = 1.0;
+
 const VERTEX_SHADER = `
 attribute vec3 aPosition;
 attribute vec2 aTexCoord;
@@ -13,9 +16,10 @@ void main() {
 `;
 
 const FRAGMENT_SHADER = (pair_count) => `
+#line 0
 #define PAIR_COUNT ${pair_count}
-#define CIRCLE 0.0
-#define LINE 1.0
+#define CIRCLE ${PRIMITIVE_CIRCLE.toFixed(1)}
+#define LINE ${PRIMITIVE_LINE.toFixed(1)}
 #define PI ${Math.PI}
 
 precision highp float;
@@ -34,36 +38,31 @@ uniform vec3 background_color;
 
 uniform vec2 mouse_uv;
 
+// +1 for north hemisphere or -1 for south hemisphere. This
+// is used to reverse twists for the southern hemisphere
+uniform float hemisphere;
+
 // [-1, 1] x [-1, 1]
 varying vec2 v_uv;
 
-float circle(vec2 point, vec2 center, float radius, float interior) {
+float circle(vec2 point, vec2 center, float radius, float interior, float feather_amount) {
   float dist = length(point - center);
-  float mask = smoothstep(radius + 0.01, radius, dist);
+  
+  float mask = smoothstep(radius + feather_amount, radius - feather_amount, dist);
   
   return mix(1.0 - mask, mask, interior);
 }
 
-float circle_outline(vec2 point, vec2 center, float radius) {
-  float dist = length(point - center);
-  
-  float outer = smoothstep(radius + 0.01, radius, dist);
-  float inner = 1.0 - smoothstep(radius, radius - 0.01, dist);
-  return outer * inner;
-}
-
-float half_plane(vec2 point, vec2 normal) {
+float half_plane(vec2 point, vec2 normal, float feather_amount) {
   float dist = dot(point, normal);
-  return smoothstep(0.01, 0.0, dist);
-}
-
-float half_plane_outline(vec2 point, vec2 normal) {
-  float dist = abs(dot(point, normal));
-  return smoothstep(0.01, 0.0, dist);
+  return smoothstep(0.0 + feather_amount, 0.0 - feather_amount, dist);
 }
 
 vec3 fill_circles(vec2 uv) {
   vec3 color = background_color;
+  
+  const float CIRCLE_FEATHER_AMOUNT = 0.0025;
+  const float LINE_FEATHER_AMOUNT = 0.01;
   
   for (int i = 0; i < PAIR_COUNT; i++) {
     vec4 primitive = primitives[i];
@@ -75,15 +74,13 @@ vec3 fill_circles(vec2 uv) {
     float primitive_type = primitive.a;
     float mask = 0.0;
     float outline = 0.0;
+    float feather_amount = 0.0;
     if (primitive_type == CIRCLE) {
-      mask = circle(uv, primitive.xy, primitive.z, interior);
-      outline = circle_outline(uv, primitive.xy, primitive.z);
+      mask = circle(uv, primitive.xy, primitive.z, interior, CIRCLE_FEATHER_AMOUNT);
     } else {
-      mask = half_plane(uv, primitive.xy);
-      outline = half_plane_outline(uv, primitive.xy);
+      mask = half_plane(uv, primitive.xy, LINE_FEATHER_AMOUNT);
     }
     
-    float actual_mask = mix(outline, mask, should_fill);
     vec3 circle_color = colors[i];
     vec3 fill_color = mix(background_color, circle_color, should_fill);
     color = mix(color, fill_color, mask);
@@ -107,7 +104,9 @@ vec2 to_rect(vec2 polar) {
 }
 
 vec2 twist(vec2 polar, float twist_amount) {
-  return vec2(polar.x, polar.y + twist_amount);
+  // for the southern hemisphere, reverse the twist direction so
+  // when projected to a sphere, the tangents at the edges match up.
+  return vec2(polar.x, polar.y + hemisphere * twist_amount);
 }
 
 vec2 radial_stretch(vec2 polar, float control_point) {
@@ -138,7 +137,12 @@ void main() {
   vec3 color = fill_circles(pos);
   
   // only show the unit circle
-  float unit_circle = circle(v_uv, vec2(0.0), 1.0, 1.0);
+  // A tiny bit bigger to reduce the background bleeding when I post-process
+  // the images via image warping.
+  float radius = 1.0 + 0.001;
+  float interior = 1.0;
+  float feather_amount = 0.0025;
+  float unit_circle = circle(v_uv, vec2(0.0), radius, interior, feather_amount);
   color = mix(vec3(0.0), color, unit_circle);
   
   gl_FragColor = vec4(color, 1.0);

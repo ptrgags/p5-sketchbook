@@ -1,285 +1,106 @@
-const BOUNDARY_START = 'START';
-const BOUNDARY_END = 'END';
-const SIZE = 512;
-const PAIR_COUNT = 50;
+// Need 2 for a stereographic projection, but this sketch
+// will generate more for you if you want.
+const IMAGE_COUNT = 2;
 
-function rgb8(r, g, b) {
-  return [r / 255, g / 255, b / 255];
-}
+// Images are square IMAGE_SIZE x IMAGE_SIZE
+const IMAGE_SIZE = 512;
 
-// palette from coolors.co: https://coolors.co/5f0f40-9a031e-fb8b24-e36414-0f4c5c
-const BACKGROUND_COLOR = rgb8(15, 76, 92);
-const COLORS = [  
-  rgb8(95, 15, 64),
-  rgb8(154, 3, 30),
-  rgb8(251, 139, 36),
-  rgb8(227, 100, 20)
-];
+// How many pairs of boundary points around the edge of the circle
+const PAIR_COUNT = 40;
 
-class Boundary {
-  constructor(type) {
-    this.type = type;
-    this.index = undefined;
-    this.angle = undefined;
-    this.point = undefined;
-    this.fill = undefined;
-    this.pair = undefined;
-    this.color = undefined;
-    this.label = undefined;
-  }
-}
+// The boundary pattern is generated randomly in chunks of the same
+// color. This is the largest number of boundary point pairs generated
+// in a single chunk. Smaller means more color variation but less shape
+// variation. Larger means more shape variation but less color variation.
+const MAX_CHUNK_LENGTH = 8;
 
-function rand_int(max) {
-  return floor(random() * max);
-}
+// Choose your colors
+// desert
+//const PALETTE = new Palette("https://coolors.co/5f0f40-9a031e-fb8b24-e36414-0f4c5c");
+// rainbow
+//const PALETTE = new Palette("https://coolors.co/f94144-f3722c-f8961e-f9844a-f9c74f-90be6d-43aa8b-4d908e-577590-277da1");
+// nautical
+//const PALETTE = new Palette("https://coolors.co/0081a7-00afb9-fdfcdc-fed9b7-f07167");
+// Simple - black, red & white
+//const PALETTE = new Palette("https://coolors.co/000000-ff0000-ffffff");
+// lemon-lime
+//const PALETTE = new Palette("https://coolors.co/007f5f-2b9348-55a630-80b918-aacc00-bfd200-d4d700-dddf00-eeef20-ffff3f")
+// blues
+const PALETTE = new Palette("https://coolors.co/000000-7400b8-6930c3-5e60ce-5390d9-4ea8de-48bfe3-56cfe1-64dfdf-72efdd-80ffdb");
+// maroon and blue
+//const PALETTE = new Palette("https://coolors.co/780000-c1121f-fdf0d5-003049-669bbc");
 
-function make_connection_string(pairCount) {
-  let connection_string = [];
-  for (var i = 0; i < pairCount; i++) {
-    const index = rand_int(connection_string.length);
+// Elephant-like
+//const PALETTE = new Palette("https://coolors.co/093824-ee6055-2f0a28-aaf683-565961-093824");
+
+// Purples
+//const PALETTE = new Palette("https://coolors.co/49306b-635380-90708c-ace4aa-e1cdb5");
+
+// Pistachio
+//const PALETTE = new Palette("https://coolors.co/c9cba3-ffe1a8-e26d5c-723d46-472d30");
+
+function make_sketch(sketch_index, boundary, hemisphere) {
+  return (p5) => {
+    let poincare_shader;
     
-    const start = new Boundary(BOUNDARY_START);
-    const end = new Boundary(BOUNDARY_END);
-    start.pair = end;
-    end.pair = start;
-    
-    const color_index = rand_int(COLORS.length);
-    const pair_color = COLORS[color_index];
-    start.color = pair_color;
-    end.color = pair_color;
-    const LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-    const label = LABELS[color_index % LABELS.length];
-    start.label = label;
-    end.label = label;
-    
-    connection_string.splice(
-      index,
-      0,
-      start,
-      end
-    );
-  }
-  
-  return connection_string;
-}
-
-function print_connection_string(connection_string) {
-  let brackets = '';
-  let fill = '';
-  let labels = '';
-  for (const boundary of connection_string) {
-    if (boundary.type === BOUNDARY_START) {
-      brackets += '[';
-    } else {
-      brackets += ']';
+    function set_uniforms(geometry) {
+      const primitive_buffer = [];
+      const fill_buffer = [];
+      const color_buffer = [];
+      
+      for (let i = 0; i < PAIR_COUNT; i++) {
+        const geom = geometry[i];
+        primitive_buffer.push(...geom.primitive);
+        fill_buffer.push(...geom.fill);
+        color_buffer.push(...geom.color);
+      }
+      
+      poincare_shader.setUniform('mouse_uv', [0.0, 0.0]);
+      poincare_shader.setUniform('primitives', primitive_buffer);
+      poincare_shader.setUniform('fill_flags', fill_buffer);
+      poincare_shader.setUniform('colors', color_buffer);
+      poincare_shader.setUniform('hemisphere', hemisphere);
+      poincare_shader.setUniform('background_color', PALETTE.background_color);
     }
     
-    fill += (boundary.fill && boundary.type === BOUNDARY_START) ? '.' : ' ';
-    labels += boundary.label;
-  }
-  console.log(`${brackets}\n${fill}\n${labels}`);
-}
-
-function compute_fill(connection_string) {
-  const fill_stack = [true];
-  
-  for (var i = 0; i < connection_string.length; i++) {
-    const boundary = connection_string[i];
-    boundary.fill = fill_stack[fill_stack.length - 1];
-    
-    const next_boundary = connection_string[(i + 1) % connection_string.length];
-    const colors_match = boundary.label === next_boundary.label;
-    
-    if (next_boundary.type === BOUNDARY_START) {
-      const fill = colors_match ? !boundary.fill : true;
-      fill_stack.push(fill);
-    } else {
-      fill_stack.pop();
-    }
-  }
-}
-
-function label_connections(connection_string) {
-  const connectionCount = connection_string.length;
-  for (const [i, boundary] of connection_string.entries()) {
-    // for monochrome images, the fill is a simple odd/even coloring.
-    //boundary.fill = i % 2 == 0;
-    
-    const angle = i / connectionCount * TWO_PI;
-    boundary.index = i;
-    boundary.angle = angle;
-    boundary.point = [cos(angle), sin(angle)];
-  }
-}
-
-const PRIMITIVE_CIRCLE = 0.0;
-const PRIMITIVE_LINE = 1.0;
-
-// compute a circle orthogonal to the unit circle that goes through
-// a pair of boundary points. Only the start point is needed.
-// If the points are on opposite sides of the circle, a line is returned
-// instead of a circle.
-function orthogonal_circle(boundary_start) {
-  const boundary_end = boundary_start.pair;
-  
-  const index_diff = (boundary_end.index - boundary_start.index) % (2 * PAIR_COUNT);
-  if (index_diff === PAIR_COUNT) {
-    // compute the tangent direction
-    const [x1, y1] = boundary_start.point;
-    const [x2, y2] = boundary_end.point;
-    const diff_x = x2 - x1;
-    const diff_y = y2 - y1;
-    const diff_length = sqrt(diff_x * diff_x + diff_y * diff_y);
-    const tx = diff_x / diff_length;
-    const ty = diff_y / diff_length;
-    
-    // rotate the tangent vector 90 degrees 
-    const [nx, ny] = [-ty, tx];
-    
-    // the diameter goes through the origin, so we always have a line of the form
-    // nx x + ny y = 0
-    const n_dot_p1 = 0.0;
-    
-    return {
-      primitive: [nx, ny, n_dot_p1, PRIMITIVE_LINE],
-      fill: [boundary_start.fill, true],
-      color: boundary_start.color,
+    p5.setup = () => {
+      boundary.label_points();
+      const geometry = boundary.compute_geometry();
+      
+      console.log("Making sketch for boundary", sketch_index);
+      boundary.print();
+      
+      p5.createCanvas(IMAGE_SIZE, IMAGE_SIZE, p5.WEBGL);
+      poincare_shader = p5.createShader(VERTEX_SHADER, FRAGMENT_SHADER(PAIR_COUNT));
+      p5.shader(poincare_shader);
+      set_uniforms(geometry);
     };
-  }
-  
-  // if we take the two boundary points as vectors from the origin, what is the
-  // angle of the bisectors? the center of the new circle will be in this direction
-  let angle_bisector = (boundary_start.angle + boundary_end.angle) / 2;
-  
-  let interior = true;
-  
-  // there are two possible bisectors on a circle. We want the one 
-  // through the smaller interval.
-  if ((boundary_end.angle - boundary_start.angle) % TWO_PI > PI) {
-    angle_bisector += PI;
-    angle_bisector %= TWO_PI;
-    interior = false;
-  }
-  
-  const [ax, ay] = boundary_start.point;
-  const [bx, by] = boundary_end.point;
-  
-  // compute the cross diagonal length
-  const dx = bx - ax;
-  const dy = by - ay;
-  const cross_diag_squared = dx * dx + dy * dy;
-  const cross_diag = sqrt(cross_diag_squared);
-  
-  // compute the distance of the orthogonal circle from the origin.
-  // and its radius
-  // We have a kite formed by:
-  // - The origin O
-  // - One of the boundary points A
-  // - The center of the orthogonal circle C
-  // - The other boundary point B
-  //
-  // Notice:
-  // - |OA| = |OB| = 1 since the boundary points are unit length
-  // - |AC| = |CB| = r the radius of the orthogonal circle
-  // - angle OAC and angle CBA are both 90 degrees since an orthogonal
-  //   circle intersects the unit circle at 90 degrees
-  //
-  // The area of a kite has a couple forms. Here we care about two of them:
-  // - A = a * b * sin(theta) where a and b are the two side lengths and theta
-  //   is the angle between them
-  // - A = (p * q) / 2 where p and q are the two diagonals
-  //
-  // In our case: 
-  // - a = |OA| = 1
-  // - b = |AC| = r
-  // - theta = angle OAC = pi / 2
-  // - p = |OC| = diag  -- the main diagonal
-  // - q = |AB| = cross_diag -- the cross diagonal
-  //
-  // a * b * sin(theta) = (p * q) / 2
-  // 1 * r * sin(pi / 2) = diag * cross_diag / 2
-  // r = diag * cross_diag / 2
-  //
-  // but also we have a right triangle formed by OA, AC, OC so:
-  // 1^2 + r^2 = diag^2
-  // 1 + ((diag * cross_diag) / 2)^2 = diag^2
-  // 1 + (diag^2 * cross_diag^2) / 4 = diag^2
-  // 4 + diag^2 * cross_diag^2 = 4 * diag^2
-  // 4 = (4 - cross_diag^2) * diag^2
-  // 4 / (4 - cross_diag^2) = diag^2
-  // sqrt(4 / (4 - cross_diag^2)) = diag
-  //
-  // diag is the radial coordinate of the circle center, whereas the
-  // angle bisector computed above is the aziumuthal coordinate.
-  // r is the radius of the circle.
-  const diag = sqrt(4 / (4 - cross_diag_squared));
-  const radius = (diag * cross_diag) / 2;
-  
-  // compute the circle center in rectangular coordinates
-  const cx = diag * cos(angle_bisector);
-  const cy = diag * sin(angle_bisector);
-  
-  return {
-    primitive: [cx, cy, radius, PRIMITIVE_CIRCLE], 
-    fill: [boundary_start.fill, interior],
-    color: boundary_start.color
+    
+    p5.draw = () => {
+      p5.background(128);
+      p5.shader(poincare_shader);
+      p5.quad(-1, -1, 1, -1, 1, 1, -1, 1);
+    };
+    
+    p5.mouseDragged = () => {
+      // TODO: This doesn't work well for multiple sketches, I'll need to find something else
+      //poincare_shader.setUniform('mouse_uv', [p5.mouseX / (p5.width - 1), p5.mouseY / (p5.height - 1)]);
+    };
   };
 }
 
-function compute_geometry(connection_string) {
-  const geometry = [];
-  for (const boundary of connection_string) {
-    if (boundary.type === BOUNDARY_START) {
-      // usually a circle, but if the boundary points are opposite
-      // this is a circle.
-      const cline = orthogonal_circle(boundary);
-      geometry.push(cline);
-    }
-  }
-  return geometry;
-}
+// The circle boundaries must all be generated together to ensure they have the same
+// pattern around the unit circle.
+const boundaries = Boundary.generate_multiple(PAIR_COUNT, IMAGE_COUNT, PALETTE, MAX_CHUNK_LENGTH);
+const sketches = new Array(IMAGE_COUNT);
+const NORTH_HEMISPHERE = +1;
+const SOUTH_HEMISPHERE = -1;
 
-function set_uniforms(shader, geometry) {
-  const primitive_buffer = [];
-  const fill_buffer = [];
-  const color_buffer = [];
-  
-  for (let i = 0; i < PAIR_COUNT; i++) {
-    const geom = geometry[i];
-    primitive_buffer.push(...geom.primitive);
-    fill_buffer.push(...geom.fill);
-    color_buffer.push(...geom.color);
-  }
-  
-  shader.setUniform('mouse_uv', [0.0, 0.0]);
-  shader.setUniform('primitives', primitive_buffer);
-  shader.setUniform('fill_flags', fill_buffer);
-  shader.setUniform('colors', color_buffer);
-  shader.setUniform('background_color', BACKGROUND_COLOR);
-}
-
-let geometry;
-let connection_string;
-let poincare_shader;
-function setup() {
-  const connection_string = make_connection_string(PAIR_COUNT);
-  label_connections(connection_string);
-  compute_fill(connection_string);
-  print_connection_string(connection_string);
-  const geometry = compute_geometry(connection_string);
-  createCanvas(SIZE, SIZE, WEBGL);
-  
-  poincare_shader = createShader(VERTEX_SHADER, FRAGMENT_SHADER(PAIR_COUNT));
-  shader(poincare_shader);
-  set_uniforms(poincare_shader, geometry);
-}
-
-function draw() {
-  background(128);
-  shader(poincare_shader);
-  quad(-1, -1, 1, -1, 1, 1, -1, 1);
-}
-
-function mouseDragged() {
-  poincare_shader.setUniform('mouse_uv', [mouseX / (width - 1), mouseY / (height - 1)]);
+for (const [i, boundary] of boundaries.entries()) {
+  // Alternate between northern and southern hemisphere. This is used to
+  // reverse any twisting distortion so we get a smooth boundary if used
+  // as a stereographic projection
+  const hemisphere = i % 2 == 0 ? NORTH_HEMISPHERE : SOUTH_HEMISPHERE;
+  const sketch = make_sketch(i, boundary, hemisphere);
+  sketches.push(new p5(sketch));
 }
