@@ -40,3 +40,15 @@ the following:
 
 * Moved parameters to a simple struct, similar to what I did with the
     [SeashellTexture sketch](../SeashellTexture/).
+* Added Web Gamepad API support so I can adjust the curvature manually
+
+This was the first time I used the [Web Gamepad API](https://developer.mozilla.org/en-US/docs/Web/API/Gamepad_API/Using_the_Gamepad_API)
+It proved pretty easy to set up, though one thing that the MSN docs don't
+explain well is that the Gamepad objects are created every frame, not updated
+in place, so using `naviagtor.getGamepads()[i]` is important in the update
+loop.
+
+Next Steps:
+* Modify the gamepad controls to adjust the curve speed
+    (perhaps with the A button?) and/or the maximum curvature (right stick?)
+* Create a README

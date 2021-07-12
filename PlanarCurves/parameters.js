@@ -13,9 +13,13 @@ class Parameters {
     
     this.initial_position = options.initial_position || [0, 0];
     this.initial_angle = options.initial_angle || 0;
-    this.max_points_per_curve = options.max_points_per_curve || 5000;
+    
+    const max_points = options.max_points_per_curve || 5000;
+    this.max_points_per_curve = max_points;
+    this.limit_curve_length = max_points > 0; 
+    
     this.curvature_func = options.curvature_func || random_walk_curvature;
-    this.curvature_amplitude = options.curvature_func || 1;
+    this.curvature_amplitude = options.curvature_amplitude || 1;
     this.delta_arc_length = options.delta_arc_length || 0.5;
     this.iters_per_update = options.iters_per_update || 10;
   }
@@ -25,4 +29,16 @@ Parameters.RANDOM_WALK = new Parameters({
   coolors_url: "https://coolors.co/b7094c-a01a58-892b64-723c70-5c4d7d-455e89-2e6f95-1780a1-0091ad",  
   position_variation: [0, 5],
   angle_variation: Math.PI / 8,
+  curvature_func: random_walk_curvature
+});
+
+Parameters.GAMEPAD = new Parameters({
+  coolors_url: "https://coolors.co/ca7df9-9e65f9-724cf9-3980e9-00b4d8-48cae4-90e0ef",
+  position_variation: [3, 5],
+  initial_angle: Math.PI / 2,
+  angle_variation: Math.PI / 24,
+  curvature_func: gamepad_curvature,
+  curvature_amplitude: 0.01,
+  iters_per_update: 5,
+  max_points_per_curve: -1
 });

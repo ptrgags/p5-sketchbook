@@ -1,6 +1,7 @@
-const PARAMETERS = Parameters.RANDOM_WALK;
+const PARAMETERS = Parameters.GAMEPAD;
 
 const CURVES = new Array(PARAMETERS.num_curves);
+const GAMEPAD = new GamepadAxisControls();
 
 class PlanarCurve {
   constructor(initial_position, initial_angle, line_color, curvature_func) {
@@ -23,7 +24,7 @@ class PlanarCurve {
   }
   
   update(delta_s) {
-    const curvature = this.curvature_func(this.arc_length);
+    const curvature = PARAMETERS.curvature_amplitude * this.curvature_func(this.arc_length);
     const delta_angle = curvature * delta_s;
     const tangent_x = cos(this.angle);
     const tangent_y = sin(this.angle);
@@ -36,7 +37,7 @@ class PlanarCurve {
     this.angle += delta_angle;
     this.arc_length += delta_s;
     
-    if (this.positions.length > PARAMETERS.max_points_per_curve) {
+    if (PARAMETERS.limit_curve_length && this.positions.length > PARAMETERS.max_points_per_curve) {
       this.positions.shift();
     }
   }
@@ -70,4 +71,6 @@ function draw() {
       curve.update(PARAMETERS.delta_arc_length);
     }
   }
+  
+  GAMEPAD.update();
 }
