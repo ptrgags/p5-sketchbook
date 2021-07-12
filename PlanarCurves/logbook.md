@@ -32,3 +32,11 @@ Next Steps:
   * normal curve or other impulse-like function?
   * Tap into the gamepad API to adjust the curvature in real-time?
   * Try the self-avoiding walk (perhaps in a separate sketch?)
+
+## 2021-07-12 Clean up Sketch
+
+Today I want to clean up the sketch to move on to something else. I did
+the following:
+
+* Moved parameters to a simple struct, similar to what I did with the
+    [SeashellTexture sketch](../SeashellTexture/).
