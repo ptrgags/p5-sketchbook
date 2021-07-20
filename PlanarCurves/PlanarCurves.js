@@ -1,8 +1,11 @@
-const PARAMETERS = Parameters.POINTER;
+const PARAMETERS = Parameters.RANDOM_WALK;
 
 const CURVES = new Array(PARAMETERS.num_curves);
 const GAMEPAD = new GamepadAxisControls();
 let pointer;
+
+const midi_enabled = PARAMETERS === Parameters.MIDI;
+const MIDI = new MidiControls(midi_enabled);
 
 class PlanarCurve {
   constructor(initial_position, initial_angle, line_color, curvature_func) {

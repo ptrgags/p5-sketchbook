@@ -39,3 +39,9 @@ function pointer_curvature(s) {
   //const sign = Math.sign(x);
   return x;
 }
+
+function midi_curvature(s) {
+  const normalized = MIDI.cc_value / 127;
+  const signed = 2 * normalized - 1;
+  return signed;
+}

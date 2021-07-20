@@ -51,3 +51,12 @@ Parameters.POINTER = new Parameters({
   angle_variation: Math.PI / 24,
   max_points_per_curve: 10000
 });
+
+Parameters.MIDI = new Parameters({
+  coolors_url: "https://coolors.co/004b23-006400-007200-008000-38b000-70e000-9ef01a-ccff33",
+  curvature_func: midi_curvature,
+  curvature_amplitude: 0.1,
+  iters_per_update: 4,
+  angle_variation: Math.PI / 24,
+  max_points_per_curve: 5000
+});

@@ -52,3 +52,25 @@ Next Steps:
 * Modify the gamepad controls to adjust the curve speed
     (perhaps with the A button?) and/or the maximum curvature (right stick?)
 * Create a README
+
+## 2021-07-20 More Input types
+
+Today I tried two more input experiments:
+
+* Use the [Pointer Events API](https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events)
+    to use my graphics tablet tilt to control the curvature.
+* Use the [Web MIDI API](https://developer.mozilla.org/en-US/docs/Web/API/Web_MIDI_API)
+    to use a MIDI CC event to control the curvature
+
+Both were pretty easy to set up. The MIDI control knob was a little more
+ergonomic than the pen control. Though I still like the gamepad controls best
+since it's easier to change the curvature suddenly.
+
+The idea for the graphics tablet came after reading a 2021 Bridges conference
+paper about [Real-time Ornamental Calligraphic Pens](http://archive.bridgesmathart.org/2021/bridges2021-141.pdf).
+It mentioned digital pens and styli, that made me wonder if this is supported
+in the browser, and it is!
+
+Next Steps:
+
+* Create a README
