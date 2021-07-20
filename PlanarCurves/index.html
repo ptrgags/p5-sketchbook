@@ -9,12 +9,22 @@
   <script language="javascript" type="text/javascript" src="gamepad.js"></script>
   <script language="javascript" type="text/javascript" src="palette.js"></script>
   <script language="javascript" type="text/javascript" src="parameters.js"></script>
+  <script language="javascript" type="text/javascript" src="pointer.js"></script>
   <script language="javascript" type="text/javascript" src="PlanarCurves.js"></script>
   <!-- OK, YOU CAN MAKE CHANGES BELOW THIS LINE AGAIN -->
 
   <!-- This line removes any default padding and style.
        You might only need one of these values set. -->
-  <style> body { padding: 0; margin: 0; } </style>
+  <style> 
+    body { 
+      padding: 0; 
+      margin: 0; 
+    }
+    
+    #target {
+      touch-action: none;
+    }
+  </style>
 </head>
 
 <body>

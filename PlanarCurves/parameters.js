@@ -42,3 +42,12 @@ Parameters.GAMEPAD = new Parameters({
   iters_per_update: 5,
   max_points_per_curve: -1
 });
+
+Parameters.POINTER = new Parameters({
+  coolors_url: "https://coolors.co/540d6e-ee4266-ffd23f-3bceac-0ead69",
+  curvature_func: pointer_curvature,
+  curvature_amplitude: 0.2,
+  iters_per_update: 2,
+  angle_variation: Math.PI / 24,
+  max_points_per_curve: 10000
+});

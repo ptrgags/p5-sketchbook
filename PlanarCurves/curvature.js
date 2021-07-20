@@ -32,3 +32,10 @@ function gamepad_curvature(s) {
   //const right_stick = GAMEPAD.axes[RIGHT_STICK_Y];
   return left_stick;
 }
+
+function pointer_curvature(s) {
+  //const magnitude = pointer.pressure;
+  const [x, y] = pointer.tilt_direction;
+  //const sign = Math.sign(x);
+  return x;
+}

@@ -1,7 +1,8 @@
-const PARAMETERS = Parameters.GAMEPAD;
+const PARAMETERS = Parameters.POINTER;
 
 const CURVES = new Array(PARAMETERS.num_curves);
 const GAMEPAD = new GamepadAxisControls();
+let pointer;
 
 class PlanarCurve {
   constructor(initial_position, initial_angle, line_color, curvature_func) {
@@ -54,7 +55,8 @@ function init_curves() {
 }
 
 function setup() {
-  createCanvas(500, 700);
+  const canvas = createCanvas(500, 700);
+  pointer = new PointerControls(canvas);
   init_curves();
 }
 
