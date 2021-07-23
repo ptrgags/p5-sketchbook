@@ -63,7 +63,7 @@ class Quadtree {
     
     // Move all points from this node to the children
     for (const point of this.points) {
-      const quadrant = this.bounds.get_quadrant(point);
+      const quadrant = this.bounds.get_quadrant(point.position);
       this.children[quadrant].insert_point(point);
     }
     this.points = [];
@@ -79,23 +79,22 @@ class Quadtree {
     }
     
     let empty_count = 0;
-    const dirty_lists = [];
+    const child_dirty_list = [];
     for (const child of this.children) {
       const child_dirty_points = child.redistribute_dirty_points();
-      dirty_lists.push(child_dirty_points);
+      child_dirty_list.push(...child_dirty_points);
       
       if (child.is_empty) {
         empty_count++;
       }
     }
     
-    const child_dirty_list = [].concat(dirty_lists);
     const outside_parent_list = [];
-    for (const point of dirty_list) {
+    for (const point of child_dirty_list) {
       if (this.bounds.contains(point.position)) {
         // point moved from one child to another,
         // redistribute the point.
-        point.dirty = false;
+        point.is_dirty = false;
         this.insert_point(point);
       } else {
         // Point moved outside the parent, propagate
@@ -117,22 +116,22 @@ class Quadtree {
   circle_query(circle) {
     const square = circle.get_bounding_square();
     const points = this.rectangle_query(square);
-    return points.filter((p) => circle.contains(p));
+    return points.filter((p) => circle.contains(p.position));
   }
   
   rectangle_query(rectangle) {
     if (this.is_leaf) {
-      return this.points.filter((p) => rectangle.contains(p));
+      return this.points.filter((p) => rectangle.contains(p.position));
     }
     
     const child_points = [];
     for (const child of this.children) {
       if (rectangle.intersects(child.bounds)) {
         const quadrant_points = child.rectangle_query(rectangle);
-        child_points.push(quadrant_points);
+        child_points.push(...quadrant_points);
       }
     }
-    return [].concat(child_points);
+    return child_points;
   }
   
   // for debugging

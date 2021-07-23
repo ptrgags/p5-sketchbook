@@ -40,12 +40,12 @@ class DifferentialNode {
   
   clamp_to(rectangle) {
     const position = this.position;
-    position.x = clamp(position.x, rectangle.left, rectangle.right);
-    position.y = clamp(position.y, rectangle.top, rectangle.bottom);
+    position.x = clamp(position.x, rectangle.left, rectangle.right - 1);
+    position.y = clamp(position.y, rectangle.top, rectangle.bottom - 1);
   }
   
   check_if_dirty() {
-    if (!this.quadtree_node.bounds.contains(this)) {
+    if (!this.quadtree_node.bounds.contains(this.position)) {
       this.is_dirty = true;
     }
   }
@@ -56,9 +56,24 @@ class DifferentialNode {
   
   // for debugging
   draw() {
-    strokeWeight(3);
+    const position = this.position;
+    const velocity = this.velocity;
+    const acceleration = this.acceleration;
+    
     noFill();
+    strokeWeight(3);
+    
+    // draw the radius of determining nearby points
+    //stroke(255);
+    //circle(position.x, position.y, 2 * NEARBY_RADIUS);
+    
+    // position vectors
+    stroke(255, 0, 0);
+    line(position.x, position.y, position.x + velocity.x, position.y + velocity.y);
+    stroke(0, 255, 0);
+    line(position.x, position.y, position.x + acceleration.x, position.y + acceleration.y);
+    
     stroke(255, 127, 0);
-    point(this.x, this.y);
+    point(position.x, position.y);
   }
 }

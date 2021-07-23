@@ -1,13 +1,15 @@
 // Attraction between neighboring points is modeled like springs.
-const SPRING_STIFFNESS = 0.1;
-const SPRING_REST_LENGTH = 50;
+const SPRING_STIFFNESS = 0.005;
+const SPRING_REST_LENGTH = 100;
 
 // Radius of points to check when computing repulsion
-const NEARBY_RADIUS = 50;
+const REPULSION_AMOUNT = 1e4;
+const NEARBY_RADIUS = 100;
 
 // Temporary accumulators since vectors are added in-place
 const TEMP_TOTAL_FORCE = new Vector2(0, 0);
 const TEMP_ATTRACTION = new Vector2(0, 0);
+const TEMP_REPULSION = new Vector2(0, 0);
 
 class DifferentialPolyline {
   constructor(positions_array, quadtree) {
@@ -24,6 +26,22 @@ class DifferentialPolyline {
     for (const node of this.nodes) {
       this.quadtree.insert_point(node);
     }
+  }
+  
+  add_point(index) {
+    if (index >= this.nodes.length - 1) {
+      throw new Error("OUT OF BOUNDS");
+    }
+    const before = this.nodes[index];
+    const after = this.nodes[index + 1];
+    const midpoint = new Vector2(0, 0);
+    midpoint.clone_from(before.position);
+    midpoint.add(after.position);
+    midpoint.scale(0.5);
+    
+    const point = new DifferentialNode(midpoint);
+    this.nodes.splice(index + 1, 0, point);
+    this.quadtree.insert_point(point);
   }
   
   compute_attraction(total_force, node, neighbor_index) {
@@ -47,8 +65,6 @@ class DifferentialPolyline {
     // where k is the spring constant (SPRING_STIFFNESS)
     // and x is the displacement from the rest length:
     // x = (|r| - rest_length) r_dir;
-    //
-    // TEMP
     const spring_displacement = distance - SPRING_REST_LENGTH;
     TEMP_ATTRACTION.scale(-SPRING_STIFFNESS * spring_displacement);
     
@@ -64,12 +80,19 @@ class DifferentialPolyline {
     // F = (k / |r|^2) r_dir
     //   = (k / |r|^3) r
     for (const nearby_point of nearby_points) {
+      if (nearby_point === node) {
+        continue;
+      }
       // compute the displacement r from nearby_point -> point
       TEMP_REPULSION.clone_from(node.position);
       TEMP_REPULSION.sub(nearby_point.position);
       
       // compute the force 
       const distance = TEMP_REPULSION.get_length();
+      if (distance === 0) {
+        throw new Error("DIVIDE BY ZERO");
+      }
+      
       const scalar = REPULSION_AMOUNT / (distance * distance * distance);
       TEMP_REPULSION.scale(scalar);
       

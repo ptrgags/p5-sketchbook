@@ -13,8 +13,10 @@ class Rectangle {
   }
   
   contains(point) {
-    return this.left < point.x && point.x < this.right &&
-      this.top < point.y && point.y < this.bottom;
+    return (
+      this.left <= point.x && point.x < this.right &&
+      this.top <= point.y && point.y < this.bottom
+    );
   }
   
   intersects(other) {
@@ -31,12 +33,12 @@ class Rectangle {
   
   get_quadrant(point) {
     let x_bit = 0;
-    if (point.x > this.x + this.width / 2) {
+    if (point.x >= this.x + this.width / 2) {
       x_bit = 1;
     }
     
     let y_bit = 0;
-    if (point.y > this.y + this.height / 2) {
+    if (point.y >= this.y + this.height / 2) {
       y_bit = 1;
     }
     
