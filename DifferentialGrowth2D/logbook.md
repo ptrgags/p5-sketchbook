@@ -65,3 +65,99 @@ Next Steps:
 * Try multiple polylines at once
 * After a while, I seem to hit a bug where a point is not redistributed
     properly. I need to investigate this further.
+
+## 2021-07-24 Steering
+
+No new code today, but I read [Jason Webb's code](https://github.com/jasonwebb/2d-differential-growth-experiments/blob/master/core/Path.js)
+a little more carefully today. I see he computes the position as:
+
+```
+position = lerp(position, nextPosition, maxVelocity)
+```
+
+and the "forces" modify `nextPosition`, also with `lerp()`s, along the lines
+of this:
+
+```
+nextPosition(0) = position
+// many equations similar to this:
+nextPosition = lerp(nextPosition, target, maximumValue)
+```
+
+This compounded lerping means this behavior is actually quite involved,
+a vector-valued polynomial in general. It's not a Bezier curve, but it
+reminds me of it.
+
+### Mathematical Aside: Lerp and Moving Towards a Target
+
+I had one interesting observation about the first equation, repeated here:
+
+```
+position = lerp(position, nextPosition, maxVelocity)
+```
+
+Suppose `nextPosition` is some constant position, a faraway `target` if you will.
+then you can expand the lerp as follows:
+
+```
+position = (1 - maxVelocity) * position + maxVelocity * target
+         = position - maxVelocity * position + maxVelocity * target
+         = position + maxVelocity * (target - position)
+```
+
+I observe:
+
+* This looks like the kinematics equation `x_f = x_0 + delta_t * velocity`
+* `maxVelocity` thus acts like the time step `delta_t`
+* And `target - position` is like the velocity.
+* This velocity is defined in terms of the position, so this is _not_ linear
+
+But now let's think about that last point as an ordinary differential equation:
+
+```
+x(0) = x0 // initial position
+dx/dt = target - x
+// looks like exponential decay!
+
+Guess:
+x(t) = Ae^(-t) + B
+dx/dt = -Ae^(-t)
+
+Substitute:
+dx/dt = target - x
+-Ae^(-t) = target - (Ae^(-t) + B)
+       0 = target - B
+       B = target
+
+Initial conditions:
+x0 = x(0)
+x0 = Ae^(-0) + target
+(x0 - target) = A
+
+Solution:
+x(t) = (x0 - target)e^(-t) + target
+```
+
+In other words, the point approaches the target following an
+_exponential decay_ curve in time! See [This Desmos sketch](https://www.desmos.com/calculator/by8yaee2ah). 
+This was surprising to me since `lerp()` is _linear_ interpolation. 
+
+An interesting consequence is the point will never actually reach the target,
+only approach it.
+
+### Connection: Boids and _The Nature of Code_
+
+This lerp behavior seemed familiar, it reminds me of Boids flocking
+simulations and steering forces. 
+
+I returned to the book _The Nature of Code_ by Daniel Shiffman which is where
+I first learned about this. [Chapter 6](https://natureofcode.com/book/chapter-6-autonomous-agents/) talks all about steering forces, including
+attraction, repulsion, moving towards a target, etc. I plan to read this
+further and rephrase differential growth in terms of autonomous agents before
+continuing.
+
+### Next Steps
+
+* Reformulate the attraction, repulsion and boundary forces in terms of
+    autonomous agents
+* Implement this
