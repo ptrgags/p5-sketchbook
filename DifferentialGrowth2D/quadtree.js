@@ -37,6 +37,18 @@ class Quadtree {
     return this.points.length === 0;
   }
   
+  count_nodes() {
+    if (this.is_leaf) {
+      return 1;
+    }
+    
+    let sum = 1;
+    for (const child of this.children) {
+      sum += child.count_nodes();
+    }
+    return sum;
+  }
+  
   insert_point(point) {
     if (!this.bounds.contains(point.position)) {
       throw new Error("OUT OF BOUNDS!");
@@ -105,9 +117,9 @@ class Quadtree {
     
     // If all the points moved out of the parent,
     // we can remove the child cells.
-    if (empty_count === 4) {
-      this.children = [];
-    }
+    //if (empty_count === 4) {
+    //  this.children = [];
+    //}
     
     // propagate points we weren't able to redistribute
     return outside_parent_list;

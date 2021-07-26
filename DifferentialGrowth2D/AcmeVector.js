@@ -1,7 +1,7 @@
 // This file is called AcmeVector because p5.js alphabetically sorts imports and that causes dependency issues :(
 
 class Vector2 {
-  constructor(x, y) {
+  constructor(x=0, y=0) {
     this.x = x;
     this.y = y;
   }
@@ -35,5 +35,27 @@ class Vector2 {
     const x = this.x;
     const y = this.y;
     return Math.sqrt(x * x + y * y);
+  }
+  
+  set_magnitude(magnitude) {
+    const old_magnitude = this.get_length();
+    if (old_magnitude !== 0) {
+      this.scale(magnitude / old_magnitude);
+    }
+  }
+  
+  limit(maximum) {
+    const old_magnitude = this.get_length();
+    const magnitude = Math.min(old_magnitude, maximum);
+    this.set_magnitude(magnitude);
+  }
+  
+  normalize() {
+    const magnitude = this.get_length();
+    if (magnitude !== 0) {
+      this.x /= magnitude;
+      this.y /= magnitude;
+      this.z /= magnitude;
+    }
   }
 }

@@ -161,3 +161,40 @@ continuing.
 * Reformulate the attraction, repulsion and boundary forces in terms of
     autonomous agents
 * Implement this
+
+## 2021-07-25 A Lot Closer
+
+|  |  |
+|--|--|
+|![A Lot Closer](figures/a-lot-closer.png) | ![A Lot Closer](figures/a-lot-closer-2.png) |
+
+I tried describing the differential growth in terms of steering forces.
+It's working a lot better!
+
+* Attraction works by setting the desired velocity to `neighbor - node`,
+    limited in magnitude to some maximum speed. This only is applied if
+    the node is at least some distance away from the neighbor (as if
+    pulled back by stretching
+* Repulsion works by computing the direction away from each nearby point
+    and summing them to get an average direction. Again, limit this
+    to a maximum speed
+* All steering forces are computed as `desired_velocity - node.velocity`
+
+
+This works well at first, but if there's too many nodes, it can get messy:
+
+<img src="figures/but-not-quite.png" alt="...but not quite" width="250">
+
+Next Steps:
+
+* Figure out how to keep the points within some boundary shape
+    (circles or rectangles)
+* Debug the quadtree point redistribution a little bit, it sometimes breaks
+* Try multiple polylines
+* Add coloring
+* See how the linked sources handled dividing the curve, there might be
+    details I'm missing.
+* Move parameters to a struct for presets as usual.
+* Color points with a palette
+* Play with the mass of the nodes. Older nodes are more massive
+    (as if by growth)

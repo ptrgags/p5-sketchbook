@@ -1,15 +1,27 @@
+const MAX_SPEED = 10;
+const MAX_FORCE = 10;
+
 // Attraction between neighboring points is modeled like springs.
-const SPRING_STIFFNESS = 0.005;
-const SPRING_REST_LENGTH = 100;
+const ATTRACTION_MIN_DISTANCE = 50;
 
 // Radius of points to check when computing repulsion
-const REPULSION_AMOUNT = 1e4;
-const NEARBY_RADIUS = 100;
+//const REPULSION_AMOUNT = 1e4;
+const NEARBY_RADIUS = 50;
+
+
 
 // Temporary accumulators since vectors are added in-place
-const TEMP_TOTAL_FORCE = new Vector2(0, 0);
-const TEMP_ATTRACTION = new Vector2(0, 0);
-const TEMP_REPULSION = new Vector2(0, 0);
+const TEMP_DESIRED_VELOCITY = new Vector2();
+const TEMP_STEERING_FORCE = new Vector2();
+const TEMP_TOTAL_FORCE = new Vector2();
+const TEMP_ATTRACTION = new Vector2();
+const TEMP_REPULSION = new Vector2();
+
+// Because JavaScript doesn't handle the modulo operator
+// correctly for negative numbers
+function fixed_modulo(x, modulus) {
+  return ((x % modulus) + modulus) % modulus; 
+}
 
 class DifferentialPolyline {
   constructor(positions_array, quadtree) {
@@ -19,8 +31,8 @@ class DifferentialPolyline {
     });
     
     // fix the endpoints
-    this.nodes[0].fixed = true;
-    this.nodes[positions_array.length - 1].fixed = true;
+    //this.nodes[0].fixed = true;
+    //this.nodes[positions_array.length - 1].fixed = true;
     
     this.quadtree = quadtree;
     for (const node of this.nodes) {
@@ -45,71 +57,97 @@ class DifferentialPolyline {
   }
   
   compute_attraction(total_force, node, neighbor_index) {
-    const start = this.nodes[neighbor_index];
-    const end = node;
+    const start = node;
+    const end = this.nodes[neighbor_index];
     
-    // Compute the direction vector r from start -> end
-    // but separate it into magnitude and direction:
-    // r = |r| * r_dir
-    // 
-    // by the end of this block:
-    // distance = |r|
-    // TEMP_ATTRACTION = r_dir
-    TEMP_ATTRACTION.clone_from(end.position);
-    TEMP_ATTRACTION.sub(start.position);
-    const distance = TEMP_ATTRACTION.get_length();
-    TEMP_ATTRACTION.scale(1.0 / distance);
+    // r = end - start
+    TEMP_DESIRED_VELOCITY.clone_from(end.position);
+    TEMP_DESIRED_VELOCITY.sub(start.position);
     
-    // The attraction force is modeled like a spring
-    // F = -k * x
-    // where k is the spring constant (SPRING_STIFFNESS)
-    // and x is the displacement from the rest length:
-    // x = (|r| - rest_length) r_dir;
-    const spring_displacement = distance - SPRING_REST_LENGTH;
-    TEMP_ATTRACTION.scale(-SPRING_STIFFNESS * spring_displacement);
+    // Only apply attraction if the points get far apart
+    const distance = TEMP_DESIRED_VELOCITY.get_length();
+    if (distance < ATTRACTION_MIN_DISTANCE) {
+      return;
+    }
     
-    total_force.add(TEMP_ATTRACTION);
+    TEMP_DESIRED_VELOCITY.limit(MAX_SPEED);
+    
+    
+    TEMP_STEERING_FORCE.clone_from(TEMP_DESIRED_VELOCITY);
+    TEMP_STEERING_FORCE.sub(node.velocity);
+    TEMP_STEERING_FORCE.limit(MAX_FORCE);
+    
+    total_force.add(TEMP_STEERING_FORCE);
   }
   
   compute_repulsion(total_force, node) {
     const circle = new Circle(node.position, NEARBY_RADIUS);
     const nearby_points = this.quadtree.circle_query(circle);
     
-    // Repulsion is modeled as an inverse-square law
-    // r = point - nearby_point
-    // F = (k / |r|^2) r_dir
-    //   = (k / |r|^3) r
+    let count = 0;
+    // desired repulsion velocity is the average direction "away" from neighbor points
+    TEMP_DESIRED_VELOCITY.set_zero();
     for (const nearby_point of nearby_points) {
       if (nearby_point === node) {
         continue;
       }
-      // compute the displacement r from nearby_point -> point
+      
+      // r = point - nearby_point
+      // we want r_dir = normalize(r)
       TEMP_REPULSION.clone_from(node.position);
       TEMP_REPULSION.sub(nearby_point.position);
+      TEMP_REPULSION.normalize();
       
-      // compute the force 
-      const distance = TEMP_REPULSION.get_length();
-      if (distance === 0) {
-        throw new Error("DIVIDE BY ZERO");
-      }
-      
-      const scalar = REPULSION_AMOUNT / (distance * distance * distance);
-      TEMP_REPULSION.scale(scalar);
-      
-      total_force.add(TEMP_REPULSION);
+      // update sum and count
+      TEMP_DESIRED_VELOCITY.add(TEMP_REPULSION);
     }
+    
+    // We don't actually need to compute the average, just set the magnitude
+    // to the max speed
+    if (count > 0) {
+      TEMP_DESIRED_VELOCITY.set_magnitude(MAX_SPEED);
+    }
+    
+    TEMP_STEERING_FORCE.clone_from(TEMP_DESIRED_VELOCITY);
+    TEMP_STEERING_FORCE.sub(node.velocity);
+    TEMP_STEERING_FORCE.limit(MAX_FORCE);
+    
+    total_force.add(TEMP_STEERING_FORCE);
+  }
+  
+  compute_containment(total_force, node) {
+    // Stay within a circular boundary
+    const BOUNDARY_CENTER = new Vector2(WIDTH / 2, HEIGHT / 2);
+    const BOUNDARY_RADIUS = 150; 
+    
+    TEMP_DESIRED_VELOCITY.clone_from(node.position);
+    TEMP_DESIRED_VELOCITY.sub(BOUNDARY_CENTER);
+    const distance = TEMP_DESIRED_VELOCITY.get_length();
+    
+    if (distance <= BOUNDARY_RADIUS) {
+      return;
+    }
+    
+    TEMP_DESIRED_VELOCITY.scale(-1);
+    
+    // TODO: I see a pattern here.
+    TEMP_STEERING_FORCE.clone_from(TEMP_DESIRED_VELOCITY);
+    TEMP_STEERING_FORCE.sub(node.velocity);
+    TEMP_STEERING_FORCE.limit(MAX_FORCE);
+    total_force.add(TEMP_STEERING_FORCE);
   }
   
   compute_forces(node, index, delta_time) {
-    // endpoints are fixed
+    // fixed nodes do not move
     if (node.fixed) {
       return;
     }
     
     TEMP_TOTAL_FORCE.set_zero();
-    this.compute_attraction(TEMP_TOTAL_FORCE, node, index - 1);
-    this.compute_attraction(TEMP_TOTAL_FORCE, node, index + 1);
+    this.compute_attraction(TEMP_TOTAL_FORCE, node, fixed_modulo(index - 1, this.nodes.length));
+    this.compute_attraction(TEMP_TOTAL_FORCE, node, (index + 1) % this.nodes.length);
     this.compute_repulsion(TEMP_TOTAL_FORCE, node);
+    //this.compute_containment(TEMP_TOTAL_FORCE, node);
     
     node.apply_forces(TEMP_TOTAL_FORCE, delta_time);
   }
@@ -124,13 +162,21 @@ class DifferentialPolyline {
   }
   
   draw() {
-    noFill();
+    fill(255, 0, 0);
     stroke(255, 255, 0);
-    strokeWeight(1);
+    strokeWeight(2.5);
+    beginShape();
+    for (const node of this.nodes) {
+      const position = node.position;
+      vertex(position.x, position.y);
+    }
+    /*
     for (let i = 0; i < this.nodes.length - 1; i++) {
       const start = this.nodes[i].position;
       const end = this.nodes[i + 1].position;
-      line(start.x, start.y, end.x, end.y);
+      vertex(start.x, start.y, end.x, end.y);
     }
+    */
+    endShape(CLOSE);
   }
 }

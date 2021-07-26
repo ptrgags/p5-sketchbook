@@ -61,13 +61,13 @@ class DifferentialNode {
     const acceleration = this.acceleration;
     
     noFill();
-    strokeWeight(3);
-    
     // draw the radius of determining nearby points
-    //stroke(255);
-    //circle(position.x, position.y, 2 * NEARBY_RADIUS);
+    strokeWeight(0.5);
+    stroke(255);
+    circle(position.x, position.y, 2 * NEARBY_RADIUS);
     
     // position vectors
+    strokeWeight(3);
     stroke(255, 0, 0);
     line(position.x, position.y, position.x + velocity.x, position.y + velocity.y);
     stroke(0, 255, 0);
