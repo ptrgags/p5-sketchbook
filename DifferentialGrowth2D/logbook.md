@@ -185,7 +185,8 @@ This works well at first, but if there's too many nodes, it can get messy:
 
 <img src="figures/but-not-quite.png" alt="...but not quite" width="250">
 
-Next Steps:
+
+### Next Steps
 
 * Figure out how to keep the points within some boundary shape
     (circles or rectangles)
@@ -198,3 +199,14 @@ Next Steps:
 * Color points with a palette
 * Play with the mass of the nodes. Older nodes are more massive
     (as if by growth)
+
+### Bonus: Convergence to Triangles?!?!
+
+While I was writing up this log entry, I left the sketch running for a long while. I see that the points arange themselves into an approximate equilateral
+triangle grid:
+
+![Triangle Grid?](figures/triangle-grid.png)
+
+Not sure why this is the case. I wonder if it has anything to do with
+honeycombs, but those create hexagons, not equilateral triangles. I'll
+have to think about this.
