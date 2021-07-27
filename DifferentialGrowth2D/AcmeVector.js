@@ -55,7 +55,16 @@ class Vector2 {
     if (magnitude !== 0) {
       this.x /= magnitude;
       this.y /= magnitude;
-      this.z /= magnitude;
     }
+  }
+  
+  static distance(v1, v2) {
+    const x = v2.x - v1.x;
+    const y = v2.y - v2.y;
+    return Math.sqrt(x * x + y * y);
+  }
+  
+  static dot(v1, v2) {
+    return v1.x * v2.x + v1.y * v2.y;
   }
 }

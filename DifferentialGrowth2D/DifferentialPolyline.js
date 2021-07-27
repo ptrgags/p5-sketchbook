@@ -1,3 +1,11 @@
+const MAX_EDGE_LENGTH = 150;
+
+const MAX_POINTS_PER_POLYLINE = 1000;
+
+// How small of an angle below which more nodes will be added
+const PINCH_ANGLE_THRESHOLD = Math.PI / 6;
+const PINCH_THRESHOLD = Math.cos(Math.PI / 4);
+
 const MAX_SPEED = 10;
 const MAX_FORCE = 10;
 
@@ -8,14 +16,14 @@ const ATTRACTION_MIN_DISTANCE = 50;
 //const REPULSION_AMOUNT = 1e4;
 const NEARBY_RADIUS = 50;
 
-
-
 // Temporary accumulators since vectors are added in-place
 const TEMP_DESIRED_VELOCITY = new Vector2();
 const TEMP_STEERING_FORCE = new Vector2();
 const TEMP_TOTAL_FORCE = new Vector2();
 const TEMP_ATTRACTION = new Vector2();
 const TEMP_REPULSION = new Vector2();
+const TEMP_BA = new Vector2();
+const TEMP_BC = new Vector2();
 
 // Because JavaScript doesn't handle the modulo operator
 // correctly for negative numbers
@@ -40,13 +48,57 @@ class DifferentialPolyline {
     }
   }
   
+  split_long_edges() {
+    for (let i = 0; i < this.nodes.length; i++) {
+      const start = this.nodes[i];
+      const end = this.nodes[(i + 1) % this.nodes.length];
+      const edge_length = Vector2.distance(start.position, end.position);
+      if (edge_length > MAX_EDGE_LENGTH) {
+        this.add_point(i);
+      }
+    }
+  }
+  
+  split_pinched_angles() {
+    const split_points = [];
+    for (let i = 0; i < this.nodes.length; i++) {
+      const a_index = fixed_modulo(i - 1, this.nodes.length);
+      const a = this.nodes[a_index].position;
+      const b = this.nodes[i].position;
+      const c = this.nodes[(i + 1) % this.nodes.length].position;
+      
+      TEMP_BA.clone_from(a);
+      TEMP_BA.sub(b);
+      TEMP_BA.normalize();
+      
+      TEMP_BC.clone_from(c);
+      TEMP_BC.sub(b);
+      TEMP_BC.normalize();
+      
+      // The angle between two vectors is between 0 and 180 degrees.
+      // angles >= 90 aren't too bad
+      // angles < 90 get more and more pinched. I'm leaving the exact
+      // threshold as a parameter
+      const cos_angle = Vector2.dot(TEMP_BA, TEMP_BC);
+      if (cos_angle > PINCH_THRESHOLD) {
+        split_points.push(i);
+      }
+    }
+    
+    for (let i = 0; i < split_points.length; i++) {
+      const index = split_points[split_points.length - 1 - i];
+      this.add_point(index);
+    }
+  }
+  
   add_point(index) {
-    if (index >= this.nodes.length - 1) {
+    if (index < 0 || index >= this.nodes.length) {
       throw new Error("OUT OF BOUNDS");
     }
+    
     const before = this.nodes[index];
-    const after = this.nodes[index + 1];
-    const midpoint = new Vector2(0, 0);
+    const after = this.nodes[(index + 1) % this.nodes.length];
+    const midpoint = new Vector2();
     midpoint.clone_from(before.position);
     midpoint.add(after.position);
     midpoint.scale(0.5);
@@ -159,6 +211,8 @@ class DifferentialPolyline {
       node.clamp_to(QUADTREE.bounds);
       node.check_if_dirty();
     }
+    
+    this.split_long_edges();
   }
   
   draw() {
@@ -170,13 +224,6 @@ class DifferentialPolyline {
       const position = node.position;
       vertex(position.x, position.y);
     }
-    /*
-    for (let i = 0; i < this.nodes.length - 1; i++) {
-      const start = this.nodes[i].position;
-      const end = this.nodes[i + 1].position;
-      vertex(start.x, start.y, end.x, end.y);
-    }
-    */
     endShape(CLOSE);
   }
 }

@@ -29,9 +29,13 @@ function draw() {
   QUADTREE.draw();
   POLYLINE.draw();
   
-  if (frameCount % 50 === 0) {
+  if (frameCount % 500 == 0) {
     const index = int(random() * (POLYLINE.nodes.length - 1));
     POLYLINE.add_point(index);
+  }
+  
+  if (frameCount % 100 === 0) {
+    POLYLINE.split_pinched_angles();
   }
   
   POLYLINE.update(DELTA_TIME);

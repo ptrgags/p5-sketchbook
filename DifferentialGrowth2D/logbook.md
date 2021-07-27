@@ -185,7 +185,6 @@ This works well at first, but if there's too many nodes, it can get messy:
 
 <img src="figures/but-not-quite.png" alt="...but not quite" width="250">
 
-
 ### Next Steps
 
 * Figure out how to keep the points within some boundary shape
@@ -210,3 +209,32 @@ triangle grid:
 Not sure why this is the case. I wonder if it has anything to do with
 honeycombs, but those create hexagons, not equilateral triangles. I'll
 have to think about this.
+
+## 2021-07-27 Splitting Edges
+
+Today I worked on adding more edge splitting behaviors:
+
+* If edges get too long, split them in the middle
+* Every so often, check the angles between each pair of edges. If the angle
+    is too sharp, add a node
+
+The latter needs to be done somewhat infrequently, otherwise the quadtree gets
+overwhelmed with many nodes in the same spot
+
+I still see self-intersections sometimes, not sure why yet.
+
+### Side note: a lead on the out-of-bounds bug
+
+Along the way, I found a lead on why the out-of-bounds bug still sometimes
+happens. Somehow the quadtree bounds is becoming very small, so one of the
+intervals becomes `[WIDTH - 1, WIDTH - 1)` which is an empty interval, no
+points could possibly be in bounds.
+
+I still need to investigate why this is happening, but at least I now know
+what to look for.
+
+### Next Steps
+
+* Color the nodes by how they were created (initial, edge split, etc)
+* Investigate the self-intersections
+* Play with parameters - how to make this more curvy?
