@@ -39,3 +39,42 @@ Next Steps:
 * Experiment with rendering methods
   * Interpolate color palette
   * Try making some sort of phase space plot to see what's going on?
+
+
+## 2021-07-31 Phase Plots, More Terms
+
+Today I added a sort of phase plot, though not the usual sort. Since there
+are four chemicals, I'd need 4 dimensions. Instead of that, I decided to
+put the four chemicals at the corners of a square and interpolate based
+on normalized values. This is helpful, though I need to find a better way
+to distinguish points that overlap.
+
+I also added a bunch of other terms to the equation:
+
+* Diffusion
+* Exponential Growth/Decay
+* Constant rates
+
+I still find it hard to control, but somehow I managed to make this:
+
+![Wavy](figures/wavy.png)
+
+The relevant parameters here are:
+
+```
+reactions (-> reaction rate: 0.01)
+A -> B
+B -> C
+C -> D
+D -> A
+
+diffusion: 0.4 for all chemicals
+initial concentration: random values
+```
+
+Next steps:
+
+* Try to get a working predator/prey model working
+* Consider float coefficients
+* Better coloring for the texture
+* Determine how to distinguish points on the phase plot

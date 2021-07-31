@@ -27,14 +27,45 @@ function init_chemicals() {
   return chemicals;
 }
 
+const CONSTANT_RATES = {
+  A: 0,
+  B: 0,
+  C: 0,
+  D: 0
+};
+
+const EXPONENTIAL_RATES = {
+  A: 0,
+  B: 0,
+  C: 0,
+  D: 0
+};
+
+const DIFFUSION_RATES = {
+  A: 0.4,
+  B: 0.4,
+  C: 0.4,
+  D: 0.4
+};
+
 const EQUATIONS = [
   //new ChemicalEquation("A <-> B", 1, 1),
   //new ChemicalEquation("A + B -> 2B", 0.1, 1),
+  new ChemicalEquation("A -> B", 0.01, 0.01),
+  new ChemicalEquation("B -> C", 0.01, 0.01),
+  new ChemicalEquation("C -> D", 0.01, 0.01),
+  new ChemicalEquation("D -> A", 0.01, 0.01),
+  //new ChemicalEquation("A + B + C + D -> A", 1, 1),
+  
+  //new ChemicalEquation("B + C -> 2B", 0.5, 1), 
 
-  new ChemicalEquation("A + B -> C", 1, 1),
-  new ChemicalEquation("B + C -> D", 1, 1),
-  new ChemicalEquation("C + D -> A", 1, 1),
-  new ChemicalEquation("D + A -> B", 1, 1),
+  //new ChemicalEquation("3B + 2C -> 2C", 2, 1),
+  //new ChemicalEquation("A -> A", 1, 1),
+
+  //new ChemicalEquation("A + B -> C", 1, 1),
+  //new ChemicalEquation("B + C -> D", 1, 1),
+  //new ChemicalEquation("C + D -> A", 1, 1),
+  //new ChemicalEquation("D + A -> B", 1, 1),
   
   //new ChemicalEquation("A -> A", 1, 1),
   //new ChemicalEquation("3A -> B", 0.1, 1),
@@ -66,8 +97,10 @@ const EQUATIONS = [
   //new ChemicalEquation("A + B + C + D <-> 4B", 1, 0.2)
 ];
 
-const CHEMICALS = init_chemicals();
-const ITERATIONS_PER_FRAME = 1;
+const READ = 0;
+const WRITE = 1;
+const CHEMICALS = [init_chemicals(), init_chemicals()];
+const ITERATIONS_PER_FRAME = 10;
 const DELTA_TIME = 0.1;
 
 let texture;
@@ -76,7 +109,7 @@ function setup() {
   texture = createGraphics(WIDTH, HEIGHT);
 }
 
-function empty_concentration() {
+function empty_concentrations() {
   return {
     A: 0,
     B: 0,
@@ -92,6 +125,13 @@ function add_concentrations(a, b) {
   a.D += b.D;
 }
 
+function multiply_concentrations(a, b) {
+  a.A *= b.A;
+  a.B *= b.B;
+  a.C *= b.C;
+  a.D *= b.D;
+}
+
 function scale_concentrations(concentrations, scalar) {
   concentrations.A *= scalar;
   concentrations.B *= scalar;
@@ -99,17 +139,74 @@ function scale_concentrations(concentrations, scalar) {
   concentrations.D *= scalar;
 }
 
+function clone(concentrations) {
+  const result = empty_concentrations();
+  result.A = concentrations.A;
+  result.B = concentrations.B;
+  result.C = concentrations.C;
+  result.D = concentrations.D;
+  return result;
+}
+
+function laplacian(left, middle, right) {
+  // laplacian f ~= left - 2 * middle + right;
+  const sum = empty_concentrations();
+  add_concentrations(sum, left);
+  add_concentrations(sum, right);
+  const weighted_middle = clone(middle);
+  scale_concentrations(weighted_middle, -2);
+  add_concentrations(sum, weighted_middle);
+  return sum;
+}
+
+function diffusion(left, middle, right, rates) {
+  const diffusion_term = laplacian(left, middle, right);
+  scale_concentrations(diffusion_term, rates);
+}
+
 function update_chemicals(delta_time) {
+  // Swap buffers.
+  [CHEMICALS[READ], CHEMICALS[WRITE]] = [CHEMICALS[WRITE], CHEMICALS[READ]];
+  
+  const read_buffer = CHEMICALS[READ];
+  const write_buffer = CHEMICALS[WRITE];
   for (let i = 0; i < WIDTH; i++) {
-    const current_concentrations = CHEMICALS[i];
-    const total_diff = empty_concentration();
+    const left_index = Math.max(i - 1, 0);
+    const right_index = Math.min(i + 1, WIDTH - 1);
+    const left_neighbor = read_buffer[left_index];
+    const input = read_buffer[i];
+    const right_neighbor = read_buffer[right_index];
+    const output = write_buffer[i];
+    
+    // time derivatives of each concentration
+    const derivatives = empty_concentrations();
+    
+    // Reaction terms
     for (const equation of EQUATIONS) {
-      const diff = equation.compute_changes(current_concentrations);
-      add_concentrations(total_diff, diff);
+      const reaction_terms = equation.compute_changes(input);
+      add_concentrations(derivatives, reaction_terms);
     }
     
-    scale_concentrations(total_diff, delta_time);
-    add_concentrations(current_concentrations, total_diff);
+    // diffusion terms
+    // dx = D * laplacian(x)
+    const diffusion_terms = laplacian(left_neighbor, input, right_neighbor);
+    multiply_concentrations(diffusion_terms, DIFFUSION_RATES);
+    add_concentrations(derivatives, diffusion_terms);
+    
+    // Exponential growth/decay
+    const exponential_terms = clone(input);
+    multiply_concentrations(exponential_terms, EXPONENTIAL_RATES);
+    add_concentrations(derivatives, exponential_terms);
+    
+    // Constant addition/removal
+    add_concentrations(derivatives, CONSTANT_RATES);
+    
+    // Euler's Method
+    // output = input + dt * derivatives
+    scale_concentrations(output, 0);
+    add_concentrations(output, input);
+    scale_concentrations(derivatives, delta_time);
+    add_concentrations(output, derivatives);
   }
 }
 
@@ -135,7 +232,7 @@ function display_chemical(x, y, concentrations) {
 
 function display_chemicals(y) {
   for (let i = 0; i < WIDTH; i++) {
-    display_chemical(i, y, CHEMICALS[i]);
+    display_chemical(i, y, CHEMICALS[READ][i]);
   }
 }
 
@@ -198,7 +295,7 @@ function display_phase_plot() {
   
   noFill();
   strokeWeight(4);
-  for (const concentrations of CHEMICALS) {
+  for (const concentrations of CHEMICALS[READ]) {
     display_concentration_phase(concentrations);
   }
   
@@ -212,11 +309,11 @@ function draw() {
   image(texture, 0, 0);
   display_phase_plot();
   
-  if (frameCount > HEIGHT) {
-    return;
+  if (frameCount <= HEIGHT) {
+    display_chemicals(frameCount - 1);
   }
   
-  display_chemicals(frameCount - 1);
+  
   
   for (let i = 0; i < ITERATIONS_PER_FRAME; i++) {
     update_chemicals(DELTA_TIME);
