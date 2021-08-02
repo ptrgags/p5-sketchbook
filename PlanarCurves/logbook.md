@@ -74,3 +74,4 @@ in the browser, and it is!
 Next Steps:
 
 * Create a README
+* Experiment with more curvature functions.
