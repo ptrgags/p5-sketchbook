@@ -11,6 +11,7 @@ const PALETTE = {
 };
 */
 
+
 const BACKGROUND_COLOR = "#d7d9b1";
 const PALETTE = {
   A: "#06aed5",
@@ -80,26 +81,26 @@ const CONSTANT_RATES = {
 
 const LINEAR_SCALE = -0.01;
 const LINEAR_RATES = [
-  0, 0, 0, 0,
-  0, 0, 0, 0,
-  0, 0, 0, 0,
+  0, 1, 0, 0,
+  1, 0, 0, 0,
+  0, 0, 1, 1,
   0, 0, 0, 0,
 ];
 
 const DIFFUSION_RATES = {
-  A: 0.1,
-  B: 0.1,
-  C: 0.1,
-  D: 0.1
+  A: 0.01,
+  B: 0.01,
+  C: 0.01,
+  D: 0.01
 };
 
 const EQUATIONS = [
   //new ChemicalEquation("C <-> D", 0.1, 0.01),
   //new ChemicalEquation("A + B -> 2B", 0.1, 1),
-  new ChemicalEquation("2A -> B", 0.01, 0.01),
-  new ChemicalEquation("2B -> C", 0.01, 0.01),
-  new ChemicalEquation("2C -> D", 0.01, 0.01),
-  new ChemicalEquation("2D -> A", 0.01, 0.01),
+  //new ChemicalEquation("2A -> B", 0.001, 0.01),
+  //new ChemicalEquation("2B -> C", 0.001, 0.01),
+  //new ChemicalEquation("2C -> D", 0.001, 0.01),
+  //new ChemicalEquation("2D -> A", 0.001, 0.01),
   //new ChemicalEquation("A + B + C + D -> 5A", 0, 1),
   //new ChemicalEquation("3B + 2C -> 2C", 2, 1),
   
@@ -148,8 +149,14 @@ const EQUATIONS = [
 const READ = 0;
 const WRITE = 1;
 const CHEMICALS = [init_chemicals(), init_chemicals()];
-const ITERATIONS_PER_FRAME = 100;
-const DELTA_TIME = 0.1;
+const ITERATIONS_PER_FRAME = 4;
+const DELTA_TIME = 1;
+const REVERSAL_ENABLED = true;
+const REVERSAL_FRAMES = 31;
+const SHIFT_ENABLED = true;
+const SHIFT_FRAMES = 4;
+
+let shift_amount = 0;
 
 let texture;
 function setup() {
@@ -248,9 +255,9 @@ function update_chemicals(delta_time) {
   for (let i = 0; i < WIDTH; i++) {
     const left_index = Math.max(i - 1, 0);
     const right_index = Math.min(i + 1, WIDTH - 1);
-    const left_neighbor = read_buffer[left_index];
-    const input = read_buffer[i];
-    const right_neighbor = read_buffer[right_index];
+    const left_neighbor = read_buffer[(left_index + shift_amount) % WIDTH];
+    const input = read_buffer[(i + shift_amount) % WIDTH];
+    const right_neighbor = read_buffer[(right_index + shift_amount) % WIDTH];
     const output = write_buffer[i];
     
     // time derivatives of each concentration
@@ -314,9 +321,50 @@ function display_chemical(x, y, concentrations) {
   texture.point(x, y);
 }
 
+// map (-inf, inf) into the range [0, 1].
+// Negative values are flipped
+function tone_map(x) {
+  x = Math.abs(x);
+  return x / (1 + x);
+}
+
+function display_blended(x, y, concentrations) {
+  const a = tone_map(concentrations.A);
+  const b = tone_map(concentrations.B);
+  const c = tone_map(concentrations.C);
+  const d = tone_map(concentrations.D);
+  const weights = [a, b, c, d];
+  
+  const a_color = color(PALETTE.A);
+  const b_color = color(PALETTE.B);
+  const c_color = color(PALETTE.C);
+  const d_color = color(PALETTE.D);
+  const colors = [a_color, b_color, c_color, d_color];
+  
+  let avg_r = 0;
+  let avg_g = 0;
+  let avg_b = 0;
+  for (let i = 0; i < 4; i++) {
+    const c = colors[i];
+    for (let j = 0; j < 4; j++) {
+      avg_r += weights[j] * red(c);
+      avg_g += weights[j] * green(c);
+      avg_b += weights[j] * blue(c);
+    }
+  }
+  avg_r /= 4.0;
+  avg_g /= 4.0;
+  avg_b /= 4.0;
+  
+  texture.noFill();
+  texture.stroke(color(avg_r, avg_g, avg_b));
+  texture.point(x, y);
+}
+
 function display_chemicals(y) {
   for (let i = 0; i < WIDTH; i++) {
-    display_chemical(i, y, CHEMICALS[READ][i]);
+    //display_chemical(i, y, CHEMICALS[READ][i]);
+    display_blended(i, y, CHEMICALS[READ][i]);
   }
 }
 
@@ -393,9 +441,16 @@ function draw() {
   image(texture, 0, 0);
   display_phase_plot();
   
-  if (frameCount % 41 === 0) {
+  if (REVERSAL_ENABLED && frameCount % REVERSAL_FRAMES === 0) {
     scale_concentrations(DIFFUSION_RATES, -1);
   }
+  
+  if (SHIFT_ENABLED && shift_amount === 1) {
+    shift_amount--;
+  } else if (SHIFT_ENABLED && frameCount % SHIFT_FRAMES === 0) {
+    shift_amount++;
+  }
+  
   
   if (frameCount <= HEIGHT) {
     display_chemicals(frameCount - 1);

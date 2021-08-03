@@ -127,3 +127,103 @@ Next Steps:
     proportional to how close the point is to the boundary (too extreme) or to the center (too muddy)?
 * Try cyclicly shifting the values every so often. I just want to see what happens.
 * Clean up the parameters, and save presets
+
+## 2021-08-03 Insights
+
+After sleeping on it, I had a few interesting insights:
+
+### Redundant Terms
+
+First of all, I realized that several terms are technically redundant!
+If you work out the autocatalysis equations, you get these equivalences:
+
+| Chemical Equation | Equivalent ODEs | Description |
+|-------------------|-----------------|------------|
+| `-> A` | `dA/dt = k(1-0)A^0 = k` | constant increase |
+| `A ->` | `dA/dt = k(0-1)A^0 = -k` | constant decrease |
+| `A -> 2A` | `dA/dt = k(2-1)A^1 = kA` | exponential increase |
+| `-> -1A` (hear me out...) | `dA/dt = k(-1 - 0)A^0` | exponential decrease |
+| `A -> A + B` | `dA/dt = 0`, `dB/dt = k(1-0)A^1 = kA` | B grows proportional to A |
+| `A -> A + -1B` (hear me out...) | `dA/dt = 0`, `dB/dt = k(-1 - 0)A = -kA` | B decreases proportional to A |
+
+The first two equations mean you can express constant increases/decreases.
+The second two equations mean you can express exponential growth/decay
+(albeit decay requires negative coefficients). The last two equations can
+be used to represent all the other possible linear terms.
+
+This means, technically speaking I could get away without constant or linear terms. However, this would require many equations. It would be more
+efficient (and easier to read) to just use the rate coefficients. Use
+the actual chemical equations for expressing non-linear terms.
+
+One other takeaway is that the chemical equations are not very intuitive.
+`A -> 2A` represents exponential growth, but `2A -> A` does NOT represent
+exponential decay, as it's a quadratic term `dA/dt = k(1-2)A^2 = -kA^2`.
+I should keep this in mind when experimenting.
+
+### Tone Mapping
+
+I'm still trying to determine a way to handle the fact that chemical values
+can easily grow very large or even negative.
+
+And this reminded me of one thing from doing physically-based rendering at
+work: tone-mapping is one way to map `[0, inf) -> [0, 1)`. With some slight
+modifications, you can extend this so the domain can be negative. Depending
+on whether the result should be signed or unsigned, here are a couple options:
+
+```
+f(x) = |x| / (1 + |x|)  // maps (-inf, inf) -> [0, 1)
+g(x) = x / (1 + |x|)    // maps (-inf, inf) -> (-1, 1)
+```
+
+Though of course, these are not unique. Like actual tonemapping, you might want
+to adjust the curve so it is closer to 1 or closer to 0.
+
+I tried using this to make weights so I can interpolate colors. It works,
+though interpolating in RGB space doesn't work well. I'll need to keep
+thinking.
+
+### Cyclic Shifts
+
+Running out of time this morning, I hastily slapped in some code to
+shift the domain every so many frames. The results give stripy patterns:
+
+![Stripes](figures/stripes.png)
+
+Two issues with this:
+
+1. It introduces noticeable seams where the shift happens. Maybe I need to find a bettter way that blends values. Similar to diffusion, just more directional. (or is this representable by advection?)
+2. Need to think through the interaction between this and the boundary clamping.
+3. Right now I only shift one direction, it would be more interesting to vary the shift direction and amount
+
+### Shell History
+
+At this point, there's several different parts to this simulation tied
+to the number of frames:
+
+* Reaction & Diffusion for some number of iterations per frame
+* Reversing the diffusion direction every so often
+* Shifting the domain every so often
+* (eventually) shrinking/growing the domain size
+* (eventually) regulating the chemicals somehow for more interesting patterns?
+
+Right now I've been doing these by testing `frameCount % event_frequency === 0`. But this is somewhat lazy, and I need this to be done in lockstep with
+other parts of shell generation.
+
+So here's one idea: generate a history of the shell. This is a list of
+events such as "perform n iterations of reaction/diffusion" or "shift domain 1 place to the right" or "grow the domain at these points". This can be generated
+all at once, or incrementally. Then this program should interpret that as applying the relevant math to the chemical concentrations.
+
+Similarly, this would apply to the other parts of this seashell generation
+(differential growth for the cross section and curvature/torsion of the shell).
+There would have to be some cross-communication, e.g. it's the differential
+growth simulation that would control the size of the domain based on the
+number of vertices. Though if this can be avoided, that would be best, as
+I'd rather not interleave 3 different simulations.
+
+### Next Steps:
+
+* Document this shell history idea in my `super-seashells` repo
+* Rephrase in terms of shell history
+* Think of a better method of picking colors
+* Try shrinking/growing the domain size
+* Add a regulation step
