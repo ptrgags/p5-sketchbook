@@ -1,6 +1,7 @@
 const WIDTH = 500;
 const HEIGHT = 700;
 
+/*
 const BACKGROUND_COLOR = "#cee0dc"; 
 const PALETTE = {
   A: "#57467b", // grape
@@ -8,8 +9,24 @@ const PALETTE = {
   C: "#f18f01", // orange
   D: "#a5243d" // burgandy
 };
+*/
 
-const rand_value = Math.random();
+const BACKGROUND_COLOR = "#d7d9b1";
+const PALETTE = {
+  A: "#06aed5",
+  B: "#ef8354",
+  C: "#086788",
+  D: "#493843",
+};
+
+function random_species() {
+  const rand_index = Math.floor(4 * Math.random());
+  const species = CHEMICAL_SYMBOLS[rand_index];
+  const result = empty_concentrations();
+  result[species] = Math.random();
+  return result;
+}
+
 function generate_concentration() {
   return {
     A: Math.random(),
@@ -19,10 +36,37 @@ function generate_concentration() {
   };
 }
 
+let prev_a = 0, prev_b = 0, prev_c = 0, prev_d = 0;
+function aggregate_concentration() {
+  const result = {
+    A: (prev_a + Math.random()) / 2,
+    B: (prev_b + Math.random()) / 2,
+    C: (prev_c + Math.random()) / 2,
+    D: (prev_d + Math.random()) / 2
+  };
+  
+  prev_a = result.A;
+  prev_b = result.B;
+  prev_c = result.C;
+  prev_d = result.D;
+  return result;
+}
+
+function cycle_species(i) {
+  return {
+    A: (i % 2) * Math.random(),
+    B: ((i % 3) % 2) * Math.random(),
+    C: ((i % 5) % 2) * Math.random(),
+    D: ((i % 7) % 2) * Math.random(),
+  }
+}
+
 function init_chemicals() {
   const chemicals = new Array(WIDTH);
   for (let i = 0; i < WIDTH; i++) {
-    chemicals[i] = generate_concentration();
+    chemicals[i] = aggregate_concentration();
+    //chemicals[i] = generate_concentration();
+    //chemicals[i] = cycle_species(i);
   }
   return chemicals;
 }
@@ -34,28 +78,32 @@ const CONSTANT_RATES = {
   D: 0
 };
 
-const EXPONENTIAL_RATES = {
-  A: 0,
-  B: 0,
-  C: 0,
-  D: 0
-};
+const LINEAR_SCALE = -0.01;
+const LINEAR_RATES = [
+  0, 0, 0, 0,
+  0, 0, 0, 0,
+  0, 0, 0, 0,
+  0, 0, 0, 0,
+];
 
 const DIFFUSION_RATES = {
-  A: 0.4,
-  B: 0.4,
-  C: 0.4,
-  D: 0.4
+  A: 0.1,
+  B: 0.1,
+  C: 0.1,
+  D: 0.1
 };
 
 const EQUATIONS = [
-  //new ChemicalEquation("A <-> B", 1, 1),
+  //new ChemicalEquation("C <-> D", 0.1, 0.01),
   //new ChemicalEquation("A + B -> 2B", 0.1, 1),
-  new ChemicalEquation("A -> B", 0.01, 0.01),
-  new ChemicalEquation("B -> C", 0.01, 0.01),
-  new ChemicalEquation("C -> D", 0.01, 0.01),
-  new ChemicalEquation("D -> A", 0.01, 0.01),
-  //new ChemicalEquation("A + B + C + D -> A", 1, 1),
+  new ChemicalEquation("2A -> B", 0.01, 0.01),
+  new ChemicalEquation("2B -> C", 0.01, 0.01),
+  new ChemicalEquation("2C -> D", 0.01, 0.01),
+  new ChemicalEquation("2D -> A", 0.01, 0.01),
+  //new ChemicalEquation("A + B + C + D -> 5A", 0, 1),
+  //new ChemicalEquation("3B + 2C -> 2C", 2, 1),
+  
+  //new ChemicalEquation("A + B <-> C", 0.1, 0.5),
   
   //new ChemicalEquation("B + C -> 2B", 0.5, 1), 
 
@@ -100,7 +148,7 @@ const EQUATIONS = [
 const READ = 0;
 const WRITE = 1;
 const CHEMICALS = [init_chemicals(), init_chemicals()];
-const ITERATIONS_PER_FRAME = 10;
+const ITERATIONS_PER_FRAME = 100;
 const DELTA_TIME = 0.1;
 
 let texture;
@@ -159,9 +207,36 @@ function laplacian(left, middle, right) {
   return sum;
 }
 
+function linear_transform(input, matrix) {
+  const [
+    a11, a12, a13, a14,
+    a21, a22, a23, a24,
+    a31, a32, a33, a34,
+    a41, a42, a43, a44
+  ] = matrix;
+  const a = input.A;
+  const b = input.B;
+  const c = input.C;
+  const d = input.D;
+  
+  const result = empty_concentrations();
+  result.A = a11 * a + a12 * b + a13 * c + a14 * d;
+  result.B = a21 * a + a22 * b + a23 * c + a24 * d;
+  result.C = a31 * a + a32 * b + a33 * c + a34 * d;
+  result.D = a41 * a + a42 * b + a43 * c + a44 * d;
+  return result;
+}
+
 function diffusion(left, middle, right, rates) {
   const diffusion_term = laplacian(left, middle, right);
   scale_concentrations(diffusion_term, rates);
+}
+
+function handle_negatives(concentrations) {
+  concentrations.A = Math.abs(concentrations.A);
+  concentrations.B = Math.abs(concentrations.B);
+  concentrations.C = Math.abs(concentrations.C);
+  concentrations.D = Math.abs(concentrations.D);
 }
 
 function update_chemicals(delta_time) {
@@ -191,12 +266,18 @@ function update_chemicals(delta_time) {
     // dx = D * laplacian(x)
     const diffusion_terms = laplacian(left_neighbor, input, right_neighbor);
     multiply_concentrations(diffusion_terms, DIFFUSION_RATES);
+     
     add_concentrations(derivatives, diffusion_terms);
     
+    // Exponential growth/decay and other linear terms
+    const linear_terms = linear_transform(input, LINEAR_RATES);
+    scale_concentrations(linear_terms, LINEAR_SCALE);
+    add_concentrations(derivatives, linear_terms);
+    
     // Exponential growth/decay
-    const exponential_terms = clone(input);
-    multiply_concentrations(exponential_terms, EXPONENTIAL_RATES);
-    add_concentrations(derivatives, exponential_terms);
+    //const exponential_terms = clone(input);
+    //multiply_concentrations(exponential_terms, EXPONENTIAL_RATES);
+    //add_concentrations(derivatives, exponential_terms);
     
     // Constant addition/removal
     add_concentrations(derivatives, CONSTANT_RATES);
@@ -207,6 +288,9 @@ function update_chemicals(delta_time) {
     add_concentrations(output, input);
     scale_concentrations(derivatives, delta_time);
     add_concentrations(output, derivatives);
+    
+    // Reflect negative values
+    handle_negatives(output);
   }
 }
 
@@ -309,11 +393,13 @@ function draw() {
   image(texture, 0, 0);
   display_phase_plot();
   
+  if (frameCount % 41 === 0) {
+    scale_concentrations(DIFFUSION_RATES, -1);
+  }
+  
   if (frameCount <= HEIGHT) {
     display_chemicals(frameCount - 1);
   }
-  
-  
   
   for (let i = 0; i < ITERATIONS_PER_FRAME; i++) {
     update_chemicals(DELTA_TIME);

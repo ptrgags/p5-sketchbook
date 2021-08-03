@@ -78,3 +78,52 @@ Next steps:
 * Consider float coefficients
 * Better coloring for the texture
 * Determine how to distinguish points on the phase plot
+
+
+## 2021-08-02 More Parameters
+
+I added more parameters. Lots of parameters:
+
+* I expanded the linear coefficients into a whole matrix with the intent of making solutions that circle around in phase space. Didn't quite work the way I
+expected. Not sure why, probably it's the scaling factor that turns it into a spiral sink.
+* I added some logic to reflect negative values. Not really sure what to do here but this works.
+
+I still wasn't happy with the fact that diffusion tends to muddy the results
+by making the points converge on the average. So I tried making the diffusion
+rate _negative_ to exaggerate differences. The results seem to result in chaotic paths (or maybe that's float precision?)
+
+But the problem is values can diverge too far as well. That's not good.
+
+So tired me had an idea: What if I flipped the sign of the diffusion
+coefficient every so often? this way it doesn't converge or diverge too much.
+
+I tried this, flipping the sign every so many frames. This works surprisingly
+well, it tends to produce horizontal stripes. Though I need to control
+the timing better to avoid stretched out portions if possible.
+
+This time I used a cumulative sum of each chemical to seed the
+initial row.
+
+The results of all this? WOW:
+
+![What have I done](figures/speechless.png)
+
+Relevant parameters for the above
+
+```
+Diffusion rates: 0.1 (sign flips every 41 frames)
+Delta time: 0.1
+Iterations per frame: 100
+Reactions: (reaction rate 0.01 for all)
+2A -> B
+2B -> C
+2C -> D
+2D -> A
+```
+
+Next Steps:
+
+* Try playing with the diffusion rate. Maybe the reversal should be
+    proportional to how close the point is to the boundary (too extreme) or to the center (too muddy)?
+* Try cyclicly shifting the values every so often. I just want to see what happens.
+* Clean up the parameters, and save presets
