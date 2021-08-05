@@ -227,3 +227,10 @@ I'd rather not interleave 3 different simulations.
 * Think of a better method of picking colors
 * Try shrinking/growing the domain size
 * Add a regulation step
+
+## 2021-08-05 Cleanup
+
+Today I started reorganizing the code before continuing. The chemical
+concentration data structure is now moved to its own file. I also created
+a `SeashellTexture` and `ReactionDiffusion` classes to encapsulate the
+main logic. This will also make it easy to make presets.

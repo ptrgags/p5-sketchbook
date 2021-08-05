@@ -37,41 +37,6 @@ function generate_concentration() {
   };
 }
 
-let prev_a = 0, prev_b = 0, prev_c = 0, prev_d = 0;
-function aggregate_concentration() {
-  const result = {
-    A: (prev_a + Math.random()) / 2,
-    B: (prev_b + Math.random()) / 2,
-    C: (prev_c + Math.random()) / 2,
-    D: (prev_d + Math.random()) / 2
-  };
-  
-  prev_a = result.A;
-  prev_b = result.B;
-  prev_c = result.C;
-  prev_d = result.D;
-  return result;
-}
-
-function cycle_species(i) {
-  return {
-    A: (i % 2) * Math.random(),
-    B: ((i % 3) % 2) * Math.random(),
-    C: ((i % 5) % 2) * Math.random(),
-    D: ((i % 7) % 2) * Math.random(),
-  }
-}
-
-function init_chemicals() {
-  const chemicals = new Array(WIDTH);
-  for (let i = 0; i < WIDTH; i++) {
-    chemicals[i] = aggregate_concentration();
-    //chemicals[i] = generate_concentration();
-    //chemicals[i] = cycle_species(i);
-  }
-  return chemicals;
-}
-
 const CONSTANT_RATES = {
   A: 0,
   B: 0,
@@ -162,143 +127,6 @@ let texture;
 function setup() {
   createCanvas(2 * WIDTH, HEIGHT);
   texture = createGraphics(WIDTH, HEIGHT);
-}
-
-function empty_concentrations() {
-  return {
-    A: 0,
-    B: 0,
-    C: 0,
-    D: 0
-  };
-}
-
-function add_concentrations(a, b) {
-  a.A += b.A;
-  a.B += b.B;
-  a.C += b.C;
-  a.D += b.D;
-}
-
-function multiply_concentrations(a, b) {
-  a.A *= b.A;
-  a.B *= b.B;
-  a.C *= b.C;
-  a.D *= b.D;
-}
-
-function scale_concentrations(concentrations, scalar) {
-  concentrations.A *= scalar;
-  concentrations.B *= scalar;
-  concentrations.C *= scalar;
-  concentrations.D *= scalar;
-}
-
-function clone(concentrations) {
-  const result = empty_concentrations();
-  result.A = concentrations.A;
-  result.B = concentrations.B;
-  result.C = concentrations.C;
-  result.D = concentrations.D;
-  return result;
-}
-
-function laplacian(left, middle, right) {
-  // laplacian f ~= left - 2 * middle + right;
-  const sum = empty_concentrations();
-  add_concentrations(sum, left);
-  add_concentrations(sum, right);
-  const weighted_middle = clone(middle);
-  scale_concentrations(weighted_middle, -2);
-  add_concentrations(sum, weighted_middle);
-  return sum;
-}
-
-function linear_transform(input, matrix) {
-  const [
-    a11, a12, a13, a14,
-    a21, a22, a23, a24,
-    a31, a32, a33, a34,
-    a41, a42, a43, a44
-  ] = matrix;
-  const a = input.A;
-  const b = input.B;
-  const c = input.C;
-  const d = input.D;
-  
-  const result = empty_concentrations();
-  result.A = a11 * a + a12 * b + a13 * c + a14 * d;
-  result.B = a21 * a + a22 * b + a23 * c + a24 * d;
-  result.C = a31 * a + a32 * b + a33 * c + a34 * d;
-  result.D = a41 * a + a42 * b + a43 * c + a44 * d;
-  return result;
-}
-
-function diffusion(left, middle, right, rates) {
-  const diffusion_term = laplacian(left, middle, right);
-  scale_concentrations(diffusion_term, rates);
-}
-
-function handle_negatives(concentrations) {
-  concentrations.A = Math.abs(concentrations.A);
-  concentrations.B = Math.abs(concentrations.B);
-  concentrations.C = Math.abs(concentrations.C);
-  concentrations.D = Math.abs(concentrations.D);
-}
-
-function update_chemicals(delta_time) {
-  // Swap buffers.
-  [CHEMICALS[READ], CHEMICALS[WRITE]] = [CHEMICALS[WRITE], CHEMICALS[READ]];
-  
-  const read_buffer = CHEMICALS[READ];
-  const write_buffer = CHEMICALS[WRITE];
-  for (let i = 0; i < WIDTH; i++) {
-    const left_index = Math.max(i - 1, 0);
-    const right_index = Math.min(i + 1, WIDTH - 1);
-    const left_neighbor = read_buffer[(left_index + shift_amount) % WIDTH];
-    const input = read_buffer[(i + shift_amount) % WIDTH];
-    const right_neighbor = read_buffer[(right_index + shift_amount) % WIDTH];
-    const output = write_buffer[i];
-    
-    // time derivatives of each concentration
-    const derivatives = empty_concentrations();
-    
-    // Reaction terms
-    for (const equation of EQUATIONS) {
-      const reaction_terms = equation.compute_changes(input);
-      add_concentrations(derivatives, reaction_terms);
-    }
-    
-    // diffusion terms
-    // dx = D * laplacian(x)
-    const diffusion_terms = laplacian(left_neighbor, input, right_neighbor);
-    multiply_concentrations(diffusion_terms, DIFFUSION_RATES);
-     
-    add_concentrations(derivatives, diffusion_terms);
-    
-    // Exponential growth/decay and other linear terms
-    const linear_terms = linear_transform(input, LINEAR_RATES);
-    scale_concentrations(linear_terms, LINEAR_SCALE);
-    add_concentrations(derivatives, linear_terms);
-    
-    // Exponential growth/decay
-    //const exponential_terms = clone(input);
-    //multiply_concentrations(exponential_terms, EXPONENTIAL_RATES);
-    //add_concentrations(derivatives, exponential_terms);
-    
-    // Constant addition/removal
-    add_concentrations(derivatives, CONSTANT_RATES);
-    
-    // Euler's Method
-    // output = input + dt * derivatives
-    scale_concentrations(output, 0);
-    add_concentrations(output, input);
-    scale_concentrations(derivatives, delta_time);
-    add_concentrations(output, derivatives);
-    
-    // Reflect negative values
-    handle_negatives(output);
-  }
 }
 
 function get_max_concentration(concentrations) {
@@ -433,8 +261,6 @@ function display_phase_plot() {
   
   pop();
 }
-
-
 
 function draw() {
   background(BACKGROUND_COLOR);
