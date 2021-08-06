@@ -1,5 +1,15 @@
-const TEMP_OUTPUT = empty_concentrations();
-const TEMP_DERIVATIVES = empty_concentrations();
+const TEMP_OUTPUT = {
+  A: 0,
+  B: 0,
+  C: 0,
+  D: 0,
+};
+const TEMP_DERIVATIVES = {
+  A: 0,
+  B: 0,
+  C: 0,
+  D: 0,
+};
 
 const DEFAULT_LINEAR_RATES = [
   0, 0, 0, 0,

@@ -110,3 +110,14 @@ function laplacian(left, middle, right) {
   add_concentrations(sum, weighted_middle);
   return sum;
 }
+
+function get_max_concentration(concentrations) {
+  return Object.entries(concentrations).reduce((a, b) => {
+    const [chemical_a, value_a] = a;
+    const [chemical_b, value_b] = b;
+    if (value_a >= value_b) {
+      return a;
+    }
+    return b;
+  });
+}
