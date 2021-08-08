@@ -34,10 +34,10 @@ const REACTION = new ReactionDiffusion({
     0, 0, 0, 0
   ],
   diffusion_rates: {
-    A: 0.0,
-    B: 0.0,
-    C: 0.0,
-    D: 0.0
+    A: 0.01,
+    B: 0.01,
+    C: 0.01,
+    D: 0.01
   }
 });
 
@@ -45,7 +45,8 @@ const SEASHELL = new SeashellTexture({
   reaction_diffusion: REACTION,
   max_width: WIDTH,
   max_height: HEIGHT,
-  palette: PALETTE
+  palette: PALETTE,
+  initial_width: 10
 });
 
 const READ = 0;
@@ -56,18 +57,24 @@ const REVERSAL_ENABLED = true;
 const REVERSAL_FRAMES = 31;
 const SHIFT_ENABLED = true;
 const SHIFT_FRAMES = 4;
-
+const GROWTH_ENABLED = true;
+const GROWTH_FRAMES = 8;
 let shift_amount = 0;
 
+
 let shell_img;
+let texture_img;
 function setup() {
-  createCanvas(2 * WIDTH, HEIGHT);
+  createCanvas(3 * WIDTH, HEIGHT);
   shell_img = createGraphics(WIDTH, HEIGHT);
+  texture_img = createGraphics(WIDTH, HEIGHT);
 }
 
+let rendered_texture = false;
 function draw() {
   background(BACKGROUND_COLOR);
   image(shell_img, 0, 0);
+  image(texture_img, 2 * WIDTH, 0);
   
   push();
   translate(WIDTH, 0);
@@ -85,8 +92,16 @@ function draw() {
     shift_amount++;
   }
   
+  if (GROWTH_ENABLED && frameCount % GROWTH_FRAMES === 0) {
+    SEASHELL.grow(new Set([2, 4, 6]));
+  }
+  
   SEASHELL.draw_shell(shell_img);
   
+  if (!rendered_texture && frameCount === SEASHELL.max_height + 1) {
+    SEASHELL.draw_texture(texture_img);
+    rendered_texture = true;
+  }
   
   SEASHELL.react(ITERATIONS_PER_FRAME);
   SEASHELL.deposit();

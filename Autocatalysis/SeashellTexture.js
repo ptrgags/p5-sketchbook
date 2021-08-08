@@ -26,6 +26,10 @@ class SeashellTexture {
     const current_width = options.initial_width || max_width;
     this.shell_widths[0] = current_width;
     
+    // an array of Set<Number> that stores indices of cells
+    // that split into multiple cells
+    this.growth_indices = new Array(max_height);
+    
     this.palette = options.palette || DEFAULT_PALETTE;
     
     this.max_width = max_width;
@@ -38,11 +42,12 @@ class SeashellTexture {
   }
   
   initialize() {
-    for (let i = 0; i < this.current_width; i++) {
+    // always initialze the maximum size.
+    for (let i = 0; i < this.max_width; i++) {
       var concentrations = aggregate_concentration();
       this.read_buffer[i] = concentrations;
       this.write_buffer[i] = clone(concentrations);
-    }
+    } 
     
     for (let i = 0; i < this.max_height; i++) {
       for (let j = 0; j < this.max_width; j++) {
@@ -97,6 +102,39 @@ class SeashellTexture {
     this.reaction_diffusion.reverse_diffusion();
   }
   
+  grow(growth_indices) {
+    if (this.current_row >= this.max_height) {
+      return;
+    }
+    
+    // Save the indices, this will be used for texturing later
+    this.growth_indices[this.current_row] = growth_indices;
+    
+    const old_length = this.current_width;
+    const new_length = old_length + growth_indices.size;
+    let new_index = 0;
+    for (let old_index = 0; old_index < old_length; old_index++) {
+      if (growth_indices.has(old_index)) {
+        
+        // copy the cell value to both of the new cells.
+        // TODO: experiment with different methods for dividing the chemicals
+        const old_values = clone(this.read_buffer[old_index]);
+        
+        set_concentrations(this.write_buffer[new_index], old_values);
+        set_concentrations(this.write_buffer[new_index + 1], old_values);
+        new_index += 2;
+      } else {
+        set_concentrations(this.write_buffer[new_index], this.read_buffer[old_index]);
+        new_index += 1;
+      }
+    }
+    
+    this.current_width = new_length;
+    for (let i = 0; i < new_length; i++) {
+      set_concentrations(this.read_buffer[i], this.write_buffer[i]);
+    }
+  }
+  
   display_chemical(x, y, concentrations) {
     const [chemical, max_concentration] = get_max_concentration(concentrations);
     const chemical_color = color(PALETTE[chemical]);
@@ -112,8 +150,8 @@ class SeashellTexture {
     x = Math.abs(x);
     return x / (1 + x);
   }
-
-  display_blended(x, y, concentrations, shell_img) {
+  
+  blended_color(concentrations) {
     const a = this.tone_map(concentrations.A);
     const b = this.tone_map(concentrations.B);
     const c = this.tone_map(concentrations.C);
@@ -141,8 +179,13 @@ class SeashellTexture {
     avg_g /= 4.0;
     avg_b /= 4.0;
     
+    return color(avg_r, avg_g, avg_b);
+  }
+
+  display_blended(x, y, concentrations, shell_img) {
+    const blended_color = this.blended_color(concentrations);
     shell_img.noFill();
-    shell_img.stroke(color(avg_r, avg_g, avg_b));
+    shell_img.stroke(blended_color);
     shell_img.point(x, y);
   }
   
@@ -160,8 +203,77 @@ class SeashellTexture {
     }
   }
   
-  draw_texture() {
+  compute_texture_widths() {
+    const widths = new Array(this.max_height);
+    for (let i = 0; i < this.max_height; i++) {
+      widths[i] = new Array(this.shell_widths[i]);
+    }
     
+    // the bottom row is initialzed with 1s
+    const last_row = this.max_height - 1;
+    const last_row_width = this.shell_widths[last_row];
+    for (let i = 0; i < last_row_width; i++) {
+      widths[last_row][i] = 1;
+    }
+    
+    // each cell either has 1 or 2 children depending on the history
+    // of shell growth. The width of a cell is equal to the widths of
+    // the children
+    
+    for (let parent_row = last_row - 1; parent_row >= 0; parent_row--) {
+      const parent_widths = widths[parent_row];
+      
+      const child_row = parent_row + 1;
+      const child_widths = widths[child_row];
+      
+      const growth_indices = this.growth_indices[parent_row] || new Set();
+      
+      let child_index = 0;
+      for (let i = 0; i < parent_widths.length; i++) {
+        if (growth_indices.has(i)) {
+          parent_widths[i] = child_widths[child_index] + child_widths[child_index + 1];
+          child_index += 2;
+        } else {
+          parent_widths[i] = child_widths[child_index];
+          child_index += 1;
+        }
+      }
+    }
+    
+    return widths;
+  }
+  
+  draw_texture(texture_img) {
+    const widths = this.compute_texture_widths();
+    
+    for (const [y, cell_widths] of widths.entries()) {
+      let x = 0;
+      for (const [column, cell_width] of cell_widths.entries()) {
+        const shell_index = y * this.max_width + y;
+        const concentrations = this.shell[shell_index];
+        
+        if (!concentrations) {
+          console.log("ugh");
+          continue;
+        }
+        
+        const blended_color = this.blended_color(concentrations);
+        
+        
+        if (!cell_width) {
+          console.log("whoops");
+          continue;
+        }
+        
+        for (let i = 0; i < cell_width; i++) {
+          texture_img.noFill();
+          texture_img.stroke(blended_color);
+          texture_img.point(x + i, y);
+        }
+        
+        x += cell_width;
+      }
+    }
   }
   
   display_concentration_phase(concentrations) {

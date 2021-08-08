@@ -234,3 +234,33 @@ Today I started reorganizing the code before continuing. The chemical
 concentration data structure is now moved to its own file. I also created
 a `SeashellTexture` and `ReactionDiffusion` classes to encapsulate the
 main logic. This will also make it easy to make presets.
+
+## 2021-08-08 Start working on shell growth
+
+Today I finished reorganizing the code and started experimenting with making
+the shell grow -- ie. change the size of the row while the simulation is
+in progress. So far I've got that much working.
+
+TODO: Screenshot
+
+The other part is rendering the texture. If I render the array contents directly,
+the UV coordinates will be stretched out
+
+TODO: Streched out UVs
+
+Instead, if I duplicate pixels around, I can make the texture more rectangular
+and this will make the UVs less stretched.
+
+TODO: Better
+
+To do this, I need to stretch out the texture, but only in the places
+where the shell grew.
+
+TODO: Diagrams of this
+
+Next Steps:
+
+* Debug the texture rendering
+* Add diagrams of this growth algorithm
+* Try different amounts of growth
+* Try shrinking the texture too
