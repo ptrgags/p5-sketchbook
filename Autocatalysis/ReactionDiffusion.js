@@ -33,9 +33,10 @@ class ReactionDiffusion {
   }
   
   compute(shell, delta_time) {
-    for (let i = 0; i < shell.current_width; i++) {
-      const left_index = fixed_modulo(i - 1, current_width);
-      const right_index = fixed_modulo(i + 1, current_width);
+    const current_width = shell.current_width;
+    for (let i = 0; i < current_width; i++) {
+      const left_index = fixed_mod(i - 1, current_width);
+      const right_index = fixed_mod(i + 1, current_width);
       const left_neighbor = shell.read(left_index);
       const right_neighbor = shell.read(right_index);
       const input = shell.read(i);
@@ -54,17 +55,17 @@ class ReactionDiffusion {
       // dx = D * laplacian(x)
       const diffusion_terms = laplacian(left_neighbor, input, right_neighbor);
       multiply_concentrations(diffusion_terms, this.diffusion_rates);
-      add_concentrations(derivatives, diffusion_terms);
+      add_concentrations(TEMP_DERIVATIVES, diffusion_terms);
     
       // Exponential growth/decay and other linear ODE terms
       // dx = M * x
-      const linear_terms = linear_transform(input, LINEAR_RATES);
-      scale_concentrations(linear_terms, LINEAR_SCALE);
+      const linear_terms = linear_transform(input, this.linear_rates);
+      scale_concentrations(linear_terms, this.linear_scale);
       add_concentrations(TEMP_DERIVATIVES, linear_terms);
     
       // Constant addition/removal
       // dx = C
-      add_concentrations(TEMP_DERIVATIVES, CONSTANT_RATES);
+      add_concentrations(TEMP_DERIVATIVES, this.constant_rates);
     
       // Euler's Method
       // output = input + dt * derivatives
@@ -75,5 +76,9 @@ class ReactionDiffusion {
       // write this to the write buffer
       shell.write(i, TEMP_OUTPUT);
     }
+  }
+  
+  reverse_diffusion() {
+    scale_concentrations(this.diffusion_rates, -1);
   }
 }

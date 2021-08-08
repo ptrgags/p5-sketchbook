@@ -11,7 +11,6 @@ const PALETTE = {
 };
 */
 
-
 const BACKGROUND_COLOR = "#d7d9b1";
 const PALETTE = {
   A: "#06aed5",
@@ -20,46 +19,26 @@ const PALETTE = {
   D: "#493843",
 };
 
-function random_species() {
-  const rand_index = Math.floor(4 * Math.random());
-  const species = CHEMICAL_SYMBOLS[rand_index];
-  const result = empty_concentrations();
-  result[species] = Math.random();
-  return result;
-}
-
-function generate_concentration() {
-  return {
-    A: Math.random(),
-    B: Math.random(),
-    C: Math.random(),
-    D: Math.random()
-  };
-}
-
-const CONSTANT_RATES = {
-  A: 0,
-  B: 0,
-  C: 0,
-  D: 0
-};
-
-const LINEAR_SCALE = -0.01;
-const LINEAR_RATES = [
-  0, 1, 0, 0,
-  1, 0, 0, 0,
-  0, 0, 1, 1,
-  0, 0, 0, 0,
-];
-
-const DIFFUSION_RATES = {
-  A: 0.01,
-  B: 0.01,
-  C: 0.01,
-  D: 0.01
-};
-
 const REACTION = new ReactionDiffusion({
+  constant_rates: {
+    A: 0,
+    B: 0,
+    C: 0,
+    D: 0
+  },
+  linear_scale: 1,
+  linear_rates: [
+    0, 0, 0, 0,
+    0, 0, 0, 0,
+    0, 0, 0, 0,
+    0, 0, 0, 0
+  ],
+  diffusion_rates: {
+    A: 0.0,
+    B: 0.0,
+    C: 0.0,
+    D: 0.0
+  }
 });
 
 const SEASHELL = new SeashellTexture({
@@ -71,7 +50,7 @@ const SEASHELL = new SeashellTexture({
 
 const READ = 0;
 const WRITE = 1;
-const ITERATIONS_PER_FRAME = 4;
+const ITERATIONS_PER_FRAME = 10;
 const DELTA_TIME = 1;
 const REVERSAL_ENABLED = true;
 const REVERSAL_FRAMES = 31;
@@ -80,15 +59,15 @@ const SHIFT_FRAMES = 4;
 
 let shift_amount = 0;
 
-let texture;
+let shell_img;
 function setup() {
   createCanvas(2 * WIDTH, HEIGHT);
-  texture = createGraphics(WIDTH, HEIGHT);
+  shell_img = createGraphics(WIDTH, HEIGHT);
 }
 
 function draw() {
   background(BACKGROUND_COLOR);
-  image(texture, 0, 0);
+  image(shell_img, 0, 0);
   
   push();
   translate(WIDTH, 0);
@@ -97,8 +76,8 @@ function draw() {
   
   
   if (REVERSAL_ENABLED && frameCount % REVERSAL_FRAMES === 0) {
-    scale_concentrations(DIFFUSION_RATES, -1);
-  }
+    SEASHELL.reverse_diffusion();
+  } 
   
   if (SHIFT_ENABLED && shift_amount === 1) {
     shift_amount--;
@@ -106,9 +85,10 @@ function draw() {
     shift_amount++;
   }
   
-  SEASHELL.draw_shell();
+  SEASHELL.draw_shell(shell_img);
   
   
   SEASHELL.react(ITERATIONS_PER_FRAME);
   SEASHELL.deposit();
+  SEASHELL.swap_buffers();
 }

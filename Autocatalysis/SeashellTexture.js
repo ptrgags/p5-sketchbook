@@ -23,11 +23,14 @@ class SeashellTexture {
     this.shell = new Array(max_width * max_height);
     this.shell_widths = new Array(max_height);
     
+    const current_width = options.initial_width || max_width;
+    this.shell_widths[0] = current_width;
+    
     this.palette = options.palette || DEFAULT_PALETTE;
     
     this.max_width = max_width;
     this.max_height = max_height;
-    this.current_width = options.initial_width;
+    this.current_width = current_width;
     this.current_row = 0;
     this.current_shift = 0;
     
@@ -76,6 +79,7 @@ class SeashellTexture {
     }
     
     this.shell_widths[this.current_row] = this.current_width;
+    this.current_row++;
   }
   
   // shift the chemicals around the shell's surface
@@ -87,6 +91,10 @@ class SeashellTexture {
     for (let i = 0; i < n; i++) {
       this.reaction_diffusion.compute(this, this.delta_time);
     }
+  }
+  
+  reverse_diffusion() {
+    this.reaction_diffusion.reverse_diffusion();
   }
   
   display_chemical(x, y, concentrations) {
@@ -105,11 +113,11 @@ class SeashellTexture {
     return x / (1 + x);
   }
 
-  display_blended(x, y, concentrations) {
-    const a = tone_map(concentrations.A);
-    const b = tone_map(concentrations.B);
-    const c = tone_map(concentrations.C);
-    const d = tone_map(concentrations.D);
+  display_blended(x, y, concentrations, shell_img) {
+    const a = this.tone_map(concentrations.A);
+    const b = this.tone_map(concentrations.B);
+    const c = this.tone_map(concentrations.C);
+    const d = this.tone_map(concentrations.D);
     const weights = [a, b, c, d];
     
     const a_color = color(PALETTE.A);
@@ -133,9 +141,9 @@ class SeashellTexture {
     avg_g /= 4.0;
     avg_b /= 4.0;
     
-    texture.noFill();
-    texture.stroke(color(avg_r, avg_g, avg_b));
-    texture.point(x, y);
+    shell_img.noFill();
+    shell_img.stroke(color(avg_r, avg_g, avg_b));
+    shell_img.point(x, y);
   }
   
   display_chemicals(y) {
@@ -145,13 +153,10 @@ class SeashellTexture {
     }
   }
   
-  draw_shell() {
-    for (let i = 0; i < this.current_row; i++) {
-      const row_width = this.shell_widths[i];
-      for (let j = 0; j < row_width; j++) {
-        //display_chemical(j, i, this.read_buffer[j]);
-        display_blended(j, i, this.read_buffer[j]);
-      }
+  draw_shell(shell_img) {
+    for (let i = 0; i < this.current_width; i++) {
+      //this.display_chemical(j, i, this.read_buffer[j]);
+      this.display_blended(i, this.current_row, this.read_buffer[i], shell_img);
     }
   }
   
