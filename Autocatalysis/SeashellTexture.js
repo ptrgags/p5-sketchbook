@@ -79,7 +79,7 @@ class SeashellTexture {
     }
     
     for (let i = 0; i < this.current_width; i++) {
-      const shell_index = this.max_width * this.current_row + i;
+      const shell_index = this.current_row * this.max_width + i;
       add_concentrations(this.shell[shell_index], this.read(shell_index));
     }
     
@@ -135,13 +135,9 @@ class SeashellTexture {
     }
   }
   
-  display_chemical(x, y, concentrations) {
+  max_color(concentrations) {
     const [chemical, max_concentration] = get_max_concentration(concentrations);
-    const chemical_color = color(PALETTE[chemical]);
-    
-    texture.noFill();
-    texture.stroke(PALETTE[chemical]);
-    texture.point(x, y);
+    return color(this.palette[chemical]);
   }
 
   // map (-inf, inf) into the range [0, 1].
@@ -181,9 +177,14 @@ class SeashellTexture {
     
     return color(avg_r, avg_g, avg_b);
   }
+  
+  compute_color(concentrations) {
+    return this.max_color(concentrations);
+    //return this.blended_color(concentrations);
+  }
 
   display_blended(x, y, concentrations, shell_img) {
-    const blended_color = this.blended_color(concentrations);
+    const blended_color = this.compute_color(concentrations);
     shell_img.noFill();
     shell_img.stroke(blended_color);
     shell_img.point(x, y);
@@ -246,10 +247,17 @@ class SeashellTexture {
   draw_texture(texture_img) {
     const widths = this.compute_texture_widths();
     
-    for (const [y, cell_widths] of widths.entries()) {
+    const expected_sum = this.shell_widths[this.shell_widths.length - 1]; 
+    for (const row of widths) {
+      const sum = row.reduce((a, b) => a + b);
+      console.assert(sum === expected_sum, "row is the wrong width");
+    }
+    
+    texture_img.noFill();    
+    for (const [row, column_widths] of widths.entries()) {
       let x = 0;
-      for (const [column, cell_width] of cell_widths.entries()) {
-        const shell_index = y * this.max_width + y;
+      for (const [column, column_width] of column_widths.entries()) {
+        const shell_index = row * this.max_width + column;
         const concentrations = this.shell[shell_index];
         
         if (!concentrations) {
@@ -257,21 +265,20 @@ class SeashellTexture {
           continue;
         }
         
-        const blended_color = this.blended_color(concentrations);
+        const blended_color = this.compute_color(concentrations);
         
-        
-        if (!cell_width) {
+        if (!column_width) {
           console.log("whoops");
           continue;
         }
         
-        for (let i = 0; i < cell_width; i++) {
-          texture_img.noFill();
-          texture_img.stroke(blended_color);
-          texture_img.point(x + i, y);
+        
+        texture_img.stroke(blended_color);
+        for (let i = 0; i < column_width; i++) {
+          texture_img.point(x + i, row);
         }
         
-        x += cell_width;
+        x += column_width;
       }
     }
   }

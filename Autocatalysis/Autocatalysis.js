@@ -21,15 +21,15 @@ const PALETTE = {
 
 const REACTION = new ReactionDiffusion({
   constant_rates: {
-    A: 0,
-    B: 0,
+    A: 0.01,
+    B: -0.01,
     C: 0,
     D: 0
   },
-  linear_scale: 1,
+  linear_scale: 0.02,
   linear_rates: [
-    0, 0, 0, 0,
-    0, 0, 0, 0,
+    0, -1, 0, 0,
+    1, 0, 0, 0,
     0, 0, 0, 0,
     0, 0, 0, 0
   ],
@@ -46,7 +46,7 @@ const SEASHELL = new SeashellTexture({
   max_width: WIDTH,
   max_height: HEIGHT,
   palette: PALETTE,
-  initial_width: 10
+  initial_width: 50
 });
 
 const READ = 0;
@@ -54,8 +54,8 @@ const WRITE = 1;
 const ITERATIONS_PER_FRAME = 10;
 const DELTA_TIME = 1;
 const REVERSAL_ENABLED = true;
-const REVERSAL_FRAMES = 31;
-const SHIFT_ENABLED = true;
+const REVERSAL_FRAMES = 10;
+const SHIFT_ENABLED = false;
 const SHIFT_FRAMES = 4;
 const GROWTH_ENABLED = true;
 const GROWTH_FRAMES = 8;
