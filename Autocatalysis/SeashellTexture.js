@@ -80,7 +80,7 @@ class SeashellTexture {
     
     for (let i = 0; i < this.current_width; i++) {
       const shell_index = this.current_row * this.max_width + i;
-      add_concentrations(this.shell[shell_index], this.read(shell_index));
+      set_concentrations(this.shell[shell_index], this.read(i));
     }
     
     this.shell_widths[this.current_row] = this.current_width;
@@ -112,6 +112,11 @@ class SeashellTexture {
     
     const old_length = this.current_width;
     const new_length = old_length + growth_indices.size;
+    
+    if (new_length > this.max_width) {
+      throw new Error("Shell is growing too fast, slow down!");
+    }
+    
     let new_index = 0;
     for (let old_index = 0; old_index < old_length; old_index++) {
       if (growth_indices.has(old_index)) {
@@ -212,10 +217,7 @@ class SeashellTexture {
     
     // the bottom row is initialzed with 1s
     const last_row = this.max_height - 1;
-    const last_row_width = this.shell_widths[last_row];
-    for (let i = 0; i < last_row_width; i++) {
-      widths[last_row][i] = 1;
-    }
+    widths[last_row].fill(1);
     
     // each cell either has 1 or 2 children depending on the history
     // of shell growth. The width of a cell is equal to the widths of
@@ -227,7 +229,7 @@ class SeashellTexture {
       const child_row = parent_row + 1;
       const child_widths = widths[child_row];
       
-      const growth_indices = this.growth_indices[parent_row] || new Set();
+      const growth_indices = this.growth_indices[child_row] || new Set();
       
       let child_index = 0;
       for (let i = 0; i < parent_widths.length; i++) {
@@ -247,38 +249,20 @@ class SeashellTexture {
   draw_texture(texture_img) {
     const widths = this.compute_texture_widths();
     
-    const expected_sum = this.shell_widths[this.shell_widths.length - 1]; 
-    for (const row of widths) {
-      const sum = row.reduce((a, b) => a + b);
-      console.assert(sum === expected_sum, "row is the wrong width");
-    }
-    
-    texture_img.noFill();    
+    texture_img.noFill();
     for (const [row, column_widths] of widths.entries()) {
-      let x = 0;
+      let offset = 0;
       for (const [column, column_width] of column_widths.entries()) {
         const shell_index = row * this.max_width + column;
         const concentrations = this.shell[shell_index];
-        
-        if (!concentrations) {
-          console.log("ugh");
-          continue;
-        }
-        
         const blended_color = this.compute_color(concentrations);
         
-        if (!column_width) {
-          console.log("whoops");
-          continue;
-        }
-        
-        
         texture_img.stroke(blended_color);
-        for (let i = 0; i < column_width; i++) {
-          texture_img.point(x + i, row);
-        }
         
-        x += column_width;
+        for (let i = 0; i < column_width; i++) {
+          texture_img.point(offset + i, row);
+        }
+        offset += column_width;
       }
     }
   }

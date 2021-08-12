@@ -46,7 +46,7 @@ const SEASHELL = new SeashellTexture({
   max_width: WIDTH,
   max_height: HEIGHT,
   palette: PALETTE,
-  initial_width: 50
+  initial_width: 10
 });
 
 const READ = 0;

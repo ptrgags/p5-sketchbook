@@ -264,3 +264,20 @@ Next Steps:
 * Add diagrams of this growth algorithm
 * Try different amounts of growth
 * Try shrinking the texture too
+
+## 2021-08-12 Debugged Texture Stretching
+
+I tried debugging the texture streching again, Finally got it working.
+I had used the wrong variable in one place, and I had an off-by-one
+error in another place.
+
+Now the jagged array structure (leftmost third) stretches out to
+a nice rectangle (rightmost third)
+
+![Texture Stretching](figures/texture-stretching.png)
+
+Next Steps:
+* Add diagrams above to explain how this works
+* Try different amounts of growth
+* Try shrinking texture too
+* Encode these texture changes as "events" in the shell's history
