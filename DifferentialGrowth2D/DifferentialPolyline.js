@@ -7,14 +7,14 @@ const PINCH_ANGLE_THRESHOLD = Math.PI / 6;
 const PINCH_THRESHOLD = Math.cos(Math.PI / 4);
 
 const MAX_SPEED = 10;
-const MAX_FORCE = 10;
+const MAX_FORCE = 20;
 
 // Attraction between neighboring points is modeled like springs.
-const ATTRACTION_MIN_DISTANCE = 50;
+const ATTRACTION_MIN_DISTANCE = 20;
 
 // Radius of points to check when computing repulsion
 //const REPULSION_AMOUNT = 1e4;
-const NEARBY_RADIUS = 50;
+const NEARBY_RADIUS = 20;
 
 // Temporary accumulators since vectors are added in-place
 const TEMP_DESIRED_VELOCITY = new Vector2();
@@ -215,8 +215,8 @@ class DifferentialPolyline {
     this.split_long_edges();
   }
   
-  draw() {
-    fill(255, 0, 0);
+  draw(fill_color) {
+    fill(fill_color);
     stroke(255, 255, 0);
     strokeWeight(2.5);
     beginShape();

@@ -238,3 +238,21 @@ what to look for.
 * Color the nodes by how they were created (initial, edge split, etc)
 * Investigate the self-intersections
 * Play with parameters - how to make this more curvy?
+
+## 2021-08-23 Multiple Polylines
+
+Today I tried adding a second polyline. I also played with the parameters a bit 
+to try to make the results be more curvy and less pointy. Reducing the mass
+of the points so they react faster to the forces, decreasing the radii for
+attraction and repulsion, and increasing the rate of adding nodes definitely
+helped:
+
+| | | |
+|--|--|--|
+|![New Parameters](figures/new_params.png)|![wormlike](figures/wormlike.png)|![grown](figures/grown.png)|
+
+### Next Steps
+
+* Try a quadtree larger than the canvas
+* also try different rules for bounding the growth. When I port this to Python,
+    the boundary will likely be circular.

@@ -1,4 +1,4 @@
-const DEFAULT_CAPACITY = 4;
+const DEFAULT_CAPACITY = 10;
 
 function partition(array, condition) {
   const pass = [];

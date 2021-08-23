@@ -11,7 +11,7 @@ class DifferentialNode {
     this.position = position;
     this.velocity = new Vector2(0, 0);
     this.acceleration = new Vector2(0, 0);
-    this.mass = 100.0;
+    this.mass = 1.0;
     this.fixed = false;
     this.quadtree_node = undefined;
     this.is_dirty = false;

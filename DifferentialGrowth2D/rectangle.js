@@ -50,8 +50,6 @@ class Rectangle {
     const y = this.y;
     const half_w = this.width / 2;
     const half_h = this.height / 2;
-    const w = this.width;
-    const h = this.h;
     const mid_x = x + half_w;
     const mid_y = y + half_h;
     
