@@ -1,0 +1,124 @@
+{
+  "length_measures": 256,
+  "pattern_counts": {
+    "1": 9
+  },
+  "rules": {
+    "": {
+      "children": [
+        "0",
+        "1",
+        "2",
+        "0",
+        "1",
+        "2",
+        "0",
+        "1",
+        "2",
+        "0",
+        "1",
+        "2",
+        "0",
+        "1",
+        "2",
+        "0"
+      ],
+      "length_measures": 256,
+      "subdivisions": 16
+    },
+    "0": {
+      "children": [
+        "00",
+        "01",
+        "02",
+        "00",
+        "01",
+        "02",
+        "00",
+        "01",
+        "02",
+        "00",
+        "01",
+        "02",
+        "00",
+        "01",
+        "02",
+        "00"
+      ],
+      "length_measures": 16,
+      "subdivisions": 16
+    },
+    "00": {
+      "length_measures": 1
+    },
+    "01": {
+      "length_measures": 1
+    },
+    "02": {
+      "length_measures": 1
+    },
+    "1": {
+      "children": [
+        "10",
+        "11",
+        "12",
+        "10",
+        "11",
+        "12",
+        "10",
+        "11",
+        "12",
+        "10",
+        "11",
+        "12",
+        "10",
+        "11",
+        "12",
+        "10"
+      ],
+      "length_measures": 16,
+      "subdivisions": 16
+    },
+    "10": {
+      "length_measures": 1
+    },
+    "11": {
+      "length_measures": 1
+    },
+    "12": {
+      "length_measures": 1
+    },
+    "2": {
+      "children": [
+        "20",
+        "21",
+        "22",
+        "20",
+        "21",
+        "22",
+        "20",
+        "21",
+        "22",
+        "20",
+        "21",
+        "22",
+        "20",
+        "21",
+        "22",
+        "20"
+      ],
+      "length_measures": 16,
+      "subdivisions": 16
+    },
+    "20": {
+      "length_measures": 1
+    },
+    "21": {
+      "length_measures": 1
+    },
+    "22": {
+      "length_measures": 1
+    }
+  },
+  "start_symbol": ""
+}

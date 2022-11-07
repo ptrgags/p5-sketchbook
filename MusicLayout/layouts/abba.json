@@ -1,0 +1,207 @@
+{
+  "length_measures": 256,
+  "pattern_counts": {
+    "1": 16
+  },
+  "rules": {
+    "": {
+      "children": [
+        "a",
+        "b",
+        "b",
+        "a"
+      ],
+      "length_measures": 256,
+      "subdivisions": 4
+    },
+    "a": {
+      "children": [
+        "aa",
+        "ab",
+        "ab",
+        "aa"
+      ],
+      "length_measures": 64,
+      "subdivisions": 4
+    },
+    "aa": {
+      "children": [
+        "aaa",
+        "aab",
+        "aab",
+        "aaa"
+      ],
+      "length_measures": 16,
+      "subdivisions": 4
+    },
+    "aaa": {
+      "children": [
+        "aaaa",
+        "aaab",
+        "aaab",
+        "aaaa"
+      ],
+      "length_measures": 4,
+      "subdivisions": 4
+    },
+    "aaaa": {
+      "length_measures": 1
+    },
+    "aaab": {
+      "length_measures": 1
+    },
+    "aab": {
+      "children": [
+        "aaba",
+        "aabb",
+        "aabb",
+        "aaba"
+      ],
+      "length_measures": 4,
+      "subdivisions": 4
+    },
+    "aaba": {
+      "length_measures": 1
+    },
+    "aabb": {
+      "length_measures": 1
+    },
+    "ab": {
+      "children": [
+        "aba",
+        "abb",
+        "abb",
+        "aba"
+      ],
+      "length_measures": 16,
+      "subdivisions": 4
+    },
+    "aba": {
+      "children": [
+        "abaa",
+        "abab",
+        "abab",
+        "abaa"
+      ],
+      "length_measures": 4,
+      "subdivisions": 4
+    },
+    "abaa": {
+      "length_measures": 1
+    },
+    "abab": {
+      "length_measures": 1
+    },
+    "abb": {
+      "children": [
+        "abba",
+        "abbb",
+        "abbb",
+        "abba"
+      ],
+      "length_measures": 4,
+      "subdivisions": 4
+    },
+    "abba": {
+      "length_measures": 1
+    },
+    "abbb": {
+      "length_measures": 1
+    },
+    "b": {
+      "children": [
+        "ba",
+        "bb",
+        "bb",
+        "ba"
+      ],
+      "length_measures": 64,
+      "subdivisions": 4
+    },
+    "ba": {
+      "children": [
+        "baa",
+        "bab",
+        "bab",
+        "baa"
+      ],
+      "length_measures": 16,
+      "subdivisions": 4
+    },
+    "baa": {
+      "children": [
+        "baaa",
+        "baab",
+        "baab",
+        "baaa"
+      ],
+      "length_measures": 4,
+      "subdivisions": 4
+    },
+    "baaa": {
+      "length_measures": 1
+    },
+    "baab": {
+      "length_measures": 1
+    },
+    "bab": {
+      "children": [
+        "baba",
+        "babb",
+        "babb",
+        "baba"
+      ],
+      "length_measures": 4,
+      "subdivisions": 4
+    },
+    "baba": {
+      "length_measures": 1
+    },
+    "babb": {
+      "length_measures": 1
+    },
+    "bb": {
+      "children": [
+        "bba",
+        "bbb",
+        "bbb",
+        "bba"
+      ],
+      "length_measures": 16,
+      "subdivisions": 4
+    },
+    "bba": {
+      "children": [
+        "bbaa",
+        "bbab",
+        "bbab",
+        "bbaa"
+      ],
+      "length_measures": 4,
+      "subdivisions": 4
+    },
+    "bbaa": {
+      "length_measures": 1
+    },
+    "bbab": {
+      "length_measures": 1
+    },
+    "bbb": {
+      "children": [
+        "bbba",
+        "bbbb",
+        "bbbb",
+        "bbba"
+      ],
+      "length_measures": 4,
+      "subdivisions": 4
+    },
+    "bbba": {
+      "length_measures": 1
+    },
+    "bbbb": {
+      "length_measures": 1
+    }
+  },
+  "start_symbol": ""
+}
