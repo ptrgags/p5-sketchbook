@@ -1,17 +1,19 @@
-const MEASURE_WIDTH_PX = 30;
+const MEASURE_WIDTH_PX = 60;
 const MEASURE_HEIGHT_PX = 14;
 const TEXT_SIZE = 12;
 
 let abba;
 let grid_mod3;
+let rand;
 
 function preload() {
     abba = loadJSON("layouts/abba.json");
     grid_mod3 = loadJSON("layouts/grid_mod3.json");
+    rand = loadJSON("layouts/random.json");
 }
 
 function setup() {
-    createCanvas(16 * MEASURE_WIDTH_PX, 256 * MEASURE_HEIGHT_PX);
+    createCanvas(20 * MEASURE_WIDTH_PX, 256 * MEASURE_HEIGHT_PX);
 }
 
 const visited = new Set();
@@ -29,7 +31,7 @@ function draw_rule(x, y, symbol, rule) {
     textSize(TEXT_SIZE);
     fill(0);
     noStroke();
-    text(symbol, x + 2, y + TEXT_SIZE);
+    text(`${symbol} (${rule.length_measures})`, x + 2, y + TEXT_SIZE);
 }
 
 function draw_layout(layout, symbol, current_y, depth) {
@@ -54,6 +56,10 @@ function draw() {
     draw_layout(abba, "", 0, 0);
 
     visited.clear();
-    translate(8 * MEASURE_WIDTH_PX, 0);
+    translate(6 * MEASURE_WIDTH_PX, 0);
     draw_layout(grid_mod3, "", 0, 0);
+
+    visited.clear();
+    translate(6 * MEASURE_WIDTH_PX, 0);
+    draw_layout(rand, "", 0, 0);
 }
