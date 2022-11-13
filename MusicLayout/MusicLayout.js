@@ -9,7 +9,7 @@ let rand;
 function preload() {
     abba = loadJSON("layouts/abba.json");
     grid_mod3 = loadJSON("layouts/grid_mod3.json");
-    rand = loadJSON("layouts/random.json");
+    rand = loadJSON("layouts/bottom_up.json");
 }
 
 function setup() {
@@ -61,5 +61,5 @@ function draw() {
 
     visited.clear();
     translate(6 * MEASURE_WIDTH_PX, 0);
-    draw_layout(rand, "", 0, 0);
+    draw_layout(rand, rand.start_symbol, 0, 0);
 }

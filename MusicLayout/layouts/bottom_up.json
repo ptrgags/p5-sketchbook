@@ -1,0 +1,794 @@
+{
+  "length_measures": 256,
+  "pattern_counts": {
+    "1": 4,
+    "2": 8,
+    "256": 1,
+    "4": 4
+  },
+  "rules": {
+    "": {
+      "length_measures": 256
+    },
+    "C128-0": {
+      "children": [
+        "C8-5",
+        "C4-2",
+        "C32-1",
+        "C4-3",
+        "C32-4",
+        "C32-3",
+        "C8-6",
+        "P4-3",
+        "P4-1"
+      ],
+      "length_measures": 128,
+      "subdivisions": 32
+    },
+    "C128-1": {
+      "children": [
+        "C8-3",
+        "C32-2",
+        "C8-2",
+        "C32-1",
+        "C16-1",
+        "C8-0",
+        "C4-2",
+        "C4-3",
+        "C4-0",
+        "C4-2",
+        "P4-2",
+        "P4-1"
+      ],
+      "length_measures": 128,
+      "subdivisions": 32
+    },
+    "C128-2": {
+      "children": [
+        "C16-3",
+        "C4-1",
+        "C32-4",
+        "C8-6",
+        "P4-0",
+        "C8-1",
+        "C8-1",
+        "P4-3",
+        "C8-7",
+        "C32-1",
+        "C4-2"
+      ],
+      "length_measures": 128,
+      "subdivisions": 32
+    },
+    "C128-3": {
+      "children": [
+        "C32-0",
+        "C32-3",
+        "C32-1",
+        "C32-0"
+      ],
+      "length_measures": 128,
+      "subdivisions": 4
+    },
+    "C128-4": {
+      "children": [
+        "C16-3",
+        "C8-4",
+        "P4-2",
+        "C32-0",
+        "C32-2",
+        "C16-6",
+        "C16-1",
+        "P4-0"
+      ],
+      "length_measures": 128,
+      "subdivisions": 32
+    },
+    "C128-5": {
+      "children": [
+        "C4-3",
+        "C16-5",
+        "C8-1",
+        "C16-0",
+        "C8-4",
+        "C8-5",
+        "C32-0",
+        "C8-4",
+        "C16-3",
+        "C8-1",
+        "C4-3"
+      ],
+      "length_measures": 128,
+      "subdivisions": 32
+    },
+    "C128-6": {
+      "children": [
+        "C16-3",
+        "C4-3",
+        "C8-2",
+        "P4-0",
+        "P4-3",
+        "P4-2",
+        "C8-5",
+        "C32-3",
+        "C8-6",
+        "C32-6",
+        "C8-7"
+      ],
+      "length_measures": 128,
+      "subdivisions": 32
+    },
+    "C128-7": {
+      "children": [
+        "C8-2",
+        "C32-6",
+        "C32-4",
+        "C16-1",
+        "C16-7",
+        "C16-1",
+        "C8-7"
+      ],
+      "length_measures": 128,
+      "subdivisions": 16
+    },
+    "C16-0": {
+      "children": [
+        "P2-2",
+        "P1-0",
+        "P1-0",
+        "P1-1",
+        "C4-3",
+        "P1-0",
+        "P1-0",
+        "P2-2",
+        "P1-0",
+        "P2-7"
+      ],
+      "length_measures": 16,
+      "subdivisions": 16
+    },
+    "C16-1": {
+      "children": [
+        "P2-0",
+        "P1-0",
+        "P2-1",
+        "P4-1",
+        "P2-4",
+        "P1-3",
+        "P2-3",
+        "P2-6"
+      ],
+      "length_measures": 16,
+      "subdivisions": 16
+    },
+    "C16-2": {
+      "children": [
+        "P2-5",
+        "P4-2",
+        "P2-0",
+        "P4-0",
+        "P2-5",
+        "P2-7"
+      ],
+      "length_measures": 16,
+      "subdivisions": 8
+    },
+    "C16-3": {
+      "children": [
+        "P1-2",
+        "P2-4",
+        "P2-0",
+        "C4-2",
+        "P2-4",
+        "P4-0",
+        "P1-0"
+      ],
+      "length_measures": 16,
+      "subdivisions": 16
+    },
+    "C16-4": {
+      "children": [
+        "C4-0",
+        "P2-2",
+        "C4-2",
+        "P2-2",
+        "C4-1"
+      ],
+      "length_measures": 16,
+      "subdivisions": 8
+    },
+    "C16-5": {
+      "children": [
+        "P2-4",
+        "P1-1",
+        "P1-0",
+        "P1-1",
+        "P4-2",
+        "C4-1",
+        "P2-7",
+        "P1-0"
+      ],
+      "length_measures": 16,
+      "subdivisions": 16
+    },
+    "C16-6": {
+      "children": [
+        "P2-2",
+        "C4-1",
+        "C4-1",
+        "P4-3",
+        "P1-2",
+        "P1-3"
+      ],
+      "length_measures": 16,
+      "subdivisions": 16
+    },
+    "C16-7": {
+      "children": [
+        "P1-0",
+        "P2-5",
+        "P4-1",
+        "P2-1",
+        "P4-0",
+        "P1-1",
+        "P1-2",
+        "P1-2"
+      ],
+      "length_measures": 16,
+      "subdivisions": 16
+    },
+    "C256-0": {
+      "children": [
+        "C64-7",
+        "C32-2",
+        "C32-5",
+        "C16-2",
+        "C32-7",
+        "C32-7",
+        "C16-0",
+        "C16-0",
+        "C16-3"
+      ],
+      "length_measures": 256,
+      "subdivisions": 16
+    },
+    "C256-1": {
+      "children": [
+        "C64-6",
+        "C16-7",
+        "C8-1",
+        "C32-1",
+        "C64-3",
+        "C64-5",
+        "C8-0"
+      ],
+      "length_measures": 256,
+      "subdivisions": 32
+    },
+    "C256-2": {
+      "children": [
+        "C16-7",
+        "C16-3",
+        "C32-1",
+        "C16-4",
+        "C32-3",
+        "C32-1",
+        "C16-2",
+        "C16-6",
+        "C64-3",
+        "C8-6",
+        "C8-7"
+      ],
+      "length_measures": 256,
+      "subdivisions": 32
+    },
+    "C256-3": {
+      "children": [
+        "C32-5",
+        "C16-7",
+        "C32-2",
+        "C16-6",
+        "C16-7",
+        "C32-4",
+        "C64-7",
+        "C32-3",
+        "C8-2",
+        "C8-2"
+      ],
+      "length_measures": 256,
+      "subdivisions": 32
+    },
+    "C256-4": {
+      "children": [
+        "C8-6",
+        "C8-5",
+        "C8-5",
+        "C32-5",
+        "C64-5",
+        "C16-3",
+        "C32-5",
+        "C16-5",
+        "C64-3",
+        "C8-2"
+      ],
+      "length_measures": 256,
+      "subdivisions": 32
+    },
+    "C256-5": {
+      "children": [
+        "C32-4",
+        "C16-3",
+        "C32-5",
+        "C16-7",
+        "C64-0",
+        "C16-2",
+        "C32-6",
+        "C16-2",
+        "C16-4",
+        "C16-5"
+      ],
+      "length_measures": 256,
+      "subdivisions": 16
+    },
+    "C256-6": {
+      "children": [
+        "C8-4",
+        "C64-0",
+        "C64-1",
+        "C8-7",
+        "C16-0",
+        "C32-6",
+        "C32-1",
+        "C16-7",
+        "C8-2",
+        "C8-3"
+      ],
+      "length_measures": 256,
+      "subdivisions": 32
+    },
+    "C256-7": {
+      "children": [
+        "C32-2",
+        "C8-2",
+        "C8-1",
+        "C32-2",
+        "C16-0",
+        "C64-5",
+        "C32-5",
+        "C64-1"
+      ],
+      "length_measures": 256,
+      "subdivisions": 32
+    },
+    "C32-0": {
+      "children": [
+        "P1-3",
+        "P4-1",
+        "P2-6",
+        "P4-1",
+        "C8-0",
+        "P1-3",
+        "C8-3",
+        "P2-1",
+        "P1-1",
+        "P1-2"
+      ],
+      "length_measures": 32,
+      "subdivisions": 32
+    },
+    "C32-1": {
+      "children": [
+        "P1-1",
+        "P1-3",
+        "C8-2",
+        "P1-0",
+        "P2-2",
+        "P4-0",
+        "C8-7",
+        "P1-0",
+        "P2-5",
+        "C4-3"
+      ],
+      "length_measures": 32,
+      "subdivisions": 32
+    },
+    "C32-2": {
+      "children": [
+        "P1-1",
+        "P2-2",
+        "C8-0",
+        "P2-0",
+        "P1-1",
+        "C8-2",
+        "P2-6",
+        "P2-0",
+        "P4-3",
+        "P2-5"
+      ],
+      "length_measures": 32,
+      "subdivisions": 32
+    },
+    "C32-3": {
+      "children": [
+        "P1-2",
+        "C4-0",
+        "C4-3",
+        "P1-1",
+        "P2-2",
+        "P2-1",
+        "P4-1",
+        "C4-2",
+        "C8-7",
+        "P2-5"
+      ],
+      "length_measures": 32,
+      "subdivisions": 32
+    },
+    "C32-4": {
+      "children": [
+        "C8-2",
+        "C8-4",
+        "P2-4",
+        "C8-7",
+        "P1-1",
+        "P1-0",
+        "P4-1"
+      ],
+      "length_measures": 32,
+      "subdivisions": 32
+    },
+    "C32-5": {
+      "children": [
+        "C4-3",
+        "C8-3",
+        "P2-4",
+        "P2-6",
+        "P1-2",
+        "C4-3",
+        "P4-1",
+        "C4-0",
+        "P2-0",
+        "P1-1"
+      ],
+      "length_measures": 32,
+      "subdivisions": 32
+    },
+    "C32-6": {
+      "children": [
+        "C8-3",
+        "P1-1",
+        "P1-0",
+        "P2-2",
+        "P2-3",
+        "P1-1",
+        "P1-1",
+        "P2-2",
+        "C8-3",
+        "C4-1",
+        "P2-2"
+      ],
+      "length_measures": 32,
+      "subdivisions": 32
+    },
+    "C32-7": {
+      "children": [
+        "P1-1",
+        "P2-3",
+        "P1-0",
+        "P2-7",
+        "P1-3",
+        "C4-1",
+        "P1-2",
+        "P1-1",
+        "C8-2",
+        "C4-0",
+        "C4-1",
+        "P1-1",
+        "P1-2",
+        "P1-3"
+      ],
+      "length_measures": 32,
+      "subdivisions": 32
+    },
+    "C4-0": {
+      "children": [
+        "P1-1",
+        "P1-2",
+        "P1-2",
+        "P1-0"
+      ],
+      "length_measures": 4,
+      "subdivisions": 4
+    },
+    "C4-1": {
+      "children": [
+        "P1-1",
+        "P1-2",
+        "P1-2",
+        "P1-1"
+      ],
+      "length_measures": 4,
+      "subdivisions": 4
+    },
+    "C4-2": {
+      "children": [
+        "P1-0",
+        "P1-0",
+        "P1-3",
+        "P1-0"
+      ],
+      "length_measures": 4,
+      "subdivisions": 4
+    },
+    "C4-3": {
+      "children": [
+        "P1-1",
+        "P1-0",
+        "P1-1",
+        "P1-0"
+      ],
+      "length_measures": 4,
+      "subdivisions": 4
+    },
+    "C64-0": {
+      "children": [
+        "C16-2",
+        "P2-2",
+        "P2-0",
+        "C8-6",
+        "C16-3",
+        "P2-2",
+        "C16-6",
+        "P2-3"
+      ],
+      "length_measures": 64,
+      "subdivisions": 32
+    },
+    "C64-1": {
+      "children": [
+        "C8-5",
+        "P2-4",
+        "C16-2",
+        "P2-6",
+        "C16-0",
+        "P4-1",
+        "P2-6",
+        "P2-1",
+        "P4-2",
+        "P2-0",
+        "C4-3",
+        "P2-4"
+      ],
+      "length_measures": 64,
+      "subdivisions": 32
+    },
+    "C64-2": {
+      "children": [
+        "C8-4",
+        "C16-6",
+        "C8-6",
+        "C4-3",
+        "P4-3",
+        "C8-3",
+        "C4-3",
+        "C8-0",
+        "C4-2"
+      ],
+      "length_measures": 64,
+      "subdivisions": 16
+    },
+    "C64-3": {
+      "children": [
+        "P2-1",
+        "C8-1",
+        "C16-3",
+        "C16-5",
+        "P4-2",
+        "C16-1",
+        "P2-2"
+      ],
+      "length_measures": 64,
+      "subdivisions": 32
+    },
+    "C64-4": {
+      "children": [
+        "C16-3",
+        "P2-6",
+        "P2-3",
+        "C16-4",
+        "C4-3",
+        "P2-6",
+        "P4-0",
+        "C8-0",
+        "P2-0",
+        "C8-4"
+      ],
+      "length_measures": 64,
+      "subdivisions": 32
+    },
+    "C64-5": {
+      "children": [
+        "P2-5",
+        "C8-6",
+        "C16-3",
+        "C8-0",
+        "C4-0",
+        "P4-2",
+        "C16-6",
+        "P2-5",
+        "P2-7",
+        "P2-5"
+      ],
+      "length_measures": 64,
+      "subdivisions": 32
+    },
+    "C64-6": {
+      "children": [
+        "C8-4",
+        "P2-0",
+        "C8-4",
+        "P2-1",
+        "C16-3",
+        "C16-1",
+        "C8-6",
+        "P4-0"
+      ],
+      "length_measures": 64,
+      "subdivisions": 32
+    },
+    "C64-7": {
+      "children": [
+        "P4-1",
+        "C16-2",
+        "C4-1",
+        "C16-6",
+        "P4-1",
+        "C16-0",
+        "P2-2",
+        "P2-1"
+      ],
+      "length_measures": 64,
+      "subdivisions": 32
+    },
+    "C8-0": {
+      "children": [
+        "P1-3",
+        "P2-7",
+        "P2-0",
+        "P1-2",
+        "P2-0"
+      ],
+      "length_measures": 8,
+      "subdivisions": 8
+    },
+    "C8-1": {
+      "children": [
+        "P2-6",
+        "P1-3",
+        "P1-2",
+        "P2-7",
+        "P1-0",
+        "P1-1"
+      ],
+      "length_measures": 8,
+      "subdivisions": 8
+    },
+    "C8-2": {
+      "children": [
+        "P1-1",
+        "P2-7",
+        "P2-4",
+        "P2-4",
+        "P1-2"
+      ],
+      "length_measures": 8,
+      "subdivisions": 8
+    },
+    "C8-3": {
+      "children": [
+        "P1-3",
+        "P2-3",
+        "P2-5",
+        "P1-3",
+        "P2-3"
+      ],
+      "length_measures": 8,
+      "subdivisions": 8
+    },
+    "C8-4": {
+      "children": [
+        "P1-2",
+        "P2-3",
+        "P2-6",
+        "P1-0",
+        "P1-0",
+        "P1-3"
+      ],
+      "length_measures": 8,
+      "subdivisions": 8
+    },
+    "C8-5": {
+      "children": [
+        "P1-3",
+        "P2-3",
+        "P1-0",
+        "P2-0",
+        "P2-3"
+      ],
+      "length_measures": 8,
+      "subdivisions": 8
+    },
+    "C8-6": {
+      "children": [
+        "P2-3",
+        "P1-3",
+        "P2-3",
+        "P2-1",
+        "P1-3"
+      ],
+      "length_measures": 8,
+      "subdivisions": 8
+    },
+    "C8-7": {
+      "children": [
+        "P1-0",
+        "P2-7",
+        "P2-2",
+        "P1-1",
+        "P1-1",
+        "P1-0"
+      ],
+      "length_measures": 8,
+      "subdivisions": 8
+    },
+    "P1-0": {
+      "length_measures": 1
+    },
+    "P1-1": {
+      "length_measures": 1
+    },
+    "P1-2": {
+      "length_measures": 1
+    },
+    "P1-3": {
+      "length_measures": 1
+    },
+    "P2-0": {
+      "length_measures": 2
+    },
+    "P2-1": {
+      "length_measures": 2
+    },
+    "P2-2": {
+      "length_measures": 2
+    },
+    "P2-3": {
+      "length_measures": 2
+    },
+    "P2-4": {
+      "length_measures": 2
+    },
+    "P2-5": {
+      "length_measures": 2
+    },
+    "P2-6": {
+      "length_measures": 2
+    },
+    "P2-7": {
+      "length_measures": 2
+    },
+    "P4-0": {
+      "length_measures": 4
+    },
+    "P4-1": {
+      "length_measures": 4
+    },
+    "P4-2": {
+      "length_measures": 4
+    },
+    "P4-3": {
+      "length_measures": 4
+    }
+  },
+  "start_symbol": "C256-3"
+}
