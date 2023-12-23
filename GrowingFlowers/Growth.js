@@ -1,11 +1,16 @@
+const MAX_GROWTH_STEPS = 500;
+const BUD_TIME = 10;
+const EARLY_GROWTH_TIME = 10;
+
 class Node {
-    constructor(index, parent_index) {
+    constructor(index, parent_index, growth_step) {
         this.index = index;
         this.parent_index = parent_index;
+        this.growth_step = growth_step;
 
         // The leaf nodes are flowers. Assume a leaf until
         // this node is grown.
-        this.is_flower = true;
+        this.is_flower = false;
     }
 }
 
@@ -17,10 +22,12 @@ class Growth {
         this.grid = new Array(grid_width * grid_height);
 
         const start_index = this.hash(start_x, start_y);
-        this.grid[start_index] = new Node(start_index, undefined);
+        this.grid[start_index] = new Node(start_index, undefined, 0);
 
         // Start simple with a stack
         this.frontier = [start_index];
+
+        this.growth_step = 0;
     }
 
     hash(x, y) {
@@ -38,13 +45,15 @@ class Growth {
         const [x, y] = this.unhash(index);
         const neighbors = [];
 
-        // List neighbors in order from top to bottom
-        // so we favor upwards growth if selected greedily
+        // List neighbors in order from bottom to top so
+        // when we push to the stack we favor upwards growth
 
-        // up
-        if (y > 0) {
-            neighbors.push(index - this.grid_width);
+        // down
+        /*
+        if (y < this.grid_width - 1) {
+            neighbors.push(index + this.grid_width);
         }
+        */
 
         // left
         if (x > 0) {
@@ -53,12 +62,12 @@ class Growth {
 
         // right
         if (x < this.grid_width - 1) {
-            neighbors.push(index + 1)
+            neighbors.push(index + 1);
         }
 
-        // down
-        if (y < this.grid_width - 1) {
-            neighbors.push(index + this.grid_width);
+        // up
+        if (y > 0) {
+            neighbors.push(index - this.grid_width);
         }
 
         return neighbors;
@@ -66,8 +75,20 @@ class Growth {
 
     // Grow one simulation step (if possible)
     grow_step() {
+        // Always keep the simulation time ticking so flowers grow
+        // even if we stop early.
+        const step = this.growth_step;
+        this.growth_step++;
+
         // Stop when the stack is empty
         if (this.frontier.length === 0) {
+            console.log("Done growing!");
+            return;
+        }
+
+        if (step > MAX_GROWTH_STEPS) {
+            // Still keep the simulat
+            console.log("Max growth reached!");
             return;
         }
 
@@ -82,15 +103,24 @@ class Growth {
             (i) => this.grid[i] === undefined
         );
 
+        // For the first few steps, make the chance of skipping low
+        const skip_chance = step < EARLY_GROWTH_TIME ? 0.1 : 0.45;
+
+        let added_branches = false;
         for (const neighbor_index of valid_neighbors) {
             // Flip a coin. If heads, skip this neighbor.
-            if (Math.random() < 0.5) {
+            if (Math.random() < skip_chance) {
                 continue;
             }
 
-            this.grid[neighbor_index] = new Node(neighbor_index, current_index);
-            this.grid[current_index].is_flower = false;
+            this.grid[neighbor_index] = new Node(neighbor_index, current_index, this.growth_step);
             this.frontier.push(neighbor_index);
+            added_branches = true;
+        }
+
+        // If we didn't add branches, mark this node as a flower
+        if (!added_branches) {
+            this.grid[current_index].is_flower = true;
         }
     }
 
@@ -119,6 +149,11 @@ class Growth {
         fill(flower_color);
         noStroke();
         for (const flower_node of flowers) {
+            // Only draw the flower if the node has been around for a while
+            if (this.growth_step - flower_node.growth_step <= BUD_TIME) {
+                continue;
+            }
+
             const [x, y] = this.unhash(flower_node.index);
             ellipse(x * SPACING, y * SPACING, 6);
         }

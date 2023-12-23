@@ -29,11 +29,23 @@ const GROWTH = new Growth(GRID_WIDTH, START_Y + 1, START_X, START_Y);
 let flower_color;
 function setup() {
     createCanvas(WIDTH, HEIGHT);
-    flower_color = color(
-        random(0, 255),
-        random(0, 255),
-        random(0, 255)
-    );
+
+    const FLOWER_COLORS = [
+        // Purple
+        color(148, 3, 252),
+        // Red
+        color(255, 0, 0),
+        // Pale blue
+        color(173, 224, 237),
+        // Yellow
+        color(255, 208, 38),
+        // Blue
+        color(34, 5, 255),
+        // Orange
+        color(255, 149, 0),
+    ]
+
+    flower_color = random(FLOWER_COLORS);
 }
 
 function draw() {
@@ -43,6 +55,7 @@ function draw() {
     translate(OFFSET_X, OFFSET_Y);
 
     // Draw the background grid for reference
+    /*
     fill(128);
     noStroke();
     for (let i = 0; i < GRID_WIDTH; i++) {
@@ -50,6 +63,7 @@ function draw() {
             ellipse(i * SPACING, j * SPACING, 2);
         }
     }
+    */
 
     // Draw the bottom-most stem in green
     const STEM_COLOR = color(33, 112, 37);
