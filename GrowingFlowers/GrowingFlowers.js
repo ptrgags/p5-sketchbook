@@ -25,7 +25,6 @@ const START_Y = FLOWERPOT.y - 2;
 // to only above the start y
 const GROWTH = new Growth(GRID_WIDTH, START_Y + 1, START_X, START_Y);
 
-
 let flower_color;
 function setup() {
     createCanvas(WIDTH, HEIGHT);
@@ -65,14 +64,16 @@ function draw() {
     }
     */
 
+    // Draw a trellis
+    stroke(71, 52, 26);
+    strokeWeight(8);
+
     // Draw the bottom-most stem in green
     const STEM_COLOR = color(33, 112, 37);
     stroke(STEM_COLOR)
     strokeWeight(4);
     noFill();
     line(START_X * SPACING, START_Y * SPACING, START_X * SPACING, (START_Y + 2) * SPACING);
-    
-    
     
     GROWTH.draw(SPACING, STEM_COLOR, flower_color);
 
@@ -87,7 +88,6 @@ function draw() {
         FLOWERPOT.height * SPACING
     );
     rect(FLOWERPOT.x * SPACING, FLOWERPOT.y * SPACING, FLOWERPOT.width * SPACING, SPACING);
-
 
     pop();
 

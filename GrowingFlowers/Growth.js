@@ -50,13 +50,6 @@ class Growth {
         // List neighbors in order from bottom to top so
         // when we push to the stack we favor upwards growth
 
-        // down
-        /*
-        if (y < this.grid_width - 1) {
-            neighbors.push(index + this.grid_width);
-        }
-        */
-
         // left
         if (x > 0) {
             neighbors.push(index - 1);
