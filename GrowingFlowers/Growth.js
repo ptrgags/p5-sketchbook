@@ -1,6 +1,8 @@
-const MAX_GROWTH_STEPS = 500;
+const MAX_GROWTH_STEPS = 2000;
 const BUD_TIME = 10;
 const EARLY_GROWTH_TIME = 10;
+
+
 
 class Node {
     constructor(index, parent_index, growth_step) {
@@ -118,9 +120,23 @@ class Growth {
             added_branches = true;
         }
 
+        // Every once and a while, shuffle the list so the growth
+        // happens all over, not just DFS
+        if (step % 20 === 0) {
+            this.shuffle();
+        }
+
         // If we didn't add branches, mark this node as a flower
         if (!added_branches) {
             this.grid[current_index].is_flower = true;
+        }
+    }
+
+    shuffle() {
+        const array = this.frontier;
+        for (let i = array.length - 1; i >= 1; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[j], array[i]] = [array[i], array[j]];
         }
     }
 
