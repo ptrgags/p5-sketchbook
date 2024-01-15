@@ -1,6 +1,9 @@
 body {
     padding: 0;
     margin: 0;
+    font-family: sans-serif;
+    background-color: #350a3d;
+    color: #eeeec5;
 }
 
 .container {
