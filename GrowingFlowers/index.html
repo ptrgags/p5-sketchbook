@@ -6,13 +6,25 @@
   <script language="javascript" type="text/javascript" src="libraries/p5.min.js"></script>
   <script type="module">
     import { sketch } from "./GrowingFlowers.js";
-    const p5_sketch = new p5(sketch);
+    const p5_sketch = new p5(sketch, "container");
   </script>
-  <style> 
-    body { padding: 0; margin: 0; } 
+  <style>
+    body {
+        font-family: sans-serif;
+        background-color: #003020;
+        color: #eeeec5;
+    }
+
+    .container {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
   </style>
 </head>
 
 <body>
+    <div id="container" class="container"></div>
 </body>
 </html>
