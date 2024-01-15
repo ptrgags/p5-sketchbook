@@ -1,3 +1,5 @@
+import { Growth } from "./Growth.js";
+
 const WIDTH = 500;
 const HEIGHT = 700;
 
@@ -25,73 +27,73 @@ const START_Y = FLOWERPOT.y - 2;
 // to only above the start y
 const GROWTH = new Growth(GRID_WIDTH, START_Y + 1, START_X, START_Y);
 
-let flower_color;
-function setup() {
-    createCanvas(WIDTH, HEIGHT);
-
+export const sketch = (p) => {
     const FLOWER_COLORS = [
         // Purple
-        color(148, 3, 252),
+        p.color(148, 3, 252),
         // Red
-        color(255, 0, 0),
+        p.color(255, 0, 0),
         // Pale blue
-        color(173, 224, 237),
+        p.color(173, 224, 237),
         // Yellow
-        color(255, 208, 38),
+        p.color(255, 208, 38),
         // Blue
-        color(34, 5, 255),
+        p.color(34, 5, 255),
         // Orange
-        color(255, 149, 0),
+        p.color(255, 149, 0),
     ]
 
-    flower_color = random(FLOWER_COLORS);
-}
-
-function draw() {
-    background(0);
-
-    push();
-    translate(OFFSET_X, OFFSET_Y);
-
-    // Draw the background grid for reference
-    /*
-    fill(128);
-    noStroke();
-    for (let i = 0; i < GRID_WIDTH; i++) {
-        for (let j = 0; j <= START_Y; j++) {
-            ellipse(i * SPACING, j * SPACING, 2);
-        }
+    let flower_color;
+    p.setup = () => {
+        p.createCanvas(WIDTH, HEIGHT);
+        flower_color = p.random(FLOWER_COLORS);
     }
-    */
 
-    // Draw a trellis
-    stroke(71, 52, 26);
-    strokeWeight(8);
-
-    // Draw the bottom-most stem in green
-    const STEM_COLOR = color(33, 112, 37);
-    stroke(STEM_COLOR)
-    strokeWeight(4);
-    noFill();
-    line(START_X * SPACING, START_Y * SPACING, START_X * SPACING, (START_Y + 2) * SPACING);
+    p.draw = () => {
+        p.background(0);
     
-    GROWTH.draw(SPACING, STEM_COLOR, flower_color);
-
-    // Draw the flowerpot in brown. Draw it last so it hides the bottom of the
-    // bottom stem
-    fill(71, 52, 26);
-    stroke(0);
-    rect(
-        (FLOWERPOT.x + 1) * SPACING,
-        FLOWERPOT.y * SPACING,
-        (FLOWERPOT.width - 2) * SPACING,
-        FLOWERPOT.height * SPACING
-    );
-    rect(FLOWERPOT.x * SPACING, FLOWERPOT.y * SPACING, FLOWERPOT.width * SPACING, SPACING);
-
-    pop();
-
-    if (frameCount % 10 == 0) {
-        GROWTH.grow_step();
+        p.push();
+        p.translate(OFFSET_X, OFFSET_Y);
+    
+        // Draw a trellis
+        p.stroke(71, 52, 26);
+        p.strokeWeight(8);
+    
+        // Draw the bottom-most stem in green
+        const STEM_COLOR = p.color(33, 112, 37);
+        p.stroke(STEM_COLOR)
+        p.strokeWeight(4);
+        p.noFill();
+        p.line(
+            START_X * SPACING,
+            START_Y * SPACING,
+            START_X * SPACING,
+            (START_Y + 2) * SPACING
+        );
+        
+        GROWTH.draw(p, SPACING, STEM_COLOR, flower_color);
+    
+        // Draw the flowerpot in brown. Draw it last so it hides the bottom of
+        // the bottom stem
+        p.fill(71, 52, 26);
+        p.stroke(0);
+        p.rect(
+            (FLOWERPOT.x + 1) * SPACING,
+            FLOWERPOT.y * SPACING,
+            (FLOWERPOT.width - 2) * SPACING,
+            FLOWERPOT.height * SPACING
+        );
+        p.rect(
+            FLOWERPOT.x * SPACING,
+            FLOWERPOT.y * SPACING,
+            FLOWERPOT.width * SPACING, 
+            SPACING
+        );
+    
+        p.pop();
+    
+        if (p.frameCount % 10 == 0) {
+            GROWTH.grow_step();
+        }
     }
 }

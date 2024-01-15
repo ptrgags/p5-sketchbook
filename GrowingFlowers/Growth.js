@@ -2,8 +2,6 @@ const MAX_GROWTH_STEPS = 2000;
 const BUD_TIME = 10;
 const EARLY_GROWTH_TIME = 10;
 
-
-
 class Node {
     constructor(index, parent_index, growth_step) {
         this.index = index;
@@ -16,7 +14,7 @@ class Node {
     }
 }
 
-class Growth {
+export class Growth {
     constructor(grid_width, grid_height, start_x, start_y) {
         this.grid_width = grid_width;
         this.grid_height = grid_height;
@@ -133,7 +131,7 @@ class Growth {
         }
     }
 
-    draw(spacing, stem_color, flower_color) {
+    draw(p, spacing, stem_color, flower_color) {
         const flowers = [];
         for (const node of this.grid) {
             if (node === undefined) {
@@ -141,12 +139,12 @@ class Growth {
             }
 
             // Draw a stem connecting this node to the parent
-            fill(stem_color);
-            noFill();
+            p.fill(stem_color);
+            p.noFill();
             if (node.parent_index !== undefined) {
                 const [x, y] = this.unhash(node.index);
                 const [px, py] = this.unhash(node.parent_index);
-                line(x * spacing, y * spacing, px * spacing, py * spacing);
+                p.line(x * spacing, y * spacing, px * spacing, py * spacing);
             }
 
             // Mark flower nodes for drawing that in the second pass
@@ -155,8 +153,8 @@ class Growth {
             }
         }
 
-        fill(flower_color);
-        noStroke();
+        p.fill(flower_color);
+        p.noStroke();
         for (const flower_node of flowers) {
             // Only draw the flower if the node has been around for a while
             if (this.growth_step - flower_node.growth_step <= BUD_TIME) {
@@ -164,7 +162,7 @@ class Growth {
             }
 
             const [x, y] = this.unhash(flower_node.index);
-            ellipse(x * SPACING, y * SPACING, 6);
+            p.ellipse(x * spacing, y * spacing, 6);
         }
     }
 }
