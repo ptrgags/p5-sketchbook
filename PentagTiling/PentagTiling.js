@@ -176,9 +176,25 @@ function find_cell(x, y) {
   return [row, 4 * half + col];
 }
 
+function can_select(state, row, col) {
+  for (const grid of state.grids) {
+    const cell = grid.get_cell(row, col);
+    if (!cell) {
+      // out of bounds, short circuit the whole function
+      return false;
+    }
+
+    if (cell.is_selectable) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 const state = {
   mouse_cell: undefined,
-  grid: new PentagGrid(ROWS, COLS),
+  grids: [new PentagGrid(ROWS, COLS), new PentagGrid(ROWS, COLS)],
 };
 
 export const sketch = (p) => {
@@ -196,25 +212,33 @@ export const sketch = (p) => {
     p.stroke(127);
     p.strokeWeight(2);
     p.fill(255);
-    for (const cell of state.grid) {
+    for (const cell of state.grids[0]) {
       draw_pentag_cell(p, cell.row, cell.col);
     }
 
     // Highlight the cell the mouse is hovered over
+    p.fill(0, 255, 255);
     if (state.mouse_cell) {
       const [mouse_row, mouse_col] = state.mouse_cell;
-      const cell = state.grid.get_cell(mouse_row, mouse_col);
-      if (cell.is_selectable) {
-        p.fill(0, 255, 255);
+      if (can_select(state, mouse_row, mouse_col)) {
         draw_pentag_cell(p, mouse_row, mouse_col);
       }
     }
 
-    // Draw all arcs as a warmup
+    // Draw the first layer of arcs thick in a mint green
     p.noFill();
-    p.strokeWeight(10);
+    p.stroke(3, 252, 152);
+    p.strokeWeight(15);
     p.strokeCap(p.SQUARE);
-    for (const cell of state.grid) {
+    for (const cell of state.grids[0]) {
+      draw_pentag_arcs(p, cell.row, cell.col, cell.arc_flags);
+    }
+
+    //Draw the second layer of arcs thinner and in orange
+    p.noFill();
+    p.stroke(255, 89, 0);
+    p.strokeWeight(4);
+    for (const cell of state.grids[1]) {
       draw_pentag_arcs(p, cell.row, cell.col, cell.arc_flags);
     }
   };
@@ -241,7 +265,9 @@ export const sketch = (p) => {
 
     const mouse_cell = find_cell(x, y);
     if (mouse_cell) {
-      state.grid.select(...mouse_cell);
+      for (const grid of state.grids) {
+        grid.select(...mouse_cell);
+      }
     }
 
     return false;

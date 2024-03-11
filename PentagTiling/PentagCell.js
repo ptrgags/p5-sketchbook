@@ -1,3 +1,9 @@
+const SIDE_VERTICAL = 0;
+const SIDE_TOP = 1;
+const SIDE_TOP_DIAG = 2;
+const SIDE_BOTTOM_DIAG = 3;
+const SIDE_BOTTOM = 4;
+
 export class PentagCell {
   constructor(row, col) {
     this.row = row;
@@ -22,7 +28,7 @@ export class PentagCell {
   }
 
   get is_selectable() {
-    return this.arc_choice_count > 1;
+    return this.arc_choice_count > 0;
   }
 
   get arc_flags() {
@@ -42,25 +48,18 @@ export class PentagCell {
     return [false, false, false, false];
   }
 
-  get_partner() {
-    if (this.arc_type === undefined) {
-      throw new Error("Can't get partner without an arc type!");
-    }
-
+  get_neighbor(side) {
     const col_direction = this.is_flipped ? -1 : 1;
 
-    // Flat side
-    if (this.arc_type === 0) {
+    if (side === SIDE_VERTICAL) {
       return [this.row, this.col - col_direction];
     }
 
-    // Top side
-    if (this.arc_type === 1) {
+    if (side === SIDE_TOP) {
       return [this.row - 1, this.col];
     }
 
-    // Top diagonal
-    if (this.arc_type === 2) {
+    if (side === SIDE_TOP_DIAG) {
       switch (this.col % 4) {
         case 0:
           return [this.row - 1, this.col + 1];
@@ -73,8 +72,7 @@ export class PentagCell {
       }
     }
 
-    // Bottom diagonal
-    if (this.arc_type === 3) {
+    if (side === SIDE_BOTTOM_DIAG) {
       switch (this.col % 4) {
         case 0:
           return [this.row, this.col + 1];
@@ -87,8 +85,23 @@ export class PentagCell {
       }
     }
 
-    // Bottom side
     return [this.row + 1, this.col];
+  }
+
+  get all_neighbors() {
+    const result = [];
+    for (let i = 0; i < 5; i++) {
+      result.push(this.get_neighbor(i));
+    }
+    return result;
+  }
+
+  get_partner() {
+    if (this.arc_type === undefined) {
+      throw new Error("Can't get partner without an arc type!");
+    }
+
+    return this.get_neighbor(this.arc_type);
   }
 
   select_random() {
@@ -104,7 +117,6 @@ export class PentagCell {
     this.arc_type = index;
 
     this.arc_choices = [false, false, false, false, false];
-    this.arc_choices[index] = true;
   }
 
   select(arc_type) {
@@ -114,6 +126,5 @@ export class PentagCell {
 
     this.arc_type = arc_type;
     this.arc_choices = [false, false, false, false, false];
-    this.arc_choices[arc_type] = true;
   }
 }

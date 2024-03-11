@@ -19,8 +19,7 @@ export class PentagGrid {
   clear_grid() {
     for (let i = 0; i < this.rows; i++) {
       for (let j = 0; j < this.cols; j++) {
-        // Skip cells off the end of the grid
-        if (i === this.rows - 1 && PentagGrid.needs_y_offset(j)) {
+        if (!this.in_bounds(i, j)) {
           continue;
         }
 
@@ -29,7 +28,28 @@ export class PentagGrid {
     }
   }
 
+  get_partner(cell) {
+    const [partner_row, partner_col] = cell.get_partner();
+    return this.get_cell(partner_row, partner_col);
+  }
+
+  in_bounds(row, col) {
+    if (row < 0 || row >= this.rows || col < 0 || col >= this.cols) {
+      return false;
+    }
+
+    if (row === this.rows - 1 && PentagGrid.needs_y_offset(col)) {
+      return false;
+    }
+
+    return true;
+  }
+
   get_cell(row, col) {
+    if (!this.in_bounds(row, col)) {
+      return undefined;
+    }
+
     return this.grid[row * this.cols + col];
   }
 
@@ -50,32 +70,57 @@ export class PentagGrid {
     const arc_type = cell.arc_type;
     const partner_type = (5 - arc_type) % 5;
 
-    const partner = this.get_partner(cell);
+    const partner = this.get_cell(...cell.get_partner());
 
     if (partner) {
       partner.select(partner_type);
     }
-  }
 
-  get_partner(cell) {
-    const [partner_row, partner_col] = cell.get_partner();
-    if (
-      partner_row < 0 ||
-      partner_row >= this.rows ||
-      partner_col < 0 ||
-      partner_col >= this.cols
-    ) {
-      return undefined;
+    // Update constraints for this tile's neighbors
+    for (const [side, neighbor_coords] of cell.all_neighbors.entries()) {
+      const neighbor = this.get_cell(...neighbor_coords);
+      if (!neighbor) {
+        continue;
+      }
+
+      // We already handled the case of an empty side
+      if (side === arc_type) {
+        continue;
+      }
+
+      // To give an example, if the neighbor is in the up direction,
+      // then its empty direction must not be in the down direction else
+      // the arc in this tile will have nothing to connect to.
+      const opposite_side = (5 - side) % 5;
+      neighbor.arc_choices[opposite_side] = false;
+      console.log(
+        `${side}: updating constraints for tile ${neighbor.row},${neighbor.col}: ${opposite_side}=false`
+      );
     }
 
-    if (
-      partner_row === this.rows - 1 &&
-      PentagGrid.needs_y_offset(partner_col)
-    ) {
-      return undefined;
-    }
+    // Also update constraints for the partner tile's neighbors
+    if (partner) {
+      for (const [side, neighbor_coords] of partner.all_neighbors.entries()) {
+        const neighbor = this.get_cell(...neighbor_coords);
+        if (!neighbor) {
+          continue;
+        }
 
-    return this.get_cell(partner_row, partner_col);
+        // We already handled the case of an empty side
+        if (side === partner_type) {
+          continue;
+        }
+
+        // To give an example, if the neighbor is in the up direction,
+        // then its empty direction must not be in the down direction else
+        // the arc in this tile will have nothing to connect to.
+        const opposite_side = (5 - side) % 5;
+        neighbor.arc_choices[opposite_side] = false;
+        console.log(
+          `updating constraints for tile ${neighbor.row},${neighbor.col}: ${opposite_side}=false`
+        );
+      }
+    }
   }
 
   static needs_y_offset(col) {
