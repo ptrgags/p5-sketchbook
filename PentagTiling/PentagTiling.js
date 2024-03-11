@@ -119,6 +119,23 @@ function draw_pentag_arcs(p, row, col, arc_enabled) {
   }
 }
 
+function get_arc_flags(tile_type) {
+  switch (tile_type) {
+    case 0:
+      return [true, false, false, true, false];
+    case 1:
+      return [false, false, true, false, true];
+    case 2:
+      return [false, true, false, true, false];
+    case 3:
+      return [true, false, true, false, false];
+    case 4:
+      return [false, true, false, false, true];
+  }
+
+  return undefined;
+}
+
 export const sketch = (p) => {
   p.setup = () => {
     p.createCanvas(WIDTH, HEIGHT);
@@ -155,7 +172,7 @@ export const sketch = (p) => {
 
         p.strokeWeight(10);
         p.strokeCap(p.SQUARE);
-        draw_pentag_arcs(p, row, col, [true, true, true, true, true]);
+        draw_pentag_arcs(p, row, col, get_arc_flags(row % 5));
       }
     }
   };
