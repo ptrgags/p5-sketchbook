@@ -1,3 +1,5 @@
+import { PentagGrid } from "./PentagGrid.js";
+
 /**
  * An artistic tiling using pentagons. Not regular pentagons, but
  * a square + triangle, like some luggage/shopping tags.
@@ -37,15 +39,6 @@ function draw_pentag(p, point_x, point_y, flipped) {
   p.endShape(p.CLOSE);
 }
 
-function needs_y_offset(col) {
-  // For every four columns, the second and third ones need to be shifted.
-  // In other words, if the columns are numbered 0, 1, 2, 3, we want 1 and 2.
-  //
-  // If we cycle this left (col - 1) === (col + 3) (mod 4), we have
-  // 3, 0, 1, 2, and now we can select out 0 or 1 by simple less than.
-  return (col + 3) % 4 < 2;
-}
-
 function get_pentag_point(row, col) {
   const column_quad = Math.floor(col / 4);
   const OFFSETS = [3, 2, 8, 7];
@@ -53,7 +46,7 @@ function get_pentag_point(row, col) {
 
   // For every four columns, the second and third ones need to be
   // shifted one square vertically
-  const offset_y = needs_y_offset(col);
+  const offset_y = PentagGrid.needs_y_offset(col);
   const y = 2 * row + Number(offset_y) + 1;
 
   return [x, y];
@@ -128,23 +121,6 @@ function draw_pentag_arcs(p, row, col, arc_enabled) {
   }
 }
 
-function get_arc_flags(tile_type) {
-  switch (tile_type) {
-    case 0:
-      return [true, false, false, true, false];
-    case 1:
-      return [false, false, true, false, true];
-    case 2:
-      return [false, true, false, true, false];
-    case 3:
-      return [true, false, true, false, false];
-    case 4:
-      return [false, true, false, false, true];
-  }
-
-  return undefined;
-}
-
 function find_cell(x, y) {
   const grid_row = Math.floor(y / SQUARE_SIZE);
   const grid_col = Math.floor(x / SQUARE_SIZE);
@@ -185,7 +161,7 @@ function find_cell(x, y) {
   }
 
   let row;
-  if (needs_y_offset(col)) {
+  if (PentagGrid.needs_y_offset(col)) {
     row = Math.floor((grid_row - 1) / 2);
   } else {
     row = Math.floor(grid_row / 2);
@@ -193,7 +169,7 @@ function find_cell(x, y) {
 
   // The tiles in the offset columns at the edge of the screen are a bit
   // cropped, so ignore them.
-  if (needs_y_offset(col) && (row < 0 || row >= ROWS - 1)) {
+  if (PentagGrid.needs_y_offset(col) && (row < 0 || row >= ROWS - 1)) {
     return undefined;
   }
 
@@ -202,6 +178,7 @@ function find_cell(x, y) {
 
 const state = {
   mouse_cell: undefined,
+  grid: new PentagGrid(ROWS, COLS),
 };
 
 export const sketch = (p) => {
@@ -219,36 +196,26 @@ export const sketch = (p) => {
     p.stroke(127);
     p.strokeWeight(2);
     p.fill(255);
-    for (let row = 0; row < ROWS; row++) {
-      for (let col = 0; col < COLS; col++) {
-        // The offset tiles go offscreen a tiny bit, so ignore them.
-        if (row === ROWS - 1 && needs_y_offset(col)) {
-          continue;
-        }
-
-        draw_pentag_cell(p, row, col);
-      }
+    for (const cell of state.grid) {
+      draw_pentag_cell(p, cell.row, cell.col);
     }
 
+    // Highlight the cell the mouse is hovered over
     if (state.mouse_cell) {
       const [mouse_row, mouse_col] = state.mouse_cell;
-      p.fill(0, 255, 255);
-      draw_pentag_cell(p, mouse_row, mouse_col);
+      const cell = state.grid.get_cell(mouse_row, mouse_col);
+      if (cell.is_selectable) {
+        p.fill(0, 255, 255);
+        draw_pentag_cell(p, mouse_row, mouse_col);
+      }
     }
 
     // Draw all arcs as a warmup
     p.noFill();
     p.strokeWeight(10);
     p.strokeCap(p.SQUARE);
-    for (let row = 0; row < ROWS; row++) {
-      for (let col = 0; col < COLS; col++) {
-        // The offset tiles go offscreen a tiny bit, so ignore them.
-        if (row === ROWS - 1 && needs_y_offset(col)) {
-          continue;
-        }
-
-        draw_pentag_arcs(p, row, col, get_arc_flags(row % 5));
-      }
+    for (const cell of state.grid) {
+      draw_pentag_arcs(p, cell.row, cell.col, cell.arc_flags);
     }
   };
 
@@ -256,9 +223,27 @@ export const sketch = (p) => {
     const x = p.mouseX;
     const y = p.mouseY;
     if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT) {
+      state.mouse_cell = undefined;
       return true;
     }
 
     state.mouse_cell = find_cell(x, y);
+
+    return false;
+  };
+
+  p.mouseReleased = () => {
+    const x = p.mouseX;
+    const y = p.mouseY;
+    if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT) {
+      return true;
+    }
+
+    const mouse_cell = find_cell(x, y);
+    if (mouse_cell) {
+      state.grid.select(...mouse_cell);
+    }
+
+    return false;
   };
 };
