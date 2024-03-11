@@ -37,6 +37,15 @@ function draw_pentag(p, point_x, point_y, flipped) {
   p.endShape(p.CLOSE);
 }
 
+function needs_y_offset(col) {
+  // For every four columns, the second and third ones need to be shifted.
+  // In other words, if the columns are numbered 0, 1, 2, 3, we want 1 and 2.
+  //
+  // If we cycle this left (col - 1) === (col + 3) (mod 4), we have
+  // 3, 0, 1, 2, and now we can select out 0 or 1 by simple less than.
+  return (col + 3) % 4 < 2;
+}
+
 function get_pentag_point(row, col) {
   const column_quad = Math.floor(col / 4);
   const OFFSETS = [3, 2, 8, 7];
@@ -44,7 +53,7 @@ function get_pentag_point(row, col) {
 
   // For every four columns, the second and third ones need to be
   // shifted one square vertically
-  const offset_y = (col + 3) % 4 < 2;
+  const offset_y = needs_y_offset(col);
   const y = 2 * row + Number(offset_y) + 1;
 
   return [x, y];
@@ -136,6 +145,65 @@ function get_arc_flags(tile_type) {
   return undefined;
 }
 
+function find_cell(x, y) {
+  const grid_row = Math.floor(y / SQUARE_SIZE);
+  const grid_col = Math.floor(x / SQUARE_SIZE);
+
+  const grid_x = x % SQUARE_SIZE;
+  const grid_y = y % SQUARE_SIZE;
+  const is_bottom_left = grid_y > grid_x;
+  const is_top_left = grid_y < SQUARE_SIZE - 1 - grid_x;
+
+  // The pentag tiling repeats twice horizontally
+  const half = Math.floor(grid_col / 10);
+  // Column number within this half of the canvas
+  const half_col = Math.floor(grid_col % 10);
+
+  let col;
+  if (half_col < 2) {
+    col = 0;
+  } else if (half_col === 2) {
+    // Handle where the pentags interlock
+    if (grid_row % 2 === 0) {
+      col = is_bottom_left ? 0 : 1;
+    } else {
+      col = is_top_left ? 0 : 1;
+    }
+  } else if (half_col < 5) {
+    col = 1;
+  } else if (half_col < 7) {
+    col = 2;
+  } else if (half_col === 7) {
+    // Handle where pentags interlock
+    if (grid_row % 2 === 0) {
+      col = is_top_left ? 2 : 3;
+    } else {
+      col = is_bottom_left ? 2 : 3;
+    }
+  } else {
+    col = 3;
+  }
+
+  let row;
+  if (needs_y_offset(col)) {
+    row = Math.floor((grid_row - 1) / 2);
+  } else {
+    row = Math.floor(grid_row / 2);
+  }
+
+  // The tiles in the offset columns at the edge of the screen are a bit
+  // cropped, so ignore them.
+  if (needs_y_offset(col) && (row < 0 || row >= ROWS - 1)) {
+    return undefined;
+  }
+
+  return [row, 4 * half + col];
+}
+
+const state = {
+  mouse_cell: undefined,
+};
+
 export const sketch = (p) => {
   p.setup = () => {
     p.createCanvas(WIDTH, HEIGHT);
@@ -154,7 +222,7 @@ export const sketch = (p) => {
     for (let row = 0; row < ROWS; row++) {
       for (let col = 0; col < COLS; col++) {
         // The offset tiles go offscreen a tiny bit, so ignore them.
-        if (row === ROWS - 1 && (col + 3) % 4 < 2) {
+        if (row === ROWS - 1 && needs_y_offset(col)) {
           continue;
         }
 
@@ -162,18 +230,35 @@ export const sketch = (p) => {
       }
     }
 
+    if (state.mouse_cell) {
+      const [mouse_row, mouse_col] = state.mouse_cell;
+      p.fill(0, 255, 255);
+      draw_pentag_cell(p, mouse_row, mouse_col);
+    }
+
     // Draw all arcs as a warmup
+    p.noFill();
+    p.strokeWeight(10);
+    p.strokeCap(p.SQUARE);
     for (let row = 0; row < ROWS; row++) {
       for (let col = 0; col < COLS; col++) {
         // The offset tiles go offscreen a tiny bit, so ignore them.
-        if (row === ROWS - 1 && (col + 3) % 4 < 2) {
+        if (row === ROWS - 1 && needs_y_offset(col)) {
           continue;
         }
 
-        p.strokeWeight(10);
-        p.strokeCap(p.SQUARE);
         draw_pentag_arcs(p, row, col, get_arc_flags(row % 5));
       }
     }
+  };
+
+  p.mouseMoved = () => {
+    const x = p.mouseX;
+    const y = p.mouseY;
+    if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT) {
+      return true;
+    }
+
+    state.mouse_cell = find_cell(x, y);
   };
 };
