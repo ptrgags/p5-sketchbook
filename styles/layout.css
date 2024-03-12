@@ -1,14 +1,38 @@
 body {
-    padding: 0;
-    margin: 0;
-    font-family: sans-serif;
-    background-color: #350a3d;
-    color: #eeeec5;
+  padding: 0;
+  margin: 0;
+  font-family: sans-serif;
+  background-color: #350a3d;
+  color: #eeeec5;
 }
 
 .container {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/*
+ * TODO: figure out how to adjust mouse coordinates for object-fit: contain
+.container canvas {
+  max-width: 100vw;
+  object-fit: contain;
+}
+*/
+
+a:link {
+  color: #e2e259;
+}
+
+a:visited {
+  color: #a3a342;
+}
+
+a:hover {
+  color: #33addd;
+}
+
+.description {
+  padding: 20px;
 }
