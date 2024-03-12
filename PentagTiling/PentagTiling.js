@@ -61,6 +61,16 @@ function draw_pentag_cell(p, row, col) {
   draw_pentag(p, x * SQUARE_SIZE, y * SQUARE_SIZE, flipped);
 }
 
+function draw_dot(p, row, col, radius) {
+  const [x, y] = get_pentag_point(row, col);
+  const flipped = col % 2 === 1;
+  const x_direction = flipped ? -1.0 : 1.0;
+
+  const cx = (x - 1.5 * x_direction) * SQUARE_SIZE;
+  const cy = y * SQUARE_SIZE;
+  p.circle(cx, cy, 2 * radius);
+}
+
 function draw_pentag_arcs(p, row, col, arc_enabled) {
   const [x, y] = get_pentag_point(row, col);
   const flipped = col % 2 === 1;
@@ -209,15 +219,15 @@ export const sketch = (p) => {
     p.noFill();
 
     // Draw the pentag grid
-    p.stroke(127);
+    p.stroke(59, 66, 81);
     p.strokeWeight(2);
-    p.fill(255);
+    p.fill(82, 123, 146);
     for (const cell of state.grids[0]) {
       draw_pentag_cell(p, cell.row, cell.col);
     }
 
     // Highlight the cell the mouse is hovered over
-    p.fill(0, 255, 255);
+    p.fill(199, 255, 243);
     if (state.mouse_cell) {
       const [mouse_row, mouse_col] = state.mouse_cell;
       if (can_select(state, mouse_row, mouse_col)) {
@@ -225,21 +235,30 @@ export const sketch = (p) => {
       }
     }
 
-    // Draw the first layer of arcs thick in a mint green
+    // Draw the first layer of arcs/ circles to indicate clickable
     p.noFill();
-    p.stroke(3, 252, 152);
+    p.stroke(165, 229, 197);
     p.strokeWeight(15);
     p.strokeCap(p.SQUARE);
     for (const cell of state.grids[0]) {
-      draw_pentag_arcs(p, cell.row, cell.col, cell.arc_flags);
+      if (cell.is_selectable) {
+        draw_dot(p, cell.row, cell.col, 0.25 * SQUARE_SIZE);
+      } else {
+        draw_pentag_arcs(p, cell.row, cell.col, cell.arc_flags);
+      }
     }
 
     //Draw the second layer of arcs thinner and in orange
     p.noFill();
-    p.stroke(255, 89, 0);
+    p.stroke(133, 71, 49);
+    //p.stroke(43, 98, 103);
     p.strokeWeight(4);
     for (const cell of state.grids[1]) {
-      draw_pentag_arcs(p, cell.row, cell.col, cell.arc_flags);
+      if (cell.is_selectable) {
+        draw_dot(p, cell.row, cell.col, 0.125 * SQUARE_SIZE);
+      } else {
+        draw_pentag_arcs(p, cell.row, cell.col, cell.arc_flags);
+      }
     }
   };
 
