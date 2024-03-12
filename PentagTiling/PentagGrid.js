@@ -76,15 +76,12 @@ export class PentagGrid {
       partner.select(partner_type);
     }
 
+    const one_option_left = [];
+
     // Update constraints for this tile's neighbors
     for (const [side, neighbor_coords] of cell.all_neighbors.entries()) {
       const neighbor = this.get_cell(...neighbor_coords);
       if (!neighbor) {
-        continue;
-      }
-
-      // We already handled the case of an empty side
-      if (side === arc_type) {
         continue;
       }
 
@@ -93,9 +90,10 @@ export class PentagGrid {
       // the arc in this tile will have nothing to connect to.
       const opposite_side = (5 - side) % 5;
       neighbor.arc_choices[opposite_side] = false;
-      console.log(
-        `${side}: updating constraints for tile ${neighbor.row},${neighbor.col}: ${opposite_side}=false`
-      );
+
+      if (neighbor.arc_choice_count === 1) {
+        one_option_left.push(neighbor);
+      }
     }
 
     // Also update constraints for the partner tile's neighbors
@@ -106,20 +104,22 @@ export class PentagGrid {
           continue;
         }
 
-        // We already handled the case of an empty side
-        if (side === partner_type) {
-          continue;
-        }
-
         // To give an example, if the neighbor is in the up direction,
         // then its empty direction must not be in the down direction else
         // the arc in this tile will have nothing to connect to.
         const opposite_side = (5 - side) % 5;
         neighbor.arc_choices[opposite_side] = false;
-        console.log(
-          `updating constraints for tile ${neighbor.row},${neighbor.col}: ${opposite_side}=false`
-        );
+
+        if (neighbor.arc_choice_count === 1) {
+          one_option_left.push(neighbor);
+        }
       }
+    }
+
+    // If we have cells that only have one option left, recursively select
+    // them so we don't end up with a tile with no possible choices later.
+    for (const cell of one_option_left) {
+      this.select(cell.row, cell.col);
     }
   }
 
