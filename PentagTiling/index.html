@@ -1,16 +1,41 @@
 <html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script language="javascript" type="text/javascript" src="../libraries/p5.min.js"></script>
-  <script type="module">
-    import { sketch } from "./PentagTiling.js";
-    const p5_sketch = new p5(sketch, "container");
-  </script>
-  <link rel="stylesheet" href="../styles/layout.css"></style>
-</head>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../libraries/p5.min.js"
+    ></script>
+    <script type="module">
+      import { sketch } from "./PentagTiling.js";
+      const p5_sketch = new p5(sketch, "container");
+    </script>
+    <link rel="stylesheet" href="../styles/layout.css" />
+  </head>
 
-<body>
-    <div id="container" class="container"></div>
-</body>
+  <body>
+    <div class="container">
+      <h1>Pentag Tiling</h1>
+      <div id="container"></div>
+      <div class="description">
+        <p>Click any tile with a circle to add arcs to the tiling.</p>
+        <p>
+          It is possible to get stuck (i.e. have a tile with no valid options).
+          One strategy to prevent this is to always click through an entire
+          column or row at a time.
+        </p>
+        <p>
+          This is a tiling of tag-shaped pentagons (I call them "pentags" for
+          lack of a better word) and arcs. It's based on some
+          <a href="./2024-03-12_PentagDoodle.jpg">doodles</a> I made on graph
+          paper.
+        </p>
+        <p>
+          For more details, see the
+          <a href="./2024-03-12_PentagExplainer.png">explainer</a>
+        </p>
+      </div>
+    </div>
+  </body>
 </html>

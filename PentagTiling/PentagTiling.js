@@ -215,19 +215,17 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    p.stroke(127);
-    p.noFill();
-
     // Draw the pentag grid
-    p.stroke(59, 66, 81);
+    // Color theme taken from https://lospec.com/palette-list/cthulhu-16
+    p.stroke(59, 66, 81); // dark blue
     p.strokeWeight(2);
-    p.fill(82, 123, 146);
+    p.fill(82, 123, 146); // pale dark blue
     for (const cell of state.grids[0]) {
       draw_pentag_cell(p, cell.row, cell.col);
     }
 
     // Highlight the cell the mouse is hovered over
-    p.fill(199, 255, 243);
+    p.fill(199, 255, 243); // light blue
     if (state.mouse_cell) {
       const [mouse_row, mouse_col] = state.mouse_cell;
       if (can_select(state, mouse_row, mouse_col)) {
@@ -235,7 +233,7 @@ export const sketch = (p) => {
       }
     }
 
-    // Draw the first layer of arcs/ circles to indicate clickable
+    // Draw the first layer of arcs/dots in sea green
     p.noFill();
     p.stroke(165, 229, 197);
     p.strokeWeight(15);
@@ -248,10 +246,9 @@ export const sketch = (p) => {
       }
     }
 
-    //Draw the second layer of arcs thinner and in orange
+    //Draw the second layer of arcs/dots in brown
     p.noFill();
     p.stroke(133, 71, 49);
-    //p.stroke(43, 98, 103);
     p.strokeWeight(4);
     for (const cell of state.grids[1]) {
       if (cell.is_selectable) {
