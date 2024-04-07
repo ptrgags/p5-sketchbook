@@ -1,3 +1,4 @@
+import { fix_mouse_coords } from "../common/fix_mouse_coords.js";
 import { PentagGrid } from "./PentagGrid.js";
 
 /**
@@ -205,11 +206,13 @@ function can_select(state, row, col) {
 const state = {
   mouse_cell: undefined,
   grids: [new PentagGrid(ROWS, COLS), new PentagGrid(ROWS, COLS)],
+  canvas: undefined,
 };
 
 export const sketch = (p) => {
   p.setup = () => {
-    p.createCanvas(WIDTH, HEIGHT);
+    const canvas = p.createCanvas(WIDTH, HEIGHT);
+    state.canvas = canvas.elt;
   };
 
   p.draw = () => {
@@ -260,8 +263,10 @@ export const sketch = (p) => {
   };
 
   p.mouseMoved = () => {
-    const x = p.mouseX;
-    const y = p.mouseY;
+    // p5.js doesn't account for my CSS that scales the canvas while keeping
+    // aspect ratio
+    const [x, y] = fix_mouse_coords(state.canvas, p.mouseX, p.mouseY);
+
     if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT) {
       state.mouse_cell = undefined;
       return true;
@@ -273,8 +278,10 @@ export const sketch = (p) => {
   };
 
   p.mouseReleased = () => {
-    const x = p.mouseX;
-    const y = p.mouseY;
+    // p5.js doesn't account for my CSS that scales the canvas while keeping
+    // aspect ratio
+    const [x, y] = fix_mouse_coords(state.canvas, p.mouseX, p.mouseY);
+
     if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT) {
       return true;
     }
