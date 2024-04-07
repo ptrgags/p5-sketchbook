@@ -10,9 +10,32 @@ export class Meter {
 
     this.amount = MAX_AMOUNT;
     this.empty_count = 0;
+
+    this.broken = false;
+
+    // Randomly generate positions where a crack will appear
+    // if you wait too long before refilling the meter.
+    this.crack_xs = [
+      0.25 + 0.5 * Math.random(),
+      0.25 + 0.5 * Math.random(),
+      0.25 + 0.5 * Math.random(),
+      0.25 + 0.5 * Math.random(),
+    ];
+
+    this.crack_ys = [
+      0,
+      0.25 + 0.1 * Math.random(),
+      0.5 + 0.1 * Math.random(),
+      0.75 + 0.1 * Math.random(),
+    ];
   }
 
   fill(amount) {
+    // Once a meter is broken, you can't go back.
+    if (this.broken) {
+      return;
+    }
+
     this.amount += amount;
     // Overfilling the meter helps you catch up. Though it takes a few clicks
     // to do so.
@@ -28,7 +51,11 @@ export class Meter {
     // you let it sit, the worse it gets.
     if (this.amount <= 0) {
       this.amount = 0;
-      this.empty_count = Math.min(this.empty_count + 2, 255);
+      this.empty_count = Math.min(this.empty_count + 2, 2 * 255);
+    }
+
+    if (this.empty_count > 255) {
+      this.broken = true;
     }
   }
 
@@ -63,6 +90,18 @@ export class Meter {
         this.x + METER_WIDTH,
         this.y + h * METER_HEIGHT
       );
+    }
+
+    // Draw cracks if the meter has broken.
+    if (this.broken) {
+      for (let i = 0; i < this.crack_xs.length - 1; i++) {
+        p.line(
+          this.x + this.crack_xs[i] * METER_WIDTH,
+          this.y + this.crack_ys[i] * METER_HEIGHT,
+          this.x + this.crack_xs[i + 1] * METER_WIDTH,
+          this.y + this.crack_ys[i + 1] * METER_HEIGHT
+        );
+      }
     }
 
     p.pop();
