@@ -16,9 +16,67 @@
 
   <body>
     <div class="container">
-      <h1>SeashellTexture (2021)</h1>
+      <h1>Seashell Texture (2021)</h1>
       <div id="sketch"></div>
-      <div class="description"></div>
+      <div class="description">
+        <p>
+          This animation is a simulation of the pigmentation patterns on
+          seashells, based on the 1992 SIGGRAPH paper,
+          <a href="http://algorithmicbotany.org/papers/shells.sig92.pdf"
+            ><cite>Modeling Seashells</cite></a
+          >
+          by Fowler, Meinhardt and Prusinkiewicz.
+        </p>
+        <p>
+          In particular, this triangle-looking pattern is a model for the shell
+          of
+          <a href="https://en.wikipedia.org/wiki/Oliva_porphyria"
+            ><i>Olivia Poryphia</i></a
+          >, a.k.a. tent olive sea snail. Interestingly, this pattern can also
+          be created via
+          <a
+            href="https://mathworld.wolfram.com/ElementaryCellularAutomaton.html"
+            >Elementary Cellular Automata</a
+          >. In fact, I've done this in a different project, see my
+          <a
+            href="https://github.com/ptrgags/paper-toaster?tab=readme-ov-file#elementary-cellular-automaton-2022-07-09"
+            >paper-toaster</a
+          >
+          repo.
+        </p>
+        <p>
+          The paper linked above describes a reaction-diffusion system in one
+          dimension for how activator and inhibitor hormones move across the
+          shell's edge. The shell is growing only at the edge, everything else
+          is just a history of past growth, similar to a
+          <a href="https://en.wikipedia.org/wiki/Strip_photography"
+            >slit scan animation</a
+          >.
+        </p>
+        <p>
+          With this slit-scan interpretation in mind, we can examine the motion
+          of the darker pigment:
+        </p>
+        <ul>
+          <li>
+            The tips of triangles pointing up are events where the chemical
+            reactions produce new pigment.
+          </li>
+          <li>
+            The sides of triangles pointing upwards show the pigment spreading
+            out horizontally.
+          </li>
+          <li>
+            The sides of triangles pointing downwards represent two waves of
+            pigment heading towards each other.
+          </li>
+          <li>
+            The tips of triangles pointing downwards are events where pigments
+            collide. The chemical reaction causes these to cancel out and you
+            get the lighter color afterwards.
+          </li>
+        </ul>
+      </div>
     </div>
   </body>
 </html>
