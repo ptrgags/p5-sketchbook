@@ -51,10 +51,10 @@ export class Meter {
     // you let it sit, the worse it gets.
     if (this.amount <= 0) {
       this.amount = 0;
-      this.empty_count = Math.min(this.empty_count + 2, 2 * 255);
+      this.empty_count = Math.min(this.empty_count + 2, 3 * 255);
     }
 
-    if (this.empty_count > 255) {
+    if (this.empty_count > 2 * 255) {
       this.broken = true;
     }
   }
