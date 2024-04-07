@@ -9,14 +9,27 @@ export class Meter {
     this.y = y;
 
     this.amount = MAX_AMOUNT;
+    this.empty_count = 0;
   }
 
   fill(amount) {
-    this.amount = Math.min(this.amount + amount, MAX_AMOUNT);
+    this.amount += amount;
+    // Overfilling the meter helps you catch up. Though it takes a few clicks
+    // to do so.
+    if (this.amount >= MAX_AMOUNT) {
+      this.amount = MAX_AMOUNT;
+      this.empty_count = Math.max(this.empty_count - 64, 0);
+    }
   }
 
   drain(amount) {
-    this.amount = Math.max(this.amount - amount, 0);
+    this.amount -= amount;
+    // Letting the meter drain completely means you're behind. The longer
+    // you let it sit, the worse it gets.
+    if (this.amount <= 0) {
+      this.amount = 0;
+      this.empty_count = Math.min(this.empty_count + 2, 255);
+    }
   }
 
   draw(p) {
@@ -24,7 +37,10 @@ export class Meter {
 
     // Fill a rect proportional to the current amount out of 255
     p.noStroke();
-    p.fill(127, 127, 255);
+    // The color gets more red the more you fail to empty the meter.
+    const red = Math.min(this.empty_count, 255);
+    const blue_green = 255 - red;
+    p.fill(red, 0, blue_green);
     const fill_height = (this.amount / 255) * METER_HEIGHT;
     p.rect(
       this.x,
