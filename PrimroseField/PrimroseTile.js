@@ -7,22 +7,21 @@ const MIN_SQUARE_SIZE = 16;
 // GRID_SIZE This should be either 8 or 16 depending on desired look
 // of an individual tile. Note that the larger this is, the smaller the possible
 // depth for a given image size.
-const GRID_SIZE = 16;
-const MIN_TILE_HEIGHT = MIN_SQUARE_SIZE * GRID_SIZE;
-const MIN_TILE_WIDTH = 2 * MIN_TILE_HEIGHT;
+const GRID_SIZE = 8;
+const MIN_TILE_WIDTH = MIN_SQUARE_SIZE * GRID_SIZE;
+const MIN_TILE_HEIGHT = 2 * MIN_TILE_WIDTH;
 
-// Desired output size = 4096 x 2048, roughly 4K but at a 2:1 aspect
-// ratio since that's required for this tiling.
-const IMAGE_HEIGHT = 512;
-const IMAGE_WIDTH = 2 * IMAGE_HEIGHT;
+// Desired output size in pixels.
+const IMAGE_WIDTH = 512;
+const IMAGE_HEIGHT = 2 * IMAGE_WIDTH;
 
 // we need to scale the tile up to compensate for the shrinking
 // that will happen by the tiling. The recursion depth can be computed
 // from this as well.
-const MAX_SCALE = IMAGE_HEIGHT / MIN_TILE_HEIGHT;
-const MAX_DEPTH = Math.log2(MAX_SCALE);
-const TILE_WIDTH = IMAGE_WIDTH;
-const TILE_HEIGHT = IMAGE_HEIGHT;
+const MAX_SCALE = IMAGE_WIDTH / MIN_TILE_WIDTH;
+export const MAX_DEPTH = Math.log2(MAX_SCALE);
+export const TILE_WIDTH = IMAGE_WIDTH;
+export const TILE_HEIGHT = IMAGE_HEIGHT;
 const CROSS_STROKE_LENGTH = MAX_SCALE * MIN_CROSS_LENGTH;
 const CROSS_STROKE_THICKNESS = MAX_SCALE * MIN_CROSS_WIDTH;
 const SQUARE_SIZE = MAX_SCALE * MIN_SQUARE_SIZE;
@@ -36,15 +35,15 @@ const MEDIUM_PURPLE = [103, 58, 161];
 const MEDIUM_BLUE = [36, 142, 236];
 const LIGHT_BLUE = [66, 253, 228];
 
-class PrimroseTile {
-  constructor() {
-    this.gfx = createGraphics(TILE_WIDTH, TILE_HEIGHT);
+export class PrimroseTile {
+  constructor(p) {
+    this.gfx = p.createGraphics(TILE_WIDTH, TILE_HEIGHT);
 
     this.palette = {
-      checkerboard_bg: color(...MEDIUM_BLUE),
-      checkerboard_fg: color(...MEDIUM_PURPLE),
-      cross_dark: color(...DARK_MAGENTA),
-      cross_light: color(...LIGHT_BLUE),
+      checkerboard_bg: p.color(...MEDIUM_BLUE),
+      checkerboard_fg: p.color(...MEDIUM_PURPLE),
+      cross_dark: p.color(...DARK_MAGENTA),
+      cross_light: p.color(...LIGHT_BLUE),
     };
 
     this.make_graphics();
@@ -52,7 +51,7 @@ class PrimroseTile {
 
   checkerboard(bg_color, fg_color) {
     // To save half the effort, draw a background for one
-    // color and then just draw the
+    // color and then just draw the other color
     this.gfx.noStroke();
     this.gfx.fill(bg_color);
     this.gfx.rect(0, 0, TILE_HEIGHT, TILE_HEIGHT);
@@ -119,7 +118,7 @@ class PrimroseTile {
     this.draw_primrose_field();
 
     this.gfx.push();
-    this.gfx.translate(TILE_WIDTH / 2, 0);
+    this.gfx.translate(0, TILE_HEIGHT / 2);
     this.draw_primrose_field(true);
     this.gfx.pop();
 
@@ -131,7 +130,7 @@ class PrimroseTile {
     }
   }
 
-  draw() {
-    image(this.gfx, 0, 0);
+  draw(p) {
+    p.image(this.gfx, 0, 0);
   }
 }
