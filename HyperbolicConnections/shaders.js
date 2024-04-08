@@ -1,7 +1,7 @@
-const PRIMITIVE_CIRCLE = 0.0;
-const PRIMITIVE_LINE = 1.0;
+export const PRIMITIVE_CIRCLE = 0.0;
+export const PRIMITIVE_LINE = 1.0;
 
-const VERTEX_SHADER = `
+export const VERTEX_SHADER = `
 attribute vec3 aPosition;
 attribute vec2 aTexCoord;
 
@@ -15,7 +15,7 @@ void main() {
 }
 `;
 
-const FRAGMENT_SHADER = (pair_count) => `
+export const FRAGMENT_SHADER = (pair_count) => `
 #line 0
 #define PAIR_COUNT ${pair_count}
 #define CIRCLE ${PRIMITIVE_CIRCLE.toFixed(1)}
@@ -130,6 +130,7 @@ vec2 warp(vec2 polar) {
 
 void main() {
   vec2 pos = v_uv;
+  pos.y *= 7.0 / 5.0;
   pos = to_polar(pos);
   pos = warp(pos);
   pos = to_rect(pos);
@@ -142,8 +143,8 @@ void main() {
   float radius = 1.0 + 0.001;
   float interior = 1.0;
   float feather_amount = 0.0025;
-  float unit_circle = circle(v_uv, vec2(0.0), radius, interior, feather_amount);
-  color = mix(vec3(0.0), color, unit_circle);
+  float unit_circle = circle(pos, vec2(0.0), radius, interior, feather_amount);
+  //color = mix(vec3(0.0), color, unit_circle);
   
   gl_FragColor = vec4(color, 1.0);
 }
