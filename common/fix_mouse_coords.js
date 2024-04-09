@@ -8,8 +8,12 @@
  * @returns {number[]} Fixed coords [x, y]
  */
 export function fix_mouse_coords(canvas, mouse_x, mouse_y) {
+  // This is what p5.js uses for its pixel ratio. I needed to use this
+  // since one of my monitors has a devicePixelRatio of 1.5, but p5.js
+  // rounds this up to 2
+  const pixel_ratio = Math.ceil(window.devicePixelRatio) || 1;
+
   // Get the resolution of the canvas' pixel data
-  const pixel_ratio = window.devicePixelRatio;
   const canvas_width = canvas.width / pixel_ratio;
   const canvas_height = canvas.height / pixel_ratio;
   const aspect_ratio = canvas_width / canvas_height;
