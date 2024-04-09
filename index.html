@@ -3,15 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles/layout.css" />
     <style>
-      body {
-        padding: 0;
-        margin: 0;
-        font-family: sans-serif;
-        background-color: #350a3d;
-        color: #eeeec5;
-      }
-
       .linklist {
         width: 100%;
         display: flex;
@@ -22,51 +15,110 @@
 
       .link {
         width: 50%;
-        max-width: 400px;
-        background-color: #581664;
+        max-width: 600px;
+        background-color: var(--background-light);
         padding: 10px;
         border-radius: 10px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
       }
 
-      a:link {
-        color: #e2e259;
+      .link img {
+        width: 250px;
       }
 
-      a:visited {
-        color: #a3a342;
-      }
-
-      a:hover {
-        color: #33addd;
+      @media screen and (max-width: 500px) {
+        .link {
+          width: 250px;
+        }
       }
     </style>
+    <script type="module" src="common/sketchbook-navbar.js"></script>
   </head>
 
   <body>
+    <sketchbook-navbar></sketchbook-navbar>
     <div id="container" class="linklist">
       <h1>P5 Sketchbook</h1>
       <p>
         A collection of art experiments I've made in
         <a href="https://p5js.org/">p5.js</a>
       </p>
-      <div class="link"><a href="./PentagTiling/">Pentag Tiling</a> (2024)</div>
       <div class="link">
+        <a href="./HyperbolicConnections/">
+          <img
+            alt="view hyperbolic connections example"
+            src="thumbnails/hyperbolic-connections.png"
+          />
+        </a>
+        <a href="./HyperbolicConnections/">Hyperbolic Connections</a> (2021,
+        2024)
+      </div>
+      <div class="link">
+        <a href="./PentagTiling/">
+          <img
+            alt="view pentag tiling example"
+            src="thumbnails/pentag-tiling.png"
+          />
+        </a>
+        <a href="./PentagTiling/">Pentag Tiling</a> (2024)
+      </div>
+      <div class="link">
+        <a href="./GrowingFlowers/">
+          <img
+            alt="view growing flowers example"
+            src="thumbnails/growing-flowers.png"
+          />
+        </a>
         <a href="./GrowingFlowers/">Growing Flowers</a> (2023)
       </div>
       <div class="link">
-        <a href="./HyperbolicConnections/">HyperbolicConnections</a> (2021)
+        <a href="./OrigamiTiles/">
+          <img
+            alt="view origami tiles example"
+            src="thumbnails/origami-tiles.png"
+          />
+        </a>
+        <a href="./OrigamiTiles/">Origami Tiles</a>
+        (2021)
       </div>
-      <div class="link"><a href="./OrigamiTiles/">Origami Tiles</a> (2021)</div>
       <div class="link">
+        <a href="./SeashellTexture/">
+          <img
+            alt="view seashell texture"
+            src="thumbnails/seashell-texture.png"
+          />
+        </a>
         <a href="./SeashellTexture/">Seashell Texture</a> (2021)
       </div>
       <div class="link">
-        <a href="./PrimroseField/">Primrose Field</a> (2020)
+        <a href="./PrimroseField/">
+          <img
+            alt="view primrose field example"
+            src="thumbnails/primrose-field.png"
+          />
+        </a>
+        <a href="./PrimroseField/">Primrose Field Tiling</a> (2020)
       </div>
-      <div class="link"><a href="./Bezier/">Bezier</a> (2016)</div>
-      <div class="link"><a href="./HexGrid/">Hex Grid</a> (2016)</div>
-      <!-- SpaceTransform once converted to JS -->
-      <!-- Motion once converted to JS -->
+      <div class="link">
+        <a href="./Bezier/">
+          <img
+            alt="view bezier curve example"
+            src="thumbnails/bezier-curve.png"
+          />
+        </a>
+        <a href="./Bezier/">Bézier Curve</a>
+        (2016)
+      </div>
+      <div class="link">
+        <a href="./HexGrid/">
+          <img alt="view hex grid example" src="thumbnails/hex-grid.png" />
+        </a>
+        <a href="./HexGrid/">Hex Grid</a> (2016)
+      </div>
     </div>
   </body>
 </html>

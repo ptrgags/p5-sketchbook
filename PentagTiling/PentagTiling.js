@@ -1,3 +1,4 @@
+import { fix_mouse_coords } from "../common/fix_mouse_coords.js";
 import { PentagGrid } from "./PentagGrid.js";
 
 /**
@@ -208,8 +209,9 @@ const state = {
 };
 
 export const sketch = (p) => {
+  let canvas;
   p.setup = () => {
-    p.createCanvas(WIDTH, HEIGHT);
+    canvas = p.createCanvas(WIDTH, HEIGHT).elt;
   };
 
   p.draw = () => {
@@ -260,8 +262,10 @@ export const sketch = (p) => {
   };
 
   p.mouseMoved = () => {
-    const x = p.mouseX;
-    const y = p.mouseY;
+    // p5.js doesn't account for my CSS that scales the canvas while keeping
+    // aspect ratio
+    const [x, y] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
+
     if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT) {
       state.mouse_cell = undefined;
       return true;
@@ -273,8 +277,10 @@ export const sketch = (p) => {
   };
 
   p.mouseReleased = () => {
-    const x = p.mouseX;
-    const y = p.mouseY;
+    // p5.js doesn't account for my CSS that scales the canvas while keeping
+    // aspect ratio
+    const [x, y] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
+
     if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT) {
       return true;
     }

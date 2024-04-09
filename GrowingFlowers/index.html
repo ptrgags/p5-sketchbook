@@ -1,16 +1,49 @@
 <html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script language="javascript" type="text/javascript" src="../libraries/p5.min.js"></script>
-  <script type="module">
-    import { sketch } from "./GrowingFlowers.js";
-    const p5_sketch = new p5(sketch, "container");
-  </script>
-  <link rel="stylesheet" href="../styles/layout.css"></style>
-</head>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../libraries/p5.min.js"
+    ></script>
+    <script type="module">
+      import { sketch } from "./GrowingFlowers.js";
+      import "../common/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../styles/layout.css" />
+  </head>
 
-<body>
-    <div id="container" class="container"></div>
-</body>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>Growing Flowers (2023)</h1>
+      <div id="sketch"></div>
+      <div class="description">
+        <p>Every time the page is refreshed, a new plant is grown.</p>
+        <p>
+          I made this as a generative art experiment that's fun to watch. At
+          each time step, pick a node in the tree. A random neighbor is chosen
+          (with a chance of skipping) to grow a new branch. If no new branches
+          are added, the node becomes a "flower" and blooms after a delay.
+        </p>
+        <p>
+          This is similar to a random depth-first-search (DFS) maze generation
+          algorithm, however:
+        </p>
+        <ol>
+          <li>
+            Growth can go upwards and sideways, but not downwards. Furthermore,
+            upwards growth is weighted slightly higher.
+          </li>
+          <li>
+            Every several simulation steps, I shuffle the list of unvisited
+            nodes so the plant grows more "bushy". a true DFS produces a plant
+            that mostly follows a single path.
+          </li>
+        </ol>
+      </div>
+    </div>
+  </body>
 </html>

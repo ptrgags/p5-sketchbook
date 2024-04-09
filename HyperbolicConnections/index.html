@@ -1,21 +1,48 @@
 <html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- PLEASE NO CHANGES BELOW THIS LINE (UNTIL I SAY SO) -->
-  <script language="javascript" type="text/javascript" src="libraries/p5.min.js"></script>
-  <script language="javascript" type="text/javascript" src="boundaries.js"></script>
-  <script language="javascript" type="text/javascript" src="palette.js"></script>
-  <script language="javascript" type="text/javascript" src="shaders.js"></script>
-  <script language="javascript" type="text/javascript" src="HyperbolicConnections.js"></script>
-  <!-- OK, YOU CAN MAKE CHANGES BELOW THIS LINE AGAIN -->
-
-  <!-- This line removes any default padding and style.
-       You might only need one of these values set. -->
-  <style> body { padding: 0; margin: 0; } </style>
-</head>
-
-<body>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../libraries/p5.min.js"
+    ></script>
+    <script type="module">
+      import { sketch } from "./HyperbolicConnections.js";
+      import "../common/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../styles/layout.css" />
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>Hyperbolic Connections (2021, 2024)</h1>
+      <div id="sketch"></div>
+      <div class="description">
+        <p>
+          Click and drag the canvas to warp the image. The horizontal direction
+          controls the amount of stretching, the vertical direction controls the
+          amount of twisting.
+        </p>
+        <p>
+          This sketch generates abstract patterns on the Poincaré model of the
+          hyperbolic plane.
+        </p>
+        <p>
+          This sketch has a
+          <a
+            href="https://github.com/ptrgags/p5-sketchbook/tree/main/HyperbolicConnections"
+            >README</a
+          >
+          in GitHub which provides a more detailed explanation with diagrams.
+        </p>
+        <p>
+          Since returning to the original sketch, I modified it a bit to show
+          the outside of the disk (just because it looks cool!) and to add the
+          warping behavior.
+        </p>
+      </div>
+    </div>
+  </body>
 </html>

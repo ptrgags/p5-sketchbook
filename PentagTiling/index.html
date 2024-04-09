@@ -9,14 +9,16 @@
     ></script>
     <script type="module">
       import { sketch } from "./PentagTiling.js";
+      import "../common/sketchbook-navbar.js";
       const p5_sketch = new p5(sketch, "sketch");
     </script>
     <link rel="stylesheet" href="../styles/layout.css" />
   </head>
 
   <body>
+    <sketchbook-navbar></sketchbook-navbar>
     <div class="container">
-      <h1>Pentag Tiling</h1>
+      <h1>Pentag Tiling (2024)</h1>
       <div id="sketch"></div>
       <div class="description">
         <p>Click any tile with a circle to add arcs to the tiling.</p>
