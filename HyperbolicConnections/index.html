@@ -9,11 +9,13 @@
     ></script>
     <script type="module">
       import { sketch } from "./HyperbolicConnections.js";
+      import "../common/sketchbook-navbar.js";
       const p5_sketch = new p5(sketch, "sketch");
     </script>
     <link rel="stylesheet" href="../styles/layout.css" />
   </head>
   <body>
+    <sketchbook-navbar></sketchbook-navbar>
     <div class="container">
       <h1>Hyperbolic Connections (2021, 2024)</h1>
       <div id="sketch"></div>

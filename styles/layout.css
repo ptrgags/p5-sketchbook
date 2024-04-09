@@ -1,9 +1,19 @@
+:root {
+  --background-dark: #350a3d;
+  --background-light: #581664;
+}
+
 body {
   padding: 0;
   margin: 0;
   font-family: sans-serif;
-  background-color: #350a3d;
+  background-color: var(--background-dark);
   color: #eeeec5;
+}
+
+nav {
+  background-color: var(--background-light);
+  padding: 10px;
 }
 
 .container {

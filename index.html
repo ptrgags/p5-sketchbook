@@ -3,15 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles/layout.css" />
     <style>
-      body {
-        padding: 0;
-        margin: 0;
-        font-family: sans-serif;
-        background-color: #350a3d;
-        color: #eeeec5;
-      }
-
       .linklist {
         width: 100%;
         display: flex;
@@ -23,26 +16,16 @@
       .link {
         width: 50%;
         max-width: 400px;
-        background-color: #581664;
+        background-color: var(--background-light);
         padding: 10px;
         border-radius: 10px;
       }
-
-      a:link {
-        color: #e2e259;
-      }
-
-      a:visited {
-        color: #a3a342;
-      }
-
-      a:hover {
-        color: #33addd;
-      }
     </style>
+    <script type="module" src="common/sketchbook-navbar.js"></script>
   </head>
 
   <body>
+    <sketchbook-navbar></sketchbook-navbar>
     <div id="container" class="linklist">
       <h1>P5 Sketchbook</h1>
       <p>

@@ -9,12 +9,14 @@
     ></script>
     <script type="module">
       import { sketch } from "./SeashellTexture.js";
+      import "../common/sketchbook-navbar.js";
       const p5_sketch = new p5(sketch, "sketch");
     </script>
     <link rel="stylesheet" href="../styles/layout.css" />
   </head>
 
   <body>
+    <sketchbook-navbar></sketchbook-navbar>
     <div class="container">
       <h1>Seashell Texture (2021)</h1>
       <div id="sketch"></div>
