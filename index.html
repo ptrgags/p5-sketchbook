@@ -15,10 +15,25 @@
 
       .link {
         width: 50%;
-        max-width: 400px;
+        max-width: 600px;
         background-color: var(--background-light);
         padding: 10px;
         border-radius: 10px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .link img {
+        width: 250px;
+      }
+
+      @media screen and (max-width: 500px) {
+        .link {
+          width: 250px;
+        }
       }
     </style>
     <script type="module" src="common/sketchbook-navbar.js"></script>
@@ -33,22 +48,77 @@
         <a href="https://p5js.org/">p5.js</a>
       </p>
       <div class="link">
+        <a href="./HyperbolicConnections/">
+          <img
+            alt="view hyperbolic connections example"
+            src="thumbnails/hyperbolic-connections.png"
+          />
+        </a>
         <a href="./HyperbolicConnections/">Hyperbolic Connections</a> (2021,
         2024)
       </div>
-      <div class="link"><a href="./PentagTiling/">Pentag Tiling</a> (2024)</div>
       <div class="link">
+        <a href="./PentagTiling/">
+          <img
+            alt="view pentag tiling example"
+            src="thumbnails/pentag-tiling.png"
+          />
+        </a>
+        <a href="./PentagTiling/">Pentag Tiling</a> (2024)
+      </div>
+      <div class="link">
+        <a href="./GrowingFlowers/">
+          <img
+            alt="view growing flowers example"
+            src="thumbnails/growing-flowers.png"
+          />
+        </a>
         <a href="./GrowingFlowers/">Growing Flowers</a> (2023)
       </div>
-      <div class="link"><a href="./OrigamiTiles/">Origami Tiles</a> (2021)</div>
       <div class="link">
+        <a href="./OrigamiTiles/">
+          <img
+            alt="view origami tiles example"
+            src="thumbnails/origami-tiles.png"
+          />
+        </a>
+        <a href="./OrigamiTiles/">Origami Tiles</a>
+        (2021)
+      </div>
+      <div class="link">
+        <a href="./SeashellTexture/">
+          <img
+            alt="view seashell texture"
+            src="thumbnails/seashell-texture.png"
+          />
+        </a>
         <a href="./SeashellTexture/">Seashell Texture</a> (2021)
       </div>
       <div class="link">
+        <a href="./PrimroseField/">
+          <img
+            alt="view primrose field example"
+            src="thumbnails/primrose-field.png"
+          />
+        </a>
         <a href="./PrimroseField/">Primrose Field Tiling</a> (2020)
       </div>
-      <div class="link"><a href="./Bezier/">Bézier Curve</a> (2016)</div>
-      <div class="link"><a href="./HexGrid/">Hex Grid</a> (2016)</div>
+      <div class="link">
+        <a href="./Bezier/">
+          <img
+            alt="view bezier curve example"
+            src="thumbnails/bezier-curve.png"
+          />
+        </a>
+        <a href="./Bezier/">Bézier Curve</a>
+        (2016)
+      </div>
+      <div class="link">
+        <a href="./HexGrid/">
+          <img alt="view hex grid example" src="thumbnails/hex-grid.png" />
+        </a>
+        <a href="./HexGrid/">Hex Grid</a> (2016)
+      </div>
     </div>
   </body>
 </html>
