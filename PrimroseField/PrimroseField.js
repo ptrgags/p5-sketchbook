@@ -68,8 +68,8 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
     p.push();
-    const margin_x = (500 - TILE_WIDTH) / 2;
-    const margin_y = (700 - TILE_HEIGHT) / 2;
+    const margin_x = (p.width - TILE_WIDTH) / 2;
+    const margin_y = (p.height - TILE_HEIGHT) / 2;
     p.translate(margin_x, margin_y);
     draw_tiling(p, 2);
     p.pop();
