@@ -25,7 +25,7 @@ export const sketch = (p) => {
       p.circle(
         max_radius * radius * p.cos(angle),
         -max_radius * radius * p.sin(angle),
-        10
+        20
       );
 
       p.rect(
