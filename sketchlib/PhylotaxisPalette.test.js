@@ -10,6 +10,56 @@ describe("PhyllotaxisPalette", () => {
     });
   });
 
+  describe("get_point", () => {
+    it("throws for index less than 0", () => {
+      const palette = new PhyllotaxisPalette(10);
+
+      expect(() => {
+        return palette.get_point(-1);
+      }).toThrowError(/must be nonnegative/);
+    });
+
+    it("throws for index at length of palette", () => {
+      const palette = new PhyllotaxisPalette(10);
+
+      expect(() => {
+        return palette.get_point(10);
+      }).toThrowError(/must be less than the palette length of 10/);
+    });
+
+    it("index 0 results in (1, 0)", () => {
+      const palette = new PhyllotaxisPalette(15);
+
+      const result = palette.get_point(0);
+
+      expect(result).toEqual({
+        r: 1,
+        theta: 0,
+      });
+    });
+
+    it("in-between index computes the correct point", () => {
+      const palette = new PhyllotaxisPalette(7);
+
+      const { r, theta } = palette.get_point(3);
+
+      // 1 - 3/6
+      expect(r).toBe(0.5);
+
+      // 3 times the golden angle normalized to [0, 1)
+      expect(theta).toBeCloseTo(0.9167043820063725);
+    });
+
+    it("index N - 1 results in the origin", () => {
+      const palette = new PhyllotaxisPalette(13);
+
+      const { r } = palette.get_point(12);
+
+      // The angle doesn't matter
+      expect(r).toBe(0);
+    });
+  });
+
   describe("get_color", () => {
     it("throws for index less than 0", () => {
       const palette = new PhyllotaxisPalette(10);
