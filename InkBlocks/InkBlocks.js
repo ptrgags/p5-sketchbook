@@ -1,20 +1,10 @@
-const GOLDEN_RATIO = (1 + Math.sqrt(5)) / 2;
-const GOLDEN_ANGLE = (2 * Math.PI) / GOLDEN_RATIO / GOLDEN_RATIO;
+import { PhyllotaxisPalette } from "../sketchlib/PhyllotaxisPalette.js";
 
 const SQUARE_SIZE = 10;
 const ROW_COUNT = 70;
 
 const PALETTE_SIZE = 50;
-const PALETTE = new Array(PALETTE_SIZE);
-for (let i = 0; i <= PALETTE_SIZE; i++) {
-  const angle = i * GOLDEN_ANGLE;
-  const radius = 1.0 - i / PALETTE_SIZE;
-  PALETTE[i] = {
-    hue: (angle % (2.0 * Math.PI)) / (2.0 * Math.PI),
-    saturation: radius,
-    value: 1.0,
-  };
-}
+const PALETTE = new PhyllotaxisPalette(PALETTE_SIZE);
 
 class Pen {
   constructor(color, capacity) {
@@ -29,7 +19,7 @@ class PenCase {
     this.pens = new Array(pen_count);
     this.history = [];
     for (let i = 0; i < pen_count; i++) {
-      this.pens[i] = new Pen(PALETTE[i], 100);
+      this.pens[i] = new Pen(PALETTE.get_color(i), 100);
     }
     this.next_pen = pen_count;
   }
@@ -47,7 +37,7 @@ class PenCase {
 
     while (next_index < this.pen_count) {
       next_pens[next_index] = new Pen(
-        PALETTE[this.next_pen % PALETTE.length],
+        PALETTE.get_color(this.next_pen % PALETTE_SIZE),
         100
       );
       next_index++;
