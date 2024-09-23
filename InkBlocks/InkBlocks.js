@@ -51,28 +51,34 @@ class PenCase {
 
 export const sketch = (p) => {
   let pen_case = new PenCase(6);
+  pen_case.update();
+
   p.setup = () => {
     p.createCanvas(500, 700);
-  };
 
-  p.draw = () => {
+    // Only render the background once
     p.background(0);
 
     p.colorMode(p.HSB, 1.0);
-    for (const [i, pens] of pen_case.history.entries()) {
-      const row = i % ROW_COUNT;
-      const col = Math.floor(i / ROW_COUNT);
+  };
 
-      for (const [j, pen] of pens.entries()) {
-        const c = pen.color;
-        p.fill(c.hue, c.saturation, c.value);
-        p.rect(
-          col * (SQUARE_SIZE * pens.length + 3) + j * SQUARE_SIZE,
-          row * SQUARE_SIZE,
-          SQUARE_SIZE,
-          SQUARE_SIZE
-        );
-      }
+  p.draw = () => {
+    // Only render the most recent row on top of what was already rendered
+    const i = pen_case.history.length - 1;
+    const pens = pen_case.history[i];
+
+    const row = i % ROW_COUNT;
+    const col = Math.floor(i / ROW_COUNT);
+
+    for (const [j, pen] of pens.entries()) {
+      const c = pen.color;
+      p.fill(c.hue, c.saturation, c.value);
+      p.rect(
+        col * (SQUARE_SIZE * pens.length + 3) + j * SQUARE_SIZE,
+        row * SQUARE_SIZE,
+        SQUARE_SIZE,
+        SQUARE_SIZE
+      );
     }
 
     if (pen_case.history.length < 8 * ROW_COUNT) {
