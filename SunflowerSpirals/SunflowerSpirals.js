@@ -9,7 +9,7 @@ const PRIMORDIUM_SPEED = 3 / 16;
 const PRIMORDIUM_MIN_SIZE = 4;
 const PRIMORDIUM_GROWTH_RATE = 1 / 32;
 
-const MAX_PRIMORDIA = 250;
+const MAX_PRIMORDIA = 150;
 
 class Primordium {
   constructor(index) {
@@ -43,13 +43,43 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
+    const BROWN = p.color(63, 31, 0);
+    const ORANGE = p.color(255, 127, 0);
+    const YELLOW = p.color(255, 255, 0);
+
+    const BROWN_POINT = 0.5;
+    const ORANGE_POINT = 0.7;
+    const YELLOW_POINT = 0.8;
+
     for (const primordium of primordia) {
+      const dist = Math.min(primordium.distance / (0.5 * p.width));
+
+      let petal_color;
+      if (dist < BROWN_POINT) {
+        petal_color = BROWN;
+      } else if (dist < ORANGE_POINT) {
+        petal_color = p.lerpColor(
+          BROWN,
+          ORANGE,
+          p.map(dist, BROWN_POINT, ORANGE_POINT, 0, 1)
+        );
+      } else if (dist < YELLOW_POINT) {
+        petal_color = p.lerpColor(
+          ORANGE,
+          YELLOW,
+          p.map(dist, ORANGE_POINT, YELLOW_POINT, 0, 1)
+        );
+      } else {
+        petal_color = YELLOW;
+      }
+
       const yellowness = p.max(
         Math.pow(primordium.distance / (0.5 * p.width), 3.0),
         0.25
       );
 
-      p.fill(255 * yellowness, 255 * yellowness, 0);
+      p.fill(petal_color);
+      //p.fill(255 * yellowness, 255 * yellowness, 0);
       p.push();
       p.translate(p.width / 2, p.height / 2);
 
