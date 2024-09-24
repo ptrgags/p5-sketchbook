@@ -1,4 +1,5 @@
 import { Primordium } from "./Primordium.js";
+import { Petal } from "./Petal.js";
 
 // How many frames before the next primordium is created
 const PRIMORDIUM_CREATION_PERIOD = 10;
@@ -10,11 +11,54 @@ const PRIMORDIUM_GROWTH_RATE = 1 / 32;
 
 const MAX_PRIMORDIA = 150;
 
-function to_rect(r, theta) {
-  return {
-    x: r * Math.cos(theta),
-    y: r * -Math.sin(theta),
-  };
+function draw_petal(p, petal) {
+  // flip coordinates so y is up.
+  p.push();
+  p.scale(1, -1);
+
+  p.beginShape();
+  p.vertex(petal.start.x, petal.start.y);
+  p.vertex(petal.side_cw.x, petal.side_cw.y);
+  p.bezierVertex(
+    petal.control_cw.x,
+    petal.control_cw.y,
+    petal.control_tip.x,
+    petal.control_tip.y,
+    petal.tip.x,
+    petal.tip.y
+  );
+  p.bezierVertex(
+    petal.control_tip.x,
+    petal.control_tip.y,
+    petal.control_ccw.x,
+    petal.control_ccw.y,
+    petal.side_ccw.x,
+    petal.side_ccw.y
+  );
+  p.endShape(p.CLOSE);
+  p.pop();
+}
+
+function sunflower_palette(p, t) {
+  const BROWN = p.color(63, 31, 0);
+  const ORANGE = p.color(255, 127, 0);
+  const YELLOW = p.color(255, 255, 0);
+
+  const BROWN_POINT = 0.5;
+  const ORANGE_POINT = 0.7;
+  const YELLOW_POINT = 0.8;
+
+  if (t < BROWN_POINT) {
+    return BROWN;
+  } else if (t < ORANGE_POINT) {
+    const t_adjusted = p.map(t, BROWN_POINT, ORANGE_POINT, 0, 1);
+    return p.lerpColor(BROWN, ORANGE, t_adjusted);
+  } else if (t < YELLOW_POINT) {
+    const t_adjusted = p.map(t, ORANGE_POINT, YELLOW_POINT, 0, 1);
+    return p.lerpColor(ORANGE, YELLOW, t_adjusted);
+  } else {
+    return YELLOW;
+  }
 }
 
 export const sketch = (p) => {
@@ -28,82 +72,20 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    const BROWN = p.color(63, 31, 0);
-    const ORANGE = p.color(255, 127, 0);
-    const YELLOW = p.color(255, 255, 0);
-
-    const BROWN_POINT = 0.5;
-    const ORANGE_POINT = 0.7;
-    const YELLOW_POINT = 0.8;
-
     for (const primordium of primordia) {
-      const { r, theta } = primordium.get_position(p.frameCount);
+      const position = primordium.get_position(p.frameCount);
       const size = primordium.get_size(p.frameCount);
 
-      const dist = Math.min(r / (0.5 * p.width));
-
-      let petal_color;
-      if (dist < BROWN_POINT) {
-        petal_color = BROWN;
-      } else if (dist < ORANGE_POINT) {
-        petal_color = p.lerpColor(
-          BROWN,
-          ORANGE,
-          p.map(dist, BROWN_POINT, ORANGE_POINT, 0, 1)
-        );
-      } else if (dist < YELLOW_POINT) {
-        petal_color = p.lerpColor(
-          ORANGE,
-          YELLOW,
-          p.map(dist, ORANGE_POINT, YELLOW_POINT, 0, 1)
-        );
-      } else {
-        petal_color = YELLOW;
-      }
+      const dist = Math.min(position.r / (0.5 * p.width));
+      const petal_color = sunflower_palette(p, dist);
 
       p.fill(petal_color);
       p.push();
       p.translate(p.width / 2, p.height / 2);
 
-      const control_offset = 0.75;
-      const r_start = r - 2 * size;
-      const r_sides = r - size;
-      const r_control_points = r_sides + control_offset * size;
-      const r_tip = r + size;
-      const r_tip_control_point = r_tip - control_offset * size;
+      const petal = new Petal(position, size);
+      draw_petal(p, petal);
 
-      const HALF_ANGULAR_SIZE = 0.2;
-      const theta1 = theta - HALF_ANGULAR_SIZE;
-      const theta2 = theta + HALF_ANGULAR_SIZE;
-
-      const start = to_rect(r_start, theta);
-      const side1 = to_rect(r_sides, theta1);
-      const side2 = to_rect(r_sides, theta2);
-      const control1 = to_rect(r_control_points, theta1);
-      const control2 = to_rect(r_control_points, theta2);
-      const control_tip = to_rect(r_tip_control_point, theta);
-      const tip = to_rect(r_tip, theta);
-
-      p.beginShape();
-      p.vertex(start.x, start.y);
-      p.vertex(side1.x, side1.y);
-      p.bezierVertex(
-        control1.x,
-        control1.y,
-        control_tip.x,
-        control_tip.y,
-        tip.x,
-        tip.y
-      );
-      p.bezierVertex(
-        control_tip.x,
-        control_tip.y,
-        control2.x,
-        control2.y,
-        side2.x,
-        side2.y
-      );
-      p.endShape(p.CLOSE);
       p.pop();
     }
 
