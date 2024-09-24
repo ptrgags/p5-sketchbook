@@ -1,5 +1,4 @@
-const GOLDEN_RATIO = (1 + Math.sqrt(5)) / 2;
-const GOLDEN_ANGLE = (2 * Math.PI) / GOLDEN_RATIO / GOLDEN_RATIO;
+import { Primordium } from "./Primordium.js";
 
 // How many frames before the next primordium is created
 const PRIMORDIUM_CREATION_PERIOD = 10;
@@ -10,20 +9,6 @@ const PRIMORDIUM_MIN_SIZE = 4;
 const PRIMORDIUM_GROWTH_RATE = 1 / 32;
 
 const MAX_PRIMORDIA = 150;
-
-class Primordium {
-  constructor(index) {
-    this.index = index;
-    this.size = PRIMORDIUM_MIN_SIZE;
-    this.angle = index * GOLDEN_ANGLE;
-    this.distance = 0;
-  }
-
-  update() {
-    this.distance += PRIMORDIUM_SPEED;
-    this.size += PRIMORDIUM_GROWTH_RATE;
-  }
-}
 
 function to_rect(r, theta) {
   return {
@@ -52,7 +37,10 @@ export const sketch = (p) => {
     const YELLOW_POINT = 0.8;
 
     for (const primordium of primordia) {
-      const dist = Math.min(primordium.distance / (0.5 * p.width));
+      const { r, theta } = primordium.get_position(p.frameCount);
+      const size = primordium.get_size(p.frameCount);
+
+      const dist = Math.min(r / (0.5 * p.width));
 
       let petal_color;
       if (dist < BROWN_POINT) {
@@ -73,19 +61,9 @@ export const sketch = (p) => {
         petal_color = YELLOW;
       }
 
-      const yellowness = p.max(
-        Math.pow(primordium.distance / (0.5 * p.width), 3.0),
-        0.25
-      );
-
       p.fill(petal_color);
-      //p.fill(255 * yellowness, 255 * yellowness, 0);
       p.push();
       p.translate(p.width / 2, p.height / 2);
-
-      const r = primordium.distance;
-      const size = primordium.size;
-      const theta = primordium.angle;
 
       const control_offset = 0.75;
       const r_start = r - 2 * size;
@@ -130,17 +108,19 @@ export const sketch = (p) => {
     }
 
     if (p.frameCount % PRIMORDIUM_CREATION_PERIOD == 0) {
-      const primordium = new Primordium(primordia_count);
+      const primordium = new Primordium(
+        primordia_count,
+        p.frameCount,
+        PRIMORDIUM_MIN_SIZE,
+        PRIMORDIUM_SPEED,
+        PRIMORDIUM_GROWTH_RATE
+      );
       primordia.push(primordium);
       primordia_count++;
 
       if (primordia.length >= MAX_PRIMORDIA) {
         primordia.shift();
       }
-    }
-
-    for (const primordium of primordia) {
-      primordium.update();
     }
   };
 };

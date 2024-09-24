@@ -1,6 +1,4 @@
-const TAU = 2 * Math.PI;
-const PHI = (1 + Math.sqrt(5)) / 2;
-const GOLDEN_ANGLE = TAU / (PHI * PHI);
+import { TAU, GOLDEN_ANGLE } from "../sketchlib/math_consts.js";
 
 /**
  * A simple struct representing a color in the HSV color space
@@ -69,7 +67,6 @@ export class PhyllotaxisPalette {
   get_color(index) {
     const { r, theta } = this.get_point(index);
 
-    const TAU = 2.0 * Math.PI;
     const hue = theta / TAU;
     const saturation = r;
     const value = 1.0;
