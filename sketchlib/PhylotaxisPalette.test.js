@@ -96,7 +96,11 @@ describe("PhyllotaxisPalette", () => {
 
       // 5 times the golden angle normalized to [0, 1)
       expect(hue).toBeCloseTo(0.9098300562505257);
-      expect(saturation).toBeCloseTo(1 / 6);
+
+      // the radius of the point is 1 - 5/6 = 1/6
+      // But since there are more points near to the center of the circle,
+      // a sqrt is applied, giving sqrt(1/6)
+      expect(saturation).toBeCloseTo(0.40824829046);
       expect(value).toBe(1);
     });
 

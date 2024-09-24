@@ -1,6 +1,6 @@
 import { PhyllotaxisPalette } from "../sketchlib/PhyllotaxisPalette.js";
 
-const PRIMORDIUM_CREATION_PERIOD = 50;
+const PRIMORDIUM_CREATION_PERIOD = 10;
 const RECT_SIZE = 8;
 
 export const sketch = (p) => {
@@ -23,12 +23,9 @@ export const sketch = (p) => {
 
       p.push();
       p.translate(p.width / 2, p.height / 2);
-      const { r, theta } = palette.get_point(i);
-      p.circle(
-        max_radius * r * p.cos(theta),
-        -max_radius * r * p.sin(theta),
-        20
-      );
+      const point = palette.get_point(i);
+      const size = p.map(point.r, 0, 1, 10, 50);
+      p.circle(max_radius * point.x, -max_radius * point.y, size);
       p.pop();
 
       p.rect(0, i * RECT_SIZE, RECT_SIZE, RECT_SIZE);

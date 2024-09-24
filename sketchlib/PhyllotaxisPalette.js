@@ -1,4 +1,5 @@
 import { TAU, GOLDEN_ANGLE } from "../sketchlib/math_consts.js";
+import { Polar } from "./Polar.js";
 
 /**
  * A simple struct representing a color in the HSV color space
@@ -6,13 +7,6 @@ import { TAU, GOLDEN_ANGLE } from "../sketchlib/math_consts.js";
  * @property {number} hue The hue component from [0, 1]
  * @property {number} saturation The saturation component from [0, 1]
  * @property {number} value the value component from [0, 1]
- */
-
-/**
- * A simple struct representing polar coordinates
- * @typedef {Object} PolarCoords
- * @property {number} r The radius
- * @property {number} theta The angle
  */
 
 /**
@@ -53,10 +47,7 @@ export class PhyllotaxisPalette {
     const angle = index * GOLDEN_ANGLE;
     const radius = 1.0 - index / (this.primordia_count - 1);
 
-    return {
-      r: radius,
-      theta: angle % TAU,
-    };
+    return new Polar(radius, angle % TAU);
   }
 
   /**
@@ -68,7 +59,7 @@ export class PhyllotaxisPalette {
     const { r, theta } = this.get_point(index);
 
     const hue = theta / TAU;
-    const saturation = r;
+    const saturation = Math.sqrt(r);
     const value = 1.0;
 
     return {
