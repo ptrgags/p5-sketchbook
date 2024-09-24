@@ -3,7 +3,7 @@ import { PhyllotaxisPalette } from "../sketchlib/PhyllotaxisPalette.js";
 const SQUARE_SIZE = 10;
 const ROW_COUNT = 70;
 
-const PALETTE_SIZE = 50;
+const PALETTE_SIZE = 30;
 const PALETTE = new PhyllotaxisPalette(PALETTE_SIZE);
 
 class Pen {
