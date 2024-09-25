@@ -20,10 +20,10 @@ describe("Petal", () => {
     const size = 10;
 
     const petal = new Petal(anchor_point, size);
+
     const theta_start = petal.start.theta;
     const theta_control_tip = petal.control_tip.theta;
     const theta_tip = petal.tip.theta;
-
     expect(theta_start).toBe(center_angle);
     expect(theta_control_tip).toBe(center_angle);
     expect(theta_tip).toBe(center_angle);
@@ -35,10 +35,10 @@ describe("Petal", () => {
     const size = 10;
 
     const petal = new Petal(anchor_point, size);
+
     const r_start = petal.start.r;
     const r_control_tip = petal.control_tip.r;
     const r_tip = petal.tip.r;
-
     expect(r_start).toBeLessThan(r_anchor);
     expect(r_anchor).toBeLessThan(r_control_tip);
     expect(r_control_tip).toBeLessThan(r_tip);
