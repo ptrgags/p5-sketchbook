@@ -1,57 +1,63 @@
 import { PhyllotaxisPalette } from "../sketchlib/PhyllotaxisPalette.js";
+import { FountainPen, FountainPenCase } from "./FountainPenCase.js";
 
-const SQUARE_SIZE = 10;
-const ROW_COUNT = 70;
-
-const PALETTE_SIZE = 30;
-const PALETTE = new PhyllotaxisPalette(PALETTE_SIZE);
-
-class Pen {
-  constructor(color, capacity) {
-    this.color = color;
-    this.capacity = capacity;
-  }
+const PALETTE_SIZE = 20;
+const PHYLOTAXIS_PALETTE = new PhyllotaxisPalette(PALETTE_SIZE);
+const PALETTE = new Array(PALETTE_SIZE);
+for (let i = 0; i < PALETTE_SIZE; i++) {
+  PALETTE[i] = PHYLOTAXIS_PALETTE.get_color(i);
 }
 
-class PenCase {
-  constructor(pen_count) {
-    this.pen_count = pen_count;
-    this.pens = new Array(pen_count);
-    this.history = [];
-    for (let i = 0; i < pen_count; i++) {
-      this.pens[i] = new Pen(PALETTE.get_color(i), 100);
-    }
-    this.next_pen = pen_count;
+const PEN_CAPACITY = 100;
+const PEN_COUNT = 6;
+const MAX_PEN_USAGE = 0.1 * PEN_CAPACITY;
+
+const WIDTH = 500;
+const HEIGHT = 700;
+const SQUARE_SIZE = 10;
+const ROW_COUNT = HEIGHT / SQUARE_SIZE;
+const MAJOR_COLUMN_WIDTH = PEN_COUNT * SQUARE_SIZE;
+const MAJOR_COLUMN_COUNT = Math.floor(WIDTH / MAJOR_COLUMN_WIDTH);
+const MAJOR_COLUMN_SPACING =
+  (WIDTH - MAJOR_COLUMN_COUNT * MAJOR_COLUMN_WIDTH) / (MAJOR_COLUMN_COUNT - 1);
+
+const HISTORY_LENGTH = MAJOR_COLUMN_COUNT * ROW_COUNT;
+
+function make_pens() {
+  const pens = new Array(PEN_COUNT);
+  for (let i = 0; i < PEN_COUNT; i++) {
+    pens[i] = new FountainPen(PALETTE[i], PEN_CAPACITY);
+  }
+  return pens;
+}
+
+function random_ink_usage() {
+  const result = new Array(PEN_COUNT);
+  for (let i = 0; i < PEN_COUNT; i++) {
+    result[i] = MAX_PEN_USAGE * Math.random();
+  }
+  return result;
+}
+
+function simulate(length) {
+  const result = new Array(length);
+  let pen_case = new FountainPenCase(
+    make_pens(),
+    PALETTE,
+    PEN_CAPACITY,
+    PEN_COUNT
+  );
+  for (let i = 0; i < length; i++) {
+    result[i] = pen_case;
+    const ink_usage = random_ink_usage();
+    pen_case = pen_case.next_iter(ink_usage);
   }
 
-  update() {
-    const next_pens = new Array(this.pen_count);
-    let next_index = 0;
-    for (const pen of this.pens) {
-      const ink_usage = 40.0 * Math.random();
-      if (pen.capacity - ink_usage >= 0) {
-        next_pens[next_index] = new Pen(pen.color, pen.capacity - ink_usage);
-        next_index++;
-      }
-    }
-
-    while (next_index < this.pen_count) {
-      next_pens[next_index] = new Pen(
-        PALETTE.get_color(this.next_pen % PALETTE_SIZE),
-        100
-      );
-      next_index++;
-      this.next_pen++;
-    }
-
-    this.history.push(this.pens);
-    this.pens = next_pens;
-  }
+  return result;
 }
 
 export const sketch = (p) => {
-  let pen_case = new PenCase(6);
-  pen_case.update();
+  const history = simulate(HISTORY_LENGTH);
 
   p.setup = () => {
     p.createCanvas(500, 700);
@@ -63,26 +69,29 @@ export const sketch = (p) => {
   };
 
   p.draw = () => {
+    // Once the canvas is full, we can stop
+    const i = p.frameCount - 1;
+    if (i >= HISTORY_LENGTH) {
+      return;
+    }
+
     // Only render the most recent row on top of what was already rendered
-    const i = pen_case.history.length - 1;
-    const pens = pen_case.history[i];
+    const pens = history[i].pens;
 
     const row = i % ROW_COUNT;
     const col = Math.floor(i / ROW_COUNT);
+    const column_offset = col * (MAJOR_COLUMN_WIDTH + MAJOR_COLUMN_SPACING);
 
     for (const [j, pen] of pens.entries()) {
       const c = pen.color;
-      p.fill(c.hue, c.saturation, c.value);
+      const fullness = pen.capacity / PEN_CAPACITY;
+      p.fill(c.hue, c.saturation, fullness);
       p.rect(
-        col * (SQUARE_SIZE * pens.length + 3) + j * SQUARE_SIZE,
+        column_offset + j * SQUARE_SIZE,
         row * SQUARE_SIZE,
         SQUARE_SIZE,
         SQUARE_SIZE
       );
-    }
-
-    if (pen_case.history.length < 8 * ROW_COUNT) {
-      pen_case.update();
     }
   };
 };
