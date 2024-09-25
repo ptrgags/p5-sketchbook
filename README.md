@@ -20,3 +20,13 @@ cd ..
 # now the index page will be http://localhost:8080/p5-sketchbook/
 http-server
 ```
+
+## Running unit tests
+
+```sh
+# (First time only) Install the dev dependency of vitest
+npm install
+
+# runs vitest
+npm test
+```
