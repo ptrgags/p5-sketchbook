@@ -1,4 +1,4 @@
-// Links are added to the page in this order
+// Links for all of the sketches. Links are added to the page in this order
 export const LINKS = [
   {
     title: "Cordate Leaf",
@@ -41,7 +41,7 @@ export const LINKS = [
     year: "2021",
   },
   {
-    title: "Primrose Field Tiling",
+    title: "Primrose Field",
     year: "2020",
   },
   {

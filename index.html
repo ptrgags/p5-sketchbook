@@ -36,21 +36,13 @@
         }
       }
     </style>
-    <script type="module" src="common/sketchbook-navbar.js"></script>
+    <script type="module" src="./sketchlib/sketchbook-navbar.js"></script>
     <script type="module">
-      import { LINKS } from "./links.js";
-
-      // The sketch URL is ./SketchTitleHere/
-      function get_sketch_url(title) {
-        const pascal_case = title.split(" ").join("");
-        return `./${pascal_case}/`;
-      }
-
-      // Thumbnails are ./thumbnails/sketch-title-here.png
-      function get_thumbnail_url(title) {
-        const kebob_case = title.split(" ").join("-");
-        return `./thumbnails/${kebob_case}.png`;
-      }
+      import { LINKS } from "./sketchlib/links.js";
+      import {
+        get_sketch_url,
+        get_thumbnail_url,
+      } from "./sketchlib/format_links.js";
 
       function make_link(link_info) {
         const title = link_info.title;
