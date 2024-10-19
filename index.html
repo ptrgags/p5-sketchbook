@@ -40,20 +40,36 @@
     <script type="module">
       import { LINKS } from "./links.js";
 
+      // The sketch URL is ./SketchTitleHere/
+      function get_sketch_url(title) {
+        const pascal_case = title.split(" ").join("");
+        return `./${pascal_case}/`;
+      }
+
+      // Thumbnails are ./thumbnails/sketch-title-here.png
+      function get_thumbnail_url(title) {
+        const kebob_case = title.split(" ").join("-");
+        return `./thumbnails/${kebob_case}.png`;
+      }
+
       function make_link(link_info) {
+        const title = link_info.title;
+        const sketch_url = link_info.link ?? get_sketch_url(title);
+        const thumbnail_url = link_info.thumbnail ?? get_thumbnail_url(title);
+
         // Clickable thumbnail
         const img = document.createElement("img");
-        img.setAttribute("alt", `view ${link_info.title} example`);
-        img.setAttribute("src", link_info.thumbnail);
+        img.setAttribute("alt", `view ${title} example`);
+        img.setAttribute("src", thumbnail_url);
 
         const img_link = document.createElement("a");
-        img_link.setAttribute("href", link_info.link);
+        img_link.setAttribute("href", sketch_url);
         img_link.appendChild(img);
 
         // Make the title clickable too
         const text_link = document.createElement("a");
-        text_link.setAttribute("href", link_info.link);
-        text_link.innerText = link_info.title;
+        text_link.setAttribute("href", sketch_url);
+        text_link.innerText = title;
 
         const date = document.createTextNode(` (${link_info.year})`);
 
