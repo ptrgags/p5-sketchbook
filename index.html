@@ -37,6 +37,122 @@
       }
     </style>
     <script type="module" src="common/sketchbook-navbar.js"></script>
+    <script type="module">
+      // Links are added to the page in this order
+      const LINKS = [
+        {
+          title: "Cordate Leaf",
+          year: "2024",
+          link: "./CordateLeaf",
+          thumbnail: "thumbnails/cordate-leaf.png",
+        },
+        {
+          title: "Ink Blocks",
+          year: "2024",
+          link: "./InkBlocks",
+          thumbnail: "thumbnails/ink-blocks.png",
+        },
+        {
+          link: "./PhyllotaxisPalette/",
+          thumbnail: "thumbnails/phyllotaxis-palette.png",
+          title: "Phyllotaxis Palette",
+          year: "2024",
+        },
+        {
+          link: "./InfiniteSunflower/",
+          thumbnail: "thumbnails/infinite-sunflower.png",
+          title: "Infinite Sunflower",
+          year: "2024",
+        },
+        {
+          link: "./Refill/",
+          thumbnail: "thumbnails/refill.png",
+          title: "Refill",
+          year: "2024",
+        },
+        {
+          link: "./HyperbolicConnections/",
+          thumbnail: "thumbnails/hyperbolic-connections.png",
+          title: "Hyperbolic Connections",
+          year: "2021, 2024",
+        },
+        {
+          link: "./PentagTiling/",
+          thumbnail: "thumbnails/pentag-tiling.png",
+          title: "Pentag Tiling",
+          year: "2024",
+        },
+        {
+          link: "./GrowingFlowers/",
+          thumbnail: "thumbnails/growing-flowers.png",
+          title: "Growing Flowers",
+          year: "2023",
+        },
+        {
+          link: "./OrigamiTiles/",
+          thumbnail: "thumbnails/origami-tiles.png",
+          title: "Origami Tiles",
+          year: "2021",
+        },
+        {
+          link: "./SeashellTexture/",
+          thumbnail: "thumbnails/seashell-texture.png",
+          title: "Seashell Texture",
+          year: "2021",
+        },
+        {
+          link: "./PrimroseField/",
+          thumbnail: "thumbnails/primrose-field.png",
+          title: "Primrose Field Tiling",
+          year: "2020",
+        },
+        {
+          link: "./Bezier/",
+          thumbnail: "thumbnails/bezier-curve.png",
+          title: "Bézier Curve",
+          year: "2016",
+        },
+        {
+          link: "./HexGrid/",
+          thumbnail: "thumbnails/hex-grid.png",
+          title: "Hex Grid",
+          year: "2016",
+        },
+      ];
+
+      function make_link(link_info) {
+        // Clickable thumbnail
+        const img = document.createElement("img");
+        img.setAttribute("alt", `view ${link_info.title} example`);
+        img.setAttribute("src", link_info.thumbnail);
+
+        const img_link = document.createElement("a");
+        img_link.setAttribute("href", link_info.link);
+        img_link.appendChild(img);
+
+        // Make the title clickable too
+        const text_link = document.createElement("a");
+        text_link.setAttribute("href", link_info.link);
+        text_link.innerText = link_info.title;
+
+        const date = document.createTextNode(` (${link_info.year})`);
+
+        const link = document.createElement("div");
+        link.classList.add("link");
+        link.append(img_link, text_link, date);
+
+        return link;
+      }
+
+      window.addEventListener("load", () => {
+        const link_list = document.getElementById("container");
+
+        for (const link_info of LINKS) {
+          const link = make_link(link_info);
+          link_list.appendChild(link);
+        }
+      });
+    </script>
   </head>
 
   <body>
@@ -47,108 +163,6 @@
         A collection of art experiments I've made in
         <a href="https://p5js.org/">p5.js</a>
       </p>
-      <div class="link">
-        <a href="./InkBlocks/">
-          <img alt="view ink blocks example" src="thumbnails/ink-blocks.png" />
-        </a>
-        <a href="./InkBlocks">Ink Blocks</a> (2024)
-      </div>
-      <div class="link">
-        <a href="./PhyllotaxisPalette/">
-          <img
-            alt="view phyllotaxis palette example"
-            src="thumbnails/phyllotaxis-palette.png"
-          />
-        </a>
-        <a href="./PhyllotaxisPalette/">Phyllotaxis Palette</a> (2024)
-      </div>
-      <div class="link">
-        <a href="./InfiniteSunflower/">
-          <img
-            alt="view infinite sunflower example"
-            src="thumbnails/infinite-sunflower.png"
-          />
-        </a>
-        <a href="./InfiniteSunflower/">Infinite Sunflower</a> (2024)
-      </div>
-      <div class="link">
-        <a href="./Refill/">
-          <img alt="view refill example" src="thumbnails/refill.png" />
-        </a>
-        <a href="./Refill/">Refill</a> (2024)
-      </div>
-      <div class="link">
-        <a href="./HyperbolicConnections/">
-          <img
-            alt="view hyperbolic connections example"
-            src="thumbnails/hyperbolic-connections.png"
-          />
-        </a>
-        <a href="./HyperbolicConnections/">Hyperbolic Connections</a> (2021,
-        2024)
-      </div>
-      <div class="link">
-        <a href="./PentagTiling/">
-          <img
-            alt="view pentag tiling example"
-            src="thumbnails/pentag-tiling.png"
-          />
-        </a>
-        <a href="./PentagTiling/">Pentag Tiling</a> (2024)
-      </div>
-      <div class="link">
-        <a href="./GrowingFlowers/">
-          <img
-            alt="view growing flowers example"
-            src="thumbnails/growing-flowers.png"
-          />
-        </a>
-        <a href="./GrowingFlowers/">Growing Flowers</a> (2023)
-      </div>
-      <div class="link">
-        <a href="./OrigamiTiles/">
-          <img
-            alt="view origami tiles example"
-            src="thumbnails/origami-tiles.png"
-          />
-        </a>
-        <a href="./OrigamiTiles/">Origami Tiles</a>
-        (2021)
-      </div>
-      <div class="link">
-        <a href="./SeashellTexture/">
-          <img
-            alt="view seashell texture"
-            src="thumbnails/seashell-texture.png"
-          />
-        </a>
-        <a href="./SeashellTexture/">Seashell Texture</a> (2021)
-      </div>
-      <div class="link">
-        <a href="./PrimroseField/">
-          <img
-            alt="view primrose field example"
-            src="thumbnails/primrose-field.png"
-          />
-        </a>
-        <a href="./PrimroseField/">Primrose Field Tiling</a> (2020)
-      </div>
-      <div class="link">
-        <a href="./Bezier/">
-          <img
-            alt="view bezier curve example"
-            src="thumbnails/bezier-curve.png"
-          />
-        </a>
-        <a href="./Bezier/">Bézier Curve</a>
-        (2016)
-      </div>
-      <div class="link">
-        <a href="./HexGrid/">
-          <img alt="view hex grid example" src="thumbnails/hex-grid.png" />
-        </a>
-        <a href="./HexGrid/">Hex Grid</a> (2016)
-      </div>
     </div>
   </body>
 </html>
