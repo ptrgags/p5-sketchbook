@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../libraries/p5.min.js"
+    ></script>
+    <script type="module">
+      import { sketch } from "./CordateLeaf.js";
+      import "../common/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../styles/layout.css" />
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>Cordate Leaf (2024)</h1>
+      <div id="sketch"></div>
+      <div class="description">
+        <p>
+          Animation of a growing leaf with a cordate shape. This is based on a
+          diagram in Chapter 5 of The Algorithmic Beauty of Plants by Przemysław
+          Prusinkiewicz and Aristid Lindenmayer (yes, the Lindenmayer whom
+          L-systems are named after!).
+        </p>
+        <p>
+          Essentially the shape of the leaf is a bunch of radial ribs. They all
+          move at the same rate, but start growing at different times. The rib
+          in the center is the first one which is why the center of the leaf is
+          pointy. At constant time intervals, symmetric pairs of ribs are added,
+          always a constant angle away from the adjacent rib.
+        </p>
+        <p>
+          Because of the time delay between the growth of the ribs, you get this
+          heart shape. If all the ribs started growing at the same time, it
+          would make a circular pattern instead.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
