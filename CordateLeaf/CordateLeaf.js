@@ -50,15 +50,11 @@ function draw_rib(p, parent, rib) {
     UNIT_LENGTH * RIB_SCALE * -tip.y,
     UNIT_LENGTH * RIB_SCALE * -tip.x
   );
-
-  /*
-  for (const child of rib.children) {
-    draw_rib(p, new Polar(0.5 * tip.r, tip.theta), child);
-  }
-    */
 }
 
 export const sketch = (p) => {
+  // The leaf has left-right mirror symmetry. This means we only have to
+  // compute one half of the leaf and render it twice.
   const ribs = [];
 
   p.setup = () => {
@@ -80,7 +76,6 @@ export const sketch = (p) => {
 
     const tips = ribs.map((x) => x.tip);
 
-    //p.noStroke();
     p.strokeWeight(2);
     p.fill(0, 63, 0);
     p.beginShape();
