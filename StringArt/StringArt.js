@@ -23,6 +23,7 @@ class Polynomial {
 export const sketch = (p) => {
   const coefficients = [1, 2, 3, 4];
   let poly = new Polynomial(...coefficients);
+  let display_sliders = true;
 
   p.setup = () => {
     p.createCanvas(500, 700);
@@ -31,17 +32,19 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    p.fill(255);
-    p.noStroke();
-    const n = coefficients.length;
-    const height = p.height / 4;
-    for (let i = 0; i < n; i++) {
-      p.rect(
-        0,
-        i * height,
-        (p.width * coefficients[i]) / (MODULUS - 1),
-        height
-      );
+    if (display_sliders) {
+      p.fill(255);
+      p.noStroke();
+      const n = coefficients.length;
+      const height = p.height / 4;
+      for (let i = 0; i < n; i++) {
+        p.rect(
+          0,
+          i * height,
+          (p.width * coefficients[i]) / (MODULUS - 1),
+          height
+        );
+      }
     }
 
     const diameter = 0.9 * p.width;
@@ -85,5 +88,9 @@ export const sketch = (p) => {
 
   p.mouseReleased = () => {
     poly = new Polynomial(...coefficients);
+  };
+
+  p.keyReleased = () => {
+    display_sliders = !display_sliders;
   };
 };
