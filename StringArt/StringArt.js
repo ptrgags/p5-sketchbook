@@ -18,6 +18,32 @@ class Polynomial {
 
     return (a * x3 + b * x2 + c * x + d) % MODULUS;
   }
+
+  to_string() {
+    const [a, b, c, d] = this.coefficients;
+    let terms = [];
+
+    if (a != 0) {
+      terms.push(`${a}x^3`);
+    }
+
+    if (b != 0) {
+      terms.push(`${b}x^2`);
+    }
+
+    if (c != 0) {
+      terms.push(`${c}x`);
+    }
+
+    if (d != 0) {
+      terms.push(`${d}`);
+    }
+
+    if (terms.length == 0) {
+      return `0 (mod ${MODULUS})`;
+    }
+    return `${terms.join(" + ")} (mod ${MODULUS})`;
+  }
 }
 
 export const sketch = (p) => {
@@ -25,8 +51,11 @@ export const sketch = (p) => {
   let poly = new Polynomial(...coefficients);
   let display_sliders = true;
 
+  let polynomial_div = document.getElementById("polynomial");
+
   p.setup = () => {
     p.createCanvas(500, 700);
+    polynomial_div.innerText = poly.to_string();
   };
 
   p.draw = () => {
@@ -88,6 +117,9 @@ export const sketch = (p) => {
 
   p.mouseReleased = () => {
     poly = new Polynomial(...coefficients);
+
+    polynomial_div.innerText = poly.to_string();
+    return false;
   };
 
   p.keyReleased = () => {
