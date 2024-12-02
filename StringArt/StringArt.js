@@ -1,26 +1,28 @@
 import { Polar } from "../sketchlib/Polar.js";
 
+const MODULUS = 60;
+
 /**
  * Polynomial ax^3 + bx^2 + cx + d where the coefficients
- * and values are evaluated mod 12
+ * and values are evaluated mod n
  */
-class PolynomialMod12 {
+class Polynomial {
   constructor(a, b, c, d) {
     this.coefficients = [a, b, c, d];
   }
 
   compute(x) {
-    const x2 = (x * x) % 12;
-    const x3 = (x2 * x) % 12;
+    const x2 = (x * x) % MODULUS;
+    const x3 = (x2 * x) % MODULUS;
     const [a, b, c, d] = this.coefficients;
 
-    return (a * x3 + b * x2 + c * x + d) % 12;
+    return (a * x3 + b * x2 + c * x + d) % MODULUS;
   }
 }
 
 export const sketch = (p) => {
   const coefficients = [1, 2, 3, 4];
-  let poly = new PolynomialMod12(...coefficients);
+  let poly = new Polynomial(...coefficients);
 
   p.setup = () => {
     p.createCanvas(500, 700);
@@ -34,7 +36,12 @@ export const sketch = (p) => {
     const n = coefficients.length;
     const height = p.height / 4;
     for (let i = 0; i < n; i++) {
-      p.rect(0, i * height, (p.width * coefficients[i]) / 11, height);
+      p.rect(
+        0,
+        i * height,
+        (p.width * coefficients[i]) / (MODULUS - 1),
+        height
+      );
     }
 
     const diameter = 0.9 * p.width;
@@ -48,12 +55,12 @@ export const sketch = (p) => {
 
     p.stroke(255, 127, 0);
     p.noFill();
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < MODULUS; i++) {
       const start = i;
       const end = poly.compute(i);
 
-      const start_polar = new Polar(radius, (start * Math.PI) / 6.0);
-      const end_polar = new Polar(radius, (end * Math.PI) / 6.0);
+      const start_polar = new Polar(radius, (start * 2.0 * Math.PI) / MODULUS);
+      const end_polar = new Polar(radius, (end * 2.0 * Math.PI) / MODULUS);
 
       if (start == end) {
         p.circle(cx + start_polar.x, cy + start_polar.y, 0.05 * p.width);
@@ -71,12 +78,12 @@ export const sketch = (p) => {
   p.mouseDragged = () => {
     const row_height = p.height / 4;
     const index = Math.floor(p.mouseY / row_height);
-    const bin_size = p.width / 12;
+    const bin_size = p.width / MODULUS;
     const value = Math.round(p.mouseX / bin_size);
-    coefficients[index] = Math.max(Math.min(value, 11), 0);
+    coefficients[index] = Math.max(Math.min(value, MODULUS - 1), 0);
   };
 
   p.mouseReleased = () => {
-    poly = new PolynomialMod12(...coefficients);
+    poly = new Polynomial(...coefficients);
   };
 };
