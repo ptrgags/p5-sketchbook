@@ -96,7 +96,7 @@ export const sketch = (p) => {
       const c_polar = points[c];
       const d_polar = points[d];
 
-      p.bezier(
+      /*p.bezier(
         a_polar.x,
         a_polar.y,
         b_polar.x,
@@ -106,6 +106,24 @@ export const sketch = (p) => {
         d_polar.x,
         d_polar.y
       );
+      */
+    }
+
+    for (let i = 0; i < MODULUS; i++) {
+      const orbit = poly.orbit(i);
+
+      if (orbit.length == 1) {
+        continue;
+      }
+
+      p.stroke((255 * i) / MODULUS, 0, 0);
+
+      for (let j = 0; j < orbit.length; j++) {
+        const a_polar = points[orbit[j]];
+        const b_polar = points[orbit[(j + 1) % orbit.length]];
+
+        p.line(a_polar.x, a_polar.y, b_polar.x, b_polar.y);
+      }
     }
 
     // Animate transitions between points

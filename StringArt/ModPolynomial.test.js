@@ -85,6 +85,44 @@ describe("ModPolynomial", () => {
     });
   });
 
+  describe("orbit", () => {
+    const MODULUS = 4;
+
+    it("with fixed point returns one element", () => {
+      const poly = new ModPolynomial(0, 0, 2, 0, MODULUS);
+
+      const result = poly.orbit(0);
+
+      expect(result).toEqual([0]);
+    });
+
+    it("with involution returns two elements", () => {
+      // 1 - x -> 3x + 1 (mod 4)
+      const poly = new ModPolynomial(0, 0, 3, 1, MODULUS);
+
+      const result = poly.orbit(3);
+
+      expect(result).toEqual([3, 2]);
+    });
+
+    it("with full-cycle returns all elements", () => {
+      // x + 1 will visit every element
+      const poly = new ModPolynomial(0, 0, 1, 1, MODULUS);
+
+      const result = poly.orbit(0);
+      expect(result).toEqual([0, 1, 2, 3]);
+    });
+
+    it("with eventual cycle does not include repeats", () => {
+      const poly = new ModPolynomial(0, 1, 2, 0, MODULUS);
+
+      const result = poly.orbit(1);
+
+      // 1 -> 1^2 + 2(1) = 3 -> 3^2 + 2(3) = 9 + 6 = 15 = 3
+      expect(result).toEqual([1, 3]);
+    });
+  });
+
   describe("to_string", () => {
     const MODULUS = 5;
 

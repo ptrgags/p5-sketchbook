@@ -50,6 +50,20 @@ export class ModPolynomial {
     return mod(a * x3 + b * x2 + c * x + d, n);
   }
 
+  orbit(x) {
+    const result = [x];
+    let current = x;
+    for (let i = 0; i < this.modulus; i++) {
+      current = this.compute(current);
+      if (result.includes(current)) {
+        return result;
+      }
+      result.push(current);
+    }
+
+    return result;
+  }
+
   to_string() {
     const [a, b, c, d] = this.coefficients;
     const n = this.modulus;
