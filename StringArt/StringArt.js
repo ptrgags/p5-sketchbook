@@ -2,12 +2,17 @@ import { Polar } from "../sketchlib/Polar.js";
 import { ModPolynomial } from "./ModPolynomial.js";
 
 const MODULUS = 60;
+const WIDTH = 500;
+const HEIGHT = 700;
+const DIAMETER = 0.9 * WIDTH;
+const RADIUS = DIAMETER / 2;
 
 export const sketch = (p) => {
   const coefficients = [0, 0, 16, 3];
   let poly = new ModPolynomial(...coefficients, MODULUS);
+  const polynomial_div = document.getElementById("polynomial");
 
-  let polynomial_div = document.getElementById("polynomial");
+  const points = new Array(MODULUS);
 
   function update_coefficients() {
     poly = new ModPolynomial(...coefficients, MODULUS);
@@ -27,45 +32,62 @@ export const sketch = (p) => {
   }
 
   p.setup = () => {
-    p.createCanvas(500, 700);
+    p.createCanvas(WIDTH, HEIGHT);
+
+    // Configure the UI elements in the HTML page
     polynomial_div.innerText = poly.to_string();
     configure_slider("coeff-a", 0);
     configure_slider("coeff-b", 1);
     configure_slider("coeff-c", 2);
     configure_slider("coeff-d", 3);
+
+    for (let i = 0; i < MODULUS; i++) {
+      points[i] = new Polar(RADIUS, (i * 2.0 * Math.PI) / MODULUS);
+    }
   };
 
   p.draw = () => {
     p.background(0);
 
-    const diameter = 0.9 * p.width;
-    const radius = diameter / 2;
     const cx = p.width / 2;
     const cy = p.height / 2;
 
-    p.stroke(255, 0, 0);
-    p.noFill();
-    p.circle(cx, cy, diameter);
+    p.push();
+    p.translate(cx, cy);
 
-    p.stroke(255, 127, 0);
+    // Draw the unit circle
+    p.stroke("#540D6E");
+    p.strokeWeight(5);
     p.noFill();
+    p.circle(0, 0, DIAMETER);
+
+    // Draw lines from x -> f(x)
+    p.stroke("#FFD23F");
+    p.noFill();
+    p.strokeWeight(2);
     for (let i = 0; i < MODULUS; i++) {
       const start = i;
       const end = poly.compute(i);
 
-      const start_polar = new Polar(radius, (start * 2.0 * Math.PI) / MODULUS);
-      const end_polar = new Polar(radius, (end * 2.0 * Math.PI) / MODULUS);
+      const start_polar = points[start];
+      const end_polar = points[end];
 
       if (start == end) {
-        p.circle(cx + start_polar.x, cy + start_polar.y, 0.05 * p.width);
+        p.circle(start_polar.x, start_polar.y, 0.05 * p.width);
       } else {
-        p.line(
-          cx + start_polar.x,
-          cy + start_polar.y,
-          cx + end_polar.x,
-          cy + end_polar.y
-        );
+        p.line(start_polar.x, start_polar.y, end_polar.x, end_polar.y);
       }
     }
+
+    // Draw dots at each point on the circle
+    p.noStroke();
+    p.fill("#EE4266");
+    for (let i = 0; i < MODULUS; i++) {
+      const point = points[i];
+
+      p.circle(point.x, point.y, 0.02 * p.width);
+    }
+
+    p.pop();
   };
 };
