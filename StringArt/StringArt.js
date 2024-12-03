@@ -4,34 +4,39 @@ import { ModPolynomial } from "./ModPolynomial.js";
 const MODULUS = 60;
 
 export const sketch = (p) => {
-  const coefficients = [1, 2, 3, 4];
+  const coefficients = [0, 0, 16, 3];
   let poly = new ModPolynomial(...coefficients, MODULUS);
-  let display_sliders = true;
 
   let polynomial_div = document.getElementById("polynomial");
+
+  function update_coefficients() {
+    poly = new ModPolynomial(...coefficients, MODULUS);
+
+    polynomial_div.innerText = poly.to_string();
+  }
+
+  function configure_slider(id, index) {
+    const slider = document.getElementById(id);
+
+    slider.value = coefficients[index];
+
+    slider.addEventListener("input", (e) => {
+      coefficients[index] = parseInt(e.target.value);
+    });
+    slider.addEventListener("change", update_coefficients);
+  }
 
   p.setup = () => {
     p.createCanvas(500, 700);
     polynomial_div.innerText = poly.to_string();
+    configure_slider("coeff-a", 0);
+    configure_slider("coeff-b", 1);
+    configure_slider("coeff-c", 2);
+    configure_slider("coeff-d", 3);
   };
 
   p.draw = () => {
     p.background(0);
-
-    if (display_sliders) {
-      p.fill(255);
-      p.noStroke();
-      const n = coefficients.length;
-      const height = p.height / 4;
-      for (let i = 0; i < n; i++) {
-        p.rect(
-          0,
-          i * height,
-          (p.width * coefficients[i]) / (MODULUS - 1),
-          height
-        );
-      }
-    }
 
     const diameter = 0.9 * p.width;
     const radius = diameter / 2;
@@ -62,24 +67,5 @@ export const sketch = (p) => {
         );
       }
     }
-  };
-
-  p.mouseDragged = () => {
-    const row_height = p.height / 4;
-    const index = Math.floor(p.mouseY / row_height);
-    const bin_size = p.width / MODULUS;
-    const value = Math.round(p.mouseX / bin_size);
-    coefficients[index] = Math.max(Math.min(value, MODULUS - 1), 0);
-  };
-
-  p.mouseReleased = () => {
-    poly = new ModPolynomial(...coefficients, MODULUS);
-
-    polynomial_div.innerText = poly.to_string();
-    return false;
-  };
-
-  p.keyReleased = () => {
-    display_sliders = !display_sliders;
   };
 };

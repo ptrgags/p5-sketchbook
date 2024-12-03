@@ -12,6 +12,10 @@
       import { sketch } from "./StringArt.js";
       import "../common/sketchbook-navbar.js";
       const p5_sketch = new p5(sketch, "sketch");
+
+      function input_coeff(e) {
+        console.log(e);
+      }
     </script>
     <link rel="stylesheet" href="../styles/layout.css" />
   </head>
@@ -20,10 +24,24 @@
     <div class="container">
       <h1>String Art (2024)</h1>
       <div id="sketch"></div>
-      <div class="description">
+      <div>
         <p>f(x) = <span id="polynomial"></span></p>
-        <p></p>
       </div>
+      <div>
+        <label for="coeff-a">a</label
+        ><input id="coeff-a" type="range" min="0" max="59" />
+        <br />
+        <label for="coeff-b">b</label
+        ><input id="coeff-b" type="range" min="0" max="59" />
+        <br />
+        <label for="coeff-c">c</label
+        ><input id="coeff-c" type="range" min="0" max="59" />
+        <br />
+        <label for="coeff-d">d</label
+        ><input id="coeff-d" type="range" min="0" max="59" />
+        <br />
+      </div>
+      <div class="description"></div>
     </div>
   </body>
 </html>
