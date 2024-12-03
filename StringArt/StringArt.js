@@ -76,8 +76,36 @@ export const sketch = (p) => {
       if (start == end) {
         p.circle(start_polar.x, start_polar.y, 0.05 * p.width);
       } else {
-        p.line(start_polar.x, start_polar.y, end_polar.x, end_polar.y);
+        //p.line(start_polar.x, start_polar.y, end_polar.x, end_polar.y);
       }
+    }
+
+    // Experiment: Draw bezier curves from x -> f(x), f^2(x), f^3(x)
+    // Mostly just gives spaghetti...
+    p.stroke("#FFD23F");
+    p.noFill();
+    p.strokeWeight(2);
+    for (let i = 0; i < MODULUS; i++) {
+      const a = i;
+      const b = poly.compute(a);
+      const c = poly.compute(b);
+      const d = poly.compute(c);
+
+      const a_polar = points[a];
+      const b_polar = points[b];
+      const c_polar = points[c];
+      const d_polar = points[d];
+
+      p.bezier(
+        a_polar.x,
+        a_polar.y,
+        b_polar.x,
+        b_polar.y,
+        c_polar.x,
+        c_polar.y,
+        d_polar.x,
+        d_polar.y
+      );
     }
 
     // Animate transitions between points
@@ -99,7 +127,7 @@ export const sketch = (p) => {
       const x = p.lerp(start_polar.x, end_polar.x, t);
       const y = p.lerp(start_polar.y, end_polar.y, t);
 
-      p.circle(x, y, 0.02 * p.width);
+      //p.circle(x, y, 0.02 * p.width);
     }
 
     // Draw dots at each point on the circle
