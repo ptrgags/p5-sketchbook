@@ -1,54 +1,11 @@
 import { Polar } from "../sketchlib/Polar.js";
+import { ModPolynomial } from "./ModPolynomial.js";
 
 const MODULUS = 60;
 
-/**
- * Polynomial ax^3 + bx^2 + cx + d where the coefficients
- * and values are evaluated mod n
- */
-class Polynomial {
-  constructor(a, b, c, d) {
-    this.coefficients = [a, b, c, d];
-  }
-
-  compute(x) {
-    const x2 = (x * x) % MODULUS;
-    const x3 = (x2 * x) % MODULUS;
-    const [a, b, c, d] = this.coefficients;
-
-    return (a * x3 + b * x2 + c * x + d) % MODULUS;
-  }
-
-  to_string() {
-    const [a, b, c, d] = this.coefficients;
-    let terms = [];
-
-    if (a != 0) {
-      terms.push(`${a}x^3`);
-    }
-
-    if (b != 0) {
-      terms.push(`${b}x^2`);
-    }
-
-    if (c != 0) {
-      terms.push(`${c}x`);
-    }
-
-    if (d != 0) {
-      terms.push(`${d}`);
-    }
-
-    if (terms.length == 0) {
-      return `0 (mod ${MODULUS})`;
-    }
-    return `${terms.join(" + ")} (mod ${MODULUS})`;
-  }
-}
-
 export const sketch = (p) => {
   const coefficients = [1, 2, 3, 4];
-  let poly = new Polynomial(...coefficients);
+  let poly = new ModPolynomial(...coefficients, MODULUS);
   let display_sliders = true;
 
   let polynomial_div = document.getElementById("polynomial");
@@ -116,7 +73,7 @@ export const sketch = (p) => {
   };
 
   p.mouseReleased = () => {
-    poly = new Polynomial(...coefficients);
+    poly = new ModPolynomial(...coefficients, MODULUS);
 
     polynomial_div.innerText = poly.to_string();
     return false;
