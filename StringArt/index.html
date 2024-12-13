@@ -23,7 +23,7 @@
   <body>
     <sketchbook-navbar></sketchbook-navbar>
     <div class="container">
-      <h1>String Art (2024)</h1>
+      <h1>String Art (2017, 2024)</h1>
       <p>Use the sliders below to change the pattern</p>
       <div>
         <p>f(x) = <span id="polynomial"></span></p>
@@ -44,10 +44,38 @@
       <div>
         <input type="checkbox" id="animate" />
         <label for="animate">Animate</label>
+        <input type="checkbox" id="show-lines" />
+        <label for="show-lines">Show Lines</label>
       </div>
       <div id="sketch"></div>
 
-      <div class="description"></div>
+      <div class="description">
+        <p>
+          I was looking through some old Processing.py code from my college
+          years and found a sketch that looked interesting. I adapted it into
+          the nicer form that you see here.
+        </p>
+        <p>
+          This sketch visualizes modular integer arithmetic. Essentially it's
+          your usual arithmetic, except wrapped around a circle. If a number is
+          larger than the number of points around the circle, you just wrap
+          around to 0. It's a lot like a clock or a board game.
+        </p>
+        <p>
+          The visualization is simple. Take each point on the circle. Apply the
+          selected math function to the number. Then draw a line between the
+          input and output point. One exception is when a number lands on
+          itself.In that case, I draw a circle around the point.
+        </p>
+        <p>
+          The result is a web of lines that look quite similar to string art.
+        </p>
+        <p>
+          Since it's hard to tell which end of the line is the input and which
+          is the output, the Animate option animates the transition. More
+          importantly, it creates mesmerizing patterns!
+        </p>
+      </div>
     </div>
   </body>
 </html>
