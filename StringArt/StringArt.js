@@ -90,53 +90,7 @@ export const sketch = (p) => {
       if (start == end) {
         p.circle(start_polar.x, start_polar.y, 0.05 * p.width);
       } else {
-        //p.line(start_polar.x, start_polar.y, end_polar.x, end_polar.y);
-      }
-    }
-
-    // Experiment: Draw bezier curves from x -> f(x), f^2(x), f^3(x)
-    // Mostly just gives spaghetti...
-    p.stroke("#FFD23F");
-    p.noFill();
-    p.strokeWeight(2);
-    for (let i = 0; i < MODULUS; i++) {
-      const a = i;
-      const b = poly.compute(a);
-      const c = poly.compute(b);
-      const d = poly.compute(c);
-
-      const a_polar = points[a];
-      const b_polar = points[b];
-      const c_polar = points[c];
-      const d_polar = points[d];
-
-      /*p.bezier(
-        a_polar.x,
-        a_polar.y,
-        b_polar.x,
-        b_polar.y,
-        c_polar.x,
-        c_polar.y,
-        d_polar.x,
-        d_polar.y
-      );
-      */
-    }
-
-    for (let i = 0; i < MODULUS; i++) {
-      const orbit = poly.orbit(i);
-
-      if (orbit.length == 1) {
-        continue;
-      }
-
-      p.stroke((255 * i) / MODULUS, 0, 0);
-
-      for (let j = 0; j < orbit.length; j++) {
-        const a_polar = points[orbit[j]];
-        const b_polar = points[orbit[(j + 1) % orbit.length]];
-
-        p.line(a_polar.x, a_polar.y, b_polar.x, b_polar.y);
+        p.line(start_polar.x, start_polar.y, end_polar.x, end_polar.y);
       }
     }
 
