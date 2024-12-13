@@ -15,7 +15,7 @@
     </script>
     <link rel="stylesheet" href="../styles/layout.css" />
     <style>
-      input {
+      input[type="range"] {
         width: 200px;
       }
     </style>
@@ -24,6 +24,7 @@
     <sketchbook-navbar></sketchbook-navbar>
     <div class="container">
       <h1>String Art (2024)</h1>
+      <p>Use the sliders below to change the pattern</p>
       <div>
         <p>f(x) = <span id="polynomial"></span></p>
       </div>
@@ -39,7 +40,10 @@
         <br />
         <label for="coeff-d">d</label
         ><input id="coeff-d" type="range" min="0" max="59" />
-        <br />
+      </div>
+      <div>
+        <input type="checkbox" id="animate" />
+        <label for="animate">Animate</label>
       </div>
       <div id="sketch"></div>
 

@@ -14,6 +14,8 @@ export const sketch = (p) => {
 
   const points = new Array(MODULUS);
 
+  let animate = false;
+
   function update_coefficients() {
     poly = new ModPolynomial(...coefficients, MODULUS);
 
@@ -31,6 +33,16 @@ export const sketch = (p) => {
     slider.addEventListener("change", update_coefficients);
   }
 
+  function configure_animate_checkbox() {
+    const checkbox = document.getElementById("animate");
+
+    checkbox.checked = false;
+
+    checkbox.addEventListener("change", (e) => {
+      animate = e.target.checked;
+    });
+  }
+
   p.setup = () => {
     p.createCanvas(WIDTH, HEIGHT);
 
@@ -40,6 +52,8 @@ export const sketch = (p) => {
     configure_slider("coeff-b", 1);
     configure_slider("coeff-c", 2);
     configure_slider("coeff-d", 3);
+
+    configure_animate_checkbox();
 
     for (let i = 0; i < MODULUS; i++) {
       points[i] = new Polar(RADIUS, (i * 2.0 * Math.PI) / MODULUS);
@@ -127,25 +141,27 @@ export const sketch = (p) => {
     }
 
     // Animate transitions between points
-    p.noStroke();
-    p.fill("#3BCEAC");
-    const ANIMATION_PERIOD = 300;
-    const t = (p.frameCount % ANIMATION_PERIOD) / ANIMATION_PERIOD;
-    for (let i = 0; i < MODULUS; i++) {
-      const start = i;
-      const end = poly.compute(i);
+    if (animate) {
+      p.noStroke();
+      p.fill("#3BCEAC");
+      const ANIMATION_PERIOD = 300;
+      const t = (p.frameCount % ANIMATION_PERIOD) / ANIMATION_PERIOD;
+      for (let i = 0; i < MODULUS; i++) {
+        const start = i;
+        const end = poly.compute(i);
 
-      if (start == end) {
-        continue;
+        if (start == end) {
+          continue;
+        }
+
+        const start_polar = points[start];
+        const end_polar = points[end];
+
+        const x = p.lerp(start_polar.x, end_polar.x, t);
+        const y = p.lerp(start_polar.y, end_polar.y, t);
+
+        p.circle(x, y, 0.02 * p.width);
       }
-
-      const start_polar = points[start];
-      const end_polar = points[end];
-
-      const x = p.lerp(start_polar.x, end_polar.x, t);
-      const y = p.lerp(start_polar.y, end_polar.y, t);
-
-      //p.circle(x, y, 0.02 * p.width);
     }
 
     // Draw dots at each point on the circle
