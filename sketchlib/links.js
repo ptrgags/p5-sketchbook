@@ -1,6 +1,10 @@
 // Links for all of the sketches. Links are added to the page in this order
 export const LINKS = [
   {
+    title: "String Art",
+    year: "2024",
+  },
+  {
     title: "Cordate Leaf",
     year: "2024",
   },

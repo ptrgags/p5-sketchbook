@@ -95,6 +95,5 @@ export const sketch = (p) => {
       x / (p.width - 1),
       y / (p.height - 1),
     ]);
-    return false;
   };
 };
