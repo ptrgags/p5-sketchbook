@@ -17,6 +17,12 @@
     <style>
       input[type="range"] {
         width: 200px;
+        margin-top: 4px;
+      }
+
+      input[type="checkbox"] {
+        margin-top: 4px;
+        margin-bottom: 20px;
       }
     </style>
   </head>
@@ -25,9 +31,7 @@
     <div class="container">
       <h1>String Art (2017, 2024)</h1>
       <p>Use the sliders below to change the pattern</p>
-      <div>
-        <p>f(x) = <span id="polynomial"></span></p>
-      </div>
+      <p>f(x) = <span id="polynomial"></span></p>
       <div>
         <label for="coeff-a">a</label
         ><input id="coeff-a" type="range" min="0" max="59" />
