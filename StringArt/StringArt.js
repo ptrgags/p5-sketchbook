@@ -15,6 +15,7 @@ export const sketch = (p) => {
   const points = new Array(MODULUS);
 
   let animate = false;
+  let show_lines = true;
 
   function update_coefficients() {
     poly = new ModPolynomial(...coefficients, MODULUS);
@@ -43,6 +44,58 @@ export const sketch = (p) => {
     });
   }
 
+  function configure_lines_checkbox() {
+    const checkbox = document.getElementById("show-lines");
+
+    checkbox.checked = true;
+
+    checkbox.addEventListener("change", (e) => {
+      show_lines = e.target.checked;
+    });
+  }
+
+  function draw_lines(p) {
+    p.stroke("#FFD23F");
+    p.noFill();
+    p.strokeWeight(2);
+    for (let i = 0; i < MODULUS; i++) {
+      const start = i;
+      const end = poly.compute(i);
+
+      const start_polar = points[start];
+      const end_polar = points[end];
+
+      if (start == end) {
+        p.circle(start_polar.x, start_polar.y, 0.05 * p.width);
+      } else {
+        p.line(start_polar.x, start_polar.y, end_polar.x, end_polar.y);
+      }
+    }
+  }
+
+  function animate_transitions(p) {
+    p.noStroke();
+    p.fill("#3BCEAC");
+    const ANIMATION_PERIOD = 300;
+    const t = (p.frameCount % ANIMATION_PERIOD) / ANIMATION_PERIOD;
+    for (let i = 0; i < MODULUS; i++) {
+      const start = i;
+      const end = poly.compute(i);
+
+      if (start == end) {
+        continue;
+      }
+
+      const start_polar = points[start];
+      const end_polar = points[end];
+
+      const x = p.lerp(start_polar.x, end_polar.x, t);
+      const y = p.lerp(start_polar.y, end_polar.y, t);
+
+      p.circle(x, y, 0.02 * p.width);
+    }
+  }
+
   p.setup = () => {
     p.createCanvas(WIDTH, HEIGHT);
 
@@ -54,6 +107,7 @@ export const sketch = (p) => {
     configure_slider("coeff-d", 3);
 
     configure_animate_checkbox();
+    configure_lines_checkbox();
 
     for (let i = 0; i < MODULUS; i++) {
       points[i] = new Polar(RADIUS, (i * 2.0 * Math.PI) / MODULUS);
@@ -77,45 +131,13 @@ export const sketch = (p) => {
     p.circle(0, 0, DIAMETER);
 
     // Draw lines from x -> f(x)
-    p.stroke("#FFD23F");
-    p.noFill();
-    p.strokeWeight(2);
-    for (let i = 0; i < MODULUS; i++) {
-      const start = i;
-      const end = poly.compute(i);
-
-      const start_polar = points[start];
-      const end_polar = points[end];
-
-      if (start == end) {
-        p.circle(start_polar.x, start_polar.y, 0.05 * p.width);
-      } else {
-        p.line(start_polar.x, start_polar.y, end_polar.x, end_polar.y);
-      }
+    if (show_lines) {
+      draw_lines(p);
     }
 
     // Animate transitions between points
     if (animate) {
-      p.noStroke();
-      p.fill("#3BCEAC");
-      const ANIMATION_PERIOD = 300;
-      const t = (p.frameCount % ANIMATION_PERIOD) / ANIMATION_PERIOD;
-      for (let i = 0; i < MODULUS; i++) {
-        const start = i;
-        const end = poly.compute(i);
-
-        if (start == end) {
-          continue;
-        }
-
-        const start_polar = points[start];
-        const end_polar = points[end];
-
-        const x = p.lerp(start_polar.x, end_polar.x, t);
-        const y = p.lerp(start_polar.y, end_polar.y, t);
-
-        p.circle(x, y, 0.02 * p.width);
-      }
+      animate_transitions(p);
     }
 
     // Draw dots at each point on the circle
