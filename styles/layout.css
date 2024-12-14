@@ -11,6 +11,11 @@ body {
   color: #eeeec5;
 }
 
+p {
+  line-height: 1.5em;
+  margin: 10px;
+}
+
 nav {
   background-color: var(--background-light);
   padding: 10px;
