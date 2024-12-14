@@ -2,7 +2,7 @@
 export const LINKS = [
   {
     title: "String Art",
-    year: "2024",
+    year: "2017, 2024",
   },
   {
     title: "Cordate Leaf",

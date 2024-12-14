@@ -55,29 +55,31 @@
 
       <div class="description">
         <p>
-          I was looking through some old Processing.py code from my college
-          years and found a sketch that looked interesting. I adapted it into
-          the nicer form that you see here.
+          This sketch visualizes modular integer arithmetic. This is your usual
+          addition and multiplication, except wrapped around a circle. If a
+          number is larger than the number of points on the circle, you just
+          wrap around to 0. It's just like going around the numbers of a clock
+          or spaces on a board game.
         </p>
         <p>
-          This sketch visualizes modular integer arithmetic. Essentially it's
-          your usual arithmetic, except wrapped around a circle. If a number is
-          larger than the number of points around the circle, you just wrap
-          around to 0. It's a lot like a clock or a board game.
+          The visualization works as follows: take a point on the circle. Apply
+          the selected math function to transform it into a new number. Then
+          draw a line between the original and new points. Doing this for all
+          points on the circle creates a web structure that looks like string
+          art.
         </p>
         <p>
-          The visualization is simple. Take each point on the circle. Apply the
-          selected math function to the number. Then draw a line between the
-          input and output point. One exception is when a number lands on
-          itself.In that case, I draw a circle around the point.
+          Sometimes a number will land back on itself. In cases like these, a
+          circle is drawn around the point to emphasize that it stays in place.
         </p>
         <p>
-          The result is a web of lines that look quite similar to string art.
+          The "Animate" option animates the transition from a number to its
+          transformed value. This makes it easier to tell which end of a line is
+          which. More importantly, it creates mesmerizing patterns!
         </p>
         <p>
-          Since it's hard to tell which end of the line is the input and which
-          is the output, the Animate option animates the transition. More
-          importantly, it creates mesmerizing patterns!
+          This sketch was adapted from some old Processing.py code I made back
+          in 2017.
         </p>
       </div>
     </div>
