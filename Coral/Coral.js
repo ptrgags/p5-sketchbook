@@ -1,5 +1,4 @@
 import { fix_mouse_coords } from "../common/fix_mouse_coords.js";
-import { in_bounds } from "../common/in_bounds.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -28,6 +27,26 @@ function uv_to_world(point) {
     x: QUAD_X + u * QUAD_WIDTH,
     y: QUAD_Y + (1 - v) * QUAD_HEIGHT,
   };
+}
+
+function clamp(x, min, max) {
+  return Math.max(Math.min(x, max), min);
+}
+
+class Rect {
+  constructor(x, y, width, height) {
+    this.position = { x, y };
+    this.dimensions = { x: width, y: height };
+  }
+
+  clamp(point) {
+    const { x, y } = point;
+
+    return {
+      x: clamp(x, this.position.x, this.position.x + this.dimensions.x),
+      y: clamp(y, this.position.y, this.position.y + this.dimensions.y),
+    };
+  }
 }
 
 class ControlPoint {
@@ -60,8 +79,9 @@ const SELECT_RADIUS = 8;
 const SELECT_RADIUS_SQR = SELECT_RADIUS * SELECT_RADIUS;
 
 class InteractiveVertex {
-  constructor(control_point) {
+  constructor(control_point, constraint) {
     this.control_point = control_point;
+    this.constraint = constraint;
   }
 
   get position() {
@@ -76,7 +96,7 @@ class InteractiveVertex {
   }
 
   move(uv) {
-    this.control_point.position = uv;
+    this.control_point.position = this.constraint.clamp(uv);
   }
 }
 
@@ -88,7 +108,17 @@ const SPLINE = new Spline([
   new ControlPoint(0.25, 0.0, 0.1, -0.1),
 ]);
 
-const VERTICES = SPLINE.control_points.map((x) => new InteractiveVertex(x));
+const CONSTRAINTS = [
+  new Rect(0.5, 0.0, 0.5, 0.0),
+  new Rect(0.5, 0.5, 0.5, 0.0),
+  new Rect(0.5, 0.5, 0.0, 0.5),
+  new Rect(0.0, 0.5, 0.5, 0.0),
+  new Rect(0.0, 0.0, 0.5, 0.0),
+];
+
+const VERTICES = SPLINE.control_points.map(
+  (x, i) => new InteractiveVertex(x, CONSTRAINTS[i])
+);
 
 export const sketch = (p) => {
   let canvas;
