@@ -8,6 +8,47 @@ function compute_tangent_points(point, direction) {
   return [forward, backward];
 }
 
+function add(a, b) {
+  return { x: a.x + b.x, y: a.y + b.y };
+}
+
+function sub(a, b) {
+  return { x: a.x - b.x, y: a.y - b.y };
+}
+
+function uv_to_world(point) {
+  const { x: u, y: v } = point;
+
+  return {
+    x: 250 - 100 + u * 200,
+    y: 350 + 100 - v * 200,
+  };
+}
+
+class ControlPoint {
+  constructor(x, y, dx, dy) {
+    this.position = { x, y };
+    this.tangent = { x: dx, y: dy };
+
+    this.forward_point = add(this.position, this.tangent);
+    this.backward_point = sub(this.position, this.tangent);
+  }
+}
+
+class Spline {
+  constructor(control_points) {
+    this.control_points = control_points;
+  }
+}
+
+const SPLINE = new Spline([
+  new ControlPoint(0.75, 0.0, 0.0, 0.1),
+  new ControlPoint(0.75, 0.5, -0.1, 0.1),
+  new ControlPoint(0.5, 0.75, -0.1, 0.0),
+  new ControlPoint(0.25, 0.5, 0.2, -0.1),
+  new ControlPoint(0.25, 0.0, 0.1, -0.1),
+]);
+
 export const sketch = (p) => {
   p.setup = () => {
     p.createCanvas(500, 700);
@@ -16,62 +57,48 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    p.push();
-    p.translate(p.width / 2, p.height / 2);
-
     p.stroke(127);
     p.noFill();
+    p.push();
+    p.translate(p.width / 2, p.height / 2);
     p.rect(-100, -100, 200, 200);
     p.line(0, -100, 0, 100);
     p.line(-100, 0, 100, 0);
+    p.pop();
+
+    // Draw the Hermite spline
+    p.stroke(0, 255, 255);
+    p.noFill();
+    p.strokeWeight(2);
+    for (let i = 0; i < SPLINE.control_points.length - 1; i++) {
+      const start = SPLINE.control_points[i];
+      const end = SPLINE.control_points[i + 1];
+
+      const a = uv_to_world(start.position);
+      const b = uv_to_world(start.forward_point);
+      const c = uv_to_world(end.backward_point);
+      const d = uv_to_world(end.position);
+
+      p.bezier(a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y);
+    }
 
     // Draw vertices
     p.stroke(255, 255, 0);
     p.strokeWeight(4);
     p.noFill();
-    const v1 = [25, 100];
-    const v2 = [50, 0];
-    const v3 = [0, -25];
-    const v4 = [-75, 0];
-    const v5 = [-25, 100];
+    for (const point of SPLINE.control_points) {
+      const pos = uv_to_world(point.position);
+      p.point(pos.x, pos.y);
+    }
 
-    p.point(...v1);
-    p.point(...v2);
-    p.point(...v3);
-    p.point(...v4);
-    p.point(...v5);
-
-    const d1 = [20, -20];
-    const d2 = [0, -20];
-    const d3 = [-10, 5];
-    const d4 = [0, 30];
-    const d5 = [-10, 20];
-    const [f1, b1] = compute_tangent_points(v1, d1);
-    const [f2, b2] = compute_tangent_points(v2, d2);
-    const [f3, b3] = compute_tangent_points(v3, d3);
-    const [f4, b4] = compute_tangent_points(v4, d4);
-    const [f5, b5] = compute_tangent_points(v5, d5);
-    // Draw control points
+    // Draw tangents
     p.stroke(0, 255, 0);
     p.noFill();
-    p.point(...f1);
-    p.point(...f2);
-    p.point(...f3);
-    p.point(...f4);
-    p.point(...f5);
-    p.point(...b1);
-    p.point(...b2);
-    p.point(...b3);
-    p.point(...b4);
-    p.point(...b5);
-
-    p.stroke(0, 255, 255);
-    p.noFill();
-    p.bezier(...v1, ...f1, ...b2, ...v2);
-    p.bezier(...v2, ...f2, ...b3, ...v3);
-    p.bezier(...v3, ...f3, ...b4, ...v4);
-    p.bezier(...v4, ...f4, ...b5, ...v5);
-
-    p.pop();
+    p.strokeWeight(1);
+    for (const point of SPLINE.control_points) {
+      const a = uv_to_world(point.position);
+      const b = uv_to_world(point.forward_point);
+      p.line(a.x, a.y, b.x, b.y);
+    }
   };
 };
