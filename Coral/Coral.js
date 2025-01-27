@@ -111,8 +111,13 @@ class InteractiveVertex {
 }
 
 class InteractiveTangent {
-  constructor(control_point) {
+  constructor(control_point, constraint) {
     this.control_point = control_point;
+    this.constraint = constraint;
+  }
+
+  get tip() {
+    return this.control_point.forward_point;
   }
 
   is_hovering(mouse) {
@@ -124,7 +129,7 @@ class InteractiveTangent {
 
   move(uv) {
     const tangent = sub(uv, this.control_point.position);
-    this.control_point.tangent = tangent;
+    this.control_point.tangent = this.constraint.clamp(tangent);
   }
 }
 
@@ -148,7 +153,17 @@ const VERTICES = SPLINE.control_points.map(
   (x, i) => new InteractiveVertex(x, CONSTRAINTS[i])
 );
 
-const TANGENTS = SPLINE.control_points.map((x, i) => new InteractiveTangent(x));
+const TANGENT_CONSTRAINTS = [
+  new Rect(-0.5, 0, 1.0, 0.5),
+  new Rect(-0.5, 0, 1.0, 0.5),
+  new Rect(-0.5, -0.5, 0.5, 1.0),
+  new Rect(-0.5, -0.5, 1.0, 0.5),
+  new Rect(-0.5, -0.5, 1.0, 0.5),
+];
+
+const TANGENTS = SPLINE.control_points.map(
+  (x, i) => new InteractiveTangent(x, TANGENT_CONSTRAINTS[i])
+);
 
 export const sketch = (p) => {
   let canvas;
@@ -203,10 +218,13 @@ export const sketch = (p) => {
       p.line(a.x, a.y, b.x, b.y);
     }
 
-    if (selected_vertex) {
-      p.stroke(255);
-      p.noFill();
-      p.strokeWeight(1);
+    p.stroke(255);
+    p.noFill();
+    p.strokeWeight(1);
+    if (selected_tangent) {
+      const position = uv_to_world(selected_tangent.tip);
+      p.circle(position.x, position.y, SELECT_RADIUS * 2);
+    } else if (selected_vertex) {
       const position = uv_to_world(selected_vertex.position);
       p.circle(position.x, position.y, SELECT_RADIUS * 2);
     }
