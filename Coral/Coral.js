@@ -52,10 +52,10 @@ class Rect {
 class ControlPoint {
   constructor(x, y, dx, dy) {
     this._position = { x, y };
-    this.tangent = { x: dx, y: dy };
+    this._tangent = { x: dx, y: dy };
 
-    this.forward_point = add(this._position, this.tangent);
-    this.backward_point = sub(this._position, this.tangent);
+    this.forward_point = add(this._position, this._tangent);
+    this.backward_point = sub(this._position, this._tangent);
   }
 
   get position() {
@@ -64,8 +64,18 @@ class ControlPoint {
 
   set position(value) {
     this._position = value;
-    this.forward_point = add(this._position, this.tangent);
-    this.backward_point = sub(this._position, this.tangent);
+    this.forward_point = add(this._position, this._tangent);
+    this.backward_point = sub(this._position, this._tangent);
+  }
+
+  get tangent() {
+    return this._tangent;
+  }
+
+  set tangent(value) {
+    this._tangent = value;
+    this.forward_point = add(this._position, this._tangent);
+    this.backward_point = sub(this._position, this._tangent);
   }
 }
 
@@ -100,6 +110,24 @@ class InteractiveVertex {
   }
 }
 
+class InteractiveTangent {
+  constructor(control_point) {
+    this.control_point = control_point;
+  }
+
+  is_hovering(mouse) {
+    const position_world = uv_to_world(this.control_point.forward_point);
+    const dist_sqr = norm(sub(mouse, position_world));
+
+    return dist_sqr < SELECT_RADIUS_SQR;
+  }
+
+  move(uv) {
+    const tangent = sub(uv, this.control_point.position);
+    this.control_point.tangent = tangent;
+  }
+}
+
 const SPLINE = new Spline([
   new ControlPoint(0.75, 0.0, 0.0, 0.1),
   new ControlPoint(0.75, 0.5, -0.1, 0.1),
@@ -119,6 +147,8 @@ const CONSTRAINTS = [
 const VERTICES = SPLINE.control_points.map(
   (x, i) => new InteractiveVertex(x, CONSTRAINTS[i])
 );
+
+const TANGENTS = SPLINE.control_points.map((x, i) => new InteractiveTangent(x));
 
 export const sketch = (p) => {
   let canvas;
@@ -193,6 +223,7 @@ export const sketch = (p) => {
   };
 
   let selected_vertex;
+  let selected_tangent;
   p.mousePressed = () => {
     if (!canvas) {
       return;
@@ -201,10 +232,17 @@ export const sketch = (p) => {
     const [mx, my] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
     mouse = { x: mx, y: my };
 
+    for (const tangent of TANGENTS) {
+      if (tangent.is_hovering(mouse)) {
+        selected_tangent = tangent;
+        return;
+      }
+    }
+
     for (const vertex of VERTICES) {
       if (vertex.is_hovering(mouse)) {
         selected_vertex = vertex;
-        break;
+        return;
       }
     }
   };
@@ -215,13 +253,17 @@ export const sketch = (p) => {
 
     const u = (mx - QUAD_X) / QUAD_WIDTH;
     const v = 1 - (my - QUAD_Y) / QUAD_HEIGHT;
+    const uv = { x: u, y: v };
 
-    if (selected_vertex) {
-      selected_vertex.move({ x: u, y: v });
+    if (selected_tangent) {
+      selected_tangent.move(uv);
+    } else if (selected_vertex) {
+      selected_vertex.move(uv);
     }
   };
 
   p.mouseReleased = () => {
     selected_vertex = undefined;
+    selected_tangent = undefined;
   };
 };
