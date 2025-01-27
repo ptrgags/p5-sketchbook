@@ -1,12 +1,13 @@
-function compute_tangent_points(point, direction) {
-  const [x, y] = point;
-  const [dx, dy] = direction;
+import { fix_mouse_coords } from "../common/fix_mouse_coords.js";
+import { in_bounds } from "../common/in_bounds.js";
 
-  const forward = [x + dx, y + dy];
-  const backward = [x - dx, y - dy];
+const WIDTH = 500;
+const HEIGHT = 700;
 
-  return [forward, backward];
-}
+const QUAD_X = WIDTH / 2 - 100;
+const QUAD_Y = HEIGHT / 2 - 100;
+const QUAD_WIDTH = 200;
+const QUAD_HEIGHT = 200;
 
 function add(a, b) {
   return { x: a.x + b.x, y: a.y + b.y };
@@ -16,28 +17,66 @@ function sub(a, b) {
   return { x: a.x - b.x, y: a.y - b.y };
 }
 
+function norm(v) {
+  return v.x * v.x + v.y * v.y;
+}
+
 function uv_to_world(point) {
   const { x: u, y: v } = point;
 
   return {
-    x: 250 - 100 + u * 200,
-    y: 350 + 100 - v * 200,
+    x: QUAD_X + u * QUAD_WIDTH,
+    y: QUAD_Y + (1 - v) * QUAD_HEIGHT,
   };
 }
 
 class ControlPoint {
   constructor(x, y, dx, dy) {
-    this.position = { x, y };
+    this._position = { x, y };
     this.tangent = { x: dx, y: dy };
 
-    this.forward_point = add(this.position, this.tangent);
-    this.backward_point = sub(this.position, this.tangent);
+    this.forward_point = add(this._position, this.tangent);
+    this.backward_point = sub(this._position, this.tangent);
+  }
+
+  get position() {
+    return this._position;
+  }
+
+  set position(value) {
+    this._position = value;
+    this.forward_point = add(this._position, this.tangent);
+    this.backward_point = sub(this._position, this.tangent);
   }
 }
 
 class Spline {
   constructor(control_points) {
     this.control_points = control_points;
+  }
+}
+
+const SELECT_RADIUS = 8;
+const SELECT_RADIUS_SQR = SELECT_RADIUS * SELECT_RADIUS;
+
+class InteractiveVertex {
+  constructor(control_point) {
+    this.control_point = control_point;
+  }
+
+  get position() {
+    return this.control_point.position;
+  }
+
+  is_hovering(mouse) {
+    const position_world = uv_to_world(this.control_point.position);
+    const dist_sqr = norm(sub(mouse, position_world));
+
+    return dist_sqr < SELECT_RADIUS_SQR;
+  }
+
+  move(uv) {
+    this.control_point.position = uv;
   }
 }
 
@@ -49,9 +88,12 @@ const SPLINE = new Spline([
   new ControlPoint(0.25, 0.0, 0.1, -0.1),
 ]);
 
+const VERTICES = SPLINE.control_points.map((x) => new InteractiveVertex(x));
+
 export const sketch = (p) => {
+  let canvas;
   p.setup = () => {
-    p.createCanvas(500, 700);
+    canvas = p.createCanvas(500, 700).elt;
   };
 
   p.draw = () => {
@@ -59,9 +101,9 @@ export const sketch = (p) => {
 
     p.stroke(127);
     p.noFill();
+    p.rect(QUAD_X, QUAD_Y, QUAD_WIDTH, QUAD_HEIGHT);
     p.push();
     p.translate(p.width / 2, p.height / 2);
-    p.rect(-100, -100, 200, 200);
     p.line(0, -100, 0, 100);
     p.line(-100, 0, 100, 0);
     p.pop();
@@ -100,5 +142,56 @@ export const sketch = (p) => {
       const b = uv_to_world(point.forward_point);
       p.line(a.x, a.y, b.x, b.y);
     }
+
+    if (selected_vertex) {
+      p.stroke(255);
+      p.noFill();
+      p.strokeWeight(1);
+      const position = uv_to_world(selected_vertex.position);
+      p.circle(position.x, position.y, SELECT_RADIUS * 2);
+    }
+  };
+
+  let mouse = { x: 0, y: 0 };
+  p.mouseMoved = () => {
+    if (!canvas) {
+      return;
+    }
+
+    const [mx, my] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
+    mouse = { x: mx, y: my };
+  };
+
+  let selected_vertex;
+  p.mousePressed = () => {
+    if (!canvas) {
+      return;
+    }
+
+    const [mx, my] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
+    mouse = { x: mx, y: my };
+
+    for (const vertex of VERTICES) {
+      if (vertex.is_hovering(mouse)) {
+        selected_vertex = vertex;
+        break;
+      }
+    }
+  };
+
+  p.mouseDragged = () => {
+    const [mx, my] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
+    mouse = { x: mx, y: my };
+
+    const u = (mx - QUAD_X) / QUAD_WIDTH;
+    const v = 1 - (my - QUAD_Y) / QUAD_HEIGHT;
+
+    if (selected_vertex) {
+      selected_vertex.move({ x: u, y: v });
+    }
+  };
+
+  p.mouseReleased = () => {
+    selected_vertex = undefined;
   };
 };
