@@ -83,6 +83,22 @@ class Spline {
   constructor(control_points) {
     this.control_points = control_points;
   }
+
+  log_params() {
+    console.log("current control points:");
+    for (const point of this.control_points) {
+      console.log(
+        "p:",
+        point.position.x.toPrecision(3),
+        point.position.y.toPrecision(3)
+      );
+      console.log(
+        "v:",
+        point.tangent.x.toPrecision(3),
+        point.tangent.y.toPrecision(3)
+      );
+    }
+  }
 }
 
 const SELECT_RADIUS = 8;
@@ -134,11 +150,11 @@ class InteractiveTangent {
 }
 
 const SPLINE = new Spline([
-  new ControlPoint(0.75, 0.0, 0.0, 0.1),
-  new ControlPoint(0.75, 0.5, -0.1, 0.1),
-  new ControlPoint(0.5, 0.75, -0.1, 0.0),
-  new ControlPoint(0.25, 0.5, 0.2, -0.1),
-  new ControlPoint(0.25, 0.0, 0.1, -0.1),
+  new ControlPoint(0.75, 0.0, -0.21, 0.219),
+  new ControlPoint(0.75, 0.5, 0.09, 0.204),
+  new ControlPoint(0.5, 0.934, -0.185, 0.055),
+  new ControlPoint(0.25, 0.5, 0.11, -0.291),
+  new ControlPoint(0.25, 0.0, -0.095, -0.176),
 ]);
 
 const CONSTRAINTS = [
@@ -183,7 +199,7 @@ export const sketch = (p) => {
     p.line(-100, 0, 100, 0);
     p.pop();
 
-    // Draw the Hermite spline
+    // Draw the Bezier spline
     p.stroke(0, 255, 255);
     p.noFill();
     p.strokeWeight(2);
@@ -283,5 +299,6 @@ export const sketch = (p) => {
   p.mouseReleased = () => {
     selected_vertex = undefined;
     selected_tangent = undefined;
+    SPLINE.log_params();
   };
 };
