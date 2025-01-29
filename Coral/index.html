@@ -14,13 +14,36 @@
       const p5_sketch = new p5(sketch, "sketch");
     </script>
     <link rel="stylesheet" href="../styles/layout.css" />
+    <style>
+      img {
+        display: block;
+        margin: 0 auto;
+      }
+    </style>
   </head>
   <body>
     <sketchbook-navbar></sketchbook-navbar>
     <div class="container">
       <h1>WIP Coral Tile Editor (2025)</h1>
       <div id="sketch"></div>
-      <div class="description">blah blah blah...</div>
+      <div class="description">
+        <p>
+          Click and drag the vertices (yellow) and tips of the tangents (green)
+          to adjust the shape of the curve!
+        </p>
+        <p>
+          Lately I've been studying a coral-shaped motif that appears often in
+          my art. Here's an example:
+        </p>
+        <img src="coral-example.png" alt="example of coral motif" />
+        <p>
+          I'm working towards modeling this shape with bezier curves in
+          quad-shaped tiles. As a first step, I want to explore how the curve
+          flows through the tile. This interactive tile will help me explore the
+          possible shapes and develop guidelines on how to place control points
+          to match the art style.
+        </p>
+      </div>
     </div>
   </body>
 </html>
