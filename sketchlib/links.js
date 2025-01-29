@@ -1,6 +1,12 @@
 // Links for all of the sketches. Links are added to the page in this order
 export const LINKS = [
   {
+    link: "./Coral/",
+    title: "(WIP) Coral Editor",
+    thumbnail: "thumbnails/coral.png",
+    year: "2025",
+  },
+  {
     title: "String Art",
     year: "2017, 2024",
   },
