@@ -200,7 +200,7 @@ export const sketch = (p) => {
     p.pop();
 
     // Draw the Bezier spline
-    p.stroke(0, 255, 255);
+    p.stroke(131, 71, 181);
     p.noFill();
     p.strokeWeight(2);
     for (let i = 0; i < SPLINE.control_points.length - 1; i++) {
@@ -215,15 +215,6 @@ export const sketch = (p) => {
       p.bezier(a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y);
     }
 
-    // Draw vertices
-    p.stroke(255, 255, 0);
-    p.strokeWeight(4);
-    p.noFill();
-    for (const point of SPLINE.control_points) {
-      const pos = uv_to_world(point.position);
-      p.point(pos.x, pos.y);
-    }
-
     // Draw tangents
     p.stroke(0, 255, 0);
     p.noFill();
@@ -232,6 +223,23 @@ export const sketch = (p) => {
       const a = uv_to_world(point.position);
       const b = uv_to_world(point.forward_point);
       p.line(a.x, a.y, b.x, b.y);
+    }
+    // Draw a circle at the tips of the tangents
+    p.stroke(0, 255, 0);
+    p.noFill();
+    p.strokeWeight(6);
+    for (const point of SPLINE.control_points) {
+      const pos = uv_to_world(point.forward_point);
+      p.point(pos.x, pos.y);
+    }
+
+    // Draw vertices
+    p.stroke(255, 255, 0);
+    p.strokeWeight(6);
+    p.noFill();
+    for (const point of SPLINE.control_points) {
+      const pos = uv_to_world(point.position);
+      p.point(pos.x, pos.y);
     }
 
     p.stroke(255);
