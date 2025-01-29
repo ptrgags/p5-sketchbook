@@ -254,16 +254,6 @@ export const sketch = (p) => {
     }
   };
 
-  let mouse = { x: 0, y: 0 };
-  p.mouseMoved = () => {
-    if (!canvas) {
-      return;
-    }
-
-    const [mx, my] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
-    mouse = { x: mx, y: my };
-  };
-
   let selected_vertex;
   let selected_tangent;
   p.mousePressed = () => {
@@ -272,7 +262,7 @@ export const sketch = (p) => {
     }
 
     const [mx, my] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
-    mouse = { x: mx, y: my };
+    const mouse = { x: mx, y: my };
 
     for (const tangent of TANGENTS) {
       if (tangent.is_hovering(mouse)) {
@@ -291,7 +281,6 @@ export const sketch = (p) => {
 
   p.mouseDragged = () => {
     const [mx, my] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
-    mouse = { x: mx, y: my };
 
     const u = (mx - QUAD_X) / QUAD_WIDTH;
     const v = 1 - (my - QUAD_Y) / QUAD_HEIGHT;
