@@ -1,21 +1,12 @@
 import { fix_mouse_coords } from "../common/fix_mouse_coords.js";
+import { Point } from "../pga2d/objects.js";
 
-let cp1 = [100, 240];
-let cp2 = [320, 100];
-let cp3 = [400, 600];
-let cp4 = [300, 400];
+let cp1 = new Point(100, 240);
+let cp2 = new Point(320, 100);
+let cp3 = new Point(400, 600);
 
 let steps = 10;
 let ratio = 1.0 / steps;
-
-function interpolate(p1, p2, ratio) {
-  const [x1, y1] = p1;
-  const [x2, y2] = p2;
-
-  const lerp_x = (1.0 - ratio) * x1 + ratio * x2;
-  const lerp_y = (1.0 - ratio) * y1 + ratio * y2;
-  return [lerp_x, lerp_y];
-}
 
 function circle(p, x, y, r) {
   p.ellipse(x, y, r, r);
@@ -26,33 +17,16 @@ function plot(p, point, radius = 3) {
 }
 
 function line_between(p, a, b) {
-  const [ax, ay] = a;
-  const [bx, by] = b;
-  p.line(ax, ay, bx, by);
+  p.line(a.x, a.y, b.x, b.y);
 }
 
 function* bezier_gen(p1, p2, p3, steps, ratio) {
   for (let x = 0; x < steps; x++) {
-    const p4 = interpolate(p1, p2, ratio * x);
-    const p5 = interpolate(p2, p3, ratio * x);
+    const p4 = Point.lerp(p1, p2, ratio * x);
+    const p5 = Point.lerp(p2, p3, ratio * x);
     // Curve point
-    const p6 = interpolate(p4, p5, ratio * x);
+    const p6 = Point.lerp(p4, p5, ratio * x);
     yield [p4, p5, p6];
-  }
-}
-
-function* bezier_gen_cubic(p1, p2, p3, p4, steps, ratio) {
-  for (let x = 0; x < steps; x++) {
-    //First subdivision
-    const p5 = interpolate(p1, p2, ratio * x);
-    const p6 = interpolate(p2, p3, ratio * x);
-    const p7 = interpolate(p3, p4, ratio * x);
-    // Second subdivision
-    const p8 = interpolate(p5, p6, ratio * x);
-    const p9 = interpolate(p6, p7, ratio * x);
-    // Curve point
-    const p10 = interpolate(p8, p9, ratio * x);
-    yield [p8, p9, p10];
   }
 }
 
@@ -69,8 +43,8 @@ export const sketch = (p) => {
     p.strokeWeight(4);
     p.noFill();
     p.beginShape();
-    p.vertex(...cp1);
-    p.quadraticVertex(...cp2, ...cp3);
+    p.vertex(cp1.x, cp1.y);
+    p.quadraticVertex(cp2.x, cp2.y, cp3.x, cp3.y);
     p.endShape();
 
     p.stroke(255);

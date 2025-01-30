@@ -1,3 +1,5 @@
+import { Point } from "../pga2d/objects.js";
+
 /**
  * In my CSS I use object-fit: contain to scale the canvases while
  * maintaining aspect ratio and canvas resolution. p5 is not aware
@@ -42,5 +44,5 @@ export function fix_mouse_coords(canvas, mouse_x, mouse_y) {
 
   const x = ((mouse_x - margin_left) * canvas_width) / effective_width;
   const y = ((mouse_y - margin_top) * canvas_height) / effective_height;
-  return [x, y];
+  return new Point(x, y);
 }

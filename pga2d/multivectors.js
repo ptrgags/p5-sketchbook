@@ -21,4 +21,15 @@ export class Even {
     const yo = this.yo - other.yo;
     return new Even(scalar, xy, xo, yo);
   }
+
+  static lerp(a, b, t) {
+    const s = 1 - t;
+
+    const scalar = s * a.scalar + t * b.scalar;
+    const xy = s * a.xy + t * b.xy;
+    const xo = s * a.xo + t * b.xo;
+    const yo = s * a.yo + t * b.yo;
+
+    return new Even(scalar, xy, xo, yo);
+  }
 }

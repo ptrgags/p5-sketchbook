@@ -28,6 +28,18 @@ describe("Point", () => {
     const expected = new Direction(-2, 2);
     expect(result).toEqual(expected);
   });
+
+  it("lerp interpolates two points", () => {
+    const a = new Point(1, 2);
+    const b = new Point(-2, -8);
+
+    const result = Point.lerp(a, b, 0.25);
+
+    // 3/4 * 1 + 1/4 * -2 = 1/4(3 -2) = 1/4
+    // 3/4 * 2 + 1/4 * -8 = 1/4(6 - 8) = -2/4 = -1/2
+    const expected = new Point(0.25, -0.5);
+    expect(result).toEqual(expected);
+  });
 });
 
 describe("Direction", () => {

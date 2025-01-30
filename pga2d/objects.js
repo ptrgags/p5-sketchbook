@@ -31,6 +31,11 @@ export class Point {
   dist_sqr(point) {
     return this.sub(point).norm();
   }
+
+  static lerp(a, b, t) {
+    const { xo, yo } = Even.lerp(a.bivec, b.bivec, t);
+    return new Point(yo, -xo);
+  }
 }
 
 export class Direction {
