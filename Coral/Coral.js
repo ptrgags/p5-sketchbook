@@ -199,7 +199,7 @@ export const sketch = (p) => {
     p.noFill();
     p.strokeWeight(2);
     for (const tile of TILES) {
-      draw_tile_spline(p, tile);
+      //draw_tile_spline(p, tile);
     }
 
     // Draw tangents

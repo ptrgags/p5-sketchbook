@@ -22,7 +22,7 @@ export class CoralTile {
 
     const se_position = has_flag(this.connection_flags, CONNECT_DOWN)
       ? vec2(0.75, 0)
-      : vec2(1, 0.25);
+      : vec2(0.5, 0.25);
     const se_dir = has_flag(this.connection_flags, CONNECT_DOWN)
       ? DIR_UP
       : DIR_RIGHT;

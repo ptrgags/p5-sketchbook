@@ -45,9 +45,9 @@ export class Rect {
     const result = new Array(n * n);
     const sub_dimensions = scale(1 / n, this.dimensions);
     for (let i = 0; i < n; i++) {
-      const x = this.position.x + i * sub_dimensions.x;
+      const y = this.position.y + i * sub_dimensions.y;
       for (let j = 0; j < n; j++) {
-        const y = this.position.y + j * sub_dimensions.y;
+        const x = this.position.x + j * sub_dimensions.x;
         result[i * n + j] = new Rect(x, y, sub_dimensions.x, sub_dimensions.y);
       }
     }
