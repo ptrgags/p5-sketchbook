@@ -1,10 +1,12 @@
+import { Grid, Index2D } from "../sketchlib/Grid.js";
+
 const MAX_GROWTH_STEPS = 2000;
 const BUD_TIME = 10;
 const EARLY_GROWTH_TIME = 10;
 
 class Node {
-  constructor(index, parent_index, growth_step) {
-    this.index = index;
+  constructor(index_2d, parent_index, growth_step) {
+    this.index_2d = index_2d;
     this.parent_index = parent_index;
     this.growth_step = growth_step;
 
@@ -19,10 +21,10 @@ export class Growth {
     this.grid_width = grid_width;
     this.grid_height = grid_height;
 
-    this.grid = new Array(grid_width * grid_height);
+    this.grid = new Grid(grid_height, grid_width);
 
-    const start_index = this.hash(start_x, start_y);
-    this.grid[start_index] = new Node(start_index, undefined, 0);
+    const start_index = new Index2D(start_y, start_x);
+    this.grid.set_2d(start_index, new Node(start_index, undefined, 0));
 
     // Start simple with a stack
     this.frontier = [start_index];
@@ -30,16 +32,7 @@ export class Growth {
     this.growth_step = 0;
   }
 
-  hash(x, y) {
-    return y * this.grid_width + x;
-  }
-
-  unhash(index) {
-    return [index % this.grid_width, Math.floor(index / this.grid_width)];
-  }
-
   neighbor_indices(index) {
-    const [x, y] = this.unhash(index);
     const neighbors = [];
 
     // List neighbors in order from bottom to top so
@@ -119,7 +112,7 @@ export class Growth {
 
     // If we didn't add branches, mark this node as a flower
     if (!added_branches) {
-      this.grid[current_index].is_flower = true;
+      this.grid.get_2d(current_index).is_flower = true;
     }
   }
 
