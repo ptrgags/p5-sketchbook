@@ -3,9 +3,6 @@ import { Palette } from "./palette.js";
 import { Boundary, PAIR_COUNT } from "./boundaries.js";
 import { VERTEX_SHADER, FRAGMENT_SHADER } from "./shaders.js";
 
-// Images are square IMAGE_SIZE x IMAGE_SIZE
-const IMAGE_SIZE = 512;
-
 // The boundary pattern is generated randomly in chunks of the same
 // color. This is the largest number of boundary point pairs generated
 // in a single chunk. Smaller means more color variation but less shape
@@ -90,10 +87,10 @@ export const sketch = (p) => {
   };
 
   p.mouseDragged = () => {
-    const [x, y] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
+    const mouse = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
     poincare_shader.setUniform("mouse_uv", [
-      x / (p.width - 1),
-      y / (p.height - 1),
+      mouse.x / (p.width - 1),
+      mouse.y / (p.height - 1),
     ]);
   };
 };

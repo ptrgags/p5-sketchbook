@@ -272,8 +272,7 @@ export const sketch = (p) => {
       return;
     }
 
-    const [mx, my] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
-    const mouse = new Point(mx, my);
+    const mouse = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
 
     for (const tangent of TANGENTS) {
       if (tangent.is_hovering(mouse)) {
@@ -291,8 +290,7 @@ export const sketch = (p) => {
   };
 
   p.mouseDragged = () => {
-    const [mx, my] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
-    const mouse = new Point(mx, my);
+    const mouse = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
 
     const uv = BIG_QUAD.world_to_uv(mouse);
 

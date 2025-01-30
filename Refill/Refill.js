@@ -58,7 +58,7 @@ export const sketch = (p) => {
   };
 
   p.mousePressed = () => {
-    const [x, y] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
+    const { x, y } = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
     if (!in_bounds(x, y, WIDTH, HEIGHT)) {
       return true;
     }
@@ -67,7 +67,7 @@ export const sketch = (p) => {
   };
 
   p.mouseReleased = () => {
-    const [x, y] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
+    const { x, y } = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
     if (!in_bounds(x, y, WIDTH, HEIGHT)) {
       return true;
     }
@@ -80,7 +80,6 @@ export const sketch = (p) => {
 
     const REFILL = 256;
     const meter_index = Math.floor(grid_y) * GRID_SIZE + Math.floor(grid_x);
-    console.log("clicked meter", meter_index);
     state.meters[meter_index].fill(REFILL);
     return false;
   };

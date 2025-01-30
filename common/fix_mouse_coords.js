@@ -7,9 +7,14 @@ import { Point } from "../pga2d/objects.js";
  * @param {HTMLCanvasElement} canvas The HTML canvas used by p5
  * @param {number} mouse_x the mouseX coordinate from p5
  * @param {number} mouse_y the mouseY coordinate from p5
- * @returns {number[]} Fixed coords [x, y]
+ * @returns {Point} Fixed coords (x, y). If the canvas wasn't ready yet, this returns (0, 0)
  */
 export function fix_mouse_coords(canvas, mouse_x, mouse_y) {
+  // The canvas hasn't been added to the page yet! gracefully return (0, 0)
+  if (!canvas) {
+    return new Point(0, 0);
+  }
+
   // This is what p5.js uses for its pixel ratio. I needed to use this
   // since one of my monitors has a devicePixelRatio of 1.5, but p5.js
   // rounds this up to 2

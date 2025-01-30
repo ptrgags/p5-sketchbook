@@ -1,4 +1,5 @@
 import { fix_mouse_coords } from "../common/fix_mouse_coords.js";
+import { in_bounds } from "../common/in_bounds.js";
 import { PentagGrid } from "./PentagGrid.js";
 
 /**
@@ -264,9 +265,9 @@ export const sketch = (p) => {
   p.mouseMoved = () => {
     // p5.js doesn't account for my CSS that scales the canvas while keeping
     // aspect ratio
-    const [x, y] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
+    const { x, y } = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
 
-    if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT) {
+    if (!in_bounds(x, y, WIDTH, HEIGHT)) {
       state.mouse_cell = undefined;
       return true;
     }
@@ -279,9 +280,9 @@ export const sketch = (p) => {
   p.mouseReleased = () => {
     // p5.js doesn't account for my CSS that scales the canvas while keeping
     // aspect ratio
-    const [x, y] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
+    const { x, y } = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
 
-    if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT) {
+    if (!in_bounds(x, y, WIDTH, HEIGHT)) {
       return true;
     }
 
