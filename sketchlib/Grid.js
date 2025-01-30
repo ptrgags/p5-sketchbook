@@ -1,25 +1,3 @@
-export class Index1D {
-  constructor(i) {
-    if (i < 0) {
-      throw new Error("i must be non-negative");
-    }
-
-    this.i = i;
-  }
-
-  previous() {
-    if (this.i === 0) {
-      return undefined;
-    }
-
-    return new Index1D(this.i - 1);
-  }
-
-  next() {
-    return new Index1D(this.i + 1);
-  }
-}
-
 export class Index2D {
   constructor(i, j) {
     if (i < 0) {
@@ -77,29 +55,7 @@ export class Grid {
     }
   }
 
-  set_1d(index, value) {
-    if (!(index instanceof Index1D)) {
-      throw new Error("index must be an Index1D object");
-    }
-
-    if (index.i >= this.values.length) {
-      throw new Error("index out of bounds");
-    }
-    this.values[index.i] = value;
-  }
-
-  get_1d(index) {
-    if (!(index instanceof Index1D)) {
-      throw new Error("index must be an Index1D object");
-    }
-
-    if (index.i >= this.values.length) {
-      throw new Error("index out of bounds");
-    }
-    return this.values[index.i];
-  }
-
-  set_2d(index, value) {
+  set(index, value) {
     if (!(index instanceof Index2D)) {
       throw new Error("index must be an Index2D object");
     }
@@ -111,7 +67,7 @@ export class Grid {
     this.values[i] = value;
   }
 
-  get_2d(index) {
+  get(index) {
     if (!(index instanceof Index2D)) {
       throw new Error("index must be an Index2D object");
     }
