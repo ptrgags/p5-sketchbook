@@ -1,5 +1,3 @@
-import { add, sub } from "./vector.js";
-
 export class ControlPoint {
   constructor(position, tangent) {
     this.position = position;
@@ -7,10 +5,10 @@ export class ControlPoint {
   }
 
   get forward_point() {
-    return add(this.position, this.tangent);
+    return this.position.add(this.tangent);
   }
 
   get backward_point() {
-    return sub(this.position, this.tangent);
+    return this.position.sub(this.tangent);
   }
 }

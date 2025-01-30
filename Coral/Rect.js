@@ -1,4 +1,4 @@
-import { scale } from "./vector.js";
+import { Direction, Point } from "../pga2d/objects.js";
 
 function clamp(x, min, max) {
   return Math.max(Math.min(x, max), min);
@@ -6,26 +6,29 @@ function clamp(x, min, max) {
 
 export class Rect {
   constructor(x, y, width, height) {
-    this.position = { x, y };
-    this.dimensions = { x: width, y: height };
+    this.position = new Point(x, y);
+    this.dimensions = new Direction(width, height);
+  }
+
+  get far_corner() {
+    return this.position.add(this.dimensions);
   }
 
   clamp(point) {
     const { x, y } = point;
+    const { x: near_x, y: near_y } = this.position;
+    const { x: far_x, y: far_y } = this.far_corner;
 
-    return {
-      x: clamp(x, this.position.x, this.position.x + this.dimensions.x),
-      y: clamp(y, this.position.y, this.position.y + this.dimensions.y),
-    };
+    return new Point(clamp(x, near_x, far_x), clamp(y, near_y, far_y));
   }
 
   uv_to_world(uv) {
     const { x: u, y: v } = uv;
 
-    return {
-      x: this.position.x + u * this.dimensions.x,
-      y: this.position.y + (1 - v) * this.dimensions.y,
-    };
+    return new Point(
+      this.position.x + u * this.dimensions.x,
+      this.position.y + (1 - v) * this.dimensions.y
+    );
   }
 
   world_to_uv(world) {
@@ -33,7 +36,7 @@ export class Rect {
 
     const u = (x - this.position.x) / this.dimensions.x;
     const v = 1 - (y - this.position.y) / this.dimensions.y;
-    return { x: u, y: v };
+    return new Point(u, v);
   }
 
   /**
@@ -43,7 +46,7 @@ export class Rect {
    */
   subdivide_grid(n) {
     const result = new Array(n * n);
-    const sub_dimensions = scale(1 / n, this.dimensions);
+    const sub_dimensions = this.dimensions.scale(1 / n);
     for (let i = 0; i < n; i++) {
       const y = this.position.y + i * sub_dimensions.y;
       for (let j = 0; j < n; j++) {

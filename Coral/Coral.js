@@ -1,8 +1,8 @@
 import { fix_mouse_coords } from "../common/fix_mouse_coords.js";
 import { Rect } from "./Rect.js";
-import { vec2, sub, norm } from "./vector.js";
 import { ControlPoint } from "./ControlPoint.js";
 import { CoralTile } from "./CoralTile.js";
+import { Point, Direction } from "../pga2d/objects.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -62,7 +62,7 @@ class InteractiveVertex {
     const position_world = this.tile_quad.uv_to_world(
       this.control_point.position
     );
-    const dist_sqr = norm(sub(mouse, position_world));
+    const dist_sqr = mouse.dist_sqr(position_world);
 
     return dist_sqr < SELECT_RADIUS_SQR;
   }
@@ -87,23 +87,23 @@ class InteractiveTangent {
     const position_world = this.tile_quad.uv_to_world(
       this.control_point.forward_point
     );
-    const dist_sqr = norm(sub(mouse, position_world));
+    const dist_sqr = mouse.dist_sqr(position_world);
 
     return dist_sqr < SELECT_RADIUS_SQR;
   }
 
   move(uv) {
-    const tangent = sub(uv, this.control_point.position);
+    const tangent = uv.sub(this.control_point.position);
     this.control_point.tangent = this.constraint.clamp(tangent);
   }
 }
 
 const SPLINE = new Spline([
-  new ControlPoint(vec2(0.75, 0.0), vec2(-0.21, 0.219)),
-  new ControlPoint(vec2(0.75, 0.5), vec2(0.09, 0.204)),
-  new ControlPoint(vec2(0.5, 0.934), vec2(-0.185, 0.055)),
-  new ControlPoint(vec2(0.25, 0.5), vec2(0.11, -0.291)),
-  new ControlPoint(vec2(0.25, 0.0), vec2(-0.095, -0.176)),
+  new ControlPoint(new Point(0.75, 0.0), new Direction(-0.21, 0.219)),
+  new ControlPoint(new Point(0.75, 0.5), new Direction(0.09, 0.204)),
+  new ControlPoint(new Point(0.5, 0.934), new Direction(-0.185, 0.055)),
+  new ControlPoint(new Point(0.25, 0.5), new Direction(0.11, -0.291)),
+  new ControlPoint(new Point(0.25, 0.0), new Direction(-0.095, -0.176)),
 ]);
 
 const CONSTRAINTS = [
@@ -179,16 +179,16 @@ function draw_tile_spline(p, tile) {
 }
 
 const CONNECT_POINTS = [
-  vec2(1.0, 0.5),
-  vec2(0.5, 1.0),
-  vec2(0.0, 0.5),
-  vec2(0.5, 0.0),
+  new Point(1.0, 0.5),
+  new Point(0.5, 1.0),
+  new Point(0.0, 0.5),
+  new Point(0.5, 0.0),
 ];
 
 function draw_tile_connections(p, tile) {
   const quad = tile.quad;
   const flags = tile.connection_flags;
-  const center = quad.uv_to_world(vec2(0.5, 0.5));
+  const center = quad.uv_to_world(new Point(0.5, 0.5));
   for (let i = 0; i < 4; i++) {
     if (!((flags >> i) & 1)) {
       continue;
@@ -273,7 +273,7 @@ export const sketch = (p) => {
     }
 
     const [mx, my] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
-    const mouse = { x: mx, y: my };
+    const mouse = new Point(mx, my);
 
     for (const tangent of TANGENTS) {
       if (tangent.is_hovering(mouse)) {
@@ -292,7 +292,7 @@ export const sketch = (p) => {
 
   p.mouseDragged = () => {
     const [mx, my] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
-    const mouse = { x: mx, y: my };
+    const mouse = new Point(mx, my);
 
     const uv = BIG_QUAD.world_to_uv(mouse);
 
