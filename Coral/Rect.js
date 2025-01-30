@@ -1,3 +1,5 @@
+import { scale } from "./vector.js";
+
 function clamp(x, min, max) {
   return Math.max(Math.min(x, max), min);
 }
@@ -32,5 +34,24 @@ export class Rect {
     const u = (x - this.position.x) / this.dimensions.x;
     const v = 1 - (y - this.position.y) / this.dimensions.y;
     return { x: u, y: v };
+  }
+
+  /**
+   * Subdivide into a n x n grid of smaller quads
+   * @param {number} n the number of divisions on a side
+   * @returns {Rect[]} The sub-tiles
+   */
+  subdivide_grid(n) {
+    const result = new Array(n * n);
+    const sub_dimensions = scale(1 / n, this.dimensions);
+    for (let i = 0; i < n; i++) {
+      const x = this.position.x + i * sub_dimensions.x;
+      for (let j = 0; j < n; j++) {
+        const y = this.position.y + j * sub_dimensions.y;
+        result[i * n + j] = new Rect(x, y, sub_dimensions.x, sub_dimensions.y);
+      }
+    }
+
+    return result;
   }
 }

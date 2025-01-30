@@ -1,22 +1,12 @@
 import { fix_mouse_coords } from "../common/fix_mouse_coords.js";
 import { Rect } from "./Rect.js";
+import { add, sub, norm } from "./vector.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
 
 const BIG_QUAD = new Rect(0, HEIGHT / 2 - WIDTH / 2, WIDTH, WIDTH);
-
-function add(a, b) {
-  return { x: a.x + b.x, y: a.y + b.y };
-}
-
-function sub(a, b) {
-  return { x: a.x - b.x, y: a.y - b.y };
-}
-
-function norm(v) {
-  return v.x * v.x + v.y * v.y;
-}
+const SMALL_QUADS = BIG_QUAD.subdivide_grid(4);
 
 class ControlPoint {
   constructor(x, y, dx, dy) {
@@ -175,7 +165,10 @@ export const sketch = (p) => {
 
     p.stroke(127);
     p.noFill();
-    draw_quad(p, BIG_QUAD);
+    //draw_quad(p, BIG_QUAD);
+    for (const quad of SMALL_QUADS) {
+      draw_quad(p, quad);
+    }
 
     // Draw the Bezier spline
     p.stroke(131, 71, 181);
