@@ -1,6 +1,8 @@
 import { fix_mouse_coords } from "../common/fix_mouse_coords.js";
 import { Rect } from "./Rect.js";
-import { add, sub, norm } from "./vector.js";
+import { vec2, sub, norm } from "./vector.js";
+import { ControlPoint } from "./ControlPoint.js";
+import { CoralTile } from "./CoralTile.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -8,35 +10,17 @@ const HEIGHT = 700;
 const BIG_QUAD = new Rect(0, HEIGHT / 2 - WIDTH / 2, WIDTH, WIDTH);
 const SMALL_QUADS = BIG_QUAD.subdivide_grid(4);
 
-class ControlPoint {
-  constructor(x, y, dx, dy) {
-    this._position = { x, y };
-    this._tangent = { x: dx, y: dy };
+// prettier-ignore
+const CONNECTION_ORDER = [
+  0b1001, 0b1101, 0b1100, 0b1000,
+  0b1010, 0b1111, 0b1110, 0b1010, 
+  0b0011, 0b0111, 0b0110, 0b0010,
+  0b0001, 0b0101, 0b0100, 0b0000,
+];
 
-    this.forward_point = add(this._position, this._tangent);
-    this.backward_point = sub(this._position, this._tangent);
-  }
-
-  get position() {
-    return this._position;
-  }
-
-  set position(value) {
-    this._position = value;
-    this.forward_point = add(this._position, this._tangent);
-    this.backward_point = sub(this._position, this._tangent);
-  }
-
-  get tangent() {
-    return this._tangent;
-  }
-
-  set tangent(value) {
-    this._tangent = value;
-    this.forward_point = add(this._position, this._tangent);
-    this.backward_point = sub(this._position, this._tangent);
-  }
-}
+const TILES = SMALL_QUADS.map(
+  (quad, i) => new CoralTile(quad, CONNECTION_ORDER[i])
+);
 
 class Spline {
   constructor(control_points) {
@@ -115,11 +99,11 @@ class InteractiveTangent {
 }
 
 const SPLINE = new Spline([
-  new ControlPoint(0.75, 0.0, -0.21, 0.219),
-  new ControlPoint(0.75, 0.5, 0.09, 0.204),
-  new ControlPoint(0.5, 0.934, -0.185, 0.055),
-  new ControlPoint(0.25, 0.5, 0.11, -0.291),
-  new ControlPoint(0.25, 0.0, -0.095, -0.176),
+  new ControlPoint(vec2(0.75, 0.0), vec2(-0.21, 0.219)),
+  new ControlPoint(vec2(0.75, 0.5), vec2(0.09, 0.204)),
+  new ControlPoint(vec2(0.5, 0.934), vec2(-0.185, 0.055)),
+  new ControlPoint(vec2(0.25, 0.5), vec2(0.11, -0.291)),
+  new ControlPoint(vec2(0.25, 0.0), vec2(-0.095, -0.176)),
 ]);
 
 const CONSTRAINTS = [
@@ -131,7 +115,7 @@ const CONSTRAINTS = [
 ];
 
 const VERTICES = SPLINE.control_points.map(
-  (x, i) => new InteractiveVertex(x, CONSTRAINTS[i], BIG_QUAD)
+  (x, i) => new InteractiveVertex(x, CONSTRAINTS[i], SMALL_QUADS[0])
 );
 
 const TANGENT_CONSTRAINTS = [
@@ -143,7 +127,7 @@ const TANGENT_CONSTRAINTS = [
 ];
 
 const TANGENTS = SPLINE.control_points.map(
-  (x, i) => new InteractiveTangent(x, TANGENT_CONSTRAINTS[i], BIG_QUAD)
+  (x, i) => new InteractiveTangent(x, TANGENT_CONSTRAINTS[i], SMALL_QUADS[0])
 );
 
 function draw_quad(p, rect) {
@@ -152,6 +136,46 @@ function draw_quad(p, rect) {
   p.rect(x, y, w, h);
   p.line(x, y + h / 2, x + w, y + h / 2);
   p.line(x + w / 2, y, x + w / 2, y + h);
+}
+
+function draw_tile_tangents(p, tile) {
+  const quad = tile.quad;
+  for (const point of tile.control_points) {
+    const a = quad.uv_to_world(point.position);
+    const b = quad.uv_to_world(point.forward_point);
+    p.line(a.x, a.y, b.x, b.y);
+  }
+}
+
+function draw_tile_tangent_tips(p, tile) {
+  const quad = tile.quad;
+  for (const point of tile.control_points) {
+    const pos = quad.uv_to_world(point.forward_point);
+    p.point(pos.x, pos.y);
+  }
+}
+
+function draw_tile_vertices(p, tile) {
+  const quad = tile.quad;
+  for (const point of tile.control_points) {
+    const pos = quad.uv_to_world(point.position);
+    p.point(pos.x, pos.y);
+  }
+}
+
+function draw_tile_spline(p, tile) {
+  const quad = tile.quad;
+  for (let i = 0; i < tile.control_points.length - 1; i++) {
+    const start = tile.control_points[i];
+    const end = tile.control_points[i + 1];
+
+    const a = quad.uv_to_world(start.position);
+    const b = quad.uv_to_world(start.forward_point);
+    const c = quad.uv_to_world(end.backward_point);
+    const d = quad.uv_to_world(end.position);
+
+    p.bezier(a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y);
+  }
 }
 
 export const sketch = (p) => {
@@ -174,43 +198,32 @@ export const sketch = (p) => {
     p.stroke(131, 71, 181);
     p.noFill();
     p.strokeWeight(2);
-    for (let i = 0; i < SPLINE.control_points.length - 1; i++) {
-      const start = SPLINE.control_points[i];
-      const end = SPLINE.control_points[i + 1];
-
-      const a = BIG_QUAD.uv_to_world(start.position);
-      const b = BIG_QUAD.uv_to_world(start.forward_point);
-      const c = BIG_QUAD.uv_to_world(end.backward_point);
-      const d = BIG_QUAD.uv_to_world(end.position);
-
-      p.bezier(a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y);
+    for (const tile of TILES) {
+      draw_tile_spline(p, tile);
     }
 
     // Draw tangents
     p.stroke(0, 255, 0);
     p.noFill();
     p.strokeWeight(1);
-    for (const point of SPLINE.control_points) {
-      const a = BIG_QUAD.uv_to_world(point.position);
-      const b = BIG_QUAD.uv_to_world(point.forward_point);
-      p.line(a.x, a.y, b.x, b.y);
+    for (const tile of TILES) {
+      draw_tile_tangents(p, tile);
     }
+
     // Draw a circle at the tips of the tangents
     p.stroke(0, 255, 0);
     p.noFill();
     p.strokeWeight(6);
-    for (const point of SPLINE.control_points) {
-      const pos = BIG_QUAD.uv_to_world(point.forward_point);
-      p.point(pos.x, pos.y);
+    for (const tile of TILES) {
+      draw_tile_tangent_tips(p, tile);
     }
 
     // Draw vertices
     p.stroke(255, 255, 0);
     p.strokeWeight(6);
     p.noFill();
-    for (const point of SPLINE.control_points) {
-      const pos = BIG_QUAD.uv_to_world(point.position);
-      p.point(pos.x, pos.y);
+    for (const tile of TILES) {
+      draw_tile_vertices(p, tile);
     }
 
     p.stroke(255);
