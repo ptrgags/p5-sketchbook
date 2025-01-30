@@ -1,10 +1,12 @@
 import { PentagCell } from "./PentagCell.js";
+import { Grid } from "../sketchlib/Grid.js";
+import { in_bounds } from "../common/in_bounds.js";
 
 export class PentagGrid {
   constructor(rows, cols) {
     this.rows = rows;
     this.cols = cols;
-    this.grid = new Array(rows * cols);
+    this.grid = new Grid(rows, cols);
     this.clear_grid();
   }
 
@@ -17,15 +19,13 @@ export class PentagGrid {
   }
 
   clear_grid() {
-    for (let i = 0; i < this.rows; i++) {
-      for (let j = 0; j < this.cols; j++) {
-        if (!this.in_bounds(i, j)) {
-          continue;
-        }
-
-        this.grid[i * this.cols + j] = new PentagCell(i, j);
+    this.grid.fill((index) => {
+      if (!this.in_bounds(index)) {
+        return undefined;
       }
-    }
+
+      return new PentagCell(index);
+    });
   }
 
   get_partner(cell) {
@@ -33,8 +33,9 @@ export class PentagGrid {
     return this.get_cell(partner_row, partner_col);
   }
 
-  in_bounds(row, col) {
-    if (row < 0 || row >= this.rows || col < 0 || col >= this.cols) {
+  in_bounds(index) {
+    const { i: row, j: col } = index;
+    if (!in_bounds(col, row, this.cols, this.rows)) {
       return false;
     }
 
@@ -45,16 +46,16 @@ export class PentagGrid {
     return true;
   }
 
-  get_cell(row, col) {
-    if (!this.in_bounds(row, col)) {
+  get_cell(index) {
+    if (!this.in_bounds(index)) {
       return undefined;
     }
 
-    return this.grid[row * this.cols + col];
+    return this.grid.get(index);
   }
 
-  select(row, col) {
-    const cell = this.get_cell(row, col);
+  select(index) {
+    const cell = this.get_cell(index);
     if (!cell.is_selectable) {
       return;
     }
@@ -70,7 +71,7 @@ export class PentagGrid {
     const arc_type = cell.arc_type;
     const partner_type = (5 - arc_type) % 5;
 
-    const partner = this.get_cell(...cell.get_partner());
+    const partner = this.get_cell(cell.get_partner());
 
     if (partner) {
       partner.select(partner_type);
@@ -80,7 +81,7 @@ export class PentagGrid {
 
     // Update constraints for this tile's neighbors
     for (const [side, neighbor_coords] of cell.all_neighbors.entries()) {
-      const neighbor = this.get_cell(...neighbor_coords);
+      const neighbor = this.get_cell(neighbor_coords);
       if (!neighbor) {
         continue;
       }
@@ -99,7 +100,7 @@ export class PentagGrid {
     // Also update constraints for the partner tile's neighbors
     if (partner) {
       for (const [side, neighbor_coords] of partner.all_neighbors.entries()) {
-        const neighbor = this.get_cell(...neighbor_coords);
+        const neighbor = this.get_cell(neighbor_coords);
         if (!neighbor) {
           continue;
         }
@@ -119,7 +120,7 @@ export class PentagGrid {
     // If we have cells that only have one option left, recursively select
     // them so we don't end up with a tile with no possible choices later.
     for (const cell of one_option_left) {
-      this.select(cell.row, cell.col);
+      this.select(cell.index);
     }
   }
 

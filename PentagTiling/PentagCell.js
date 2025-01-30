@@ -1,3 +1,5 @@
+import { Index2D } from "../sketchlib/Grid.js";
+
 const SIDE_VERTICAL = 0;
 const SIDE_TOP = 1;
 const SIDE_TOP_DIAG = 2;
@@ -5,9 +7,8 @@ const SIDE_BOTTOM_DIAG = 3;
 const SIDE_BOTTOM = 4;
 
 export class PentagCell {
-  constructor(row, col) {
-    this.row = row;
-    this.col = col;
+  constructor(index) {
+    this.index = index;
 
     this.arc_type = undefined;
     this.arc_choices = [true, true, true, true, true];
@@ -49,43 +50,45 @@ export class PentagCell {
   }
 
   get_neighbor(side) {
+    const { i: row, j: col } = this.index;
     const col_direction = this.is_flipped ? -1 : 1;
 
     if (side === SIDE_VERTICAL) {
-      return [this.row, this.col - col_direction];
+      return new Index2D(row, col - col_direction);
     }
 
     if (side === SIDE_TOP) {
-      return [this.row - 1, this.col];
+      return this.index.up();
     }
 
     if (side === SIDE_TOP_DIAG) {
-      switch (this.col % 4) {
+      switch (col % 4) {
         case 0:
-          return [this.row - 1, this.col + 1];
+          return new Index2D(row - 1, col + 1);
         case 1:
-          return [this.row, this.col - 1];
+          return this.index.left();
         case 2:
-          return [this.row, this.col + 1];
+          return this.index.right();
         case 3:
-          return [this.row - 1, this.col - 1];
+          return new Index2D(row - 1, col - 1);
       }
     }
 
     if (side === SIDE_BOTTOM_DIAG) {
-      switch (this.col % 4) {
+      switch (col % 4) {
         case 0:
-          return [this.row, this.col + 1];
+          return this.index.right();
         case 1:
-          return [this.row + 1, this.col - 1];
+          return new Index2D(row + 1, col - 1);
         case 2:
-          return [this.row + 1, this.col + 1];
+          return new Index2D(row + 1, col + 1);
         case 3:
-          return [this.row, this.col - 1];
+          return this.index.left();
       }
     }
 
-    return [this.row + 1, this.col];
+    // SIDE_BOTTOM
+    return this.index.down();
   }
 
   get all_neighbors() {

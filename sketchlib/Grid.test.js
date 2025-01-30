@@ -76,6 +76,20 @@ describe("Grid", () => {
     }
   });
 
+  it("fill populates the array with the callback values", () => {
+    const grid = new Grid(2, 2);
+
+    grid.fill((index) => {
+      const { i, j } = index;
+
+      return i * 2 + j;
+    });
+    const result = [...grid];
+
+    const expected = [0, 1, 2, 3];
+    expect(result).toEqual(expected);
+  });
+
   it("set_2d with 1D index throws", () => {
     const grid = new Grid(4, 4);
 

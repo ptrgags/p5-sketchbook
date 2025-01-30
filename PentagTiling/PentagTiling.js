@@ -1,5 +1,7 @@
 import { fix_mouse_coords } from "../common/fix_mouse_coords.js";
+import { in_bounds } from "../common/in_bounds.js";
 import { PentagGrid } from "./PentagGrid.js";
+import { Index2D } from "../sketchlib/Grid.js";
 
 /**
  * An artistic tiling using pentagons. Not regular pentagons, but
@@ -40,7 +42,8 @@ function draw_pentag(p, point_x, point_y, flipped) {
   p.endShape(p.CLOSE);
 }
 
-function get_pentag_point(row, col) {
+function get_pentag_point(index) {
+  const { i: row, j: col } = index;
   const column_quad = Math.floor(col / 4);
   const OFFSETS = [3, 2, 8, 7];
   const x = column_quad * 10 + OFFSETS[col % 4];
@@ -53,18 +56,18 @@ function get_pentag_point(row, col) {
   return [x, y];
 }
 
-function draw_pentag_cell(p, row, col) {
-  const [x, y] = get_pentag_point(row, col);
+function draw_pentag_cell(p, index) {
+  const [x, y] = get_pentag_point(index);
 
   // Every other column is a backwards pentag
-  const flipped = col % 2 === 1;
+  const flipped = index.j % 2 === 1;
 
   draw_pentag(p, x * SQUARE_SIZE, y * SQUARE_SIZE, flipped);
 }
 
-function draw_dot(p, row, col, radius) {
-  const [x, y] = get_pentag_point(row, col);
-  const flipped = col % 2 === 1;
+function draw_dot(p, index, radius) {
+  const [x, y] = get_pentag_point(index);
+  const flipped = index.j % 2 === 1;
   const x_direction = flipped ? -1.0 : 1.0;
 
   const cx = (x - 1.5 * x_direction) * SQUARE_SIZE;
@@ -72,9 +75,9 @@ function draw_dot(p, row, col, radius) {
   p.circle(cx, cy, 2 * radius);
 }
 
-function draw_pentag_arcs(p, row, col, arc_enabled) {
-  const [x, y] = get_pentag_point(row, col);
-  const flipped = col % 2 === 1;
+function draw_pentag_arcs(p, index, arc_enabled) {
+  const [x, y] = get_pentag_point(index);
+  const flipped = index.j % 2 === 1;
   const x_direction = flipped ? -1.0 : 1.0;
 
   //    ____1____
@@ -184,12 +187,12 @@ function find_cell(x, y) {
     return undefined;
   }
 
-  return [row, 4 * half + col];
+  return new Index2D(row, 4 * half + col);
 }
 
-function can_select(state, row, col) {
+function can_select(state, index) {
   for (const grid of state.grids) {
-    const cell = grid.get_cell(row, col);
+    const cell = grid.get_cell(index);
     if (!cell) {
       // out of bounds, short circuit the whole function
       return false;
@@ -223,15 +226,15 @@ export const sketch = (p) => {
     p.strokeWeight(2);
     p.fill(82, 123, 146); // pale dark blue
     for (const cell of state.grids[0]) {
-      draw_pentag_cell(p, cell.row, cell.col);
+      draw_pentag_cell(p, cell.index);
     }
 
     // Highlight the cell the mouse is hovered over
     p.fill(199, 255, 243); // light blue
-    if (state.mouse_cell) {
-      const [mouse_row, mouse_col] = state.mouse_cell;
-      if (can_select(state, mouse_row, mouse_col)) {
-        draw_pentag_cell(p, mouse_row, mouse_col);
+    const mouse_cell = state.mouse_cell;
+    if (mouse_cell) {
+      if (can_select(state, mouse_cell)) {
+        draw_pentag_cell(p, mouse_cell);
       }
     }
 
@@ -242,9 +245,9 @@ export const sketch = (p) => {
     p.strokeCap(p.SQUARE);
     for (const cell of state.grids[0]) {
       if (cell.is_selectable) {
-        draw_dot(p, cell.row, cell.col, 0.25 * SQUARE_SIZE);
+        draw_dot(p, cell.index, 0.25 * SQUARE_SIZE);
       } else {
-        draw_pentag_arcs(p, cell.row, cell.col, cell.arc_flags);
+        draw_pentag_arcs(p, cell.index, cell.arc_flags);
       }
     }
 
@@ -254,9 +257,9 @@ export const sketch = (p) => {
     p.strokeWeight(4);
     for (const cell of state.grids[1]) {
       if (cell.is_selectable) {
-        draw_dot(p, cell.row, cell.col, 0.125 * SQUARE_SIZE);
+        draw_dot(p, cell.index, 0.125 * SQUARE_SIZE);
       } else {
-        draw_pentag_arcs(p, cell.row, cell.col, cell.arc_flags);
+        draw_pentag_arcs(p, cell.index, cell.arc_flags);
       }
     }
   };
@@ -266,7 +269,7 @@ export const sketch = (p) => {
     // aspect ratio
     const [x, y] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
 
-    if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT) {
+    if (!in_bounds(x, y, WIDTH, HEIGHT)) {
       state.mouse_cell = undefined;
       return true;
     }
@@ -281,14 +284,14 @@ export const sketch = (p) => {
     // aspect ratio
     const [x, y] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
 
-    if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT) {
+    if (!in_bounds(x, y, WIDTH, HEIGHT)) {
       return true;
     }
 
     const mouse_cell = find_cell(x, y);
     if (mouse_cell) {
       for (const grid of state.grids) {
-        grid.select(...mouse_cell);
+        grid.select(mouse_cell);
       }
     }
 

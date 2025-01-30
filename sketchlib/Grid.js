@@ -55,6 +55,14 @@ export class Grid {
     }
   }
 
+  fill(callback) {
+    for (let i = 0; i < this.rows; i++) {
+      for (let j = 0; j < this.rows; j++) {
+        this.values[i * this.cols + j] = callback(new Index2D(i, j));
+      }
+    }
+  }
+
   set(index, value) {
     if (!(index instanceof Index2D)) {
       throw new Error("index must be an Index2D object");
