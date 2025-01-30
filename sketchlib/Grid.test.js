@@ -13,6 +13,58 @@ describe("Index2D", () => {
       new Index2D(3, -1);
     }).toThrowError("j must be non-negative");
   });
+
+  it("left returns undefined at left boundary", () => {
+    const index = new Index2D(1, 0);
+
+    const result = index.left();
+
+    expect(result).toBeUndefined();
+  });
+
+  it("left computes left neighbor", () => {
+    const index = new Index2D(1, 5);
+
+    const result = index.left();
+
+    const expected = new Index2D(1, 4);
+    expect(result).toEqual(expected);
+  });
+
+  it("right computes right neighbor", () => {
+    const index = new Index2D(1, 5);
+
+    const result = index.right();
+
+    const expected = new Index2D(1, 6);
+    expect(result).toEqual(expected);
+  });
+
+  it("up returns undefined at top boundary", () => {
+    const index = new Index2D(0, 1);
+
+    const result = index.up();
+
+    expect(result).toBeUndefined();
+  });
+
+  it("up computes upwards neighbor", () => {
+    const index = new Index2D(1, 5);
+
+    const result = index.up();
+
+    const expected = new Index2D(0, 5);
+    expect(result).toEqual(expected);
+  });
+
+  it("down computes downwards neighbor", () => {
+    const index = new Index2D(1, 5);
+
+    const result = index.down();
+
+    const expected = new Index2D(2, 6);
+    expect(result).toEqual(expected);
+  });
 });
 
 describe("Grid", () => {
@@ -64,5 +116,43 @@ describe("Grid", () => {
     expect(() => {
       grid.get(new Index2D(4, 0));
     }).toThrowError("index out of bounds");
+  });
+
+  it("right with index at right edge returns undefined", () => {
+    const grid = new Grid(4, 4);
+    const on_edge = new Index2D(0, 3);
+
+    const result = grid.right(on_edge);
+
+    expect(result).toBeUndefined();
+  });
+
+  it("right with index in bounds returns right neighbor", () => {
+    const grid = new Grid(4, 4);
+    const index = new Index2D(0, 2);
+
+    const result = grid.right(index);
+
+    const expected = new Index2D(0, 3);
+    expect(result).toEqual(result);
+  });
+
+  it("down with index at bottom edge returns undefined", () => {
+    const grid = new Grid(4, 4);
+    const on_edge = new Index2D(3, 0);
+
+    const result = grid.down(on_edge);
+
+    expect(result).toBeUndefined();
+  });
+
+  it("down with index in bounds returns downward neighbor", () => {
+    const grid = new Grid(4, 4);
+    const index = new Index2D(2, 0);
+
+    const result = grid.right(index);
+
+    const expected = new Index2D(3, 0);
+    expect(result).toEqual(result);
   });
 });

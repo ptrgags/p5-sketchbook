@@ -80,7 +80,7 @@ export class Grid {
   }
 
   right(index) {
-    if (index.j >= this.cols) {
+    if (index.j >= this.cols - 1) {
       return undefined;
     }
 
@@ -88,7 +88,7 @@ export class Grid {
   }
 
   down(index) {
-    if (index.i >= this.rows) {
+    if (index.i >= this.rows - 1) {
       return undefined;
     }
 

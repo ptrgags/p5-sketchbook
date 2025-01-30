@@ -24,7 +24,7 @@ export class Growth {
     this.grid = new Grid(grid_height, grid_width);
 
     const start_index = new Index2D(start_y, start_x);
-    this.grid.set_2d(start_index, new Node(start_index, undefined, 0));
+    this.grid.set(start_index, new Node(start_index, undefined, 0));
 
     // Start simple with a stack
     this.frontier = [start_index];
@@ -85,7 +85,7 @@ export class Growth {
 
     // Neighbors are only valid if that grid cell is empty
     const valid_neighbors = possible_neighbors.filter(
-      (index) => this.grid.get_2d(index) === undefined
+      (index) => this.grid.get(index) === undefined
     );
 
     // For the first few steps, make the chance of skipping low
@@ -98,7 +98,7 @@ export class Growth {
         continue;
       }
 
-      this.grid.set_2d(
+      this.grid.set(
         neighbor_index,
         new Node(neighbor_index, current_index, this.growth_step)
       );
@@ -114,7 +114,7 @@ export class Growth {
 
     // If we didn't add branches, mark this node as a flower
     if (!added_branches) {
-      this.grid.get_2d(current_index).is_flower = true;
+      this.grid.get(current_index).is_flower = true;
     }
   }
 
