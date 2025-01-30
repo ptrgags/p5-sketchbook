@@ -36,6 +36,14 @@ export class Index2D {
   }
 }
 
+export function griderator(rows, cols, callback) {
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      callback(i, j);
+    }
+  }
+}
+
 /**
  * 2D Grid class
  */
@@ -48,16 +56,16 @@ export class Grid {
   }
 
   *[Symbol.iterator]() {
-    for (let i = 0; i < this.rows; i++) {
-      for (let j = 0; j < this.cols; j++) {
-        yield this.values[i * this.cols + j];
-      }
-    }
+    yield* this.values;
+  }
+
+  entries() {
+    return this.values.entries();
   }
 
   fill(callback) {
     for (let i = 0; i < this.rows; i++) {
-      for (let j = 0; j < this.rows; j++) {
+      for (let j = 0; j < this.cols; j++) {
         this.values[i * this.cols + j] = callback(new Index2D(i, j));
       }
     }

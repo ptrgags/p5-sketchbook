@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Grid, Index2D } from "./Grid";
+import { Grid, griderator, Index2D } from "./Grid";
 
 describe("Index2D", () => {
   it("throws for negative row", () => {
@@ -67,6 +67,25 @@ describe("Index2D", () => {
   });
 });
 
+describe("griderator", () => {
+  it("calls the callback for the given number of rows and columns", () => {
+    const result = [];
+    griderator(2, 3, (i, j) => {
+      result.push([i, j]);
+    });
+
+    const expected = [
+      [0, 0],
+      [0, 1],
+      [0, 2],
+      [1, 0],
+      [1, 1],
+      [1, 2],
+    ];
+    expect(result).toEqual(expected);
+  });
+});
+
 describe("Grid", () => {
   it("pre-allocates the array with undefined values", () => {
     const grid = new Grid(4, 5);
@@ -74,6 +93,26 @@ describe("Grid", () => {
     for (const entry of grid) {
       expect(entry).toBeUndefined();
     }
+  });
+
+  it("entries enumerates the entries", () => {
+    const grid = new Grid(2, 2);
+    grid.fill((index) => {
+      return index.i;
+    });
+
+    const result = [];
+    for (const x of grid.entries()) {
+      result.push(x);
+    }
+
+    const expected = [
+      [0, 0],
+      [1, 0],
+      [2, 1],
+      [3, 1],
+    ];
+    expect(result).toEqual(expected);
   });
 
   it("fill populates the array with the callback values", () => {
