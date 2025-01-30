@@ -13,7 +13,7 @@ const SMALL_QUADS = BIG_QUAD.subdivide_grid(4);
 // prettier-ignore
 const CONNECTION_ORDER = [
   0b1001, 0b1101, 0b1100, 0b1000,
-  0b1010, 0b1111, 0b1110, 0b1010, 
+  0b1011, 0b1111, 0b1110, 0b1010, 
   0b0011, 0b0111, 0b0110, 0b0010,
   0b0001, 0b0101, 0b0100, 0b0000,
 ];
@@ -178,6 +178,27 @@ function draw_tile_spline(p, tile) {
   }
 }
 
+const CONNECT_POINTS = [
+  vec2(1.0, 0.5),
+  vec2(0.5, 1.0),
+  vec2(0.0, 0.5),
+  vec2(0.5, 0.0),
+];
+
+function draw_tile_connections(p, tile) {
+  const quad = tile.quad;
+  const flags = tile.connection_flags;
+  const center = quad.uv_to_world(vec2(0.5, 0.5));
+  for (let i = 0; i < 4; i++) {
+    if (!((flags >> i) & 1)) {
+      continue;
+    }
+
+    const connect_point = quad.uv_to_world(CONNECT_POINTS[i]);
+    p.line(center.x, center.y, connect_point.x, connect_point.y);
+  }
+}
+
 export const sketch = (p) => {
   let canvas;
   p.setup = () => {
@@ -189,9 +210,15 @@ export const sketch = (p) => {
 
     p.stroke(127);
     p.noFill();
-    //draw_quad(p, BIG_QUAD);
     for (const quad of SMALL_QUADS) {
       draw_quad(p, quad);
+    }
+
+    p.stroke(255, 127, 0);
+    p.strokeWeight(4);
+    p.noFill();
+    for (const tile of TILES) {
+      draw_tile_connections(p, tile);
     }
 
     // Draw the Bezier spline
