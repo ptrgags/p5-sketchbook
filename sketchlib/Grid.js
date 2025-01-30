@@ -45,6 +45,14 @@ export class Index2D {
     return new Index2D(this.i, this.j + 1);
   }
 
+  up() {
+    if (this.i === 0) {
+      return undefined;
+    }
+
+    return new Index2D(this.i - 1, this.j);
+  }
+
   down() {
     return new Index2D(this.i + 1, this.j + 1);
   }
@@ -113,5 +121,21 @@ export class Grid {
       throw new Error("index out of bounds");
     }
     return this.values[i];
+  }
+
+  right(index) {
+    if (index.j >= this.cols) {
+      return undefined;
+    }
+
+    return index.right();
+  }
+
+  down(index) {
+    if (index.i >= this.rows) {
+      return undefined;
+    }
+
+    return index.down();
   }
 }

@@ -5,8 +5,8 @@ const BUD_TIME = 10;
 const EARLY_GROWTH_TIME = 10;
 
 class Node {
-  constructor(index_2d, parent_index, growth_step) {
-    this.index_2d = index_2d;
+  constructor(index, parent_index, growth_step) {
+    this.index = index;
     this.parent_index = parent_index;
     this.growth_step = growth_step;
 
@@ -39,18 +39,21 @@ export class Growth {
     // when we push to the stack we favor upwards growth
 
     // left
-    if (x > 0) {
-      neighbors.push(index - 1);
+    const left = index.left();
+    if (left) {
+      neighbors.push(left);
     }
 
     // right
-    if (x < this.grid_width - 1) {
-      neighbors.push(index + 1);
+    const right = this.grid.right(index);
+    if (right) {
+      neighbors.push(right);
     }
 
     // up
-    if (y > 0) {
-      neighbors.push(index - this.grid_width);
+    const up = index.up();
+    if (up) {
+      neighbors.push(up);
     }
 
     return neighbors;
@@ -82,7 +85,7 @@ export class Growth {
 
     // Neighbors are only valid if that grid cell is empty
     const valid_neighbors = possible_neighbors.filter(
-      (i) => this.grid[i] === undefined
+      (index) => this.grid.get_2d(index) === undefined
     );
 
     // For the first few steps, make the chance of skipping low
@@ -95,10 +98,9 @@ export class Growth {
         continue;
       }
 
-      this.grid[neighbor_index] = new Node(
+      this.grid.set_2d(
         neighbor_index,
-        current_index,
-        this.growth_step
+        new Node(neighbor_index, current_index, this.growth_step)
       );
       this.frontier.push(neighbor_index);
       added_branches = true;
@@ -135,9 +137,9 @@ export class Growth {
       p.fill(stem_color);
       p.noFill();
       if (node.parent_index !== undefined) {
-        const [x, y] = this.unhash(node.index);
-        const [px, py] = this.unhash(node.parent_index);
-        p.line(x * spacing, y * spacing, px * spacing, py * spacing);
+        const { i, j } = node.index;
+        const { i: pi, j: pj } = node.parent_index;
+        p.line(j * spacing, i * spacing, pj * spacing, pi * spacing);
       }
 
       // Mark flower nodes for drawing that in the second pass
@@ -154,8 +156,8 @@ export class Growth {
         continue;
       }
 
-      const [x, y] = this.unhash(flower_node.index);
-      p.ellipse(x * spacing, y * spacing, 6);
+      const { i, j } = flower_node.index;
+      p.ellipse(j * spacing, i * spacing, 6);
     }
   }
 }
