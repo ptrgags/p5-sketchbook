@@ -1,12 +1,10 @@
 import { fix_mouse_coords } from "../common/fix_mouse_coords.js";
+import { Rect } from "./Rect.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
 
-const QUAD_X = WIDTH / 2 - 100;
-const QUAD_Y = HEIGHT / 2 - 100;
-const QUAD_WIDTH = 200;
-const QUAD_HEIGHT = 200;
+const BIG_QUAD = new Rect(0, HEIGHT / 2 - WIDTH / 2, WIDTH, WIDTH);
 
 function add(a, b) {
   return { x: a.x + b.x, y: a.y + b.y };
@@ -18,35 +16,6 @@ function sub(a, b) {
 
 function norm(v) {
   return v.x * v.x + v.y * v.y;
-}
-
-function uv_to_world(point) {
-  const { x: u, y: v } = point;
-
-  return {
-    x: QUAD_X + u * QUAD_WIDTH,
-    y: QUAD_Y + (1 - v) * QUAD_HEIGHT,
-  };
-}
-
-function clamp(x, min, max) {
-  return Math.max(Math.min(x, max), min);
-}
-
-class Rect {
-  constructor(x, y, width, height) {
-    this.position = { x, y };
-    this.dimensions = { x: width, y: height };
-  }
-
-  clamp(point) {
-    const { x, y } = point;
-
-    return {
-      x: clamp(x, this.position.x, this.position.x + this.dimensions.x),
-      y: clamp(y, this.position.y, this.position.y + this.dimensions.y),
-    };
-  }
 }
 
 class ControlPoint {
@@ -105,9 +74,10 @@ const SELECT_RADIUS = 8;
 const SELECT_RADIUS_SQR = SELECT_RADIUS * SELECT_RADIUS;
 
 class InteractiveVertex {
-  constructor(control_point, constraint) {
+  constructor(control_point, constraint, tile_quad) {
     this.control_point = control_point;
     this.constraint = constraint;
+    this.tile_quad = tile_quad;
   }
 
   get position() {
@@ -115,7 +85,9 @@ class InteractiveVertex {
   }
 
   is_hovering(mouse) {
-    const position_world = uv_to_world(this.control_point.position);
+    const position_world = this.tile_quad.uv_to_world(
+      this.control_point.position
+    );
     const dist_sqr = norm(sub(mouse, position_world));
 
     return dist_sqr < SELECT_RADIUS_SQR;
@@ -127,9 +99,10 @@ class InteractiveVertex {
 }
 
 class InteractiveTangent {
-  constructor(control_point, constraint) {
+  constructor(control_point, constraint, tile_quad) {
     this.control_point = control_point;
     this.constraint = constraint;
+    this.tile_quad = tile_quad;
   }
 
   get tip() {
@@ -137,7 +110,9 @@ class InteractiveTangent {
   }
 
   is_hovering(mouse) {
-    const position_world = uv_to_world(this.control_point.forward_point);
+    const position_world = this.tile_quad.uv_to_world(
+      this.control_point.forward_point
+    );
     const dist_sqr = norm(sub(mouse, position_world));
 
     return dist_sqr < SELECT_RADIUS_SQR;
@@ -166,7 +141,7 @@ const CONSTRAINTS = [
 ];
 
 const VERTICES = SPLINE.control_points.map(
-  (x, i) => new InteractiveVertex(x, CONSTRAINTS[i])
+  (x, i) => new InteractiveVertex(x, CONSTRAINTS[i], BIG_QUAD)
 );
 
 const TANGENT_CONSTRAINTS = [
@@ -178,8 +153,16 @@ const TANGENT_CONSTRAINTS = [
 ];
 
 const TANGENTS = SPLINE.control_points.map(
-  (x, i) => new InteractiveTangent(x, TANGENT_CONSTRAINTS[i])
+  (x, i) => new InteractiveTangent(x, TANGENT_CONSTRAINTS[i], BIG_QUAD)
 );
+
+function draw_quad(p, rect) {
+  const { x, y } = rect.position;
+  const { x: w, y: h } = rect.dimensions;
+  p.rect(x, y, w, h);
+  p.line(x, y + h / 2, x + w, y + h / 2);
+  p.line(x + w / 2, y, x + w / 2, y + h);
+}
 
 export const sketch = (p) => {
   let canvas;
@@ -192,12 +175,7 @@ export const sketch = (p) => {
 
     p.stroke(127);
     p.noFill();
-    p.rect(QUAD_X, QUAD_Y, QUAD_WIDTH, QUAD_HEIGHT);
-    p.push();
-    p.translate(p.width / 2, p.height / 2);
-    p.line(0, -100, 0, 100);
-    p.line(-100, 0, 100, 0);
-    p.pop();
+    draw_quad(p, BIG_QUAD);
 
     // Draw the Bezier spline
     p.stroke(131, 71, 181);
@@ -207,10 +185,10 @@ export const sketch = (p) => {
       const start = SPLINE.control_points[i];
       const end = SPLINE.control_points[i + 1];
 
-      const a = uv_to_world(start.position);
-      const b = uv_to_world(start.forward_point);
-      const c = uv_to_world(end.backward_point);
-      const d = uv_to_world(end.position);
+      const a = BIG_QUAD.uv_to_world(start.position);
+      const b = BIG_QUAD.uv_to_world(start.forward_point);
+      const c = BIG_QUAD.uv_to_world(end.backward_point);
+      const d = BIG_QUAD.uv_to_world(end.position);
 
       p.bezier(a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y);
     }
@@ -220,8 +198,8 @@ export const sketch = (p) => {
     p.noFill();
     p.strokeWeight(1);
     for (const point of SPLINE.control_points) {
-      const a = uv_to_world(point.position);
-      const b = uv_to_world(point.forward_point);
+      const a = BIG_QUAD.uv_to_world(point.position);
+      const b = BIG_QUAD.uv_to_world(point.forward_point);
       p.line(a.x, a.y, b.x, b.y);
     }
     // Draw a circle at the tips of the tangents
@@ -229,7 +207,7 @@ export const sketch = (p) => {
     p.noFill();
     p.strokeWeight(6);
     for (const point of SPLINE.control_points) {
-      const pos = uv_to_world(point.forward_point);
+      const pos = BIG_QUAD.uv_to_world(point.forward_point);
       p.point(pos.x, pos.y);
     }
 
@@ -238,7 +216,7 @@ export const sketch = (p) => {
     p.strokeWeight(6);
     p.noFill();
     for (const point of SPLINE.control_points) {
-      const pos = uv_to_world(point.position);
+      const pos = BIG_QUAD.uv_to_world(point.position);
       p.point(pos.x, pos.y);
     }
 
@@ -246,10 +224,10 @@ export const sketch = (p) => {
     p.noFill();
     p.strokeWeight(1);
     if (selected_tangent) {
-      const position = uv_to_world(selected_tangent.tip);
+      const position = BIG_QUAD.uv_to_world(selected_tangent.tip);
       p.circle(position.x, position.y, SELECT_RADIUS * 2);
     } else if (selected_vertex) {
-      const position = uv_to_world(selected_vertex.position);
+      const position = BIG_QUAD.uv_to_world(selected_vertex.position);
       p.circle(position.x, position.y, SELECT_RADIUS * 2);
     }
   };
@@ -281,10 +259,9 @@ export const sketch = (p) => {
 
   p.mouseDragged = () => {
     const [mx, my] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
+    const mouse = { x: mx, y: my };
 
-    const u = (mx - QUAD_X) / QUAD_WIDTH;
-    const v = 1 - (my - QUAD_Y) / QUAD_HEIGHT;
-    const uv = { x: u, y: v };
+    const uv = BIG_QUAD.world_to_uv(mouse);
 
     if (selected_tangent) {
       selected_tangent.move(uv);
