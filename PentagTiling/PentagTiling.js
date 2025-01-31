@@ -1,7 +1,8 @@
 import { fix_mouse_coords } from "../common/fix_mouse_coords.js";
 import { in_bounds } from "../common/in_bounds.js";
 import { PentagGrid } from "./PentagGrid.js";
-import { Index2D } from "../sketchlib/Grid.js";
+import { PentagArcType } from "./PentagCell.js";
+import { PentagIndex } from "./PentagIndex.js";
 
 /**
  * An artistic tiling using pentagons. Not regular pentagons, but
@@ -9,12 +10,12 @@ import { Index2D } from "../sketchlib/Grid.js";
  *
  * ...like this:
  *
- *  ____           _____
- * |    \_________/     |
- * |____/    |    \_____| ...
- * |    \____|____/     |
- * |____/    |    \_____|
- *      \____|____/
+ *  _____           _____
+ * |     \_________/     |
+ * |_____/    |    \_____| ...
+ * |     \____|____/     |
+ * |_____/    |    \_____|
+ *       \____|____/
  *
  *          ...
  */
@@ -43,7 +44,7 @@ function draw_pentag(p, point_x, point_y, flipped) {
 }
 
 function get_pentag_point(index) {
-  const { i: row, j: col } = index;
+  const { row, col } = index;
   const column_quad = Math.floor(col / 4);
   const OFFSETS = [3, 2, 8, 7];
   const x = column_quad * 10 + OFFSETS[col % 4];
@@ -60,14 +61,14 @@ function draw_pentag_cell(p, index) {
   const [x, y] = get_pentag_point(index);
 
   // Every other column is a backwards pentag
-  const flipped = index.j % 2 === 1;
+  const flipped = index.col % 2 === 1;
 
   draw_pentag(p, x * SQUARE_SIZE, y * SQUARE_SIZE, flipped);
 }
 
 function draw_dot(p, index, radius) {
   const [x, y] = get_pentag_point(index);
-  const flipped = index.j % 2 === 1;
+  const flipped = index.col % 2 === 1;
   const x_direction = flipped ? -1.0 : 1.0;
 
   const cx = (x - 1.5 * x_direction) * SQUARE_SIZE;
@@ -77,7 +78,7 @@ function draw_dot(p, index, radius) {
 
 function draw_pentag_arcs(p, index, arc_enabled) {
   const [x, y] = get_pentag_point(index);
-  const flipped = index.j % 2 === 1;
+  const flipped = index.col % 2 === 1;
   const x_direction = flipped ? -1.0 : 1.0;
 
   //    ____1____
@@ -110,27 +111,27 @@ function draw_pentag_arcs(p, index, arc_enabled) {
   ].map(([dx, dy]) => [(x + dx) * SQUARE_SIZE, (y + dy) * SQUARE_SIZE]);
 
   // Arc 0: between the top diagonal and top
-  if (arc_enabled[0]) {
+  if (arc_enabled[PentagArcType.TOP_DIAG_AND_TOP]) {
     p.bezier(...midpoints[0], ...centers[1], ...centers[0], ...midpoints[1]);
   }
 
-  // Arc 1: Between top and flat side
-  if (arc_enabled[1]) {
+  // Arc 1: Between top and vertical side
+  if (arc_enabled[PentagArcType.TOP_AND_VERTICAL]) {
     p.bezier(...midpoints[1], ...centers[0], ...centers[0], ...midpoints[2]);
   }
 
   // Arc 2: Between flat side and bottom
-  if (arc_enabled[2]) {
+  if (arc_enabled[PentagArcType.VERTICAL_AND_BOTTOM]) {
     p.bezier(...midpoints[2], ...centers[0], ...centers[0], ...midpoints[3]);
   }
 
   // Arc 3: Between bottom and bottom diagonal
-  if (arc_enabled[3]) {
+  if (arc_enabled[PentagArcType.BOTTOM_AND_BOTTOM_DIAG]) {
     p.bezier(...midpoints[3], ...centers[0], ...centers[1], ...midpoints[4]);
   }
 
   // Arc 4: Between diagonals
-  if (arc_enabled[4]) {
+  if (arc_enabled[PentagArcType.BOTTOM_DIAG_AND_TOP_DIAG]) {
     p.bezier(...midpoints[4], ...centers[1], ...centers[1], ...midpoints[0]);
   }
 }
@@ -174,20 +175,20 @@ function find_cell(x, y) {
     col = 3;
   }
 
-  let row;
-  if (PentagGrid.needs_y_offset(col)) {
-    row = Math.floor((grid_row - 1) / 2);
-  } else {
-    row = Math.floor(grid_row / 2);
-  }
+  // To determine the row, we first need to check if the
+  const is_staggered = new PentagIndex(0, col).is_staggered;
+
+  const row = is_staggered
+    ? Math.floor((grid_row - 1) / 2)
+    : Math.floor(grid_row / 2);
 
   // The tiles in the offset columns at the edge of the screen are a bit
   // cropped, so ignore them.
-  if (PentagGrid.needs_y_offset(col) && (row < 0 || row >= ROWS - 1)) {
+  if (is_staggered && (row < 0 || row >= ROWS - 1)) {
     return undefined;
   }
 
-  return new Index2D(row, 4 * half + col);
+  return new PentagIndex(row, 4 * half + col);
 }
 
 function can_select(state, index) {
@@ -247,7 +248,7 @@ export const sketch = (p) => {
       if (cell.is_selectable) {
         draw_dot(p, cell.index, 0.25 * SQUARE_SIZE);
       } else {
-        draw_pentag_arcs(p, cell.index, cell.arc_flags);
+        draw_pentag_arcs(p, cell.index, cell.arc_display_flags);
       }
     }
 
@@ -259,7 +260,7 @@ export const sketch = (p) => {
       if (cell.is_selectable) {
         draw_dot(p, cell.index, 0.125 * SQUARE_SIZE);
       } else {
-        draw_pentag_arcs(p, cell.index, cell.arc_flags);
+        draw_pentag_arcs(p, cell.index, cell.arc_display_flags);
       }
     }
   };

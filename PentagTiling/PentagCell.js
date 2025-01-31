@@ -1,21 +1,52 @@
-import { Index2D } from "../sketchlib/Grid.js";
+import { PentagIndex, PentagSide } from "./PentagIndex.js";
 
-const SIDE_VERTICAL = 0;
-const SIDE_TOP = 1;
-const SIDE_TOP_DIAG = 2;
-const SIDE_BOTTOM_DIAG = 3;
-const SIDE_BOTTOM = 4;
+export const PentagArcType = {
+  TOP_DIAG_AND_TOP: 0,
+  TOP_AND_VERTICAL: 1,
+  VERTICAL_AND_BOTTOM: 2,
+  BOTTOM_AND_BOTTOM_DIAG: 3,
+  BOTTOM_DIAG_AND_TOP_DIAG: 4,
+  COUNT: 5,
+};
+Object.freeze(PentagArcType);
+
+export const DISCONNECTED_SIDE_TO_ENABLED_ARCS = {
+  [PentagSide.VERTICAL]: [
+    PentagArcType.BOTTOM_AND_BOTTOM_DIAG,
+    PentagArcType.TOP_DIAG_AND_TOP,
+  ],
+  [PentagSide.TOP]: [
+    PentagArcType.VERTICAL_AND_BOTTOM,
+    PentagArcType.BOTTOM_DIAG_AND_TOP_DIAG,
+  ],
+  [PentagSide.TOP_DIAG]: [
+    PentagArcType.TOP_AND_VERTICAL,
+    PentagArcType.BOTTOM_AND_BOTTOM_DIAG,
+  ],
+  [PentagSide.BOTTOM_DIAG]: [
+    PentagArcType.TOP_DIAG_AND_TOP,
+    PentagArcType.VERTICAL_AND_BOTTOM,
+  ],
+  [PentagSide.BOTTOM]: [
+    PentagArcType.BOTTOM_DIAG_AND_TOP_DIAG,
+    PentagArcType.TOP_AND_VERTICAL,
+  ],
+};
 
 export class PentagCell {
   constructor(index) {
+    if (!(index instanceof PentagIndex)) {
+      throw new Error("index must be a PentagIndex");
+    }
     this.index = index;
 
-    this.arc_type = undefined;
-    this.arc_choices = [true, true, true, true, true];
-  }
+    // Once we draw curves on the tile, it will connect two pairs of
+    // sides, leaving one side disconnected. When that happens, this will be set
+    // to a PentagSide (see PentagIndex.js)
+    this.disconnected_side = undefined;
 
-  get is_flipped() {
-    return this.col % 2 === 1;
+    // This is a map from PentagSide -> whether an arc exists at this tile.
+    this.arc_choices = [true, true, true, true, true];
   }
 
   get arc_choice_count() {
@@ -32,79 +63,49 @@ export class PentagCell {
     return this.arc_choice_count > 0;
   }
 
-  get arc_flags() {
-    switch (this.arc_type) {
-      case 0:
-        return [true, false, false, true, false];
-      case 1:
-        return [false, false, true, false, true];
-      case 2:
-        return [false, true, false, true, false];
-      case 3:
-        return [true, false, true, false, false];
-      case 4:
-        return [false, true, false, false, true];
+  /**
+   * Get a set of flags to determine which arcs to draw
+   * @return {boolean[]} an array of 5 flags for the 5 possible arcs. Either 0 or 2 of these flags will be set.
+   */
+  get arc_display_flags() {
+    // If the tile is completely disconnected, render nothing
+    const flags = [false, false, false, false, false];
+
+    if (!this.disconnected_side) {
+      return flags;
     }
 
-    return [false, false, false, false];
+    // With one side disconnected, the other 4 sides get connected with 2
+    // arcs
+    const [arc1, arc2] =
+      DISCONNECTED_SIDE_TO_ENABLED_ARCS[this.disconnected_side];
+    flags[arc1] = true;
+    flags[arc2] = true;
+
+    return flags;
   }
 
-  get_neighbor(side) {
-    const { i: row, j: col } = this.index;
-    const col_direction = this.is_flipped ? -1 : 1;
-
-    if (side === SIDE_VERTICAL) {
-      return new Index2D(row, col - col_direction);
-    }
-
-    if (side === SIDE_TOP) {
-      return this.index.up();
-    }
-
-    if (side === SIDE_TOP_DIAG) {
-      switch (col % 4) {
-        case 0:
-          return new Index2D(row - 1, col + 1);
-        case 1:
-          return this.index.left();
-        case 2:
-          return this.index.right();
-        case 3:
-          return new Index2D(row - 1, col - 1);
-      }
-    }
-
-    if (side === SIDE_BOTTOM_DIAG) {
-      switch (col % 4) {
-        case 0:
-          return this.index.right();
-        case 1:
-          return new Index2D(row + 1, col - 1);
-        case 2:
-          return new Index2D(row + 1, col + 1);
-        case 3:
-          return this.index.left();
-      }
-    }
-
-    // SIDE_BOTTOM
-    return this.index.down();
-  }
-
-  get all_neighbors() {
+  get_all_neighbor_indices() {
     const result = [];
-    for (let i = 0; i < 5; i++) {
-      result.push(this.get_neighbor(i));
+    for (let side = 0; side < PentagSide.COUNT; side++) {
+      result.push(this.index.get_neighbor(side));
     }
     return result;
   }
 
-  get_partner() {
-    if (this.arc_type === undefined) {
-      throw new Error("Can't get partner without an arc type!");
+  /**
+   * Once a tile has been selected, 4 sides have arcs that must connect to neighbors,
+   * but the final side is disconnected. The adjacent tile in that direction
+   * must also be disconnected (else you'd have an arc to nowhere!) so these
+   * tiles are partnered up.
+   * @returns {PentagIndex|undefined} The index of the partner cell (if this exists)
+   */
+  get_partner_index() {
+    if (this.disconnected_side === undefined) {
+      throw new Error("Tile doesn't have a partner yet!");
     }
 
-    return this.get_neighbor(this.arc_type);
+    return this.index.get_neighbor(this.disconnected_side);
   }
 
   select_random() {
@@ -117,17 +118,17 @@ export class PentagCell {
     do {
       index = Math.floor(5 * Math.random());
     } while (!this.arc_choices[index]);
-    this.arc_type = index;
+    this.disconnected_side = index;
 
     this.arc_choices = [false, false, false, false, false];
   }
 
-  select(arc_type) {
-    if (!this.arc_choices[arc_type]) {
-      throw new Error("Invalid arc type!");
+  select(disconnected_side) {
+    if (!this.arc_choices[disconnected_side]) {
+      throw new Error("Can't choose that side!");
     }
 
-    this.arc_type = arc_type;
+    this.disconnected_side = disconnected_side;
     this.arc_choices = [false, false, false, false, false];
   }
 }

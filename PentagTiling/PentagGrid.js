@@ -1,6 +1,7 @@
 import { PentagCell } from "./PentagCell.js";
 import { Grid } from "../sketchlib/Grid.js";
 import { in_bounds } from "../common/in_bounds.js";
+import { opposite_side, PentagIndex } from "./PentagIndex.js";
 
 export class PentagGrid {
   constructor(rows, cols) {
@@ -24,34 +25,42 @@ export class PentagGrid {
         return undefined;
       }
 
-      return new PentagCell(index);
+      const pentag_index = PentagIndex.from_index_2d(index);
+      return new PentagCell(pentag_index);
     });
   }
 
   get_partner(cell) {
-    const [partner_row, partner_col] = cell.get_partner();
-    return this.get_cell(partner_row, partner_col);
+    return this.get_cell(cell.get_partner_index());
   }
 
-  in_bounds(index) {
-    const { i: row, j: col } = index;
+  /**
+   * Check if a PentagIndex is in the bounds of the grid. Since the grid
+   * is a little unusual (some cells are staggered), some tiles are
+   * disallowed for being slightly off-screen even though they're technically
+   * in range of the array.
+   * @param {PentagIndex} pentag_index The coordinates to check
+   * @returns Boolean true if the pentag index is in bounds.
+   */
+  in_bounds(pentag_index) {
+    const { row, col } = pentag_index;
     if (!in_bounds(col, row, this.cols, this.rows)) {
       return false;
     }
 
-    if (row === this.rows - 1 && PentagGrid.needs_y_offset(col)) {
+    if (row === this.rows - 1 && pentag_index.is_staggered) {
       return false;
     }
 
     return true;
   }
 
-  get_cell(index) {
-    if (!this.in_bounds(index)) {
+  get_cell(pentag_index) {
+    if (!this.in_bounds(pentag_index)) {
       return undefined;
     }
 
-    return this.grid.get(index);
+    return this.grid.get(pentag_index.to_index_2d());
   }
 
   select(index) {
@@ -68,19 +77,20 @@ export class PentagGrid {
     // an arc. The adjacent tile to the empty side (if it exists)
     // must have the additive inverse arc type
     // (e.g. 0 <-> 0, 1 <-> 4, 2 <-> 3)
-    const arc_type = cell.arc_type;
-    const partner_type = (5 - arc_type) % 5;
+    const disconnected_side = cell.disconnected_side;
+    const partner_disconnected_side = opposite_side(disconnected_side);
 
-    const partner = this.get_cell(cell.get_partner());
+    const partner = this.get_cell(cell.get_partner_index());
 
     if (partner) {
-      partner.select(partner_type);
+      partner.select(partner_disconnected_side);
     }
 
     const one_option_left = [];
 
     // Update constraints for this tile's neighbors
-    for (const [side, neighbor_coords] of cell.all_neighbors.entries()) {
+    const neighbors = cell.get_all_neighbor_indices();
+    for (const [side, neighbor_coords] of neighbors.entries()) {
       const neighbor = this.get_cell(neighbor_coords);
       if (!neighbor) {
         continue;
@@ -99,7 +109,8 @@ export class PentagGrid {
 
     // Also update constraints for the partner tile's neighbors
     if (partner) {
-      for (const [side, neighbor_coords] of partner.all_neighbors.entries()) {
+      const neighbors = partner.get_all_neighbor_indices();
+      for (const [side, neighbor_coords] of neighbors.entries()) {
         const neighbor = this.get_cell(neighbor_coords);
         if (!neighbor) {
           continue;
