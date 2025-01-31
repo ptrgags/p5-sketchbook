@@ -71,7 +71,7 @@ export class PentagCell {
     // If the tile is completely disconnected, render nothing
     const flags = [false, false, false, false, false];
 
-    if (!this.disconnected_side) {
+    if (this.disconnected_side === undefined) {
       return flags;
     }
 

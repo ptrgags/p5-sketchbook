@@ -21,11 +21,12 @@ export class PentagGrid {
 
   clear_grid() {
     this.grid.fill((index) => {
-      if (!this.in_bounds(index)) {
+      const pentag_index = PentagIndex.from_index_2d(index);
+
+      if (!this.in_bounds(pentag_index)) {
         return undefined;
       }
 
-      const pentag_index = PentagIndex.from_index_2d(index);
       return new PentagCell(pentag_index);
     });
   }
@@ -99,8 +100,7 @@ export class PentagGrid {
       // To give an example, if the neighbor is in the up direction,
       // then its empty direction must not be in the down direction else
       // the arc in this tile will have nothing to connect to.
-      const opposite_side = (5 - side) % 5;
-      neighbor.arc_choices[opposite_side] = false;
+      neighbor.arc_choices[opposite_side(side)] = false;
 
       if (neighbor.arc_choice_count === 1) {
         one_option_left.push(neighbor);
@@ -119,8 +119,7 @@ export class PentagGrid {
         // To give an example, if the neighbor is in the up direction,
         // then its empty direction must not be in the down direction else
         // the arc in this tile will have nothing to connect to.
-        const opposite_side = (5 - side) % 5;
-        neighbor.arc_choices[opposite_side] = false;
+        neighbor.arc_choices[opposite_side(side)] = false;
 
         if (neighbor.arc_choice_count === 1) {
           one_option_left.push(neighbor);
@@ -133,14 +132,5 @@ export class PentagGrid {
     for (const cell of one_option_left) {
       this.select(cell.index);
     }
-  }
-
-  static needs_y_offset(col) {
-    // For every four columns, the second and third ones need to be shifted.
-    // In other words, if the columns are numbered 0, 1, 2, 3, we want 1 and 2.
-    //
-    // If we cycle this left (col - 1) === (col + 3) (mod 4), we have
-    // 3, 0, 1, 2, and now we can select out 0 or 1 by simple less than.
-    return (col + 3) % 4 < 2;
   }
 }

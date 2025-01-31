@@ -51,25 +51,19 @@ function get_pentag_point(index) {
 
   // For every four columns, the second and third ones need to be
   // shifted one square vertically
-  const offset_y = PentagGrid.needs_y_offset(col);
-  const y = 2 * row + Number(offset_y) + 1;
+  const y = 2 * row + Number(index.is_staggered) + 1;
 
   return [x, y];
 }
 
 function draw_pentag_cell(p, index) {
   const [x, y] = get_pentag_point(index);
-
-  // Every other column is a backwards pentag
-  const flipped = index.col % 2 === 1;
-
-  draw_pentag(p, x * SQUARE_SIZE, y * SQUARE_SIZE, flipped);
+  draw_pentag(p, x * SQUARE_SIZE, y * SQUARE_SIZE, index.is_flipped);
 }
 
 function draw_dot(p, index, radius) {
   const [x, y] = get_pentag_point(index);
-  const flipped = index.col % 2 === 1;
-  const x_direction = flipped ? -1.0 : 1.0;
+  const x_direction = index.is_flipped ? -1.0 : 1.0;
 
   const cx = (x - 1.5 * x_direction) * SQUARE_SIZE;
   const cy = y * SQUARE_SIZE;
@@ -78,8 +72,7 @@ function draw_dot(p, index, radius) {
 
 function draw_pentag_arcs(p, index, arc_enabled) {
   const [x, y] = get_pentag_point(index);
-  const flipped = index.col % 2 === 1;
-  const x_direction = flipped ? -1.0 : 1.0;
+  const x_direction = index.is_flipped ? -1.0 : 1.0;
 
   //    ____1____
   //   |         \
