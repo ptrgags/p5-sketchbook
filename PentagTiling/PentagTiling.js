@@ -1,5 +1,8 @@
 import { fix_mouse_coords } from "../common/fix_mouse_coords.js";
+import { in_bounds } from "../common/in_bounds.js";
 import { PentagGrid } from "./PentagGrid.js";
+import { PentagArcType } from "./PentagCell.js";
+import { PentagIndex } from "./PentagIndex.js";
 
 /**
  * An artistic tiling using pentagons. Not regular pentagons, but
@@ -7,12 +10,12 @@ import { PentagGrid } from "./PentagGrid.js";
  *
  * ...like this:
  *
- *  ____           _____
- * |    \_________/     |
- * |____/    |    \_____| ...
- * |    \____|____/     |
- * |____/    |    \_____|
- *      \____|____/
+ *  _____           _____
+ * |     \_________/     |
+ * |_____/    |    \_____| ...
+ * |     \____|____/     |
+ * |_____/    |    \_____|
+ *       \____|____/
  *
  *          ...
  */
@@ -40,42 +43,36 @@ function draw_pentag(p, point_x, point_y, flipped) {
   p.endShape(p.CLOSE);
 }
 
-function get_pentag_point(row, col) {
+function get_pentag_point(index) {
+  const { row, col } = index;
   const column_quad = Math.floor(col / 4);
   const OFFSETS = [3, 2, 8, 7];
   const x = column_quad * 10 + OFFSETS[col % 4];
 
   // For every four columns, the second and third ones need to be
   // shifted one square vertically
-  const offset_y = PentagGrid.needs_y_offset(col);
-  const y = 2 * row + Number(offset_y) + 1;
+  const y = 2 * row + Number(index.is_staggered) + 1;
 
   return [x, y];
 }
 
-function draw_pentag_cell(p, row, col) {
-  const [x, y] = get_pentag_point(row, col);
-
-  // Every other column is a backwards pentag
-  const flipped = col % 2 === 1;
-
-  draw_pentag(p, x * SQUARE_SIZE, y * SQUARE_SIZE, flipped);
+function draw_pentag_cell(p, index) {
+  const [x, y] = get_pentag_point(index);
+  draw_pentag(p, x * SQUARE_SIZE, y * SQUARE_SIZE, index.is_flipped);
 }
 
-function draw_dot(p, row, col, radius) {
-  const [x, y] = get_pentag_point(row, col);
-  const flipped = col % 2 === 1;
-  const x_direction = flipped ? -1.0 : 1.0;
+function draw_dot(p, index, radius) {
+  const [x, y] = get_pentag_point(index);
+  const x_direction = index.is_flipped ? -1.0 : 1.0;
 
   const cx = (x - 1.5 * x_direction) * SQUARE_SIZE;
   const cy = y * SQUARE_SIZE;
   p.circle(cx, cy, 2 * radius);
 }
 
-function draw_pentag_arcs(p, row, col, arc_enabled) {
-  const [x, y] = get_pentag_point(row, col);
-  const flipped = col % 2 === 1;
-  const x_direction = flipped ? -1.0 : 1.0;
+function draw_pentag_arcs(p, index, arc_enabled) {
+  const [x, y] = get_pentag_point(index);
+  const x_direction = index.is_flipped ? -1.0 : 1.0;
 
   //    ____1____
   //   |         \
@@ -107,27 +104,27 @@ function draw_pentag_arcs(p, row, col, arc_enabled) {
   ].map(([dx, dy]) => [(x + dx) * SQUARE_SIZE, (y + dy) * SQUARE_SIZE]);
 
   // Arc 0: between the top diagonal and top
-  if (arc_enabled[0]) {
+  if (arc_enabled[PentagArcType.TOP_DIAG_AND_TOP]) {
     p.bezier(...midpoints[0], ...centers[1], ...centers[0], ...midpoints[1]);
   }
 
-  // Arc 1: Between top and flat side
-  if (arc_enabled[1]) {
+  // Arc 1: Between top and vertical side
+  if (arc_enabled[PentagArcType.TOP_AND_VERTICAL]) {
     p.bezier(...midpoints[1], ...centers[0], ...centers[0], ...midpoints[2]);
   }
 
   // Arc 2: Between flat side and bottom
-  if (arc_enabled[2]) {
+  if (arc_enabled[PentagArcType.VERTICAL_AND_BOTTOM]) {
     p.bezier(...midpoints[2], ...centers[0], ...centers[0], ...midpoints[3]);
   }
 
   // Arc 3: Between bottom and bottom diagonal
-  if (arc_enabled[3]) {
+  if (arc_enabled[PentagArcType.BOTTOM_AND_BOTTOM_DIAG]) {
     p.bezier(...midpoints[3], ...centers[0], ...centers[1], ...midpoints[4]);
   }
 
   // Arc 4: Between diagonals
-  if (arc_enabled[4]) {
+  if (arc_enabled[PentagArcType.BOTTOM_DIAG_AND_TOP_DIAG]) {
     p.bezier(...midpoints[4], ...centers[1], ...centers[1], ...midpoints[0]);
   }
 }
@@ -171,25 +168,25 @@ function find_cell(x, y) {
     col = 3;
   }
 
-  let row;
-  if (PentagGrid.needs_y_offset(col)) {
-    row = Math.floor((grid_row - 1) / 2);
-  } else {
-    row = Math.floor(grid_row / 2);
-  }
+  // To determine the row, we first need to check if the
+  const is_staggered = new PentagIndex(0, col).is_staggered;
+
+  const row = is_staggered
+    ? Math.floor((grid_row - 1) / 2)
+    : Math.floor(grid_row / 2);
 
   // The tiles in the offset columns at the edge of the screen are a bit
   // cropped, so ignore them.
-  if (PentagGrid.needs_y_offset(col) && (row < 0 || row >= ROWS - 1)) {
+  if (is_staggered && (row < 0 || row >= ROWS - 1)) {
     return undefined;
   }
 
-  return [row, 4 * half + col];
+  return new PentagIndex(row, 4 * half + col);
 }
 
-function can_select(state, row, col) {
+function can_select(state, index) {
   for (const grid of state.grids) {
-    const cell = grid.get_cell(row, col);
+    const cell = grid.get_cell(index);
     if (!cell) {
       // out of bounds, short circuit the whole function
       return false;
@@ -223,15 +220,15 @@ export const sketch = (p) => {
     p.strokeWeight(2);
     p.fill(82, 123, 146); // pale dark blue
     for (const cell of state.grids[0]) {
-      draw_pentag_cell(p, cell.row, cell.col);
+      draw_pentag_cell(p, cell.index);
     }
 
     // Highlight the cell the mouse is hovered over
     p.fill(199, 255, 243); // light blue
-    if (state.mouse_cell) {
-      const [mouse_row, mouse_col] = state.mouse_cell;
-      if (can_select(state, mouse_row, mouse_col)) {
-        draw_pentag_cell(p, mouse_row, mouse_col);
+    const mouse_cell = state.mouse_cell;
+    if (mouse_cell) {
+      if (can_select(state, mouse_cell)) {
+        draw_pentag_cell(p, mouse_cell);
       }
     }
 
@@ -242,9 +239,9 @@ export const sketch = (p) => {
     p.strokeCap(p.SQUARE);
     for (const cell of state.grids[0]) {
       if (cell.is_selectable) {
-        draw_dot(p, cell.row, cell.col, 0.25 * SQUARE_SIZE);
+        draw_dot(p, cell.index, 0.25 * SQUARE_SIZE);
       } else {
-        draw_pentag_arcs(p, cell.row, cell.col, cell.arc_flags);
+        draw_pentag_arcs(p, cell.index, cell.arc_display_flags);
       }
     }
 
@@ -254,9 +251,9 @@ export const sketch = (p) => {
     p.strokeWeight(4);
     for (const cell of state.grids[1]) {
       if (cell.is_selectable) {
-        draw_dot(p, cell.row, cell.col, 0.125 * SQUARE_SIZE);
+        draw_dot(p, cell.index, 0.125 * SQUARE_SIZE);
       } else {
-        draw_pentag_arcs(p, cell.row, cell.col, cell.arc_flags);
+        draw_pentag_arcs(p, cell.index, cell.arc_display_flags);
       }
     }
   };
@@ -266,7 +263,7 @@ export const sketch = (p) => {
     // aspect ratio
     const [x, y] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
 
-    if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT) {
+    if (!in_bounds(x, y, WIDTH, HEIGHT)) {
       state.mouse_cell = undefined;
       return true;
     }
@@ -281,14 +278,14 @@ export const sketch = (p) => {
     // aspect ratio
     const [x, y] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
 
-    if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT) {
+    if (!in_bounds(x, y, WIDTH, HEIGHT)) {
       return true;
     }
 
     const mouse_cell = find_cell(x, y);
     if (mouse_cell) {
       for (const grid of state.grids) {
-        grid.select(...mouse_cell);
+        grid.select(mouse_cell);
       }
     }
 

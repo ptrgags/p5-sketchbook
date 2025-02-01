@@ -1,5 +1,6 @@
 import { fix_mouse_coords } from "../common/fix_mouse_coords.js";
 import { in_bounds } from "../common/in_bounds.js";
+import { Index2D, Grid } from "../sketchlib/Grid.js";
 import { METER_WIDTH, METER_HEIGHT, Meter } from "./Meter.js";
 
 const WIDTH = 500;
@@ -13,46 +14,40 @@ const OFFSET_X =
 const OFFSET_Y =
   (HEIGHT - GRID_SIZE * (METER_HEIGHT + SPACING_Y_PX)) / 2 + SPACING_Y_PX / 2;
 
-function init_meters(state) {
-  const meters = state.meters;
-  for (let i = 0; i < GRID_SIZE; i++) {
+function init_meters(meters) {
+  meters.fill((index) => {
+    const { i, j } = index;
     const y = OFFSET_Y + i * (METER_HEIGHT + SPACING_Y_PX);
-    for (let j = 0; j < GRID_SIZE; j++) {
-      const x = OFFSET_X + j * (METER_WIDTH + SPACING_X_PX);
-      meters[i * GRID_SIZE + j] = new Meter(x, y);
-    }
-  }
+    const x = OFFSET_X + j * (METER_WIDTH + SPACING_X_PX);
+    return new Meter(x, y);
+  });
 }
 
 export const sketch = (p) => {
   let canvas;
 
   const state = {
-    meters: Array(GRID_SIZE * GRID_SIZE),
+    meters: new Grid(GRID_SIZE, GRID_SIZE),
   };
 
   p.setup = () => {
     canvas = p.createCanvas(WIDTH, HEIGHT).elt;
-    init_meters(state);
+    init_meters(state.meters);
   };
 
   p.draw = () => {
     p.background(0);
 
-    for (let i = 0; i < GRID_SIZE; i++) {
-      for (let j = 0; j < GRID_SIZE; j++) {
-        const index = i * GRID_SIZE + j;
-        const meter = state.meters[index];
-        meter.draw(p);
+    for (const [i, meter] of state.meters.entries()) {
+      meter.draw(p);
 
-        // Progressively start draining meters, adding one more meter
-        // after the time it takes to completely drain the meter.
-        const DRAIN_RATE = 1;
-        const DRAIN_PERIOD = 256 / DRAIN_RATE;
-        const start_frame = DRAIN_PERIOD * index;
-        if (p.frameCount > start_frame) {
-          meter.drain(DRAIN_RATE);
-        }
+      // Progressively start draining meters, adding one more meter
+      // after the time it takes to completely drain the meter.
+      const DRAIN_RATE = 1;
+      const DRAIN_PERIOD = 256 / DRAIN_RATE;
+      const start_frame = DRAIN_PERIOD * i;
+      if (p.frameCount > start_frame) {
+        meter.drain(DRAIN_RATE);
       }
     }
   };
@@ -72,16 +67,15 @@ export const sketch = (p) => {
       return true;
     }
 
-    const grid_x = (x - OFFSET_X) / (METER_WIDTH + SPACING_X_PX);
-    const grid_y = (y - OFFSET_Y) / (METER_HEIGHT + SPACING_Y_PX);
-    if (!in_bounds(grid_x, grid_y, GRID_SIZE, GRID_SIZE)) {
+    const grid_row = (y - OFFSET_Y) / (METER_HEIGHT + SPACING_Y_PX);
+    const grid_col = (x - OFFSET_X) / (METER_WIDTH + SPACING_X_PX);
+    if (!in_bounds(grid_col, grid_row, GRID_SIZE, GRID_SIZE)) {
       return true;
     }
 
     const REFILL = 256;
-    const meter_index = Math.floor(grid_y) * GRID_SIZE + Math.floor(grid_x);
-    console.log("clicked meter", meter_index);
-    state.meters[meter_index].fill(REFILL);
+    const meter_index = new Index2D(Math.floor(grid_row), Math.floor(grid_col));
+    state.meters.get(meter_index).fill(REFILL);
     return false;
   };
 };
