@@ -32,6 +32,7 @@ export class Point {
     return this.sub(point).norm();
   }
 }
+Point.ORIGIN = Object.freeze(new Point(0, 0));
 
 export class Direction {
   constructor(x, y) {
@@ -59,3 +60,5 @@ export class Direction {
     return new Direction(scalar * this.x, scalar * this.y);
   }
 }
+Direction.X = Object.freeze(new Direction(1, 0));
+Direction.Y = Object.freeze(new Direction(0, 1));

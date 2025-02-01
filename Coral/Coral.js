@@ -3,6 +3,7 @@ import { Rect } from "./Rect.js";
 import { ControlPoint } from "./ControlPoint.js";
 import { CoralTile } from "./CoralTile.js";
 import { Point, Direction } from "../pga2d/objects.js";
+import { InteractiveTangent, InteractiveVertex } from "./interactive.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -44,60 +45,6 @@ class Spline {
   }
 }
 
-const SELECT_RADIUS = 8;
-const SELECT_RADIUS_SQR = SELECT_RADIUS * SELECT_RADIUS;
-
-class InteractiveVertex {
-  constructor(control_point, constraint, tile_quad) {
-    this.control_point = control_point;
-    this.constraint = constraint;
-    this.tile_quad = tile_quad;
-  }
-
-  get position() {
-    return this.control_point.position;
-  }
-
-  is_hovering(mouse) {
-    const position_world = this.tile_quad.uv_to_world(
-      this.control_point.position
-    );
-    const dist_sqr = mouse.dist_sqr(position_world);
-
-    return dist_sqr < SELECT_RADIUS_SQR;
-  }
-
-  move(uv) {
-    this.control_point.position = this.constraint.clamp(uv);
-  }
-}
-
-class InteractiveTangent {
-  constructor(control_point, constraint, tile_quad) {
-    this.control_point = control_point;
-    this.constraint = constraint;
-    this.tile_quad = tile_quad;
-  }
-
-  get tip() {
-    return this.control_point.forward_point;
-  }
-
-  is_hovering(mouse) {
-    const position_world = this.tile_quad.uv_to_world(
-      this.control_point.forward_point
-    );
-    const dist_sqr = mouse.dist_sqr(position_world);
-
-    return dist_sqr < SELECT_RADIUS_SQR;
-  }
-
-  move(uv) {
-    const tangent = uv.sub(this.control_point.position);
-    this.control_point.tangent = this.constraint.clamp(tangent);
-  }
-}
-
 const SPLINE = new Spline([
   new ControlPoint(new Point(0.75, 0.0), new Direction(-0.21, 0.219)),
   new ControlPoint(new Point(0.75, 0.5), new Direction(0.09, 0.204)),
@@ -114,9 +61,25 @@ const CONSTRAINTS = [
   new Rect(0.0, 0.0, 0.5, 0.0),
 ];
 
-const VERTICES = SPLINE.control_points.map(
-  (x, i) => new InteractiveVertex(x, CONSTRAINTS[i], SMALL_QUADS[0])
-);
+const VERTICES = [];
+const TANGENTS = [];
+for (const tile of TILES) {
+  for (const [
+    control_point,
+    vertex_constraint,
+    tangent_constraint,
+  ] of tile.get_constraints()) {
+    VERTICES.push(
+      new InteractiveVertex(control_point, vertex_constraint, tile.quad)
+    );
+    TANGENTS.push(
+      new InteractiveTangent(control_point, tangent_constraint, tile.quad)
+    );
+  }
+}
+
+// Order to check for mouse hits. Note that this doesn't scale well.
+const SELECTION_ORDER = [...TANGENTS, ...VERTICES];
 
 const TANGENT_CONSTRAINTS = [
   new Rect(-0.5, 0, 1.0, 0.5),
@@ -125,10 +88,6 @@ const TANGENT_CONSTRAINTS = [
   new Rect(-0.5, -0.5, 1.0, 0.5),
   new Rect(-0.5, -0.5, 1.0, 0.5),
 ];
-
-const TANGENTS = SPLINE.control_points.map(
-  (x, i) => new InteractiveTangent(x, TANGENT_CONSTRAINTS[i], SMALL_QUADS[0])
-);
 
 function draw_quad(p, rect) {
   const { x, y } = rect.position;
@@ -199,8 +158,15 @@ function draw_tile_connections(p, tile) {
   }
 }
 
+function highlight_selction(p, selected_object) {
+  const position = selected_object.position_world;
+  p.circle(position.x, position.y, SELECT_RADIUS * 2);
+}
+
 export const sketch = (p) => {
   let canvas;
+  let selected_object;
+
   p.setup = () => {
     canvas = p.createCanvas(500, 700).elt;
   };
@@ -256,17 +222,11 @@ export const sketch = (p) => {
     p.stroke(255);
     p.noFill();
     p.strokeWeight(1);
-    if (selected_tangent) {
-      const position = BIG_QUAD.uv_to_world(selected_tangent.tip);
-      p.circle(position.x, position.y, SELECT_RADIUS * 2);
-    } else if (selected_vertex) {
-      const position = BIG_QUAD.uv_to_world(selected_vertex.position);
-      p.circle(position.x, position.y, SELECT_RADIUS * 2);
+    if (selected_object) {
+      highlight_selction(p, selected_object);
     }
   };
 
-  let selected_vertex;
-  let selected_tangent;
   p.mousePressed = () => {
     if (!canvas) {
       return;
@@ -275,17 +235,10 @@ export const sketch = (p) => {
     const [mx, my] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
     const mouse = new Point(mx, my);
 
-    for (const tangent of TANGENTS) {
-      if (tangent.is_hovering(mouse)) {
-        selected_tangent = tangent;
-        return;
-      }
-    }
-
-    for (const vertex of VERTICES) {
-      if (vertex.is_hovering(mouse)) {
-        selected_vertex = vertex;
-        return;
+    for (const object of SELECTION_ORDER) {
+      if (object.is_hovering(mouse)) {
+        selected_object = object;
+        break;
       }
     }
   };

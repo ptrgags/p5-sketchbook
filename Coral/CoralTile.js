@@ -6,10 +6,10 @@ export const CONNECT_UP = 0b0010;
 export const CONNECT_LEFT = 0b0100;
 export const CONNECT_DOWN = 0b1000;
 
-const DIR_LEFT = new Direction(-0.1, 0);
-const DIR_RIGHT = new Direction(0.1, 0);
-const DIR_UP = new Direction(0, 0.1);
-const DIR_DOWN = new Direction(0, -0.1);
+const DIR_LEFT = Direction.X.scale(-0.1);
+const DIR_RIGHT = Direction.X.scale(0.1);
+const DIR_UP = Direction.Y.scale(0.1);
+const DIR_DOWN = Direction.Y.scale(-0.1);
 
 function has_flag(flags, flag) {
   return (flags & flag) === flag;
@@ -53,5 +53,9 @@ export class CoralTile {
     const sw = new ControlPoint(sw_position, sw_dir);
 
     this.control_points = [se, ne, nw, sw];
+  }
+
+  get_constraints() {
+    return [];
   }
 }

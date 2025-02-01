@@ -123,6 +123,15 @@ export class Grid {
     return result;
   }
 
+  /**
+   * Get the number of entries in the underlying array. This is equal to
+   * this.rows * this.cols
+   * @return {Number} The number of entries in the grid
+   */
+  get length() {
+    return this.values.length;
+  }
+
   set(index, value) {
     if (!(index instanceof Index2D)) {
       throw new Error("index must be an Index2D object");
