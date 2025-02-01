@@ -1,4 +1,6 @@
 // the crosses at the corners of grid squares can't ever be smaller than 2x4 px
+import { griderator } from "../sketchlib/Grid.js";
+
 // else it stops looking like a cross and the illusion becomes less effective.
 const MIN_CROSS_WIDTH = 2;
 const MIN_CROSS_LENGTH = 4 * MIN_CROSS_WIDTH;
@@ -88,30 +90,28 @@ export class PrimroseTile {
       colors.cross_light,
     ];
 
-    for (let i = 0; i < GRID_SIZE - 1; i++) {
-      for (let j = 0; j < GRID_SIZE - 1; j++) {
-        const diag = invert_y ? i + (GRID_SIZE - 1 - j) : i + j;
-        const selected_color = colormap[diag % colormap.length];
-        this.gfx.fill(selected_color);
-        const center_x = (i + 1) * SQUARE_SIZE;
-        const center_y = (j + 1) * SQUARE_SIZE;
-        // horizontal stroke
-        this.gfx.rect(
-          center_x - CROSS_STROKE_LENGTH / 2,
-          center_y - CROSS_STROKE_THICKNESS / 2,
-          CROSS_STROKE_LENGTH,
-          CROSS_STROKE_THICKNESS
-        );
+    griderator(GRID_SIZE - 1, GRID_SIZE - 1, (i, j) => {
+      const diag = invert_y ? i + (GRID_SIZE - 1 - j) : i + j;
+      const selected_color = colormap[diag % colormap.length];
+      this.gfx.fill(selected_color);
+      const center_x = (i + 1) * SQUARE_SIZE;
+      const center_y = (j + 1) * SQUARE_SIZE;
+      // horizontal stroke
+      this.gfx.rect(
+        center_x - CROSS_STROKE_LENGTH / 2,
+        center_y - CROSS_STROKE_THICKNESS / 2,
+        CROSS_STROKE_LENGTH,
+        CROSS_STROKE_THICKNESS
+      );
 
-        // vertical stroke
-        this.gfx.rect(
-          center_x - CROSS_STROKE_THICKNESS / 2,
-          center_y - CROSS_STROKE_LENGTH / 2,
-          CROSS_STROKE_THICKNESS,
-          CROSS_STROKE_LENGTH
-        );
-      }
-    }
+      // vertical stroke
+      this.gfx.rect(
+        center_x - CROSS_STROKE_THICKNESS / 2,
+        center_y - CROSS_STROKE_LENGTH / 2,
+        CROSS_STROKE_THICKNESS,
+        CROSS_STROKE_LENGTH
+      );
+    });
   }
 
   make_graphics() {
