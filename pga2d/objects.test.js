@@ -38,12 +38,29 @@ describe("Direction", () => {
     expect(a.y).toBe(5);
   });
 
+  it("neg negates the components", () => {
+    const a = new Direction(1, -3);
+
+    const result = a.neg();
+
+    const expected = new Direction(-1, 3);
+    expect(result).toEqual(expected);
+  });
+
   it("norm returns the sum of squared components", () => {
     const a = new Direction(3, 4);
 
     const result = a.norm();
 
     expect(result).toBe(25);
+  });
+
+  it("magnitude returns the magnitude", () => {
+    const a = new Direction(3, 4);
+
+    const result = a.magnitude();
+
+    expect(result).toBeCloseTo(5);
   });
 
   it("scale performs scalar multiplication", () => {
@@ -53,5 +70,16 @@ describe("Direction", () => {
 
     const expected = new Direction(8, -6);
     expect(result).toEqual(expected);
+  });
+
+  it("dot of two directions computes the dot product of components", () => {
+    const a = new Direction(1, 2);
+    const b = new Direction(3, 4);
+
+    const result = a.dot(b);
+
+    // 1 * 3 + 2 * 4 = 11
+    const expected = 11;
+    expect(result).toBe(expected);
   });
 });

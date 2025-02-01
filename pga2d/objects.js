@@ -51,13 +51,29 @@ export class Direction {
     return -this.bivec.xo;
   }
 
+  neg() {
+    return new Direction(-this.x, -this.y);
+  }
+
   norm() {
     const { yo: x, xo: y } = this.bivec;
     return x * x + y * y;
   }
 
+  magnitude() {
+    const mag_sqr = this.norm();
+    if (mag_sqr === 0) {
+      return 0;
+    }
+    return Math.sqrt(mag_sqr);
+  }
+
   scale(scalar) {
     return new Direction(scalar * this.x, scalar * this.y);
+  }
+
+  dot(other) {
+    return this.x * other.x + this.y * other.y;
   }
 }
 Direction.X = Object.freeze(new Direction(1, 0));

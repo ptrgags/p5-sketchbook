@@ -3,7 +3,11 @@ import { Rect } from "./Rect.js";
 import { ControlPoint } from "./ControlPoint.js";
 import { CoralTile } from "./CoralTile.js";
 import { Point, Direction } from "../pga2d/objects.js";
-import { InteractiveTangent, InteractiveVertex } from "./interactive.js";
+import {
+  SELECT_RADIUS,
+  InteractiveTangent,
+  InteractiveVertex,
+} from "./interactive.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -13,6 +17,8 @@ const SMALL_QUADS = BIG_QUAD.subdivide_grid(4);
 
 // prettier-ignore
 const CONNECTION_ORDER = [
+  // all 16 connection types, arranged in a 4x4 grid to form closed
+  // loops.
   [0b1001, 0b1101, 0b1100, 0b1000],
   [0b1011, 0b1111, 0b1110, 0b1010], 
   [0b0011, 0b0111, 0b0110, 0b0010],
@@ -247,18 +253,12 @@ export const sketch = (p) => {
     const [mx, my] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
     const mouse = new Point(mx, my);
 
-    const uv = BIG_QUAD.world_to_uv(mouse);
-
-    if (selected_tangent) {
-      selected_tangent.move(uv);
-    } else if (selected_vertex) {
-      selected_vertex.move(uv);
+    if (selected_object) {
+      selected_object.move(mouse);
     }
   };
 
   p.mouseReleased = () => {
-    selected_vertex = undefined;
-    selected_tangent = undefined;
-    SPLINE.log_params();
+    selected_object = undefined;
   };
 };

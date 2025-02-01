@@ -22,3 +22,4 @@ export class Even {
     return new Even(scalar, xy, xo, yo);
   }
 }
+Even.IDENTITY = Object.freeze(new Even(1, 0, 0, 0));
