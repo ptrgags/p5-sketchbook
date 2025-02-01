@@ -1,4 +1,5 @@
 import { Direction, Point } from "../pga2d/objects.js";
+import { Grid } from "../sketchlib/Grid.js";
 
 function clamp(x, min, max) {
   return Math.max(Math.min(x, max), min);
@@ -42,18 +43,18 @@ export class Rect {
   /**
    * Subdivide into a n x n grid of smaller quads
    * @param {number} n the number of divisions on a side
-   * @returns {Rect[]} The sub-tiles
+   * @returns {Grid<Rect>} The sub-tiles
    */
   subdivide_grid(n) {
-    const result = new Array(n * n);
+    const result = new Grid(n, n);
     const sub_dimensions = this.dimensions.scale(1 / n);
-    for (let i = 0; i < n; i++) {
+    result.fill((index) => {
+      const { i, j } = index;
       const y = this.position.y + i * sub_dimensions.y;
-      for (let j = 0; j < n; j++) {
-        const x = this.position.x + j * sub_dimensions.x;
-        result[i * n + j] = new Rect(x, y, sub_dimensions.x, sub_dimensions.y);
-      }
-    }
+      const x = this.position.x + j * sub_dimensions.x;
+
+      return new Rect(x, y, sub_dimensions.x, sub_dimensions.y);
+    });
 
     return result;
   }

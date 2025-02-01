@@ -12,14 +12,14 @@ const SMALL_QUADS = BIG_QUAD.subdivide_grid(4);
 
 // prettier-ignore
 const CONNECTION_ORDER = [
-  0b1001, 0b1101, 0b1100, 0b1000,
-  0b1011, 0b1111, 0b1110, 0b1010, 
-  0b0011, 0b0111, 0b0110, 0b0010,
-  0b0001, 0b0101, 0b0100, 0b0000,
+  [0b1001, 0b1101, 0b1100, 0b1000],
+  [0b1011, 0b1111, 0b1110, 0b1010], 
+  [0b0011, 0b0111, 0b0110, 0b0010],
+  [0b0001, 0b0101, 0b0100, 0b0000],
 ];
 
 const TILES = SMALL_QUADS.map(
-  (quad, i) => new CoralTile(quad, CONNECTION_ORDER[i])
+  ({ i, j }, quad) => new CoralTile(quad, CONNECTION_ORDER[i][j])
 );
 
 class Spline {
