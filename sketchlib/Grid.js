@@ -71,7 +71,7 @@ export class Index2D {
    * @returns {Index2D} The downwards neighbor
    */
   down() {
-    return new Index2D(this.i + 1, this.j + 1);
+    return new Index2D(this.i + 1, this.j);
   }
 }
 

@@ -45,7 +45,7 @@ export class CoralTile {
     const se = new ControlPoint(se_position, se_dir.scale(0.1));
     const se_vertex_constraint = connects_down
       ? new Rect(0.5, 0, 0.5, 0)
-      : new Rect(1, 0, 0, 0.5);
+      : new Rect(0.5, 0, 0, 0.5);
 
     const connects_right = has_flag(this.connection_flags, CONNECT_RIGHT);
     const ne_position = connects_right

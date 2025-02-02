@@ -62,7 +62,7 @@ describe("Index2D", () => {
 
     const result = index.down();
 
-    const expected = new Index2D(2, 6);
+    const expected = new Index2D(2, 5);
     expect(result).toEqual(expected);
   });
 });
