@@ -7,7 +7,7 @@ export const CONNECT_UP = 0b0010;
 export const CONNECT_LEFT = 0b0100;
 export const CONNECT_DOWN = 0b1000;
 
-const ConnectionDirection = {
+export const ConnectionDirection = {
   RIGHT: 0,
   UP: 1,
   LEFT: 2,
@@ -23,6 +23,14 @@ const DIR_DOWN = Direction.Y.neg();
 function has_flag(flags, flag) {
   return (flags & flag) === flag;
 }
+
+export const Quadrant = {
+  SOUTHEAST: 0,
+  NORTHEAST: 1,
+  NORTHWEST: 2,
+  SOUTHWEST: 3,
+};
+Object.freeze(Quadrant);
 
 export class CoralTile {
   constructor(quad, connection_flags) {
@@ -75,6 +83,14 @@ export class CoralTile {
       sw_vertex_constraint,
     ];
     this.tangent_constraints = [se_dir, ne_dir, nw_dir, sw_dir];
+  }
+
+  is_connected(direction) {
+    return has_flag(this.connection_flags, 1 << direction);
+  }
+
+  get_control_point(quadrant) {
+    return this.control_points[quadrant];
   }
 
   get_constraints() {

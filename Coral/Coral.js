@@ -8,6 +8,7 @@ import {
   InteractiveTangent,
   InteractiveVertex,
 } from "./interactive.js";
+import { find_splines } from "./find_splines.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -29,44 +30,6 @@ const TILES = SMALL_QUADS.map(
   ({ i, j }, quad) => new CoralTile(quad, CONNECTION_ORDER[i][j])
 );
 
-class Spline {
-  constructor(control_points) {
-    this.control_points = control_points;
-  }
-
-  log_params() {
-    console.log("current control points:");
-    for (const point of this.control_points) {
-      console.log(
-        "p:",
-        point.position.x.toPrecision(3),
-        point.position.y.toPrecision(3)
-      );
-      console.log(
-        "v:",
-        point.tangent.x.toPrecision(3),
-        point.tangent.y.toPrecision(3)
-      );
-    }
-  }
-}
-
-const SPLINE = new Spline([
-  new ControlPoint(new Point(0.75, 0.0), new Direction(-0.21, 0.219)),
-  new ControlPoint(new Point(0.75, 0.5), new Direction(0.09, 0.204)),
-  new ControlPoint(new Point(0.5, 0.934), new Direction(-0.185, 0.055)),
-  new ControlPoint(new Point(0.25, 0.5), new Direction(0.11, -0.291)),
-  new ControlPoint(new Point(0.25, 0.0), new Direction(-0.095, -0.176)),
-]);
-
-const CONSTRAINTS = [
-  new Rect(0.5, 0.0, 0.5, 0.0),
-  new Rect(0.5, 0.5, 0.5, 0.0),
-  new Rect(0.5, 0.5, 0.0, 0.5),
-  new Rect(0.0, 0.5, 0.5, 0.0),
-  new Rect(0.0, 0.0, 0.5, 0.0),
-];
-
 const VERTICES = [];
 const TANGENTS = [];
 for (const tile of TILES) {
@@ -86,14 +49,6 @@ for (const tile of TILES) {
 
 // Order to check for mouse hits. Note that this doesn't scale well.
 const SELECTION_ORDER = [...TANGENTS, ...VERTICES];
-
-const TANGENT_CONSTRAINTS = [
-  new Rect(-0.5, 0, 1.0, 0.5),
-  new Rect(-0.5, 0, 1.0, 0.5),
-  new Rect(-0.5, -0.5, 0.5, 1.0),
-  new Rect(-0.5, -0.5, 1.0, 0.5),
-  new Rect(-0.5, -0.5, 1.0, 0.5),
-];
 
 function draw_quad(p, rect) {
   const { x, y } = rect.position;
@@ -128,17 +83,10 @@ function draw_tile_vertices(p, tile) {
   }
 }
 
-function draw_tile_spline(p, tile) {
-  const quad = tile.quad;
-  for (let i = 0; i < tile.control_points.length - 1; i++) {
-    const start = tile.control_points[i];
-    const end = tile.control_points[i + 1];
+const SPLINES = find_splines(TILES);
 
-    const a = quad.uv_to_world(start.position);
-    const b = quad.uv_to_world(start.forward_point);
-    const c = quad.uv_to_world(end.backward_point);
-    const d = quad.uv_to_world(end.position);
-
+function draw_spline(p, spline) {
+  for (const [a, b, c, d] of spline.to_bezier_world()) {
     p.bezier(a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y);
   }
 }
@@ -197,8 +145,8 @@ export const sketch = (p) => {
     p.stroke(131, 71, 181);
     p.noFill();
     p.strokeWeight(2);
-    for (const tile of TILES) {
-      //draw_tile_spline(p, tile);
+    for (const spline of SPLINES) {
+      draw_spline(p, spline);
     }
 
     // Draw tangents
