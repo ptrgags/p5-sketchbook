@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Point, Direction } from "./objects";
+import { Point, Direction, Line } from "./objects";
 
 describe("Point", () => {
   it("gets the underlying x and y components", () => {
@@ -36,6 +36,15 @@ describe("Direction", () => {
 
     expect(a.x).toBe(-3);
     expect(a.y).toBe(5);
+  });
+
+  it("dual returns the orthogonal line", () => {
+    const a = new Direction(2, 1);
+
+    const result = a.dual();
+
+    const expected = new Line(2, 1, 0);
+    expect(result).toEqual(expected);
   });
 
   it("neg negates the components", () => {

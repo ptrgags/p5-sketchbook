@@ -1,4 +1,4 @@
-import { Even } from "./multivectors.js";
+import { Even, Odd } from "./multivectors.js";
 
 export class Point {
   constructor(x, y) {
@@ -51,6 +51,11 @@ export class Direction {
     return -this.bivec.xo;
   }
 
+  dual() {
+    const { x: nx, y: ny } = this.bivec.dual();
+    return new Line(nx, ny, 0);
+  }
+
   neg() {
     return new Direction(-this.x, -this.y);
   }
@@ -78,3 +83,9 @@ export class Direction {
 }
 Direction.X = Object.freeze(new Direction(1, 0));
 Direction.Y = Object.freeze(new Direction(0, 1));
+
+export class Line {
+  constructor(nx, ny, d) {
+    this.vec = new Odd(nx, ny, -d, 0);
+  }
+}

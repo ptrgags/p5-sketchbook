@@ -21,5 +21,18 @@ export class Even {
     const yo = this.yo - other.yo;
     return new Even(scalar, xy, xo, yo);
   }
+
+  dual() {
+    return new Odd(this.yo, -this.xo, this.xy, this.scalar);
+  }
 }
 Even.IDENTITY = Object.freeze(new Even(1, 0, 0, 0));
+
+export class Odd {
+  constructor(x, y, o, xyo) {
+    this.x = x;
+    this.y = y;
+    this.o = o;
+    this.xyo = xyo;
+  }
+}

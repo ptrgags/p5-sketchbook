@@ -1,3 +1,5 @@
+import { Flector } from "../pga2d/versors.js";
+
 export const SELECT_RADIUS = 8;
 const SELECT_RADIUS_SQR = SELECT_RADIUS * SELECT_RADIUS;
 const MAX_TANGENT_MAGNITUDE = 0.5;
@@ -29,9 +31,16 @@ export class InteractiveVertex {
 }
 
 export class InteractiveTangent {
-  constructor(control_point, constraint, tile_quad) {
+  constructor(control_point, forward_direction, tile_quad) {
+    // The forward direction serves as a constraint so we never have
+    // a backwards-pointing tangent. To reflect a point forward, we need
+    // the reflection in the line orthogonal to the forward direction
+    this.forward_direction = forward_direction;
+    const dual_line = forward_direction.dual();
+
+    this.flip_forward = Flector.reflection(dual_line);
+
     this.control_point = control_point;
-    this.constraint = constraint;
     this.tile_quad = tile_quad;
   }
 
@@ -52,18 +61,16 @@ export class InteractiveTangent {
     const uv = this.tile_quad.world_to_uv(mouse);
     const original_tangent = uv.sub(this.control_point.position);
 
-    // If the tangent is facing backwards, negate it to flip it forwards.
-    // This is done instead of a reflection so we don't get sudden jumps
-    // when the mouse crosses the 90 degree line.
-    const flipped_tangent =
-      original_tangent.dot(this.constraint) < 0
-        ? original_tangent.neg()
+    // If the tangent is facing backwards, reflect it so it's facing forwards
+    const corrected_tangent =
+      original_tangent.dot(this.forward_direction) < 0
+        ? this.flip_forward.transform(original_tangent)
         : original_tangent;
 
     const original_length = original_tangent.magnitude();
     const adjusted_length = Math.min(original_length, MAX_TANGENT_MAGNITUDE);
 
     const scale_factor = adjusted_length / original_length;
-    this.control_point.tangent = flipped_tangent.scale(scale_factor);
+    this.control_point.tangent = corrected_tangent.scale(scale_factor);
   }
 }
