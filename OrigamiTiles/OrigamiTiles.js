@@ -1,3 +1,5 @@
+import { griderator } from "../sketchlib/Grid.js";
+
 // How many triangle tiles I made SVG files for
 const TILE_COUNT = 14;
 // Size of a single tile.
@@ -106,43 +108,39 @@ export const sketch = (p) => {
     p.push();
     p.translate(0, OFFSET_Y);
 
-    for (let i = 0; i < CANVAS_SIZE_TILES; i++) {
-      for (let j = 0; j < CANVAS_SIZE_TILES; j++) {
-        // Draw the tile bounds
-        p.stroke(255);
-        p.noFill();
-        p.rect(
-          i * TILE_SIZE + 1,
-          j * TILE_SIZE + 1,
-          TILE_SIZE - 2,
-          TILE_SIZE - 2
+    griderator(CANVAS_SIZE_TILES, CANVAS_SIZE_TILES, (i, j) => {
+      // Draw the tile bounds
+      p.stroke(255);
+      p.noFill();
+      p.rect(
+        i * TILE_SIZE + 1,
+        j * TILE_SIZE + 1,
+        TILE_SIZE - 2,
+        TILE_SIZE - 2
+      );
+
+      if ((i + j) % 2 == 0) {
+        p.line(
+          i * TILE_SIZE,
+          j * TILE_SIZE,
+          (i + 1) * TILE_SIZE,
+          (j + 1) * TILE_SIZE
         );
-
-        if ((i + j) % 2 == 0) {
-          p.line(
-            i * TILE_SIZE,
-            j * TILE_SIZE,
-            (i + 1) * TILE_SIZE,
-            (j + 1) * TILE_SIZE
-          );
-        } else {
-          p.line(
-            (i + 1) * TILE_SIZE,
-            j * TILE_SIZE,
-            i * TILE_SIZE,
-            (j + 1) * TILE_SIZE
-          );
-        }
+      } else {
+        p.line(
+          (i + 1) * TILE_SIZE,
+          j * TILE_SIZE,
+          i * TILE_SIZE,
+          (j + 1) * TILE_SIZE
+        );
       }
-    }
+    });
 
-    for (let i = 0; i < CANVAS_SIZE_TILES; i++) {
-      for (let j = 0; j < CANVAS_SIZE_TILES; j++) {
-        const tile1 = p.floor(p.random(TILE_COUNT));
-        const tile2 = p.floor(p.random(TILE_COUNT));
-        draw_tile(p, i, j, tile1, tile2);
-      }
-    }
+    griderator(CANVAS_SIZE_TILES, CANVAS_SIZE_TILES, (i, j) => {
+      const tile1 = p.floor(p.random(TILE_COUNT));
+      const tile2 = p.floor(p.random(TILE_COUNT));
+      draw_tile(p, i, j, tile1, tile2);
+    });
 
     p.pop();
   };

@@ -1,8 +1,13 @@
 import { fix_mouse_coords } from "../common/fix_mouse_coords.js";
 import { Rect } from "./Rect.js";
-import { ControlPoint } from "./ControlPoint.js";
 import { CoralTile } from "./CoralTile.js";
-import { Point, Direction } from "../pga2d/objects.js";
+import { Point } from "../pga2d/objects.js";
+import {
+  SELECT_RADIUS,
+  InteractiveTangent,
+  InteractiveVertex,
+} from "./interactive.js";
+import { find_splines } from "./find_splines.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -12,123 +17,37 @@ const SMALL_QUADS = BIG_QUAD.subdivide_grid(4);
 
 // prettier-ignore
 const CONNECTION_ORDER = [
-  0b1001, 0b1101, 0b1100, 0b1000,
-  0b1011, 0b1111, 0b1110, 0b1010, 
-  0b0011, 0b0111, 0b0110, 0b0010,
-  0b0001, 0b0101, 0b0100, 0b0000,
+  // all 16 connection types, arranged in a 4x4 grid to form closed
+  // loops.
+  [0b1001, 0b1101, 0b1100, 0b1000],
+  [0b1011, 0b1111, 0b1110, 0b1010], 
+  [0b0011, 0b0111, 0b0110, 0b0010],
+  [0b0001, 0b0101, 0b0100, 0b0000],
 ];
 
 const TILES = SMALL_QUADS.map(
-  (quad, i) => new CoralTile(quad, CONNECTION_ORDER[i])
+  ({ i, j }, quad) => new CoralTile(quad, CONNECTION_ORDER[i][j])
 );
 
-class Spline {
-  constructor(control_points) {
-    this.control_points = control_points;
-  }
-
-  log_params() {
-    console.log("current control points:");
-    for (const point of this.control_points) {
-      console.log(
-        "p:",
-        point.position.x.toPrecision(3),
-        point.position.y.toPrecision(3)
-      );
-      console.log(
-        "v:",
-        point.tangent.x.toPrecision(3),
-        point.tangent.y.toPrecision(3)
-      );
-    }
-  }
-}
-
-const SELECT_RADIUS = 8;
-const SELECT_RADIUS_SQR = SELECT_RADIUS * SELECT_RADIUS;
-
-class InteractiveVertex {
-  constructor(control_point, constraint, tile_quad) {
-    this.control_point = control_point;
-    this.constraint = constraint;
-    this.tile_quad = tile_quad;
-  }
-
-  get position() {
-    return this.control_point.position;
-  }
-
-  is_hovering(mouse) {
-    const position_world = this.tile_quad.uv_to_world(
-      this.control_point.position
+const VERTICES = [];
+const TANGENTS = [];
+for (const tile of TILES) {
+  for (const [
+    control_point,
+    vertex_constraint,
+    tangent_constraint,
+  ] of tile.get_constraints()) {
+    VERTICES.push(
+      new InteractiveVertex(control_point, vertex_constraint, tile.quad)
     );
-    const dist_sqr = mouse.dist_sqr(position_world);
-
-    return dist_sqr < SELECT_RADIUS_SQR;
-  }
-
-  move(uv) {
-    this.control_point.position = this.constraint.clamp(uv);
-  }
-}
-
-class InteractiveTangent {
-  constructor(control_point, constraint, tile_quad) {
-    this.control_point = control_point;
-    this.constraint = constraint;
-    this.tile_quad = tile_quad;
-  }
-
-  get tip() {
-    return this.control_point.forward_point;
-  }
-
-  is_hovering(mouse) {
-    const position_world = this.tile_quad.uv_to_world(
-      this.control_point.forward_point
+    TANGENTS.push(
+      new InteractiveTangent(control_point, tangent_constraint, tile.quad)
     );
-    const dist_sqr = mouse.dist_sqr(position_world);
-
-    return dist_sqr < SELECT_RADIUS_SQR;
-  }
-
-  move(uv) {
-    const tangent = uv.sub(this.control_point.position);
-    this.control_point.tangent = this.constraint.clamp(tangent);
   }
 }
 
-const SPLINE = new Spline([
-  new ControlPoint(new Point(0.75, 0.0), new Direction(-0.21, 0.219)),
-  new ControlPoint(new Point(0.75, 0.5), new Direction(0.09, 0.204)),
-  new ControlPoint(new Point(0.5, 0.934), new Direction(-0.185, 0.055)),
-  new ControlPoint(new Point(0.25, 0.5), new Direction(0.11, -0.291)),
-  new ControlPoint(new Point(0.25, 0.0), new Direction(-0.095, -0.176)),
-]);
-
-const CONSTRAINTS = [
-  new Rect(0.5, 0.0, 0.5, 0.0),
-  new Rect(0.5, 0.5, 0.5, 0.0),
-  new Rect(0.5, 0.5, 0.0, 0.5),
-  new Rect(0.0, 0.5, 0.5, 0.0),
-  new Rect(0.0, 0.0, 0.5, 0.0),
-];
-
-const VERTICES = SPLINE.control_points.map(
-  (x, i) => new InteractiveVertex(x, CONSTRAINTS[i], SMALL_QUADS[0])
-);
-
-const TANGENT_CONSTRAINTS = [
-  new Rect(-0.5, 0, 1.0, 0.5),
-  new Rect(-0.5, 0, 1.0, 0.5),
-  new Rect(-0.5, -0.5, 0.5, 1.0),
-  new Rect(-0.5, -0.5, 1.0, 0.5),
-  new Rect(-0.5, -0.5, 1.0, 0.5),
-];
-
-const TANGENTS = SPLINE.control_points.map(
-  (x, i) => new InteractiveTangent(x, TANGENT_CONSTRAINTS[i], SMALL_QUADS[0])
-);
+// Order to check for mouse hits. Note that this doesn't scale well.
+const SELECTION_ORDER = [...TANGENTS, ...VERTICES];
 
 function draw_quad(p, rect) {
   const { x, y } = rect.position;
@@ -163,32 +82,25 @@ function draw_tile_vertices(p, tile) {
   }
 }
 
-function draw_tile_spline(p, tile) {
-  const quad = tile.quad;
-  for (let i = 0; i < tile.control_points.length - 1; i++) {
-    const start = tile.control_points[i];
-    const end = tile.control_points[i + 1];
+const SPLINES = find_splines(TILES);
 
-    const a = quad.uv_to_world(start.position);
-    const b = quad.uv_to_world(start.forward_point);
-    const c = quad.uv_to_world(end.backward_point);
-    const d = quad.uv_to_world(end.position);
-
+function draw_spline(p, spline) {
+  for (const [a, b, c, d] of spline.to_bezier_world()) {
     p.bezier(a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y);
   }
 }
 
 const CONNECT_POINTS = [
-  new Point(1.0, 0.5),
-  new Point(0.5, 1.0),
-  new Point(0.0, 0.5),
-  new Point(0.5, 0.0),
+  Point.point(1.0, 0.5),
+  Point.point(0.5, 1.0),
+  Point.point(0.0, 0.5),
+  Point.point(0.5, 0.0),
 ];
 
 function draw_tile_connections(p, tile) {
   const quad = tile.quad;
   const flags = tile.connection_flags;
-  const center = quad.uv_to_world(new Point(0.5, 0.5));
+  const center = quad.uv_to_world(Point.point(0.5, 0.5));
   for (let i = 0; i < 4; i++) {
     if (!((flags >> i) & 1)) {
       continue;
@@ -199,8 +111,15 @@ function draw_tile_connections(p, tile) {
   }
 }
 
+function highlight_selction(p, selected_object) {
+  const position = selected_object.position_world;
+  p.circle(position.x, position.y, SELECT_RADIUS * 2);
+}
+
 export const sketch = (p) => {
   let canvas;
+  let selected_object;
+
   p.setup = () => {
     canvas = p.createCanvas(500, 700).elt;
   };
@@ -225,8 +144,8 @@ export const sketch = (p) => {
     p.stroke(131, 71, 181);
     p.noFill();
     p.strokeWeight(2);
-    for (const tile of TILES) {
-      //draw_tile_spline(p, tile);
+    for (const spline of SPLINES) {
+      draw_spline(p, spline);
     }
 
     // Draw tangents
@@ -256,17 +175,11 @@ export const sketch = (p) => {
     p.stroke(255);
     p.noFill();
     p.strokeWeight(1);
-    if (selected_tangent) {
-      const position = BIG_QUAD.uv_to_world(selected_tangent.tip);
-      p.circle(position.x, position.y, SELECT_RADIUS * 2);
-    } else if (selected_vertex) {
-      const position = BIG_QUAD.uv_to_world(selected_vertex.position);
-      p.circle(position.x, position.y, SELECT_RADIUS * 2);
+    if (selected_object) {
+      highlight_selction(p, selected_object);
     }
   };
 
-  let selected_vertex;
-  let selected_tangent;
   p.mousePressed = () => {
     if (!canvas) {
       return;
@@ -274,17 +187,10 @@ export const sketch = (p) => {
 
     const mouse = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
 
-    for (const tangent of TANGENTS) {
-      if (tangent.is_hovering(mouse)) {
-        selected_tangent = tangent;
-        return;
-      }
-    }
-
-    for (const vertex of VERTICES) {
-      if (vertex.is_hovering(mouse)) {
-        selected_vertex = vertex;
-        return;
+    for (const object of SELECTION_ORDER) {
+      if (object.is_hovering(mouse)) {
+        selected_object = object;
+        break;
       }
     }
   };
@@ -292,18 +198,12 @@ export const sketch = (p) => {
   p.mouseDragged = () => {
     const mouse = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
 
-    const uv = BIG_QUAD.world_to_uv(mouse);
-
-    if (selected_tangent) {
-      selected_tangent.move(uv);
-    } else if (selected_vertex) {
-      selected_vertex.move(uv);
+    if (selected_object) {
+      selected_object.move(mouse);
     }
   };
 
   p.mouseReleased = () => {
-    selected_vertex = undefined;
-    selected_tangent = undefined;
-    SPLINE.log_params();
+    selected_object = undefined;
   };
 };

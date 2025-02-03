@@ -1,3 +1,5 @@
+import { Grid, Index2D } from "../sketchlib/Grid.js";
+
 const MAX_GROWTH_STEPS = 2000;
 const BUD_TIME = 10;
 const EARLY_GROWTH_TIME = 10;
@@ -19,10 +21,10 @@ export class Growth {
     this.grid_width = grid_width;
     this.grid_height = grid_height;
 
-    this.grid = new Array(grid_width * grid_height);
+    this.grid = new Grid(grid_height, grid_width);
 
-    const start_index = this.hash(start_x, start_y);
-    this.grid[start_index] = new Node(start_index, undefined, 0);
+    const start_index = new Index2D(start_y, start_x);
+    this.grid.set(start_index, new Node(start_index, undefined, 0));
 
     // Start simple with a stack
     this.frontier = [start_index];
@@ -30,34 +32,28 @@ export class Growth {
     this.growth_step = 0;
   }
 
-  hash(x, y) {
-    return y * this.grid_width + x;
-  }
-
-  unhash(index) {
-    return [index % this.grid_width, Math.floor(index / this.grid_width)];
-  }
-
   neighbor_indices(index) {
-    const [x, y] = this.unhash(index);
     const neighbors = [];
 
     // List neighbors in order from bottom to top so
     // when we push to the stack we favor upwards growth
 
     // left
-    if (x > 0) {
-      neighbors.push(index - 1);
+    const left = index.left();
+    if (left) {
+      neighbors.push(left);
     }
 
     // right
-    if (x < this.grid_width - 1) {
-      neighbors.push(index + 1);
+    const right = this.grid.right(index);
+    if (right) {
+      neighbors.push(right);
     }
 
     // up
-    if (y > 0) {
-      neighbors.push(index - this.grid_width);
+    const up = index.up();
+    if (up) {
+      neighbors.push(up);
     }
 
     return neighbors;
@@ -89,7 +85,7 @@ export class Growth {
 
     // Neighbors are only valid if that grid cell is empty
     const valid_neighbors = possible_neighbors.filter(
-      (i) => this.grid[i] === undefined
+      (index) => this.grid.get(index) === undefined
     );
 
     // For the first few steps, make the chance of skipping low
@@ -102,10 +98,9 @@ export class Growth {
         continue;
       }
 
-      this.grid[neighbor_index] = new Node(
+      this.grid.set(
         neighbor_index,
-        current_index,
-        this.growth_step
+        new Node(neighbor_index, current_index, this.growth_step)
       );
       this.frontier.push(neighbor_index);
       added_branches = true;
@@ -119,7 +114,7 @@ export class Growth {
 
     // If we didn't add branches, mark this node as a flower
     if (!added_branches) {
-      this.grid[current_index].is_flower = true;
+      this.grid.get(current_index).is_flower = true;
     }
   }
 
@@ -142,9 +137,9 @@ export class Growth {
       p.fill(stem_color);
       p.noFill();
       if (node.parent_index !== undefined) {
-        const [x, y] = this.unhash(node.index);
-        const [px, py] = this.unhash(node.parent_index);
-        p.line(x * spacing, y * spacing, px * spacing, py * spacing);
+        const { i, j } = node.index;
+        const { i: pi, j: pj } = node.parent_index;
+        p.line(j * spacing, i * spacing, pj * spacing, pi * spacing);
       }
 
       // Mark flower nodes for drawing that in the second pass
@@ -161,8 +156,8 @@ export class Growth {
         continue;
       }
 
-      const [x, y] = this.unhash(flower_node.index);
-      p.ellipse(x * spacing, y * spacing, 6);
+      const { i, j } = flower_node.index;
+      p.ellipse(j * spacing, i * spacing, 6);
     }
   }
 }
