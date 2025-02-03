@@ -1,4 +1,4 @@
-import { Line, Point, Direction } from "./objects.js";
+import { Line, Point } from "./objects.js";
 
 export class Flector {
   constructor(odd) {
@@ -17,10 +17,6 @@ export class Flector {
 
     // Point
     const { xy, xo, yo } = this.odd.sandwich(object.bivec);
-    if (xy === 0) {
-      return new Direction(yo, -xo);
-    }
-
-    return new Point(yo / xy, -xo / xy);
+    return new Point(xy, xo, yo);
   }
 }

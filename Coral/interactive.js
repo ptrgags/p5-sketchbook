@@ -64,10 +64,10 @@ export class InteractiveTangent {
     // If the tangent is facing backwards, reflect it so it's facing forwards
     const corrected_tangent =
       original_tangent.dot(this.forward_direction) < 0
-        ? this.flip_forward.transform(original_tangent)
+        ? this.flip_forward.transform(original_tangent).neg()
         : original_tangent;
 
-    const original_length = original_tangent.magnitude();
+    const original_length = original_tangent.ideal_mag();
     const adjusted_length = Math.min(original_length, MAX_TANGENT_MAGNITUDE);
 
     const scale_factor = adjusted_length / original_length;

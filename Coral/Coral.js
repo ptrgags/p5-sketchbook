@@ -1,8 +1,7 @@
 import { fix_mouse_coords } from "../common/fix_mouse_coords.js";
 import { Rect } from "./Rect.js";
-import { ControlPoint } from "./ControlPoint.js";
 import { CoralTile } from "./CoralTile.js";
-import { Point, Direction } from "../pga2d/objects.js";
+import { Point } from "../pga2d/objects.js";
 import {
   SELECT_RADIUS,
   InteractiveTangent,
@@ -92,16 +91,16 @@ function draw_spline(p, spline) {
 }
 
 const CONNECT_POINTS = [
-  new Point(1.0, 0.5),
-  new Point(0.5, 1.0),
-  new Point(0.0, 0.5),
-  new Point(0.5, 0.0),
+  Point.point(1.0, 0.5),
+  Point.point(0.5, 1.0),
+  Point.point(0.0, 0.5),
+  Point.point(0.5, 0.0),
 ];
 
 function draw_tile_connections(p, tile) {
   const quad = tile.quad;
   const flags = tile.connection_flags;
-  const center = quad.uv_to_world(new Point(0.5, 0.5));
+  const center = quad.uv_to_world(Point.point(0.5, 0.5));
   for (let i = 0; i < 4; i++) {
     if (!((flags >> i) & 1)) {
       continue;
@@ -187,7 +186,7 @@ export const sketch = (p) => {
     }
 
     const [mx, my] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
-    const mouse = new Point(mx, my);
+    const mouse = Point.point(mx, my);
 
     for (const object of SELECTION_ORDER) {
       if (object.is_hovering(mouse)) {
@@ -199,7 +198,7 @@ export const sketch = (p) => {
 
   p.mouseDragged = () => {
     const [mx, my] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
-    const mouse = new Point(mx, my);
+    const mouse = Point.point(mx, my);
 
     if (selected_object) {
       selected_object.move(mouse);

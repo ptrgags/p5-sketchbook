@@ -2,50 +2,26 @@ import { Even, Odd } from "./multivectors.js";
 import { is_nearly } from "../sketchlib/is_nearly.js";
 
 export class Point {
-  constructor(x, y) {
-    // a euclidean point is represented in 2D PGA as a bivector
-    // normalized so xy = 1, i.e.
-    // a*yo - b*xo + xy
-    // here a is the x-component and b is the y-component. Note the negative
-    // sign, this is due to storing the blades in lexicographic order
-    this.bivec = new Even(0, 1, -y, x);
+  constructor(xy, xo, yo) {
+    if (xy === undefined) {
+      throw new Error("fix me!");
+    }
+
+    this.is_direction = is_nearly(xy, 0);
+
+    if (this.is_direction) {
+      this.bivec = new Even(0, 0, xo, yo);
+    } else {
+      this.bivec = new Even(0, 1, xo / xy, yo / xy);
+    }
   }
 
-  get x() {
-    return this.bivec.yo;
+  static point(x, y) {
+    return new Point(1, -y, x);
   }
 
-  get y() {
-    return -this.bivec.xo;
-  }
-
-  add(direction) {
-    const { xo, yo } = this.bivec.add(direction.bivec);
-    return new Point(yo, -xo);
-  }
-
-  sub(point) {
-    const { xo, yo } = this.bivec.sub(point.bivec);
-    return new Direction(yo, -xo);
-  }
-
-  dist_sqr(point) {
-    return this.sub(point).norm();
-  }
-
-  equals(other) {
-    return this.bivec.equals(other.bivec);
-  }
-}
-Point.ORIGIN = Object.freeze(new Point(0, 0));
-
-export class Direction {
-  constructor(x, y) {
-    // A direction (ideal point) is represented in 2D PGA as a bivector
-    // with xy = 0. These are null vectors so can't be normalized.
-    //
-    // a * yo - b * xo
-    this.bivec = new Even(0, 0, -y, x);
+  static direction(x, y) {
+    return new Point(0, -y, x);
   }
 
   get x() {
@@ -57,29 +33,62 @@ export class Direction {
   }
 
   dual() {
-    const { x: nx, y: ny } = this.bivec.dual();
-    return new Line(nx, ny, 0);
+    const { x: nx, y: ny, o: d } = this.bivec.dual();
+    return new Line(nx, ny, d);
   }
 
   neg() {
-    return new Direction(-this.x, -this.y);
+    if (this.is_direction) {
+      return Point.direction(-this.x, -this.y);
+    } else {
+      // Negating a point results in -xo, -yo -xy which is equivalent to
+      // xo, yo, xy by homogeneity.
+      return this;
+    }
   }
 
-  norm() {
+  euclidean_norm() {
+    // the xo and yo parts square to 0, so we only have xy * yx
+    const { xy } = this.bivec;
+    return xy * xy;
+  }
+
+  euclidean_mag() {
+    return Math.sqrt(this.euclidean_norm());
+  }
+
+  ideal_norm() {
+    // this is the euclidean norm of the dual, but computed without allocating
+    // the dual line
     const { yo: x, xo: y } = this.bivec;
     return x * x + y * y;
   }
 
-  magnitude() {
-    const mag_sqr = this.norm();
-    if (mag_sqr === 0) {
-      return 0;
-    }
-    return Math.sqrt(mag_sqr);
+  ideal_mag() {
+    return Math.sqrt(this.ideal_norm());
+  }
+
+  add(other) {
+    const { xy, xo, yo } = this.bivec.add(other.bivec);
+    return new Point(xy, xo, yo);
+  }
+
+  sub(other) {
+    const { xy, xo, yo } = this.bivec.sub(other.bivec);
+    return new Point(xy, xo, yo);
+  }
+
+  dist_sqr(point) {
+    return this.sub(point).ideal_norm();
   }
 
   scale(scalar) {
-    return new Direction(scalar * this.x, scalar * this.y);
+    if (this.is_direction) {
+      return Point.direction(scalar * this.x, scalar * this.y);
+    }
+
+    // A point is invariant to scaling due to homogeneity
+    return this;
   }
 
   dot(other) {
@@ -90,8 +99,9 @@ export class Direction {
     return this.bivec.equals(other.bivec);
   }
 }
-Direction.X = Object.freeze(new Direction(1, 0));
-Direction.Y = Object.freeze(new Direction(0, 1));
+Point.ORIGIN = Object.freeze(Point.point(0, 0));
+Point.DIR_X = Object.freeze(Point.direction(1, 0));
+Point.DIR_Y = Object.freeze(Point.direction(0, 1));
 
 export class Line {
   constructor(nx, ny, d) {

@@ -1,4 +1,4 @@
-import { Direction, Point } from "../pga2d/objects.js";
+import { Point } from "../pga2d/objects.js";
 import { Grid } from "../sketchlib/Grid.js";
 
 function clamp(x, min, max) {
@@ -7,8 +7,8 @@ function clamp(x, min, max) {
 
 export class Rect {
   constructor(x, y, width, height) {
-    this.position = new Point(x, y);
-    this.dimensions = new Direction(width, height);
+    this.position = Point.point(x, y);
+    this.dimensions = Point.direction(width, height);
   }
 
   get far_corner() {
@@ -20,13 +20,13 @@ export class Rect {
     const { x: near_x, y: near_y } = this.position;
     const { x: far_x, y: far_y } = this.far_corner;
 
-    return new Point(clamp(x, near_x, far_x), clamp(y, near_y, far_y));
+    return Point.point(clamp(x, near_x, far_x), clamp(y, near_y, far_y));
   }
 
   uv_to_world(uv) {
     const { x: u, y: v } = uv;
 
-    return new Point(
+    return Point.point(
       this.position.x + u * this.dimensions.x,
       this.position.y + (1 - v) * this.dimensions.y
     );
@@ -37,7 +37,7 @@ export class Rect {
 
     const u = (x - this.position.x) / this.dimensions.x;
     const v = 1 - (y - this.position.y) / this.dimensions.y;
-    return new Point(u, v);
+    return Point.point(u, v);
   }
 
   /**
