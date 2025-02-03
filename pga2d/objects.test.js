@@ -92,3 +92,23 @@ describe("Direction", () => {
     expect(result).toBe(expected);
   });
 });
+
+describe("Line", () => {
+  it("constructor normalizes Euclidean line", () => {
+    const line = new Line(3, 4, 5);
+
+    expect(line.is_infinite).toBe(false);
+    expect(line.nx).toBe(3 / 5);
+    expect(line.ny).toBe(4 / 5);
+    expect(line.d).toBe(1);
+  });
+
+  it("constructor doesn't modify line at infinity", () => {
+    const line = new Line(0, 0, 42);
+
+    expect(line.is_infinite).toBe(true);
+    expect(line.nx).toBe(0);
+    expect(line.ny).toBe(0);
+    expect(line.d).toBe(42);
+  });
+});

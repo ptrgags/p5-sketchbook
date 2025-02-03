@@ -1,3 +1,5 @@
+import { is_nearly } from "../sketchlib/is_nearly.js";
+
 export class Even {
   constructor(scalar, xy, xo, yo) {
     this.scalar = scalar;
@@ -25,6 +27,15 @@ export class Even {
   dual() {
     return new Odd(this.yo, -this.xo, this.xy, this.scalar);
   }
+
+  equals(other) {
+    return (
+      is_nearly(this.scalar, other.scalar) &&
+      is_nearly(this.xy, other.xy) &&
+      is_nearly(this.xo, other.xo) &&
+      is_nearly(this.yo, other.yo)
+    );
+  }
 }
 Even.IDENTITY = Object.freeze(new Even(1, 0, 0, 0));
 
@@ -36,46 +47,101 @@ export class Odd {
     this.xyo = xyo;
   }
 
+  norm() {
+    return this.x * this.x + this.y * this.y;
+  }
+
   sandwich_even(other) {
-    const { x, y, o } = this;
-    const { scalar, xy: p, xo: q, yo: r } = other;
+    const { x, y, o, xyo } = this;
+    const { scalar, xy, xo, yo } = other;
 
-    // TODO: this doesn't include the pseudoscalar xyo in the bread yet.
+    // EDIT: In the derivation below, I'm forgetting to account for the
+    // negative sign for rev(xyo)... I'll revisit this later.
+    //
+    // let A = (ax + by + co + dxyo)
+    //  A^-1 = rev(A) / A^2 = (ax + by + co - dxyo)/A^2
+    //     B = (A + Bxy + Cxo + Dyo)
+    //
+    //  ABA^-1 = 1/A^2 (AB rev(A))
+    //
+    // so we can pull the scalar 1/A^2 out of the product and handle it at the end
+    //
+    // The sandwich product splits into "symmetrical" terms like (ax)B(ax) and
+    // pairs of asymmetrical terms like (ax)B(by) + (by)B(ax). We'll treat
+    // each one separately.
+    //
+    // For symmetrical terms, note that if the bread has a null vector in it
+    // (co and dxyo terms), the result will be 0 since the inner product will
+    // be invoked. So we only have to look at ax and by.
+    //
+    // Furthermore, the trick is to look for how many basis vectors overlap
+    // in a blade sandwich. If it's even, the result is commutative so the
+    // sign will be positive. If it's odd, the result is anticommutative so
+    // the sign will be negative. So we have:
+    //
+    // (ax)B(ax) = a^2(xBx) = a^2(A - Bxy - Cxo + Dyo)
+    // (by)B(by) = b^2(yBy) = b^2(A - Bxy + Cxo - Dyo)
+    //
+    // Now what about the asymmetrical sandwiches like (ax)B(by) + (by)B(ax)?
+    // First, the scalars can be pulled out: (ab)(xBy + yBx)
+    // Each term T of B will either commute or anticommute with x, and this is
+    // independent of the anticommutativity with y.
+    //
+    // There are four possibilities of sign when we commute T with one of the
+    // blades:
+    //
+    // T and x | T and y | xTy + yTx
+    // --------|---------|-----------------------------
+    //    +    |    +    |  Txy + Tyx = T(xy - xy) = 0
+    //    +    |    -    |  Txy - Tyx = 2T(xy)
+    //    -    |    +    | -Txy + Tyx = -2T(xy)
+    //    -    |    -    | -Txy - Tyx = T(-xy + xy) = 0
+    //
+    // So terms that fully commute or anti-commute will cancel out. We only
+    // need to consider terms that commute with one of the pieces of bread but
+    // not the other. Also note that what's left will always have a coefficient
+    // of 2 out front.
+    //
+    // Also remember that this is a degenerate algebra, so any term with two
+    // copies of the null vector will become zero regardless of commutativity.
+    //
+    // Also note that since we are multiplying odd and even grades,
+    // even overlaps commute, odd overlaps anticommute.
+    //
+    // [ax/B/by]   = 2ab(0 + 0 - (Cxo)xy + (Dyo)xy) = 2ab(-Cyo - Dxo)
+    // [ax/B/co]   = 2ac(0 - (Bxy)xo + 0 + 0) = 2ac(Byo)
+    // [ax/B/dxyo] = 2ad(0 - (Bxy)(x)(xyo) + 0 + 0) = 2ad(Bxo)
+    // [by/B/co]   = 2bc(0 - (Bxy)yo + 0 + 0) = 2bc(-Bxo)
+    // [by/B/dxyo] = 2bd(0 - (Bxy)(y)(xyo) + 0 + 0) = 2bd(-Byo)
+    // [co/B/dxyo] = 0 (two null vectors)
+    //
+    // Let's gather up terms by component
+    // scalar: a^2A + b^2A = (a^2 + b^2)A
+    // xy: -a^2 B -b^2 B = -(a^2 + b^2)B
+    // xo: -a^2 C + b^2 C -2ab D + 2ad B - 2bc B = (b^2 - a^2)C -(2ab)D + 2(ad - bc)B
+    // yo: a^2 D - b^2 D -2ab C + 2ac B - 2bd B = (a^2 - b^2)D -(2ab)C + 2(ac - bd)B
+    //
+    // Remember that we have to divide by A^2 = (a^2 + b^2) at the end!
 
-    // Sandwich is linear over the filling, so
-    // A(s + B)A^-1 = sAA^-1 + ABA^-1 = s + ABA^-1
-    // so the original scalar passes through unchanged. As for the rest...
-
-    // ABA^-1 = A(Pxy + Qxo + Ryo)A^-1 = PAxyA^-1 + QAxoA^-1 + RAyoA^-1
-
-    // AxyA^-1 = (ax + by + co)xy(ax + by + co)
-    //         = (ay - bx + cxyo)(ax + by + co)
-    //         = (-a^2xy + ab + acyo) - (ab + b^2xy + bcxo) + (acyo - bcxo + 0)
-    //         = 0 - (a^2 + b^2)xy + 2acyo - 2bcxo
-
-    // AxoA^-1 = (ax + by + co)xo(ax + by + co)
-    //         = (ao - bxyo + 0)(ax + by + co)
-    //         = (-a^2xo - abyo + 0 -abxy + b^2xo + 0)
-    //         = -abxy -abyo + (b^2 - a^2)xo
-
-    // AyoA^-1 = (ax + by + co)yo(ax + by + co)
-    //         = (axyo + bo + 0)(ax + by + co)
-    //         = (a^2yo - abxo + 0 - abxo - b^2yo + 0)
-    //         = -2abxo + (a^2 - b^2)yo
-
-    // adding things up we have
-    // (-P(a^2 + b^2) - Qab)xy + (-2Pbc + Q(b^2 - a^2) - 2Rab)xo + (2Pac - Qab + R(a^2 - b^2))yo
     const a_sqr = x * x;
     const b_sqr = y * y;
     const ab = x * y;
-    const bc = y * o;
     const ac = x * o;
-    const scalar_part = scalar;
-    const xy_part = -p * (a_sqr + b_sqr) - q * ab;
-    const xo_part = -2 * p * bc + q * (b_sqr - a_sqr) - 2 * r * ab;
-    const yo_part = 2 * p * ac - q * ab - r * (a_sqr - b_sqr);
+    const ad = x * xyo;
+    const bc = y * o;
+    const bd = y * xyo;
 
-    return new Even(scalar_part, xy_part, xo_part, yo_part);
+    // The scalar term is A^3/A^2 = A
+    const scalar_part = scalar;
+
+    // the xy term is -A^2/A^2 B = -B
+    const xy_part = -xy;
+    const xo_part = (b_sqr - a_sqr) * xo - 2 * ab * yo + 2 * (ad - bc) * xy;
+    const yo_part = (a_sqr - b_sqr) * yo - 2 * ab * xo + 2 * (ac - bd) * xy;
+
+    const mag_sqr = a_sqr + b_sqr;
+
+    return new Even(scalar_part, xy_part, xo_part / mag_sqr, yo_part / mag_sqr);
   }
 
   sandwich_odd(other) {
@@ -88,5 +154,14 @@ export class Odd {
     }
 
     return this.sandwich_even(other);
+  }
+
+  equals(other) {
+    return (
+      is_nearly(this.x, other.x) &&
+      is_nearly(this.y, other.y) &&
+      is_nearly(this.o, other.o) &&
+      is_nearly(this.xyo, other.xyo)
+    );
   }
 }

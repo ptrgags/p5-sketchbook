@@ -1,4 +1,5 @@
 import { Even, Odd } from "./multivectors.js";
+import { is_nearly } from "../sketchlib/is_nearly.js";
 
 export class Point {
   constructor(x, y) {
@@ -30,6 +31,10 @@ export class Point {
 
   dist_sqr(point) {
     return this.sub(point).norm();
+  }
+
+  equals(other) {
+    return this.bivec.equals(other.bivec);
   }
 }
 Point.ORIGIN = Object.freeze(new Point(0, 0));
@@ -80,12 +85,41 @@ export class Direction {
   dot(other) {
     return this.x * other.x + this.y * other.y;
   }
+
+  equals(other) {
+    return this.bivec.equals(other.bivec);
+  }
 }
 Direction.X = Object.freeze(new Direction(1, 0));
 Direction.Y = Object.freeze(new Direction(0, 1));
 
 export class Line {
   constructor(nx, ny, d) {
-    this.vec = new Odd(nx, ny, -d, 0);
+    const mag_sqr = nx * nx + ny * ny;
+
+    this.is_infinite = is_nearly(mag_sqr, 0);
+
+    if (this.is_infinite) {
+      this.vec = new Odd(0, 0, -d, 0);
+    } else {
+      const mag = Math.sqrt(mag_sqr);
+      this.vec = new Odd(nx / mag, ny / mag, -d / mag, 0);
+    }
+  }
+
+  get nx() {
+    return this.vec.x;
+  }
+
+  get ny() {
+    return this.vec.y;
+  }
+
+  get d() {
+    return -this.vec.o;
+  }
+
+  equals(other) {
+    return this.vec.equals(other.vec);
   }
 }
