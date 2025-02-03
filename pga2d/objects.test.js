@@ -30,7 +30,7 @@ describe("Point", () => {
       const result = a.add(dir);
 
       const expected = Point.point(4, 6);
-      expect(result).toEqual(expected);
+      expect(result).toBePoint(expected);
     });
 
     it("subtracting points produces the correct direction", () => {
@@ -40,7 +40,7 @@ describe("Point", () => {
       const result = a.sub(b);
 
       const expected = Point.direction(-2, 2);
-      expect(result).toEqual(expected);
+      expect(result).toBePoint(expected);
     });
 
     it("joining two points gives the line through them", () => {
@@ -50,17 +50,20 @@ describe("Point", () => {
       const result = a.join(b);
 
       const expected = new Line(1, 1, 1);
-      expect(result).toEqual(expected);
+      expect(result).toBeLine(expected);
     });
 
     it("swapping join arguments reverses the line's orientation", () => {
       const a = Point.point(0, 1);
       const b = Point.point(1, 0);
 
-      const result = a.join(b);
+      const result_forward = a.join(b);
+      const result_backward = b.join(a);
 
-      const expected = new Line(-1, -1, 1);
-      expect(result).toBeLine(expected);
+      const expected_forward = new Line(1, 1, 1);
+      const expected_backward = new Line(-1, -1, -1);
+      expect(result_forward).toBeLine(expected_forward);
+      expect(result_backward).toBeLine(expected_backward);
     });
 
     it("lerp interpolates two points", () => {
@@ -90,7 +93,7 @@ describe("Point", () => {
       const result = a.dual();
 
       const expected = new Line(2, 1, 0);
-      expect(result).toEqual(expected);
+      expect(result).toBeLine(expected);
     });
 
     it("neg negates the components", () => {
@@ -99,7 +102,7 @@ describe("Point", () => {
       const result = a.neg();
 
       const expected = Point.direction(-1, 3);
-      expect(result).toEqual(expected);
+      expect(result).toBePoint(expected);
     });
 
     it("ideal norm returns the magnitude of x and y components", () => {
@@ -126,7 +129,7 @@ describe("Point", () => {
       const result = dir.scale(2);
 
       const expected = Point.direction(8, -6);
-      expect(result).toEqual(expected);
+      expect(result).toBePoint(expected);
     });
 
     it("dot of two directions computes the dot product of components", () => {
@@ -150,7 +153,7 @@ describe("Point", () => {
     // 3/4 * 1 + 1/4 * -2 = 1/4(3 -2) = 1/4
     // 3/4 * 2 + 1/4 * -8 = 1/4(6 - 8) = -2/4 = -1/2
     const expected = Point.direction(0.25, -0.5);
-    expect(result).toEqual(expected);
+    expect(result).toBePoint(expected);
   });
 });
 

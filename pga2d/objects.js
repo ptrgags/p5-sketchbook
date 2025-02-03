@@ -84,7 +84,7 @@ export class Point {
 
   join(other) {
     const { x, y, o } = this.bivec.vee(other.bivec);
-    return new Line(x, y, o);
+    return new Line(x, y, -o);
   }
 
   dist_sqr(point) {

@@ -33,7 +33,7 @@ function format_point_diff(received, expected) {
   diff_float_property(diffs, r_bivec, e_bivec, "xo", "y");
   diff_float_property(diffs, r_bivec, e_bivec, "xy", "weight");
 
-  return diffs.join("\n");
+  return "actual | expected\n" + diffs.join("\n");
 }
 
 function format_line_diff(received, expected) {
@@ -50,7 +50,7 @@ function format_line_diff(received, expected) {
   diff_float_property(diffs, r_vec, e_vec, "y");
   diff_float_property(diffs, r_vec, e_vec, "o");
 
-  return diffs.join("\n");
+  return "actual | expected\n" + diffs.join("\n");
 }
 
 export const PGA_MATCHERS = {

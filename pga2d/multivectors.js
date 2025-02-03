@@ -28,11 +28,15 @@ export class Even {
     return new Odd(this.yo, -this.xo, this.xy, this.scalar);
   }
 
-  vee_even(other) {
-    //const { scalar: as, xy: axy, xo: axo, yo: ayo } = this;
-    //const { scalar: bs, xy: bxy, xo: bxo, yo: byo } = other;
+  // in 2D PGA, the antidual has exactly the same signs as the dual
+  // so we get this function for free!
+  antidual = this.dual;
 
-    return new Odd(0, 0, 0, 0);
+  vee_even(other) {
+    // a v b = antidual(dual(a) ^ dual(b))
+    const a_dual = this.dual();
+    const b_dual = other.dual();
+    return a_dual.wedge(b_dual).dual();
   }
 
   vee_odd(other) {
