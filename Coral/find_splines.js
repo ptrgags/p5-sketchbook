@@ -66,7 +66,6 @@ function find_spline(tile_grid, visited, start_index) {
 
   let current_quadrant_index = start_index;
   while (!visited.get(current_quadrant_index)) {
-    console.log(current_quadrant_index);
     visited.set(current_quadrant_index, true);
     const quadrant = get_quadrant(current_quadrant_index);
     const tile_index = get_tile_index(current_quadrant_index);
@@ -95,7 +94,6 @@ export function find_splines(tile_grid) {
   griderator(subtile_rows, subtile_columns, (i, j) => {
     const index = new Index2D(i, j);
     if (!visited.get(index)) {
-      console.log("new spline starting at", index);
       const spline = find_spline(tile_grid, visited, index);
       splines.push(spline);
     }
