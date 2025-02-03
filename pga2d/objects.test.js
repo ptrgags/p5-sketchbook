@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { Point, Line } from "./objects";
+import { PGA_MATCHERS } from "./pga_matchers";
+
+expect.extend(PGA_MATCHERS);
 
 describe("Point", () => {
   describe("euclidean", () => {
@@ -38,6 +41,26 @@ describe("Point", () => {
 
       const expected = Point.direction(-2, 2);
       expect(result).toEqual(expected);
+    });
+
+    it("joining two points gives the line through them", () => {
+      const a = Point.point(0, 1);
+      const b = Point.point(1, 0);
+
+      const result = a.join(b);
+
+      const expected = new Line(1, 1, 1);
+      expect(result).toEqual(expected);
+    });
+
+    it("swapping join arguments reverses the line's orientation", () => {
+      const a = Point.point(0, 1);
+      const b = Point.point(1, 0);
+
+      const result = a.join(b);
+
+      const expected = new Line(-1, -1, 1);
+      expect(result).toBeLine(expected);
     });
 
     it("lerp interpolates two points", () => {
@@ -148,5 +171,24 @@ describe("Line", () => {
     expect(line.nx).toBe(0);
     expect(line.ny).toBe(0);
     expect(line.d).toBe(42);
+  });
+
+  it("meet of axes returns origin", () => {
+    const a = Line.X_AXIS;
+    const b = Line.Y_AXIS;
+
+    const result = a.meet(b);
+
+    expect(result).toBePoint(Point.ORIGIN);
+  });
+
+  it("meet of two lines returns their intersection", () => {
+    const a = new Line(1, 1, 1);
+    const b = new Line(1, -1, 2);
+
+    const result = a.meet(b);
+
+    const expected = Point.point(1.5, -0.5);
+    expect(result).toBePoint(expected);
   });
 });

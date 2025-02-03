@@ -82,6 +82,11 @@ export class Point {
     return new Point(xy, xo, yo);
   }
 
+  join(other) {
+    const { x, y, o } = this.bivec.vee(other.bivec);
+    return new Line(x, y, o);
+  }
+
   dist_sqr(point) {
     return this.sub(point).ideal_norm();
   }
@@ -139,7 +144,14 @@ export class Line {
     return -this.vec.o;
   }
 
+  meet(other) {
+    const { xy, xo, yo } = this.vec.wedge(other.vec);
+    return new Point(xy, xo, yo);
+  }
+
   equals(other) {
     return this.vec.equals(other.vec);
   }
 }
+Line.X_AXIS = Object.freeze(new Line(0, 1, 0));
+Line.Y_AXIS = Object.freeze(new Line(1, 0, 0));

@@ -28,6 +28,25 @@ export class Even {
     return new Odd(this.yo, -this.xo, this.xy, this.scalar);
   }
 
+  vee_even(other) {
+    //const { scalar: as, xy: axy, xo: axo, yo: ayo } = this;
+    //const { scalar: bs, xy: bxy, xo: bxo, yo: byo } = other;
+
+    return new Odd(0, 0, 0, 0);
+  }
+
+  vee_odd(other) {
+    throw new Error("Not implemented");
+  }
+
+  vee(other) {
+    if (other instanceof Even) {
+      return this.vee_even(other);
+    }
+
+    return this.vee_odd(other);
+  }
+
   equals(other) {
     return (
       is_nearly(this.scalar, other.scalar) &&
@@ -158,6 +177,31 @@ export class Odd {
     const yo_part = (a_sqr - b_sqr) * yo - 2 * ab * xo + 2 * (ac - bd) * xy;
 
     return new Even(scalar_part, xy_part, xo_part / mag_sqr, yo_part / mag_sqr);
+  }
+
+  wedge_odd(other) {
+    // Note that the pseudoscalar part xyo will always wedge to 0, so we can
+    // ignore it.
+    const { x: ax, y: ay, o: ao } = this;
+    const { x: bx, y: by, o: bo } = other;
+
+    const xy_part = ax * by - ay * bx;
+    const xo_part = ax * bo - ao * bx;
+    const yo_part = ay * bo - ao * by;
+
+    return new Even(0, xy_part, xo_part, yo_part);
+  }
+
+  wedge_even(other) {
+    throw new Error("Not Implemented");
+  }
+
+  wedge(other) {
+    if (other instanceof Odd) {
+      return this.wedge_odd(other);
+    }
+
+    return this.wedge_even(other);
   }
 
   sandwich_odd(other) {
