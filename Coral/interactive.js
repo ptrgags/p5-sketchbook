@@ -64,7 +64,10 @@ export class InteractiveTangent {
     // If the tangent is facing backwards, reflect it so it's facing forwards
     const corrected_tangent =
       original_tangent.dot(this.forward_direction) < 0
-        ? this.flip_forward.transform(original_tangent).neg()
+        ? // Since directions are represented as ideal points (bivectors)
+          // not vectors, you get a negative sign which is unwanted here. Hence
+          // the .neg()
+          this.flip_forward.transform(original_tangent).neg()
         : original_tangent;
 
     const original_length = original_tangent.ideal_mag();
