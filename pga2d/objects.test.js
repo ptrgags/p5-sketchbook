@@ -77,6 +77,15 @@ describe("Point", () => {
       const expected = Point.point(0.25, -0.5);
       expect(result).toEqual(expected);
     });
+
+    it("toString formats as point", () => {
+      const a = Point.point(0.00012345, 2.98763);
+
+      const result = a.toString();
+
+      const expected = "Point(0.000123, 2.99)";
+      expect(result).toBe(expected);
+    });
   });
 
   describe("ideal", () => {
@@ -193,5 +202,14 @@ describe("Line", () => {
 
     const expected = Point.point(1.5, -0.5);
     expect(result).toBePoint(expected);
+  });
+
+  it("toString formats as direction", () => {
+    const a = Point.direction(0.00012345, 2.98763);
+
+    const result = a.toString();
+
+    const expected = "Direction(0.000123, 2.99)";
+    expect(result).toBe(expected);
   });
 });

@@ -104,6 +104,17 @@ export class Point {
     return this.x * other.x + this.y * other.y;
   }
 
+  toString() {
+    const x_str = this.x.toPrecision(3);
+    const y_str = this.y.toPrecision(3);
+
+    if (this.is_direction) {
+      return `Direction(${x_str}, ${y_str})`;
+    }
+
+    return `Point(${x_str}, ${y_str})`;
+  }
+
   equals(other) {
     return this.bivec.equals(other.bivec);
   }

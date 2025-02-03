@@ -4,9 +4,13 @@ import { Line, Point } from "../pga2d/objects.js";
 const WIDTH = 500;
 const HEIGHT = 700;
 
-const VANISHING_POINT = Point.point(WIDTH / 2, HEIGHT / 2);
-
-const HORIZON = VANISHING_POINT.join(Point.DIR_X);
+// vanishing point of the rails
+const VP_RAILS = Point.point(WIDTH / 2, HEIGHT / 2);
+// Another vanishing point for reference to determine where the ties go
+const VP_REFERENCE = Point.point(-WIDTH / 2, HEIGHT / 2);
+const HORIZON = VP_RAILS.join(Point.DIR_X);
+const A = Point.point(WIDTH / 4, 0);
+const B = Point.point((3 * WIDTH) / 4, 0);
 
 const POINT_DIAMETER = 8;
 function draw_point(p, point) {
@@ -25,7 +29,9 @@ function draw_line(p, line) {
   const isx_bottom = line.meet(BOTTOM_SIDE);
   const intersections = [isx_right, isx_top, isx_left, isx_bottom].filter(
     (isx) => {
-      !isx.is_direction && in_bounds(isx.x, isx.y, WIDTH, HEIGHT);
+      return (
+        !isx.is_direction && in_bounds(isx.x, isx.y, WIDTH + 1, HEIGHT + 1)
+      );
     }
   );
 
@@ -35,6 +41,10 @@ function draw_line(p, line) {
   }
 
   const [a, b] = intersections;
+  draw_line_segment(p, a, b);
+}
+
+function draw_line_segment(p, a, b) {
   p.line(a.x, HEIGHT - a.y, b.x, HEIGHT - b.y);
 }
 
@@ -46,7 +56,29 @@ export const sketch = (p) => {
     p.background(127);
 
     p.noFill();
-    draw_point(p, VANISHING_POINT);
+    draw_point(p, VP_RAILS);
     draw_line(p, HORIZON);
+
+    draw_point(p, A);
+    draw_point(p, B);
+
+    // Draw the left and right sides of the train tracks
+    draw_line_segment(p, A, VP_RAILS);
+    draw_line_segment(p, B, VP_RAILS);
+
+    const left = A.join(VP_RAILS);
+    const right = B.join(VP_RAILS);
+
+    const C = B.join(VP_REFERENCE).meet(left);
+    const D = C.join(Point.DIR_X).meet(right);
+    draw_line_segment(p, C, D);
+    draw_point(p, C);
+    draw_point(p, D);
+
+    const E = D.join(VP_REFERENCE).meet(left);
+    const F = E.join(Point.DIR_X).meet(right);
+    draw_line_segment(p, E, F);
+    draw_point(p, E);
+    draw_point(p, F);
   };
 };
