@@ -1,97 +1,109 @@
 import { describe, it, expect } from "vitest";
 import { Point, Line } from "./objects";
 
-describe("Point (euclidean)", () => {
-  it("gets the underlying x and y components", () => {
-    const a = Point.point(2, -5);
+describe("Point", () => {
+  describe("euclidean", () => {
+    it("gets the underlying x and y components", () => {
+      const a = Point.point(2, -5);
 
-    expect(a.x).toBe(2);
-    expect(a.y).toBe(-5);
+      expect(a.x).toBe(2);
+      expect(a.y).toBe(-5);
+    });
+
+    it("adding two points returns the midpoint", () => {
+      const a = Point.point(1, 2);
+      const b = Point.point(3, 4);
+
+      const result = a.add(b);
+
+      const expected = Point.point(2, 3);
+      expect(result).toEqual(expected);
+    });
+
+    it("adding a direction returns the correct point", () => {
+      const a = Point.point(1, 2);
+      const dir = Point.direction(3, 4);
+
+      const result = a.add(dir);
+
+      const expected = Point.point(4, 6);
+      expect(result).toEqual(expected);
+    });
+
+    it("subtracting points produces the correct direction", () => {
+      const a = Point.point(1, 4);
+      const b = Point.point(3, 2);
+
+      const result = a.sub(b);
+
+      const expected = Point.direction(-2, 2);
+      expect(result).toEqual(expected);
+    });
   });
 
-  it("adding a direction returns the correct point", () => {
-    const a = Point.point(1, 2);
-    const dir = Point.direction(3, 4);
+  describe("ideal", () => {
+    it("gets the underlying x and y components", () => {
+      const a = Point.direction(-3, 5);
 
-    const result = a.add(dir);
+      expect(a.x).toBe(-3);
+      expect(a.y).toBe(5);
+    });
 
-    const expected = Point.point(4, 6);
-    expect(result).toEqual(expected);
-  });
+    it("dual returns the orthogonal line", () => {
+      const a = Point.direction(2, 1);
 
-  it("subtracting points produces the correct direction", () => {
-    const a = Point.point(1, 4);
-    const b = Point.point(3, 2);
+      const result = a.dual();
 
-    const result = a.sub(b);
+      const expected = new Line(2, 1, 0);
+      expect(result).toEqual(expected);
+    });
 
-    const expected = Point.direction(-2, 2);
-    expect(result).toEqual(expected);
-  });
-});
+    it("neg negates the components", () => {
+      const a = Point.direction(1, -3);
 
-describe("Point (ideal)", () => {
-  it("gets the underlying x and y components", () => {
-    const a = Point.direction(-3, 5);
+      const result = a.neg();
 
-    expect(a.x).toBe(-3);
-    expect(a.y).toBe(5);
-  });
+      const expected = Point.direction(-1, 3);
+      expect(result).toEqual(expected);
+    });
 
-  it("dual returns the orthogonal line", () => {
-    const a = Point.direction(2, 1);
+    it("ideal norm returns the magnitude of x and y components", () => {
+      const a = Point.direction(3, 4);
 
-    const result = a.dual();
+      const result = a.ideal_norm();
 
-    const expected = new Line(2, 1, 0);
-    expect(result).toEqual(expected);
-  });
+      // 3^2 + 4^2
+      expect(result).toBe(25);
+    });
 
-  it("neg negates the components", () => {
-    const a = Point.direction(1, -3);
+    it("ideal magnitude returns the magnitude of x and y components", () => {
+      const a = Point.direction(3, 4);
 
-    const result = a.neg();
+      const result = a.ideal_mag();
 
-    const expected = Point.direction(-1, 3);
-    expect(result).toEqual(expected);
-  });
+      // sqrt(3^2 + 4^2) = sqrt(25) = 5
+      expect(result).toBeCloseTo(5);
+    });
 
-  it("ideal norm returns the magnitude of x and y components", () => {
-    const a = Point.direction(3, 4);
+    it("scale performs scalar multiplication", () => {
+      const dir = Point.direction(4, -3);
 
-    const result = a.ideal_norm();
+      const result = dir.scale(2);
 
-    // 3^2 + 4^2
-    expect(result).toBe(25);
-  });
+      const expected = Point.direction(8, -6);
+      expect(result).toEqual(expected);
+    });
 
-  it("ideal magnitude returns the magnitude of x and y components", () => {
-    const a = Point.direction(3, 4);
+    it("dot of two directions computes the dot product of components", () => {
+      const a = Point.direction(1, 2);
+      const b = Point.direction(3, 4);
 
-    const result = a.ideal_mag();
+      const result = a.dot(b);
 
-    // sqrt(3^2 + 4^2) = sqrt(25) = 5
-    expect(result).toBeCloseTo(5);
-  });
-
-  it("scale performs scalar multiplication", () => {
-    const dir = Point.direction(4, -3);
-
-    const result = dir.scale(2);
-
-    const expected = Point.direction(8, -6);
-    expect(result).toEqual(expected);
-  });
-
-  it("dot of two directions computes the dot product of components", () => {
-    const a = Point.direction(1, 2);
-    const b = Point.direction(3, 4);
-
-    const result = a.dot(b);
-
-    // 1 * 3 + 2 * 4 = 3 + 8 = 11
-    const expected = 11;
-    expect(result).toBe(expected);
+      // 1 * 3 + 2 * 4 = 3 + 8 = 11
+      const expected = 11;
+      expect(result).toBe(expected);
+    });
   });
 });
 

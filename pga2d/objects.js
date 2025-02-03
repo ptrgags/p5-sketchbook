@@ -102,6 +102,7 @@ export class Point {
 Point.ORIGIN = Object.freeze(Point.point(0, 0));
 Point.DIR_X = Object.freeze(Point.direction(1, 0));
 Point.DIR_Y = Object.freeze(Point.direction(0, 1));
+Point.ZERO = Object.freeze(new Point(0, 0, 0));
 
 export class Line {
   constructor(nx, ny, d) {

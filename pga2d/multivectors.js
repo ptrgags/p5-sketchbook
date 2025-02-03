@@ -37,6 +37,7 @@ export class Even {
     );
   }
 }
+Even.ZERO = Object.freeze(new Even(0, 0, 0, 0));
 Even.IDENTITY = Object.freeze(new Even(1, 0, 0, 0));
 
 export class Odd {
@@ -54,6 +55,12 @@ export class Odd {
   sandwich_even(other) {
     const { x, y, o, xyo } = this;
     const { scalar, xy, xo, yo } = other;
+
+    // if the bread is a null vector, the result will be zero
+    const mag_sqr = x * x + y * y;
+    if (is_nearly(mag_sqr, 0)) {
+      return Even.ZERO;
+    }
 
     // EDIT: In the derivation below, I'm forgetting to account for the
     // negative sign for rev(xyo)... I'll revisit this later.
@@ -138,8 +145,6 @@ export class Odd {
     const xy_part = -xy;
     const xo_part = (b_sqr - a_sqr) * xo - 2 * ab * yo + 2 * (ad - bc) * xy;
     const yo_part = (a_sqr - b_sqr) * yo - 2 * ab * xo + 2 * (ac - bd) * xy;
-
-    const mag_sqr = a_sqr + b_sqr;
 
     return new Even(scalar_part, xy_part, xo_part / mag_sqr, yo_part / mag_sqr);
   }
