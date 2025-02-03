@@ -5,7 +5,7 @@ const WIDTH = 500;
 const HEIGHT = 700;
 
 // vanishing point of the rails
-const VP_RAILS = Point.point(WIDTH / 2, HEIGHT / 2);
+const VP_RAILS = Point.point(WIDTH / 2, (3 * HEIGHT) / 4);
 // Another vanishing point for reference to determine where the ties go
 const VP_REFERENCE = Point.point(-WIDTH / 2, HEIGHT / 2);
 const HORIZON = VP_RAILS.join(Point.DIR_X);
@@ -48,6 +48,9 @@ function draw_line_segment(p, a, b) {
   p.line(a.x, HEIGHT - a.y, b.x, HEIGHT - b.y);
 }
 
+const RAIL_WIDTH = 30;
+const RAIL_HEIGHT = 50;
+
 export const sketch = (p) => {
   let canvas;
   p.setup = () => {
@@ -59,12 +62,64 @@ export const sketch = (p) => {
     draw_point(p, VP_RAILS);
     draw_line(p, HORIZON);
 
-    draw_point(p, A);
-    draw_point(p, B);
+    const A_top_left = A.add(Point.DIR_Y.scale(RAIL_HEIGHT));
+    const A_top_right = A_top_left.add(Point.DIR_X.scale(RAIL_WIDTH));
+    const A_bottom_right = A.add(Point.DIR_X.scale(RAIL_WIDTH));
+    const rail_top_left = A_top_left.join(VP_RAILS);
+    const rail_top_right = A_top_right.join(VP_RAILS);
+    const rail_bottom_right = A_bottom_right.join(VP_RAILS);
+    const isx_top_left = rail_top_left.meet(BOTTOM_SIDE);
+    const isx_top_right = rail_top_right.meet(BOTTOM_SIDE);
+    const isx_bottom_right = rail_bottom_right.meet(BOTTOM_SIDE);
+    draw_line_segment(p, VP_RAILS, isx_top_left);
+    draw_line_segment(p, VP_RAILS, isx_top_right);
+    draw_line_segment(p, VP_RAILS, isx_bottom_right);
 
+    const B_bottom_left = B;
+    const B_top_left = B.add(Point.DIR_Y.scale(RAIL_HEIGHT));
+    const B_top_right = B_top_left.add(Point.DIR_X.scale(RAIL_WIDTH));
+    const B_rail_bottom_left = B_bottom_left.join(VP_RAILS);
+    const B_rail_top_left = B_top_left.join(VP_RAILS);
+    const B_rail_top_right = B_top_right.join(VP_RAILS);
+    const isx_B_bottom_left = B_rail_bottom_left.meet(BOTTOM_SIDE);
+    const isx_B_top_left = B_rail_top_left.meet(BOTTOM_SIDE);
+    const isx_B_top_right = B_rail_top_right.meet(BOTTOM_SIDE);
+    draw_line_segment(p, VP_RAILS, isx_B_bottom_left);
+    draw_line_segment(p, VP_RAILS, isx_B_top_left);
+    draw_line_segment(p, VP_RAILS, isx_B_top_right);
+
+    const tie_bottom_left = Point.point(50, 0);
+    const first_tie_top = tie_bottom_left
+      .add(Point.DIR_Y.scale(30))
+      .join(Point.DIR_X);
+    const ties_left = tie_bottom_left.join(VP_RAILS);
+
+    const tie_bottom_right = Point.point(475, 0);
+    const ties_right = tie_bottom_right.join(VP_RAILS);
+    const tie_top_left = ties_left.meet(first_tie_top);
+    const tie_top_right = ties_right.meet(first_tie_top);
+
+    const tie_diag1 = tie_top_left.join(tie_bottom_right);
+    const tie_diag2 = tie_top_right.join(tie_bottom_left);
+    const tie_center = tie_diag1.meet(tie_diag2);
+    const rail_center = tie_center.join(VP_RAILS);
+
+    // debug lines
+    p.stroke(255, 0, 0);
+    draw_line(p, ties_left);
+    draw_line(p, first_tie_top);
+    draw_line(p, ties_right);
+    draw_line(p, tie_diag1);
+    draw_line(p, tie_diag2);
+    draw_line(p, rail_center);
+
+    p.stroke(0);
+
+    /*
     // Draw the left and right sides of the train tracks
     draw_line_segment(p, A, VP_RAILS);
     draw_line_segment(p, B, VP_RAILS);
+
 
     const left = A.join(VP_RAILS);
     const right = B.join(VP_RAILS);
@@ -80,5 +135,6 @@ export const sketch = (p) => {
     draw_line_segment(p, E, F);
     draw_point(p, E);
     draw_point(p, F);
+    */
   };
 };
