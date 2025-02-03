@@ -62,7 +62,7 @@ describe("Index2D", () => {
 
     const result = index.down();
 
-    const expected = new Index2D(2, 6);
+    const expected = new Index2D(2, 5);
     expect(result).toEqual(expected);
   });
 });
@@ -127,6 +127,24 @@ describe("Grid", () => {
 
     const expected = [0, 1, 2, 3];
     expect(result).toEqual(expected);
+  });
+
+  it("fill computes a new grid of the same size", () => {
+    const grid = new Grid(2, 2);
+    grid.fill((index) => {
+      const { i, j } = index;
+
+      return i + j;
+    });
+
+    const result_grid = grid.map((index, x) => {
+      const { i, j } = index;
+      return `(${i}, ${j}): ${x}`;
+    });
+    const result_values = [...result_grid];
+
+    const expected = ["(0, 0): 0", "(0, 1): 1", "(1, 0): 1", "(1, 1): 2"];
+    expect(result_values).toEqual(expected);
   });
 
   it("set_2d with 1D index throws", () => {

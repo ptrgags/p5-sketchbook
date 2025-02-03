@@ -71,13 +71,15 @@ export class Index2D {
    * @returns {Index2D} The downwards neighbor
    */
   down() {
-    return new Index2D(this.i + 1, this.j + 1);
+    return new Index2D(this.i + 1, this.j);
   }
 }
 
 /**
  * 2D array of values. It is indexed by Index2D objects rather than
  * an integer index.
+ *
+ * @template T
  */
 export class Grid {
   constructor(rows, cols) {
@@ -90,13 +92,14 @@ export class Grid {
   *[Symbol.iterator]() {
     yield* this.values;
   }
+
   entries() {
     return this.values.entries();
   }
 
   /**
    * Fill the grid by applying a callback function at every grid cell.
-   * @param {function(Index2D)} callback A function that takes an index and
+   * @param {function(Index2D): T} callback A function that takes an index and
    * computes the value to store at that point in the grid.
    */
   fill(callback) {
@@ -105,6 +108,28 @@ export class Grid {
         this.values[i * this.cols + j] = callback(new Index2D(i, j));
       }
     }
+  }
+
+  /**
+   * Iterate over the grid, and produce a new grid of the same size by
+   * calling a function at each cell
+   * @template U
+   * @param {function(Index2D, T): U} callback A function that takes an index and the current value and computes a corresponding value in the new grid
+   * @returns {Grid<U>} A new grid
+   */
+  map(callback) {
+    const result = new Grid(this.rows, this.cols);
+    result.fill((index) => callback(index, this.get(index)));
+    return result;
+  }
+
+  /**
+   * Get the number of entries in the underlying array. This is equal to
+   * this.rows * this.cols
+   * @return {Number} The number of entries in the grid
+   */
+  get length() {
+    return this.values.length;
   }
 
   set(index, value) {
