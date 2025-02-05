@@ -48,6 +48,17 @@ function draw_line_segment(p, a, b) {
   p.line(a.x, HEIGHT - a.y, b.x, HEIGHT - b.y);
 }
 
+function draw_outside_walls(p, a, b, walls) {
+  const line = a.join(b);
+  const intersections = walls.map((wall) => line.meet(wall));
+  draw_line_segment(p, a, intersections[0]);
+  for (let i = 1; i < intersections.length - 2; i += 2) {
+    draw_line_segment(p, intersections[i], intersections[i + 1]);
+  }
+
+  draw_line_segment(p, intersections[intersections.length - 1], b);
+}
+
 const RAIL_WIDTH = 30;
 const RAIL_HEIGHT = 50;
 
@@ -111,6 +122,33 @@ function even_spaced_rectangles(point_a, point_b, vp, vertical_spacing) {
   };
 }
 
+function railroad_ties(tie_bottoms, tie_thickness) {
+  const ties = [];
+
+  const point_a = tie_bottoms.left_endpoints[0];
+  const point_b = tie_bottoms.right_endpoints[1];
+  const ref_point = Point.lerp(point_a, point_b, tie_thickness);
+  const ref_line = ref_point.join(tie_bottoms.vanishing_point);
+
+  const { guide_left, guide_right } = tie_bottoms;
+  const quad_count = tie_bottoms.horizontal_lines.length - 1;
+  for (let i = 0; i < quad_count; i++) {
+    const quad_a = tie_bottoms.left_endpoints[i];
+    const quad_b = tie_bottoms.right_endpoints[i];
+    const quad_c = tie_bottoms.right_endpoints[i + 1];
+
+    const diag = quad_a.join(quad_c);
+    const isx = diag.meet(ref_line);
+    const tie_top = isx.join(Point.DIR_X);
+    const top_left = tie_top.meet(guide_left);
+    const top_right = tie_top.meet(guide_right);
+
+    ties.push([quad_a, quad_b, top_right, top_left]);
+  }
+
+  return ties;
+}
+
 export const sketch = (p) => {
   let canvas;
   p.setup = () => {
@@ -158,38 +196,21 @@ export const sketch = (p) => {
       VP_RAILS,
       TIE_SPACING
     );
+    const ties = railroad_ties(tie_bottoms, 0.5);
+
+    const walls = [
+      rail_top_left,
+      rail_bottom_right,
+      B_rail_bottom_left,
+      B_rail_top_right,
+    ];
 
     // debug lines
-    p.stroke(255, 0, 0);
-    draw_line(p, tie_bottoms.guide_left);
-    draw_line(p, tie_bottoms.guide_right);
-    tie_bottoms.left_endpoints.forEach((left, i) => {
-      const right = tie_bottoms.right_endpoints[i];
-      draw_line_segment(p, left, right);
-    });
-
-    p.stroke(0);
-
-    /*
-    // Draw the left and right sides of the train tracks
-    draw_line_segment(p, A, VP_RAILS);
-    draw_line_segment(p, B, VP_RAILS);
-
-
-    const left = A.join(VP_RAILS);
-    const right = B.join(VP_RAILS);
-
-    const C = B.join(VP_REFERENCE).meet(left);
-    const D = C.join(Point.DIR_X).meet(right);
-    draw_line_segment(p, C, D);
-    draw_point(p, C);
-    draw_point(p, D);
-
-    const E = D.join(VP_REFERENCE).meet(left);
-    const F = E.join(Point.DIR_X).meet(right);
-    draw_line_segment(p, E, F);
-    draw_point(p, E);
-    draw_point(p, F);
-    */
+    for (const [a, b, c, d] of ties) {
+      draw_outside_walls(p, a, b, walls);
+      draw_line_segment(p, b, c);
+      draw_outside_walls(p, d, c, walls);
+      draw_line_segment(p, d, a);
+    }
   };
 };
