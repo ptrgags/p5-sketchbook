@@ -12,11 +12,6 @@ const HORIZON = VP_RAILS.join(Point.DIR_X);
 const A = Point.point(WIDTH / 4, 0);
 const B = Point.point((3 * WIDTH) / 4, 0);
 
-const POINT_DIAMETER = 8;
-function draw_point(p, point) {
-  p.circle(point.x, HEIGHT - point.y, POINT_DIAMETER);
-}
-
 const RIGHT_SIDE = new Line(1, 0, WIDTH);
 const TOP_SIDE = new Line(0, 1, HEIGHT);
 const LEFT_SIDE = Line.Y_AXIS;
@@ -157,7 +152,6 @@ export const sketch = (p) => {
     p.background(127);
 
     p.noFill();
-    draw_point(p, VP_RAILS);
     draw_line(p, HORIZON);
 
     const A_top_left = A.add(Point.DIR_Y.scale(RAIL_HEIGHT));
