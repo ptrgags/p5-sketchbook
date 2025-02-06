@@ -1,5 +1,11 @@
-import { in_bounds } from "../common/in_bounds.js";
 import { Line, Point } from "../pga2d/objects.js";
+import {
+  PolygonPrimitive,
+  RectPrimitive,
+  GroupPrimitive,
+} from "./primitives.js";
+import { Color, Style } from "./Style.js";
+import { draw_primitive } from "./rendering.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -14,40 +20,11 @@ const BOTTOM_SIDE = new Line(0, 1, HEIGHT);
 const RAIL_WIDTH = 30;
 const RAIL_HEIGHT = 50;
 
-class RectPrimitive {
-  constructor(position, dimensions) {
-    this.position = position;
-    this.dimensions = dimensions;
-  }
-}
-
-class LinePrimitive {
-  constructor(a, b) {
-    this.a = a;
-    this.b = b;
-  }
-}
-
-class PolygonPrimitive {
-  constructor(points) {
-    this.points = points;
-  }
-
-  *[Symbol.iterator]() {
-    yield* this.points;
-  }
-}
-
-class GroupPrimitive {
-  constructor(primitives, style) {
-    this.primitives = primitives;
-    this.style = style;
-  }
-
-  *[Symbol.iterator]() {
-    yield* this.primitives;
-  }
-}
+const DEFAULT_STYLE = new Style().with_stroke(new Color(0, 0, 0));
+const GROUND_STYLE = DEFAULT_STYLE.with_fill(new Color(135, 201, 162));
+const SKY_STYLE = new Style().with_fill(new Color(30, 173, 235));
+const RAIL_STYLE = DEFAULT_STYLE.with_fill(new Color(71, 70, 69));
+const TIE_STYLE = DEFAULT_STYLE.with_fill(new Color(99, 59, 26));
 
 function compute_rails() {
   const A_top_left = A.add(Point.DIR_Y.scale(-RAIL_HEIGHT));
@@ -183,153 +160,140 @@ function railroad_ties(tie_bottoms, tie_thickness) {
   return ties;
 }
 
-function draw_rect(p, rect) {
-  const { x, y } = rect.position;
-  const { x: w, y: h } = rect.dimensions;
-  p.rect(x, y, w, h);
+function make_background() {
+  const sky_prim = new RectPrimitive(
+    Point.point(0, 0),
+    Point.direction(WIDTH, VP_RAILS.y)
+  );
+  const sky = new GroupPrimitive([sky_prim], SKY_STYLE);
+
+  const ground_prim = new RectPrimitive(
+    Point.point(0, VP_RAILS.y),
+    Point.direction(WIDTH, HEIGHT - VP_RAILS.y)
+  );
+  const ground = new GroupPrimitive([ground_prim], GROUND_STYLE);
+
+  return new GroupPrimitive([sky, ground]);
 }
 
-function draw_line(p, line) {
-  const a = line.a;
-  const b = line.b;
-  p.line(a.x, a.y, b.x, b.y);
-}
+class AnimatedTie {
+  constructor(quad, start_frame, duration_frames) {
+    if (quad.vertices.length != 4) {
+      throw new Error("quad must have exactly 4 vertices");
+    }
 
-function draw_polygon(p, polygon) {
-  p.beginShape();
-  for (const vertex of polygon) {
-    p.vertex(vertex.x, vertex.y);
-  }
-  p.endShape(p.CLOSE);
-}
-
-function apply_style(p, style) {
-  if (style.stroke) {
-    const { r, g, b } = style.stroke;
-    p.stroke(r, g, b);
-  } else {
-    p.noStroke();
+    this.quad = quad;
+    this.start_frame = start_frame;
+    this.duration_frames = duration_frames;
   }
 
-  if (style.fill) {
-    const { r, g, b } = style.fill;
-    p.fill(r, g, b);
-  } else {
-    p.noFill();
-  }
+  compute_polygon(frame) {
+    // We haven't started animating, so don't render anything
+    if (frame < this.start_frame) {
+      return undefined;
+    }
 
-  p.strokeWeight(style.stroke_width);
-}
+    // We've finished the animation, so just render the full quad
+    if (frame >= this.start_frame + this.duration_frames) {
+      return this.quad;
+    }
 
-function draw_group(p, group) {
-  p.push();
-  if (group.style) {
-    apply_style(p, group.style);
-  }
+    // In between, expand the tie from the left edge
+    const t = (frame - this.start_frame) / this.duration_frames;
+    const [a, b, c, d] = this.quad.vertices;
+    const bottom_right = Point.lerp(a, b, t);
+    const top_right = Point.lerp(d, c, t);
 
-  for (const child of group) {
-    draw_primitive(p, child);
-  }
-
-  p.pop();
-}
-
-function draw_primitive(p, primitive) {
-  if (primitive instanceof GroupPrimitive) {
-    draw_group(p, primitive);
-  } else if (primitive instanceof RectPrimitive) {
-    draw_rect(p, primitive);
-  } else if (primitive instanceof LinePrimitive) {
-    draw_line(p, primitive);
-  } else if (primitive instanceof PolygonPrimitive) {
-    draw_polygon(p, primitive);
+    return new PolygonPrimitive([a, bottom_right, top_right, d]);
   }
 }
 
-class Color {
-  constructor(r, g, b) {
-    this.r = r;
-    this.g = g;
-    this.b = b;
+const TIE_DURATION = 100;
+const TIE_DELAY = 25;
+function make_ties() {
+  const tie_bottom_left = Point.point(50, HEIGHT);
+  const tie_bottom_right = Point.point(475, HEIGHT);
+
+  const TIE_SPACING = 100;
+  const tie_bottoms = even_spaced_rectangles(
+    tie_bottom_left,
+    tie_bottom_right,
+    VP_RAILS,
+    TIE_SPACING
+  );
+  const tie_prims = railroad_ties(tie_bottoms, 0.5);
+
+  const animated_ties = tie_prims.map(
+    (quad, i) => new AnimatedTie(quad, i * TIE_DELAY, TIE_DURATION)
+  );
+  return animated_ties;
+}
+
+class AnimatedRails {
+  constructor(triangles, start_frame, duration_frames) {
+    triangles.forEach((x) => {
+      if (x.vertices.length !== 3) {
+        throw new Error("Each rail primitive must be a triangle!");
+      }
+    });
+    this.triangles = triangles;
+    this.start_frame = start_frame;
+    this.duration_frames = duration_frames;
+  }
+
+  compute_polygons(frame) {
+    if (frame < this.start_frame) {
+      return [];
+    }
+
+    if (frame >= this.start_frame + this.duration_frames) {
+      return this.triangles;
+    }
+
+    // In between, lerp points towards the vanishing point. This will
+    // produce a _quad_ rather than a triangle for the in-between frames.
+    const t = (frame - this.start_frame) / this.duration_frames;
+    return this.triangles.map((tri) => {
+      const [a, b, vp] = tri.vertices;
+
+      const top_left = Point.lerp(a, vp, t);
+      const top_right = Point.lerp(b, vp, t);
+      return new PolygonPrimitive([a, b, top_right, top_left]);
+    });
   }
 }
 
-class Style {
-  constructor() {
-    this.stroke = undefined;
-    this.fill = undefined;
-    this.stroke_width = 1;
-  }
+const RAILS_START_FRAME = 20;
+const RAILS_DURATION = 200;
+function make_rails() {
+  const rail_prims = compute_rails();
 
-  clone() {
-    const result = new Style();
-    result.stroke = this.stroke;
-    result.fill = this.fill;
-    result.stroke_width = this.stroke_width;
-    return result;
-  }
-
-  with_stroke(stroke) {
-    const result = this.clone();
-    result.stroke = stroke;
-    return result;
-  }
-
-  with_fill(fill) {
-    const result = this.clone();
-    result.fill = fill;
-    return result;
-  }
-
-  with_width(width) {
-    const result = this.clone();
-    result.stroke_width = width;
-    return result;
-  }
+  return new AnimatedRails(rail_prims, RAILS_START_FRAME, RAILS_DURATION);
 }
+
+const BACKGROUND = make_background();
+const ANIMATED_TIES = make_ties();
+const ANIMATED_RAILS = make_rails();
 
 export const sketch = (p) => {
   p.setup = () => {
-    p.createCanvas(WIDTH, HEIGHT).elt;
+    p.createCanvas(WIDTH, HEIGHT);
 
-    const default_style = new Style().with_stroke(new Color(0, 0, 0));
+    draw_primitive(p, BACKGROUND);
+  };
 
-    const sky_prim = new RectPrimitive(
-      Point.point(0, 0),
-      Point.direction(WIDTH, VP_RAILS.y)
-    );
-    const sky_style = default_style.with_fill(new Color(30, 173, 235));
-    const sky = new GroupPrimitive([sky_prim], sky_style);
+  p.draw = () => {
+    const tie_prims = ANIMATED_TIES.map((x) =>
+      x.compute_polygon(p.frameCount)
+    ).filter((x) => x !== undefined);
+    const ties = new GroupPrimitive(tie_prims, TIE_STYLE);
 
-    const ground_prim = new RectPrimitive(
-      Point.point(0, VP_RAILS.y),
-      Point.direction(WIDTH, HEIGHT - VP_RAILS.y)
-    );
-    const ground_style = new Style()
-      .with_stroke(new Color(0, 0, 0))
-      .with_fill(new Color(135, 201, 162));
-    const ground = new GroupPrimitive([ground_prim], ground_style);
+    const rail_prims = ANIMATED_RAILS.compute_polygons(p.frameCount);
+    const rails = new GroupPrimitive(rail_prims, RAIL_STYLE);
 
-    const rail_prims = compute_rails();
-    const rail_style = default_style.with_fill(new Color(71, 70, 69));
-    const rails = new GroupPrimitive(rail_prims, rail_style);
+    const dynamic_geom = new GroupPrimitive([ties, rails]);
 
-    const tie_bottom_left = Point.point(50, HEIGHT);
-    const tie_bottom_right = Point.point(475, HEIGHT);
-
-    const TIE_SPACING = 100;
-    const tie_bottoms = even_spaced_rectangles(
-      tie_bottom_left,
-      tie_bottom_right,
-      VP_RAILS,
-      TIE_SPACING
-    );
-    const tie_prims = railroad_ties(tie_bottoms, 0.5);
-    const tie_style = default_style.with_fill(new Color(99, 59, 26));
-    const ties = new GroupPrimitive(tie_prims, tie_style);
-
-    const primitives = new GroupPrimitive([sky, ground, ties, rails]);
-
-    draw_primitive(p, primitives);
+    draw_primitive(p, BACKGROUND);
+    draw_primitive(p, dynamic_geom);
   };
 };
