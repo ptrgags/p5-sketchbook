@@ -5,45 +5,21 @@ const WIDTH = 500;
 const HEIGHT = 700;
 
 // vanishing point of the rails
-const VP_RAILS = Point.point(WIDTH / 2, (3 * HEIGHT) / 4);
-const HORIZON = VP_RAILS.join(Point.DIR_X);
-const A = Point.point(WIDTH / 4, 0);
-const B = Point.point((3 * WIDTH) / 4, 0);
+const VP_RAILS = Point.point(WIDTH / 2, HEIGHT / 4);
+const A = Point.point(WIDTH / 4, HEIGHT);
+const B = Point.point((3 * WIDTH) / 4, HEIGHT);
 
-const RIGHT_SIDE = new Line(1, 0, WIDTH);
-const TOP_SIDE = new Line(0, 1, HEIGHT);
-const LEFT_SIDE = Line.Y_AXIS;
-const BOTTOM_SIDE = Line.X_AXIS;
-
-/**
- * Clip a line to the screen to form a line segment
- * @param {Line} line Line to clip
- * @returns LinePrimitive the clipped line segment
- */
-function clip_line(line) {
-  const isx_right = line.meet(RIGHT_SIDE);
-  const isx_top = line.meet(TOP_SIDE);
-  const isx_left = line.meet(LEFT_SIDE);
-  const isx_bottom = line.meet(BOTTOM_SIDE);
-  const intersections = [isx_right, isx_top, isx_left, isx_bottom].filter(
-    (isx) => {
-      return (
-        !isx.is_direction && in_bounds(isx.x, isx.y, WIDTH + 1, HEIGHT + 1)
-      );
-    }
-  );
-
-  if (intersections.length !== 2) {
-    console.log("line not visible!");
-    return;
-  }
-
-  const [a, b] = intersections;
-  return new LinePrimitive(a, b);
-}
+const BOTTOM_SIDE = new Line(0, 1, HEIGHT);
 
 const RAIL_WIDTH = 30;
 const RAIL_HEIGHT = 50;
+
+class RectPrimitive {
+  constructor(position, dimensions) {
+    this.position = position;
+    this.dimensions = dimensions;
+  }
+}
 
 class LinePrimitive {
   constructor(a, b) {
@@ -63,8 +39,9 @@ class PolygonPrimitive {
 }
 
 class GroupPrimitive {
-  constructor(primitives) {
+  constructor(primitives, style) {
     this.primitives = primitives;
+    this.style = style;
   }
 
   *[Symbol.iterator]() {
@@ -73,7 +50,7 @@ class GroupPrimitive {
 }
 
 function compute_rails() {
-  const A_top_left = A.add(Point.DIR_Y.scale(RAIL_HEIGHT));
+  const A_top_left = A.add(Point.DIR_Y.scale(-RAIL_HEIGHT));
   const A_top_right = A_top_left.add(Point.DIR_X.scale(RAIL_WIDTH));
   const A_bottom_right = A.add(Point.DIR_X.scale(RAIL_WIDTH));
   const A_rail_top_left = A_top_left.join(VP_RAILS);
@@ -84,7 +61,7 @@ function compute_rails() {
   const isx_A_bottom_right = A_rail_bottom_right.meet(BOTTOM_SIDE);
 
   const B_bottom_left = B;
-  const B_top_left = B.add(Point.DIR_Y.scale(RAIL_HEIGHT));
+  const B_top_left = B.add(Point.DIR_Y.scale(-RAIL_HEIGHT));
   const B_top_right = B_top_left.add(Point.DIR_X.scale(RAIL_WIDTH));
   const B_rail_bottom_left = B_bottom_left.join(VP_RAILS);
   const B_rail_top_left = B_top_left.join(VP_RAILS);
@@ -116,16 +93,7 @@ function compute_rails() {
     VP_RAILS,
   ]);
 
-  return {
-    left: {
-      top: left_rail_top,
-      side: left_rail_side,
-    },
-    right: {
-      top: right_rail_top,
-      side: right_rail_side,
-    },
-  };
+  return [left_rail_top, left_rail_side, right_rail_top, right_rail_side];
 }
 
 const MAX_ITERATIONS = 500;
@@ -144,7 +112,7 @@ function even_spaced_rectangles(point_a, point_b, vp, vertical_spacing) {
   // the second line is the given number of pixels above it.
   const first_line = point_a.join(point_b);
   const second_line = point_a
-    .add(Point.DIR_Y.scale(vertical_spacing))
+    .add(Point.DIR_Y.scale(-vertical_spacing))
     .join(Point.DIR_X);
 
   // Left and right guidelines that lead to the vanishing point
@@ -212,28 +180,65 @@ function railroad_ties(tie_bottoms, tie_thickness) {
     ties.push(new PolygonPrimitive([quad_a, quad_b, top_right, top_left]));
   }
 
-  return new GroupPrimitive(ties);
+  return ties;
+}
+
+function draw_rect(p, rect) {
+  const { x, y } = rect.position;
+  const { x: w, y: h } = rect.dimensions;
+  p.rect(x, y, w, h);
 }
 
 function draw_line(p, line) {
   const a = line.a;
   const b = line.b;
-  p.line(a.x, HEIGHT - a.y, b.x, HEIGHT - b.y);
+  p.line(a.x, a.y, b.x, b.y);
 }
 
 function draw_polygon(p, polygon) {
   p.beginShape();
   for (const vertex of polygon) {
-    p.vertex(vertex.x, HEIGHT - vertex.y);
+    p.vertex(vertex.x, vertex.y);
   }
   p.endShape(p.CLOSE);
 }
 
+function apply_style(p, style) {
+  if (style.stroke) {
+    const { r, g, b } = style.stroke;
+    p.stroke(r, g, b);
+  } else {
+    p.noStroke();
+  }
+
+  if (style.fill) {
+    const { r, g, b } = style.fill;
+    p.fill(r, g, b);
+  } else {
+    p.noFill();
+  }
+
+  p.strokeWeight(style.stroke_width);
+}
+
+function draw_group(p, group) {
+  p.push();
+  if (group.style) {
+    apply_style(p, group.style);
+  }
+
+  for (const child of group) {
+    draw_primitive(p, child);
+  }
+
+  p.pop();
+}
+
 function draw_primitive(p, primitive) {
   if (primitive instanceof GroupPrimitive) {
-    for (const child of primitive) {
-      draw_primitive(p, child);
-    }
+    draw_group(p, primitive);
+  } else if (primitive instanceof RectPrimitive) {
+    draw_rect(p, primitive);
   } else if (primitive instanceof LinePrimitive) {
     draw_line(p, primitive);
   } else if (primitive instanceof PolygonPrimitive) {
@@ -241,25 +246,76 @@ function draw_primitive(p, primitive) {
   }
 }
 
+class Color {
+  constructor(r, g, b) {
+    this.r = r;
+    this.g = g;
+    this.b = b;
+  }
+}
+
+class Style {
+  constructor() {
+    this.stroke = undefined;
+    this.fill = undefined;
+    this.stroke_width = 1;
+  }
+
+  clone() {
+    const result = new Style();
+    result.stroke = this.stroke;
+    result.fill = this.fill;
+    result.stroke_width = this.stroke_width;
+    return result;
+  }
+
+  with_stroke(stroke) {
+    const result = this.clone();
+    result.stroke = stroke;
+    return result;
+  }
+
+  with_fill(fill) {
+    const result = this.clone();
+    result.fill = fill;
+    return result;
+  }
+
+  with_width(width) {
+    const result = this.clone();
+    result.stroke_width = width;
+    return result;
+  }
+}
+
 export const sketch = (p) => {
   p.setup = () => {
     p.createCanvas(WIDTH, HEIGHT).elt;
 
-    p.background(127);
+    const default_style = new Style().with_stroke(new Color(0, 0, 0));
 
-    p.noFill();
-    const horizon = clip_line(HORIZON);
+    const sky_prim = new RectPrimitive(
+      Point.point(0, 0),
+      Point.direction(WIDTH, VP_RAILS.y)
+    );
+    const sky_style = default_style.with_fill(new Color(30, 173, 235));
+    const sky = new GroupPrimitive([sky_prim], sky_style);
 
-    const rails = compute_rails();
-    const rail_primitives = new GroupPrimitive([
-      rails.left.top,
-      rails.left.side,
-      rails.right.top,
-      rails.right.side,
-    ]);
+    const ground_prim = new RectPrimitive(
+      Point.point(0, VP_RAILS.y),
+      Point.direction(WIDTH, HEIGHT - VP_RAILS.y)
+    );
+    const ground_style = new Style()
+      .with_stroke(new Color(0, 0, 0))
+      .with_fill(new Color(135, 201, 162));
+    const ground = new GroupPrimitive([ground_prim], ground_style);
 
-    const tie_bottom_left = Point.point(50, 0);
-    const tie_bottom_right = Point.point(475, 0);
+    const rail_prims = compute_rails();
+    const rail_style = default_style.with_fill(new Color(71, 70, 69));
+    const rails = new GroupPrimitive(rail_prims, rail_style);
+
+    const tie_bottom_left = Point.point(50, HEIGHT);
+    const tie_bottom_right = Point.point(475, HEIGHT);
 
     const TIE_SPACING = 100;
     const tie_bottoms = even_spaced_rectangles(
@@ -268,15 +324,12 @@ export const sketch = (p) => {
       VP_RAILS,
       TIE_SPACING
     );
-    const tie_primitives = railroad_ties(tie_bottoms, 0.5);
+    const tie_prims = railroad_ties(tie_bottoms, 0.5);
+    const tie_style = default_style.with_fill(new Color(99, 59, 26));
+    const ties = new GroupPrimitive(tie_prims, tie_style);
 
-    const primitives = new GroupPrimitive([
-      horizon,
-      tie_primitives,
-      rail_primitives,
-    ]);
+    const primitives = new GroupPrimitive([sky, ground, ties, rails]);
 
-    p.fill(255, 0, 0);
     draw_primitive(p, primitives);
   };
 };
