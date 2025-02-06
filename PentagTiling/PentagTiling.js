@@ -261,7 +261,7 @@ export const sketch = (p) => {
   p.mouseMoved = () => {
     // p5.js doesn't account for my CSS that scales the canvas while keeping
     // aspect ratio
-    const [x, y] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
+    const { x, y } = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
 
     if (!in_bounds(x, y, WIDTH, HEIGHT)) {
       state.mouse_cell = undefined;
@@ -276,7 +276,7 @@ export const sketch = (p) => {
   p.mouseReleased = () => {
     // p5.js doesn't account for my CSS that scales the canvas while keeping
     // aspect ratio
-    const [x, y] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
+    const { x, y } = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
 
     if (!in_bounds(x, y, WIDTH, HEIGHT)) {
       return true;

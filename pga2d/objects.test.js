@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { Point, Line } from "./objects";
+import { PGA_MATCHERS } from "./pga_matchers";
+
+expect.extend(PGA_MATCHERS);
 
 describe("Point", () => {
   describe("euclidean", () => {
@@ -27,7 +30,7 @@ describe("Point", () => {
       const result = a.add(dir);
 
       const expected = Point.point(4, 6);
-      expect(result).toEqual(expected);
+      expect(result).toBePoint(expected);
     });
 
     it("subtracting points produces the correct direction", () => {
@@ -37,7 +40,51 @@ describe("Point", () => {
       const result = a.sub(b);
 
       const expected = Point.direction(-2, 2);
+      expect(result).toBePoint(expected);
+    });
+
+    it("joining two points gives the line through them", () => {
+      const a = Point.point(0, 1);
+      const b = Point.point(1, 0);
+
+      const result = a.join(b);
+
+      const expected = new Line(1, 1, 1);
+      expect(result).toBeLine(expected);
+    });
+
+    it("swapping join arguments reverses the line's orientation", () => {
+      const a = Point.point(0, 1);
+      const b = Point.point(1, 0);
+
+      const result_forward = a.join(b);
+      const result_backward = b.join(a);
+
+      const expected_forward = new Line(1, 1, 1);
+      const expected_backward = new Line(-1, -1, -1);
+      expect(result_forward).toBeLine(expected_forward);
+      expect(result_backward).toBeLine(expected_backward);
+    });
+
+    it("lerp interpolates two points", () => {
+      const a = Point.point(1, 2);
+      const b = Point.point(-2, -8);
+
+      const result = Point.lerp(a, b, 0.25);
+
+      // 3/4 * 1 + 1/4 * -2 = 1/4(3 -2) = 1/4
+      // 3/4 * 2 + 1/4 * -8 = 1/4(6 - 8) = -2/4 = -1/2
+      const expected = Point.point(0.25, -0.5);
       expect(result).toEqual(expected);
+    });
+
+    it("toString formats as point", () => {
+      const a = Point.point(0.00012345, 2.98763);
+
+      const result = a.toString();
+
+      const expected = "Point(0.000123, 2.99)";
+      expect(result).toBe(expected);
     });
   });
 
@@ -55,7 +102,7 @@ describe("Point", () => {
       const result = a.dual();
 
       const expected = new Line(2, 1, 0);
-      expect(result).toEqual(expected);
+      expect(result).toBeLine(expected);
     });
 
     it("neg negates the components", () => {
@@ -64,7 +111,7 @@ describe("Point", () => {
       const result = a.neg();
 
       const expected = Point.direction(-1, 3);
-      expect(result).toEqual(expected);
+      expect(result).toBePoint(expected);
     });
 
     it("ideal norm returns the magnitude of x and y components", () => {
@@ -91,7 +138,7 @@ describe("Point", () => {
       const result = dir.scale(2);
 
       const expected = Point.direction(8, -6);
-      expect(result).toEqual(expected);
+      expect(result).toBePoint(expected);
     });
 
     it("dot of two directions computes the dot product of components", () => {
@@ -104,6 +151,18 @@ describe("Point", () => {
       const expected = 11;
       expect(result).toBe(expected);
     });
+  });
+
+  it("lerp interpolates two directions", () => {
+    const a = Point.direction(1, 2);
+    const b = Point.direction(-2, -8);
+
+    const result = Point.lerp(a, b, 0.25);
+
+    // 3/4 * 1 + 1/4 * -2 = 1/4(3 -2) = 1/4
+    // 3/4 * 2 + 1/4 * -8 = 1/4(6 - 8) = -2/4 = -1/2
+    const expected = Point.direction(0.25, -0.5);
+    expect(result).toBePoint(expected);
   });
 });
 
@@ -124,5 +183,33 @@ describe("Line", () => {
     expect(line.nx).toBe(0);
     expect(line.ny).toBe(0);
     expect(line.d).toBe(42);
+  });
+
+  it("meet of axes returns origin", () => {
+    const a = Line.X_AXIS;
+    const b = Line.Y_AXIS;
+
+    const result = a.meet(b);
+
+    expect(result).toBePoint(Point.ORIGIN);
+  });
+
+  it("meet of two lines returns their intersection", () => {
+    const a = new Line(1, 1, 1);
+    const b = new Line(1, -1, 2);
+
+    const result = a.meet(b);
+
+    const expected = Point.point(1.5, -0.5);
+    expect(result).toBePoint(expected);
+  });
+
+  it("toString formats as direction", () => {
+    const a = Point.direction(0.00012345, 2.98763);
+
+    const result = a.toString();
+
+    const expected = "Direction(0.000123, 2.99)";
+    expect(result).toBe(expected);
   });
 });

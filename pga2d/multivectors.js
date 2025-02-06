@@ -28,6 +28,29 @@ export class Even {
     return new Odd(this.yo, -this.xo, this.xy, this.scalar);
   }
 
+  // in 2D PGA, the antidual has exactly the same signs as the dual
+  // so we get this function for free!
+  antidual = this.dual;
+
+  vee_even(other) {
+    // a v b = antidual(dual(a) ^ dual(b))
+    const a_dual = this.dual();
+    const b_dual = other.dual();
+    return a_dual.wedge(b_dual).antidual();
+  }
+
+  vee_odd(other) {
+    throw new Error("Not implemented");
+  }
+
+  vee(other) {
+    if (other instanceof Even) {
+      return this.vee_even(other);
+    }
+
+    return this.vee_odd(other);
+  }
+
   equals(other) {
     return (
       is_nearly(this.scalar, other.scalar) &&
@@ -35,6 +58,17 @@ export class Even {
       is_nearly(this.xo, other.xo) &&
       is_nearly(this.yo, other.yo)
     );
+  }
+
+  static lerp(a, b, t) {
+    const s = 1 - t;
+
+    const scalar = s * a.scalar + t * b.scalar;
+    const xy = s * a.xy + t * b.xy;
+    const xo = s * a.xo + t * b.xo;
+    const yo = s * a.yo + t * b.yo;
+
+    return new Even(scalar, xy, xo, yo);
   }
 }
 Even.ZERO = Object.freeze(new Even(0, 0, 0, 0));
@@ -147,6 +181,31 @@ export class Odd {
     const yo_part = (a_sqr - b_sqr) * yo - 2 * ab * xo + 2 * (ac - bd) * xy;
 
     return new Even(scalar_part, xy_part, xo_part / mag_sqr, yo_part / mag_sqr);
+  }
+
+  wedge_odd(other) {
+    // Note that the pseudoscalar part xyo will always wedge to 0, so we can
+    // ignore it.
+    const { x: ax, y: ay, o: ao } = this;
+    const { x: bx, y: by, o: bo } = other;
+
+    const xy_part = ax * by - ay * bx;
+    const xo_part = ax * bo - ao * bx;
+    const yo_part = ay * bo - ao * by;
+
+    return new Even(0, xy_part, xo_part, yo_part);
+  }
+
+  wedge_even(other) {
+    throw new Error("Not Implemented");
+  }
+
+  wedge(other) {
+    if (other instanceof Odd) {
+      return this.wedge_odd(other);
+    }
+
+    return this.wedge_even(other);
   }
 
   sandwich_odd(other) {

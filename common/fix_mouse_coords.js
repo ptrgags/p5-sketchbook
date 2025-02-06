@@ -1,3 +1,5 @@
+import { Point } from "../pga2d/objects.js";
+
 /**
  * In my CSS I use object-fit: contain to scale the canvases while
  * maintaining aspect ratio and canvas resolution. p5 is not aware
@@ -5,9 +7,14 @@
  * @param {HTMLCanvasElement} canvas The HTML canvas used by p5
  * @param {number} mouse_x the mouseX coordinate from p5
  * @param {number} mouse_y the mouseY coordinate from p5
- * @returns {number[]} Fixed coords [x, y]
+ * @returns {Point} Fixed coords (x, y). If the canvas wasn't ready yet, this returns (0, 0)
  */
 export function fix_mouse_coords(canvas, mouse_x, mouse_y) {
+  // The canvas hasn't been added to the page yet! gracefully return (0, 0)
+  if (!canvas) {
+    return Point.point(0, 0);
+  }
+
   // This is what p5.js uses for its pixel ratio. I needed to use this
   // since one of my monitors has a devicePixelRatio of 1.5, but p5.js
   // rounds this up to 2
@@ -42,5 +49,5 @@ export function fix_mouse_coords(canvas, mouse_x, mouse_y) {
 
   const x = ((mouse_x - margin_left) * canvas_width) / effective_width;
   const y = ((mouse_y - margin_top) * canvas_height) / effective_height;
-  return [x, y];
+  return Point.point(x, y);
 }

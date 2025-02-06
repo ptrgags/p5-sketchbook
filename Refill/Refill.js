@@ -53,7 +53,7 @@ export const sketch = (p) => {
   };
 
   p.mousePressed = () => {
-    const [x, y] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
+    const { x, y } = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
     if (!in_bounds(x, y, WIDTH, HEIGHT)) {
       return true;
     }
@@ -62,7 +62,7 @@ export const sketch = (p) => {
   };
 
   p.mouseReleased = () => {
-    const [x, y] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
+    const { x, y } = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
     if (!in_bounds(x, y, WIDTH, HEIGHT)) {
       return true;
     }

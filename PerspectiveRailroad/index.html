@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../libraries/p5.min.js"
+    ></script>
+    <script type="module">
+      import { sketch } from "./PerspectiveRailroad.js";
+      import "../common/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../styles/layout.css" />
+    <style>
+      img {
+        display: block;
+        margin: 0 auto;
+      }
+    </style>
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>Perspective Railroad (2025)</h1>
+      <div id="sketch"></div>
+      <div class="description">
+        <p>
+          This animation draws inspiration from both math and art. I recently
+          read
+          <a
+            href="https://www.google.com/books/edition/_/YQ3jDAAAQBAJ?hl=en&kptab=overview"
+            >Perspective Made Easy</a
+          >
+          by Ernest R. Norling. The book is a handy tutorial on drawing in
+          perspective in traditional art. A couple of constructions were helpful
+          here. First, the method to draw evenly-spaced fence posts is useful
+          for spacing the bottom of each railroad tie. I also used the method to
+          divide a perspective rectangle into even sub-divisions. This was
+          useful for giving the railroad ties thickness.
+        </p>
+        <p>
+          I've also been exploring
+          <a href="https://bivector.net/index.html">Geometric Algebra</a>, and
+          found that
+          <a href="https://bivector.net/PGA4CS.html"
+            >2D Plane-based Geometric Algebra (PGA)</a
+          >
+          is perfect for perspective drawings like this. It allows you to "join"
+          two points into a line, or "meet" two lines to find the point of
+          intersection. This is much like drawing with a straightedge on paper.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

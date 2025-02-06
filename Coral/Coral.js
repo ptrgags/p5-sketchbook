@@ -185,8 +185,7 @@ export const sketch = (p) => {
       return;
     }
 
-    const [mx, my] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
-    const mouse = Point.point(mx, my);
+    const mouse = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
 
     for (const object of SELECTION_ORDER) {
       if (object.is_hovering(mouse)) {
@@ -197,8 +196,7 @@ export const sketch = (p) => {
   };
 
   p.mouseDragged = () => {
-    const [mx, my] = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
-    const mouse = Point.point(mx, my);
+    const mouse = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
 
     if (selected_object) {
       selected_object.move(mouse);
