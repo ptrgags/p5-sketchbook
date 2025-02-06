@@ -187,6 +187,10 @@ class AnimatedTie {
     this.duration_frames = duration_frames;
   }
 
+  is_finished(frame) {
+    return frame >= this.start_frame + this.duration_frames;
+  }
+
   compute_polygon(frame) {
     // We haven't started animating, so don't render anything
     if (frame < this.start_frame) {
@@ -194,7 +198,7 @@ class AnimatedTie {
     }
 
     // We've finished the animation, so just render the full quad
-    if (frame >= this.start_frame + this.duration_frames) {
+    if (this.is_finished(frame)) {
       return this.quad;
     }
 
@@ -246,12 +250,16 @@ class AnimatedRails {
     this.duration_frames = duration_frames;
   }
 
+  is_finished(frame) {
+    return frame >= this.start_frame + this.duration_frames;
+  }
+
   compute_polygons(frame) {
     if (frame < this.start_frame) {
       return [];
     }
 
-    if (frame >= this.start_frame + this.duration_frames) {
+    if (this.is_finished(frame)) {
       return this.triangles;
     }
 
@@ -279,6 +287,7 @@ const ANIMATED_TIES = make_ties();
 const ANIMATED_RAILS = make_rails();
 
 export const sketch = (p) => {
+  let animation_finished = false;
   p.setup = () => {
     p.createCanvas(WIDTH, HEIGHT);
 
@@ -286,6 +295,10 @@ export const sketch = (p) => {
   };
 
   p.draw = () => {
+    if (animation_finished) {
+      return;
+    }
+
     const tie_prims = ANIMATED_TIES.map((x) =>
       x.compute_polygon(p.frameCount)
     ).filter((x) => x !== undefined);
@@ -298,5 +311,12 @@ export const sketch = (p) => {
 
     draw_primitive(p, BACKGROUND);
     draw_primitive(p, dynamic_geom);
+
+    if (
+      ANIMATED_RAILS.is_finished(p.frameCount) &&
+      ANIMATED_TIES.every((x) => x.is_finished(p.frameCount))
+    ) {
+      animation_finished = true;
+    }
   };
 };
