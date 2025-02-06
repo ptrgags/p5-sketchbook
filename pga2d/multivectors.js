@@ -36,7 +36,7 @@ export class Even {
     // a v b = antidual(dual(a) ^ dual(b))
     const a_dual = this.dual();
     const b_dual = other.dual();
-    return a_dual.wedge(b_dual).dual();
+    return a_dual.wedge(b_dual).antidual();
   }
 
   vee_odd(other) {
