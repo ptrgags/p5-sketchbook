@@ -208,8 +208,9 @@ class AnimatedTie {
   }
 }
 
-const TIE_DURATION = 100;
-const TIE_DELAY = 25;
+const RAILS_START_FRAME = 20;
+const RAILS_DURATION = 200;
+const TIE_DURATION = 30;
 function make_ties() {
   const tie_bottom_left = Point.point(50, HEIGHT);
   const tie_bottom_right = Point.point(475, HEIGHT);
@@ -223,9 +224,13 @@ function make_ties() {
   );
   const tie_prims = railroad_ties(tie_bottoms, 0.5);
 
-  const animated_ties = tie_prims.map(
-    (quad, i) => new AnimatedTie(quad, i * TIE_DELAY, TIE_DURATION)
-  );
+  const animated_ties = tie_prims.map((quad, i) => {
+    const y = quad.vertices[0].y;
+    const t_start = (y - HEIGHT) / (VP_RAILS.y - HEIGHT);
+    const start_frame = t_start * RAILS_DURATION;
+
+    return new AnimatedTie(quad, start_frame, TIE_DURATION);
+  });
   return animated_ties;
 }
 
@@ -263,8 +268,6 @@ class AnimatedRails {
   }
 }
 
-const RAILS_START_FRAME = 20;
-const RAILS_DURATION = 200;
 function make_rails() {
   const rail_prims = compute_rails();
 
