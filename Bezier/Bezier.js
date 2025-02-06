@@ -1,9 +1,9 @@
 import { fix_mouse_coords } from "../common/fix_mouse_coords.js";
 import { Point } from "../pga2d/objects.js";
 
-let cp1 = new Point(100, 240);
-let cp2 = new Point(320, 100);
-let cp3 = new Point(400, 600);
+let cp1 = Point.point(100, 240);
+let cp2 = Point.point(320, 100);
+let cp3 = Point.point(400, 600);
 
 let steps = 10;
 let ratio = 1.0 / steps;

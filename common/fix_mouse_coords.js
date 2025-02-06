@@ -49,5 +49,5 @@ export function fix_mouse_coords(canvas, mouse_x, mouse_y) {
 
   const x = ((mouse_x - margin_left) * canvas_width) / effective_width;
   const y = ((mouse_y - margin_top) * canvas_height) / effective_height;
-  return new Point(x, y);
+  return Point.point(x, y);
 }
