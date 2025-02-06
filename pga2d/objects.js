@@ -47,10 +47,6 @@ export class Point {
     }
   }
 
-  dist_sqr(point) {
-    return this.sub(point).norm();
-  }
-
   euclidean_norm() {
     // the xo and yo parts square to 0, so we only have xy * yx
     const { xy } = this.bivec;
