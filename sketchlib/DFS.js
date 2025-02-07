@@ -10,19 +10,19 @@
 export class DFSTraversal {
   /**
    * Get the total number of vertices to be traversed.
-   * @param {G} grid The grid to check for vertices
    * @return {number} The total number of vertices
    */
-  get_vertex_count(grid) {
+  get_vertex_count() {
     throw new Error("not implemented");
   }
 
   /**
    * For forest traversal, pick the next start node
-   * @param {G} grid
-   * @param {Set<H>} visited_set
+   * @param {G} grid The grid
+   * @param {Set<H>} visited_set The visited elements
+   * @return {I} The unvisited index to start
    */
-  pick_start(grid, visited_set) {
+  pick_start(visited_set) {
     throw new Error("not implemented");
   }
 
@@ -41,7 +41,7 @@ export class DFSTraversal {
    * @param {G} grid The grid
    * @param {I} index The index of the current cell
    */
-  get_neighbors(grid, index) {
+  get_neighbors(index) {
     throw new Error("not implemented");
   }
 
@@ -80,7 +80,7 @@ export class DFS {
   /**
    * Perform DFS traversal until the entire
    *
-   * @param {function(I, T)} callback A function to call at each visited cell in preorder.
+   * @param {function(I[])} callback A function to call at each visited cell. The value is a path to this cell
    */
   dfs_forest(callback) {
     const visited = new Set();
@@ -88,35 +88,41 @@ export class DFS {
     const vertex_count = this.traversal.get_vertex_count(this.grid);
     while (visited.size < vertex_count) {
       const start_index = this.traversal.pick_start(visited);
-      this.dfs_tree(start_index, visited, callback);
+      this.dfs_tree(start_index, callback, visited);
     }
   }
 
   /**
    * Perform a DFS traversal on a single start node
    * @param {I} start_index The index of the first cell to visit
-   * @param {function(I, T)} callback A function to call at each visited cell in preorder
-   * @param {Set<H> | undefined} visited A set
+   * @param {function(I[])} callback A function to call at each visited cell. The value is a path to the current cell.
+   * @param {Set<H> | undefined} visited A set of hashed indices to indicate which cells were visited
    */
   dfs_tree(start_index, callback, visited) {
     visited = visited ?? new Set();
 
     const stack = [start_index];
+    const path = [];
     while (stack.length > 0) {
       const current_index = stack.pop();
       visited.add(this.traversal.hash(current_index));
 
-      const node = this.grid.get(current_index);
-      callback(current_index, node);
+      path.push(current_index);
+      callback(path);
 
-      const unvisited_neighbors = this.grid
-        .get_neighbors()
+      const unvisited_neighbors = this.traversal
+        .get_neighbors(current_index)
         .filter((index) => !visited.has(this.traversal.hash(index)));
 
       const ordered_neighbors =
         this.traversal.order_neighbors(unvisited_neighbors);
 
-      this.stack.push(...ordered_neighbors);
+      if (ordered_neighbors.length > 0) {
+        stack.push(...ordered_neighbors);
+      } else {
+        // We reached a dead end, backtrack
+        path.pop();
+      }
     }
   }
 }

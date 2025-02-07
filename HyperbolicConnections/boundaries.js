@@ -1,17 +1,8 @@
 import { PRIMITIVE_CIRCLE, PRIMITIVE_LINE } from "./shaders.js";
+import { Random } from "../sketchlib/random.js";
 
 // How many pairs of boundary points around the edge of the circle
 export const PAIR_COUNT = 40;
-
-// random int in [min, max)
-function rand_int(min, max) {
-  return Math.floor(Math.random() * (max - min) + min);
-}
-
-function rand_choice(array) {
-  const index = rand_int(0, array.length);
-  return array[index];
-}
 
 const BOUNDARY_START = "[";
 const BOUNDARY_END = "]";
@@ -215,7 +206,7 @@ export class Boundary {
       start.label = label;
       end.label = label;
 
-      const insert_index = rand_int(0, chunk.length);
+      const insert_index = Random.rand_int(0, chunk.length);
       chunk.splice(insert_index, 0, start, end);
     }
 
@@ -241,10 +232,10 @@ export class Boundary {
     let remaining_count = pair_count;
     while (remaining_count > 0) {
       const max_length = Math.min(max_chunk_length, remaining_count);
-      const chunk_length = rand_int(1, max_length + 1);
-      const color_index = rand_int(0, palette.colors.length);
+      const chunk_length = Random.rand_int(1, max_length + 1);
+      const color_index = Random.rand_int(0, palette.colors.length);
       const chunk_color = palette.colors[color_index];
-      const insert_index = 2 * rand_int(0, boundaries[0].length / 2);
+      const insert_index = 2 * Random.rand_int(0, boundaries[0].length / 2);
       for (let i = 0; i < boundary_count; i++) {
         const chunk = this.generate_boundary_chunk(
           chunk_length,

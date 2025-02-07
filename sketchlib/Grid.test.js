@@ -1,5 +1,6 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, test } from "vitest";
 import { Grid, griderator, Index2D } from "./Grid";
+import { GridDirection } from "./GridDiection";
 
 describe("Index2D", () => {
   it("throws for negative row", () => {
@@ -64,6 +65,42 @@ describe("Index2D", () => {
 
     const expected = new Index2D(2, 5);
     expect(result).toEqual(expected);
+  });
+
+  describe("direction_to", () => {
+    it("with same index returns undefined", () => {
+      const index = new Index2D(1, 5);
+
+      const result = index.direction_to(index);
+
+      expect(result).toBeUndefined();
+    });
+
+    it("with non-adjacent index returns undefined", () => {
+      const a = new Index2D(1, 5);
+      const b = new Index2D(3, 5);
+
+      const result = a.direction_to(b);
+
+      expect(result).toBeUndefined();
+    });
+
+    test.each([
+      ["right", 1, 6, GridDirection.RIGHT],
+      ["up", 0, 5, GridDirection.UP],
+      ["left", 1, 4, GridDirection.LEFT],
+      ["down", 2, 5, GridDirection.DOWN],
+    ])(
+      "with adjacent cell returns the correct direction: %s",
+      (label, i, j, expected) => {
+        const a = new Index2D(1, 5);
+        const neighbor = new Index2D(i, j);
+
+        const result = a.direction_to(neighbor);
+
+        expect(result).toBe(expected);
+      }
+    );
   });
 });
 
@@ -204,6 +241,17 @@ describe("Grid", () => {
     expect(() => {
       grid.get(new Index2D(4, 0));
     }).toThrowError("index out of bounds");
+  });
+
+  it("hash with 2D index returns 1D array index", () => {
+    const grid = new Grid(2, 3);
+    const index = new Index2D(1, 1);
+
+    const result = grid.hash(index);
+
+    // 1 * 3 + 1 = 4
+    const expected = 4;
+    expect(result).toBe(expected);
   });
 
   it("right with index at right edge returns undefined", () => {

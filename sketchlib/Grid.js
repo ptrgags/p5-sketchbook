@@ -1,3 +1,5 @@
+import { GridDirection } from "./GridDiection.js";
+
 /**
  * Iterate over a 2D range of values, performing an action at each step.
  * This is useful for drawing graphics arranged in a grid even if there's no
@@ -72,6 +74,37 @@ export class Index2D {
    */
   down() {
     return new Index2D(this.i + 1, this.j);
+  }
+
+  /**
+   * Compute the direction to a neighboring cell.
+   * @param {Index2D} other Another cell
+   * @returns {GridDirection|undefined} If the cell neighbors this one, the grid direction is returned. Else undefined is returned to indicate not adjacent.
+   */
+  direction_to(other) {
+    const { i: ai, j: aj } = this;
+    const { i: bi, j: bj } = other;
+
+    const di = bi - ai;
+    const dj = bj - aj;
+
+    if (dj === 1 && di === 0) {
+      return GridDirection.RIGHT;
+    }
+
+    if (dj === -1 && di === 0) {
+      return GridDirection.LEFT;
+    }
+
+    if (dj === 0 && di === 1) {
+      return GridDirection.DOWN;
+    }
+
+    if (dj === 0 && di === -1) {
+      return GridDirection.UP;
+    }
+
+    return undefined;
   }
 }
 
@@ -153,7 +186,7 @@ export class Grid {
       throw new Error("index must be an Index2D object");
     }
 
-    const i = index.i * this.cols + index.j;
+    const i = this.hash(index);
     if (i >= this.values.length) {
       throw new Error("index out of bounds");
     }
@@ -165,11 +198,16 @@ export class Grid {
       throw new Error("index must be an Index2D object");
     }
 
-    const i = index.i * this.cols + index.j;
+    const i = this.hash(index);
     if (i >= this.values.length) {
       throw new Error("index out of bounds");
     }
     return this.values[i];
+  }
+
+  hash(index) {
+    const { i, j } = index;
+    return i * this.cols + j;
   }
 
   /**
@@ -198,5 +236,20 @@ export class Grid {
     }
 
     return index.down();
+  }
+
+  /**
+   * Get neighbor indices that are in bounds. Results are returned in
+   * counterclockwise order starting from the right.
+   * @param {Index2D} index The current cell index
+   * @returns {Index2D[]} List of all in-bounds neighbors accessible from this cell.
+   */
+  get_neighbors(index) {
+    return [
+      this.right(index),
+      index.up(),
+      index.left(),
+      this.down(index),
+    ].filter((x) => x !== undefined);
   }
 }
