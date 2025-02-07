@@ -286,9 +286,9 @@ describe("Grid", () => {
     const grid = new Grid(4, 4);
     const index = new Index2D(2, 0);
 
-    const result = grid.right(index);
+    const result = grid.down(index);
 
     const expected = new Index2D(3, 0);
-    expect(result).toEqual(result);
+    expect(result).toEqual(expected);
   });
 });

@@ -3,7 +3,6 @@
  * to customize the behavior of DFS
  *
  * @interface DFSTraversal
- * @template G The grid type
  * @template I The index type for the grid
  * @template {number | string} H The hash type
  */
@@ -18,7 +17,6 @@ export class DFSTraversal {
 
   /**
    * For forest traversal, pick the next start node
-   * @param {G} grid The grid
    * @param {Set<H>} visited_set The visited elements
    * @return {I} The unvisited index to start
    */
@@ -38,7 +36,6 @@ export class DFSTraversal {
   /**
    * Get all the reachable neighbors from the given index. Do not check
    * if the neighbor is visited, this will be done by the DFS traversal.
-   * @param {G} grid The grid
    * @param {I} index The index of the current cell
    */
   get_neighbors(index) {
@@ -61,19 +58,15 @@ export class DFSTraversal {
 /**
  * A generic implementation of a DFS preorder traversal
  *
- * @template G The grid type. It must have a get function that returns T
  * @template I The index type for the grid. G::I
  * @template H The hash type for indices.
- * @template T The type of the grid value.
  */
 export class DFS {
   /**
    * Constructor
-   * @param {G} grid The grid we're traversing
    * @param {DFSTraversal<G, I, H>} traversal The traversal logic for this particular traversal
    */
-  constructor(grid, traversal) {
-    this.grid = grid;
+  constructor(traversal) {
     this.traversal = traversal;
   }
 
@@ -85,7 +78,7 @@ export class DFS {
   dfs_forest(callback) {
     const visited = new Set();
 
-    const vertex_count = this.traversal.get_vertex_count(this.grid);
+    const vertex_count = this.traversal.get_vertex_count();
     while (visited.size < vertex_count) {
       const start_index = this.traversal.pick_start(visited);
       this.dfs_tree(start_index, callback, visited);
@@ -105,6 +98,12 @@ export class DFS {
     const path = [];
     while (stack.length > 0) {
       const current_index = stack.pop();
+
+      // We visited this node before we got back to the stack entry
+      if (visited.has(this.traversal.hash(current_index))) {
+        continue;
+      }
+
       visited.add(this.traversal.hash(current_index));
 
       path.push(current_index);

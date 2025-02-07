@@ -3,6 +3,7 @@ import { Random } from "../sketchlib/random.js";
 import { DFS } from "../sketchlib/DFS.js";
 import { FlagSet } from "../sketchlib/FlagSet.js";
 import { GridDirection } from "../sketchlib/GridDiection.js";
+import { GridDFSTraversal } from "../sketchlib/GridDFSTraversal.js";
 
 class MazeCell {
   constructor() {
@@ -27,24 +28,23 @@ class MazeCell {
 export class RandomDFSMazeTraversal {
   constructor(grid) {
     this.grid = grid;
+    this.grid_traversal = new GridDFSTraversal(grid);
   }
 
   get_vertex_count() {
-    return this.grid.length;
+    return this.grid_traversal.get_vertex_count();
   }
 
-  pick_start() {
-    const row = Random.rand_int(0, this.grid.rows);
-    const col = Random.rand_int(0, this.grid.cols);
-    return new Index2D(row, col);
+  pick_start(visited_set) {
+    return this.grid_traversal.pick_start(visited_set);
   }
 
   hash(index) {
-    return this.grid.hash(index);
+    return this.grid_traversal.hash(index);
   }
 
   get_neighbors(index) {
-    const neighbors_in_bounds = this.grid.get_neighbors(index);
+    const neighbors_in_bounds = this.grid_traversal.get_neighbors(index);
     const current = this.grid.get(index);
 
     // We want the neighbors that are _not_ yet connected
@@ -65,8 +65,8 @@ export function generate_maze(rows, cols) {
     return new MazeCell();
   });
 
-  const traversal = new RandomDFSMazeTraversal(grid);
-  const dfs = new DFS(grid, traversal);
+  const traversal = new GridDFSTraversal(grid); //new RandomDFSMazeTraversal(grid);
+  const dfs = new DFS(traversal);
 
   dfs.dfs_forest((path) => {
     if (path.length >= 2) {
