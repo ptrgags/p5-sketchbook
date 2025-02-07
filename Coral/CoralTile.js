@@ -1,28 +1,13 @@
 import { ControlPoint } from "./ControlPoint.js";
 import { Point } from "../pga2d/objects.js";
 import { Rect } from "./Rect.js";
-
-export const CONNECT_RIGHT = 0b0001;
-export const CONNECT_UP = 0b0010;
-export const CONNECT_LEFT = 0b0100;
-export const CONNECT_DOWN = 0b1000;
-
-export const ConnectionDirection = {
-  RIGHT: 0,
-  UP: 1,
-  LEFT: 2,
-  DOWN: 3,
-};
-Object.freeze(ConnectionDirection);
+import { FlagSet } from "../sketchlib/FlagSet.js";
+import { GridDirection } from "../sketchlib/GridDiection.js";
 
 const DIR_LEFT = Point.DIR_X.neg();
 const DIR_RIGHT = Point.DIR_X;
 const DIR_UP = Point.DIR_Y;
 const DIR_DOWN = Point.DIR_Y.neg();
-
-function has_flag(flags, flag) {
-  return (flags & flag) === flag;
-}
 
 export const Quadrant = {
   SOUTHEAST: 0,
@@ -35,9 +20,10 @@ Object.freeze(Quadrant);
 export class CoralTile {
   constructor(quad, connection_flags) {
     this.quad = quad;
-    this.connection_flags = connection_flags;
+    const flags = new FlagSet(connection_flags, GridDirection.COUNT);
+    this.connection_flags = flags;
 
-    const connects_down = has_flag(this.connection_flags, CONNECT_DOWN);
+    const connects_down = flags.has_flag(GridDirection.DOWN);
     const se_position = connects_down
       ? Point.point(0.75, 0)
       : Point.point(0.5, 0.25);
@@ -47,7 +33,7 @@ export class CoralTile {
       ? new Rect(0.5, 0, 0.5, 0)
       : new Rect(0.5, 0, 0, 0.5);
 
-    const connects_right = has_flag(this.connection_flags, CONNECT_RIGHT);
+    const connects_right = flags.has_flag(GridDirection.RIGHT);
     const ne_position = connects_right
       ? Point.point(1, 0.75)
       : Point.point(0.75, 0.5);
@@ -57,7 +43,7 @@ export class CoralTile {
       ? new Rect(1, 0.5, 0, 0.5)
       : new Rect(0.5, 0.5, 0.5, 0);
 
-    const connects_up = has_flag(this.connection_flags, CONNECT_UP);
+    const connects_up = flags.has_flag(GridDirection.UP);
     const nw_position = connects_up
       ? Point.point(0.25, 1)
       : Point.point(0.5, 0.75);
@@ -67,7 +53,7 @@ export class CoralTile {
       ? new Rect(0, 1, 0.5, 0)
       : new Rect(0.5, 0.5, 0, 0.5);
 
-    const connects_left = has_flag(this.connection_flags, CONNECT_LEFT);
+    const connects_left = flags.has_flag(GridDirection.LEFT);
     const sw_position = connects_left
       ? Point.point(0, 0.25)
       : Point.point(0.25, 0.5);
@@ -88,7 +74,7 @@ export class CoralTile {
   }
 
   is_connected(direction) {
-    return has_flag(this.connection_flags, 1 << direction);
+    return this.connection_flags.has_flag(direction);
   }
 
   get_control_point(quadrant) {
