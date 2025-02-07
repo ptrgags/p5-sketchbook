@@ -129,7 +129,7 @@ describe("Grid", () => {
     expect(result).toEqual(expected);
   });
 
-  it("fill computes a new grid of the same size", () => {
+  it("map computes a new grid of the same size", () => {
     const grid = new Grid(2, 2);
     grid.fill((index) => {
       const { i, j } = index;
@@ -145,6 +145,23 @@ describe("Grid", () => {
 
     const expected = ["(0, 0): 0", "(0, 1): 1", "(1, 0): 1", "(1, 1): 2"];
     expect(result_values).toEqual(expected);
+  });
+
+  it("map array returns results in an array instead of a Grid", () => {
+    const grid = new Grid(2, 2);
+    grid.fill((index) => {
+      const { i, j } = index;
+
+      return i + j;
+    });
+
+    const result = grid.map_array((index, x) => {
+      const { i, j } = index;
+      return `(${i}, ${j}): ${x}`;
+    });
+
+    const expected = ["(0, 0): 0", "(0, 1): 1", "(1, 0): 1", "(1, 1): 2"];
+    expect(result).toEqual(expected);
   });
 
   it("set_2d with 1D index throws", () => {

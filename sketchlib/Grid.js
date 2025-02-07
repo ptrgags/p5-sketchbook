@@ -124,6 +124,22 @@ export class Grid {
   }
 
   /**
+   * Like map, but return an Array instead of a grid
+   * @param {function(Index2D, T): U} callback  A function that takes the index and current value and computes a new value
+   * @returns {Array<U>} an array of computed values, flattened in row-major order
+   */
+  map_array(callback) {
+    const result = new Array(this.rows * this.cols);
+    for (let i = 0; i < this.rows; i++) {
+      for (let j = 0; j < this.cols; j++) {
+        const index = new Index2D(i, j);
+        result[i * this.cols + j] = callback(index, this.get(index));
+      }
+    }
+    return result;
+  }
+
+  /**
    * Get the number of entries in the underlying array. This is equal to
    * this.rows * this.cols
    * @return {Number} The number of entries in the grid
