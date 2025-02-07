@@ -7,7 +7,7 @@
  * @template I The index type for the grid
  * @template {number | string} H The hash type
  */
-class DFSTraversal {
+export class DFSTraversal {
   /**
    * Get the total number of vertices to be traversed.
    * @param {G} grid The grid to check for vertices
@@ -66,7 +66,7 @@ class DFSTraversal {
  * @template H The hash type for indices.
  * @template T The type of the grid value.
  */
-class DFS {
+export class DFS {
   /**
    * Constructor
    * @param {G} grid The grid we're traversing
