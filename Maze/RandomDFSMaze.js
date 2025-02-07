@@ -65,7 +65,7 @@ export function generate_maze(rows, cols) {
     return new MazeCell();
   });
 
-  const traversal = new GridDFSTraversal(grid); //new RandomDFSMazeTraversal(grid);
+  const traversal = new RandomDFSMazeTraversal(grid);
   const dfs = new DFS(traversal);
 
   dfs.dfs_forest((path) => {

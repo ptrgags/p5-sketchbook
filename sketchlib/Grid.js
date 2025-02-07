@@ -238,6 +238,12 @@ export class Grid {
     return index.down();
   }
 
+  in_bounds(index) {
+    const { i, j } = index;
+
+    return i >= 0 && i < this.rows && j >= 0 && j < this.cols;
+  }
+
   /**
    * Get neighbor indices that are in bounds. Results are returned in
    * counterclockwise order starting from the right.
@@ -250,6 +256,6 @@ export class Grid {
       index.up(),
       index.left(),
       this.down(index),
-    ].filter((x) => x !== undefined);
+    ].filter((x) => x !== undefined && this.in_bounds(x));
   }
 }

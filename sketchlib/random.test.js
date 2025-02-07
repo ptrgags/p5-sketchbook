@@ -14,4 +14,22 @@ describe("Random", () => {
 
     expect(results_in_range).toBe(true);
   });
+
+  it("shuffle makes a copy of the array", () => {
+    const array = [1, 2, 3, 4, 5];
+    const array_copy = [...array];
+
+    const result = Random.shuffle(array);
+
+    expect(array).toEqual(array_copy);
+    expect(result).not.toBe(array);
+  });
+
+  it("shuffle returns array of same length", () => {
+    const array = [1, 2, 3, 4];
+
+    const results = Random.shuffle(array);
+
+    expect(results.length).toBe(4);
+  });
 });
