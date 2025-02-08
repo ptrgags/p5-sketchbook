@@ -1,8 +1,8 @@
-import { ControlPoint } from "./ControlPoint.js";
-import { Point } from "../pga2d/objects.js";
+import { ControlPoint } from "../../Coral/ControlPoint.js";
+import { Point } from "../../pga2d/objects.js";
 import { Rect } from "./Rect.js";
-import { FlagSet } from "../sketchlib/FlagSet.js";
-import { GridDirection } from "../sketchlib/GridDiection.js";
+import { FlagSet } from "../FlagSet.js";
+import { GridDirection } from "../GridDiection.js";
 
 const DIR_LEFT = Point.DIR_X.neg();
 const DIR_RIGHT = Point.DIR_X;
@@ -20,10 +20,9 @@ Object.freeze(Quadrant);
 export class CoralTile {
   constructor(quad, connection_flags) {
     this.quad = quad;
-    const flags = new FlagSet(connection_flags, GridDirection.COUNT);
-    this.connection_flags = flags;
+    this.connection_flags = connection_flags;
 
-    const connects_down = flags.has_flag(GridDirection.DOWN);
+    const connects_down = connection_flags.has_flag(GridDirection.DOWN);
     const se_position = connects_down
       ? Point.point(0.75, 0)
       : Point.point(0.5, 0.25);
@@ -33,7 +32,7 @@ export class CoralTile {
       ? new Rect(0.5, 0, 0.5, 0)
       : new Rect(0.5, 0, 0, 0.5);
 
-    const connects_right = flags.has_flag(GridDirection.RIGHT);
+    const connects_right = connection_flags.has_flag(GridDirection.RIGHT);
     const ne_position = connects_right
       ? Point.point(1, 0.75)
       : Point.point(0.75, 0.5);
@@ -43,7 +42,7 @@ export class CoralTile {
       ? new Rect(1, 0.5, 0, 0.5)
       : new Rect(0.5, 0.5, 0.5, 0);
 
-    const connects_up = flags.has_flag(GridDirection.UP);
+    const connects_up = connection_flags.has_flag(GridDirection.UP);
     const nw_position = connects_up
       ? Point.point(0.25, 1)
       : Point.point(0.5, 0.75);
@@ -53,7 +52,7 @@ export class CoralTile {
       ? new Rect(0, 1, 0.5, 0)
       : new Rect(0.5, 0.5, 0, 0.5);
 
-    const connects_left = flags.has_flag(GridDirection.LEFT);
+    const connects_left = connection_flags.has_flag(GridDirection.LEFT);
     const sw_position = connects_left
       ? Point.point(0, 0.25)
       : Point.point(0.25, 0.5);

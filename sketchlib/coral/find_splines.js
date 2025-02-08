@@ -1,5 +1,5 @@
-import { Grid, griderator, Index2D } from "../sketchlib/Grid.js";
-import { GridDirection } from "../sketchlib/GridDiection.js";
+import { Grid, griderator, Index2D } from "../Grid.js";
+import { GridDirection } from "../GridDiection.js";
 import { Quadrant } from "./CoralTile.js";
 import { Spline } from "./Spline.js";
 

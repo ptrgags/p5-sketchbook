@@ -8,23 +8,24 @@ import { Point } from "../pga2d/objects.js";
 import { Color, Style } from "../sketchlib/Style.js";
 import { draw_primitive } from "../sketchlib/draw_primitive.js";
 import { generate_maze } from "./RandomDFSMaze.js";
+import { CoralTile } from "../sketchlib/coral/CoralTile.js";
+import { Rect } from "../sketchlib/coral/Rect.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
 const GRID_ROWS = 14;
 const GRID_COLS = 10;
+const CELL_WIDTH = WIDTH / GRID_COLS;
+const CELL_HEIGHT = HEIGHT / GRID_ROWS;
 
 const GRID = generate_maze(GRID_ROWS, GRID_COLS);
 
 function render_grid_outline(grid) {
-  const cell_width = WIDTH / grid.cols;
-  const cell_height = HEIGHT / grid.rows;
-
   const grid_primitives = grid.map_array((index) => {
     const { i, j } = index;
 
-    const position = Point.point(j * cell_width, i * cell_height);
-    const dimensions = Point.point(cell_width, cell_height);
+    const position = Point.point(j * CELL_WIDTH, i * CELL_HEIGHT);
+    const dimensions = Point.point(CELL_WIDTH, CELL_HEIGHT);
     return new RectPrimitive(position, dimensions);
   });
 
@@ -35,16 +36,13 @@ function render_grid_outline(grid) {
 const GRID_OUTLINE = render_grid_outline(GRID);
 
 function render_connections(grid) {
-  const cell_width = WIDTH / grid.cols;
-  const cell_height = HEIGHT / grid.rows;
-
   const connection_primitives = grid
     .map_array((index, cell) => {
       const { i, j } = index;
 
       const center = Point.point(
-        (j + 0.5) * cell_width,
-        (i + 0.5) * cell_height
+        (j + 0.5) * CELL_WIDTH,
+        (i + 0.5) * CELL_HEIGHT
       );
 
       const lines = [];
@@ -52,13 +50,13 @@ function render_connections(grid) {
       // Since everything is doubly-linked, we only need to look at one
       // half of the connections
       if (cell.is_connected(GridDirection.UP)) {
-        const neighbor_center = center.add(Point.DIR_Y.scale(-cell_height));
+        const neighbor_center = center.add(Point.DIR_Y.scale(-CELL_HEIGHT));
         const line = new LinePrimitive(center, neighbor_center);
         lines.push(line);
       }
 
       if (cell.is_connected(GridDirection.LEFT)) {
-        const neighbor_center = center.add(Point.DIR_X.scale(-cell_width));
+        const neighbor_center = center.add(Point.DIR_X.scale(-CELL_WIDTH));
         const line = new LinePrimitive(center, neighbor_center);
         lines.push(line);
       }
@@ -73,6 +71,17 @@ function render_connections(grid) {
   return new GroupPrimitive(connection_primitives, CONNECTION_STYLE);
 }
 const CONNECTIONS = render_connections(GRID);
+
+const CORAL_TILES = GRID.map((index, cell) => {
+  const { i, j } = index;
+  const quad = new Rect(
+    j * CELL_WIDTH,
+    i * CELL_HEIGHT,
+    CELL_WIDTH,
+    CELL_HEIGHT
+  );
+  return new CoralTile(quad, cell.connection_flags);
+});
 
 export const sketch = (p) => {
   p.setup = () => {

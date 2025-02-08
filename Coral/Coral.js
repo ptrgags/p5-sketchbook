@@ -1,13 +1,22 @@
 import { fix_mouse_coords } from "../common/fix_mouse_coords.js";
-import { Rect } from "./Rect.js";
-import { CoralTile } from "./CoralTile.js";
-import { Point } from "../pga2d/objects.js";
+import { Rect } from "../sketchlib/coral/Rect.js";
+import { CoralTile } from "../sketchlib/coral/CoralTile.js";
+import { Color } from "../sketchlib/Style.js";
 import {
   SELECT_RADIUS,
   InteractiveTangent,
   InteractiveVertex,
 } from "./interactive.js";
-import { find_splines } from "./find_splines.js";
+import { find_splines } from "../sketchlib/coral/find_splines.js";
+import { FlagSet } from "../sketchlib/FlagSet.js";
+import { GridDirection } from "../sketchlib/GridDiection.js";
+import { Style } from "../sketchlib/Style.js";
+import {
+  render_quad,
+  render_tile_connections,
+} from "../sketchlib/coral/rendering.js";
+import { GroupPrimitive } from "../sketchlib/primitives.js";
+import { draw_primitive } from "../sketchlib/draw_primitive.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -25,9 +34,13 @@ const CONNECTION_ORDER = [
   [0b0001, 0b0101, 0b0100, 0b0000],
 ];
 
-const TILES = SMALL_QUADS.map(
-  ({ i, j }, quad) => new CoralTile(quad, CONNECTION_ORDER[i][j])
-);
+const TILES = SMALL_QUADS.map(({ i, j }, quad) => {
+  const connection_flags = new FlagSet(
+    CONNECTION_ORDER[i][j],
+    GridDirection.COUNT
+  );
+  return new CoralTile(quad, connection_flags);
+});
 
 const VERTICES = [];
 const TANGENTS = [];
@@ -48,14 +61,6 @@ for (const tile of TILES) {
 
 // Order to check for mouse hits. Note that this doesn't scale well.
 const SELECTION_ORDER = [...TANGENTS, ...VERTICES];
-
-function draw_quad(p, rect) {
-  const { x, y } = rect.position;
-  const { x: w, y: h } = rect.dimensions;
-  p.rect(x, y, w, h);
-  p.line(x, y + h / 2, x + w, y + h / 2);
-  p.line(x + w / 2, y, x + w / 2, y + h);
-}
 
 function draw_tile_tangents(p, tile) {
   const quad = tile.quad;
@@ -90,31 +95,30 @@ function draw_spline(p, spline) {
   }
 }
 
-const CONNECT_POINTS = [
-  Point.point(1.0, 0.5),
-  Point.point(0.5, 1.0),
-  Point.point(0.0, 0.5),
-  Point.point(0.5, 0.0),
-];
-
-function draw_tile_connections(p, tile) {
-  const quad = tile.quad;
-  const flags = tile.connection_flags;
-  const center = quad.uv_to_world(Point.point(0.5, 0.5));
-  for (let i = 0; i < 4; i++) {
-    if (!((flags >> i) & 1)) {
-      continue;
-    }
-
-    const connect_point = quad.uv_to_world(CONNECT_POINTS[i]);
-    p.line(center.x, center.y, connect_point.x, connect_point.y);
-  }
-}
-
 function highlight_selction(p, selected_object) {
   const position = selected_object.position_world;
   p.circle(position.x, position.y, SELECT_RADIUS * 2);
 }
+
+const DEFAULT_STYLE = new Style();
+
+const QUAD_STYLE = DEFAULT_STYLE.with_stroke(
+  new Color(127, 127, 127)
+).with_width(0.5);
+const QUAD_PRIMS = SMALL_QUADS.map_array((_, quad) => {
+  return render_quad(quad);
+}).flat();
+const QUADS = new GroupPrimitive(QUAD_PRIMS, QUAD_STYLE);
+
+const CONNECTION_STYLE = DEFAULT_STYLE.with_stroke(
+  new Color(255, 127, 0)
+).with_width(4);
+const CONNECTION_PRIMS = TILES.map_array((_, tile) => {
+  return render_tile_connections(tile);
+}).flat();
+const CONNECTIONS = new GroupPrimitive(CONNECTION_PRIMS, CONNECTION_STYLE);
+
+const STATIC_GEOMETRY = new GroupPrimitive([QUADS, CONNECTIONS]);
 
 export const sketch = (p) => {
   let canvas;
@@ -127,18 +131,7 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    p.stroke(127);
-    p.noFill();
-    for (const quad of SMALL_QUADS) {
-      draw_quad(p, quad);
-    }
-
-    p.stroke(255, 127, 0);
-    p.strokeWeight(4);
-    p.noFill();
-    for (const tile of TILES) {
-      draw_tile_connections(p, tile);
-    }
+    draw_primitive(p, STATIC_GEOMETRY);
 
     // Draw the Bezier spline
     p.stroke(131, 71, 181);
