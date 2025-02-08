@@ -94,10 +94,9 @@ export class DFS {
   dfs_tree(start_index, callback, visited) {
     visited = visited ?? new Set();
 
-    const stack = [start_index];
-    const path = [];
+    const stack = [[start_index, [start_index]]];
     while (stack.length > 0) {
-      const current_index = stack.pop();
+      const [current_index, current_path] = stack.pop();
 
       // We visited this node before we got back to the stack entry
       const hash = this.traversal.hash(current_index);
@@ -106,9 +105,7 @@ export class DFS {
       }
 
       visited.add(hash);
-
-      path.push(current_index);
-      callback(path);
+      callback(current_path);
 
       const unvisited_neighbors = this.traversal
         .get_neighbors(current_index)
@@ -117,11 +114,8 @@ export class DFS {
       const ordered_neighbors =
         this.traversal.order_neighbors(unvisited_neighbors);
 
-      if (ordered_neighbors.length > 0) {
-        stack.push(...ordered_neighbors);
-      } else {
-        // We reached a dead end, backtrack
-        path.pop();
+      for (const neighbor of ordered_neighbors) {
+        stack.push([neighbor, [...current_path, neighbor]]);
       }
     }
   }

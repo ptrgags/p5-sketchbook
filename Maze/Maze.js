@@ -48,6 +48,9 @@ function render_connections(grid) {
       );
 
       const lines = [];
+
+      // Since everything is doubly-linked, we only need to look at one
+      // half of the connections
       if (cell.is_connected(GridDirection.UP)) {
         const neighbor_center = center.add(Point.DIR_Y.scale(-cell_height));
         const line = new LinePrimitive(center, neighbor_center);
@@ -56,18 +59,6 @@ function render_connections(grid) {
 
       if (cell.is_connected(GridDirection.LEFT)) {
         const neighbor_center = center.add(Point.DIR_X.scale(-cell_width));
-        const line = new LinePrimitive(center, neighbor_center);
-        lines.push(line);
-      }
-
-      if (cell.is_connected(GridDirection.DOWN)) {
-        const neighbor_center = center.add(Point.DIR_Y.scale(cell_width));
-        const line = new LinePrimitive(center, neighbor_center);
-        lines.push(line);
-      }
-
-      if (cell.is_connected(GridDirection.RIGHT)) {
-        const neighbor_center = center.add(Point.DIR_X.scale(cell_width));
         const line = new LinePrimitive(center, neighbor_center);
         lines.push(line);
       }

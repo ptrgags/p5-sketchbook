@@ -77,6 +77,9 @@ export function generate_maze(rows, cols) {
       const curr_cell = grid.get(curr_index);
 
       const dir = prev_index.direction_to(curr_index);
+      if (dir === undefined) {
+        throw new Error("non-adjacent neighbors!");
+      }
       MazeCell.connect_neighbors(prev_cell, curr_cell, dir);
     }
   });
