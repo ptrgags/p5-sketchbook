@@ -16,6 +16,23 @@ function make_simple_dfs(grid) {
   return dfs;
 }
 
+function make_up_right_dfs(grid) {
+  // Restrict the traversal to only use up and right. This will exercise
+  // the DFS forest code as each row will be visited on a separate
+  // tree traversal
+  class UpRightTraversal extends GridDFSTraversal {
+    get_neighbors(index) {
+      return [this.grid.right(index), index.up()].filter(
+        (x) => x !== undefined && this.grid.in_bounds(x)
+      );
+    }
+  }
+
+  const traversal = new UpRightTraversal(grid);
+  const dfs = new DFS(traversal);
+  return dfs;
+}
+
 describe("DFS", () => {
   it("path in callback include the current cell", () => {
     const grid = make_grid();
@@ -50,6 +67,25 @@ describe("DFS", () => {
       const path_hashes = path.map((index) => grid.hash(index));
 
       const expected = expected_hashes.slice(0, path.length);
+      expect(path_hashes).toEqual(expected);
+    });
+  });
+
+  it("with up and right traversal, paths are correct", () => {
+    const grid = make_grid();
+    const dfs = make_up_right_dfs(grid);
+    const expected_hashes_by_row = [
+      [0, 1, 2, 3],
+      [4, 5, 6, 7],
+      [8, 9, 10, 11],
+      [12, 13, 14, 15],
+    ];
+
+    dfs.dfs_forest((path) => {
+      const row = path[0].i;
+      const path_hashes = path.map((index) => grid.hash(index));
+
+      const expected = expected_hashes_by_row[row].slice(0, path.length);
       expect(path_hashes).toEqual(expected);
     });
   });
