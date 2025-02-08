@@ -1,7 +1,7 @@
 // Links for all of the sketches. Links are added to the page in this order
 export const LINKS = [
   {
-    title: "Maze",
+    title: "Maze Coral",
     year: "2025",
   },
   {
