@@ -10,6 +10,8 @@ import { draw_primitive } from "../sketchlib/draw_primitive.js";
 import { generate_maze } from "./RandomDFSMaze.js";
 import { CoralTile } from "../sketchlib/coral/CoralTile.js";
 import { Rect } from "../sketchlib/coral/Rect.js";
+import { render_tile_walls } from "../sketchlib/coral/rendering.js";
+import { find_splines } from "../sketchlib/coral/find_splines.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -83,6 +85,19 @@ const CORAL_TILES = GRID.map((index, cell) => {
   return new CoralTile(quad, cell.connection_flags);
 });
 
+const SPLINES = find_splines(CORAL_TILES);
+function draw_spline(p, spline) {
+  for (const [a, b, c, d] of spline.to_bezier_world()) {
+    p.bezier(a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y);
+  }
+}
+
+const WALL_STYLE = new Style().with_stroke(new Color(84, 50, 8)).with_width(4);
+const WALL_PRIMS = CORAL_TILES.map_array((_, tile) => {
+  return render_tile_walls(tile);
+}).flat();
+const WALLS = new GroupPrimitive(WALL_PRIMS, WALL_STYLE);
+
 export const sketch = (p) => {
   p.setup = () => {
     p.createCanvas(WIDTH, HEIGHT);
@@ -92,5 +107,13 @@ export const sketch = (p) => {
     p.background(0);
     draw_primitive(p, GRID_OUTLINE);
     draw_primitive(p, CONNECTIONS);
+    draw_primitive(p, WALLS);
+
+    p.stroke(37, 194, 39);
+    p.strokeWeight(4);
+    p.noFill();
+    for (const spline of SPLINES) {
+      draw_spline(p, spline);
+    }
   };
 };

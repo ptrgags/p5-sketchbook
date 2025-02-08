@@ -38,3 +38,26 @@ export function render_tile_connections(tile) {
 
   return primitives;
 }
+
+const WALLS = [
+  [Point.point(1, 0), Point.point(1, 1)],
+  [Point.point(1, 1), Point.point(0, 1)],
+  [Point.point(0, 1), Point.point(0, 0)],
+  [Point.point(0, 0), Point.point(1, 0)],
+];
+export function render_tile_walls(tile) {
+  const quad = tile.quad;
+  const flags = tile.connection_flags;
+  const primitives = [];
+  for (let i = 0; i < GridDirection.COUNT; i++) {
+    if (flags.has_flag(i)) {
+      continue;
+    }
+
+    const [start, end] = WALLS[i];
+    primitives.push(
+      new LinePrimitive(quad.uv_to_world(start), quad.uv_to_world(end))
+    );
+  }
+  return primitives;
+}
