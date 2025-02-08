@@ -243,6 +243,17 @@ describe("Grid", () => {
     }).toThrowError("index out of bounds");
   });
 
+  it("get with 2D index returns correct grid entry", () => {
+    const grid = new Grid(4, 4);
+    grid.fill((index) => {
+      return index;
+    });
+    const index = new Index2D(2, 1);
+
+    const result = grid.get(index);
+    expect(result).toEqual(index);
+  });
+
   it("hash with 2D index returns 1D array index", () => {
     const grid = new Grid(2, 3);
     const index = new Index2D(1, 1);
@@ -282,16 +293,6 @@ describe("Grid", () => {
     expect(result).toBeUndefined();
   });
 
-  it("get_neighbors with index out of bounds returns empty array", () => {
-    const grid = new Grid(4, 4);
-    const index = new Index2D(10, 5);
-
-    const result = grid.get_neighbors(index);
-
-    const expected = [];
-    expect(result).toEqual(expected);
-  });
-
   it("down with index in bounds returns downward neighbor", () => {
     const grid = new Grid(4, 4);
     const index = new Index2D(2, 0);
@@ -299,6 +300,16 @@ describe("Grid", () => {
     const result = grid.down(index);
 
     const expected = new Index2D(3, 0);
+    expect(result).toEqual(expected);
+  });
+
+  it("get_neighbors with index out of bounds returns empty array", () => {
+    const grid = new Grid(4, 4);
+    const index = new Index2D(10, 5);
+
+    const result = grid.get_neighbors(index);
+
+    const expected = [];
     expect(result).toEqual(expected);
   });
 
@@ -314,6 +325,26 @@ describe("Grid", () => {
       new Index2D(2, 0),
       new Index2D(3, 1),
     ];
+    expect(result).toEqual(expected);
+  });
+
+  it("get_neighbors with index on right edge returns 3 neighbors in CCW order", () => {
+    const grid = new Grid(4, 4);
+    const index = new Index2D(2, 3);
+
+    const result = grid.get_neighbors(index);
+
+    const expected = [new Index2D(1, 3), new Index2D(2, 2), new Index2D(3, 3)];
+    expect(result).toEqual(expected);
+  });
+
+  it("get_neighbors with index on bottom edge returns 3 neighbors in CCW order", () => {
+    const grid = new Grid(4, 4);
+    const index = new Index2D(3, 2);
+
+    const result = grid.get_neighbors(index);
+
+    const expected = [new Index2D(3, 3), new Index2D(2, 2), new Index2D(3, 1)];
     expect(result).toEqual(expected);
   });
 

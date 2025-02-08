@@ -100,11 +100,12 @@ export class DFS {
       const current_index = stack.pop();
 
       // We visited this node before we got back to the stack entry
-      if (visited.has(this.traversal.hash(current_index))) {
+      const hash = this.traversal.hash(current_index);
+      if (visited.has(hash)) {
         continue;
       }
 
-      visited.add(this.traversal.hash(current_index));
+      visited.add(hash);
 
       path.push(current_index);
       callback(path);

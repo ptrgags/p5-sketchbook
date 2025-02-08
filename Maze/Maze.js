@@ -60,6 +60,18 @@ function render_connections(grid) {
         lines.push(line);
       }
 
+      if (cell.is_connected(GridDirection.DOWN)) {
+        const neighbor_center = center.add(Point.DIR_Y.scale(cell_width));
+        const line = new LinePrimitive(center, neighbor_center);
+        lines.push(line);
+      }
+
+      if (cell.is_connected(GridDirection.RIGHT)) {
+        const neighbor_center = center.add(Point.DIR_X.scale(cell_width));
+        const line = new LinePrimitive(center, neighbor_center);
+        lines.push(line);
+      }
+
       return lines;
     })
     .flat();

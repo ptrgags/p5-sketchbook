@@ -5,8 +5,9 @@ import { FlagSet } from "../sketchlib/FlagSet.js";
 import { GridDirection } from "../sketchlib/GridDiection.js";
 import { GridDFSTraversal } from "../sketchlib/GridDFSTraversal.js";
 
-class MazeCell {
-  constructor() {
+export class MazeCell {
+  constructor(index) {
+    this.index = index;
     this.connection_flags = new FlagSet(0, GridDirection.COUNT);
   }
 
@@ -61,8 +62,8 @@ export class RandomDFSMazeTraversal {
 
 export function generate_maze(rows, cols) {
   const grid = new Grid(rows, cols);
-  grid.fill(() => {
-    return new MazeCell();
+  grid.fill((index) => {
+    return new MazeCell(index);
   });
 
   const traversal = new RandomDFSMazeTraversal(grid);
