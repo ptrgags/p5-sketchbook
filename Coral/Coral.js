@@ -128,12 +128,42 @@ const WALLS = new GroupPrimitive(WALL_PRIMS, WALL_STYLE);
 
 const STATIC_GEOMETRY = new GroupPrimitive([QUADS, CONNECTIONS, WALLS]);
 
+// serialize a 16-tile tileset of coral shapes from the tiles in the editor.
+function serialize_tileset(tiles) {
+  const result = new Array(16);
+  for (const tile of tiles) {
+    const index = tile.connection_flags.to_int();
+    result[index] = tile.to_json();
+  }
+  return {
+    coral_tiles: result,
+  };
+}
+
+// Based on https://stackoverflow.com/a/30800715
+function you_wouldnt_download_a_json(json, fname) {
+  // Format with 2 space tabs
+  const json_str = encodeURIComponent(JSON.stringify(json, undefined, 2));
+  const data_url = `data:text/json;charset=utf-8,${json_str}`;
+
+  const anchor = document.createElement("a");
+  anchor.setAttribute("href", data_url);
+  anchor.setAttribute("download", fname);
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+}
+
 export const sketch = (p) => {
   let canvas;
   let selected_object;
 
   p.setup = () => {
     canvas = p.createCanvas(500, 700).elt;
+    document.getElementById("export").addEventListener("click", (e) => {
+      const tileset = serialize_tileset(TILES);
+      you_wouldnt_download_a_json(tileset, "coral_tiles.json");
+    });
   };
 
   p.draw = () => {
