@@ -1,11 +1,7 @@
 import { fix_mouse_coords } from "../common/fix_mouse_coords.js";
 import { Rect } from "../sketchlib/coral/Rect.js";
 import { CoralTile } from "../sketchlib/coral/CoralTile.js";
-import {
-  SELECT_RADIUS,
-  InteractiveTangent,
-  InteractiveVertex,
-} from "./interactive.js";
+import { InteractiveTangent, InteractiveVertex } from "./interactive.js";
 import { find_splines } from "../sketchlib/coral/find_splines.js";
 import { FlagSet } from "../sketchlib/FlagSet.js";
 import { GridDirection } from "../sketchlib/GridDiection.js";
@@ -15,7 +11,12 @@ import {
   render_tile_connections,
   render_tile_walls,
 } from "../sketchlib/coral/rendering.js";
-import { GroupPrimitive } from "../sketchlib/primitives.js";
+import {
+  CirclePrimitive,
+  GroupPrimitive,
+  LinePrimitive,
+  PointPrimitive,
+} from "../sketchlib/primitives.js";
 import { draw_primitive } from "../sketchlib/draw_primitive.js";
 import {
   GRID_STYLE,
@@ -23,6 +24,7 @@ import {
   CONNECTION_STYLE,
   SPLINE_STYLE,
 } from "../sketchlib/coral/styles.js";
+import { Color } from "../sketchlib/Style.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -67,36 +69,44 @@ for (const tile of TILES) {
 
 // Order to check for mouse hits. Note that this doesn't scale well.
 const SELECTION_ORDER = [...TANGENTS, ...VERTICES];
-
-function draw_tile_tangents(p, tile) {
-  const quad = tile.quad;
-  for (const point of tile.control_points) {
-    const a = quad.uv_to_world(point.position);
-    const b = quad.uv_to_world(point.forward_point);
-    p.line(a.x, a.y, b.x, b.y);
-  }
-}
-
-function draw_tile_tangent_tips(p, tile) {
-  const quad = tile.quad;
-  for (const point of tile.control_points) {
-    const pos = quad.uv_to_world(point.forward_point);
-    p.point(pos.x, pos.y);
-  }
-}
-
-function draw_tile_vertices(p, tile) {
-  const quad = tile.quad;
-  for (const point of tile.control_points) {
-    const pos = quad.uv_to_world(point.position);
-    p.point(pos.x, pos.y);
-  }
-}
-
 const SPLINES = find_splines(TILES);
-function highlight_selction(p, selected_object) {
-  const position = selected_object.position_world;
-  p.circle(position.x, position.y, SELECT_RADIUS * 2);
+
+// These styles are only used in this sketch
+export const HIGHLIGHT_STYLE = new Style().with_fill(new Color(0, 0, 255));
+export const VERTEX_STYLE = new Style().with_fill(new Color(255, 255, 0));
+export const TANGENT_TIP_STYLE = new Style().with_fill(new Color(0, 255, 0));
+export const TANGENT_STYLE = new Style().with_stroke(new Color(0, 255, 0));
+
+function render_control_points(tiles) {
+  const tangent_lines = [];
+  const vertices = [];
+  const tangent_tips = [];
+
+  for (const tile of tiles) {
+    const quad = tile.quad;
+    for (const point of tile.control_points) {
+      const vertex = quad.uv_to_world(point.position);
+      const tangent_point = quad.uv_to_world(point.forward_point);
+      tangent_lines.push(new LinePrimitive(vertex, tangent_point));
+      vertices.push(new PointPrimitive(vertex));
+      tangent_tips.push(new PointPrimitive(tangent_point));
+    }
+  }
+
+  // It's important to draw the points over the line
+  const tangent_line_group = new GroupPrimitive(tangent_lines, TANGENT_STYLE);
+  const vertex_group = new GroupPrimitive(vertices, VERTEX_STYLE);
+  const tangent_group = new GroupPrimitive(tangent_tips, TANGENT_TIP_STYLE);
+  return new GroupPrimitive([tangent_line_group, vertex_group, tangent_group]);
+}
+
+const HIGHLIGHT_RADIUS = 8;
+function highlight_selection(selected_object) {
+  const circle = new CirclePrimitive(
+    selected_object.position_world,
+    HIGHLIGHT_RADIUS
+  );
+  return new GroupPrimitive([circle], HIGHLIGHT_STYLE);
 }
 
 const QUAD_PRIMS = SMALL_QUADS.map_array((_, quad) => {
@@ -149,7 +159,9 @@ function update_spline_primitives() {
 
 export const sketch = (p) => {
   let canvas;
+  let highlight;
   let selected_object;
+  let control_points;
   let splines;
 
   p.setup = () => {
@@ -160,6 +172,7 @@ export const sketch = (p) => {
     });
 
     splines = update_spline_primitives();
+    control_points = render_control_points(TILES);
   };
 
   p.draw = () => {
@@ -170,36 +183,11 @@ export const sketch = (p) => {
     // Draw the Bezier spline
     draw_primitive(p, splines);
 
-    // Draw tangents
-    p.stroke(0, 255, 0);
-    p.noFill();
-    p.strokeWeight(1);
-    for (const tile of TILES) {
-      draw_tile_tangents(p, tile);
+    if (highlight) {
+      draw_primitive(p, highlight);
     }
 
-    // Draw a circle at the tips of the tangents
-    p.stroke(0, 255, 0);
-    p.noFill();
-    p.strokeWeight(6);
-    for (const tile of TILES) {
-      draw_tile_tangent_tips(p, tile);
-    }
-
-    // Draw vertices
-    p.stroke(255, 255, 0);
-    p.strokeWeight(6);
-    p.noFill();
-    for (const tile of TILES) {
-      draw_tile_vertices(p, tile);
-    }
-
-    p.stroke(255);
-    p.noFill();
-    p.strokeWeight(1);
-    if (selected_object) {
-      highlight_selction(p, selected_object);
-    }
+    draw_primitive(p, control_points);
   };
 
   p.mousePressed = () => {
@@ -212,6 +200,7 @@ export const sketch = (p) => {
     for (const object of SELECTION_ORDER) {
       if (object.is_hovering(mouse)) {
         selected_object = object;
+        highlight = highlight_selection(object);
         break;
       }
     }
@@ -222,11 +211,14 @@ export const sketch = (p) => {
 
     if (selected_object) {
       selected_object.move(mouse);
+      highlight = highlight_selection(selected_object);
       splines = update_spline_primitives();
+      control_points = render_control_points(TILES);
     }
   };
 
   p.mouseReleased = () => {
     selected_object = undefined;
+    highlight = undefined;
   };
 };
