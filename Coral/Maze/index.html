@@ -44,7 +44,34 @@
         <span class="errors" id="errors"></span>
         <button id="regen">Regenerate Maze</button><br />
       </div>
-      <div class="description">Blah Blah Blah</div>
+      <div class="description">
+        <p>
+          This is the third iteration of my coral pattern exploration, described
+          on the <a href="../TileEditor/">Coral Tile Editor</a> page. Here I
+          simply generate a maze, and use the coral tiles to shape the curve
+          based on how a cell connects to its neighbors.
+        </p>
+        <p>
+          Notice how the coral curve fits between the walls of the maze (purple)
+          and the center of the hallways (navy blue)
+        </p>
+        <p>
+          For the maze generation, I'm using random Depth-First Search. This is
+          one of 12 maze generation algorithms described in
+          <cite
+            ><a href="https://pragprog.com/titles/jbmaze/mazes-for-programmers/"
+              >Mazes for Programmers</a
+            ></cite
+          >
+          by Jamis Buck.
+        </p>
+        <p>
+          The resulting shape is quite a bit different than the desired pattern.
+          The shape is still rather grid-like, and the passageways tend to be
+          very long. That said, I have some ideas for how to improve the shape
+          further. Stay tuned for more updates!
+        </p>
+      </div>
     </div>
   </body>
 </html>

@@ -20,8 +20,8 @@ import { Grid } from "../../sketchlib/Grid.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
-const GRID_ROWS = 14;
-const GRID_COLS = 10;
+const GRID_ROWS = 7;
+const GRID_COLS = 5;
 const CELL_WIDTH = WIDTH / GRID_COLS;
 const CELL_HEIGHT = HEIGHT / GRID_ROWS;
 
