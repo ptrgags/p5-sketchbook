@@ -3,6 +3,7 @@ import {
   RectPrimitive,
   PolygonPrimitive,
   GroupPrimitive,
+  BezierPrimitive,
 } from "./primitives.js";
 
 function draw_rect(p, rect) {
@@ -23,6 +24,11 @@ function draw_polygon(p, polygon) {
     p.vertex(vertex.x, vertex.y);
   }
   p.endShape(p.CLOSE);
+}
+
+function draw_bezier(p, bezier) {
+  const { a, b, c, d } = bezier;
+  p.bezier(a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y);
 }
 
 function apply_style(p, style) {
@@ -65,5 +71,7 @@ export function draw_primitive(p, primitive) {
     draw_line(p, primitive);
   } else if (primitive instanceof PolygonPrimitive) {
     draw_polygon(p, primitive);
+  } else if (primitive instanceof BezierPrimitive) {
+    draw_bezier(p, primitive);
   }
 }

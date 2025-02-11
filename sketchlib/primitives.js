@@ -12,6 +12,15 @@ export class LinePrimitive {
   }
 }
 
+export class BezierPrimitive {
+  constructor(a, b, c, d) {
+    this.a = a;
+    this.b = b;
+    this.c = c;
+    this.d = d;
+  }
+}
+
 export class PolygonPrimitive {
   constructor(vertices) {
     this.vertices = vertices;

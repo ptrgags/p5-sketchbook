@@ -1,3 +1,5 @@
+import { BezierPrimitive } from "../primitives.js";
+
 export class Spline {
   constructor(control_points) {
     this.control_points = control_points;
@@ -19,6 +21,11 @@ export class Spline {
     }
   }
 
+  /**
+   * Transform the control points to world coordinates and return them as
+   * Bezier primitives.
+   * @returns {BezierPrimitive[]} Array of bezier curve segments to render
+   */
   to_bezier_world() {
     // Map each control point and pair of tangent points to world coordinates
     const points_world = this.control_points.map(([quad, control_point]) => {
@@ -34,7 +41,7 @@ export class Spline {
     return points_world.map((x, i) => {
       const [start, start_forward] = x;
       const [end, , end_backward] = points_world[(i + 1) % points_world.length];
-      return [start, start_forward, end_backward, end];
+      return new BezierPrimitive(start, start_forward, end_backward, end);
     });
   }
 }

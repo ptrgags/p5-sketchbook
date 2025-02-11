@@ -86,11 +86,11 @@ const CORAL_TILES = GRID.map((index, cell) => {
 });
 
 const SPLINES = find_splines(CORAL_TILES);
-function draw_spline(p, spline) {
-  for (const [a, b, c, d] of spline.to_bezier_world()) {
-    p.bezier(a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y);
-  }
-}
+const SPLINE_STYLE = new Style()
+  .with_stroke(new Color(37, 194, 39))
+  .with_width(4);
+const SPLINE_PRIMS = SPLINES.flatMap((x) => x.to_bezier_world());
+const SPLINE_GROUP = new GroupPrimitive(SPLINE_PRIMS, SPLINE_STYLE);
 
 const WALL_STYLE = new Style().with_stroke(new Color(84, 50, 8)).with_width(4);
 const WALL_PRIMS = CORAL_TILES.map_array((_, tile) => {
@@ -108,12 +108,6 @@ export const sketch = (p) => {
     draw_primitive(p, GRID_OUTLINE);
     draw_primitive(p, CONNECTIONS);
     draw_primitive(p, WALLS);
-
-    p.stroke(37, 194, 39);
-    p.strokeWeight(4);
-    p.noFill();
-    for (const spline of SPLINES) {
-      draw_spline(p, spline);
-    }
+    draw_primitive(p, SPLINE_GROUP);
   };
 };

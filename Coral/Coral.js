@@ -89,11 +89,9 @@ function draw_tile_vertices(p, tile) {
 }
 
 const SPLINES = find_splines(TILES);
-function draw_spline(p, spline) {
-  for (const [a, b, c, d] of spline.to_bezier_world()) {
-    p.bezier(a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y);
-  }
-}
+const SPLINE_STYLE = new Style()
+  .with_stroke(new Color(131, 71, 181))
+  .with_width(4);
 
 function highlight_selction(p, selected_object) {
   const position = selected_object.position_world;
@@ -154,9 +152,15 @@ function you_wouldnt_download_a_json(json, fname) {
   anchor.remove();
 }
 
+function update_spline_primitives() {
+  const spline_prims = SPLINES.flatMap((x) => x.to_bezier_world());
+  return new GroupPrimitive(spline_prims, SPLINE_STYLE);
+}
+
 export const sketch = (p) => {
   let canvas;
   let selected_object;
+  let splines;
 
   p.setup = () => {
     canvas = p.createCanvas(500, 700).elt;
@@ -164,6 +168,8 @@ export const sketch = (p) => {
       const tileset = serialize_tileset(TILES);
       you_wouldnt_download_a_json(tileset, "coral_tiles.json");
     });
+
+    splines = update_spline_primitives();
   };
 
   p.draw = () => {
@@ -172,12 +178,7 @@ export const sketch = (p) => {
     draw_primitive(p, STATIC_GEOMETRY);
 
     // Draw the Bezier spline
-    p.stroke(131, 71, 181);
-    p.noFill();
-    p.strokeWeight(2);
-    for (const spline of SPLINES) {
-      draw_spline(p, spline);
-    }
+    draw_primitive(p, splines);
 
     // Draw tangents
     p.stroke(0, 255, 0);
@@ -231,6 +232,7 @@ export const sketch = (p) => {
 
     if (selected_object) {
       selected_object.move(mouse);
+      splines = update_spline_primitives();
     }
   };
 
