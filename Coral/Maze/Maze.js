@@ -16,6 +16,7 @@ import {
   CONNECTION_STYLE,
   SPLINE_STYLE,
 } from "../styles.js";
+import { Grid } from "../../sketchlib/Grid.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -24,10 +25,9 @@ const GRID_COLS = 10;
 const CELL_WIDTH = WIDTH / GRID_COLS;
 const CELL_HEIGHT = HEIGHT / GRID_ROWS;
 
-const GRID = generate_maze(GRID_ROWS, GRID_COLS);
-// Preallocate these quads since they are constant over the lifetime of the
-// sketch
-const QUADS = GRID.map((index) => {
+// The quads are constant even if the maze changes.
+const QUADS = new Grid(GRID_ROWS, GRID_COLS);
+QUADS.fill((index) => {
   const { i, j } = index;
   return new Rect(j * CELL_WIDTH, i * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT);
 });
@@ -37,14 +37,14 @@ const QUAD_PRIMS = QUADS.map_array((_, quad) => {
 }).flat();
 const QUAD_GROUP = new GroupPrimitive(QUAD_PRIMS, GRID_STYLE);
 
-function make_default_tiles() {
-  return GRID.map((index, cell) => {
+function make_default_tiles(grid) {
+  return grid.map((index, cell) => {
     return new CoralTile(QUADS.get(index), cell.connection_flags);
   });
 }
 
-function make_tiles_from_tileset(coral_tiles) {
-  return GRID.map((index, cell) => {
+function make_tiles_from_tileset(grid, coral_tiles) {
+  return grid.map((index, cell) => {
     const quad = QUADS.get(index);
     const tile_json = coral_tiles[cell.connection_flags.to_int()];
     return CoralTile.parse_json(tile_json, quad);
@@ -75,7 +75,7 @@ function render_walls(tile_grid) {
   return new GroupPrimitive(wall_prims, WALL_STYLE);
 }
 
-function update_geometry(tile_grid) {
+function render_geometry(tile_grid) {
   const connections = render_connections(tile_grid);
   const walls = render_walls(tile_grid);
   const splines = render_splines(tile_grid);
@@ -125,25 +125,43 @@ function show_error(message) {
 }
 
 export const sketch = (p) => {
+  let maze;
+  let tileset;
   let tiles;
   let dynamic_primitives;
+
+  function update_maze() {
+    maze = generate_maze(GRID_ROWS, GRID_COLS);
+    update_geometry();
+  }
+
+  function update_geometry() {
+    if (tileset) {
+      tiles = make_tiles_from_tileset(maze, tileset.coral_tiles);
+    } else {
+      tiles = make_default_tiles(maze);
+    }
+
+    dynamic_primitives = render_geometry(tiles);
+  }
+
   p.setup = () => {
     p.createCanvas(WIDTH, HEIGHT);
 
-    tiles = make_default_tiles();
-    dynamic_primitives = update_geometry(tiles);
+    update_maze();
 
     document.getElementById("import").addEventListener("input", async (e) => {
       clear_errors();
       try {
-        const tileset = await import_tileset(e.target.files);
-        tiles = make_tiles_from_tileset(tileset.coral_tiles);
-        dynamic_primitives = update_geometry(tiles);
+        tileset = await import_tileset(e.target.files);
+        update_geometry();
       } catch (err) {
         console.error(err);
         show_error(err);
       }
     });
+
+    document.getElementById("regen").addEventListener("click", update_maze);
   };
 
   p.draw = () => {
