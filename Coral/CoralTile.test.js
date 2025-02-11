@@ -1,10 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { Rect } from "./Rect";
 import { CoralTile } from "./CoralTile";
-import { GridDirection } from "../GridDiection";
-import { FlagSet } from "../FlagSet";
-import { ControlPoint } from "../../Coral/ControlPoint";
-import { Point } from "../../pga2d/objects";
+import { GridDirection } from "../sketchlib/GridDiection";
+import { FlagSet } from "../sketchlib/FlagSet";
+import { ControlPoint } from "./ControlPoint";
+import { Point } from "../pga2d/objects";
 
 describe("CoralTile", () => {
   const QUAD = new Rect(0, 0, 200, 200);

@@ -1,8 +1,8 @@
-import { ControlPoint } from "../../Coral/ControlPoint.js";
-import { Point } from "../../pga2d/objects.js";
+import { ControlPoint } from "./ControlPoint.js";
+import { Point } from "../pga2d/objects.js";
 import { Rect } from "./Rect.js";
-import { GridDirection } from "../GridDiection.js";
-import { FlagSet } from "../FlagSet.js";
+import { GridDirection } from "../sketchlib/GridDiection.js";
+import { FlagSet } from "../sketchlib/FlagSet.js";
 
 const DIR_LEFT = Point.DIR_X.neg();
 const DIR_RIGHT = Point.DIR_X;

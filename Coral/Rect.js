@@ -1,5 +1,5 @@
-import { Point } from "../../pga2d/objects.js";
-import { Grid } from "../Grid.js";
+import { Point } from "../pga2d/objects.js";
+import { Grid } from "../sketchlib/Grid.js";
 
 function clamp(x, min, max) {
   return Math.max(Math.min(x, max), min);

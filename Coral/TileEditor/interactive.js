@@ -1,4 +1,4 @@
-import { Flector } from "../pga2d/versors.js";
+import { Flector } from "../../pga2d/versors.js";
 
 export const SELECT_RADIUS = 16;
 const SELECT_RADIUS_SQR = SELECT_RADIUS * SELECT_RADIUS;

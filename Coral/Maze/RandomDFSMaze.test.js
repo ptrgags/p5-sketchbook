@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { generate_maze } from "./RandomDFSMaze";
-import { GridDirection } from "../sketchlib/GridDiection";
-import { griderator, Index2D } from "../sketchlib/Grid";
+import { GridDirection } from "../../sketchlib/GridDiection";
+import { griderator, Index2D } from "../../sketchlib/Grid";
 
 describe("generate_maze", () => {
   it("creates a grid of the given size", () => {

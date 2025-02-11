@@ -1,4 +1,4 @@
-import { Style, Color } from "../Style.js";
+import { Style, Color } from "../sketchlib/Style.js";
 const THICK = new Style().with_width(4);
 
 export const GRID_STYLE = new Style()

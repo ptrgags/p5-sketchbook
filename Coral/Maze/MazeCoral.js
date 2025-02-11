@@ -1,21 +1,21 @@
-import { GroupPrimitive } from "../sketchlib/primitives.js";
-import { Color, Style } from "../sketchlib/Style.js";
-import { draw_primitive } from "../sketchlib/draw_primitive.js";
+import { GroupPrimitive } from "../../sketchlib/primitives.js";
+import { Color, Style } from "../../sketchlib/Style.js";
+import { draw_primitive } from "../../sketchlib/draw_primitive.js";
 import { generate_maze } from "./RandomDFSMaze.js";
-import { CoralTile } from "../sketchlib/coral/CoralTile.js";
-import { Rect } from "../sketchlib/coral/Rect.js";
+import { CoralTile } from "../CoralTile.js";
+import { Rect } from "../Rect.js";
 import {
   render_quad,
   render_tile_walls,
   render_tile_connections,
-} from "../sketchlib/coral/rendering.js";
-import { find_splines } from "../sketchlib/coral/find_splines.js";
+} from "../rendering.js";
+import { find_splines } from "../find_splines.js";
 import {
   GRID_STYLE,
   WALL_STYLE,
   CONNECTION_STYLE,
   SPLINE_STYLE,
-} from "../sketchlib/coral/styles.js";
+} from "../styles.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;

@@ -1,7 +1,9 @@
 // Links for all of the sketches. Links are added to the page in this order
 export const LINKS = [
   {
-    title: "Maze Coral",
+    link: "./Coral/Maze",
+    title: "Coral Maze",
+    thumbnail: "thumbnails/coral-maze.png",
     year: "2025",
   },
   {
@@ -9,9 +11,9 @@ export const LINKS = [
     year: "2025",
   },
   {
-    link: "./Coral/",
-    title: "(WIP) Coral Editor",
-    thumbnail: "thumbnails/coral.png",
+    link: "./Coral/TileEditor",
+    title: "Coral Tile Editor",
+    thumbnail: "thumbnails/coral-tile-editor.png",
     year: "2025",
   },
   {

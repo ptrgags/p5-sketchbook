@@ -1,30 +1,30 @@
-import { fix_mouse_coords } from "../common/fix_mouse_coords.js";
-import { Rect } from "../sketchlib/coral/Rect.js";
-import { CoralTile } from "../sketchlib/coral/CoralTile.js";
+import { fix_mouse_coords } from "../../common/fix_mouse_coords.js";
+import { Rect } from "../Rect.js";
+import { CoralTile } from "../CoralTile.js";
 import { InteractiveTangent, InteractiveVertex } from "./interactive.js";
-import { find_splines } from "../sketchlib/coral/find_splines.js";
-import { FlagSet } from "../sketchlib/FlagSet.js";
-import { GridDirection } from "../sketchlib/GridDiection.js";
-import { Style } from "../sketchlib/Style.js";
+import { find_splines } from "../find_splines.js";
+import { FlagSet } from "../../sketchlib/FlagSet.js";
+import { GridDirection } from "../../sketchlib/GridDiection.js";
+import { Style } from "../../sketchlib/Style.js";
 import {
   render_quad,
   render_tile_connections,
   render_tile_walls,
-} from "../sketchlib/coral/rendering.js";
+} from "../rendering.js";
 import {
   CirclePrimitive,
   GroupPrimitive,
   LinePrimitive,
   PointPrimitive,
-} from "../sketchlib/primitives.js";
-import { draw_primitive } from "../sketchlib/draw_primitive.js";
+} from "../../sketchlib/primitives.js";
+import { draw_primitive } from "../../sketchlib/draw_primitive.js";
 import {
   GRID_STYLE,
   WALL_STYLE,
   CONNECTION_STYLE,
   SPLINE_STYLE,
-} from "../sketchlib/coral/styles.js";
-import { Color } from "../sketchlib/Style.js";
+} from "../styles.js";
+import { Color } from "../../sketchlib/Style.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;

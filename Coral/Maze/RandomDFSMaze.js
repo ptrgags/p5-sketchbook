@@ -1,9 +1,9 @@
-import { Grid, Index2D } from "../sketchlib/Grid.js";
-import { Random } from "../sketchlib/random.js";
-import { DFS } from "../sketchlib/DFS.js";
-import { FlagSet } from "../sketchlib/FlagSet.js";
-import { GridDirection } from "../sketchlib/GridDiection.js";
-import { GridDFSTraversal } from "../sketchlib/GridDFSTraversal.js";
+import { Grid, Index2D } from "../../sketchlib/Grid.js";
+import { Random } from "../../sketchlib/random.js";
+import { DFS } from "../../sketchlib/DFS.js";
+import { FlagSet } from "../../sketchlib/FlagSet.js";
+import { GridDirection } from "../../sketchlib/GridDiection.js";
+import { GridDFSTraversal } from "../../sketchlib/GridDFSTraversal.js";
 
 export class MazeCell {
   constructor(index) {

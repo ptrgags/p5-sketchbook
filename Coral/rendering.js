@@ -1,10 +1,6 @@
-import { Point } from "../../pga2d/objects.js";
-import {
-  BezierPrimitive,
-  LinePrimitive,
-  RectPrimitive,
-} from "../primitives.js";
-import { GridDirection } from "../GridDiection.js";
+import { Point } from "../pga2d/objects.js";
+import { LinePrimitive, RectPrimitive } from "../sketchlib/primitives.js";
+import { GridDirection } from "../sketchlib/GridDiection.js";
 import { Rect } from "./Rect.js";
 import { CoralTile } from "./CoralTile.js";
 
