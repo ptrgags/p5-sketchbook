@@ -54,13 +54,14 @@
         <p>
           This is the third iteration of my coral pattern exploration, described
           on the <a href="../TileEditor/">Coral Tile Editor</a> page. Here I
-          simply generate a maze, and use the coral tiles to shape the curve
-          based on how a cell connects to its neighbors.
+          generate a maze, and use the coral tiles to shape the curve. Each cell
+          can connect to up to 4 neighbors. The configuration of connections
+          determines which tile to use.
         </p>
         <p>
-          Notice how the coral curve fits between the walls of the maze (purple)
-          and the center of the hallways (navy blue). This was a key observation
-          that led me to try this tile-based approach.
+          Notice how the coral curve is sandwiched between the walls of the maze
+          (purple) and the center of the hallways (navy blue). This was a key
+          observation that led me to try this tile-based approach.
         </p>
         <p>
           For the maze generation, I'm using random Depth-First Search. This is
@@ -75,8 +76,8 @@
         <p>
           The resulting shape is quite a bit different than the desired pattern.
           The shape is still rather grid-like, and the passageways tend to be
-          very long. I have some rough ideas on how to improve these details.
-          Stay tuned for more updates!
+          very long. Future iterations of this sketch will explore how to
+          improve these details.
         </p>
       </div>
     </div>
