@@ -1,7 +1,6 @@
 import { fix_mouse_coords } from "../common/fix_mouse_coords.js";
 import { Rect } from "../sketchlib/coral/Rect.js";
 import { CoralTile } from "../sketchlib/coral/CoralTile.js";
-import { Color } from "../sketchlib/Style.js";
 import {
   SELECT_RADIUS,
   InteractiveTangent,
@@ -18,6 +17,12 @@ import {
 } from "../sketchlib/coral/rendering.js";
 import { GroupPrimitive } from "../sketchlib/primitives.js";
 import { draw_primitive } from "../sketchlib/draw_primitive.js";
+import {
+  GRID_STYLE,
+  WALL_STYLE,
+  CONNECTION_STYLE,
+  SPLINE_STYLE,
+} from "../sketchlib/coral/styles.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -89,32 +94,21 @@ function draw_tile_vertices(p, tile) {
 }
 
 const SPLINES = find_splines(TILES);
-const SPLINE_STYLE = new Style()
-  .with_stroke(new Color(131, 71, 181))
-  .with_width(4);
-
 function highlight_selction(p, selected_object) {
   const position = selected_object.position_world;
   p.circle(position.x, position.y, SELECT_RADIUS * 2);
 }
 
-const QUAD_STYLE = new Style()
-  .with_stroke(new Color(127, 127, 127))
-  .with_width(0.5);
 const QUAD_PRIMS = SMALL_QUADS.map_array((_, quad) => {
   return render_quad(quad);
 }).flat();
-const QUADS = new GroupPrimitive(QUAD_PRIMS, QUAD_STYLE);
+const QUADS = new GroupPrimitive(QUAD_PRIMS, GRID_STYLE);
 
-const CONNECTION_STYLE = new Style()
-  .with_stroke(new Color(255, 127, 0))
-  .with_width(4);
 const CONNECTION_PRIMS = TILES.map_array((_, tile) => {
   return render_tile_connections(tile);
 }).flat();
 const CONNECTIONS = new GroupPrimitive(CONNECTION_PRIMS, CONNECTION_STYLE);
 
-const WALL_STYLE = new Style().with_stroke(new Color(84, 50, 8)).with_width(4);
 const WALL_PRIMS = TILES.map_array((_, tile) => {
   return render_tile_walls(tile);
 }).flat();

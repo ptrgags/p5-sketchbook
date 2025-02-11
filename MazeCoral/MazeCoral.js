@@ -10,6 +10,12 @@ import {
   render_tile_connections,
 } from "../sketchlib/coral/rendering.js";
 import { find_splines } from "../sketchlib/coral/find_splines.js";
+import {
+  GRID_STYLE,
+  WALL_STYLE,
+  CONNECTION_STYLE,
+  SPLINE_STYLE,
+} from "../sketchlib/coral/styles.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -26,13 +32,10 @@ const QUADS = GRID.map((index) => {
   return new Rect(j * CELL_WIDTH, i * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT);
 });
 
-const QUAD_STYLE = new Style()
-  .with_stroke(new Color(127, 127, 127))
-  .with_width(0.5);
 const QUAD_PRIMS = QUADS.map_array((_, quad) => {
   return render_quad(quad);
 }).flat();
-const QUAD_GROUP = new GroupPrimitive(QUAD_PRIMS, QUAD_STYLE);
+const QUAD_GROUP = new GroupPrimitive(QUAD_PRIMS, GRID_STYLE);
 
 function make_default_tiles() {
   return GRID.map((index, cell) => {
@@ -48,18 +51,11 @@ function make_tiles_from_tileset(coral_tiles) {
   });
 }
 
-const SPLINE_STYLE = new Style()
-  .with_stroke(new Color(37, 194, 39))
-  .with_width(4);
 function render_splines(tile_grid) {
   const splines = find_splines(tile_grid);
   const spline_prims = splines.flatMap((x) => x.to_bezier_world());
   return new GroupPrimitive(spline_prims, SPLINE_STYLE);
 }
-
-const CONNECTION_STYLE = new Style()
-  .with_stroke(new Color(255, 127, 0))
-  .with_width(4);
 
 function render_connections(tile_grid) {
   const connection_prims = tile_grid
@@ -70,7 +66,6 @@ function render_connections(tile_grid) {
   return new GroupPrimitive(connection_prims, CONNECTION_STYLE);
 }
 
-const WALL_STYLE = new Style().with_stroke(new Color(84, 50, 8)).with_width(4);
 function render_walls(tile_grid) {
   const wall_prims = tile_grid
     .map_array((_, tile) => {
