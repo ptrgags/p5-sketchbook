@@ -1,10 +1,4 @@
-import { GridDirection } from "../sketchlib/GridDiection.js";
-import {
-  RectPrimitive,
-  GroupPrimitive,
-  LinePrimitive,
-} from "../sketchlib/primitives.js";
-import { Point } from "../pga2d/objects.js";
+import { GroupPrimitive } from "../sketchlib/primitives.js";
 import { Color, Style } from "../sketchlib/Style.js";
 import { draw_primitive } from "../sketchlib/draw_primitive.js";
 import { generate_maze } from "./RandomDFSMaze.js";
@@ -87,9 +81,10 @@ function render_walls(tile_grid) {
 }
 
 function update_geometry(tile_grid) {
-  const splines = render_splines(tile_grid);
+  const connections = render_connections(tile_grid);
   const walls = render_walls(tile_grid);
-  return new GroupPrimitive([splines, walls]);
+  const splines = render_splines(tile_grid);
+  return new GroupPrimitive([connections, walls, splines]);
 }
 
 function slurp_json(file) {
