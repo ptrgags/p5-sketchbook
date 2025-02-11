@@ -98,8 +98,6 @@ function highlight_selction(p, selected_object) {
   p.circle(position.x, position.y, SELECT_RADIUS * 2);
 }
 
-const DEFAULT_STYLE = new Style();
-
 const QUAD_STYLE = new Style()
   .with_stroke(new Color(127, 127, 127))
   .with_width(0.5);
@@ -108,17 +106,15 @@ const QUAD_PRIMS = SMALL_QUADS.map_array((_, quad) => {
 }).flat();
 const QUADS = new GroupPrimitive(QUAD_PRIMS, QUAD_STYLE);
 
-const CONNECTION_STYLE = DEFAULT_STYLE.with_stroke(
-  new Color(255, 127, 0)
-).with_width(4);
+const CONNECTION_STYLE = new Style()
+  .with_stroke(new Color(255, 127, 0))
+  .with_width(4);
 const CONNECTION_PRIMS = TILES.map_array((_, tile) => {
   return render_tile_connections(tile);
 }).flat();
 const CONNECTIONS = new GroupPrimitive(CONNECTION_PRIMS, CONNECTION_STYLE);
 
-const WALL_STYLE = DEFAULT_STYLE.with_stroke(new Color(84, 50, 8)).with_width(
-  4
-);
+const WALL_STYLE = new Style().with_stroke(new Color(84, 50, 8)).with_width(4);
 const WALL_PRIMS = TILES.map_array((_, tile) => {
   return render_tile_walls(tile);
 }).flat();

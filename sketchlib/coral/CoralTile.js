@@ -108,11 +108,7 @@ export class CoralTile {
 
     const connection_flags = new FlagSet(connections, GridDirection.COUNT);
 
-    if (
-      control_points === undefined ||
-      !Array.isArray(control_points) ||
-      control_points.length !== 4
-    ) {
+    if (!Array.isArray(control_points) || control_points.length !== 4) {
       throw new Error("control_points must be an array of length 4");
     }
 

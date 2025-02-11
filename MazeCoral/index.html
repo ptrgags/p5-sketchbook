@@ -19,6 +19,10 @@
         display: block;
         margin: 0 auto;
       }
+
+      .errors {
+        color: #6e0730;
+      }
     </style>
   </head>
   <body>
@@ -26,6 +30,19 @@
     <div class="container">
       <h1>Maze Coral (2025)</h1>
       <div id="sketch"></div>
+      <div class="controls">
+        <label for="import"
+          >Import coral tileset from
+          <a href="../Coral/">Coral Tile Editor</a></label
+        ><br />
+        <input
+          type="file"
+          name="import"
+          id="import"
+          accept="application/json"
+        /><br />
+        <span class="errors" id="errors"></span>
+      </div>
       <div class="description">Blah Blah Blah</div>
     </div>
   </body>

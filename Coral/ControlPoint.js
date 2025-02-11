@@ -24,19 +24,11 @@ export class ControlPoint {
   static parse_json(json) {
     const { position, tangent } = json;
 
-    if (
-      position === undefined ||
-      !Array.isArray(position) ||
-      position.length !== 2
-    ) {
+    if (!Array.isArray(position) || position.length !== 2) {
       throw new Error("position must be an array of two numbers");
     }
 
-    if (
-      tangent === undefined ||
-      !Array.isArray(tangent) ||
-      tangent.length !== 2
-    ) {
+    if (!Array.isArray(tangent) || tangent.length !== 2) {
       throw new Error("tangent must be an array of two numbers");
     }
 
