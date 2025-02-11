@@ -1,5 +1,6 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, test } from "vitest";
 import { Grid, griderator, Index2D } from "./Grid";
+import { GridDirection } from "./GridDiection";
 
 describe("Index2D", () => {
   it("throws for negative row", () => {
@@ -65,6 +66,42 @@ describe("Index2D", () => {
     const expected = new Index2D(2, 5);
     expect(result).toEqual(expected);
   });
+
+  describe("direction_to", () => {
+    it("with same index returns undefined", () => {
+      const index = new Index2D(1, 5);
+
+      const result = index.direction_to(index);
+
+      expect(result).toBeUndefined();
+    });
+
+    it("with non-adjacent index returns undefined", () => {
+      const a = new Index2D(1, 5);
+      const b = new Index2D(3, 5);
+
+      const result = a.direction_to(b);
+
+      expect(result).toBeUndefined();
+    });
+
+    test.each([
+      ["right", 1, 6, GridDirection.RIGHT],
+      ["up", 0, 5, GridDirection.UP],
+      ["left", 1, 4, GridDirection.LEFT],
+      ["down", 2, 5, GridDirection.DOWN],
+    ])(
+      "with adjacent cell returns the correct direction: %s",
+      (label, i, j, expected) => {
+        const a = new Index2D(1, 5);
+        const neighbor = new Index2D(i, j);
+
+        const result = a.direction_to(neighbor);
+
+        expect(result).toBe(expected);
+      }
+    );
+  });
 });
 
 describe("griderator", () => {
@@ -129,7 +166,7 @@ describe("Grid", () => {
     expect(result).toEqual(expected);
   });
 
-  it("fill computes a new grid of the same size", () => {
+  it("map computes a new grid of the same size", () => {
     const grid = new Grid(2, 2);
     grid.fill((index) => {
       const { i, j } = index;
@@ -145,6 +182,23 @@ describe("Grid", () => {
 
     const expected = ["(0, 0): 0", "(0, 1): 1", "(1, 0): 1", "(1, 1): 2"];
     expect(result_values).toEqual(expected);
+  });
+
+  it("map array returns results in an array instead of a Grid", () => {
+    const grid = new Grid(2, 2);
+    grid.fill((index) => {
+      const { i, j } = index;
+
+      return i + j;
+    });
+
+    const result = grid.map_array((index, x) => {
+      const { i, j } = index;
+      return `(${i}, ${j}): ${x}`;
+    });
+
+    const expected = ["(0, 0): 0", "(0, 1): 1", "(1, 0): 1", "(1, 1): 2"];
+    expect(result).toEqual(expected);
   });
 
   it("set_2d with 1D index throws", () => {
@@ -189,6 +243,28 @@ describe("Grid", () => {
     }).toThrowError("index out of bounds");
   });
 
+  it("get with 2D index returns correct grid entry", () => {
+    const grid = new Grid(4, 4);
+    grid.fill((index) => {
+      return index;
+    });
+    const index = new Index2D(2, 1);
+
+    const result = grid.get(index);
+    expect(result).toEqual(index);
+  });
+
+  it("hash with 2D index returns 1D array index", () => {
+    const grid = new Grid(2, 3);
+    const index = new Index2D(1, 1);
+
+    const result = grid.hash(index);
+
+    // 1 * 3 + 1 = 4
+    const expected = 4;
+    expect(result).toBe(expected);
+  });
+
   it("right with index at right edge returns undefined", () => {
     const grid = new Grid(4, 4);
     const on_edge = new Index2D(0, 3);
@@ -205,7 +281,7 @@ describe("Grid", () => {
     const result = grid.right(index);
 
     const expected = new Index2D(0, 3);
-    expect(result).toEqual(result);
+    expect(result).toEqual(expected);
   });
 
   it("down with index at bottom edge returns undefined", () => {
@@ -221,9 +297,69 @@ describe("Grid", () => {
     const grid = new Grid(4, 4);
     const index = new Index2D(2, 0);
 
-    const result = grid.right(index);
+    const result = grid.down(index);
 
     const expected = new Index2D(3, 0);
-    expect(result).toEqual(result);
+    expect(result).toEqual(expected);
+  });
+
+  it("get_neighbors with index out of bounds returns empty array", () => {
+    const grid = new Grid(4, 4);
+    const index = new Index2D(10, 5);
+
+    const result = grid.get_neighbors(index);
+
+    const expected = [];
+    expect(result).toEqual(expected);
+  });
+
+  it("get_neighbors with index in the middle of the grid returns 4 neighbors in CCW order", () => {
+    const grid = new Grid(4, 4);
+    const index = new Index2D(2, 1);
+
+    const result = grid.get_neighbors(index);
+
+    const expected = [
+      new Index2D(2, 2),
+      new Index2D(1, 1),
+      new Index2D(2, 0),
+      new Index2D(3, 1),
+    ];
+    expect(result).toEqual(expected);
+  });
+
+  it("get_neighbors with index on right edge returns 3 neighbors in CCW order", () => {
+    const grid = new Grid(4, 4);
+    const index = new Index2D(2, 3);
+
+    const result = grid.get_neighbors(index);
+
+    const expected = [new Index2D(1, 3), new Index2D(2, 2), new Index2D(3, 3)];
+    expect(result).toEqual(expected);
+  });
+
+  it("get_neighbors with index on bottom edge returns 3 neighbors in CCW order", () => {
+    const grid = new Grid(4, 4);
+    const index = new Index2D(3, 2);
+
+    const result = grid.get_neighbors(index);
+
+    const expected = [new Index2D(3, 3), new Index2D(2, 2), new Index2D(3, 1)];
+    expect(result).toEqual(expected);
+  });
+
+  it("get_neighbors with index in corner returns 2 neighbors in CCW order", () => {
+    const grid = new Grid(4, 4);
+    const index = new Index2D(3, 0);
+
+    const result = grid.get_neighbors(index);
+
+    const expected = [
+      // right
+      new Index2D(3, 1),
+      // up
+      new Index2D(2, 0),
+    ];
+    expect(result).toEqual(expected);
   });
 });

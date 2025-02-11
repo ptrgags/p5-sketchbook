@@ -3,12 +3,26 @@ import {
   RectPrimitive,
   PolygonPrimitive,
   GroupPrimitive,
+  BezierPrimitive,
+  PointPrimitive,
+  CirclePrimitive,
 } from "./primitives.js";
 
 function draw_rect(p, rect) {
   const { x, y } = rect.position;
   const { x: w, y: h } = rect.dimensions;
   p.rect(x, y, w, h);
+}
+
+const POINT_RADIUS = 4;
+function draw_point(p, point) {
+  const { x, y } = point.position;
+  p.circle(x, y, 2 * POINT_RADIUS);
+}
+
+function draw_circle(p, circle) {
+  const { x, y } = circle.position;
+  p.circle(x, y, 2 * circle.radius);
 }
 
 function draw_line(p, line) {
@@ -23,6 +37,11 @@ function draw_polygon(p, polygon) {
     p.vertex(vertex.x, vertex.y);
   }
   p.endShape(p.CLOSE);
+}
+
+function draw_bezier(p, bezier) {
+  const { a, b, c, d } = bezier;
+  p.bezier(a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y);
 }
 
 function apply_style(p, style) {
@@ -65,5 +84,13 @@ export function draw_primitive(p, primitive) {
     draw_line(p, primitive);
   } else if (primitive instanceof PolygonPrimitive) {
     draw_polygon(p, primitive);
+  } else if (primitive instanceof BezierPrimitive) {
+    draw_bezier(p, primitive);
+  } else if (primitive instanceof PointPrimitive) {
+    draw_point(p, primitive);
+  } else if (primitive instanceof CirclePrimitive) {
+    draw_circle(p, primitive);
+  } else {
+    throw new Error(`unknown primitive ${primitive}`);
   }
 }

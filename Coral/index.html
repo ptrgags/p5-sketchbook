@@ -3,54 +3,21 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script
-      language="javascript"
-      type="text/javascript"
-      src="../libraries/p5.min.js"
-    ></script>
     <script type="module">
-      import { sketch } from "./Coral.js";
       import "../common/sketchbook-navbar.js";
-      const p5_sketch = new p5(sketch, "sketch");
     </script>
     <link rel="stylesheet" href="../styles/layout.css" />
-    <style>
-      img {
-        display: block;
-        margin: 0 auto;
-      }
-    </style>
   </head>
   <body>
     <sketchbook-navbar></sketchbook-navbar>
     <div class="container">
-      <h1>WIP Coral Tile Editor (2025)</h1>
-      <div id="sketch"></div>
-      <div class="description">
-        <p>
-          Click and drag the vertices (yellow) and tips of the tangents (green)
-          to adjust the shape of the curve!
-        </p>
-        <p>
-          Lately I've been studying a coral-shaped motif that appears often in
-          my art. Here's an example:
-        </p>
-        <img src="coral-example.png" alt="example of coral motif" />
-        <p>
-          I'm working towards modeling this shape with bezier curves in
-          quad-shaped tiles. This is the second iteration of the sketch. Here
-          I'm exploring a set of 16 tiles representing all the ways quads can
-          connect to each other. I traverse the grid in the direction that puts
-          the orange lines (indicating where the tiles are connected) to the
-          left.
-        </p>
-        <p>
-          To view all 16 possible tiles, I connected them into 4 islands as
-          symmetrically as possible. This explains the 4 counter-clockwise
-          loops. There are also 4 small clockwise loops due to cycles in the
-          connection graph.
-        </p>
-      </div>
+      <h1>Coral Sketches</h1>
+      <p>
+        The sketch that used to be here was split into multiple sketches. You
+        can find them with the links below:
+      </p>
+      <p><a href="./TileEditor">Coral Tile Editor</a></p>
+      <p><a href="./Maze/">Coral Maze</a></p>
     </div>
   </body>
 </html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../../libraries/p5.min.js"
+    ></script>
+    <script type="module">
+      import { sketch } from "./Maze.js";
+      import "../../common/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../../styles/layout.css" />
+    <style>
+      img {
+        display: block;
+        margin: 0 auto;
+      }
+
+      .errors {
+        color: #df1365;
+      }
+    </style>
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>Maze Coral (2025)</h1>
+      <div id="sketch"></div>
+      <div class="controls">
+        <label for="import"
+          >Import coral tileset from
+          <a href="../TileEditor/">Coral Tile Editor</a></label
+        ><br />
+        <input
+          type="file"
+          name="import"
+          id="import"
+          accept="application/json"
+        /><br />
+
+        <button id="regen">Regenerate Maze</button><br />
+        <p class="errors" id="errors"></p>
+      </div>
+      <div class="description">
+        <p>
+          To get started, here's an
+          <a href="./example_coral.json" download>example coral tileset</a> you
+          can download.
+        </p>
+        <p>
+          This is the third iteration of my coral pattern exploration, described
+          on the <a href="../TileEditor/">Coral Tile Editor</a> page. Here I
+          generate a maze, and use the coral tiles to shape the curve. Each cell
+          can connect to up to 4 neighbors. The configuration of connections
+          determines which tile to use.
+        </p>
+        <p>
+          Notice how the coral curve is sandwiched between the walls of the maze
+          (purple) and the center of the hallways (navy blue). This was a key
+          observation that led me to try this tile-based approach.
+        </p>
+        <p>
+          For the maze generation, I'm using random Depth-First Search. This is
+          one of 12 maze generation algorithms described in
+          <cite
+            ><a href="https://pragprog.com/titles/jbmaze/mazes-for-programmers/"
+              >Mazes for Programmers</a
+            ></cite
+          >
+          by Jamis Buck.
+        </p>
+        <p>
+          The resulting shape is quite a bit different than the desired pattern.
+          The shape is still rather grid-like, and the passageways tend to be
+          very long. Future iterations of this sketch will explore how to
+          improve these details.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

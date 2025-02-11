@@ -1,5 +1,6 @@
 import { Grid, griderator, Index2D } from "../sketchlib/Grid.js";
-import { ConnectionDirection, Quadrant } from "./CoralTile.js";
+import { GridDirection } from "../sketchlib/GridDiection.js";
+import { Quadrant } from "./CoralTile.js";
 import { Spline } from "./Spline.js";
 
 /**
@@ -37,10 +38,10 @@ function get_tile_index(quadrant_index) {
 //      name of direction func to call if disconnected
 // ]
 const NEXT_INDEX_LUT = {
-  [Quadrant.SOUTHEAST]: [ConnectionDirection.RIGHT, "right", "up"],
-  [Quadrant.NORTHEAST]: [ConnectionDirection.UP, "up", "left"],
-  [Quadrant.NORTHWEST]: [ConnectionDirection.LEFT, "left", "down"],
-  [Quadrant.SOUTHWEST]: [ConnectionDirection.DOWN, "down", "right"],
+  [Quadrant.SOUTHEAST]: [GridDirection.RIGHT, "right", "up"],
+  [Quadrant.NORTHEAST]: [GridDirection.UP, "up", "left"],
+  [Quadrant.NORTHWEST]: [GridDirection.LEFT, "left", "down"],
+  [Quadrant.SOUTHWEST]: [GridDirection.DOWN, "down", "right"],
 };
 
 function get_next_index(tile, quadrant_index, quadrant) {

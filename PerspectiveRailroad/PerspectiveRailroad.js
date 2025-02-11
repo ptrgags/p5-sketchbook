@@ -3,9 +3,9 @@ import {
   PolygonPrimitive,
   RectPrimitive,
   GroupPrimitive,
-} from "./primitives.js";
-import { Color, Style } from "./Style.js";
-import { draw_primitive } from "./rendering.js";
+} from "../sketchlib/primitives.js";
+import { Color, Style } from "../sketchlib/Style.js";
+import { draw_primitive } from "../sketchlib/draw_primitive.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;

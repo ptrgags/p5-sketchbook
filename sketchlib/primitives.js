@@ -1,3 +1,16 @@
+export class PointPrimitive {
+  constructor(position) {
+    this.position = position;
+  }
+}
+
+export class CirclePrimitive {
+  constructor(position, radius) {
+    this.position = position;
+    this.radius = radius;
+  }
+}
+
 export class RectPrimitive {
   constructor(position, dimensions) {
     this.position = position;
@@ -9,6 +22,15 @@ export class LinePrimitive {
   constructor(a, b) {
     this.a = a;
     this.b = b;
+  }
+}
+
+export class BezierPrimitive {
+  constructor(a, b, c, d) {
+    this.a = a;
+    this.b = b;
+    this.c = c;
+    this.d = d;
   }
 }
 
@@ -24,6 +46,9 @@ export class PolygonPrimitive {
 
 export class GroupPrimitive {
   constructor(primitives, style) {
+    if (!Array.isArray(primitives)) {
+      throw new Error("primitives must be an array of Primitive");
+    }
     this.primitives = primitives;
     this.style = style;
   }
