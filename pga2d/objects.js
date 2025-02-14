@@ -89,6 +89,10 @@ export class Point {
 
   limit_length(max_length) {
     const curr_length = this.ideal_norm();
+    if (curr_length === 0) {
+      return this;
+    }
+
     const next_length = Math.min(curr_length, max_length);
     const scale_factor = next_length / curr_length;
     return this.scale(scale_factor);

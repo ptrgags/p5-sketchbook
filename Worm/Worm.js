@@ -31,10 +31,10 @@ const COLOR_SPINE = new Color(255, 255, 255);
 const SPINE_STYLE = new Style().with_stroke(COLOR_SPINE);
 const CENTER_STYLE = new Style().with_fill(COLOR_SPINE);
 
-const WORM_SEGMENTS = 10;
-const WORM_SEGMENT_SEPARATION = 25;
+const WORM_SEGMENTS = 100;
+const WORM_SEGMENT_SEPARATION = 20;
 // speed in pixels per frame
-const WORM_MAX_SPEED = 2;
+const WORM_MAX_SPEED = 20;
 class Worm {
   constructor() {
     const first_point = Point.point(WIDTH / 2, HEIGHT / 2);
