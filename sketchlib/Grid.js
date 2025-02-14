@@ -20,7 +20,7 @@ export function griderator(rows, cols, callback) {
 
 /**
  * 2D index (i, j) into a Grid. The indices must be non-negative.
- * The naming convention assumes row-major order as this is common for 2D
+ * The naming convention assumes row-major order as this is sketchlib for 2D
  * arrays.
  */
 export class Index2D {

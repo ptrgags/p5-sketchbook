@@ -1,4 +1,4 @@
-import { fix_mouse_coords } from "../common/fix_mouse_coords.js";
+import { fix_mouse_coords } from "../sketchlib/fix_mouse_coords.js";
 import { Point } from "../pga2d/objects.js";
 
 let cp1 = Point.point(100, 240);

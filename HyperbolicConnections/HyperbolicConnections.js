@@ -1,4 +1,4 @@
-import { fix_mouse_coords } from "../common/fix_mouse_coords.js";
+import { fix_mouse_coords } from "../sketchlib/fix_mouse_coords.js";
 import { Palette } from "./palette.js";
 import { Boundary, PAIR_COUNT } from "./boundaries.js";
 import { VERTEX_SHADER, FRAGMENT_SHADER } from "./shaders.js";
