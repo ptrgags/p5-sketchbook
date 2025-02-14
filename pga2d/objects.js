@@ -47,25 +47,25 @@ export class Point {
     }
   }
 
-  euclidean_norm() {
+  euclidean_norm_sqr() {
     // the xo and yo parts square to 0, so we only have xy * yx
     const { xy } = this.bivec;
     return xy * xy;
   }
 
-  euclidean_mag() {
-    return Math.sqrt(this.euclidean_norm());
+  euclidean_norm() {
+    return Math.sqrt(this.euclidean_norm_sqr());
   }
 
-  ideal_norm() {
+  ideal_norm_sqr() {
     // this is the euclidean norm of the dual, but computed without allocating
     // the dual line
     const { yo: x, xo: y } = this.bivec;
     return x * x + y * y;
   }
 
-  ideal_mag() {
-    return Math.sqrt(this.ideal_norm());
+  ideal_norm() {
+    return Math.sqrt(this.ideal_norm_sqr());
   }
 
   add(other) {
@@ -85,6 +85,13 @@ export class Point {
 
   dist_sqr(point) {
     return this.sub(point).ideal_norm();
+  }
+
+  limit_length(max_length) {
+    const curr_length = this.ideal_norm();
+    const next_length = Math.min(curr_length, max_length);
+    const scale_factor = next_length / curr_length;
+    return this.scale(scale_factor);
   }
 
   scale(scalar) {

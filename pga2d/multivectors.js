@@ -82,7 +82,7 @@ export class Odd {
     this.xyo = xyo;
   }
 
-  norm() {
+  norm_sqr() {
     return this.x * this.x + this.y * this.y;
   }
 

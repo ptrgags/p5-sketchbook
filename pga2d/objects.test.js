@@ -117,7 +117,7 @@ describe("Point", () => {
     it("ideal norm returns the magnitude of x and y components", () => {
       const a = Point.direction(3, 4);
 
-      const result = a.ideal_norm();
+      const result = a.ideal_norm_sqr();
 
       // 3^2 + 4^2
       expect(result).toBe(25);
@@ -126,10 +126,33 @@ describe("Point", () => {
     it("ideal magnitude returns the magnitude of x and y components", () => {
       const a = Point.direction(3, 4);
 
-      const result = a.ideal_mag();
+      const result = a.ideal_norm();
 
       // sqrt(3^2 + 4^2) = sqrt(25) = 5
       expect(result).toBeCloseTo(5);
+    });
+
+    it("limit_length with short vector does not change vector", () => {
+      const a = Point.direction(1, 2);
+      const max_length = 100;
+
+      const result = a.limit_length(max_length);
+
+      expect(result).toEqual(a);
+    });
+
+    it("limit_length with long vector snaps to max length", () => {
+      const a = Point.direction(300, 400);
+      const max_length = 100;
+
+      const result = a.limit_length(max_length);
+
+      // original vector has magnitude 500 (3-4-5 triangle scaled by 100)
+      // the new magnitude is 100, which is 1/5 exactly.
+      // 300 / 5  = 60
+      // 400 / 5  = 80
+      const expected = Point.direction(60, 80);
+      expect(result).toEqual(expected);
     });
 
     it("scale performs scalar multiplication", () => {
