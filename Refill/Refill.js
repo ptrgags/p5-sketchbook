@@ -1,5 +1,5 @@
-import { fix_mouse_coords } from "../common/fix_mouse_coords.js";
-import { in_bounds } from "../common/in_bounds.js";
+import { fix_mouse_coords } from "../sketchlib/fix_mouse_coords.js";
+import { in_bounds } from "../sketchlib/in_bounds.js";
 import { Index2D, Grid } from "../sketchlib/Grid.js";
 import { METER_WIDTH, METER_HEIGHT, Meter } from "./Meter.js";
 

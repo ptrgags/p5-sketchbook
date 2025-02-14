@@ -1,5 +1,5 @@
-import { fix_mouse_coords } from "../common/fix_mouse_coords.js";
-import { in_bounds } from "../common/in_bounds.js";
+import { fix_mouse_coords } from "../sketchlib/fix_mouse_coords.js";
+import { in_bounds } from "../sketchlib/in_bounds.js";
 import { PentagGrid } from "./PentagGrid.js";
 import { PentagArcType } from "./PentagCell.js";
 import { PentagIndex } from "./PentagIndex.js";

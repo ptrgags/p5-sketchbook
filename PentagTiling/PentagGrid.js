@@ -1,6 +1,6 @@
 import { PentagCell } from "./PentagCell.js";
 import { Grid } from "../sketchlib/Grid.js";
-import { in_bounds } from "../common/in_bounds.js";
+import { in_bounds } from "../sketchlib/in_bounds.js";
 import { opposite_side, PentagIndex } from "./PentagIndex.js";
 
 export class PentagGrid {

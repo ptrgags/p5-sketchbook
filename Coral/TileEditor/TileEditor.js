@@ -1,4 +1,4 @@
-import { fix_mouse_coords } from "../../common/fix_mouse_coords.js";
+import { fix_mouse_coords } from "../../sketchlib/fix_mouse_coords.js";
 import { Rect } from "../Rect.js";
 import { CoralTile } from "../CoralTile.js";
 import { InteractiveTangent, InteractiveVertex } from "./interactive.js";
