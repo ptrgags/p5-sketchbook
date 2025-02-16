@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../libraries/p5.min.js"
+    ></script>
+    <script type="module">
+      import { sketch } from "./PhyllotaxisPalette.js";
+      import "../sketchlib/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../styles/layout.css" />
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>Phyllotaxis Palette (2024)</h1>
+      <div id="sketch"></div>
+      <div class="description">
+        <p>
+          While thinking about the math of sunflower spirals (see the
+          <a href="../InfiniteSunflower/">Infinite Sunflower sketch</a>), I
+          realized a possible use for this pattern. If the spiral is
+          superimposed on the HSV color wheel (with value = 1), then every point
+          corresponds to a unique color! And each successive color will be a
+          different hue compared with the previous one.
+        </p>
+        <p>
+          However, that produces a washed-out color palette since there are many
+          small points near the origin (white). Applying a square root to the
+          saturation compensates for this.
+        </p>
+        <p>
+          This palette is but one of many possibilities. HSV is a 3D color
+          space, and the points trace out a 1D spiral, so it's only possible to
+          pick out a small sampling of colors at a time. Since I usually use a
+          dark background, I kept the value at a maximum for good contrast.
+          However, in other situations, a palette that tends towards grey or
+          black might be more helpful.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

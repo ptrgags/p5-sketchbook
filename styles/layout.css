@@ -1,0 +1,57 @@
+:root {
+  --background-dark: #350a3d;
+  --background-light: #581664;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+  font-family: sans-serif;
+  background-color: var(--background-dark);
+  color: #eeeec5;
+}
+
+p {
+  line-height: 1.5em;
+  margin: 10px;
+}
+
+nav {
+  background-color: var(--background-light);
+  padding: 10px;
+}
+
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.container canvas {
+  max-width: 100vw;
+  object-fit: contain;
+}
+
+a:link {
+  color: #e2e259;
+}
+
+a:visited {
+  color: #a3a342;
+}
+
+a:hover {
+  color: #33addd;
+}
+
+.description {
+  padding: 20px;
+  width: 50%;
+}
+
+@media screen and (max-width: 700px) {
+  .description {
+    width: 90%;
+  }
+}

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../libraries/p5.min.js"
+    ></script>
+    <script type="module">
+      import { sketch } from "./InfiniteSunflower.js";
+      import "../sketchlib/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../styles/layout.css" />
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>Infinite Sunflower (2024)</h1>
+      <div id="sketch"></div>
+      <div class="description">
+        <p>
+          Recently I've found a few different sources that all mention the
+          mathematical pattern of spiral phyllotaxis, the spiral arrangement of
+          leaves and petals of various plants.
+        </p>
+        <ul>
+          <li>
+            <a
+              href="https://www.google.com/books/edition/The_Beauty_of_Numbers_in_Nature/xrpNEAAAQBAJ?hl=en"
+              >The Beauty of Numbers in Nature</a
+            >
+            by Ian Stewart
+          </li>
+          <li>
+            <a href="http://algorithmicbotany.org/papers/#abop"
+              >The Algorithmic Beauty of Plants, Chapter 4</a
+            >
+            by Przemysław Prusinkiewicz and Aristid Lindenmayer
+          </li>
+          <li>
+            <a
+              href="https://www.sciencedirect.com/science/article/pii/S007961072300038X"
+              >"Towards solving the mystery of spiral phyllotaxis"</a
+            >
+            by Boris Rozin
+          </li>
+        </ul>
+        <p>
+          The last paper is most relevant here, as it talks not just about how
+          the spirals relate to the Fibonacci sequence, but also how the pattern
+          develops as the inflorescence grows. It also links to
+          <a href="https://youtu.be/dvvJG6P3K_M?si=jG3OHvB5UhLB5zfd"
+            >animations of the growth pattern</a
+          >.
+        </p>
+        <p>
+          After reading that, I first explored the math of these spirals in
+          Desmos and made
+          <a href="https://www.desmos.com/calculator/9xbb0rrn1c"
+            >this interactive graph</a
+          >.
+        </p>
+        <p>
+          This sketch is my artistic interpretation of the above. I create
+          florets in the center of the circle, and each moves radially outwards.
+          Each successive floret appears one golden angle away from the previous
+          one. This is enough to produce the spiral pattern.
+        </p>
+        <p>
+          A real sunflower stops growing at a certain point, while my animation
+          goes on forever. Also, a real flower would distinguish between petals
+          and florets that produce seeds.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

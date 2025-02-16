@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../libraries/p5.min.js"
+    ></script>
+    <script type="module">
+      import { sketch } from "./StringArt.js";
+      import "../sketchlib/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../styles/layout.css" />
+    <style>
+      input[type="range"] {
+        width: 200px;
+        margin-top: 4px;
+      }
+
+      input[type="checkbox"] {
+        margin-top: 4px;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>String Art (2017, 2024)</h1>
+      <p>Use the sliders below to change the pattern</p>
+      <p>f(x) = <span id="polynomial"></span></p>
+      <div>
+        <label for="coeff-a">a</label
+        ><input id="coeff-a" type="range" min="0" max="59" />
+        <br />
+        <label for="coeff-b">b</label
+        ><input id="coeff-b" type="range" min="0" max="59" />
+        <br />
+        <label for="coeff-c">c</label
+        ><input id="coeff-c" type="range" min="0" max="59" />
+        <br />
+        <label for="coeff-d">d</label
+        ><input id="coeff-d" type="range" min="0" max="59" />
+      </div>
+      <div>
+        <input type="checkbox" id="animate" />
+        <label for="animate">Animate</label>
+        <input type="checkbox" id="show-lines" />
+        <label for="show-lines">Show Lines</label>
+      </div>
+      <div id="sketch"></div>
+
+      <div class="description">
+        <p>
+          This sketch visualizes modular integer arithmetic. This is your usual
+          addition and multiplication, except wrapped around a circle. If a
+          number is larger than the number of points on the circle, you just
+          wrap around to 0. It's just like going around the numbers of a clock
+          or spaces on a board game.
+        </p>
+        <p>
+          The visualization works as follows: take a point on the circle. Apply
+          the selected math function to transform it into a new number. Then
+          draw a line between the original and new points. Doing this for all
+          points on the circle creates a web structure that looks like string
+          art.
+        </p>
+        <p>
+          Sometimes a number will land back on itself. In cases like these, a
+          circle is drawn around the point to emphasize that it stays in place.
+        </p>
+        <p>
+          The "Animate" option animates the transition from a number to its
+          transformed value. This makes it easier to tell which end of a line is
+          which. More importantly, it creates mesmerizing patterns!
+        </p>
+        <p>
+          This sketch was adapted from some old Processing.py code I made back
+          in 2017.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
