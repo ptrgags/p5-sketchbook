@@ -1,5 +1,5 @@
 import { Vector2 } from "./AcmeVector.js";
-import { DifferentialNode, NEARBY_RADIUS } from "./node.js";
+import { DifferentialNode, NEARBY_RADIUS } from "./DifferentialNode.js";
 import { Circle } from "./circle.js";
 
 const MAX_EDGE_LENGTH = 150;
