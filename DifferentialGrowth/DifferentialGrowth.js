@@ -32,8 +32,6 @@ const STYLE_POLYLINE2 = BASE_STYLE.with_fill(new Color(0, 127, 0));
 
 export const sketch = (p) => {
   let show_ref_geometry = false;
-  let show_splines = true;
-  let show_polyline = false;
   p.setup = () => {
     p.createCanvas(WIDTH, HEIGHT);
     p.background(128);
@@ -41,16 +39,6 @@ export const sketch = (p) => {
     document.getElementById("toggle-ref-geom").addEventListener("click", () => {
       show_ref_geometry = !show_ref_geometry;
     });
-
-    document.getElementById("toggle-splines").addEventListener("click", () => {
-      show_splines = !show_splines;
-    });
-
-    document
-      .getElementById("toggle-polylines")
-      .addEventListener("click", () => {
-        show_polyline = !show_polyline;
-      });
   };
 
   p.draw = () => {
@@ -60,9 +48,7 @@ export const sketch = (p) => {
       QUADTREE.draw(p);
     }
 
-    p.strokeJoin(p.ROUND);
-
-    if (show_polyline) {
+    if (show_ref_geometry) {
       const poly1 = POLYLINE.make_polyline(
         STYLE_POLYLINE1.with_stroke(new Color(255, 255, 255))
       );
@@ -73,12 +59,10 @@ export const sketch = (p) => {
       draw_primitive(p, poly2);
     }
 
-    if (show_splines) {
-      const spline1 = POLYLINE.make_curve(STYLE_POLYLINE1);
-      const spline2 = POLYLINE2.make_curve(STYLE_POLYLINE2);
-      draw_primitive(p, spline1);
-      draw_primitive(p, spline2);
-    }
+    const spline1 = POLYLINE.make_curve(STYLE_POLYLINE1);
+    const spline2 = POLYLINE2.make_curve(STYLE_POLYLINE2);
+    draw_primitive(p, spline1);
+    draw_primitive(p, spline2);
 
     if (p.frameCount % 200 == 0) {
       POLYLINE.add_random_point();
