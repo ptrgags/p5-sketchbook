@@ -53,7 +53,7 @@ export const LINKS = [
     year: "2023",
   },
   {
-    title: "Differential Growth 2D",
+    title: "Differential Growth",
     year: "2021",
   },
   {
