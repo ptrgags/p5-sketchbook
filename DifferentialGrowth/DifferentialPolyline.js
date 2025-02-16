@@ -9,6 +9,7 @@ import { Random } from "../sketchlib/random.js";
 import { Vector2 } from "./AcmeVector.js";
 import { DifferentialNode, NEARBY_RADIUS } from "./DifferentialNode.js";
 import { Circle } from "./circle.js";
+import { mod } from "../sketchlib/mod.js";
 
 const MAX_EDGE_LENGTH = 150;
 
@@ -32,12 +33,6 @@ const TEMP_ATTRACTION = new Vector2();
 const TEMP_REPULSION = new Vector2();
 const TEMP_BA = new Vector2();
 const TEMP_BC = new Vector2();
-
-// Because JavaScript doesn't handle the modulo operator
-// correctly for negative numbers
-function fixed_modulo(x, modulus) {
-  return ((x % modulus) + modulus) % modulus;
-}
 
 export class DifferentialPolyline {
   constructor(positions_array, quadtree) {
@@ -70,7 +65,7 @@ export class DifferentialPolyline {
   split_pinched_angles() {
     const split_points = [];
     for (let i = 0; i < this.nodes.length; i++) {
-      const a_index = fixed_modulo(i - 1, this.nodes.length);
+      const a_index = mod(i - 1, this.nodes.length);
       const a = this.nodes[a_index].position;
       const b = this.nodes[i].position;
       const c = this.nodes[(i + 1) % this.nodes.length].position;
@@ -211,7 +206,7 @@ export class DifferentialPolyline {
     this.compute_attraction(
       TEMP_TOTAL_FORCE,
       node,
-      fixed_modulo(index - 1, this.nodes.length)
+      mod(index - 1, this.nodes.length)
     );
     this.compute_attraction(
       TEMP_TOTAL_FORCE,
