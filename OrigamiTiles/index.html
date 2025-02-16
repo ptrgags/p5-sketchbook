@@ -1,18 +1,70 @@
 <html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../libraries/p5.min.js"
+    ></script>
+    <script type="module">
+      import { sketch } from "./OrigamiTiles.js";
+      import "../sketchlib/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../styles/layout.css" />
+    <style>
+      .example-tile {
+        background-color: var(--background-light);
+        display: block;
+        margin: 0 auto;
+        max-width: 80%;
+      }
+    </style>
+  </head>
 
-  <!-- PLEASE NO CHANGES BELOW THIS LINE (UNTIL I SAY SO) -->
-  <script language="javascript" type="text/javascript" src="libraries/p5.min.js"></script>
-  <script language="javascript" type="text/javascript" src="OrigamiTiles.js"></script>
-  <!-- OK, YOU CAN MAKE CHANGES BELOW THIS LINE AGAIN -->
-
-  <!-- This line removes any default padding and style.
-       You might only need one of these values set. -->
-  <style> body { padding: 0; margin: 0; } </style>
-</head>
-
-<body>
-</body>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>Origami Tiles (2021)</h1>
+      <div id="sketch"></div>
+      <div class="description">
+        <p>
+          This sketch makes a continuous pattern from connecting many triangular
+          tiles. If this pattern were printed out (double-sided) and folded on
+          the light grey lines in either direction, no matter how you fold it,
+          it produces a seamless tiling!
+        </p>
+        <p>
+          To make this happen, I designed the tiles carefully so they have
+          exactly the same pattern of dark and light parts on the boundary. For
+          example, compare the following two tiles and see how the edges look
+          the same even though the interior is very different.
+        </p>
+        <img
+          alt="one of the image tiles"
+          class="example-tile"
+          src="tiles/triangle-tile1.svg"
+        />
+        <img
+          alt="another one of the image tiles for comparison"
+          class="example-tile"
+          src="tiles/triangle-tile2.svg"
+        />
+        <p>
+          Also notice how whever the curves meet the boundary of the triangle,
+          the curve and the triangle edge are always perpendicular. This is the
+          easiest way to make sure the curve doesn't suddenly bend when it moves
+          into the neighboring tile.
+        </p>
+        <p>
+          For the mathematically inclined, this means the patterns are
+          <a href="https://en.wikipedia.org/wiki/Smoothness"
+            >C<sup>1</sup> continuous</a
+          >, not just C<sup>0</sup>
+          continuous.
+        </p>
+      </div>
+    </div>
+  </body>
 </html>

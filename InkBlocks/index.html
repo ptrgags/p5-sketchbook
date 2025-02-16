@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../libraries/p5.min.js"
+    ></script>
+    <script type="module">
+      import { sketch } from "./InkBlocks.js";
+      import "../sketchlib/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../styles/layout.css" />
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>Ink Blocks (2024)</h1>
+      <div id="sketch"></div>
+      <div class="description">
+        <p>A silly automaton inspired by fountain pens and sunflowers.</p>
+        <p>
+          In my fountain pen case, I keep 6 fountain pens for journaling and
+          drawing so I always have a variety of colors available.I treat the
+          fountain pen case like a circular buffer. Each day I use a pen from
+          the next slot, circling back to the start when I reach the end.
+        </p>
+        <p>
+          Eventually, a pen runs out of ink. I remove it from the pen case for
+          cleaning. The other pens shift over to fill the gap, leaving slots
+          open at the right end of the pen case. When I clean and refill pens, I
+          choose a new color to keep things interesting, and I add it to one of
+          those slots in the end.
+        </p>
+        <p>
+          The question then is, "If I repeat this process for many months, what
+          pattern is produced?". So I made this little automaton to simulate the
+          above process.
+        </p>
+        <p>
+          Each row of 6 blocks in the above visualization represents the colors
+          used in a span of 6 days (one traversal of the fountain pen case). The
+          hue represents the ink color, while the decreasing brightness
+          represents using up the ink over time. Each successive row is the new
+          set of colors after removing empty pens and adding refilled pens.
+        </p>
+        <p>
+          What has this to do with sunflowers? I needed a color palette where
+          each new entry contrasts the previous few colors. This was around the
+          same time I was exploring the math of sunflower spirals. And I
+          realized that spiral phyllotaxis would be perfect for this. That's why
+          I made <a href="../PhyllotaxisPalette/">Phyllotaxis Palette</a>.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

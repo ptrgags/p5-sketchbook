@@ -1,19 +1,46 @@
 <html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- PLEASE NO CHANGES BELOW THIS LINE (UNTIL I SAY SO) -->
-  <script language="javascript" type="text/javascript" src="libraries/p5.min.js"></script>
-  <script language="javascript" type="text/javascript" src="PrimroseTile.js"></script>
-  <script language="javascript" type="text/javascript" src="PrimroseField.js"></script>
-  <!-- OK, YOU CAN MAKE CHANGES BELOW THIS LINE AGAIN -->
-
-  <!-- This line removes any default padding and style.
-       You might only need one of these values set. -->
-  <style> body { padding: 0; margin: 0; } </style>
-</head>
-
-<body>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../libraries/p5.min.js"
+    ></script>
+    <script type="module">
+      import { sketch } from "./PrimroseField.js";
+      import "../sketchlib/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../styles/layout.css" />
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>Primrose Field Tiling (2020)</h1>
+      <div id="sketch"></div>
+      <div class="description">
+        <p>
+          This sketch is an artistic combination of the
+          <a
+            href="https://www.dsource.in/course/visual-perception-communication-designers/6-illusory-motion/63-primrose-illusion"
+            >Primrose Field illusion</a
+          >
+          and the substitution tiling in
+          <a href="https://projecteuler.net/problem=405"
+            >Project Euler problem #405</a
+          >. Due to the colored crosses messing with the contrast, the pattern
+          appears wavy when it actually isn't.
+        </p>
+        <p>
+          Unfortunately, the pattern is a little bigger than the canvas. I use a
+          specific image size of 500x700 px because it makes a consistent image
+          size for my website. However, due to the substitution tiling, this
+          pattern only looks right for power-of-two sizes. 256x512 is too small
+          to make a nice image. 512x1024 is too big, but not too bad. So here we
+          are.
+        </p>
+      </div>
+    </div>
+  </body>
 </html>
