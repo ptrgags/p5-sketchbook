@@ -25,16 +25,23 @@ const POLYLINE2 = new DifferentialPolyline(points2, QUADTREE);
 const DELTA_TIME = 0.1;
 
 export const sketch = (p) => {
+  let show_ref_geometry = false;
   p.setup = () => {
     p.createCanvas(WIDTH, HEIGHT);
     p.background(128);
+
+    document.getElementById("toggle-ref-geom").addEventListener("click", () => {
+      show_ref_geometry = !show_ref_geometry;
+    });
   };
 
   p.draw = () => {
     p.background(128);
 
-    // for debugging
-    QUADTREE.draw(p);
+    if (show_ref_geometry) {
+      QUADTREE.draw(p);
+    }
+
     POLYLINE.draw(p, p.color(255, 128, 0));
     POLYLINE2.draw(p, p.color(0, 128, 0));
 
