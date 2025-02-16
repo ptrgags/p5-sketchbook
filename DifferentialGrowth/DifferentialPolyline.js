@@ -6,7 +6,7 @@ import {
   PolygonPrimitive,
 } from "../sketchlib/primitives.js";
 import { Random } from "../sketchlib/random.js";
-import { Vector2 } from "./AcmeVector.js";
+import { Vector2 } from "./Vector2.js";
 import { DifferentialNode, NEARBY_RADIUS } from "./DifferentialNode.js";
 import { Circle } from "./circle.js";
 import { mod } from "../sketchlib/mod.js";

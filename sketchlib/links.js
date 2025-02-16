@@ -1,6 +1,10 @@
 // Links for all of the sketches. Links are added to the page in this order
 export const LINKS = [
   {
+    title: "Differential Growth",
+    year: "2021, 2025",
+  },
+  {
     link: "./Coral/Maze",
     title: "Coral Maze",
     thumbnail: "thumbnails/coral-maze.png",
@@ -52,10 +56,7 @@ export const LINKS = [
     title: "Growing Flowers",
     year: "2023",
   },
-  {
-    title: "Differential Growth",
-    year: "2021",
-  },
+
   {
     title: "Origami Tiles",
     year: "2021",

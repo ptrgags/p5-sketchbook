@@ -1,4 +1,4 @@
-import { Vector2 } from "./AcmeVector.js";
+import { Vector2 } from "./Vector2.js";
 
 const GROWTH_RATE = 0.1;
 
