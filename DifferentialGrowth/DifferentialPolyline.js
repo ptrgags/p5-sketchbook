@@ -231,8 +231,6 @@ export class DifferentialPolyline {
       node.clamp_to(this.quadtree.bounds);
       node.check_if_dirty();
     }
-
-    this.split_long_edges();
   }
 
   make_curve(style) {
