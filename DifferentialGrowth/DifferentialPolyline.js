@@ -1,3 +1,10 @@
+import { Point } from "../pga2d/objects.js";
+import {
+  BeziergonPrimitive,
+  BezierPrimitive,
+  GroupPrimitive,
+  PolygonPrimitive,
+} from "../sketchlib/primitives.js";
 import { Random } from "../sketchlib/random.js";
 import { Vector2 } from "./AcmeVector.js";
 import { DifferentialNode, NEARBY_RADIUS } from "./DifferentialNode.js";
@@ -226,6 +233,34 @@ export class DifferentialPolyline {
     }
 
     this.split_long_edges();
+  }
+
+  make_curve(style) {
+    const positions = this.nodes.map((node) =>
+      Point.point(node.position.x, node.position.y)
+    );
+
+    const bezier_curves = [];
+    const n = positions.length;
+    for (let i = 0; i < positions.length; i++) {
+      const a = positions[i];
+      const b = positions[(i + 1) % n];
+      const c = positions[(i + 2) % n];
+      const d = positions[(i + 3) % n];
+      const curve = BezierPrimitive.from_b_spline(a, b, c, d);
+      bezier_curves.push(curve);
+    }
+
+    const beziergon = new BeziergonPrimitive(bezier_curves);
+    return new GroupPrimitive([beziergon], style);
+  }
+
+  make_polyline(style) {
+    const vertices = this.nodes.map((x) =>
+      Point.point(x.position.x, x.position.y)
+    );
+    const polygon = new PolygonPrimitive(vertices);
+    return new GroupPrimitive([polygon], style);
   }
 
   draw(p, fill_color) {
