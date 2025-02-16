@@ -1,3 +1,4 @@
+import { Random } from "../sketchlib/random.js";
 import { Vector2 } from "./AcmeVector.js";
 import { DifferentialNode, NEARBY_RADIUS } from "./DifferentialNode.js";
 import { Circle } from "./circle.js";
@@ -106,6 +107,11 @@ export class DifferentialPolyline {
     const point = new DifferentialNode(midpoint);
     this.nodes.splice(index + 1, 0, point);
     this.quadtree.insert_point(point);
+  }
+
+  add_random_point() {
+    const index = Random.rand_int(0, this.nodes.length);
+    this.add_point(index);
   }
 
   compute_attraction(total_force, node, neighbor_index) {

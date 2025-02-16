@@ -46,11 +46,8 @@ export const sketch = (p) => {
     POLYLINE2.draw(p, p.color(0, 128, 0));
 
     if (p.frameCount % 200 == 0) {
-      let index = p.int(p.random() * (POLYLINE.nodes.length - 1));
-      POLYLINE.add_point(index);
-
-      index = p.int(p.random() * (POLYLINE2.nodes.length - 1));
-      POLYLINE2.add_point(index);
+      POLYLINE.add_random_point();
+      POLYLINE2.add_random_point();
     }
 
     if (p.frameCount % 100 === 0) {
