@@ -41,7 +41,7 @@ const SPLIT_LONG_PERIOD = 1;
 const GROWTH_PERIOD = 200;
 
 // How many time steps between adding points where the curve has become too sharp
-const SPLIT_PINCHED_PERIOD = 100;
+const SPLIT_PINCHED_PERIOD = 1000;
 
 export const sketch = (p) => {
   let show_ref_geometry = false;
