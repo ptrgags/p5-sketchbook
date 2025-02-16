@@ -26,7 +26,7 @@ const POLYLINE2 = new DifferentialPolyline(points2, QUADTREE);
 
 const DELTA_TIME = 0.1;
 
-const BASE_STYLE = new Style().with_stroke(new Color(0, 0, 0)).with_width(4);
+const BASE_STYLE = new Style().with_stroke(new Color(0, 0, 0)).with_width(2);
 const STYLE_POLYLINE1 = BASE_STYLE.with_fill(new Color(255, 127, 0));
 const STYLE_POLYLINE2 = BASE_STYLE.with_fill(new Color(0, 127, 0));
 

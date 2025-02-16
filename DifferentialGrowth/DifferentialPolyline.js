@@ -242,6 +242,7 @@ export class DifferentialPolyline {
 
     const bezier_curves = [];
     const n = positions.length;
+
     for (let i = 0; i < positions.length; i++) {
       const a = positions[i];
       const b = positions[(i + 1) % n];

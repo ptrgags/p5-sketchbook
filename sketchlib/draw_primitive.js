@@ -45,9 +45,7 @@ function draw_beziergon(p, beziergon) {
   const first_point = beziergon.curves[0].a;
   p.vertex(first_point.x, first_point.y);
   for (const { b, c, d } of beziergon) {
-    p.vertex(b.x, b.y);
-    p.vertex(c.x, c.y);
-    p.vertex(d.x, d.y);
+    p.bezierVertex(b.x, b.y, c.x, c.y, d.x, d.y);
   }
   p.endShape();
 }
