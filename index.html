@@ -26,10 +26,6 @@
         gap: 10px;
       }
 
-      .link img {
-        width: 250px;
-      }
-
       @media screen and (max-width: 500px) {
         .link {
           width: 250px;
@@ -53,6 +49,8 @@
         const img = document.createElement("img");
         img.setAttribute("alt", `view ${title} example`);
         img.setAttribute("src", thumbnail_url);
+        img.setAttribute("width", "250");
+        img.setAttribute("height", "350");
 
         const img_link = document.createElement("a");
         img_link.setAttribute("href", sketch_url);
