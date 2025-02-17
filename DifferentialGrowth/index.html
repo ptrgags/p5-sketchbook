@@ -23,7 +23,81 @@
       <div class="constrols">
         <button id="toggle-ref-geom">Toggle Reference Geometry</button>
       </div>
-      <div class="description">Blah blah Blah</div>
+      <div class="description">
+        <p>
+          This sketch is a simulation of differential growth, a pattern of
+          growth you see in plants and other organic, crinkly shapes.
+        </p>
+
+        <p>
+          Each curve is represented by a polygon of many points. Each point can
+          move around independently, subject to several rules:
+        </p>
+        <ul>
+          <li>
+            If points get too close together, they experience a repulsion force.
+            This both helps the curve avoid itself, as well as other curves.
+          </li>
+          <li>
+            Points pull on their 2 connected neighbors. So if a point strays far
+            away from its neighbors, it will experience tension that pulls it
+            closer.
+          </li>
+          <li>Points are clamped so they don't go off-screen</li>
+          <li>
+            Periodically, a new node is grown at a random spot on the curve
+          </li>
+          <li>
+            If an edge of the polygon becomes too long, a new node is grown at
+            the midpoint, as if easing the strain.
+          </li>
+          <li>
+            If the angle between adjacent edges becomes too small, a new node is
+            grown in an attempt to keep the curve round.
+          </li>
+        </ul>
+        <p>
+          This implementation still isn't quite right. For example, once space
+          becomes limited, the curves start self-intersecting. I'm not sure how
+          to detect this, let alone how to avoid it.
+        </p>
+        <p>My inspiration for this sketch came from a few sources:</p>
+        <ul>
+          <li>
+            <a
+              href="https://medium.com/@jason.webb/2d-differential-growth-in-js-1843fd51b0ce"
+              >Exploring 2D differential growth with Javascript</a
+            >
+            by Jason Webb
+          </li>
+          <li>
+            <a href="https://inconvergent.net/generative/differential-line/"
+              >Differential Line</a
+            >
+            and other related articles from Inconvergent
+          </li>
+          <li>
+            The
+            <a href="https://natureofcode.com/autonomous-agents/"
+              >Autonomous Agents chapter</a
+            >
+            of <cite>The Nature of Code</cite> by Daniel Shiffman
+          </li>
+        </ul>
+        <p>
+          This sketch was started in 2021 (see the
+          <a
+            href="https://github.com/ptrgags/p5-sketchbook/blob/main/DifferentialGrowth/logbook.md"
+            >logbook</a
+          >
+          for the full history), but I stopped after a while since I wasn't
+          happy with the results. I returned to it in 2025 and cleaned it up to
+          make what you see here. I used
+          <a href="https://en.wikipedia.org/wiki/B-spline">B-splines</a>
+          to smooth out the polylines into curves, which greatly improves the
+          look. I also adjusted the simulation so the curves grow a bit faster
+        </p>
+      </div>
     </div>
   </body>
 </html>
