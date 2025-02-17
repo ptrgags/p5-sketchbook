@@ -33,6 +33,11 @@ export class Rectangle {
     return true;
   }
 
+  /**
+   * Determine which of the 4 quadrants a point is in
+   * @param {Vector2} point A point to check
+   * @returns {number} The index 0-3 of the quadrant in the same order that subdivide() returns children
+   */
   get_quadrant(point) {
     let x_bit = 0;
     if (point.x >= this.x + this.width / 2) {
