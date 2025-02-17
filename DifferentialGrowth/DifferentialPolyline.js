@@ -36,10 +36,7 @@ const TEMP_BC = new Vector2();
 
 export class DifferentialPolyline {
   constructor(positions_array, quadtree) {
-    this.nodes = positions_array.map(([x, y]) => {
-      const position = new Vector2(x, y);
-      return new DifferentialNode(position);
-    });
+    this.nodes = positions_array.map((v) => new DifferentialNode(v));
 
     // fix the endpoints
     //this.nodes[0].fixed = true;

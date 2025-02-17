@@ -3,6 +3,7 @@ import { Quadtree } from "./quadtree.js";
 import { DifferentialPolyline } from "./DifferentialPolyline.js";
 import { Color, Style } from "../sketchlib/Style.js";
 import { draw_primitive } from "../sketchlib/draw_primitive.js";
+import { Vector2 } from "./Vector2.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -17,8 +18,8 @@ for (let i = 0; i < INITIAL_POINTS; i++) {
   const angle = (2.0 * Math.PI * i) / INITIAL_POINTS;
   const x = WIDTH / 2 + 50 * Math.cos(angle);
   const y = HEIGHT / 2 + 50 * Math.sin(angle);
-  points.push([x, y - OFFSET]);
-  points2.push([x, y + OFFSET]);
+  points.push(new Vector2(x, y - OFFSET));
+  points2.push(new Vector2(x, y + OFFSET));
 }
 
 const POLYLINE = new DifferentialPolyline(points, QUADTREE);
