@@ -92,7 +92,6 @@ export class Point {
       return Point.direction(scalar * this.x, scalar * this.y);
     }
 
-    // A point is invariant to scaling due to homogeneity
     return this;
   }
 

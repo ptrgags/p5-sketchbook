@@ -6,6 +6,7 @@ import {
   BezierPrimitive,
   PointPrimitive,
   CirclePrimitive,
+  BeziergonPrimitive,
 } from "./primitives.js";
 
 function draw_rect(p, rect) {
@@ -37,6 +38,16 @@ function draw_polygon(p, polygon) {
     p.vertex(vertex.x, vertex.y);
   }
   p.endShape(p.CLOSE);
+}
+
+function draw_beziergon(p, beziergon) {
+  p.beginShape();
+  const first_point = beziergon.curves[0].a;
+  p.vertex(first_point.x, first_point.y);
+  for (const { b, c, d } of beziergon) {
+    p.bezierVertex(b.x, b.y, c.x, c.y, d.x, d.y);
+  }
+  p.endShape();
 }
 
 function draw_bezier(p, bezier) {
@@ -84,6 +95,8 @@ export function draw_primitive(p, primitive) {
     draw_line(p, primitive);
   } else if (primitive instanceof PolygonPrimitive) {
     draw_polygon(p, primitive);
+  } else if (primitive instanceof BeziergonPrimitive) {
+    draw_beziergon(p, primitive);
   } else if (primitive instanceof BezierPrimitive) {
     draw_bezier(p, primitive);
   } else if (primitive instanceof PointPrimitive) {
