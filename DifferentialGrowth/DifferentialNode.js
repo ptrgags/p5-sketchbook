@@ -1,13 +1,10 @@
 import { Vector2 } from "./Vector2.js";
+import { clamp } from "../sketchlib/clamp.js";
 
 const GROWTH_RATE = 0.1;
 
 // Radius of points to check when computing repulsion
 export const NEARBY_RADIUS = 20;
-
-function clamp(x, min_val, max_val) {
-  return Math.max(Math.min(x, max_val), min_val);
-}
 
 const TEMP_DELTA_VELOCITY = new Vector2(0, 0);
 const TEMP_DELTA_POSITION = new Vector2(0, 0);
