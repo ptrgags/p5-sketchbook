@@ -1,5 +1,5 @@
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
-import { Point } from "../pga2d/objects.js";
+import { Point, Line } from "../pga2d/objects.js";
 import {
   GroupPrimitive,
   LinePrimitive,
@@ -51,6 +51,20 @@ const POINT_Z = TOP.join(VP_45).meet(ORIGIN.join(DIRECTION_UP));
 const POINT_XZ = POINT_Z.join(VP_RIGHT).meet(POINT_X.join(DIRECTION_UP));
 const POINT_YZ = POINT_Y.join(DIRECTION_UP).meet(POINT_Z.join(VP_LEFT));
 
+const LINE1 = VP_LEFT.join(POINT_X);
+const LINE2 = ORIGIN.join(VP_LEFT);
+const LERPED = new Array(17);
+for (let i = 0; i < 17; i++) {
+  const t = i / 16;
+  LERPED[i] = Line.lerp(LINE2, LINE1, t);
+}
+
+const AXIS = ORIGIN.join(POINT_X);
+const OTHER_SIDE = POINT_Y.join(FRONT);
+const LINES = LERPED.map(
+  (x) => new LinePrimitive(x.meet(AXIS), x.meet(OTHER_SIDE))
+);
+
 const POINTS = new GroupPrimitive(
   [
     new PointPrimitive(VP_RIGHT),
@@ -63,6 +77,7 @@ const POINTS = new GroupPrimitive(
     new LinePrimitive(FRONT, POINT_Y),
     new LinePrimitive(POINT_YZ, POINT_Y),
     new LinePrimitive(POINT_YZ, POINT_Z),
+    ...LINES,
   ],
   STYLE_VP
 );

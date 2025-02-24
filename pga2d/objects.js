@@ -158,6 +158,11 @@ export class Line {
   equals(other) {
     return this.vec.equals(other.vec);
   }
+
+  static lerp(a, b, t) {
+    const { x, y, o } = Odd.lerp(a.vec, b.vec, t);
+    return new Line(x, y, o);
+  }
 }
 Line.X_AXIS = Object.freeze(new Line(0, 1, 0));
 Line.Y_AXIS = Object.freeze(new Line(1, 0, 0));
