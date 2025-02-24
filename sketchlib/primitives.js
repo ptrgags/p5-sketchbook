@@ -27,6 +27,13 @@ export class LinePrimitive {
   }
 }
 
+export class VectorPrimitive {
+  constructor(tail, tip) {
+    this.tail = tail;
+    this.tip = tip;
+  }
+}
+
 export class BezierPrimitive {
   constructor(a, b, c, d) {
     this.a = a;

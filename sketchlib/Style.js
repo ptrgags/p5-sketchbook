@@ -5,6 +5,10 @@ export class Color {
     this.b = b;
   }
 }
+Color.WHITE = Object.freeze(new Color(255, 255, 255));
+Color.RED = Object.freeze(new Color(255, 0, 0));
+Color.GREEN = Object.freeze(new Color(0, 255, 0));
+Color.BLUE = Object.freeze(new Color(0, 0, 255));
 
 export class Style {
   constructor() {
@@ -37,5 +41,9 @@ export class Style {
     const result = this.clone();
     result.stroke_width = width;
     return result;
+  }
+
+  static from_color(color) {
+    return new Style().with_stroke(color).with_fill(color);
   }
 }
