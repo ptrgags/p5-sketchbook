@@ -10,7 +10,9 @@ import { Style } from "../sketchlib/Style.js";
 import { Color } from "../sketchlib/Style.js";
 import { draw_primitive } from "../sketchlib/draw_primitive.js";
 
-class BodySegment {
+const MIN_ANGLE = Math.PI / 6;
+const MIN_DOT_PRODUCT = Math.cos(MIN_ANGLE);
+const ROTOR = class BodySegment {
   constructor(initial_position, follow_distance) {
     this.position = initial_position;
     this.follow_distance = follow_distance;
@@ -25,7 +27,16 @@ class BodySegment {
 
     this.position = segment.position.add(separation);
   }
-}
+
+  follow_bend(prev_segment, prev_prev_segment) {
+    // get vectors relative to the center point. The dual is needed here
+    const a = prev_prev_segment.position.sub(prev_segment.position).dual();
+    const b = this.position.sub(prev_segment.position).dual();
+
+    if (a.dot(b) < MIN_DOT_PRODUCT) {
+    }
+  }
+};
 
 const COLOR_SPINE = new Color(255, 255, 255);
 const SPINE_STYLE = new Style().with_stroke(COLOR_SPINE);
@@ -34,7 +45,7 @@ const CENTER_STYLE = new Style().with_fill(COLOR_SPINE);
 const WORM_SEGMENTS = 100;
 const WORM_SEGMENT_SEPARATION = 20;
 // speed in pixels per frame
-const WORM_MAX_SPEED = 20;
+const WORM_MAX_SPEED = 5;
 class Worm {
   constructor() {
     const first_point = Point.point(WIDTH / 2, HEIGHT / 2);
@@ -54,23 +65,20 @@ class Worm {
     return this.segments[this.segments.length - 1];
   }
 
-  move_tail_towards(point) {
-    const velocity = point.sub(this.tail.position).limit_length(WORM_MAX_SPEED);
-
-    this.tail.position = this.tail.position.add(velocity);
-    for (let i = 0; i < this.segments.length - 1; i++) {
-      const current_segment = this.segments[this.segments.length - 2 - i];
-      const prev_segment = this.segments[this.segments.length - 1 - i];
-      current_segment.follow(prev_segment);
-    }
-  }
-
   move_head_towards(point) {
     const velocity = point.sub(this.head.position).limit_length(WORM_MAX_SPEED);
 
     this.head.position = this.head.position.add(velocity);
     for (let i = 1; i < this.segments.length; i++) {
-      this.segments[i].follow(this.segments[i - 1]);
+      const prev_segment = this.segments[i - 1];
+      const curr_segment = this.segments[i];
+
+      if (i >= 2) {
+        const prev_prev_segment = this.segments[i - 2];
+        curr_segment.follow_bend(prev_segment, prev_prev_segment);
+      } else {
+        curr_segment.follow(prev_segment);
+      }
     }
   }
 

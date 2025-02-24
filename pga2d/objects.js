@@ -166,6 +166,10 @@ export class Line {
     return new Point(xy, xo, yo);
   }
 
+  dot(other) {
+    return this.vec.dot(other.vec);
+  }
+
   equals(other) {
     return this.vec.equals(other.vec);
   }
