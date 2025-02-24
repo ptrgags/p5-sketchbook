@@ -44,22 +44,25 @@ const POINT_X = Point.lerp(FRONT, VP_LEFT, X_PERCENT);
 // Use the vanishing points to find the origin and the other ends of the axes
 const ORIGIN = POINT_X.join(VP_RIGHT).meet(FRONT.join(VP_45));
 const POINT_Y = VP_LEFT.join(ORIGIN).meet(FRONT.join(VP_RIGHT));
-const POINT_Z = TOP.join(VP_45).meet(ORIGIN.join(Point.direction(0, -1)));
+const DIRECTION_UP = Point.direction(0, -1);
+const POINT_Z = TOP.join(VP_45).meet(ORIGIN.join(DIRECTION_UP));
+
+// Find the last 2 points to complete the cube
+const POINT_XZ = POINT_Z.join(VP_RIGHT).meet(POINT_X.join(DIRECTION_UP));
+const POINT_YZ = POINT_Y.join(DIRECTION_UP).meet(POINT_Z.join(VP_LEFT));
 
 const POINTS = new GroupPrimitive(
   [
     new PointPrimitive(VP_RIGHT),
     new PointPrimitive(VP_LEFT),
     new PointPrimitive(VP_45),
-    new PointPrimitive(FRONT),
     new PointPrimitive(TOP),
-    new PointPrimitive(POINT_X),
-    new PointPrimitive(ORIGIN),
-    new PointPrimitive(POINT_Y),
-    new PointPrimitive(POINT_Z),
-    new LinePrimitive(FRONT, VP_LEFT),
-    new LinePrimitive(FRONT, VP_RIGHT),
-    new LinePrimitive(FRONT, VP_45),
+    new LinePrimitive(POINT_XZ, POINT_X),
+    new LinePrimitive(POINT_XZ, POINT_Z),
+    new LinePrimitive(FRONT, POINT_X),
+    new LinePrimitive(FRONT, POINT_Y),
+    new LinePrimitive(POINT_YZ, POINT_Y),
+    new LinePrimitive(POINT_YZ, POINT_Z),
   ],
   STYLE_VP
 );
