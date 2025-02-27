@@ -6,10 +6,14 @@ export class Motor {
     this.even = even;
   }
 
+  reverse() {
+    return new Motor(this.even.reverse());
+  }
+
   static rotation(point, angle) {
     const c = Math.cos(angle / 2);
     const s = Math.sin(angle / 2);
-    new Even(c, s, s * point.y);
+    return new Motor(new Even(c, s, s * point.y));
   }
 
   transform(object) {

@@ -161,6 +161,10 @@ export class Line {
     return -this.vec.o;
   }
 
+  as_vec() {
+    return this.vec;
+  }
+
   meet(other) {
     const { xy, xo, yo } = this.vec.wedge(other.vec);
     return new Point(xy, xo, yo);

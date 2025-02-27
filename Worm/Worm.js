@@ -9,10 +9,13 @@ import {
 import { Style } from "../sketchlib/Style.js";
 import { Color } from "../sketchlib/Style.js";
 import { draw_primitive } from "../sketchlib/draw_primitive.js";
+import { Motor } from "../pga2d/versors.js";
 
 const MIN_ANGLE = Math.PI / 6;
 const MIN_DOT_PRODUCT = Math.cos(MIN_ANGLE);
-const ROTOR = class BodySegment {
+const ROTOR = Motor.rotation(Point.ZERO, MIN_ANGLE);
+
+class BodySegment {
   constructor(initial_position, follow_distance) {
     this.position = initial_position;
     this.follow_distance = follow_distance;
@@ -30,13 +33,20 @@ const ROTOR = class BodySegment {
 
   follow_bend(prev_segment, prev_prev_segment) {
     // get vectors relative to the center point. The dual is needed here
-    const a = prev_prev_segment.position.sub(prev_segment.position).dual();
-    const b = this.position.sub(prev_segment.position).dual();
+    const a = prev_prev_segment.position
+      .sub(prev_segment.position)
+      .dual()
+      .as_vec();
+    const b = this.position.sub(prev_segment.position).dual().as_vec();
+
+    const is_ccw = a.wedge(b).xy > 0;
 
     if (a.dot(b) < MIN_DOT_PRODUCT) {
+      const rotor = is_ccw ? ROTOR : ROTOR.reverse();
+      this.position = rotor.transform(b).add(prev_segment.position);
     }
   }
-};
+}
 
 const COLOR_SPINE = new Color(255, 255, 255);
 const SPINE_STYLE = new Style().with_stroke(COLOR_SPINE);

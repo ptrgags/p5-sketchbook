@@ -1,9 +1,28 @@
 import { describe, it, expect } from "vitest";
 import { Line, Point } from "./objects";
-import { Flector } from "./versors";
+import { Motor, Flector } from "./versors";
 import { PGA_MATCHERS } from "./pga_matchers";
 
 expect.extend(PGA_MATCHERS);
+
+describe("Motor", () => {
+  describe("rotation", () => {
+    it("reverse of a rotation in the origin is its inverse", () => {
+      const test_point = Point.point(1, -2);
+      const rotation = Motor.rotation(Point.ZERO, Math.PI / 3);
+
+      const inverse = rotation.reverse();
+      const forward_backward = inverse.transform(
+        rotation.transform(test_point)
+      );
+      const backward_forward = rotation.transform(
+        inverse.transform(test_point)
+      );
+
+      expect(forward_backward).toBePoint(backward_forward);
+    });
+  });
+});
 
 describe("Flector", () => {
   describe("reflection", () => {

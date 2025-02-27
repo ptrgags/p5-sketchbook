@@ -28,6 +28,10 @@ export class Even {
     return new Odd(this.yo, -this.xo, this.xy, this.scalar);
   }
 
+  reverse() {
+    return new Even(this.scalar, -this.xy, -this.xo, -this.yo);
+  }
+
   // in 2D PGA, the antidual has exactly the same signs as the dual
   // so we get this function for free!
   antidual = this.dual;
@@ -60,6 +64,22 @@ export class Even {
     );
   }
 
+  sandwich_even(other) {
+    throw new Error("Not implemented");
+  }
+
+  sandwich_odd(other) {
+    throw new Error("Not implemented");
+  }
+
+  sandwich(other) {
+    if (other instanceof Odd) {
+      return this.sandwich_odd(other);
+    }
+
+    return this.sandwich_even(other);
+  }
+
   static lerp(a, b, t) {
     const s = 1 - t;
 
@@ -84,6 +104,14 @@ export class Odd {
 
   norm_sqr() {
     return this.x * this.x + this.y * this.y;
+  }
+
+  dot(other) {
+    // The o and xyo components square to zero, so they are needed
+    const { x: ax, y: ay } = this;
+    const { x: bx, y: by } = other;
+
+    return ax * bx + ay * by;
   }
 
   sandwich_even(other) {
