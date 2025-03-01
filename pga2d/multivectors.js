@@ -65,6 +65,37 @@ export class Even {
   }
 
   sandwich_even(other) {
+    // Bread V = A + Bxy + Cxo + Dyo
+    const { scalar: as, xy: axy, xo: axo, yo: ayo } = this;
+    // Filling U = a + bxy + cxo + dyo
+    const { scalar: bs, xy: bxy, xo: bxo, yo: byo } = other;
+
+    // V[U] = 1/V^2 ([V|U|V] + [V/U/V]) (symmetric and antisymmetric parts)
+
+    // V^2 = A^2 + B^2 + 0 + 0 = A^2 + B^2
+    const mag_sqr = as * as + bs * bs;
+    if (is_nearly(mag_sqr, 0)) {
+      return Even.ZERO;
+    }
+
+    // Hoagie Product
+    // [V|U|V] = sum_i a_i^2 (U_i_even - U_i_odd)
+    // where i ranges over the components
+    // and the even/odd is referring to how many components _overlap_
+    // The one exception is we ignore cases where there are 2
+    //
+    // scalar: A^2 (a + bxy + cxo + dyo)
+    // xy:     B^2 (a + bxy - cxo - dyo)
+    // no xo or yo part (bread squares to 0)
+
+    // AntiHoagie Product
+    // [1/U/xy]: U_odd(1xy) = (cxo + dyo)xy = (cxoxy + dyoxy) = (cyo - dxo)
+    // [1/U/xo]: U_odd(1xo) = (bxy + )xo
+    // [1/U/yo]: U_odd(1yo) = ()yo
+    // [xy/U/xo]:
+    // [xy/U/yo]:
+    // [xo/U/yo]:
+
     throw new Error("Not implemented");
   }
 
