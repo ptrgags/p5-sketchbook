@@ -4,6 +4,7 @@ import { Color, Style } from "../sketchlib/Style.js";
 import { RectPrimitive, GroupPrimitive } from "../sketchlib/primitives.js";
 import { Point } from "../pga2d/objects.js";
 import { draw_primitive } from "../sketchlib/draw_primitive.js";
+import { sec_to_frames, Tween } from "./Tween.js";
 
 const ROWS = 16;
 const COLS = 16;
@@ -18,6 +19,47 @@ class MosaicPixel {
   constructor(color_index, index) {
     this.color_index = color_index;
     this.index = index;
+  }
+}
+
+class PixelSwapPair {
+  constructor(style_a, position_a, style_b, position_b, start_time, duration) {
+    this.style_a = style_a;
+    this.style_b = style_b;
+    this.position_a = position_a;
+    this.position_b = position_b;
+    this.tween_ab = new Tween(
+      this.position_a,
+      this.position_b,
+      start_time,
+      duration
+    );
+    this.tween_ba = new Tween(
+      this.position_b,
+      this.position_a,
+      start_time,
+      duration
+    );
+  }
+
+  is_done(time) {
+    // The tweens have the same duration, we could use either.
+    return this.tween_ab.is_done(time);
+  }
+
+  render(time) {
+    const b_position = this.tween_ba.get_value(time);
+    const a_position = this.tween_ab.get_value(time);
+
+    const square_b = new RectPrimitive(b_position, STRIDE);
+    const square_a = new RectPrimitive(a_position, STRIDE);
+
+    const group_b = new GroupPrimitive([square_b], this.style_b);
+    const group_a = new GroupPrimitive([square_a], this.style_a);
+
+    // square b must be rendered before square a so the pixel we want to
+    // move is on top.
+    return new GroupPrimitive([group_b, group_a]);
   }
 }
 
@@ -57,6 +99,15 @@ const color_groups = by_colors.map((x, i) => {
 });
 const everything = new GroupPrimitive(color_groups);
 
+const SWAP_PAIR = new PixelSwapPair(
+  new Style().with_fill(new Color(255, 0, 255)),
+  Point.point(10, 10),
+  new Style().with_fill(new Color(255, 255, 255)),
+  Point.point(10 + SQUARE_SIZE, 10),
+  sec_to_frames(1),
+  sec_to_frames(0.25)
+);
+
 export const sketch = (p) => {
   p.setup = () => {
     p.createCanvas(
@@ -72,5 +123,6 @@ export const sketch = (p) => {
     p.background(0);
 
     draw_primitive(p, everything);
+    draw_primitive(p, SWAP_PAIR.render(p.frameCount));
   };
 };
