@@ -13,7 +13,8 @@ export class Motor {
   static rotation(point, angle) {
     const c = Math.cos(angle / 2);
     const s = Math.sin(angle / 2);
-    return new Motor(new Even(c, s, s * point.y));
+    const { x, y } = point;
+    return new Motor(new Even(c, s, s * y, s * x));
   }
 
   transform(object) {

@@ -1,5 +1,9 @@
 import { is_nearly } from "../sketchlib/is_nearly.js";
 
+// Much of the math here is determined by using the geometric algebra library
+// kingdon. See my other repo math-notebook in symbolic/gaproduct.py.
+// At the time of this writing
+// this is in the cga branch
 export class Even {
   constructor(scalar, xy, xo, yo) {
     this.scalar = scalar;
@@ -70,37 +74,55 @@ export class Even {
     // Filling U = a + bxy + cxo + dyo
     const { scalar: bs, xy: bxy, xo: bxo, yo: byo } = other;
 
-    // V[U] = 1/V^2 ([V|U|V] + [V/U/V]) (symmetric and antisymmetric parts)
-
     // V^2 = A^2 + B^2 + 0 + 0 = A^2 + B^2
     const mag_sqr = as * as + bs * bs;
     if (is_nearly(mag_sqr, 0)) {
       return Even.ZERO;
     }
 
-    // Hoagie Product
-    // [V|U|V] = sum_i a_i^2 (U_i_even - U_i_odd)
-    // where i ranges over the components
-    // and the even/odd is referring to how many components _overlap_
-    // The one exception is we ignore cases where there are 2
-    //
-    // scalar: A^2 (a + bxy + cxo + dyo)
-    // xy:     B^2 (a + bxy - cxo - dyo)
-    // no xo or yo part (bread squares to 0)
-
-    // AntiHoagie Product
-    // [1/U/xy]: U_odd(1xy) = (cxo + dyo)xy = (cxoxy + dyoxy) = (cyo - dxo)
-    // [1/U/xo]: U_odd(1xo) = (bxy + )xo
-    // [1/U/yo]: U_odd(1yo) = ()yo
-    // [xy/U/xo]:
-    // [xy/U/yo]:
-    // [xo/U/yo]:
-
-    throw new Error("Not implemented");
+    const scalar = bs;
+    const xy = bxy;
+    const xo =
+      -(
+        -2 * axo * axy * bxy +
+        2 * ayo * as * bxy +
+        -as * as * bxo +
+        -2 * as * axy * byo +
+        axy * axy * bxo
+      ) / mag_sqr;
+    const yo =
+      -(
+        -2 * axo * as * bxy +
+        -2 * ayo * axy * bxy +
+        -as * as * byo +
+        2 * as * axy * bxo +
+        axy * axy * byo
+      ) / mag_sqr;
+    return new Even(scalar, xy, xo, yo);
   }
 
   sandwich_odd(other) {
-    throw new Error("Not implemented");
+    const { scalar: as, xy: axy, xo: axo, yo: ayo } = this;
+    const { x: bx, y: by, o: bo, xyo: bxyo } = other;
+
+    const mag_sqr = as * as + axy * axy;
+    if (is_nearly(mag_sqr, 0)) {
+      return Odd.ZERO;
+    }
+
+    const x = (as * as * bx + 2 * as * axy * by - axy * axy * bx) / mag_sqr;
+    const y = (as * as * bx - 2 * as * axy * bx - axy * axy * by) / mag_sqr;
+    const o =
+      (-2 * axo * as * bx +
+        -2 * axo * axy * by +
+        -2 * ayo * as * by +
+        -2 * ayo * axy * bx +
+        as * as * bo +
+        axy * axy * bo) /
+      mag_sqr;
+    const xyo = bxyo;
+
+    return new Odd(x, y, o, xyo);
   }
 
   sandwich(other) {
@@ -145,103 +167,6 @@ export class Odd {
     return ax * bx + ay * by;
   }
 
-  sandwich_even(other) {
-    const { x, y, o, xyo } = this;
-    const { scalar, xy, xo, yo } = other;
-
-    // if the bread is a null vector, the result will be zero
-    const mag_sqr = x * x + y * y;
-    if (is_nearly(mag_sqr, 0)) {
-      return Even.ZERO;
-    }
-
-    // EDIT: In the derivation below, I'm forgetting to account for the
-    // negative sign for rev(xyo)... I'll revisit this later.
-    //
-    // let A = (ax + by + co + dxyo)
-    //  A^-1 = rev(A) / A^2 = (ax + by + co - dxyo)/A^2
-    //     B = (A + Bxy + Cxo + Dyo)
-    //
-    //  ABA^-1 = 1/A^2 (AB rev(A))
-    //
-    // so we can pull the scalar 1/A^2 out of the product and handle it at the end
-    //
-    // The sandwich product splits into "symmetrical" terms like (ax)B(ax) and
-    // pairs of asymmetrical terms like (ax)B(by) + (by)B(ax). We'll treat
-    // each one separately.
-    //
-    // For symmetrical terms, note that if the bread has a null vector in it
-    // (co and dxyo terms), the result will be 0 since the inner product will
-    // be invoked. So we only have to look at ax and by.
-    //
-    // Furthermore, the trick is to look for how many basis vectors overlap
-    // in a blade sandwich. If it's even, the result is commutative so the
-    // sign will be positive. If it's odd, the result is anticommutative so
-    // the sign will be negative. So we have:
-    //
-    // (ax)B(ax) = a^2(xBx) = a^2(A - Bxy - Cxo + Dyo)
-    // (by)B(by) = b^2(yBy) = b^2(A - Bxy + Cxo - Dyo)
-    //
-    // Now what about the asymmetrical sandwiches like (ax)B(by) + (by)B(ax)?
-    // First, the scalars can be pulled out: (ab)(xBy + yBx)
-    // Each term T of B will either commute or anticommute with x, and this is
-    // independent of the anticommutativity with y.
-    //
-    // There are four possibilities of sign when we commute T with one of the
-    // blades:
-    //
-    // T and x | T and y | xTy + yTx
-    // --------|---------|-----------------------------
-    //    +    |    +    |  Txy + Tyx = T(xy - xy) = 0
-    //    +    |    -    |  Txy - Tyx = 2T(xy)
-    //    -    |    +    | -Txy + Tyx = -2T(xy)
-    //    -    |    -    | -Txy - Tyx = T(-xy + xy) = 0
-    //
-    // So terms that fully commute or anti-commute will cancel out. We only
-    // need to consider terms that commute with one of the pieces of bread but
-    // not the other. Also note that what's left will always have a coefficient
-    // of 2 out front.
-    //
-    // Also remember that this is a degenerate algebra, so any term with two
-    // copies of the null vector will become zero regardless of commutativity.
-    //
-    // Also note that since we are multiplying odd and even grades,
-    // even overlaps commute, odd overlaps anticommute.
-    //
-    // [ax/B/by]   = 2ab(0 + 0 - (Cxo)xy + (Dyo)xy) = 2ab(-Cyo - Dxo)
-    // [ax/B/co]   = 2ac(0 - (Bxy)xo + 0 + 0) = 2ac(Byo)
-    // [ax/B/dxyo] = 2ad(0 - (Bxy)(x)(xyo) + 0 + 0) = 2ad(Bxo)
-    // [by/B/co]   = 2bc(0 - (Bxy)yo + 0 + 0) = 2bc(-Bxo)
-    // [by/B/dxyo] = 2bd(0 - (Bxy)(y)(xyo) + 0 + 0) = 2bd(-Byo)
-    // [co/B/dxyo] = 0 (two null vectors)
-    //
-    // Let's gather up terms by component
-    // scalar: a^2A + b^2A = (a^2 + b^2)A
-    // xy: -a^2 B -b^2 B = -(a^2 + b^2)B
-    // xo: -a^2 C + b^2 C -2ab D + 2ad B - 2bc B = (b^2 - a^2)C -(2ab)D + 2(ad - bc)B
-    // yo: a^2 D - b^2 D -2ab C + 2ac B - 2bd B = (a^2 - b^2)D -(2ab)C + 2(ac - bd)B
-    //
-    // Remember that we have to divide by A^2 = (a^2 + b^2) at the end!
-
-    const a_sqr = x * x;
-    const b_sqr = y * y;
-    const ab = x * y;
-    const ac = x * o;
-    const ad = x * xyo;
-    const bc = y * o;
-    const bd = y * xyo;
-
-    // The scalar term is A^3/A^2 = A
-    const scalar_part = scalar;
-
-    // the xy term is -A^2/A^2 B = -B
-    const xy_part = -xy;
-    const xo_part = (b_sqr - a_sqr) * xo - 2 * ab * yo + 2 * (ad - bc) * xy;
-    const yo_part = (a_sqr - b_sqr) * yo - 2 * ab * xo + 2 * (ac - bd) * xy;
-
-    return new Even(scalar_part, xy_part, xo_part / mag_sqr, yo_part / mag_sqr);
-  }
-
   wedge_odd(other) {
     // Note that the pseudoscalar part xyo will always wedge to 0, so we can
     // ignore it.
@@ -267,8 +192,62 @@ export class Odd {
     return this.wedge_even(other);
   }
 
+  sandwich_even(other) {
+    const { x: ax, y: ay, o: ao, xyo: axyo } = this;
+    const { scalar: bs, xy: bxy, xo: bxo, yo: byo } = other;
+
+    // if the bread is a null vector, the result will be zero
+    const mag_sqr = ax * ax + ay * ay;
+    if (is_nearly(mag_sqr, 0)) {
+      return Even.ZERO;
+    }
+
+    const scalar = bs;
+    const xy = -bxy;
+    const xo =
+      -(
+        2 * ao * ay * bxy +
+        -2 * axyo * ax * bxy +
+        ax * ax * bxo +
+        2 * ax * ay * byo +
+        -ay * ay * bxo
+      ) / mag_sqr;
+    const yo =
+      -(
+        2 * ao * ax * bxy +
+        -2 * axyo * ay * bxy +
+        -ax * ax * byo +
+        2 * ax * ay * bxo +
+        ay * ay * byo
+      ) / mag_sqr;
+
+    return new Even(scalar, xy, xo, yo);
+  }
+
   sandwich_odd(other) {
-    throw new Error("Not Implemented");
+    const { x: ax, y: ay, o: ao, xyo: axyo } = this;
+    const { x: bx, y: by, o: bo, xyo: bxyo } = other;
+
+    const mag_sqr = ax * ax + ay * ay;
+    if (is_nearly(mag_sqr, 0)) {
+      return Odd.ZERO;
+    }
+
+    const x = (ax * ax * bx + 2 * ax * ay * by - ay * ay * bx) / mag_sqr;
+    const y = (-ax * ax * by + 2 * ax * ay * bx + ay * ay * by) / mag_sqr;
+    const o =
+      (2 * ao * ax * bx +
+        2 * ao * ay * by +
+        2 * axyo * ax * by +
+        -2 * axyo * ay * bx +
+        -ax * ax * bo +
+        -ay * ay * bo) /
+      mag_sqr;
+    const xyo = bxyo;
+
+    // Note: for odd[odd], we need to negate the result. The other 3
+    // sandwich products have a positive sign.
+    return new Odd(-x, -y, -o, -xyo);
   }
 
   sandwich(other) {
@@ -288,3 +267,4 @@ export class Odd {
     );
   }
 }
+Odd.ZERO = Object.freeze(new Odd(0, 0, 0, 0));
