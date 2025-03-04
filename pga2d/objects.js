@@ -125,9 +125,18 @@ export class Point {
     return this.bivec.equals(other.bivec);
   }
 
+  to_displacement() {
+    return new Odd(this.x, this.y, 0, 0);
+  }
+
   static lerp(a, b, t) {
     const { xy, xo, yo } = Even.lerp(a.bivec, b.bivec, t);
     return new Point(xy, xo, yo);
+  }
+
+  static from_displacement(vec) {
+    const { x, y } = vec;
+    return Point.point(x, y);
   }
 }
 Point.ORIGIN = Object.freeze(Point.point(0, 0));

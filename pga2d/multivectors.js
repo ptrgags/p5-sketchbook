@@ -165,6 +165,37 @@ export class Odd {
     return this.x * this.x + this.y * this.y;
   }
 
+  norm() {
+    return Math.sqrt(this.norm_sqr());
+  }
+
+  scale(scalar) {
+    return new Odd(
+      this.x * scalar,
+      this.y * scalar,
+      this.o * scalar,
+      this.xyo * scalar
+    );
+  }
+
+  normalize() {
+    const length = this.norm();
+    if (is_nearly(length, 0)) {
+      return this;
+    }
+
+    return new Odd(
+      this.x / length,
+      this.y / length,
+      this.o / length,
+      this.xyo / length
+    );
+  }
+
+  neg() {
+    return new Odd(-this.x, -this.y, -this.o, -this.xyo);
+  }
+
   add(other) {
     const x = this.x + other.x;
     const y = this.y + other.y;

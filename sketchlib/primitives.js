@@ -85,6 +85,22 @@ export class BeziergonPrimitive {
   *[Symbol.iterator]() {
     yield* this.curves;
   }
+
+  static interpolate_points(points) {
+    const bezier_curves = [];
+    const n = points.length;
+
+    for (let i = 0; i < points.length; i++) {
+      const a = points[i];
+      const b = points[(i + 1) % n];
+      const c = points[(i + 2) % n];
+      const d = points[(i + 3) % n];
+      const curve = BezierPrimitive.from_b_spline(a, b, c, d);
+      bezier_curves.push(curve);
+    }
+
+    return new BeziergonPrimitive(bezier_curves);
+  }
 }
 
 export class GroupPrimitive {

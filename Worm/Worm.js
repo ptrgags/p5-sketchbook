@@ -2,10 +2,12 @@ import { Point } from "../pga2d/objects.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { fix_mouse_coords } from "../sketchlib/fix_mouse_coords.js";
 import {
+  BeziergonPrimitive,
   CirclePrimitive,
   GroupPrimitive,
   LinePrimitive,
   PointPrimitive,
+  PolygonPrimitive,
 } from "../sketchlib/primitives.js";
 import { Style } from "../sketchlib/Style.js";
 import { Color } from "../sketchlib/Style.js";
@@ -15,6 +17,8 @@ import { Motor } from "../pga2d/versors.js";
 const MIN_ANGLE = Math.PI / 6;
 const MIN_DOT_PRODUCT = Math.cos(MIN_ANGLE);
 const ROTOR = Motor.rotation(Point.ZERO, MIN_ANGLE);
+const ROT90 = Motor.rotation(Point.ZERO, Math.PI / 2);
+const ROT45 = Motor.rotation(Point.ZERO, Math.PI / 4);
 
 class BodySegment {
   constructor(initial_position, follow_distance) {
@@ -59,7 +63,7 @@ const SPINE_STYLE = new Style().with_stroke(COLOR_SPINE);
 const CENTER_STYLE = new Style().with_fill(COLOR_SPINE);
 const WORM_STYLE = new Style()
   .with_fill(new Color(255, 122, 151))
-  .with_stroke(new Color(0, 0, 0));
+  .with_stroke(new Color(255, 0, 0));
 
 const WORM_SEGMENTS = 100;
 const WORM_SEGMENT_SEPARATION = 20;
@@ -120,21 +124,69 @@ class Worm {
 
   render_body() {
     const circles = new Array(this.segments.length);
+    const left_points = new Array(this.segments.length);
+    const right_points = new Array(this.segments.length);
     for (const [i, segment] of this.segments.entries()) {
       circles[i] = new CirclePrimitive(segment.position, WORM_THICKNESS);
 
       const forward_direction =
         i == 0
-          ? segment.position.sub(this.segments[i + 1].position)
+          ? segment.position.sub(this.segments[1].position)
           : this.segments[i - 1].position.sub(segment.position);
       const forward_vec = forward_direction.dual().as_vec();
+
+      const left_dir = ROT90.transform_multivec(forward_vec).normalize();
+      const right_dir = left_dir.neg();
+
+      const center_vec = segment.position.to_displacement();
+      const left_point = center_vec.add(left_dir.scale(WORM_THICKNESS));
+      const right_point = center_vec.add(right_dir.scale(WORM_THICKNESS));
+
+      left_points[i] = Point.from_displacement(left_point);
+      right_points[i] = Point.from_displacement(right_point);
     }
 
-    return new GroupPrimitive(circles, WORM_STYLE);
+    const head = this.head;
+    const heading = head.position
+      .sub(this.segments[1].position)
+      .to_displacement()
+      .normalize();
+
+    const head_vec = head.position.to_displacement();
+
+    const left_45 = ROT45.transform_multivec(heading);
+    const right_45 = ROT45.reverse().transform_multivec(heading);
+
+    const head_point = head_vec.add(heading.scale(WORM_THICKNESS));
+    const head_left = head_vec.add(left_45.scale(WORM_THICKNESS));
+    const head_right = head_vec.add(right_45.scale(WORM_THICKNESS));
+
+    const tail = this.tail;
+    // It's a pun :P
+    const tailing = tail.position
+      .sub(this.segments[this.segments.length - 2].position)
+      .to_displacement();
+
+    const tail_point = tail.position
+      .to_displacement()
+      .add(tailing.scale(WORM_THICKNESS));
+
+    right_points.reverse();
+    const all_points = left_points.concat(
+      Point.from_displacement(tail_point),
+      right_points,
+      Point.from_displacement(head_right),
+      Point.from_displacement(head_point),
+      Point.from_displacement(head_left)
+    );
+    const beziergon = BeziergonPrimitive.interpolate_points(all_points);
+
+    //const debug = new PointPrimitive(all_points[all_points.length - 1]);
+    return new GroupPrimitive([beziergon /*debug*/], WORM_STYLE);
   }
 
   render() {
-    // Who said worms can't be invertibrates?
+    // Who said worms can't be vertibrates?
     const spine = this.render_spine();
     const body = this.render_body();
     return new GroupPrimitive([body, spine]);
