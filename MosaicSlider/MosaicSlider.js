@@ -94,6 +94,39 @@ class MosaicGrid {
     this.dst_pixel = undefined;
   }
 
+  compute_neighbor(src_index, mouse) {
+    // If the mouse didn't leave the cell, we can ignore the mouse event.
+    const { x, y } = mouse;
+    const mi = Math.floor((y - MARGIN_Y) / SQUARE_SIZE);
+    const mj = Math.floor((x - MARGIN_X) / SQUARE_SIZE);
+    const { i, j } = src_index;
+    if (i === mi && j === mj) {
+      return undefined;
+    }
+
+    // Look at the vector between the cell's center and the mouse.
+    // Pick the closest cardinal direction and move one cell in that direction.
+    const src_center = Point.point(
+      MARGIN_X + (j + 0.5) * SQUARE_SIZE,
+      MARGIN_Y + (i + 0.5) * SQUARE_SIZE
+    );
+    const to_mouse = mouse.sub(src_center);
+
+    const abs_x = Math.abs(to_mouse.x);
+    const abs_y = Math.abs(to_mouse.y);
+    const is_horizontal = abs_x > abs_y;
+
+    if (is_horizontal && to_mouse.x > 0) {
+      return this.grid.right(src_index);
+    } else if (is_horizontal) {
+      return src_index.left();
+    } else if (!is_horizontal && to_mouse.y > 0) {
+      return this.grid.down(src_index);
+    }
+
+    return src_index.up();
+  }
+
   get_style(index) {
     const color_index = this.grid.get(index);
     return this.styles[color_index];
@@ -158,7 +191,7 @@ const SliderState = {
   ANIMATING: 2,
 };
 
-const SWAP_DURATION = sec_to_frames(0.25);
+const SWAP_DURATION = sec_to_frames(0.125);
 
 class MosaicSlider {
   constructor(colors) {
@@ -171,10 +204,12 @@ class MosaicSlider {
     this.time = 0;
 
     this.swap_pair = undefined;
+    this.mouse = Point.point(0, 0);
     this.mouse_down = false;
   }
 
   mouse_press(mouse) {
+    this.mouse = mouse;
     this.mouse_down = true;
 
     if (this.state !== SliderState.IDLE) {
@@ -193,27 +228,26 @@ class MosaicSlider {
   }
 
   mouse_drag(mouse) {
+    this.mouse = mouse;
     this.mouse_down = true;
 
     if (this.state !== SliderState.SELECTING) {
       return;
     }
 
-    const { x, y } = mouse;
-    const j = Math.floor((x - MARGIN_X) / SQUARE_SIZE);
-    const i = Math.floor((y - MARGIN_Y) / SQUARE_SIZE);
-    this.dst_index = new Index2D(i, j);
+    this.dst_index = this.grid.compute_neighbor(this.src_index, mouse);
 
     // If the mouse moved to one of the selected cell's neighbors, start
     // the swapping animation
-    if (this.src_index.direction_to(this.dst_index) !== undefined) {
-      const { i: ai, j: aj } = this.src_index;
+    if (this.dst_index) {
+      const { i: src_i, j: src_j } = this.src_index;
+      const { i: dst_i, j: dst_j } = this.dst_index;
       const position_a = CORNER.add(
-        Point.direction(aj * SQUARE_SIZE, ai * SQUARE_SIZE)
+        Point.direction(src_j * SQUARE_SIZE, src_i * SQUARE_SIZE)
       );
       const style_a = this.grid.get_style(this.src_index);
       const position_b = CORNER.add(
-        Point.direction(j * SQUARE_SIZE, i * SQUARE_SIZE)
+        Point.direction(dst_j * SQUARE_SIZE, dst_i * SQUARE_SIZE)
       );
       const style_b = this.grid.get_style(this.dst_index);
       this.swap_pair = new PixelSwapPair(
@@ -230,6 +264,7 @@ class MosaicSlider {
   }
 
   mouse_release() {
+    this.mouse = this.mouse;
     this.mouse_down = false;
 
     if (this.state === SliderState.SELECTING) {
@@ -243,11 +278,14 @@ class MosaicSlider {
     if (this.mouse_down) {
       this.state = SliderState.SELECTING;
       this.src_index = this.dst_index;
+      this.dst_index = undefined;
+      // Simulate a mouse drag to keep the animation going.
+      this.mouse_drag(this.mouse);
     } else {
       this.state = SliderState.IDLE;
       this.src_index = undefined;
+      this.dst_index = undefined;
     }
-    this.dst_index = undefined;
   }
 
   update(time) {
@@ -270,10 +308,10 @@ class MosaicSlider {
 }
 
 const COLORS = [
-  new Color(255, 0, 0),
-  new Color(0, 255, 0),
-  new Color(0, 0, 255),
-  new Color(255, 255, 0),
+  new Color(0x23, 0x1f, 0x20),
+  new Color(0xbb, 0x44, 0x30),
+  new Color(0x7e, 0xbd, 0xc2),
+  new Color(0xf3, 0xdf, 0xa2),
 ];
 
 const SWAP_PAIR = new PixelSwapPair(
