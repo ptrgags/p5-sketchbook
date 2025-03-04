@@ -94,6 +94,11 @@ class MosaicGrid {
     this.dst_pixel = undefined;
   }
 
+  get_style(index) {
+    const color_index = this.grid.get(index);
+    return this.styles[color_index];
+  }
+
   create_primitive() {
     const by_colors = [[], [], [], [], []];
     this.grid.for_each((index, color_index) => {
@@ -153,20 +158,20 @@ const SliderState = {
   ANIMATING: 2,
 };
 
+const SWAP_DURATION = sec_to_frames(0.25);
+
 class MosaicSlider {
   constructor(colors) {
     this.grid = new MosaicGrid(COLORS);
     this.state = SliderState.IDLE;
 
-    this.swap_pair = undefined;
     this.src_index = undefined;
     this.dst_index = undefined;
-    this.mouse_down = false;
 
-    const a = new Index2D(7, 7);
-    const b = new Index2D(7, 8);
-    this.grid.pop_out_pair(a, b);
-    this.grid.pop_in_swapped_pair();
+    this.time = 0;
+
+    this.swap_pair = undefined;
+    this.mouse_down = false;
   }
 
   mouse_press(mouse) {
@@ -183,30 +188,83 @@ class MosaicSlider {
       return;
     }
 
-    const index = new Index2D(i, j);
-    //this.grid.set_src(index);
-    //this.state = SliderState.SELECTING;
+    this.src_index = new Index2D(i, j);
+    this.state = SliderState.SELECTING;
   }
 
   mouse_drag(mouse) {
     this.mouse_down = true;
-  }
 
-  mouse_release(mouse) {
-    this.mouse_down = false;
-  }
+    if (this.state !== SliderState.SELECTING) {
+      return;
+    }
 
-  done_animation() {
-    if (this.mouse_down) {
-      this.grid.set(this.src_index, this.dst);
-      this.src_index;
-    } else {
+    const { x, y } = mouse;
+    const j = Math.floor((x - MARGIN_X) / SQUARE_SIZE);
+    const i = Math.floor((y - MARGIN_Y) / SQUARE_SIZE);
+    this.dst_index = new Index2D(i, j);
+
+    // If the mouse moved to one of the selected cell's neighbors, start
+    // the swapping animation
+    if (this.src_index.direction_to(this.dst_index) !== undefined) {
+      const { i: ai, j: aj } = this.src_index;
+      const position_a = CORNER.add(
+        Point.direction(aj * SQUARE_SIZE, ai * SQUARE_SIZE)
+      );
+      const style_a = this.grid.get_style(this.src_index);
+      const position_b = CORNER.add(
+        Point.direction(j * SQUARE_SIZE, i * SQUARE_SIZE)
+      );
+      const style_b = this.grid.get_style(this.dst_index);
+      this.swap_pair = new PixelSwapPair(
+        style_a,
+        position_a,
+        style_b,
+        position_b,
+        this.time,
+        SWAP_DURATION
+      );
+      this.grid.pop_out_pair(this.src_index, this.dst_index);
+      this.state = SliderState.ANIMATING;
     }
   }
 
-  update(time) {}
+  mouse_release() {
+    this.mouse_down = false;
 
-  render() {
+    if (this.state === SliderState.SELECTING) {
+      this.state = SliderState.IDLE;
+    }
+  }
+
+  done_animation() {
+    this.grid.pop_in_swapped_pair();
+    this.swap_pair = undefined;
+    if (this.mouse_down) {
+      this.state = SliderState.SELECTING;
+      this.src_index = this.dst_index;
+    } else {
+      this.state = SliderState.IDLE;
+      this.src_index = undefined;
+    }
+    this.dst_index = undefined;
+  }
+
+  update(time) {
+    this.time = time;
+
+    if (this.swap_pair && this.swap_pair.is_done(time)) {
+      this.done_animation();
+    }
+  }
+
+  render(time) {
+    if (this.swap_pair) {
+      return new GroupPrimitive([
+        this.grid.render(),
+        this.swap_pair.render(time),
+      ]);
+    }
     return this.grid.render();
   }
 }
@@ -243,19 +301,23 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    draw_primitive(p, MOSAIC.render());
+    draw_primitive(p, MOSAIC.render(p.frameCount));
     //draw_primitive(p, SWAP_PAIR.render(p.frameCount));
+
+    MOSAIC.update(p.frameCount);
   };
 
   p.mousePressed = () => {
     const mouse = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
+    MOSAIC.mouse_press(mouse);
   };
 
   p.mouseDragged = () => {
     const mouse = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
+    MOSAIC.mouse_drag(mouse);
   };
 
   p.mouseReleased = () => {
-    const mouse = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
+    MOSAIC.mouse_release();
   };
 };
