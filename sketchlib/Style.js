@@ -5,6 +5,7 @@ export class Color {
     this.b = b;
   }
 }
+Color.BLACK = Object.freeze(new Color(0, 0, 0));
 Color.WHITE = Object.freeze(new Color(255, 255, 255));
 Color.RED = Object.freeze(new Color(255, 0, 0));
 Color.GREEN = Object.freeze(new Color(0, 255, 0));
