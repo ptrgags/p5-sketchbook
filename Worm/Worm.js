@@ -2,6 +2,7 @@ import { Point } from "../pga2d/objects.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { fix_mouse_coords } from "../sketchlib/fix_mouse_coords.js";
 import {
+  CirclePrimitive,
   GroupPrimitive,
   LinePrimitive,
   PointPrimitive,
@@ -46,19 +47,25 @@ class BodySegment {
       const rotated = rotor.transform_multivec(b);
       const offset = rotated.add(prev_segment.position.dual().as_vec());
       const { xy, xo, yo } = offset.dual();
-      this.position = new Point(xy, xo, yo);
+      //this.position = new Point(xy, xo, yo);
     }
+
+    this.follow(prev_segment);
   }
 }
 
 const COLOR_SPINE = new Color(255, 255, 255);
 const SPINE_STYLE = new Style().with_stroke(COLOR_SPINE);
 const CENTER_STYLE = new Style().with_fill(COLOR_SPINE);
+const WORM_STYLE = new Style()
+  .with_fill(new Color(255, 122, 151))
+  .with_stroke(new Color(0, 0, 0));
 
 const WORM_SEGMENTS = 100;
 const WORM_SEGMENT_SEPARATION = 20;
 // speed in pixels per frame
-const WORM_MAX_SPEED = 5;
+const WORM_MAX_SPEED = 10;
+const WORM_THICKNESS = 30;
 class Worm {
   constructor() {
     const first_point = Point.point(WIDTH / 2, HEIGHT / 2);
@@ -95,7 +102,7 @@ class Worm {
     }
   }
 
-  render() {
+  render_spine() {
     const lines = new Array(this.segments.length - 1);
     for (let i = 0; i < lines.length; i++) {
       lines[i] = new LinePrimitive(
@@ -109,6 +116,28 @@ class Worm {
     const centers_group = new GroupPrimitive(centers, CENTER_STYLE);
 
     return new GroupPrimitive([spine_group, centers_group]);
+  }
+
+  render_body() {
+    const circles = new Array(this.segments.length);
+    for (const [i, segment] of this.segments.entries()) {
+      circles[i] = new CirclePrimitive(segment.position, WORM_THICKNESS);
+
+      const forward_direction =
+        i == 0
+          ? segment.position.sub(this.segments[i + 1].position)
+          : this.segments[i - 1].position.sub(segment.position);
+      const forward_vec = forward_direction.dual().as_vec();
+    }
+
+    return new GroupPrimitive(circles, WORM_STYLE);
+  }
+
+  render() {
+    // Who said worms can't be invertibrates?
+    const spine = this.render_spine();
+    const body = this.render_body();
+    return new GroupPrimitive([body, spine]);
   }
 }
 
