@@ -28,6 +28,10 @@ export class Motor {
     return new Point(xy, xo, yo);
   }
 
+  transform_multivec(multivec) {
+    return this.even.sandwich(multivec);
+  }
+
   toString() {
     return `Motor(${this.even})`;
   }
@@ -51,6 +55,10 @@ export class Flector {
     // Point
     const { xy, xo, yo } = this.odd.sandwich(object.bivec);
     return new Point(xy, xo, yo);
+  }
+
+  transform_multivec(multivec) {
+    return this.odd.sandwich(multivec);
   }
 
   toString() {

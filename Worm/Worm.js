@@ -43,7 +43,10 @@ class BodySegment {
 
     if (a.dot(b) < MIN_DOT_PRODUCT) {
       const rotor = is_ccw ? ROTOR : ROTOR.reverse();
-      this.position = rotor.transform(b).add(prev_segment.position);
+      const rotated = rotor.transform_multivec(b);
+      const offset = rotated.add(prev_segment.position.dual().as_vec());
+      const { xy, xo, yo } = offset.dual();
+      this.position = new Point(xy, xo, yo);
     }
   }
 }

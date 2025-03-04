@@ -165,6 +165,18 @@ export class Odd {
     return this.x * this.x + this.y * this.y;
   }
 
+  add(other) {
+    const x = this.x + other.x;
+    const y = this.y + other.y;
+    const o = this.o + other.o;
+    const xyo = this.xyo + other.xyo;
+    return new Odd(x, y, o, xyo);
+  }
+
+  dual() {
+    return new Even(this.xyo, this.o, -this.y, this.x);
+  }
+
   dot(other) {
     // The o and xyo components square to zero, so they are needed
     const { x: ax, y: ay } = this;
