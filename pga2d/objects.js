@@ -177,6 +177,14 @@ export class Line {
   equals(other) {
     return this.vec.equals(other.vec);
   }
+
+  toString() {
+    if (this.is_infinite) {
+      return `LineAtInfinity(${this.vec.o})`;
+    }
+
+    return `Line(${this.nx}, ${this.ny}, ${this.d})`;
+  }
 }
 Line.X_AXIS = Object.freeze(new Line(0, 1, 0));
 Line.Y_AXIS = Object.freeze(new Line(1, 0, 0));

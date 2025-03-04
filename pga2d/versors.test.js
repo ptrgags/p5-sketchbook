@@ -65,7 +65,9 @@ describe("Flector", () => {
       const line = new Line(1, 2, 3);
       const reflection = Flector.reflection(line);
 
-      const result = reflection.transform(reflection.transform(point));
+      const reflect_once = reflection.transform(point);
+      const result = reflection.transform(reflect_once);
+
       expect(result).toBePoint(point);
     });
 

@@ -143,6 +143,12 @@ export class Even {
 
     return new Even(scalar, xy, xo, yo);
   }
+
+  toString() {
+    return `${this.scalar.toPrecision(2)} + ${this.xy.toPrecision(
+      2
+    )}xy + ${this.xo.toPrecision(2)}xo + ${this.yo.toPrecision(2)}`;
+  }
 }
 Even.ZERO = Object.freeze(new Even(0, 0, 0, 0));
 Even.IDENTITY = Object.freeze(new Even(1, 0, 0, 0));
@@ -214,7 +220,7 @@ export class Odd {
       ) / mag_sqr;
     const yo =
       -(
-        2 * ao * ax * bxy +
+        -2 * ao * ax * bxy +
         -2 * axyo * ay * bxy +
         -ax * ax * byo +
         2 * ax * ay * bxo +
@@ -265,6 +271,12 @@ export class Odd {
       is_nearly(this.o, other.o) &&
       is_nearly(this.xyo, other.xyo)
     );
+  }
+
+  toString() {
+    return `${this.x.toPrecision(2)}x + ${this.y.toPrecision(
+      2
+    )}y + ${this.o.toPrecision(2)}o + ${this.xyo.toPrecision(2)}xyo`;
   }
 }
 Odd.ZERO = Object.freeze(new Odd(0, 0, 0, 0));

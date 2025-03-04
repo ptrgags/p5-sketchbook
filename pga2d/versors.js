@@ -27,6 +27,10 @@ export class Motor {
     const { xy, xo, yo } = this.even.sandwich(object.bivec);
     return new Point(xy, xo, yo);
   }
+
+  toString() {
+    return `Motor(${this.even})`;
+  }
 }
 
 export class Flector {
@@ -47,5 +51,9 @@ export class Flector {
     // Point
     const { xy, xo, yo } = this.odd.sandwich(object.bivec);
     return new Point(xy, xo, yo);
+  }
+
+  toString() {
+    return `Flector(${this.odd})`;
   }
 }
