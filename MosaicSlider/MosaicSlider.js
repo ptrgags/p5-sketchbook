@@ -63,16 +63,6 @@ class PixelSwapPair {
   }
 }
 
-const COLORS = [
-  new Color(255, 0, 0),
-  new Color(0, 255, 0),
-  new Color(0, 0, 255),
-  new Color(255, 255, 0),
-];
-const STYLES = COLORS.map((x) =>
-  new Style().with_fill(x).with_stroke(new Color(0, 0, 0))
-);
-
 function select_color(index) {
   const { i, j } = index;
   const upper_half = i < ROWS / 2;
@@ -81,24 +71,49 @@ function select_color(index) {
   return (upper_half << 1) | left_half;
 }
 
-const GRID = new Grid(ROWS, COLS);
-GRID.fill((index) => {
-  return new MosaicPixel(select_color(index), index);
-});
+class MosaicGrid {
+  constructor(colors) {
+    this.colors = colors;
+    this.grid = new Grid(ROWS, COLS);
+    this.grid.fill((index) => {
+      return new MosaicPixel(select_color(index), index);
+    });
 
-const by_colors = [[], [], [], []];
-for (const pixel of GRID) {
-  const { i, j } = pixel.index;
-  const offset = Point.direction(j * SQUARE_SIZE, i * SQUARE_SIZE);
-  const position = CORNER.add(offset);
-  const rect = new RectPrimitive(position, STRIDE);
-  by_colors[pixel.color_index].push(rect);
+    this.styles = COLORS.map((x) =>
+      new Style().with_fill(x).with_stroke(new Color(0, 0, 0))
+    );
+
+    this.primitive = this.create_primitive();
+  }
+
+  create_primitive() {
+    const by_colors = [[], [], [], []];
+    for (const pixel of this.grid) {
+      const { i, j } = pixel.index;
+      const offset = Point.direction(j * SQUARE_SIZE, i * SQUARE_SIZE);
+      const position = CORNER.add(offset);
+      const rect = new RectPrimitive(position, STRIDE);
+      by_colors[pixel.color_index].push(rect);
+    }
+    const color_groups = by_colors.map((x, i) => {
+      return new GroupPrimitive(x, this.styles[i]);
+    });
+    return new GroupPrimitive(color_groups);
+  }
+
+  render() {
+    return this.primitive;
+  }
 }
-const color_groups = by_colors.map((x, i) => {
-  return new GroupPrimitive(x, STYLES[i]);
-});
-const everything = new GroupPrimitive(color_groups);
 
+const COLORS = [
+  new Color(255, 0, 0),
+  new Color(0, 255, 0),
+  new Color(0, 0, 255),
+  new Color(255, 255, 0),
+];
+
+const MOSAIC = new MosaicGrid(COLORS);
 const SWAP_PAIR = new PixelSwapPair(
   new Style().with_fill(new Color(255, 0, 255)),
   Point.point(10, 10),
@@ -116,13 +131,12 @@ export const sketch = (p) => {
       undefined,
       document.getElementById("sketch-canvas")
     );
-    console.log(everything);
   };
 
   p.draw = () => {
     p.background(0);
 
-    draw_primitive(p, everything);
+    draw_primitive(p, MOSAIC.render());
     draw_primitive(p, SWAP_PAIR.render(p.frameCount));
   };
 };
