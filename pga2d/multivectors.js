@@ -41,10 +41,17 @@ export class Even {
   antidual = this.dual;
 
   vee_even(other) {
-    // a v b = antidual(dual(a) ^ dual(b))
-    const a_dual = this.dual();
-    const b_dual = other.dual();
-    return a_dual.wedge(b_dual).antidual();
+    // Bread V = A + Bxy + Cxo + Dyo
+    const { xy: axy, xo: axo, yo: ayo } = this;
+    // Filling U = a + bxy + cxo + dyo
+    const { xy: bxy, xo: bxo, yo: byo } = other;
+
+    const x = -axo * bxy + axy * bxo;
+    const y = -ayo * bxy + axy * byo;
+    const o = axo * byo - ayo * bxo;
+    // Since the regressive product reduces grade, we will never get the
+    // pseudoscalar
+    return new Odd(x, y, o, 0);
   }
 
   vee_odd(other) {

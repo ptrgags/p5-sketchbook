@@ -26,7 +26,7 @@ class BodySegment {
   }
 
   follow(segment) {
-    // Get a vector from the segment we're following to us, but limit it
+    // Get a direction from the segment we're following to us, but limit it
     // to the follow distance
     const separation = this.position
       .sub(segment.position)
@@ -44,7 +44,7 @@ class BodySegment {
     // Get lines oriented away from the center point
     const ba = b.join(a);
     const bc = b.join(c);
-    const is_ccw = bc.meet(ba).bivec.xy > 0;
+    const is_ccw = bc.sin_angle_to(ba) > 0;
     const dot_product = bc.dot(ba);
 
     if (dot_product < MIN_DOT_PRODUCT) {

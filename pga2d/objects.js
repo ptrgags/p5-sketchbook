@@ -187,6 +187,10 @@ export class Line {
     return this.vec.equals(other.vec);
   }
 
+  sin_angle_to(other) {
+    return this.vec.wedge(other.vec).xy;
+  }
+
   toString() {
     if (this.is_infinite) {
       return `LineAtInfinity(${this.vec.o})`;
