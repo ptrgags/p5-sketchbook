@@ -32,13 +32,13 @@ export class Even {
     return new Odd(this.yo, -this.xo, this.xy, this.scalar);
   }
 
-  reverse() {
-    return new Even(this.scalar, -this.xy, -this.xo, -this.yo);
-  }
-
   // in 2D PGA, the antidual has exactly the same signs as the dual
   // so we get this function for free!
   antidual = this.dual;
+
+  reverse() {
+    return new Even(this.scalar, -this.xy, -this.xo, -this.yo);
+  }
 
   vee_even(other) {
     // Bread V = A + Bxy + Cxo + Dyo
