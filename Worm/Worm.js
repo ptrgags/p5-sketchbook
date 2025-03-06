@@ -14,9 +14,8 @@ import { Color } from "../sketchlib/Style.js";
 import { draw_primitive } from "../sketchlib/draw_primitive.js";
 import { Motor } from "../pga2d/versors.js";
 
-const MIN_ANGLE = Math.PI / 6;
+const MIN_ANGLE = (2 * Math.PI) / 3;
 const MIN_DOT_PRODUCT = Math.cos(MIN_ANGLE);
-const ROTOR = Motor.rotation(Point.ZERO, MIN_ANGLE);
 const ROT90 = Motor.rotation(Point.ZERO, Math.PI / 2);
 const ROT45 = Motor.rotation(Point.ZERO, Math.PI / 4);
 
@@ -37,24 +36,26 @@ class BodySegment {
   }
 
   follow_bend(prev_segment, prev_prev_segment) {
-    // get vectors relative to the center point. The dual is needed here
-    const a = prev_prev_segment.position
-      .sub(prev_segment.position)
-      .dual()
-      .as_vec();
-    const b = this.position.sub(prev_segment.position).dual().as_vec();
+    // Three points around the bend
+    const a = prev_prev_segment.position;
+    const b = prev_segment.position;
+    const c = this.position;
 
-    const is_ccw = a.wedge(b).xy > 0;
+    // Get lines oriented away from the center point
+    const ba = b.join(a);
+    const bc = b.join(c);
+    const is_ccw = bc.meet(ba).bivec.xy > 0;
+    const dot_product = bc.dot(ba);
 
-    if (a.dot(b) < MIN_DOT_PRODUCT) {
-      const rotor = is_ccw ? ROTOR : ROTOR.reverse();
-      const rotated = rotor.transform_multivec(b);
-      const offset = rotated.add(prev_segment.position.dual().as_vec());
-      const { xy, xo, yo } = offset.dual();
-      //this.position = new Point(xy, xo, yo);
+    if (dot_product < MIN_DOT_PRODUCT) {
+      // The bend angle is not too sharp, so follow behind as usual
+      this.follow(prev_segment);
+      return;
+    } else if (is_ccw) {
+      this.position = Motor.rotation(b, -MIN_ANGLE).transform(a);
+    } else {
+      this.position = Motor.rotation(b, MIN_ANGLE).transform(a);
     }
-
-    this.follow(prev_segment);
   }
 }
 
