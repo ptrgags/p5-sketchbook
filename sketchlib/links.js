@@ -58,6 +58,10 @@ export const LINKS = [
   },
 
   {
+    title: "Raster Tangles",
+    year: "2022",
+  },
+  {
     title: "Origami Tiles",
     year: "2021",
   },
