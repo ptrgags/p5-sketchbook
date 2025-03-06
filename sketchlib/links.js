@@ -58,6 +58,10 @@ export const LINKS = [
   },
 
   {
+    title: "Planar Curves",
+    year: "2021",
+  },
+  {
     title: "Origami Tiles",
     year: "2021",
   },
