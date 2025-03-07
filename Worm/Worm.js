@@ -13,12 +13,15 @@ import { Color } from "../sketchlib/Style.js";
 import { draw_primitive } from "../sketchlib/draw_primitive.js";
 import { Motor } from "../pga2d/versors.js";
 import { Joint } from "./AnimationChain.js";
+import { is_nearly } from "../sketchlib/is_nearly.js";
+import { GooglyEye } from "./GooglyEye.js";
 
 const MIN_ANGLE = (2 * Math.PI) / 3;
 const MIN_DOT_PRODUCT = Math.cos(MIN_ANGLE);
 const ROT90 = Motor.rotation(Point.ORIGIN, Math.PI / 2);
 const ROT45 = Motor.rotation(Point.ORIGIN, Math.PI / 4);
 const ROT15 = Motor.rotation(Point.ORIGIN, Math.PI / 12);
+const SHOW_SPINE = false;
 
 class BodySegment {
   constructor(initial_position, follow_distance) {
@@ -65,13 +68,17 @@ const SPINE_STYLE = new Style().with_stroke(COLOR_SPINE);
 const CENTER_STYLE = new Style().with_fill(COLOR_SPINE);
 const WORM_STYLE = new Style()
   .with_fill(new Color(255, 122, 151))
-  .with_stroke(new Color(255, 0, 0));
+  .with_stroke(new Color(127, 61, 76));
 
 const WORM_SEGMENTS = 100;
 const WORM_SEGMENT_SEPARATION = 20;
 // speed in pixels per frame
 const WORM_MAX_SPEED = 10;
 const WORM_THICKNESS = 30;
+
+const WORM_EYE_RADIUS = 0.25 * WORM_THICKNESS;
+const WORM_PUPIL_RADIUS = (3 / 16) * WORM_THICKNESS;
+const WORM_EYE_SEPARATION = 0.5 * WORM_THICKNESS;
 class Worm {
   constructor() {
     const first_point = Point.point(WIDTH / 2, HEIGHT / 2);
@@ -81,11 +88,26 @@ class Worm {
      * @type {Joint[]}
      */
     this.segments = new Array(WORM_SEGMENTS);
-
     for (let i = 0; i < WORM_SEGMENTS; i++) {
       const position = first_point.add(down.scale(i));
       this.segments[i] = new Joint(position, WORM_SEGMENT_SEPARATION);
     }
+
+    this.look_direction = Point.direction(0, 1);
+    this.googly = [
+      new GooglyEye(
+        first_point.add(Point.DIR_X.scale(-WORM_EYE_SEPARATION)),
+        this.look_direction,
+        WORM_EYE_RADIUS,
+        WORM_PUPIL_RADIUS
+      ),
+      new GooglyEye(
+        first_point.add(Point.DIR_X.scale(WORM_EYE_SEPARATION)),
+        this.look_direction,
+        WORM_EYE_RADIUS,
+        WORM_PUPIL_RADIUS
+      ),
+    ];
   }
 
   get head() {
@@ -101,6 +123,10 @@ class Worm {
    */
   move_head_towards(point) {
     const velocity = point.sub(this.head.position).limit_length(WORM_MAX_SPEED);
+    if (!is_nearly(velocity.ideal_norm_sqr(), 0)) {
+      this.look_direction = velocity.normalize();
+    }
+
     this.head.position = this.head.position.add(velocity);
 
     for (let i = 1; i < this.segments.length; i++) {
@@ -208,11 +234,30 @@ class Worm {
     return new GroupPrimitive([beziergon], WORM_STYLE);
   }
 
+  render_eyes() {
+    const [left, right] = this.googly;
+
+    const center = this.head.position;
+    const left_dir = ROT90.transform_point(this.look_direction);
+    const right_dir = ROT90.reverse().transform_point(this.look_direction);
+
+    const left_position = center.add(left_dir.scale(WORM_EYE_SEPARATION));
+    const right_position = center.add(right_dir.scale(WORM_EYE_SEPARATION));
+    left.update(left_position, this.look_direction);
+    right.update(right_position, this.look_direction);
+    return new GroupPrimitive([left.render(), right.render()]);
+  }
+
   render() {
     // Who said worms can't be vertibrates?
     const spine = this.render_spine();
     const body = this.render_body();
-    return new GroupPrimitive([body, spine]);
+    const eyes = this.render_eyes();
+    if (SHOW_SPINE) {
+      return new GroupPrimitive([body, spine, eyes]);
+    } else {
+      return new GroupPrimitive([body, eyes]);
+    }
   }
 }
 
