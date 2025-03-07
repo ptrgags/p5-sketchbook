@@ -1,5 +1,5 @@
 import { is_nearly } from "../sketchlib/is_nearly";
-import { Even } from "./multivectors";
+import { Even, Odd } from "./multivectors";
 import { Point, Line } from "./objects";
 
 function diff_property(diffs, received, expected, property_name) {
@@ -20,10 +20,12 @@ function diff_float_property(diffs, received, expected, property_name, label) {
   }
 }
 
-function format_even_diff(diffs, received, expected) {
+function format_even_diff(received, expected) {
   if (!(received instanceof Even)) {
     return `received is not an Even object: ${received}`;
   }
+
+  const diffs = [];
 
   diff_float_property(diffs, received, expected, "scalar", "scalar");
   diff_float_property(diffs, received, expected, "yo", "yo");
@@ -33,10 +35,12 @@ function format_even_diff(diffs, received, expected) {
   return "actual | expected\n" + diffs.join("\n");
 }
 
-function format_odd_diff(diffs, received, expected) {
-  if (!(received instanceof Even)) {
-    return `received is not an Even object: ${received}`;
+function format_odd_diff(received, expected) {
+  if (!(received instanceof Odd)) {
+    return `received is not an Odd object: ${received}`;
   }
+
+  const diffs = [];
 
   diff_float_property(diffs, received, expected, "x", "x");
   diff_float_property(diffs, received, expected, "y", "y");

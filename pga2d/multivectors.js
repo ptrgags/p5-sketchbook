@@ -81,8 +81,7 @@ export class Even {
     // Filling U = a + bxy + cxo + dyo
     const { scalar: bs, xy: bxy, xo: bxo, yo: byo } = other;
 
-    // V^2 = A^2 + B^2 + 0 + 0 = A^2 + B^2
-    const mag_sqr = as * as + bs * bs;
+    const mag_sqr = as * as + axy * axy;
     if (is_nearly(mag_sqr, 0)) {
       return Even.ZERO;
     }
@@ -211,9 +210,19 @@ export class Odd {
     return new Odd(x, y, o, xyo);
   }
 
+  sub(other) {
+    const x = this.x - other.x;
+    const y = this.y - other.y;
+    const o = this.o - other.o;
+    const xyo = this.xyo - other.xyo;
+    return new Odd(x, y, o, xyo);
+  }
+
   dual() {
     return new Even(this.xyo, this.o, -this.y, this.x);
   }
+
+  antidual = this.dual;
 
   dot(other) {
     // The o and xyo components square to zero, so they are needed
