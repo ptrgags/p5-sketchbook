@@ -9,7 +9,7 @@ describe("Motor", () => {
   describe("rotation", () => {
     it("reverse of a rotation in the origin is its inverse", () => {
       const test_point = Point.point(1, -2);
-      const rotation = Motor.rotation(Point.ZERO, Math.PI / 3);
+      const rotation = Motor.rotation(Point.ORIGIN, Math.PI / 3);
 
       const inverse = rotation.reverse();
       const forward_backward = inverse.transform_point(

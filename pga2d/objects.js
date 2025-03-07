@@ -98,6 +98,20 @@ export class Point {
     return Math.sqrt(this.ideal_norm_sqr());
   }
 
+  normalize() {
+    if (!this.is_direction) {
+      throw new Error("Normalize only makes sense for directions");
+    }
+
+    const { x, y } = this;
+    const length = this.ideal_norm();
+    if (is_nearly(length, 0)) {
+      return Point.ZERO;
+    }
+
+    return Point.direction(x / length, y / length);
+  }
+
   add(other) {
     const { xy, xo, yo } = this.bivec.add(other.bivec);
     return new Point(xy, xo, yo);
@@ -216,10 +230,6 @@ export class Line {
 
   get d() {
     return -this.vec.o;
-  }
-
-  as_vec() {
-    return this.vec;
   }
 
   meet(other) {

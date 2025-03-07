@@ -12,11 +12,13 @@ import { Style } from "../sketchlib/Style.js";
 import { Color } from "../sketchlib/Style.js";
 import { draw_primitive } from "../sketchlib/draw_primitive.js";
 import { Motor } from "../pga2d/versors.js";
+import { Joint } from "./AnimationChain.js";
 
 const MIN_ANGLE = (2 * Math.PI) / 3;
 const MIN_DOT_PRODUCT = Math.cos(MIN_ANGLE);
-const ROT90 = Motor.rotation(Point.ZERO, Math.PI / 2);
-const ROT45 = Motor.rotation(Point.ZERO, Math.PI / 4);
+const ROT90 = Motor.rotation(Point.ORIGIN, Math.PI / 2);
+const ROT45 = Motor.rotation(Point.ORIGIN, Math.PI / 4);
+const ROT15 = Motor.rotation(Point.ORIGIN, Math.PI / 12);
 
 class BodySegment {
   constructor(initial_position, follow_distance) {
@@ -51,9 +53,9 @@ class BodySegment {
       this.follow(prev_segment);
       return;
     } else if (is_ccw) {
-      this.position = Motor.rotation(b, -MIN_ANGLE).transform(a);
+      this.position = Motor.rotation(b, -MIN_ANGLE).transform_point(a);
     } else {
-      this.position = Motor.rotation(b, MIN_ANGLE).transform(a);
+      this.position = Motor.rotation(b, MIN_ANGLE).transform_point(a);
     }
   }
 }
@@ -74,10 +76,15 @@ class Worm {
   constructor() {
     const first_point = Point.point(WIDTH / 2, HEIGHT / 2);
     const down = Point.direction(0, WORM_SEGMENT_SEPARATION);
+
+    /**
+     * @type {Joint[]}
+     */
     this.segments = new Array(WORM_SEGMENTS);
+
     for (let i = 0; i < WORM_SEGMENTS; i++) {
       const position = first_point.add(down.scale(i));
-      this.segments[i] = new BodySegment(position, WORM_SEGMENT_SEPARATION);
+      this.segments[i] = new Joint(position, WORM_SEGMENT_SEPARATION);
     }
   }
 
@@ -89,19 +96,22 @@ class Worm {
     return this.segments[this.segments.length - 1];
   }
 
+  /**
+   * @param {Point} point The point to move the head towards
+   */
   move_head_towards(point) {
     const velocity = point.sub(this.head.position).limit_length(WORM_MAX_SPEED);
-
     this.head.position = this.head.position.add(velocity);
+
     for (let i = 1; i < this.segments.length; i++) {
       const prev_segment = this.segments[i - 1];
       const curr_segment = this.segments[i];
 
-      if (i >= 2) {
+      if (/*i >= 2*/ false) {
         const prev_prev_segment = this.segments[i - 2];
-        curr_segment.follow_bend(prev_segment, prev_prev_segment);
+        curr_segment.follow_bend(prev_segment, prev_prev_segment, MIN_ANGLE);
       } else {
-        curr_segment.follow(prev_segment);
+        curr_segment.follow(prev_segment.position);
       }
     }
   }
@@ -122,67 +132,80 @@ class Worm {
     return new GroupPrimitive([spine_group, centers_group]);
   }
 
-  render_body() {
+  compute_circles() {
     const circles = new Array(this.segments.length);
+    for (const [i, segment] of this.segments.entries()) {
+      circles[i] = new CirclePrimitive(segment.position, WORM_THICKNESS);
+    }
+
+    return circles;
+  }
+
+  compute_side_points() {
     const left_points = new Array(this.segments.length);
     const right_points = new Array(this.segments.length);
     for (const [i, segment] of this.segments.entries()) {
-      circles[i] = new CirclePrimitive(segment.position, WORM_THICKNESS);
-
+      const center = segment.position;
       const forward_direction =
         i == 0
-          ? segment.position.sub(this.segments[1].position)
-          : this.segments[i - 1].position.sub(segment.position);
-      const forward_vec = forward_direction.dual().as_vec();
+          ? center.sub(this.segments[1].position)
+          : this.segments[i - 1].position.sub(center);
 
-      const left_dir = ROT90.transform_multivec(forward_vec).normalize();
+      const left_dir = ROT90.transform_point(forward_direction).normalize();
       const right_dir = left_dir.neg();
 
-      const center_vec = segment.position.to_displacement();
-      const left_point = center_vec.add(left_dir.scale(WORM_THICKNESS));
-      const right_point = center_vec.add(right_dir.scale(WORM_THICKNESS));
-
-      left_points[i] = Point.from_displacement(left_point);
-      right_points[i] = Point.from_displacement(right_point);
+      left_points[i] = center.add(left_dir.scale(WORM_THICKNESS));
+      right_points[i] = center.add(right_dir.scale(WORM_THICKNESS));
     }
 
-    const head = this.head;
-    const heading = head.position
-      .sub(this.segments[1].position)
-      .to_displacement()
+    right_points.reverse();
+
+    return {
+      left: left_points,
+      right: right_points,
+    };
+  }
+
+  compute_head_points() {
+    const head = this.head.position;
+    const heading = head.sub(this.segments[1].position).normalize();
+
+    const left_45 = ROT45.transform_point(heading);
+    const right_45 = ROT45.reverse().transform_point(heading);
+
+    const head_point = head.add(heading.scale(1.5 * WORM_THICKNESS));
+    const head_left = head.add(left_45.scale(WORM_THICKNESS));
+    const head_right = head.add(right_45.scale(WORM_THICKNESS));
+
+    return [head_right, head_point, head_left];
+  }
+
+  compute_tail_points() {
+    const tail = this.tail.position;
+    // It's a pun on "heading" :P
+    const tailing = tail
+      .sub(this.segments[this.segments.length - 2].position)
       .normalize();
 
-    const head_vec = head.position.to_displacement();
+    const left_15 = ROT15.transform_point(tailing);
+    const right_15 = ROT15.reverse().transform_point(tailing);
 
-    const left_45 = ROT45.transform_multivec(heading);
-    const right_45 = ROT45.reverse().transform_multivec(heading);
+    const tail_point = tail.add(tailing.scale(2 * WORM_THICKNESS));
+    const tail_left = tail.add(left_15.scale(WORM_THICKNESS));
+    const tail_right = tail.add(right_15.scale(WORM_THICKNESS));
 
-    const head_point = head_vec.add(heading.scale(WORM_THICKNESS));
-    const head_left = head_vec.add(left_45.scale(WORM_THICKNESS));
-    const head_right = head_vec.add(right_45.scale(WORM_THICKNESS));
+    return [tail_right, tail_point, tail_left];
+  }
 
-    const tail = this.tail;
-    // It's a pun :P
-    const tailing = tail.position
-      .sub(this.segments[this.segments.length - 2].position)
-      .to_displacement();
+  render_body() {
+    const head_points = this.compute_head_points();
+    const tail_points = this.compute_tail_points();
 
-    const tail_point = tail.position
-      .to_displacement()
-      .add(tailing.scale(WORM_THICKNESS));
-
-    right_points.reverse();
-    const all_points = left_points.concat(
-      Point.from_displacement(tail_point),
-      right_points,
-      Point.from_displacement(head_right),
-      Point.from_displacement(head_point),
-      Point.from_displacement(head_left)
-    );
+    const { left, right } = this.compute_side_points();
+    const all_points = left.concat(tail_points, right, head_points);
     const beziergon = BeziergonPrimitive.interpolate_points(all_points);
 
-    //const debug = new PointPrimitive(all_points[all_points.length - 1]);
-    return new GroupPrimitive([beziergon /*debug*/], WORM_STYLE);
+    return new GroupPrimitive([beziergon], WORM_STYLE);
   }
 
   render() {
