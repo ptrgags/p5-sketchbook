@@ -117,12 +117,12 @@ export class Even {
     }
 
     const x = (as * as * bx + 2 * as * axy * by - axy * axy * bx) / mag_sqr;
-    const y = (as * as * bx - 2 * as * axy * bx - axy * axy * by) / mag_sqr;
+    const y = (as * as * by - 2 * as * axy * bx - axy * axy * by) / mag_sqr;
     const o =
       (-2 * axo * as * bx +
         -2 * axo * axy * by +
         -2 * ayo * as * by +
-        -2 * ayo * axy * bx +
+        2 * ayo * axy * bx +
         as * as * bo +
         axy * axy * bo) /
       mag_sqr;
