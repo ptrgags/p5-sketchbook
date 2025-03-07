@@ -17,13 +17,12 @@ export class Motor {
     return new Motor(new Even(c, s, s * y, s * x));
   }
 
-  transform(object) {
-    if (object instanceof Line) {
-      const { x: nx, y: ny, o: d } = this.even.sandwich(object.vec);
-      return new Line(nx, ny, d);
-    }
+  transform_line(object) {
+    const { x: nx, y: ny, o: d } = this.even.sandwich(object.vec);
+    return new Line(nx, ny, d);
+  }
 
-    // Point
+  transform_point(object) {
     const { xy, xo, yo } = this.even.sandwich(object.bivec);
     return new Point(xy, xo, yo);
   }

@@ -7,7 +7,6 @@ import {
   GroupPrimitive,
   LinePrimitive,
   PointPrimitive,
-  PolygonPrimitive,
 } from "../sketchlib/primitives.js";
 import { Style } from "../sketchlib/Style.js";
 import { Color } from "../sketchlib/Style.js";

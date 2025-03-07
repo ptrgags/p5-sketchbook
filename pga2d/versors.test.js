@@ -12,11 +12,11 @@ describe("Motor", () => {
       const rotation = Motor.rotation(Point.ZERO, Math.PI / 3);
 
       const inverse = rotation.reverse();
-      const forward_backward = inverse.transform(
-        rotation.transform(test_point)
+      const forward_backward = inverse.transform_point(
+        rotation.transform_point(test_point)
       );
-      const backward_forward = rotation.transform(
-        inverse.transform(test_point)
+      const backward_forward = rotation.transform_point(
+        inverse.transform_point(test_point)
       );
 
       expect(forward_backward).toBePoint(backward_forward);

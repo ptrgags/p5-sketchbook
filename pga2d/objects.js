@@ -1,7 +1,24 @@
 import { Even, Odd } from "./multivectors.js";
 import { is_nearly } from "../sketchlib/is_nearly.js";
 
+/**
+ * A generalzed point that can be either a Euclidean point, or an ideal
+ * point (i.e. a direction).
+ *
+ * This is a wrapper around a bivector (an Even object) that normalizes
+ * the representation so the xy component is either 1 or 0.
+ *
+ * Because this is a bivector, some operations like reflection might have
+ * a different sign than you expect.
+ */
 export class Point {
+  /**
+   * Constructor. This is mainly for internal use, see Point.point and
+   * Point.direction instead
+   * @param {number} xy The xy component (0 for directions, nonzero for points)
+   * @param {number} xo The xo component (the *flipped* vertical direction)
+   * @param {number} yo The yo component (the horizontal direction)
+   */
   constructor(xy, xo, yo) {
     if (xy === undefined) {
       throw new Error("fix me!");
@@ -16,10 +33,23 @@ export class Point {
     }
   }
 
+  /**
+   * Create a Euclidean point, i.e. the xy component is 1
+   * @param {number} x The x coordinate
+   * @param {number} y The y coordinate
+   * @returns {Point} the constructed Point object
+   */
   static point(x, y) {
     return new Point(1, -y, x);
   }
 
+  /**
+   * Create an ideal point, i.e. the xy component is 0. This represents a
+   * point at infinity in the given direction
+   * @param {number} x The x direction
+   * @param {number} y The y direction
+   * @returns {Point} the constructed direction as a Point object
+   */
   static direction(x, y) {
     return new Point(0, -y, x);
   }
@@ -87,6 +117,20 @@ export class Point {
     return this.sub(point).ideal_norm();
   }
 
+  set_length(length) {
+    const curr_length = this.ideal_norm();
+    if (curr_length === 0) {
+      throw new Error("Trying to set length of null vector");
+    }
+
+    const scale_factor = length / curr_length;
+    return this.scale(scale_factor);
+  }
+
+  /**
+   * @param {number} max_length
+   * @returns {Point} the
+   */
   limit_length(max_length) {
     const curr_length = this.ideal_norm();
     if (curr_length === 0) {
@@ -121,6 +165,10 @@ export class Point {
     return `Point(${x_str}, ${y_str})`;
   }
 
+  /**
+   * @param {Point} other
+   * @returns {boolean} true if objects are equal
+   */
   equals(other) {
     return this.bivec.equals(other.bivec);
   }
