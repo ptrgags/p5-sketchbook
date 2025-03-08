@@ -9,7 +9,7 @@ export class Joint {
    * @param {Point} position The initial position of this joint
    * @param {number} follow_distance How many units to follow behind the target
    */
-  constructor(position, follow_distance, min_bend_angle) {
+  constructor(position, follow_distance) {
     this.position = position;
     this.follow_distance = follow_distance;
   }
@@ -86,5 +86,69 @@ export class Joint {
     const rotation = Motor.rotation(Point.ORIGIN, unbent_angle);
     const offset = rotation.transform_point(forward).scale(follow_distance);
     return b.add(offset);
+  }
+}
+
+/**
+ * A chain of joints. When you move the head of the chain, the rest of it
+ * follows behind it.
+ *
+ * based on https://www.youtube.com/watch?v=qlfh_rv6khY&ab_channel=argonaut
+ * but implemented using PGA 2D
+ */
+export class AnimationChain {
+  /**
+   * Constructor
+   * @param {Joint[]} joints The joints in the chain. The first joint is the head.
+   * @param {number} min_bend_angle The minimum allowed bending angle so
+   * the curve doesn't fold up and self-intersect
+   */
+  constructor(joints, min_bend_angle) {
+    this.joints = joints;
+    this.min_bend_angle = min_bend_angle;
+  }
+
+  get head() {
+    return this.joints[0];
+  }
+
+  get tail() {
+    return this.joints[this.joints.length - 1];
+  }
+
+  /**
+   * Get the number of joints in the chain
+   */
+  get length() {
+    return this.joints.length;
+  }
+
+  /**
+   * Get a specific joint
+   * @param {number} i The joint index
+   */
+  get_joint(i) {
+    return this.joints[i];
+  }
+
+  /**
+   * Move the head of the chain to target, then move the rest of the chain
+   * behind it.
+   * @param {Point} target The new position for the head joint
+   */
+  move(target) {
+    this.head.follow(target);
+
+    for (let i = 1; i < this.joints.length; i++) {
+      const prev = this.joints[i - 1];
+      const curr = this.joints[i];
+
+      if (i >= 2) {
+        const prev_prev = this.joints[i - 2];
+        curr.follow_bend(prev_prev, prev, this.min_bend_angle);
+      } else {
+        curr.follow(prev.position);
+      }
+    }
   }
 }

@@ -23,46 +23,6 @@ const ROT45 = Motor.rotation(Point.ORIGIN, Math.PI / 4);
 const ROT15 = Motor.rotation(Point.ORIGIN, Math.PI / 12);
 const SHOW_SPINE = true;
 
-class BodySegment {
-  constructor(initial_position, follow_distance) {
-    this.position = initial_position;
-    this.follow_distance = follow_distance;
-  }
-
-  follow(segment) {
-    // Get a direction from the segment we're following to us, but limit it
-    // to the follow distance
-    const separation = this.position
-      .sub(segment.position)
-      .limit_length(this.follow_distance);
-
-    this.position = segment.position.add(separation);
-  }
-
-  follow_bend(prev_segment, prev_prev_segment) {
-    // Three points around the bend
-    const a = prev_prev_segment.position;
-    const b = prev_segment.position;
-    const c = this.position;
-
-    // Get lines oriented away from the center point
-    const ba = b.join(a);
-    const bc = b.join(c);
-    const is_ccw = bc.sin_angle_to(ba) > 0;
-    const dot_product = bc.dot(ba);
-
-    if (dot_product < MIN_DOT_PRODUCT) {
-      // The bend angle is not too sharp, so follow behind as usual
-      this.follow(prev_segment);
-      return;
-    } else if (is_ccw) {
-      this.position = Motor.rotation(b, -MIN_ANGLE).transform_point(a);
-    } else {
-      this.position = Motor.rotation(b, MIN_ANGLE).transform_point(a);
-    }
-  }
-}
-
 const COLOR_SPINE = new Color(255, 255, 255);
 const SPINE_STYLE = new Style().with_stroke(COLOR_SPINE);
 const CENTER_STYLE = new Style().with_fill(COLOR_SPINE);

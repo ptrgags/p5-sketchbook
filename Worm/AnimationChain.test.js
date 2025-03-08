@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { Point } from "../pga2d/objects";
-import { Joint } from "./AnimationChain";
+import { AnimationChain, Joint } from "./AnimationChain";
 import { PGA_MATCHERS } from "../pga2d/pga_matchers";
 
 expect.extend(PGA_MATCHERS);
@@ -196,5 +196,83 @@ describe("Joint", () => {
       const expected = Point.point(-2 * Math.SQRT1_2, -2 * Math.SQRT1_2 - 1);
       expect(result).toBePoint(expected);
     });
+  });
+});
+
+describe("AnimationChain", () => {
+  function make_chain() {
+    const follow_distance = 1;
+    const min_bend_angle = Math.PI / 2;
+    const joints = [
+      new Joint(Point.point(0, 0), 0),
+      new Joint(Point.point(-1, 0), follow_distance),
+      new Joint(Point.point(-2, 0), follow_distance),
+      new Joint(Point.point(-3, 0), follow_distance),
+    ];
+    return new AnimationChain(joints, min_bend_angle);
+  }
+
+  it("move with target in front of chain moves chain in straight line", () => {
+    const chain = make_chain();
+    const target = Point.point(2, 0);
+
+    chain.move(target);
+
+    const expected_positions = [
+      Point.point(2, 0),
+      Point.point(1, 0),
+      Point.point(0, 0),
+      Point.point(-1, 0),
+    ];
+
+    for (let i = 0; i < expected_positions.length; i++) {
+      const joint_position = chain.get_joint(i).position;
+      expect(joint_position).toBePoint(expected_positions[i]);
+    }
+  });
+
+  it("move with shallow bend moves curve correctly", () => {
+    // See the red points in https://www.desmos.com/calculator/pogiooom3m
+    const chain = make_chain();
+    const target = Point.point(2, 1);
+
+    chain.move(target);
+
+    const expected_positions = [
+      Point.point(2, 1),
+      Point.point(1.0513167, 0.683772234),
+      Point.point(0.07551733, 0.4651045),
+      Point.point(-0.91324018, 0.31557662),
+    ];
+
+    for (let i = 0; i < expected_positions.length; i++) {
+      const joint_position = chain.get_joint(i).position;
+      expect(joint_position).toBePoint(expected_positions[i]);
+    }
+  });
+
+  it("move with sharp bend moves curve correctly", () => {
+    // See the blue points in https://www.desmos.com/calculator/pogiooom3m
+    const chain = make_chain();
+    const target = Point.point(-2, 1);
+
+    chain.move(target);
+
+    const expected_positions = [
+      Point.point(-2, 1),
+      // the point (-1, 0) moves on a 45 degree diagonal towards (-2, 1)
+      Point.point(-2 + Math.SQRT1_2, 1 - Math.SQRT1_2),
+      // Since the constraint is set at 90 degrees, we will make a corner
+      // of a square with side length 1. So the diagonal is sqrt(2), but
+      // the top corner is at +1,
+      Point.point(-2, 1 - Math.SQRT2),
+      // Okay the last one is a bit messy, let's just use the numeric approximation
+      Point.point(-2.923879532, -0.03153013),
+    ];
+
+    for (let i = 0; i < expected_positions.length; i++) {
+      const joint_position = chain.get_joint(i).position;
+      expect(joint_position).toBePoint(expected_positions[i]);
+    }
   });
 });
