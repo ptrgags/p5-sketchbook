@@ -5,6 +5,8 @@ import { PGA_MATCHERS } from "./pga_matchers";
 
 expect.extend(PGA_MATCHERS);
 
+// Numeric values are computed using kingdon, see my other repo math-notebook
+
 describe("Motor", () => {
   describe("rotation", () => {
     it("reverse of a rotation in the origin is its inverse", () => {
@@ -21,6 +23,18 @@ describe("Motor", () => {
 
       expect(forward_backward).toBePoint(backward_forward);
     });
+
+    it("Rotates points counterclockwise", () => {
+      const center = Point.point(1, -2);
+      const rotation = Motor.rotation(center, Math.PI / 4);
+      const point = Point.point(1, 0);
+
+      const result = rotation.transform_point(point);
+
+      // The point gets rotated a little bit past the y-axis
+      const expected = Point.point(-0.41421356, 0.585786436);
+      expect(result).toBePoint(expected);
+    });
   });
 });
 
@@ -31,7 +45,7 @@ describe("Flector", () => {
       const line = new Line(1, 0, 0);
       const reflection = Flector.reflection(line);
 
-      const result = reflection.transform(point);
+      const result = reflection.transform_point(point);
 
       const expected = Point.point(-3, 4);
       expect(result).toBePoint(expected);
@@ -43,7 +57,7 @@ describe("Flector", () => {
       const line = new Line(0, 1, 0);
       const reflection = Flector.reflection(line);
 
-      const result = reflection.transform(point);
+      const result = reflection.transform_point(point);
 
       const expected = Point.point(3, -4);
       expect(result).toBePoint(expected);
@@ -54,7 +68,7 @@ describe("Flector", () => {
       const line = new Line(0, 0, 1);
       const reflection = Flector.reflection(line);
 
-      const result = reflection.transform(point);
+      const result = reflection.transform_point(point);
 
       const expected = Point.ZERO;
       expect(result).toBePoint(expected);
@@ -65,8 +79,8 @@ describe("Flector", () => {
       const line = new Line(1, 2, 3);
       const reflection = Flector.reflection(line);
 
-      const reflect_once = reflection.transform(point);
-      const result = reflection.transform(reflect_once);
+      const reflect_once = reflection.transform_point(point);
+      const result = reflection.transform_point(reflect_once);
 
       expect(result).toBePoint(point);
     });
@@ -76,7 +90,7 @@ describe("Flector", () => {
       const line = new Line(1, -1, 0);
       const reflection = Flector.reflection(line);
 
-      const result = reflection.transform(point);
+      const result = reflection.transform_point(point);
 
       const expected = Point.point(4, 3);
       expect(result).toBePoint(expected);
@@ -87,7 +101,7 @@ describe("Flector", () => {
       const line = new Line(1, -1, 0);
       const reflection = Flector.reflection(line);
 
-      const result = reflection.transform(direction);
+      const result = reflection.transform_point(direction);
 
       // Note: bivectors are inverted in the mirror. Since this is
       // an ideal direction, the minus sign doesn't get normalized hence

@@ -27,16 +27,16 @@ export class Motor {
     return new Point(xy, xo, yo);
   }
 
-  transform_multivec(multivec) {
-    return this.even.sandwich(multivec);
-  }
-
   toString() {
     return `Motor(${this.even})`;
   }
 }
 
 export class Flector {
+  /**
+   * Constructor
+   * @param {Odd} odd The underlying odd object
+   */
   constructor(odd) {
     this.odd = odd;
   }
@@ -45,19 +45,27 @@ export class Flector {
     return new Flector(line.vec);
   }
 
-  transform(object) {
-    if (object instanceof Line) {
-      const { x: nx, y: ny, o: d } = this.odd.sandwich(object.vec);
-      return new Line(nx, ny, d);
-    }
-
-    // Point
-    const { xy, xo, yo } = this.odd.sandwich(object.bivec);
-    return new Point(xy, xo, yo);
+  /**
+   * @param {Odd} odd
+   * @returns {Odd} The transformed odd object
+   */
+  transform_odd(odd) {
+    return this.odd.sandwich_odd(odd);
   }
 
-  transform_multivec(multivec) {
-    return this.odd.sandwich(multivec);
+  /**
+   * @param {Line} line
+   * @returns {Line} The new line
+   */
+  transform_line(line) {
+    const vec = this.odd.sandwich_odd(line.vec);
+    return Line.from_vec(vec);
+  }
+
+  transform_point(point) {
+    // Point
+    const bivec = this.odd.sandwich_even(point.bivec);
+    return Point.from_bivec(bivec);
   }
 
   toString() {

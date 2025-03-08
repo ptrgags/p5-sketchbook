@@ -54,6 +54,15 @@ export class Point {
     return new Point(0, -y, x);
   }
 
+  /**
+   * Construct from a bivector
+   * @param {Even} bivec The bivector that represents this point.
+   */
+  static from_bivec(bivec) {
+    const { xy, xo, yo } = bivec;
+    return new Point(xy, xo, yo);
+  }
+
   get x() {
     return this.bivec.yo;
   }
@@ -195,11 +204,6 @@ export class Point {
     const { xy, xo, yo } = Even.lerp(a.bivec, b.bivec, t);
     return new Point(xy, xo, yo);
   }
-
-  static from_displacement(vec) {
-    const { x, y } = vec;
-    return Point.point(x, y);
-  }
 }
 Point.ORIGIN = Object.freeze(Point.point(0, 0));
 Point.DIR_X = Object.freeze(Point.direction(1, 0));
@@ -207,6 +211,11 @@ Point.DIR_Y = Object.freeze(Point.direction(0, 1));
 Point.ZERO = Object.freeze(new Point(0, 0, 0));
 
 export class Line {
+  /**
+   * @param {number} nx The x-component of the normal
+   * @param {number} ny The y-component of the normal
+   * @param {number} d The distance of the line from the origin in the direction of the normal with units of the normal's length
+   */
   constructor(nx, ny, d) {
     const mag_sqr = nx * nx + ny * ny;
 
@@ -218,6 +227,15 @@ export class Line {
       const mag = Math.sqrt(mag_sqr);
       this.vec = new Odd(nx / mag, ny / mag, -d / mag, 0);
     }
+  }
+
+  /**
+   * Create a line from a vector object
+   * @param {Odd} vec
+   */
+  static from_vec(vec) {
+    const { x: nx, y: ny, o: d } = vec;
+    return new Line(nx, ny, d);
   }
 
   get nx() {
