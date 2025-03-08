@@ -153,7 +153,7 @@ export class Even {
   toString() {
     return `${this.scalar.toPrecision(2)} + ${this.xy.toPrecision(
       2
-    )}xy + ${this.xo.toPrecision(2)}xo + ${this.yo.toPrecision(2)}`;
+    )}xy + ${this.xo.toPrecision(2)}xo + ${this.yo.toPrecision(2)}yo`;
   }
 }
 Even.ZERO = Object.freeze(new Even(0, 0, 0, 0));

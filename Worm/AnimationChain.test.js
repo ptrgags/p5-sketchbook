@@ -136,7 +136,7 @@ describe("Joint", () => {
         min_bend
       );
 
-      const expected = Point.point(-Math.SQRT1_2, -Math.SQRT1_2 - 1);
+      const expected = Point.point(-Math.SQRT1_2, -1 - Math.SQRT1_2);
       expect(result).toBePoint(expected);
     });
 

@@ -72,23 +72,19 @@ export class Joint {
     const ba = b.join(a);
     const bc = b.join(c);
 
-    // Determine the sin/cos of the angle abc
-    const is_ccw = bc.sin_angle_to(ba) > 0;
+    // If the bend angle is mostly straight, just do the simpler following
+    // behavior
     const dot_product = bc.dot(ba);
-
     const max_dot_product = Math.cos(min_bend_angle);
-
     if (dot_product < max_dot_product) {
-      // The bend angle isn't too sharp, so c can simply follow b
       return this.constraint_follow(b, c, follow_distance);
     }
 
-    if (is_ccw) {
-      // The bend angle is too steep on the right side, so rotate CW
-      return Motor.rotation(b, -min_bend_angle).transform_point(a);
-    }
-
-    // Same thing but for the left side and rotating CCW
-    return Motor.rotation(b, min_bend_angle).transform_point(a);
+    const is_ccw = bc.sin_angle_to(ba) > 0;
+    const unbent_angle = is_ccw ? -min_bend_angle : min_bend_angle;
+    const forward = a.sub(b).normalize();
+    const rotation = Motor.rotation(Point.ORIGIN, unbent_angle);
+    const offset = rotation.transform_point(forward).scale(follow_distance);
+    return b.add(offset);
   }
 }

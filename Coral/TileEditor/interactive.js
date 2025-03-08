@@ -67,7 +67,7 @@ export class InteractiveTangent {
         ? // Since directions are represented as ideal points (bivectors)
           // not vectors, you get a negative sign which is unwanted here. Hence
           // the .neg()
-          this.flip_forward.transform(original_tangent).neg()
+          this.flip_forward.transform_point(original_tangent).neg()
         : original_tangent;
 
     const original_length = original_tangent.ideal_mag();
