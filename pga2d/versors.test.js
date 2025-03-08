@@ -26,13 +26,13 @@ describe("Motor", () => {
 
     it("Rotates points counterclockwise", () => {
       const center = Point.point(1, -2);
-      const rotation = Motor.rotation(center, Math.PI / 4);
+      const rotation = Motor.rotation(center, Math.PI / 3);
       const point = Point.point(1, 0);
 
       const result = rotation.transform_point(point);
 
-      // The point gets rotated a little bit past the y-axis
-      const expected = Point.point(-0.41421356, 0.585786436);
+      // The point gets rotated a little bit past the y-axis into quadrant III
+      const expected = Point.point(-0.732050807, -1);
       expect(result).toBePoint(expected);
     });
   });

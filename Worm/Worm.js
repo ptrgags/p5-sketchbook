@@ -21,7 +21,7 @@ const MIN_DOT_PRODUCT = Math.cos(MIN_ANGLE);
 const ROT90 = Motor.rotation(Point.ORIGIN, Math.PI / 2);
 const ROT45 = Motor.rotation(Point.ORIGIN, Math.PI / 4);
 const ROT15 = Motor.rotation(Point.ORIGIN, Math.PI / 12);
-const SHOW_SPINE = false;
+const SHOW_SPINE = true;
 
 class BodySegment {
   constructor(initial_position, follow_distance) {
@@ -133,7 +133,7 @@ class Worm {
       const prev_segment = this.segments[i - 1];
       const curr_segment = this.segments[i];
 
-      if (/*i >= 2*/ false) {
+      if (i >= 2) {
         const prev_prev_segment = this.segments[i - 2];
         curr_segment.follow_bend(prev_segment, prev_prev_segment, MIN_ANGLE);
       } else {

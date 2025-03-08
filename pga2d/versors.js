@@ -10,11 +10,22 @@ export class Motor {
     return new Motor(this.even.reverse());
   }
 
+  /**
+   * Rotate counterclockwise around the given point
+   * @param {Point} point
+   * @param {number} angle
+   */
   static rotation(point, angle) {
     const c = Math.cos(angle / 2);
     const s = Math.sin(angle / 2);
     const { x, y } = point;
-    return new Motor(new Even(c, s, s * y, s * x));
+    // point = X * yo - Y * xo + xy
+    // the versor cos(theta/2) + sin(theta / 2)(point) is for a clockwise rotation
+    // we want a counterclockwise one, so we take the reverse
+    // c + s * (-X * yo + Y * xo - xy)
+
+    const versor = new Even(c, -s, s * y, -s * x);
+    return new Motor(versor);
   }
 
   transform_line(object) {
