@@ -122,8 +122,8 @@ export class Point {
   }
 
   add(other) {
-    const { xy, xo, yo } = this.bivec.add(other.bivec);
-    return new Point(xy, xo, yo);
+    const bivec = this.bivec.add(other.bivec);
+    return Point.from_bivec(bivec);
   }
 
   sub(other) {
@@ -151,10 +151,15 @@ export class Point {
   }
 
   /**
+   * Limit the length of a direction
    * @param {number} max_length
-   * @returns {Point} the
+   * @returns {Point} The same direction with updated magnitude
    */
   limit_length(max_length) {
+    if (!this.is_direction) {
+      return this;
+    }
+
     const curr_length = this.ideal_norm();
     if (curr_length === 0) {
       return this;

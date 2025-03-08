@@ -212,6 +212,20 @@ describe("AnimationChain", () => {
     return new AnimationChain(joints, min_bend_angle);
   }
 
+  it("move with same target as head of chain is a no-op", () => {
+    const chain = make_chain();
+    const target = Point.point(0, 0);
+
+    chain.move(target);
+
+    const expected_positions = chain.get_positions();
+
+    for (let i = 0; i < expected_positions.length; i++) {
+      const joint_position = chain.get_joint(i).position;
+      expect(joint_position).toBePoint(expected_positions[i]);
+    }
+  });
+
   it("move with target in front of chain moves chain in straight line", () => {
     const chain = make_chain();
     const target = Point.point(2, 0);

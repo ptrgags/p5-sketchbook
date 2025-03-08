@@ -128,7 +128,18 @@ export class AnimationChain {
    * @param {number} i The joint index
    */
   get_joint(i) {
+    if (i < 0) {
+      return this.joints[this.joints.length - 1 + i];
+    }
     return this.joints[i];
+  }
+
+  /**
+   * Get an array of the joint positions
+   * @returns {Point[]} The positions of the joints
+   */
+  get_positions() {
+    return this.joints.map((x) => x.position);
   }
 
   /**
@@ -137,8 +148,12 @@ export class AnimationChain {
    * @param {Point} target The new position for the head joint
    */
   move(target) {
-    this.head.follow(target);
+    // If we're already at the target, nothing to do!
+    if (this.head.position.equals(target)) {
+      return;
+    }
 
+    this.head.follow(target);
     for (let i = 1; i < this.joints.length; i++) {
       const prev = this.joints[i - 1];
       const curr = this.joints[i];

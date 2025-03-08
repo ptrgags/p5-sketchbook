@@ -12,12 +12,11 @@ import { Style } from "../sketchlib/Style.js";
 import { Color } from "../sketchlib/Style.js";
 import { draw_primitive } from "../sketchlib/draw_primitive.js";
 import { Motor } from "../pga2d/versors.js";
-import { Joint } from "./AnimationChain.js";
+import { AnimationChain, Joint } from "./AnimationChain.js";
 import { is_nearly } from "../sketchlib/is_nearly.js";
 import { GooglyEye } from "./GooglyEye.js";
 
-const MIN_ANGLE = (2 * Math.PI) / 3;
-const MIN_DOT_PRODUCT = Math.cos(MIN_ANGLE);
+const MIN_ANGLE = (3 * Math.PI) / 4;
 const ROT90 = Motor.rotation(Point.ORIGIN, Math.PI / 2);
 const ROT45 = Motor.rotation(Point.ORIGIN, Math.PI / 4);
 const ROT15 = Motor.rotation(Point.ORIGIN, Math.PI / 12);
@@ -44,14 +43,13 @@ class Worm {
     const first_point = Point.point(WIDTH / 2, HEIGHT / 2);
     const down = Point.direction(0, WORM_SEGMENT_SEPARATION);
 
-    /**
-     * @type {Joint[]}
-     */
-    this.segments = new Array(WORM_SEGMENTS);
+    const joints = new Array(WORM_SEGMENTS);
     for (let i = 0; i < WORM_SEGMENTS; i++) {
       const position = first_point.add(down.scale(i));
-      this.segments[i] = new Joint(position, WORM_SEGMENT_SEPARATION);
+      joints[i] = new Joint(position, WORM_SEGMENT_SEPARATION);
     }
+
+    this.chain = new AnimationChain(joints, MIN_ANGLE);
 
     this.look_direction = Point.direction(0, 1);
     this.googly = [
@@ -71,71 +69,60 @@ class Worm {
   }
 
   get head() {
-    return this.segments[0];
+    return this.chain.head;
   }
 
   get tail() {
-    return this.segments[this.segments.length - 1];
+    return this.chain.tail;
   }
 
   /**
    * @param {Point} point The point to move the head towards
    */
   move_head_towards(point) {
-    const velocity = point.sub(this.head.position).limit_length(WORM_MAX_SPEED);
-    if (!is_nearly(velocity.ideal_norm_sqr(), 0)) {
-      this.look_direction = velocity.normalize();
+    const head_position = this.head.position;
+
+    const velocity = point.sub(head_position); //.limit_length(WORM_MAX_SPEED);
+    if (is_nearly(velocity.ideal_norm_sqr(), 0)) {
+      return;
     }
 
-    this.head.position = this.head.position.add(velocity);
-
-    for (let i = 1; i < this.segments.length; i++) {
-      const prev_segment = this.segments[i - 1];
-      const curr_segment = this.segments[i];
-
-      if (i >= 2) {
-        const prev_prev_segment = this.segments[i - 2];
-        curr_segment.follow_bend(prev_segment, prev_prev_segment, MIN_ANGLE);
-      } else {
-        curr_segment.follow(prev_segment.position);
-      }
-    }
+    this.look_direction = velocity.normalize();
+    const target = this.head.position.add(velocity);
+    this.chain.move(target);
   }
 
   render_spine() {
-    const lines = new Array(this.segments.length - 1);
+    const lines = new Array(this.chain.length - 1);
+    const positions = this.chain.get_positions();
     for (let i = 0; i < lines.length; i++) {
-      lines[i] = new LinePrimitive(
-        this.segments[i].position,
-        this.segments[i + 1].position
-      );
+      lines[i] = new LinePrimitive(positions[i], positions[i + 1]);
     }
     const spine_group = new GroupPrimitive(lines, SPINE_STYLE);
 
-    const centers = this.segments.map((x) => new PointPrimitive(x.position));
+    const centers = positions.map((x) => new PointPrimitive(x));
     const centers_group = new GroupPrimitive(centers, CENTER_STYLE);
 
     return new GroupPrimitive([spine_group, centers_group]);
   }
 
   compute_circles() {
-    const circles = new Array(this.segments.length);
-    for (const [i, segment] of this.segments.entries()) {
-      circles[i] = new CirclePrimitive(segment.position, WORM_THICKNESS);
+    const positions = this.chain.get_positions();
+    const circles = new Array(positions.length);
+    for (const [i, center] of positions.entries()) {
+      circles[i] = new CirclePrimitive(center, WORM_THICKNESS);
     }
 
     return circles;
   }
 
   compute_side_points() {
-    const left_points = new Array(this.segments.length);
-    const right_points = new Array(this.segments.length);
-    for (const [i, segment] of this.segments.entries()) {
-      const center = segment.position;
+    const positions = this.chain.get_positions();
+    const left_points = new Array(positions.length);
+    const right_points = new Array(positions.length);
+    for (const [i, center] of positions.entries()) {
       const forward_direction =
-        i == 0
-          ? center.sub(this.segments[1].position)
-          : this.segments[i - 1].position.sub(center);
+        i == 0 ? center.sub(positions[1]) : positions[i - 1].sub(center);
 
       const left_dir = ROT90.transform_point(forward_direction).normalize();
       const right_dir = left_dir.neg();
@@ -154,7 +141,7 @@ class Worm {
 
   compute_head_points() {
     const head = this.head.position;
-    const heading = head.sub(this.segments[1].position).normalize();
+    const heading = head.sub(this.chain.get_joint(1).position).normalize();
 
     const left_45 = ROT45.transform_point(heading);
     const right_45 = ROT45.reverse().transform_point(heading);
@@ -169,9 +156,7 @@ class Worm {
   compute_tail_points() {
     const tail = this.tail.position;
     // It's a pun on "heading" :P
-    const tailing = tail
-      .sub(this.segments[this.segments.length - 2].position)
-      .normalize();
+    const tailing = tail.sub(this.chain.get_joint(-2).position).normalize();
 
     const left_15 = ROT15.transform_point(tailing);
     const right_15 = ROT15.reverse().transform_point(tailing);
