@@ -4,6 +4,7 @@ import { fix_mouse_coords } from "../sketchlib/fix_mouse_coords.js";
 import { draw_primitive } from "../sketchlib/draw_primitive.js";
 import { Point } from "../pga2d/objects.js";
 import { AnimatedWorm } from "./AnimatedWorm.js";
+import { prevent_mobile_scroll } from "../sketchlib/prevent_mobile_scroll.js";
 
 const INITIAL_POSITION = Point.point(WIDTH / 2, HEIGHT - 50);
 
@@ -14,6 +15,7 @@ export const sketch = (p) => {
   let mouse = INITIAL_POSITION;
   p.setup = () => {
     canvas = p.createCanvas(WIDTH, HEIGHT).elt;
+    prevent_mobile_scroll(canvas);
   };
 
   p.draw = () => {
@@ -24,7 +26,7 @@ export const sketch = (p) => {
     draw_primitive(p, WORM.render());
   };
 
-  p.mouseMoved = () => {
+  p.mouseMoved = (event) => {
     mouse = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
   };
 

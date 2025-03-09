@@ -1,5 +1,6 @@
 import { fix_mouse_coords } from "../sketchlib/fix_mouse_coords.js";
 import { Point } from "../pga2d/objects.js";
+import { prevent_mobile_scroll } from "../sketchlib/prevent_mobile_scroll.js";
 
 let cp1 = Point.point(100, 240);
 let cp2 = Point.point(320, 100);
@@ -35,6 +36,7 @@ export const sketch = (p) => {
 
   p.setup = () => {
     canvas = p.createCanvas(500, 700).elt;
+    prevent_mobile_scroll(canvas);
   };
 
   p.draw = () => {

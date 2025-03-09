@@ -10,6 +10,7 @@ import { Vector2 } from "./Vector2.js";
 import { DifferentialNode, NEARBY_RADIUS } from "./DifferentialNode.js";
 import { Circle } from "./circle.js";
 import { mod } from "../sketchlib/mod.js";
+import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
 
 const MAX_EDGE_LENGTH = 150;
 
