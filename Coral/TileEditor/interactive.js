@@ -1,3 +1,4 @@
+import { Point } from "../../pga2d/objects.js";
 import { Flector } from "../../pga2d/versors.js";
 
 export const SELECT_RADIUS = 10;
@@ -57,6 +58,10 @@ export class InteractiveTangent {
     return dist_sqr < SELECT_RADIUS_SQR;
   }
 
+  /**
+   * Move this tangent point to the mouse, while applying the constraints
+   * @param {Point} mouse The current mouse positions
+   */
   move(mouse) {
     const uv = this.tile_quad.world_to_uv(mouse);
     const original_tangent = uv.sub(this.control_point.position);

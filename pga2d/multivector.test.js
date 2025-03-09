@@ -57,7 +57,7 @@ describe("Even", () => {
     const a = new Even(1, 2, 3, 4);
     const b = new Even(-3, 1, -2, 2);
 
-    const result = a.vee(b);
+    const result = a.vee_even(b);
 
     const expected = new Odd(-7, 0, 14, 0);
     expect(result).toBeOdd(expected);
@@ -214,7 +214,7 @@ describe("Odd", () => {
     const a = new Odd(1, 2, 3, 4);
     const b = new Odd(-2, 1, 3, -1);
 
-    const result = a.wedge(b);
+    const result = a.wedge_odd(b);
 
     const expected = new Even(0, 5, 9, 3);
     expect(result).toBeEven(expected);

@@ -40,6 +40,11 @@ export class Even {
     return new Even(this.scalar, -this.xy, -this.xo, -this.yo);
   }
 
+  /**
+   * Compute the regressive product with another even multivector
+   * @param {Even} other The other even multivector
+   * @returns {Odd} The regressive product
+   */
   vee_even(other) {
     // Bread V = A + Bxy + Cxo + Dyo
     const { xy: axy, xo: axo, yo: ayo } = this;
@@ -56,14 +61,6 @@ export class Even {
 
   vee_odd(other) {
     throw new Error("Not implemented");
-  }
-
-  vee(other) {
-    if (other instanceof Even) {
-      return this.vee_even(other);
-    }
-
-    return this.vee_odd(other);
   }
 
   equals(other) {
@@ -247,14 +244,6 @@ export class Odd {
 
   wedge_even(other) {
     throw new Error("Not Implemented");
-  }
-
-  wedge(other) {
-    if (other instanceof Odd) {
-      return this.wedge_odd(other);
-    }
-
-    return this.wedge_even(other);
   }
 
   sandwich_even(other) {

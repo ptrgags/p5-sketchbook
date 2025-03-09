@@ -63,19 +63,34 @@ export class Point {
     return new Point(xy, xo, yo);
   }
 
+  /**
+   * @type {number}
+   */
   get x() {
     return this.bivec.yo;
   }
 
+  /**
+   * @type {number}
+   */
   get y() {
     return -this.bivec.xo;
   }
 
+  /**
+   * Get the dual line
+   * @returns {Line} The dual line
+   */
   dual() {
-    const { x: nx, y: ny, o: d } = this.bivec.dual();
-    return new Line(nx, ny, d);
+    const vec = this.bivec.dual();
+    return Line.from_vec(vec);
   }
 
+  /**
+   * For a direction, this reverses the orientation. For a point, this
+   * is a no-op due to homogeneity
+   * @returns {Point} The direction to negate
+   */
   neg() {
     if (this.is_direction) {
       return Point.direction(-this.x, -this.y);
@@ -86,16 +101,30 @@ export class Point {
     }
   }
 
+  /**
+   * Get the euclidean norm squared. This is confusingly the xy-component squared
+   * @returns {number} The squared euclidean norm
+   */
   euclidean_norm_sqr() {
     // the xo and yo parts square to 0, so we only have xy * yx
     const { xy } = this.bivec;
     return xy * xy;
   }
 
+  /**
+   * Get the euclidean norm. This is confusingly the absolute value of the xy-component
+   * @returns {number} The euclidean norm
+   */
   euclidean_norm() {
-    return Math.sqrt(this.euclidean_norm_sqr());
+    // this is equivalent to sqrt(euclidean_norm_sqr), since abs(x) = sqrt(x^2)
+    const { xy } = this.bivec;
+    return Math.abs(xy);
   }
 
+  /**
+   * The ideal norm squared. Confusingly, this is the usual norm x^2 + y^2 in GA
+   * @returns {number} The ideal norm squared
+   */
   ideal_norm_sqr() {
     // this is the euclidean norm of the dual, but computed without allocating
     // the dual line
@@ -103,10 +132,18 @@ export class Point {
     return x * x + y * y;
   }
 
+  /**
+   * The ideal norm, sqrt(x^2 + y^2)
+   * @returns {number} The ideal norm squared
+   */
   ideal_norm() {
     return Math.sqrt(this.ideal_norm_sqr());
   }
 
+  /**
+   * Normalize the point (if possible) by dividing by the norm
+   * @returns {Point} The point with unit length, or the original point for points with 0 norm
+   */
   normalize() {
     if (!this.is_direction) {
       throw new Error("Normalize only makes sense for directions");
@@ -115,27 +152,48 @@ export class Point {
     const { x, y } = this;
     const length = this.ideal_norm();
     if (is_nearly(length, 0)) {
-      return Point.ZERO;
+      return this;
     }
 
     return Point.direction(x / length, y / length);
   }
 
+  /**
+   * Add another point. For directions, this works like vector addition. For points, this actually computes the midpoint due to homogeneity
+   * @param {Point} other
+   * @returns {Point} The sum of the two points
+   */
   add(other) {
     const bivec = this.bivec.add(other.bivec);
     return Point.from_bivec(bivec);
   }
 
+  /**
+   * Subtract two generalized points. This can produce a direction or
+   * a new point depending on whether the inputs are points/directions
+   * @param {Point} other The other point
+   * @returns {Point} The result of the subtraction
+   */
   sub(other) {
     const { xy, xo, yo } = this.bivec.sub(other.bivec);
     return new Point(xy, xo, yo);
   }
 
+  /**
+   * Join two points into a line
+   * @param {Point} other The other point to join into a line
+   * @returns {Line} The line through the two points
+   */
   join(other) {
-    const { x, y, o } = this.bivec.vee(other.bivec);
-    return new Line(x, y, -o);
+    const vec = this.bivec.vee_even(other.bivec);
+    return Line.from_vec(vec);
   }
 
+  /**
+   * Compute the squared distance between this point and another one
+   * @param {Point} point another point
+   * @returns {number}
+   */
   dist_sqr(point) {
     return this.sub(point).ideal_norm_sqr();
   }
@@ -170,6 +228,12 @@ export class Point {
     return this.scale(scale_factor);
   }
 
+  /**
+   * Uniformly scale the point. This only makes sense for directions, as
+   * points are homogeneous
+   * @param {number} scalar The scale factor
+   * @returns {Point} the result of scaling
+   */
   scale(scalar) {
     if (this.is_direction) {
       return Point.direction(scalar * this.x, scalar * this.y);
@@ -178,6 +242,12 @@ export class Point {
     return this;
   }
 
+  /**
+   * Compute the dot product of the x and y components of the points.
+   * Technically this is the dot product of the duals
+   * @param {Point} other The other point
+   * @returns {number} The dot product.
+   */
   dot(other) {
     return this.x * other.x + this.y * other.y;
   }
@@ -194,20 +264,22 @@ export class Point {
   }
 
   /**
-   * @param {Point} other
+   * @param {Point} other The point to check
    * @returns {boolean} true if objects are equal
    */
   equals(other) {
     return this.bivec.equals(other.bivec);
   }
 
-  to_displacement() {
-    return new Odd(this.x, this.y, 0, 0);
-  }
-
+  /**
+   * Linearly interpolate between two points
+   * @param {Point} a The first point
+   * @param {Point} b The second point
+   * @param {number} t The interpolation factor
+   */
   static lerp(a, b, t) {
-    const { xy, xo, yo } = Even.lerp(a.bivec, b.bivec, t);
-    return new Point(xy, xo, yo);
+    const bivector = Even.lerp(a.bivec, b.bivec, t);
+    return Point.from_bivec(bivector);
   }
 }
 Point.ORIGIN = Object.freeze(Point.point(0, 0));
@@ -240,36 +312,70 @@ export class Line {
    */
   static from_vec(vec) {
     const { x: nx, y: ny, o: d } = vec;
-    return new Line(nx, ny, d);
+    return new Line(nx, ny, -d);
   }
 
+  /**
+   * The x component of the normal
+   * @type {number}
+   */
   get nx() {
     return this.vec.x;
   }
 
+  /**
+   * The y-component of the normal
+   * @type {number}
+   */
   get ny() {
     return this.vec.y;
   }
 
+  /**
+   * The distance from the origin in the direction of the normal
+   * @type {number}
+   */
   get d() {
     return -this.vec.o;
   }
 
+  /**
+   * Find the meet of two lines. This is their point of intersection, or for parallel lines
+   * an ideal point in the direction the lines point (this is 90 degrees clockwise of their normals)
+   * @param {Line} other The line to intersect with
+   */
   meet(other) {
-    const { xy, xo, yo } = this.vec.wedge(other.vec);
-    return new Point(xy, xo, yo);
+    const bivec = this.vec.wedge_odd(other.vec);
+    return Point.from_bivec(bivec);
   }
 
+  /**
+   *
+   * @param {Line} other
+   * @returns {number} The dot product of the lines. This is the cosine of the line betwen them.
+   */
   dot(other) {
     return this.vec.dot(other.vec);
   }
 
-  equals(other) {
-    return this.vec.equals(other.vec);
+  /**
+   * Get the sin of the angle between two lines without using trig functions. This is
+   * the magnitude of the wedge product
+   * @param {Line} other The other line
+   * @returns {number} Sine of the angle between the two lines
+   */
+  sin_angle_to(other) {
+    return this.vec.wedge_odd(other.vec).xy;
   }
 
-  sin_angle_to(other) {
-    return this.vec.wedge(other.vec).xy;
+  /**
+   * Check if this line is equivalent to another. This uses is_nearly()
+   * due to floating point calculations
+   * @param {Line} other Another line
+   * @returns {boolean} true if the lines are equivalent (up to epsilon)
+   */
+  equals(other) {
+    return this.vec.equals(other.vec);
   }
 
   toString() {
