@@ -4,9 +4,8 @@ import { DifferentialPolyline } from "./DifferentialPolyline.js";
 import { Color, Style } from "../sketchlib/Style.js";
 import { draw_primitive } from "../sketchlib/draw_primitive.js";
 import { Vector2 } from "./Vector2.js";
+import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
 
-const WIDTH = 500;
-const HEIGHT = 700;
 const BOUNDS = new Rectangle(0, 0, WIDTH, HEIGHT);
 const QUADTREE = new Quadtree(BOUNDS);
 
