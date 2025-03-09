@@ -5,6 +5,10 @@ export const LINKS = [
     year: "2025",
   },
   {
+    title: "Worm",
+    year: "2025",
+  },
+  {
     title: "Differential Growth",
     year: "2021, 2025",
   },

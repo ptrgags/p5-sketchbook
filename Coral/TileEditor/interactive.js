@@ -1,3 +1,4 @@
+import { Point } from "../../pga2d/objects.js";
 import { Flector } from "../../pga2d/versors.js";
 
 export const SELECT_RADIUS = 10;
@@ -57,6 +58,10 @@ export class InteractiveTangent {
     return dist_sqr < SELECT_RADIUS_SQR;
   }
 
+  /**
+   * Move this tangent point to the mouse, while applying the constraints
+   * @param {Point} mouse The current mouse positions
+   */
   move(mouse) {
     const uv = this.tile_quad.world_to_uv(mouse);
     const original_tangent = uv.sub(this.control_point.position);
@@ -67,13 +72,11 @@ export class InteractiveTangent {
         ? // Since directions are represented as ideal points (bivectors)
           // not vectors, you get a negative sign which is unwanted here. Hence
           // the .neg()
-          this.flip_forward.transform(original_tangent).neg()
+          this.flip_forward.transform_point(original_tangent).neg()
         : original_tangent;
 
-    const original_length = original_tangent.ideal_mag();
-    const adjusted_length = Math.min(original_length, MAX_TANGENT_MAGNITUDE);
-
-    const scale_factor = adjusted_length / original_length;
-    this.control_point.tangent = corrected_tangent.scale(scale_factor);
+    this.control_point.tangent = corrected_tangent.limit_length(
+      MAX_TANGENT_MAGNITUDE
+    );
   }
 }

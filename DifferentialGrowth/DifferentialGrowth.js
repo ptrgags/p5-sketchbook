@@ -4,9 +4,8 @@ import { DifferentialPolyline } from "./DifferentialPolyline.js";
 import { Color, Style } from "../sketchlib/Style.js";
 import { draw_primitive } from "../sketchlib/draw_primitive.js";
 import { Vector2 } from "./Vector2.js";
+import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
 
-const WIDTH = 500;
-const HEIGHT = 700;
 const BOUNDS = new Rectangle(0, 0, WIDTH, HEIGHT);
 const QUADTREE = new Quadtree(BOUNDS);
 
@@ -63,7 +62,7 @@ export const sketch = (p) => {
     POLYLINE2.update(DELTA_TIME);
     const results = QUADTREE.redistribute_dirty_points();
     if (results.length > 0) {
-      throw new Error("DIRTY POINTS", results);
+      throw new Error("DIRTY POINTS");
     }
 
     if (simulation_step % GROWTH_PERIOD == 0) {

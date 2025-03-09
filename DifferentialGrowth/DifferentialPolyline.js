@@ -10,6 +10,7 @@ import { Vector2 } from "./Vector2.js";
 import { DifferentialNode, NEARBY_RADIUS } from "./DifferentialNode.js";
 import { Circle } from "./circle.js";
 import { mod } from "../sketchlib/mod.js";
+import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
 
 const MAX_EDGE_LENGTH = 150;
 
@@ -230,19 +231,7 @@ export class DifferentialPolyline {
       Point.point(node.position.x, node.position.y)
     );
 
-    const bezier_curves = [];
-    const n = positions.length;
-
-    for (let i = 0; i < positions.length; i++) {
-      const a = positions[i];
-      const b = positions[(i + 1) % n];
-      const c = positions[(i + 2) % n];
-      const d = positions[(i + 3) % n];
-      const curve = BezierPrimitive.from_b_spline(a, b, c, d);
-      bezier_curves.push(curve);
-    }
-
-    const beziergon = new BeziergonPrimitive(bezier_curves);
+    const beziergon = BeziergonPrimitive.interpolate_points(positions);
     return new GroupPrimitive([beziergon], style);
   }
 
