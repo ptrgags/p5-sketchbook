@@ -16,10 +16,9 @@ import { AnimationChain, Joint } from "./AnimationChain.js";
 import { is_nearly } from "../sketchlib/is_nearly.js";
 import { GooglyEye } from "./GooglyEye.js";
 
-const MIN_BEND_ANGLE = (3 * Math.PI) / 4;
 const ROT90 = Motor.rotation(Point.ORIGIN, Math.PI / 2);
 const ROT45 = Motor.rotation(Point.ORIGIN, Math.PI / 4);
-const SHOW_SPINE = false;
+const DEBUG_SHOW_SPINE = false;
 
 const COLOR_SPINE = new Color(255, 255, 255);
 const SPINE_STYLE = new Style().with_stroke(COLOR_SPINE);
@@ -37,6 +36,7 @@ const WORM_EYE_RADIUS = 0.25 * WORM_THICKNESS;
 const WORM_PUPIL_RADIUS = (3 / 16) * WORM_THICKNESS;
 const WORM_EYE_SEPARATION = 0.5 * WORM_THICKNESS;
 const WORM_NOSE_RADIUS = 1.25 * WORM_THICKNESS;
+const WORM_MIN_BEND_ANGLE = (3 * Math.PI) / 4;
 const INITIAL_POSITION = Point.point(WIDTH / 2, HEIGHT - 2 * WORM_THICKNESS);
 
 class Worm {
@@ -50,14 +50,19 @@ class Worm {
 
       let follow_distance = WORM_SEGMENT_SEPARATION;
       if (i === 0) {
+        // The first joint is the nose of the worm, this is what will
+        // actually be following the mouse
         follow_distance = 0;
       } else if (i === 1) {
+        // The second joint is the center of the head. It follows the nose,
+        // but this distance is a little longer than the separation between
+        // joints.
         follow_distance = WORM_NOSE_RADIUS;
       }
       joints[i] = new Joint(position, follow_distance);
     }
 
-    this.chain = new AnimationChain(joints, MIN_BEND_ANGLE);
+    this.chain = new AnimationChain(joints, WORM_MIN_BEND_ANGLE);
 
     this.look_direction = Point.direction(0, 1);
     this.googly = [
@@ -76,8 +81,12 @@ class Worm {
     ];
   }
 
-  get head() {
+  get nose() {
     return this.chain.head;
+  }
+
+  get head() {
+    return this.chain.get_joint(1);
   }
 
   get tail() {
@@ -85,13 +94,12 @@ class Worm {
   }
 
   /**
-   * Move the head towards the given point.
+   * Move the worm's nose towards the given point
    * @param {Point} point The point to move the head towards
    */
-  move_head_towards(point) {
-    const head_position = this.head.position;
-
-    const to_point = point.sub(head_position);
+  move_nose_towards(point) {
+    const nose_position = this.nose.position;
+    const to_point = point.sub(nose_position);
 
     const velocity = to_point.limit_length(WORM_MAX_SPEED);
     if (is_nearly(velocity.ideal_norm_sqr(), 0)) {
@@ -99,7 +107,7 @@ class Worm {
     }
 
     this.look_direction = velocity.normalize();
-    const target = head_position.add(velocity);
+    const target = nose_position.add(velocity);
     this.chain.move(target);
   }
 
@@ -128,6 +136,7 @@ class Worm {
   }
 
   compute_side_points() {
+    // Ignore the first joint (nose), that will be handled in compute_head_points
     const positions = this.chain.get_positions().slice(1);
     const left_points = new Array(positions.length);
     const right_points = new Array(positions.length);
@@ -209,7 +218,7 @@ class Worm {
     const spine = this.render_spine();
     const body = this.render_body();
     const eyes = this.render_eyes();
-    if (SHOW_SPINE) {
+    if (DEBUG_SHOW_SPINE) {
       return new GroupPrimitive([body, spine, eyes]);
     } else {
       return new GroupPrimitive([body, eyes]);
@@ -229,7 +238,7 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    WORM.move_head_towards(mouse);
+    WORM.move_nose_towards(mouse);
 
     draw_primitive(p, WORM.render());
   };
