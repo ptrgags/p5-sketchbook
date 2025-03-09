@@ -1,4 +1,5 @@
 import { is_nearly } from "../sketchlib/is_nearly";
+import { Even, Odd } from "./multivectors";
 import { Point, Line } from "./objects";
 
 function diff_property(diffs, received, expected, property_name) {
@@ -17,6 +18,36 @@ function diff_float_property(diffs, received, expected, property_name, label) {
   if (!is_nearly(received_value, expected_value)) {
     diffs.push(`${label}: !is_nearly(${received_value}, ${expected_value})`);
   }
+}
+
+function format_even_diff(received, expected) {
+  if (!(received instanceof Even)) {
+    return `received is not an Even object: ${received}`;
+  }
+
+  const diffs = [];
+
+  diff_float_property(diffs, received, expected, "scalar", "scalar");
+  diff_float_property(diffs, received, expected, "yo", "yo");
+  diff_float_property(diffs, received, expected, "xo", "xo");
+  diff_float_property(diffs, received, expected, "xy", "xy");
+
+  return "actual | expected\n" + diffs.join("\n");
+}
+
+function format_odd_diff(received, expected) {
+  if (!(received instanceof Odd)) {
+    return `received is not an Odd object: ${received}`;
+  }
+
+  const diffs = [];
+
+  diff_float_property(diffs, received, expected, "x", "x");
+  diff_float_property(diffs, received, expected, "y", "y");
+  diff_float_property(diffs, received, expected, "o", "o");
+  diff_float_property(diffs, received, expected, "xyo", "xyo");
+
+  return "actual | expected\n" + diffs.join("\n");
 }
 
 function format_point_diff(received, expected) {
@@ -64,6 +95,18 @@ export const PGA_MATCHERS = {
     return {
       pass: received.equals(expected),
       message: () => format_line_diff(received, expected),
+    };
+  },
+  toBeEven(received, expected) {
+    return {
+      pass: received.equals(expected),
+      message: () => format_even_diff(received, expected),
+    };
+  },
+  toBeOdd(received, expected) {
+    return {
+      pass: received.equals(expected),
+      message: () => format_odd_diff(received, expected),
     };
   },
 };

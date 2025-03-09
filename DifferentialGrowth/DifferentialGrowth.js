@@ -63,7 +63,7 @@ export const sketch = (p) => {
     POLYLINE2.update(DELTA_TIME);
     const results = QUADTREE.redistribute_dirty_points();
     if (results.length > 0) {
-      throw new Error("DIRTY POINTS", results);
+      throw new Error("DIRTY POINTS");
     }
 
     if (simulation_step % GROWTH_PERIOD == 0) {

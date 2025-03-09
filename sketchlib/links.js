@@ -1,6 +1,10 @@
 // Links for all of the sketches. Links are added to the page in this order
 export const LINKS = [
   {
+    title: "Worm",
+    year: "2025",
+  },
+  {
     title: "Differential Growth",
     year: "2021, 2025",
   },
