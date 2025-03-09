@@ -30,10 +30,11 @@
           <a
             href="https://www.youtube.com/watch?v=qlfh_rv6khY&ab_channel=argonaut"
             >This YouTube video by user argonaut</a
-          >. Essentially, you have a chain of joints, and a set of simple
-          constraints on how to update them. While not a realistic simulation,
-          it's conceptually straightforward and makes for fun cartoon creatures.
-          There are two main constraints in use here:
+          >. You start with a chain of joints. There are simple constraints on
+          how to update the positions, starting on one end of the chain and
+          working towards the other. While not a realistic simulation, this
+          method is relatively simple to implement and has a fun cartoon
+          creature vibe. There are two main constraints in use here:
         </p>
         <ol>
           <li>
@@ -43,7 +44,7 @@
           <li>
             The angle between any 3 consecutive joints must be at least a
             minimum size. This prevents the curve from getting too pinched, and
-            also creates the S-bend appearance like a snake.
+            also creates S-bends like a snake.
           </li>
         </ol>
         <p>
