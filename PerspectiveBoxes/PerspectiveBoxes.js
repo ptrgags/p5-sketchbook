@@ -9,95 +9,200 @@ import {
 import { Style, Color } from "../sketchlib/Style.js";
 import { draw_primitive } from "../sketchlib/draw_primitive.js";
 
-const ANGLE = Math.PI / 3;
-const TAN_ANGLE = Math.tan(ANGLE);
-const DISTANCE = 400;
+/**
+ * Vanishing points. The right and left vanishing points are always the equivalent of
+ * 90 degrees apart in the 3D scene being portrayed. A vanishing point at 45 degrees
+ * is also computed as this is needed for boxes.
+ * @typedef {Object} VanishingPoints
+ * @property {Point} vp_left The left vanishing point, 90 degrees to the left of the right vanishing point
+ * @property {Point} vp_45 The vanishing point at an angle halfway between vp_left and vp_right. Note that due to perspective, this is NOT the midpoint!
+ * @property {Point} vp_right The right vanishing point
+ */
 
-// Right vanishing point is infinity in the -x direction
-const VP_RIGHT = Point.point(WIDTH / 2 + DISTANCE * TAN_ANGLE, HEIGHT / 2);
+/**
+ * @param {Point} center A Euclidean point for the center of vision
+ * @param {number} angle_right From the viewer's perspective in 3D, what is the angle between the center of vision and the right vanishing point?
+ * @param {number} distance How far away is the eye from the image plane, measured in pixels
+ * @returns {VanishingPoints} The computed vanishing points
+ */
+function compute_vanishing_points(center, angle_right, distance) {
+  // A vanishing point at an angle from the center of vision will appear
+  // at d * tan(angle)
 
-// Left vanishing point is infinity in the -y direction
-const VP_LEFT = Point.point(WIDTH / 2 + -DISTANCE / TAN_ANGLE, HEIGHT / 2);
+  const tan_angle = Math.tan(angle_right);
+  const right_offset = distance * tan_angle;
+  const left_offset = -distance / tan_angle;
+  const vp_right = center.add(Point.DIR_X.scale(right_offset));
+  const vp_left = center.add(Point.DIR_X.scale(left_offset));
 
-// We also need a vanishing point at 45 degrees to make sure we draw a cube
-const VP_45 = Point.point(
-  WIDTH / 2 + DISTANCE * Math.tan(ANGLE - Math.PI / 4),
-  HEIGHT / 2
-);
-
-const STYLE_VP = new Style().with_fill(Color.WHITE).with_stroke(Color.WHITE);
-
-// Create a cube with one edge pointing toward the camera
-
-// bottom front corner of the cube
-const FRONT = Point.point(WIDTH / 5, (3 * HEIGHT) / 4);
-
-// Height from bottom front corner to top front corner
-const HEIGHT_FRONT = 500;
-const TOP = FRONT.add(Point.direction(0, -HEIGHT_FRONT));
-
-// Follow the line to the left vanishing point by some percentage to
-// place the x-axis
-const X_PERCENT = 0.6;
-const POINT_X = Point.lerp(FRONT, VP_LEFT, X_PERCENT);
-
-// Use the vanishing points to find the origin and the other ends of the axes
-const ORIGIN = POINT_X.join(VP_RIGHT).meet(FRONT.join(VP_45));
-const POINT_Y = VP_LEFT.join(ORIGIN).meet(FRONT.join(VP_RIGHT));
-const DIRECTION_UP = Point.direction(0, -1);
-const POINT_Z = TOP.join(VP_45).meet(ORIGIN.join(DIRECTION_UP));
-
-// Find the last 2 points to complete the cube
-const POINT_XZ = POINT_Z.join(VP_RIGHT).meet(POINT_X.join(DIRECTION_UP));
-const POINT_YZ = POINT_Y.join(DIRECTION_UP).meet(POINT_Z.join(VP_LEFT));
-
-const LINE1 = VP_LEFT.join(POINT_X);
-const LINE2 = ORIGIN.join(VP_LEFT);
-const LERPED = new Array(17);
-for (let i = 0; i < 17; i++) {
-  const t = i / 16;
-  LERPED[i] = Line.lerp(LINE2, LINE1, t);
+  // We also need a vanishing point at 45 degrees for setting up an accurate cube
+  const offset_45 = distance * Math.tan(angle_right - Math.PI / 4);
+  const vp_45 = center.add(Point.DIR_X.scale(offset_45));
+  return { vp_left, vp_right, vp_45 };
 }
 
-const AXIS = ORIGIN.join(POINT_X);
-const OTHER_SIDE = POINT_Y.join(FRONT);
-const LINES = LERPED.map(
-  (x) => new LinePrimitive(x.meet(AXIS), x.meet(OTHER_SIDE))
-);
+/**
+ * The corners of the cube, labeled by which basis vectors you add to reach
+ * that point
+ * @typedef {Object} CubeCorners
+ */
 
-const POINTS = new GroupPrimitive(
-  [
-    new PointPrimitive(VP_RIGHT),
-    new PointPrimitive(VP_LEFT),
-    new PointPrimitive(VP_45),
-    new PointPrimitive(TOP),
-    new LinePrimitive(POINT_XZ, POINT_X),
-    new LinePrimitive(POINT_XZ, POINT_Z),
-    new LinePrimitive(FRONT, POINT_X),
-    new LinePrimitive(FRONT, POINT_Y),
-    new LinePrimitive(POINT_YZ, POINT_Y),
-    new LinePrimitive(POINT_YZ, POINT_Z),
-    ...LINES,
-  ],
-  STYLE_VP
-);
+/**
+ * The edges of the cube, labeled by which points they connect. The edges
+ * are oriented away from the origin
+ * @typedef {Object} CubeEdges
+ */
 
-const X_AXIS = new GroupPrimitive(
-  [new LinePrimitive(ORIGIN, POINT_X)],
-  Style.from_color(Color.RED).with_width(2)
-);
+/**
+ * @typedef {Object} PerspectiveCube
+ * @property {CubeCorners} corners
+ * @property {CubeEdges} edges
+ */
 
-const Y_AXIS = new GroupPrimitive(
-  [new LinePrimitive(ORIGIN, POINT_Y)],
-  Style.from_color(Color.GREEN).with_width(2)
-);
+/**
+ * Compute a perspective drawing of a cube
+ * @param {VanishingPoints} vanishing_points
+ * @param {Point} xy The bottom corner closest to the viewer, in screen pixels. This anchors the entire cube
+ * @param {number} height_xyz The height of the corner opposite from the corner (xyz) over the corner below it (xy). This is given in pixels in the image plane
+ * @param {number} percent_x How far along the line from the left vanishing point to (xy)
+ * @return {PerspectiveCube} The
+ */
+function compute_cube(vanishing_points, xy, height_xyz, percent_x) {
+  const { vp_left, vp_right, vp_45 } = vanishing_points;
+  const vp_up = Point.DIR_Y.scale(-1);
 
-const Z_AXIS = new GroupPrimitive(
-  [new LinePrimitive(ORIGIN, POINT_Z)],
-  Style.from_color(Color.BLUE).with_width(2)
-);
+  // To bootstrap the process, we need to find xyz, the point diagonally opposite
+  // the origin, and x, the corner along the x-axis. These are done with the
+  // dimensions passed in.
+  const xyz = xy.add(Point.DIR_Y.scale(-height_xyz));
+  const x = Point.lerp(vp_left, xy, percent_x);
 
-const AXES = new GroupPrimitive([X_AXIS, Y_AXIS, Z_AXIS]);
+  // Compute the origin by intersecting two lines
+  const line_o_x = vp_right.join(x);
+  const diag_xy = xy.join(vp_45);
+  const o = line_o_x.meet(diag_xy);
+
+  // compute the corner on the y-axis
+  const line_o_y = vp_left.join(o);
+  const line_y_xy = vp_right.join(xy);
+  const y = line_o_y.meet(line_y_xy);
+
+  // Compute the corner on the z-axis
+  const line_o_z = o.join(vp_up);
+  const diag_xyz = xyz.join(vp_45);
+  const z = line_o_z.meet(diag_xyz);
+
+  // Compute the remaining corners
+  const line_x_xz = x.join(vp_up);
+  const line_z_xz = vp_right.join(z);
+  const xz = line_x_xz.meet(line_z_xz);
+
+  const line_y_yz = y.join(vp_up);
+  const line_z_yz = vp_left.join(z);
+  const yz = line_y_yz.meet(line_z_yz);
+
+  // and the last lines
+  const line_x_xy = x.join(xy);
+  const line_yz_xyz = yz.join(xyz);
+  const line_xy_xyz = xy.join(xyz);
+  const line_xz_xyz = xz.join(xyz);
+
+  return {
+    corners: {
+      o,
+      x,
+      y,
+      z,
+      xy,
+      xz,
+      yz,
+      xyz,
+    },
+    edges: {
+      line_o_x,
+      line_o_y,
+      line_o_z,
+      line_x_xy,
+      line_x_xz,
+      line_y_xy,
+      line_y_yz,
+      line_z_xz,
+      line_z_yz,
+      line_xy_xyz,
+      line_xz_xyz,
+      line_yz_xyz,
+    },
+  };
+}
+
+function render_axes(cube) {
+  const { o, x, y, z } = cube.corners;
+  const x_axis = new GroupPrimitive(
+    [new LinePrimitive(o, x)],
+    Style.from_color(Color.RED).with_width(2)
+  );
+
+  const y_axis = new GroupPrimitive(
+    [new LinePrimitive(o, y)],
+    Style.from_color(Color.GREEN).with_width(2)
+  );
+
+  const z_axis = new GroupPrimitive(
+    [new LinePrimitive(o, z)],
+    Style.from_color(Color.BLUE).with_width(2)
+  );
+
+  return new GroupPrimitive([x_axis, y_axis, z_axis]);
+}
+
+function render_corners(cube) {
+  const values = Object.values(cube.corners);
+  const points = values.map((x) => new PointPrimitive(x));
+  return new GroupPrimitive(points, new Style().with_fill(Color.WHITE));
+}
+
+function render_edges(cube) {
+  const { o, x, y, z, xy, xz, yz, xyz } = cube.corners;
+
+  const lines = [
+    [o, x],
+    [o, y],
+    [o, z],
+    [x, xz],
+    [x, xy],
+    [y, xy],
+    [y, yz],
+    [z, xz],
+    [z, yz],
+    [xy, xyz],
+    [xz, xyz],
+    [yz, xyz],
+  ].map(([a, b]) => new LinePrimitive(a, b));
+
+  return new GroupPrimitive(lines, new Style().with_stroke(Color.WHITE));
+}
+
+const ANGLE = Math.PI / 3; // Math.PI / 6;
+const DISTANCE = 400;
+const CENTER = Point.point(WIDTH / 2, HEIGHT / 2);
+
+// bottom front corner of the cube
+const POINT_XY = Point.point(WIDTH / 5, (7 * HEIGHT) / 8);
+// Height from bottom front corner to top front corner
+const HEIGHT_XYZ = 600;
+// Follow the line to the left vanishing point by some percentage to
+// place the x-axis
+const PERCENT_X = 0.4;
+const VANISHING_POINTS = compute_vanishing_points(CENTER, ANGLE, DISTANCE);
+const CUBE = compute_cube(VANISHING_POINTS, POINT_XY, HEIGHT_XYZ, PERCENT_X);
+
+const VPS = new GroupPrimitive(
+  Object.values(VANISHING_POINTS).map((x) => new PointPrimitive(x)),
+  Style.from_color(Color.RED)
+);
+const CORNERS = render_corners(CUBE);
+const EDGES = render_edges(CUBE);
+const AXES = render_axes(CUBE);
 
 export const sketch = (p) => {
   p.setup = () => {
@@ -109,7 +214,9 @@ export const sketch = (p) => {
     );
     p.background(0);
 
-    draw_primitive(p, POINTS);
+    draw_primitive(p, VPS);
+    draw_primitive(p, EDGES);
+    draw_primitive(p, CORNERS);
     draw_primitive(p, AXES);
   };
 };
