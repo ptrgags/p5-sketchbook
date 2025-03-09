@@ -37,10 +37,11 @@ const WORM_EYE_RADIUS = 0.25 * WORM_THICKNESS;
 const WORM_PUPIL_RADIUS = (3 / 16) * WORM_THICKNESS;
 const WORM_EYE_SEPARATION = 0.5 * WORM_THICKNESS;
 const WORM_NOSE_RADIUS = 1.25 * WORM_THICKNESS;
+const INITIAL_POSITION = Point.point(WIDTH / 2, HEIGHT - 2 * WORM_THICKNESS);
 
 class Worm {
   constructor() {
-    const first_point = Point.point(WIDTH / 2, HEIGHT);
+    const first_point = INITIAL_POSITION;
     const down = Point.direction(0, WORM_SEGMENT_SEPARATION);
 
     const joints = new Array(WORM_SEGMENTS);
@@ -220,7 +221,7 @@ const WORM = new Worm();
 
 export const sketch = (p) => {
   let canvas;
-  let mouse = Point.point(WIDTH / 2, HEIGHT / 2);
+  let mouse = INITIAL_POSITION;
   p.setup = () => {
     canvas = p.createCanvas(WIDTH, HEIGHT).elt;
   };
@@ -236,4 +237,6 @@ export const sketch = (p) => {
   p.mouseMoved = () => {
     mouse = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
   };
+
+  p.mouseDragged = p.mouseMoved;
 };
