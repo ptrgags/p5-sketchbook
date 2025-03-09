@@ -19,8 +19,7 @@ import { GooglyEye } from "./GooglyEye.js";
 const MIN_ANGLE = (3 * Math.PI) / 4;
 const ROT90 = Motor.rotation(Point.ORIGIN, Math.PI / 2);
 const ROT45 = Motor.rotation(Point.ORIGIN, Math.PI / 4);
-const ROT15 = Motor.rotation(Point.ORIGIN, Math.PI / 12);
-const SHOW_SPINE = true;
+const SHOW_SPINE = false; //true;
 
 const COLOR_SPINE = new Color(255, 255, 255);
 const SPINE_STYLE = new Style().with_stroke(COLOR_SPINE);
@@ -29,7 +28,7 @@ const WORM_STYLE = new Style()
   .with_fill(new Color(255, 122, 151))
   .with_stroke(new Color(127, 61, 76));
 
-const WORM_SEGMENTS = 100;
+const WORM_SEGMENTS = 75;
 const WORM_SEGMENT_SEPARATION = 20;
 // speed in pixels per frame
 const WORM_MAX_SPEED = 10;
@@ -46,7 +45,8 @@ class Worm {
     const joints = new Array(WORM_SEGMENTS);
     for (let i = 0; i < WORM_SEGMENTS; i++) {
       const position = first_point.add(down.scale(i));
-      joints[i] = new Joint(position, WORM_SEGMENT_SEPARATION);
+      const follow_distance = i === 0 ? 0 : WORM_SEGMENT_SEPARATION;
+      joints[i] = new Joint(position, follow_distance);
     }
 
     this.chain = new AnimationChain(joints, MIN_ANGLE);
@@ -77,18 +77,21 @@ class Worm {
   }
 
   /**
+   * Move the head towards the given point.
    * @param {Point} point The point to move the head towards
    */
   move_head_towards(point) {
     const head_position = this.head.position;
 
-    const velocity = point.sub(head_position); //.limit_length(WORM_MAX_SPEED);
+    const to_point = point.sub(head_position);
+
+    const velocity = to_point.limit_length(WORM_MAX_SPEED);
     if (is_nearly(velocity.ideal_norm_sqr(), 0)) {
       return;
     }
 
     this.look_direction = velocity.normalize();
-    const target = this.head.position.add(velocity);
+    const target = head_position.add(velocity);
     this.chain.move(target);
   }
 
@@ -158,12 +161,12 @@ class Worm {
     // It's a pun on "heading" :P
     const tailing = tail.sub(this.chain.get_joint(-2).position).normalize();
 
-    const left_15 = ROT15.transform_point(tailing);
-    const right_15 = ROT15.reverse().transform_point(tailing);
+    const left_45 = ROT45.transform_point(tailing);
+    const right_45 = ROT45.reverse().transform_point(tailing);
 
-    const tail_point = tail.add(tailing.scale(2 * WORM_THICKNESS));
-    const tail_left = tail.add(left_15.scale(WORM_THICKNESS));
-    const tail_right = tail.add(right_15.scale(WORM_THICKNESS));
+    const tail_point = tail.add(tailing.scale(WORM_THICKNESS));
+    const tail_left = tail.add(left_45.scale(WORM_THICKNESS));
+    const tail_right = tail.add(right_45.scale(WORM_THICKNESS));
 
     return [tail_right, tail_point, tail_left];
   }
