@@ -16,10 +16,10 @@ import { AnimationChain, Joint } from "./AnimationChain.js";
 import { is_nearly } from "../sketchlib/is_nearly.js";
 import { GooglyEye } from "./GooglyEye.js";
 
-const MIN_ANGLE = (3 * Math.PI) / 4;
+const MIN_BEND_ANGLE = (3 * Math.PI) / 4;
 const ROT90 = Motor.rotation(Point.ORIGIN, Math.PI / 2);
 const ROT45 = Motor.rotation(Point.ORIGIN, Math.PI / 4);
-const SHOW_SPINE = false; //true;
+const SHOW_SPINE = false;
 
 const COLOR_SPINE = new Color(255, 255, 255);
 const SPINE_STYLE = new Style().with_stroke(COLOR_SPINE);
@@ -28,28 +28,35 @@ const WORM_STYLE = new Style()
   .with_fill(new Color(255, 122, 151))
   .with_stroke(new Color(127, 61, 76));
 
-const WORM_SEGMENTS = 75;
-const WORM_SEGMENT_SEPARATION = 20;
+const WORM_SEGMENTS = 60;
+const WORM_SEGMENT_SEPARATION = 30;
 // speed in pixels per frame
 const WORM_MAX_SPEED = 10;
-const WORM_THICKNESS = 30;
-
+const WORM_THICKNESS = 20;
 const WORM_EYE_RADIUS = 0.25 * WORM_THICKNESS;
 const WORM_PUPIL_RADIUS = (3 / 16) * WORM_THICKNESS;
 const WORM_EYE_SEPARATION = 0.5 * WORM_THICKNESS;
+const WORM_NOSE_RADIUS = 1.25 * WORM_THICKNESS;
+
 class Worm {
   constructor() {
-    const first_point = Point.point(WIDTH / 2, HEIGHT / 2);
+    const first_point = Point.point(WIDTH / 2, HEIGHT);
     const down = Point.direction(0, WORM_SEGMENT_SEPARATION);
 
     const joints = new Array(WORM_SEGMENTS);
     for (let i = 0; i < WORM_SEGMENTS; i++) {
       const position = first_point.add(down.scale(i));
-      const follow_distance = i === 0 ? 0 : WORM_SEGMENT_SEPARATION;
+
+      let follow_distance = WORM_SEGMENT_SEPARATION;
+      if (i === 0) {
+        follow_distance = 0;
+      } else if (i === 1) {
+        follow_distance = WORM_NOSE_RADIUS;
+      }
       joints[i] = new Joint(position, follow_distance);
     }
 
-    this.chain = new AnimationChain(joints, MIN_ANGLE);
+    this.chain = new AnimationChain(joints, MIN_BEND_ANGLE);
 
     this.look_direction = Point.direction(0, 1);
     this.googly = [
@@ -120,7 +127,7 @@ class Worm {
   }
 
   compute_side_points() {
-    const positions = this.chain.get_positions();
+    const positions = this.chain.get_positions().slice(1);
     const left_points = new Array(positions.length);
     const right_points = new Array(positions.length);
     for (const [i, center] of positions.entries()) {
@@ -143,8 +150,8 @@ class Worm {
   }
 
   compute_head_points() {
-    const head = this.head.position;
-    const heading = head.sub(this.chain.get_joint(1).position).normalize();
+    const head = this.chain.get_joint(1).position;
+    const heading = head.sub(this.chain.get_joint(2).position).normalize();
 
     const left_45 = ROT45.transform_point(heading);
     const right_45 = ROT45.reverse().transform_point(heading);
@@ -185,7 +192,7 @@ class Worm {
   render_eyes() {
     const [left, right] = this.googly;
 
-    const center = this.head.position;
+    const center = this.chain.get_joint(1).position;
     const left_dir = ROT90.transform_point(this.look_direction);
     const right_dir = ROT90.reverse().transform_point(this.look_direction);
 
