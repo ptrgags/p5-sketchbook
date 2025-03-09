@@ -26,7 +26,7 @@ export const sketch = (p) => {
     draw_primitive(p, WORM.render());
   };
 
-  p.mouseMoved = (event) => {
+  p.mouseMoved = () => {
     mouse = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
   };
 

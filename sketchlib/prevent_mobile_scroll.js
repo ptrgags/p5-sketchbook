@@ -10,6 +10,8 @@ export function prevent_mobile_scroll(canvas) {
     }
   };
 
+  // Since we're calling event.preventDefault(), we need to mark the event
+  // as not passive.
   const options = { passive: false };
   document.body.addEventListener("touchstart", callback, options);
   document.body.addEventListener("touchend", callback, options);
