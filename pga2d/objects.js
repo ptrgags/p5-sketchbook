@@ -137,7 +137,7 @@ export class Point {
   }
 
   dist_sqr(point) {
-    return this.sub(point).ideal_norm();
+    return this.sub(point).ideal_norm_sqr();
   }
 
   set_length(length) {

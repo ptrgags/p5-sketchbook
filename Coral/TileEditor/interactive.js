@@ -70,10 +70,8 @@ export class InteractiveTangent {
           this.flip_forward.transform_point(original_tangent).neg()
         : original_tangent;
 
-    const original_length = original_tangent.ideal_mag();
-    const adjusted_length = Math.min(original_length, MAX_TANGENT_MAGNITUDE);
-
-    const scale_factor = adjusted_length / original_length;
-    this.control_point.tangent = corrected_tangent.scale(scale_factor);
+    this.control_point.tangent = corrected_tangent.limit_length(
+      MAX_TANGENT_MAGNITUDE
+    );
   }
 }
