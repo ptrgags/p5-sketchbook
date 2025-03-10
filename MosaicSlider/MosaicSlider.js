@@ -17,12 +17,6 @@ const MARGIN_Y = (HEIGHT - ROWS * SQUARE_SIZE) / 2;
 const CORNER = Point.point(MARGIN_X, MARGIN_Y);
 const STRIDE = Point.direction(SQUARE_SIZE, SQUARE_SIZE);
 
-class MosaicPixel {
-  constructor(color_index) {
-    this.color_index = color_index;
-  }
-}
-
 class PixelSwapPair {
   constructor(style_a, position_a, style_b, position_b, start_time, duration) {
     this.style_a = style_a;
@@ -66,8 +60,8 @@ class PixelSwapPair {
 
 function select_color(index) {
   const { i, j } = index;
-  const upper_half = i < ROWS / 2;
-  const left_half = j < COLS / 2;
+  const upper_half = Number(i < ROWS / 2);
+  const left_half = Number(j < COLS / 2);
 
   return (upper_half << 1) | left_half;
 }
@@ -313,16 +307,6 @@ const COLORS = [
   new Color(0x7e, 0xbd, 0xc2),
   new Color(0xf3, 0xdf, 0xa2),
 ];
-
-const SWAP_PAIR = new PixelSwapPair(
-  new Style().with_fill(new Color(255, 0, 255)),
-  Point.point(10, 10),
-  new Style().with_fill(new Color(255, 255, 255)),
-  Point.point(10 + SQUARE_SIZE, 10),
-  sec_to_frames(1),
-  sec_to_frames(0.25)
-);
-
 const MOSAIC = new MosaicSlider();
 
 export const sketch = (p) => {
@@ -334,6 +318,14 @@ export const sketch = (p) => {
       undefined,
       document.getElementById("sketch-canvas")
     ).elt;
+
+    for (let i = 0; i < 4; i++) {
+      const color_picker = document.getElementById(`color-${i}`);
+      color_picker.addEventListener("input", (e) => {
+        // @ts-ignore
+        console.log(e.target.value);
+      });
+    }
   };
 
   p.draw = () => {

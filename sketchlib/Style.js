@@ -1,10 +1,17 @@
 export class Color {
+  /**
+   * Constructor
+   * @param {number} r The red component from 0 to 255
+   * @param {number} g The green component from 0 to 255
+   * @param {number} b The blue component from 0 to 255
+   */
   constructor(r, g, b) {
     this.r = r;
     this.g = g;
     this.b = b;
   }
 }
+Color.BLACK = Object.freeze(new Color(0, 0, 0));
 
 export class Style {
   constructor() {
@@ -21,6 +28,11 @@ export class Style {
     return result;
   }
 
+  /**
+   * Create a new style that's equivalent to this one but with a new stroke color
+   * @param {Color} stroke The new stroke color
+   * @returns {Style} a new style with the given stroke color
+   */
   with_stroke(stroke) {
     const result = this.clone();
     result.stroke = stroke;
