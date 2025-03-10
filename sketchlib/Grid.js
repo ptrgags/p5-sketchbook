@@ -143,6 +143,15 @@ export class Grid {
     }
   }
 
+  for_each(callback) {
+    for (let i = 0; i < this.rows; i++) {
+      for (let j = 0; j < this.cols; j++) {
+        const index = new Index2D(i, j);
+        callback(index, this.get(index));
+      }
+    }
+  }
+
   /**
    * Iterate over the grid, and produce a new grid of the same size by
    * calling a function at each cell
