@@ -1,3 +1,18 @@
+const REGEX_HEX_COLOR = /^#?[0-9A-Fa-f]{6}$/;
+
+/**
+ * Format a u8 as a 2-digit hex number with leading 0s as needed
+ * @param {number} value_u8
+ */
+function format_hex_u8(value_u8) {
+  const hex_value = value_u8.toString(16);
+  if (hex_value.length === 1) {
+    return `0${hex_value}`;
+  }
+
+  return hex_value;
+}
+
 export class Color {
   /**
    * Constructor
@@ -9,6 +24,40 @@ export class Color {
     this.r = r;
     this.g = g;
     this.b = b;
+  }
+
+  /**
+   * Convert a color to a CSS color code
+   * @returns {string} A string in the form #RRGGBB
+   */
+  to_hex_code() {
+    const r = format_hex_u8(this.r);
+    const g = format_hex_u8(this.g);
+    const b = format_hex_u8(this.b);
+    return `#${r}${g}${b}`;
+  }
+
+  /**
+   * Parse a color from a hex code like RRGGBB or #RRGGBB. This is useful
+   * when the input came from an HTML color input
+   * @param {string} hex_code The hex code
+   * @returns {Color} The parsed color
+   */
+  static from_hex_code(hex_code) {
+    if (!REGEX_HEX_COLOR.test(hex_code)) {
+      throw new Error("hex_code must be in the form RRGGBB or #RRGGBB");
+    }
+
+    const start = hex_code.charAt(0) === "#" ? 1 : 0;
+    const red_string = hex_code.slice(start, start + 2);
+    const green_string = hex_code.slice(start + 2, start + 4);
+    const blue_string = hex_code.slice(start + 4);
+
+    const red = parseInt(red_string, 16);
+    const green = parseInt(green_string, 16);
+    const blue = parseInt(blue_string, 16);
+
+    return new Color(red, green, blue);
   }
 }
 Color.BLACK = Object.freeze(new Color(0, 0, 0));
