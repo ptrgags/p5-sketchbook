@@ -1,6 +1,10 @@
 // Links for all of the sketches. Links are added to the page in this order
 export const LINKS = [
   {
+    title: "Mosaic Slider",
+    year: "2025",
+  },
+  {
     title: "Worm",
     year: "2025",
   },
