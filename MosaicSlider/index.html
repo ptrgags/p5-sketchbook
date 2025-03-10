@@ -14,6 +14,12 @@
       const p5_sketch = new p5(sketch, "sketch");
     </script>
     <link rel="stylesheet" href="../styles/layout.css" />
+    <style>
+      .center {
+        padding: 10px;
+        text-align: center;
+      }
+    </style>
   </head>
   <body>
     <sketchbook-navbar></sketchbook-navbar>
@@ -23,12 +29,12 @@
         <canvas id="sketch-canvas" width="500" height="700"></canvas>
       </div>
       <div class="controls">
-        <label for="color-0">A<input id="color-0" type="color" /></label>
-        <label for="color-0">B<input id="color-1" type="color" /></label>
-        <label for="color-0">C<input id="color-2" type="color" /></label>
-        <label for="color-0">D<input id="color-3" type="color" /></label>
+        <input id="color-0" type="color" />
+        <input id="color-1" type="color" />
+        <input id="color-2" type="color" />
+        <input id="color-3" type="color" />
         <br />
-        <button id="save-image">Save image</button>
+        <div class="center"><button id="save-image">Save image</button></div>
       </div>
       <div class="description">DESCRIPTION GOES HERE</div>
     </div>

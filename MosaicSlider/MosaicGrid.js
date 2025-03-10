@@ -18,10 +18,13 @@ const SWAP_DURATION = sec_to_frames(0.125);
 
 function select_color(index) {
   const { i, j } = index;
-  const upper_half = Number(i < ROWS / 2);
-  const left_half = Number(j < COLS / 2);
+  // go from
+  const half_rows = ROWS / 2;
+  const half_cols = COLS / 2;
+  const big_row = Math.floor(i / half_rows);
+  const big_col = Math.floor(j / half_rows);
 
-  return (upper_half << 1) | left_half;
+  return (big_row << 1) | big_col;
 }
 
 export class MosaicGrid {
