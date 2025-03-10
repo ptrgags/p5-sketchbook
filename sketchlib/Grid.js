@@ -143,6 +143,10 @@ export class Grid {
     }
   }
 
+  /**
+   * Call a function at each cell of the grid
+   * @param {function(Index2D, T): void} callback A function to call with the given index and cell value
+   */
   for_each(callback) {
     for (let i = 0; i < this.rows; i++) {
       for (let j = 0; j < this.cols; j++) {

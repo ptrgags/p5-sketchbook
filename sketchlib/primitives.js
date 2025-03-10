@@ -1,4 +1,5 @@
 import { Point } from "../pga2d/objects.js";
+import { Style } from "./Style.js";
 
 export class PointPrimitive {
   constructor(position) {
@@ -104,6 +105,10 @@ export class BeziergonPrimitive {
 }
 
 export class GroupPrimitive {
+  /**
+   * @param {Primitive[]} primitives
+   * @param {Style} [style]
+   */
   constructor(primitives, style) {
     if (!Array.isArray(primitives)) {
       throw new Error("primitives must be an array of Primitive");
@@ -116,3 +121,7 @@ export class GroupPrimitive {
     yield* this.primitives;
   }
 }
+
+/**
+ * @typedef {GroupPrimitive | BezierPrimitive | PolygonPrimitive | BezierPrimitive | LinePrimitive | RectPrimitive | CirclePrimitive | PointPrimitive} Primitive
+ */
