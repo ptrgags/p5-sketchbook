@@ -1,12 +1,7 @@
 import { Point } from "../pga2d/objects.js";
-
-import { Index2D } from "../sketchlib/Grid.js";
-import { in_bounds } from "../sketchlib/in_bounds.js";
 import { GroupPrimitive } from "../sketchlib/primitives.js";
 import { Color } from "../sketchlib/Style.js";
 import { MosaicGrid } from "./MosaicGrid.js";
-import { PixelSwapPair } from "./PixelSwapPair.js";
-import { sec_to_frames } from "./Tween.js";
 
 const SliderState = {
   IDLE: 0,
@@ -129,5 +124,9 @@ export class InteractiveMosaic {
       return new GroupPrimitive([grid, this.swap_pair.render(frame)]);
     }
     return grid;
+  }
+
+  get_colors() {
+    return this.grid.get_colors();
   }
 }

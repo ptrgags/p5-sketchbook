@@ -26,6 +26,23 @@ export const sketch = (p) => {
     }
   }
 
+  function init_image_save_button() {
+    document.getElementById("save-image").addEventListener("click", () => {
+      const colors = mosaic.get_colors();
+      const width = 16;
+      const image = p.createImage(width, width);
+      image.loadPixels();
+      for (const [i, color] of colors.entries()) {
+        image.pixels[4 * i] = color.r;
+        image.pixels[4 * i + 1] = color.g;
+        image.pixels[4 * i + 2] = color.b;
+        image.pixels[4 * i + 3] = 255;
+      }
+      image.updatePixels();
+      image.save("mosaic", "png");
+    });
+  }
+
   p.setup = () => {
     canvas = p.createCanvas(
       WIDTH,
@@ -35,6 +52,7 @@ export const sketch = (p) => {
     ).elt;
 
     init_color_pickers();
+    init_image_save_button();
   };
 
   p.draw = () => {

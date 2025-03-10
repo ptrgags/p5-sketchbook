@@ -36,6 +36,7 @@ export class MosaicGrid {
       return select_color(index);
     });
 
+    this.colors = colors;
     this.styles = colors.map((x) =>
       new Style().with_fill(x).with_stroke(Color.BLACK)
     );
@@ -177,6 +178,7 @@ export class MosaicGrid {
   }
 
   update_color(index, color) {
+    this.colors[index] = color;
     this.styles[index] = new Style().with_fill(color).with_stroke(Color.BLACK);
     this.primitive_dirty = true;
   }
@@ -191,6 +193,18 @@ export class MosaicGrid {
     this.dst_pixel = undefined;
 
     this.primitive_dirty = true;
+  }
+
+  get_colors() {
+    return this.grid.map_array((index, color_index) => {
+      if (index === this.src_index) {
+        color_index = this.src_index;
+      } else if (index === this.dst_index) {
+        color_index = this.dst_index;
+      }
+
+      return this.colors[color_index];
+    });
   }
 
   update() {
