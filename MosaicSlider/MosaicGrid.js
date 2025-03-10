@@ -171,7 +171,7 @@ export class MosaicGrid {
     this.grid.set(src_index, undefined);
     this.grid.set(dst_index, undefined);
 
-    this.primitive_dirty = false;
+    this.primitive_dirty = true;
 
     return swap_pair;
   }
