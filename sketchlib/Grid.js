@@ -8,7 +8,7 @@ import { GridDirection } from "./GridDiection.js";
  * The range is iterated over in row-major order.
  * @param {number} rows How many rows to iterate over
  * @param {number} cols How many columns to iterate over
- * @param {function(number, number)} callback The action to perform at cell (i, j)
+ * @param {function(number, number): void} callback The action to perform at cell (i, j)
  */
 export function griderator(rows, cols, callback) {
   for (let i = 0; i < rows; i++) {
@@ -24,6 +24,11 @@ export function griderator(rows, cols, callback) {
  * arrays.
  */
 export class Index2D {
+  /**
+   * Constructor
+   * @param {number} i The first index, usually the row
+   * @param {number} j The second index, usually the column
+   */
   constructor(i, j) {
     if (i < 0) {
       throw new Error("i must be non-negative");
@@ -144,6 +149,19 @@ export class Grid {
   }
 
   /**
+   * Call a function at each cell of the grid
+   * @param {function(Index2D, T): void} callback A function to call with the given index and cell value
+   */
+  for_each(callback) {
+    for (let i = 0; i < this.rows; i++) {
+      for (let j = 0; j < this.cols; j++) {
+        const index = new Index2D(i, j);
+        callback(index, this.get(index));
+      }
+    }
+  }
+
+  /**
    * Iterate over the grid, and produce a new grid of the same size by
    * calling a function at each cell
    * @template U
@@ -158,6 +176,7 @@ export class Grid {
 
   /**
    * Like map, but return an Array instead of a grid
+   * @template U
    * @param {function(Index2D, T): U} callback  A function that takes the index and current value and computes a new value
    * @returns {Array<U>} an array of computed values, flattened in row-major order
    */

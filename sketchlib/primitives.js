@@ -1,4 +1,5 @@
 import { Point } from "../pga2d/objects.js";
+import { Style } from "./Style.js";
 
 export class PointPrimitive {
   constructor(position) {
@@ -103,7 +104,20 @@ export class BeziergonPrimitive {
   }
 }
 
+/**
+ * A logical grouping of primitives to be rendered together, in the order
+ * listed in the primitives array. This is the main way to apply styling to
+ * primitives.
+ *
+ * Note: GroupPrimitive can be nested, but the most specific style will be the
+ * one that's applied.
+ */
 export class GroupPrimitive {
+  /**
+   * Constructor
+   * @param {Primitive[]} primitives The primitives in this group
+   * @param {Style} [style] An optional style to apply to these primitives.
+   */
   constructor(primitives, style) {
     if (!Array.isArray(primitives)) {
       throw new Error("primitives must be an array of Primitive");
@@ -116,3 +130,7 @@ export class GroupPrimitive {
     yield* this.primitives;
   }
 }
+
+/**
+ * @typedef {GroupPrimitive | BezierPrimitive | PolygonPrimitive | BezierPrimitive | LinePrimitive | RectPrimitive | CirclePrimitive | PointPrimitive} Primitive
+ */
