@@ -9,7 +9,18 @@ const SliderState = {
   ANIMATING: 2,
 };
 
+/**
+ * This is the main class for managing the interactive mosaic. It owns the
+ * MosaicGrid and any PixelSwapPair animations.
+ *
+ * This class acts as a finite state machine for handling mouse interaction,
+ * as there are only a few states.
+ */
 export class InteractiveMosaic {
+  /**
+   * Constructor
+   * @param {Color[]} colors An array of 4 colors to apply to the four quadrants of the mosaic grid
+   */
   constructor(colors) {
     this.grid = new MosaicGrid(colors);
     this.state = SliderState.IDLE;
@@ -24,6 +35,10 @@ export class InteractiveMosaic {
     this.mouse_down = false;
   }
 
+  /**
+   * Handle a mouse press event. This may advance the state machine
+   * @param {Point} mouse The current position of the mouse
+   */
   mouse_press(mouse) {
     this.mouse = mouse;
     this.mouse_down = true;
@@ -39,6 +54,10 @@ export class InteractiveMosaic {
     }
   }
 
+  /**
+   * Handle a mouse drag event. This may advance the state machine.
+   * @param {Point} mouse The current mouse position
+   */
   mouse_drag(mouse) {
     this.mouse = mouse;
     this.mouse_down = true;
@@ -61,6 +80,9 @@ export class InteractiveMosaic {
     }
   }
 
+  /**
+   * Handle a mouse release event. This may advance the state machine.
+   */
   mouse_release() {
     this.mouse = this.mouse;
     this.mouse_down = false;
@@ -70,6 +92,9 @@ export class InteractiveMosaic {
     }
   }
 
+  /**
+   * @private
+   */
   done_animation() {
     this.grid.pop_in_swapped_pair();
     this.swap_pair = undefined;
@@ -126,6 +151,10 @@ export class InteractiveMosaic {
     return grid;
   }
 
+  /**
+   * Get the colors from the underlying MosaicGrid
+   * @returns {Color[]} A flat array of the colors in the grid
+   */
   get_colors() {
     return this.grid.get_colors();
   }

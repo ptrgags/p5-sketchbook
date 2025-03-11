@@ -17,13 +17,18 @@ const CORNER = Point.point(MARGIN_X, MARGIN_Y);
 const SWAP_DURATION = sec_to_frames(1 / 16);
 const PIXEL_STYLE = new Style().with_stroke(Color.BLACK).with_width(2);
 
-function select_color(index) {
+/**
+ * Color each quadrant of the grid a different color
+ * @param {Index2D} index The index of the pixel
+ * @returns {number} The color index into the array of styles
+ */
+function get_quadrant_color(index) {
   const { i, j } = index;
-  // go from
+  // go from pixels to a 2x2 grid of quadrants
   const half_rows = ROWS / 2;
   const half_cols = COLS / 2;
   const big_row = Math.floor(i / half_rows);
-  const big_col = Math.floor(j / half_rows);
+  const big_col = Math.floor(j / half_cols);
 
   return (big_row << 1) | big_col;
 }
@@ -37,7 +42,7 @@ export class MosaicGrid {
     this.colors = colors;
     this.grid = new Grid(ROWS, COLS);
     this.grid.fill((index) => {
-      return select_color(index);
+      return get_quadrant_color(index);
     });
 
     this.colors = colors;
@@ -70,6 +75,13 @@ export class MosaicGrid {
     return new Index2D(i, j);
   }
 
+  /**
+   * If the mouse clicked a cell and then dragged to one of the four neighboring
+   * cells, return the index of the neighbor. Otherwise return undefined
+   * @param {Index2D} src_index
+   * @param {Point} mouse The current mouse position
+   * @returns {Index2D|undefined} The neighbor index, if it exists
+   */
   compute_neighbor(src_index, mouse) {
     // If the mouse didn't leave the cell, we can ignore the mouse event.
     const { x, y } = mouse;
@@ -103,11 +115,21 @@ export class MosaicGrid {
     return src_index.up();
   }
 
+  /**
+   * Look up which of the four styles to use for this pixel.
+   * @param {Index2D} index The index of the pixel to get the style for
+   * @returns {Style} the style for the selected pixels
+   */
   get_style(index) {
     const color_index = this.grid.get(index);
     return this.styles[color_index];
   }
 
+  /**
+   * Create the primitive. Call this only when the grid state changes.
+   * @private
+   * @returns {GroupPrimitive} The rendering primitive for the current state of the grid.
+   */
   create_primitive() {
     const by_colors = [[], [], [], [], []];
     this.grid.for_each((index, color_index) => {
@@ -127,6 +149,14 @@ export class MosaicGrid {
     return new GroupPrimitive(color_groups);
   }
 
+  /**
+   * Given two neighboring grid cells, create a swap pair animation
+   * @private
+   * @param {Index2D} src_index Source cell
+   * @param {Index2D} dst_index Destination cell
+   * @param {number} start_frame The frame number for the start of the animation
+   * @returns {PixelSwapPair} The swap pair animation
+   */
   compute_swap_pair(src_index, dst_index, start_frame) {
     const { i: src_i, j: src_j } = src_index;
     const { i: dst_i, j: dst_j } = dst_index;
@@ -179,6 +209,11 @@ export class MosaicGrid {
     return swap_pair;
   }
 
+  /**
+   * Update a single color for styling
+   * @param {number} index The index in [0, 4)
+   * @param {Color} color The new color
+   */
   update_color(index, color) {
     this.colors[index] = color;
     this.styles[index] = PIXEL_STYLE.with_fill(color);
@@ -197,8 +232,15 @@ export class MosaicGrid {
     this.primitive_dirty = true;
   }
 
+  /**
+   * Get the colors currently visible in the grid for exporting an image.
+   * If a swap animation is
+   * in progress, the colors before the swap are returned.
+   * @returns {Color[]} A flat array of the colors in the grid.
+   */
   get_colors() {
     return this.grid.map_array((index, color_index) => {
+      // If
       if (index === this.src_index) {
         color_index = this.src_index;
       } else if (index === this.dst_index) {
@@ -209,6 +251,9 @@ export class MosaicGrid {
     });
   }
 
+  /**
+   * Call this once a frame.
+   */
   update() {
     if (this.primitive_dirty) {
       this.primitive = this.create_primitive();
@@ -216,6 +261,10 @@ export class MosaicGrid {
     }
   }
 
+  /**
+   * The primitives to render
+   * @returns {GroupPrimitive} The primitive to render
+   */
   render() {
     return this.primitive;
   }

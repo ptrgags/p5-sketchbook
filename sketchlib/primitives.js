@@ -104,10 +104,19 @@ export class BeziergonPrimitive {
   }
 }
 
+/**
+ * A logical grouping of primitives to be rendered together, in the order
+ * listed in the primitives array. This is the main way to apply styling to
+ * primitives.
+ *
+ * Note: GroupPrimitive can be nested, but the most specific style will be the
+ * one that's applied.
+ */
 export class GroupPrimitive {
   /**
-   * @param {Primitive[]} primitives
-   * @param {Style} [style]
+   * Constructor
+   * @param {Primitive[]} primitives The primitives in this group
+   * @param {Style} [style] An optional style to apply to these primitives.
    */
   constructor(primitives, style) {
     if (!Array.isArray(primitives)) {
