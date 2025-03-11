@@ -14,7 +14,8 @@ const MARGIN_X = (WIDTH - COLS * SQUARE_SIZE) / 2;
 const MARGIN_Y = (HEIGHT - ROWS * SQUARE_SIZE) / 2;
 const STRIDE = Point.direction(SQUARE_SIZE, SQUARE_SIZE);
 const CORNER = Point.point(MARGIN_X, MARGIN_Y);
-const SWAP_DURATION = sec_to_frames(0.125);
+const SWAP_DURATION = sec_to_frames(1 / 16);
+const PIXEL_STYLE = new Style().with_stroke(Color.BLACK).with_width(2);
 
 function select_color(index) {
   const { i, j } = index;
@@ -40,9 +41,7 @@ export class MosaicGrid {
     });
 
     this.colors = colors;
-    this.styles = colors.map((x) =>
-      new Style().with_fill(x).with_stroke(Color.BLACK)
-    );
+    this.styles = colors.map((x) => PIXEL_STYLE.with_fill(x));
     // Add an additional style for hole pixels.
     this.styles.push(new Style());
 
@@ -182,7 +181,7 @@ export class MosaicGrid {
 
   update_color(index, color) {
     this.colors[index] = color;
-    this.styles[index] = new Style().with_fill(color).with_stroke(Color.BLACK);
+    this.styles[index] = PIXEL_STYLE.with_fill(color);
     this.primitive_dirty = true;
   }
 

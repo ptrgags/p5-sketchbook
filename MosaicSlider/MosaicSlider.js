@@ -3,8 +3,11 @@ import { Color } from "../sketchlib/Style.js";
 import { draw_primitive } from "../sketchlib/draw_primitive.js";
 import { fix_mouse_coords } from "../sketchlib/fix_mouse_coords.js";
 import { InteractiveMosaic } from "./InteractiveMosaic.js";
+import { prevent_mobile_scroll } from "../sketchlib/prevent_mobile_scroll.js";
 
-const INITIAL_COLORS = ["#231f20", "#bb4430", "#7ebdc2", "#f3dfa2"];
+//const INITIAL_COLORS = ["#231f20", "#bb4430", "#7ebdc2", "#f3dfa2"];
+// clouds, sky, grass, dirt
+const INITIAL_COLORS = ["#ccf0ef", "#5697d8", "#456538", "#633912"];
 
 export const sketch = (p) => {
   let canvas;
@@ -50,6 +53,7 @@ export const sketch = (p) => {
       undefined,
       document.getElementById("sketch-canvas")
     ).elt;
+    prevent_mobile_scroll(canvas);
 
     init_color_pickers();
     init_image_save_button();
