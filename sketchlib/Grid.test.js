@@ -166,6 +166,32 @@ describe("Grid", () => {
     expect(result).toEqual(expected);
   });
 
+  it("for_each calls a callback at each grid cell", () => {
+    const grid = new Grid(2, 2);
+    grid.fill((index) => {
+      const { i, j } = index;
+
+      return i * 2 + j;
+    });
+
+    const indices = [];
+    const values = [];
+    grid.for_each((index, value) => {
+      indices.push(index);
+      values.push(value);
+    });
+
+    const expected_indices = [
+      new Index2D(0, 0),
+      new Index2D(0, 1),
+      new Index2D(1, 0),
+      new Index2D(1, 1),
+    ];
+    const expected_values = [0, 1, 2, 3];
+    expect(indices).toEqual(expected_indices);
+    expect(values).toEqual(expected_values);
+  });
+
   it("map computes a new grid of the same size", () => {
     const grid = new Grid(2, 2);
     grid.fill((index) => {

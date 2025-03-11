@@ -24,6 +24,11 @@ export function griderator(rows, cols, callback) {
  * arrays.
  */
 export class Index2D {
+  /**
+   * Constructor
+   * @param {number} i The first index, usually the row
+   * @param {number} j The second index, usually the column
+   */
   constructor(i, j) {
     if (i < 0) {
       throw new Error("i must be non-negative");
