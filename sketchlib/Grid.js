@@ -120,8 +120,21 @@ export class Index2D {
  * @template T
  */
 export class Grid {
+  /**
+   * Constructor
+   * @param {number} rows Integer umber of rows
+   * @param {number} cols Integer number of columns
+   */
   constructor(rows, cols) {
+    /**
+     * Number of rows
+     * @type {number}
+     */
     this.rows = rows;
+    /**
+     * Number of columns
+     * @type {number}
+     */
     this.cols = cols;
     // Preallocate the array
     this.values = new Array(rows * cols);
