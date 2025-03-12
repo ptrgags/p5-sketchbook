@@ -5,6 +5,10 @@ export const LINKS = [
     year: "2025",
   },
   {
+    title: "Mosaic Slider",
+    year: "2025",
+  },
+  {
     title: "Worm",
     year: "2025",
   },

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../libraries/p5.min.js"
+    ></script>
+    <script type="module">
+      import { sketch } from "./MosaicSlider.js";
+      import "../sketchlib/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../styles/layout.css" />
+    <style>
+      .center {
+        padding: 10px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>Mosaic Slider (2025)</h1>
+      <div class="sketch">
+        <canvas id="sketch-canvas" width="500" height="700"></canvas>
+      </div>
+      <div class="controls">
+        <input id="color-0" type="color" />
+        <input id="color-1" type="color" />
+        <input id="color-2" type="color" />
+        <input id="color-3" type="color" />
+        <br />
+        <div class="center"><button id="save-image">Save image</button></div>
+      </div>
+      <div class="description">
+        <p>
+          Drag pixels around the canvas to make pixel art. You can use the color
+          pickers to change the colors. The "Save image" button downloads the
+          pixel art as a PNG image.
+        </p>
+        <p>
+          About a year ago, I wanted to make art for my wall. I realized that if
+          I used Lego tiles, it would let me make reusable art. This puts
+          interesting constraints on the pixel art:
+        </p>
+        <ul>
+          <li>
+            The canvas is low resolution, only 16x16 tiles! Here's what that
+            would look like if these were screen pixels:
+            <img width="16" src="figures/mosaic-tile.png" />
+          </li>
+          <li>
+            The color palette is limited by what color lego tiles I have on
+            hand.
+          </li>
+          <li>
+            I also have a limited number of tiles, so I have to be aware of
+            <em>number</em> of pixels in each color used in the artwork.
+          </li>
+        </ul>
+        <p>
+          Since counting out pixels sounds like a chore, I realized there was an
+          easier way: if I start with the same number of tiles in each color and
+          only rearrange them, that will satisfy the constraints. I don't know
+          of any drawing program with this kind of tool, so I made this sketch.
+        </p>
+        <p>
+          Here's an example artwork I made with this sketch, and what it looks
+          like in Lego:
+        </p>
+        <div class="center">
+          <img
+            width="250"
+            alt="An example abstract mosaic"
+            src="figures/mosaic-example.png"
+          />
+          <img
+            width="250"
+            alt="The same abstract mosaic made with Lego tiles"
+            src="figures/lego-mosaic.jpg"
+          />
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
