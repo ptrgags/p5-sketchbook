@@ -33,6 +33,7 @@ export function subdivide_quad(quad, n) {
     // Trivial case, just return the quad wrapped in a grid
     const grid = new Grid(1, 1);
     grid.set(new Index2D(0, 0), quad);
+    return grid;
   }
 
   // How many of each object across one side of the quad
@@ -56,8 +57,8 @@ export function subdivide_quad(quad, n) {
   // The first subdivision is computed directly from the input quad
   const { a, b, c, d } = quad;
   const last_point = line_count - 1;
-  horizontal[0] = d.join(c);
-  horizontal[last_point] = a.join(b);
+  horizontal[last_point] = d.join(c);
+  horizontal[0] = a.join(b);
 
   vertical[0] = a.join(d);
   vertical[last_point] = b.join(c);
@@ -69,11 +70,11 @@ export function subdivide_quad(quad, n) {
   points.set(new Index2D(0, 0), a);
   points.set(new Index2D(0, last_point), b);
   points.set(new Index2D(last_point, last_point), c);
-  points.set(new Index2D(last_point, last_point), c);
+  points.set(new Index2D(last_point, 0), d);
 
   // Intersect the diagonals to compute the center
   const center = diagonals[mid_diag].meet(cross_diagonals[mid_diag]);
-  const mid_point = Math.ceil(line_count / 2);
+  const mid_point = Math.floor(line_count / 2);
   points.set(new Index2D(mid_point, mid_point), center);
 
   // Find the vanishing points and from them, compute the center lines
@@ -82,7 +83,7 @@ export function subdivide_quad(quad, n) {
   horizontal[mid_point] = center.join(vp_right);
   vertical[mid_point] = center.join(vp_up);
 
-  // Find the center of the sides
+  // Find the centers of the sides
   points.set(
     new Index2D(0, mid_point),
     horizontal[0].meet(vertical[mid_point])

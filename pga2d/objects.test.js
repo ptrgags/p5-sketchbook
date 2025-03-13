@@ -281,8 +281,8 @@ describe("Line", () => {
 
     // 3/4 * 1 + 1/4 * -2 = 3/4 -2/4 = 1/4
     // 3/4 * 2 + 1/4 * -1 = 6/4 -1/4 = 5/4
-    // 3/4 * -3 + 1/4 * 4 = -9/4 +4/4 = -5/4 (remember that distance is flipped)
-    const expected = new Line(1 / 4, 5 / 4, -5 / 4);
+    // 3/4 * 3 + 1/4 * -4 = 9/4 - 4/4 = 5/4
+    const expected = new Line(1 / 4, 5 / 4, 5 / 4);
     expect(result).toBeLine(expected);
   });
 });

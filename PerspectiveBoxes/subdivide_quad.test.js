@@ -2,6 +2,9 @@ import { describe, it, expect } from "vitest";
 import { Point } from "../pga2d/objects";
 import { PerspectiveQuad } from "./PerspectiveQuad";
 import { subdivide_quad } from "./subdivide_quad";
+import { PGA_TESTERS } from "../pga2d/pga_testers";
+
+//expect.addEqualityTesters(PGA_TESTERS);
 
 describe("subdivide_quad", () => {
   it("with n = 0 returns input quad", () => {
@@ -80,8 +83,8 @@ describe("subdivide_quad", () => {
     const result = [...result_grid];
 
     // centers of sides, see desmos graph https://www.desmos.com/calculator/v63cqhvrm8
-    const top = Point.point(0.8571428571428572, 0.57143);
-    const left = Point.point(-0.8571428571428572, 0.57143);
+    const top = Point.point(0.8571428571428572, 0.5714285714285714);
+    const left = Point.point(-0.8571428571428572, 0.5714285714285714);
     const right = Point.point(1.2, -0.8);
     const bottom = Point.point(-1.2, -0.8);
     const expected = [
@@ -91,7 +94,7 @@ describe("subdivide_quad", () => {
       new PerspectiveQuad(Point.point(0, 0), right, Point.point(2, 0), top),
     ];
 
-    // TODO: See expect.addEqualityTesters
+    expect(-0).toEqual(0);
     expect(result).toEqual(expected);
   });
 });
