@@ -20,6 +20,9 @@ const DURATION_GROWTH = sec_to_frames(1);
 const MAX_SYMBOLS = 100;
 const MAX_SPEED = 10;
 
+const COLOR_CELL = Color.from_hex_code("#5cb28f");
+const STYLE_CELL = new Style().with_fill(COLOR_CELL).with_stroke(Color.BLACK);
+
 class AnabaenaCatenula {
   constructor() {
     /**
@@ -112,16 +115,13 @@ class AnabaenaCatenula {
 
   grow(frame) {
     const long_length = this.growth_tween.get_value(frame);
-    if (this.current_symbols.length + 1 !== this.chain.length) {
-      throw new Error("length mismatch!");
-    }
 
     const n = this.chain.length;
     const longer_joints = new Array(n);
     longer_joints[0] = this.chain.get_joint(0);
     for (let i = 1; i < this.chain.length; i++) {
       const old_joint = this.chain.get_joint(i);
-      const symbol = this.current_symbols.charAt(i);
+      const symbol = this.current_symbols.charAt(i - 1);
       if (symbol === "s" || symbol === "S") {
         longer_joints[i] = old_joint;
       } else {
@@ -132,14 +132,24 @@ class AnabaenaCatenula {
     this.chain = new AnimationChain(longer_joints, MIN_BEND_ANGLE);
   }
 
-  update(mouse, frame) {
+  grow_or_split(frame) {
+    if (
+      this.current_symbols.length > MAX_SYMBOLS &&
+      this.growth_tween.is_done(frame)
+    ) {
+      return;
+    }
+
     if (this.growth_tween.is_done(frame)) {
       this.split();
       this.growth_tween.restart(frame, DURATION_GROWTH);
     } else {
       this.grow(frame);
     }
+  }
 
+  update(mouse, frame) {
+    this.grow_or_split(frame);
     this.move_towards(mouse);
   }
 
@@ -156,10 +166,7 @@ class AnabaenaCatenula {
       circles[i - 1] = new CirclePrimitive(mid, radius);
     }
 
-    const color = Color.from_hex_code("#5cb28f");
-    const body = new GroupPrimitive(circles, new Style().with_fill(color));
-
-    const spine = this.chain.render_spine();
+    const body = new GroupPrimitive(circles, STYLE_CELL);
     return new GroupPrimitive([body]);
   }
 }
