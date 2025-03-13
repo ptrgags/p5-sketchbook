@@ -14,7 +14,7 @@ import { Color, Style } from "../sketchlib/Style.js";
 const INITIAL_POSITION = Point.point(WIDTH / 2, HEIGHT - 50);
 const MIN_BEND_ANGLE = (7 * Math.PI) / 8;
 
-const LENGTH_SHORT = 10;
+const LENGTH_SHORT = 20;
 const LENGTH_LONG = 2 * LENGTH_SHORT;
 const DURATION_GROWTH = sec_to_frames(1);
 const MAX_SYMBOLS = 100;
@@ -165,18 +165,24 @@ class AnabaenaCatenula {
     const circles_s = [];
     for (let i = 1; i < positions.length; i++) {
       const prev = positions[i - 1];
-      const next = positions[i];
-      // for points in 2D PGA, addition gives the midpoint due to
-      // normalization.
-      const mid = prev.add(next);
-      const radius = prev.sub(next).ideal_norm() / 2;
-      const circle = new CirclePrimitive(mid, radius);
-
+      const curr = positions[i];
       const symbol = this.current_symbols.charAt(i - 1);
+
       if (symbol === "s" || symbol === "S") {
+        const midpoint = prev.add(curr);
+        const radius = prev.sub(curr).ideal_norm() / 2;
+        const circle = new CirclePrimitive(midpoint, radius);
+
         circles_s.push(circle);
       } else {
-        circles_l.push(circle);
+        const forward = prev.sub(curr).normalize();
+        const radius = LENGTH_SHORT / 2;
+
+        const center_offset = forward.scale(radius);
+
+        let circle_a = new CirclePrimitive(curr.add(center_offset), radius);
+        let circle_b = new CirclePrimitive(prev.sub(center_offset), radius);
+        circles_l.push(circle_a, circle_b);
       }
     }
 
