@@ -20,8 +20,14 @@ const DURATION_GROWTH = sec_to_frames(1);
 const MAX_SYMBOLS = 100;
 const MAX_SPEED = 10;
 
-const COLOR_CELL = Color.from_hex_code("#5cb28f");
-const STYLE_CELL = new Style().with_fill(COLOR_CELL).with_stroke(Color.BLACK);
+const COLOR_CELL_S = Color.from_hex_code("#4cbac0");
+const COLOR_CELL_L = Color.from_hex_code("#5cb28f");
+const STYLE_CELL_S = new Style()
+  .with_fill(COLOR_CELL_S)
+  .with_stroke(Color.BLACK);
+const STYLE_CELL_L = new Style()
+  .with_fill(COLOR_CELL_L)
+  .with_stroke(Color.BLACK);
 
 class AnabaenaCatenula {
   constructor() {
@@ -155,19 +161,29 @@ class AnabaenaCatenula {
 
   render() {
     const positions = this.chain.get_positions();
-    const circles = new Array(positions.length - 1);
+    const circles_l = [];
+    const circles_s = [];
     for (let i = 1; i < positions.length; i++) {
       const prev = positions[i - 1];
       const next = positions[i];
       // for points in 2D PGA, addition gives the midpoint due to
-      // normalization :D
+      // normalization.
       const mid = prev.add(next);
       const radius = prev.sub(next).ideal_norm() / 2;
-      circles[i - 1] = new CirclePrimitive(mid, radius);
+      const circle = new CirclePrimitive(mid, radius);
+
+      const symbol = this.current_symbols.charAt(i - 1);
+      if (symbol === "s" || symbol === "S") {
+        circles_s.push(circle);
+      } else {
+        circles_l.push(circle);
+      }
     }
 
-    const body = new GroupPrimitive(circles, STYLE_CELL);
-    return new GroupPrimitive([body]);
+    return new GroupPrimitive([
+      new GroupPrimitive(circles_l, STYLE_CELL_L),
+      new GroupPrimitive(circles_s, STYLE_CELL_S),
+    ]);
   }
 }
 
