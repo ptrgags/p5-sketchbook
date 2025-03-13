@@ -5,7 +5,7 @@ import { draw_primitive } from "../sketchlib/draw_primitive.js";
 import { Point } from "../pga2d/objects.js";
 import { prevent_mobile_scroll } from "../sketchlib/prevent_mobile_scroll.js";
 import { LSystem } from "./LSystem.js";
-import { sec_to_frames, Tween } from "../MosaicSlider/Tween.js";
+import { sec_to_frames, Tween } from "../sketchlib/Tween.js";
 import { AnimationChain, Joint } from "../sketchlib/AnimationChain.js";
 import { is_nearly } from "../sketchlib/is_nearly.js";
 import { CirclePrimitive, GroupPrimitive } from "../sketchlib/primitives.js";
@@ -14,8 +14,8 @@ import { Color, Style } from "../sketchlib/Style.js";
 const INITIAL_POSITION = Point.point(WIDTH / 2, HEIGHT - 50);
 const MIN_BEND_ANGLE = (7 * Math.PI) / 8;
 
-const LENGTH_SHORT = 20;
-const LENGTH_LONG = 40;
+const LENGTH_SHORT = 10;
+const LENGTH_LONG = 2 * LENGTH_SHORT;
 const DURATION_GROWTH = sec_to_frames(1);
 const MAX_SYMBOLS = 100;
 const MAX_SPEED = 10;
@@ -37,13 +37,15 @@ class AnabaenaCatenula {
     /**
      * @type {Tween}
      */
-    this.growth_tween = new Tween(
+    this.growth_tween = Tween.scalar(
       LENGTH_SHORT,
       LENGTH_LONG,
       0,
       DURATION_GROWTH
     );
 
+    // The chain will always be this.current_symbols.length + 1
+    // since we add an extra joint at the front
     this.chain = new AnimationChain(
       [
         new Joint(INITIAL_POSITION, 0),
@@ -57,22 +59,88 @@ class AnabaenaCatenula {
   }
 
   move_towards(point) {
-    const nose_position = this.chain.get_joint(0).position;
-    const to_point = point.sub(nose_position);
+    const front = this.chain.get_joint(0).position;
+    const to_point = point.sub(front);
 
     const velocity = to_point.limit_length(MAX_SPEED);
-    if (is_nearly(velocity.ideal_norm_sqr(), 0)) {
-      return;
-    }
 
-    this.look_direction = velocity.normalize();
-    const target = nose_position.add(velocity);
+    /*if (is_nearly(velocity.ideal_norm_sqr(), 0)) {
+      return;
+    }*/
+
+    //this.look_direction = velocity.normalize();
+    const target = front.add(velocity);
     this.chain.move(target);
   }
 
-  update(mouse) {
+  split() {
+    if (this.current_symbols.length > MAX_SYMBOLS) {
+      // Limit the maximum length of the chain.
+      return;
+    }
+    const old_symbols = this.current_symbols;
+    this.current_symbols = this.polarized_fibonacci.substitute(old_symbols);
+
+    const split_joints = [this.chain.get_joint(0)];
+    for (let i = 1; i < this.chain.length; i++) {
+      const old_symbol = old_symbols.charAt(i - 1);
+      const old_joint = this.chain.get_joint(i);
+      if (old_symbol === "s" || old_symbol === "S") {
+        // Short joints mature into long joints, but keep the same length,
+        // so we can just reuse the joint
+        split_joints.push(old_joint);
+      } else {
+        // l and L cases.
+        // split a long cell into a short cell and a long cell. However,
+        // at the instant the cells split, the cells have the same length
+        // so as far as the animation chain is concerned, we don't need to
+        // distinguish them yet.
+        const prev_position = this.chain.get_joint(i - 1).position;
+        const position = old_joint.position;
+        const midpoint = prev_position.add(position);
+
+        // Even though in terms of the grammar, one of these is an l joint
+        // and one is an s joint, for the frame where the cells split, these
+        // have the same length.
+        split_joints.push(new Joint(midpoint, LENGTH_SHORT));
+        split_joints.push(new Joint(position, LENGTH_SHORT));
+      }
+    }
+
+    this.chain = new AnimationChain(split_joints, MIN_BEND_ANGLE);
+  }
+
+  grow(frame) {
+    const long_length = this.growth_tween.get_value(frame);
+    if (this.current_symbols.length + 1 !== this.chain.length) {
+      throw new Error("length mismatch!");
+    }
+
+    const n = this.chain.length;
+    const longer_joints = new Array(n);
+    longer_joints[0] = this.chain.get_joint(0);
+    for (let i = 1; i < this.chain.length; i++) {
+      const old_joint = this.chain.get_joint(i);
+      const symbol = this.current_symbols.charAt(i);
+      if (symbol === "s" || symbol === "S") {
+        longer_joints[i] = old_joint;
+      } else {
+        longer_joints[i] = new Joint(old_joint.position, long_length);
+      }
+    }
+
+    this.chain = new AnimationChain(longer_joints, MIN_BEND_ANGLE);
+  }
+
+  update(mouse, frame) {
+    if (this.growth_tween.is_done(frame)) {
+      this.split();
+      this.growth_tween.restart(frame, DURATION_GROWTH);
+    } else {
+      this.grow(frame);
+    }
+
     this.move_towards(mouse);
-    // grow
   }
 
   render() {
@@ -89,7 +157,10 @@ class AnabaenaCatenula {
     }
 
     const color = Color.from_hex_code("#5cb28f");
-    return new GroupPrimitive(circles, new Style().with_fill(color));
+    const body = new GroupPrimitive(circles, new Style().with_fill(color));
+
+    const spine = this.chain.render_spine();
+    return new GroupPrimitive([body]);
   }
 }
 
@@ -106,7 +177,7 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    BACTERIA.update(mouse);
+    BACTERIA.update(mouse, p.frameCount);
 
     draw_primitive(p, BACTERIA.render());
   };
