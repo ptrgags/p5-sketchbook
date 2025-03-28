@@ -210,6 +210,22 @@ MAZE.for_each((index, cell) => {
   }
 });
 
+/**
+ *
+ * @param {any} p p5 context
+ * @param {Tileset} tileset tileset for drawing tiles
+ * @param {Grid<Number>} tilemap The tilemap that indexes the tileset
+ * @param {Point} origin The pixel coords of where the top left corner of the grid will appear
+ * @param {number} scale The scale factor for upscaling tiles
+ */
+function blit_tilemap(p, tileset, tilemap, origin, scale) {
+  tilemap.for_each((index, tile_id) => {
+    const { i, j } = index;
+    const position = Point.direction(j, i).scale(scale * tileset.tile_size);
+    blit_tile(p, tileset, tile_id, origin.add(position), scale);
+  });
+}
+
 export const sketch = (p) => {
   let canvas;
   const images = {};
@@ -236,11 +252,13 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    TILEMAP.for_each((index, tile_id) => {
-      const { i, j } = index;
-      const position = Point.direction(j, i).scale(TILE_SCALE * TILE_SIZE);
-      blit_tile(p, tilesets.basic, tile_id, position, TILE_SCALE);
-    });
+    blit_tilemap(
+      p,
+      tilesets.basic,
+      TILEMAP,
+      Point.point(p.frameCount % 32, p.frameCount % 64),
+      TILE_SCALE
+    );
 
     blit_sprite_frame(
       p,
