@@ -66,6 +66,10 @@ function blit_sprite_frame(p, spritesheet, frame_id, dst_pos, scale) {
   );
 }
 
+/**
+ * A Sprite is an animation of one or more frames taken from a spritesheet.
+ * This doesn't handle any timing information, just the frames and looping.
+ */
 class Sprite {
   /**
    * Constructor
@@ -111,6 +115,28 @@ function blit_sprite(p, sprite, animation_time, position, scale) {
   const frame_id = sprite.get_frame(animation_time);
 
   blit_sprite_frame(p, spritesheet, frame_id, position, scale);
+}
+
+/**
+ * Given a spritesheet containing 4 rows (one for each of the cardinal directions)
+ * create sprites in the same order as GridDirection
+ * @param {Spritesheet} spritesheet The spritesheet
+ * @param {number} start_row The first row of the character animation
+ * @param {number} frame_count The number of frames in each animation
+ * @param {Point} origin The origin for each sprite animation
+ * @returns {Sprite[]} An array of 4 sprites that can be indexed by a GridDirection
+ */
+function make_cardinal_direction_sprites(
+  spritesheet,
+  start_row,
+  frame_count,
+  origin
+) {
+  const right = Sprite.from_row(spritesheet, start_row, frame_count, origin);
+  const up = Sprite.from_row(spritesheet, start_row + 1, frame_count, origin);
+  const left = Sprite.from_row(spritesheet, start_row + 2, frame_count, origin);
+  const down = Sprite.from_row(spritesheet, start_row + 3, frame_count, origin);
+  return [right, up, left, down];
 }
 
 class Tileset {
@@ -298,7 +324,7 @@ export const sketch = (p) => {
 
   p.preload = () => {
     images.tileset = p.loadImage("./sprites/placeholder-tileset.png");
-    images.walk_cycle = p.loadImage("./sprites/placeholder-walk-cycle.png");
+    images.character = p.loadImage("./sprites/placeholder-walk-cycle.png");
   };
 
   p.setup = () => {
@@ -307,66 +333,30 @@ export const sketch = (p) => {
     tilesets.basic = new Tileset(images.tileset, TILE_SIZE);
     tilemaps.background = new Tilemap(tilesets.basic, INDICES);
 
-    spritesheets.walk = new Spritesheet(
-      images.walk_cycle,
+    spritesheets.character = new Spritesheet(
+      images.character,
       Point.direction(TILE_SIZE, 2 * TILE_SIZE)
     );
 
     // the character is 2 cells tall, but its origin is at the bottom one
     const BOTTOM_HALF = Point.direction(0, TILE_SIZE);
     const WALK_LENGTH = 4;
-    sprites.walk_right = Sprite.from_row(
-      spritesheets.walk,
+    sprites.walk = make_cardinal_direction_sprites(
+      spritesheets.character,
       0,
-      WALK_LENGTH,
-      BOTTOM_HALF
-    );
-    sprites.walk_up = Sprite.from_row(
-      spritesheets.walk,
-      1,
-      WALK_LENGTH,
-      BOTTOM_HALF
-    );
-    sprites.walk_left = Sprite.from_row(
-      spritesheets.walk,
-      2,
-      WALK_LENGTH,
-      BOTTOM_HALF
-    );
-    sprites.walk_down = Sprite.from_row(
-      spritesheets.walk,
-      3,
       WALK_LENGTH,
       BOTTOM_HALF
     );
 
     const IDLE_LENGTH = 2;
-    sprites.idle_right = Sprite.from_row(
-      spritesheets.walk,
+    sprites.idle = make_cardinal_direction_sprites(
+      spritesheets.character,
       4,
       IDLE_LENGTH,
       BOTTOM_HALF
     );
-    sprites.idle_up = Sprite.from_row(
-      spritesheets.walk,
-      5,
-      IDLE_LENGTH,
-      BOTTOM_HALF
-    );
-    sprites.idle_left = Sprite.from_row(
-      spritesheets.walk,
-      6,
-      IDLE_LENGTH,
-      BOTTOM_HALF
-    );
-    sprites.idle_down = Sprite.from_row(
-      spritesheets.walk,
-      7,
-      IDLE_LENGTH,
-      BOTTOM_HALF
-    );
 
-    current_sprite = sprites.idle_right;
+    current_sprite = sprites.walk[GridDirection.LEFT];
 
     p.noSmooth();
   };
