@@ -131,8 +131,8 @@ const Tiles = {
   FLOOR: 2,
 };
 
-const TILEMAP = new Grid(3 * (2 * MAZE_ROWS - 1), 3 * (2 * MAZE_COLS - 1));
-TILEMAP.fill(() => Tiles.CEILING);
+const INDICES = new Grid(3 * (2 * MAZE_ROWS - 1), 3 * (2 * MAZE_COLS - 1));
+INDICES.fill(() => Tiles.CEILING);
 
 MAZE.for_each((index, cell) => {
   const { i: cell_y, j: cell_x } = index;
@@ -147,7 +147,7 @@ MAZE.for_each((index, cell) => {
     const dst_row = row_offset + i;
     for (let j = 0; j < 3; j++) {
       const dst_col = col_offset + j;
-      TILEMAP.set(new Index2D(dst_row, dst_col), Tiles.FLOOR);
+      INDICES.set(new Index2D(dst_row, dst_col), Tiles.FLOOR);
     }
   }
 
@@ -161,17 +161,17 @@ MAZE.for_each((index, cell) => {
 
       // Draw one floor tile
       const floor_index = new Index2D(dst_row, dst_col);
-      TILEMAP.set(floor_index, Tiles.FLOOR);
+      INDICES.set(floor_index, Tiles.FLOOR);
 
       // The two tiles above it are the wall. Since the corridor is in the
       // middle, the bottom of the wall will always fit in the grid, but the
       // top might be cropped a bit.
       const wall_bottom = floor_index.up();
-      TILEMAP.set(wall_bottom, Tiles.WALL);
+      INDICES.set(wall_bottom, Tiles.WALL);
 
       const wall_top = wall_bottom.up();
       if (wall_top) {
-        TILEMAP.set(wall_top, Tiles.WALL);
+        INDICES.set(wall_top, Tiles.WALL);
       }
     }
   }
@@ -184,14 +184,14 @@ MAZE.for_each((index, cell) => {
       const dst_row = row_offset + 3 + i;
 
       const floor_index = new Index2D(dst_row, dst_col);
-      TILEMAP.set(floor_index, Tiles.FLOOR);
+      INDICES.set(floor_index, Tiles.FLOOR);
 
       if (i > 0) {
         const left_wall = floor_index.left();
-        TILEMAP.set(left_wall, Tiles.WALL);
+        INDICES.set(left_wall, Tiles.WALL);
 
         const right_wall = floor_index.right();
-        TILEMAP.set(right_wall, Tiles.WALL);
+        INDICES.set(right_wall, Tiles.WALL);
       }
     }
   }
@@ -204,26 +204,38 @@ MAZE.for_each((index, cell) => {
       const dst_row = row_offset + 3 + i;
       for (let j = 0; j < 3; j++) {
         const dst_col = col_offset + j;
-        TILEMAP.set(new Index2D(dst_row, dst_col), Tiles.WALL);
+        INDICES.set(new Index2D(dst_row, dst_col), Tiles.WALL);
       }
     }
   }
 });
 
 /**
- *
+ * Draw a tilemap on the screen
  * @param {any} p p5 context
- * @param {Tileset} tileset tileset for drawing tiles
- * @param {Grid<Number>} tilemap The tilemap that indexes the tileset
+ * @param {Tilemap} tilemap The tilemap
  * @param {Point} origin The pixel coords of where the top left corner of the grid will appear
  * @param {number} scale The scale factor for upscaling tiles
  */
-function blit_tilemap(p, tileset, tilemap, origin, scale) {
-  tilemap.for_each((index, tile_id) => {
+function blit_tilemap(p, tilemap, origin, scale) {
+  const { tileset, indices } = tilemap;
+  indices.for_each((index, tile_id) => {
     const { i, j } = index;
     const position = Point.direction(j, i).scale(scale * tileset.tile_size);
     blit_tile(p, tileset, tile_id, origin.add(position), scale);
   });
+}
+
+class Tilemap {
+  /**
+   * Constructor
+   * @param {Tileset} tileset The tileset with the image data
+   * @param {Grid<number>} indices The tile indices into the tileset
+   */
+  constructor(tileset, indices) {
+    this.tileset = tileset;
+    this.indices = indices;
+  }
 }
 
 export const sketch = (p) => {
@@ -231,6 +243,7 @@ export const sketch = (p) => {
   const images = {};
   const tilesets = {};
   const spritesheets = {};
+  const tilemaps = {};
 
   p.preload = () => {
     images.tileset = p.loadImage("./sprites/placeholder-tileset.png");
@@ -241,6 +254,8 @@ export const sketch = (p) => {
     canvas = p.createCanvas(500, 700).elt;
 
     tilesets.basic = new Tileset(images.tileset, TILE_SIZE);
+    tilemaps.background = new Tilemap(tilesets.basic, INDICES);
+
     spritesheets.walk = new Spritesheet(
       images.walk_cycle,
       Point.direction(TILE_SIZE, 2 * TILE_SIZE)
@@ -252,14 +267,7 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    blit_tilemap(
-      p,
-      tilesets.basic,
-      TILEMAP,
-      Point.point(p.frameCount % 32, p.frameCount % 64),
-      TILE_SCALE
-    );
-
+    blit_tilemap(p, tilemaps.background, Point.ORIGIN, TILE_SCALE);
     blit_sprite_frame(
       p,
       spritesheets.walk,
