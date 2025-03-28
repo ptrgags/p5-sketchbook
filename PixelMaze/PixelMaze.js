@@ -1,4 +1,7 @@
 import { Point } from "../pga2d/objects.js";
+import { Grid, Index2D } from "../sketchlib/Grid.js";
+import { GridDirection } from "../sketchlib/GridDiection.js";
+import { generate_maze } from "../sketchlib/RandomDFSMaze.js";
 
 const TILE_SIZE = 16;
 const TILE_SCALE = 2;
@@ -118,6 +121,56 @@ function blit_sprite_frame(p, spritesheet, frame_id, dst_pos, scale) {
   );
 }
 
+const MAZE_ROWS = 4;
+const MAZE_COLS = 3;
+const MAZE = generate_maze(MAZE_ROWS, MAZE_COLS);
+
+const Tiles = {
+  CEILING: 0,
+  WALL: 1,
+  FLOOR: 2,
+};
+
+const TILEMAP = new Grid(3 * (2 * MAZE_ROWS - 1), 3 * (2 * MAZE_COLS - 1));
+TILEMAP.fill(() => Tiles.CEILING);
+
+MAZE.for_each((index, cell) => {
+  const { i: cell_y, j: cell_x } = index;
+
+  // In the output grid, each input grid cell is 3 cells wide, + another 3
+  // for the corridor between each cell
+  const row_offset = 6 * cell_y;
+  const col_offset = 6 * cell_x;
+
+  // First, we need to add a 3x3 chunk of floor tiles for this cell
+  for (let i = 0; i < 3; i++) {
+    const dst_row = row_offset + i;
+    for (let j = 0; j < 3; j++) {
+      const dst_col = col_offset + j;
+      TILEMAP.set(new Index2D(dst_row, dst_col), Tiles.FLOOR);
+    }
+  }
+
+  // If we're connected on the right, add 3 floor tiles to make a corridor
+  if (cell.is_connected(GridDirection.RIGHT)) {
+    // Middle of the 3 tiles, hence + 1
+    const dst_row = row_offset + 1;
+    for (let i = 0; i < 3; i++) {
+      const dst_col = col_offset + 3 + i;
+      TILEMAP.set(new Index2D(dst_row, dst_col), Tiles.FLOOR);
+    }
+  }
+
+  // Similarly for the vertical corridors
+  if (cell.is_connected(GridDirection.DOWN)) {
+    const dst_col = col_offset + 1;
+    for (let i = 0; i < 3; i++) {
+      const dst_row = row_offset + 3 + i;
+      TILEMAP.set(new Index2D(dst_row, dst_col), Tiles.FLOOR);
+    }
+  }
+});
+
 export const sketch = (p) => {
   let canvas;
   const images = {};
@@ -144,27 +197,17 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    blit_tile(p, tilesets.basic, 0, Point.point(0, 0), TILE_SCALE);
-    blit_tile(
-      p,
-      tilesets.basic,
-      1,
-      Point.point(0, TILE_SCALE * TILE_SIZE),
-      TILE_SCALE
-    );
-    blit_tile(
-      p,
-      tilesets.basic,
-      2,
-      Point.point(0, 2 * TILE_SCALE * TILE_SIZE),
-      TILE_SCALE
-    );
+    TILEMAP.for_each((index, tile_id) => {
+      const { i, j } = index;
+      const position = Point.direction(j, i).scale(TILE_SCALE * TILE_SIZE);
+      blit_tile(p, tilesets.basic, tile_id, position, TILE_SCALE);
+    });
 
     blit_sprite_frame(
       p,
       spritesheets.walk,
-      Math.floor(p.frameCount / 3.5) % 4,
-      Point.point(4 * TILE_SIZE, 3 * TILE_SIZE),
+      2 * 4 + (Math.floor(p.frameCount / 3.5) % 4),
+      Point.point(1 * TILE_SCALE * TILE_SIZE, 6 * TILE_SCALE * TILE_SIZE),
       TILE_SCALE
     );
   };

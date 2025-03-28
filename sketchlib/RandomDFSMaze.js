@@ -60,6 +60,12 @@ export class RandomDFSMazeTraversal {
   }
 }
 
+/**
+ * Generate a maze using DFS
+ * @param {number} rows The number of rows
+ * @param {number} cols The number of cols
+ * @returns {Grid<MazeCell>} A grid of cells connected like a maze
+ */
 export function generate_maze(rows, cols) {
   const grid = new Grid(rows, cols);
   grid.fill((index) => {
