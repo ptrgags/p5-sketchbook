@@ -276,6 +276,7 @@ export class Point {
    * @param {Point} a The first point
    * @param {Point} b The second point
    * @param {number} t The interpolation factor
+   * @returns {Point} The point t percent between a and b
    */
   static lerp(a, b, t) {
     const bivector = Even.lerp(a.bivec, b.bivec, t);
@@ -376,6 +377,18 @@ export class Line {
    */
   equals(other) {
     return this.vec.equals(other.vec);
+  }
+
+  /**
+   * Linearly interpolate two lines
+   * @param {Line} a The first line
+   * @param {Line} b The second line
+   * @param {number} t The interpolation factor
+   * @returns {Line} The line t percent between a and b
+   */
+  static lerp(a, b, t) {
+    const vec = Odd.lerp(a.vec, b.vec, t);
+    return Line.from_vec(vec);
   }
 
   toString() {

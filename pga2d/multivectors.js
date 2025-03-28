@@ -321,6 +321,17 @@ export class Odd {
     );
   }
 
+  static lerp(a, b, t) {
+    const s = 1 - t;
+
+    const x = s * a.x + t * b.x;
+    const y = s * a.y + t * b.y;
+    const o = s * a.o + t * b.o;
+    const xyo = s * a.xyo + t * b.xyo;
+
+    return new Odd(x, y, o, xyo);
+  }
+
   toString() {
     return `${this.x.toPrecision(2)}x + ${this.y.toPrecision(
       2
