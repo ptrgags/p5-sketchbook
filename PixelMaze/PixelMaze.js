@@ -1,10 +1,117 @@
 import { Point } from "../pga2d/objects.js";
 import { Grid, Index2D } from "../sketchlib/Grid.js";
 import { GridDirection } from "../sketchlib/GridDiection.js";
+import { mod } from "../sketchlib/mod.js";
 import { generate_maze } from "../sketchlib/RandomDFSMaze.js";
 
 const TILE_SIZE = 16;
 const TILE_SCALE = 2;
+
+class Spritesheet {
+  /**
+   * Constructor
+   * @param {any} image p5.Image instance
+   * @param {Point} frame_size Frame size as a direction
+   */
+  constructor(image, frame_size) {
+    const { x, y } = frame_size;
+    if (image.width % x !== 0 || image.height % y !== 0) {
+      throw new Error(
+        "image must be divisible by frame_dimensions in both dimensions"
+      );
+    }
+
+    this.image = image;
+    this.frame_size = frame_size;
+    this.grid_dims = Point.direction(image.width / x, image.height / y);
+    this.frame_count = this.grid_dims.x * this.grid_dims.y;
+  }
+
+  /**
+   * Get the pixel coordinates within the spritesheet for the top left corner
+   * of the specified frame
+   * @param {number} frame_id The frame number
+   * @returns {Point} The frame
+   */
+  get_coords(frame_id) {
+    const width = this.grid_dims.x;
+    const x = frame_id % width;
+    const y = Math.floor(frame_id / width);
+    return Point.point(x * this.frame_size.x, y * this.frame_size.y);
+  }
+}
+
+/**
+ * Low-level sprite drawing function
+ * @param {any} p p5 instance
+ * @param {Spritesheet} spritesheet the spritesheet to reference
+ * @param {number} frame_id The frame in the sprite
+ * @param {Point} dst_pos The position on the screen to display the sprite
+ * @param {number} scale the scale factor for drawing on the screen
+ */
+function blit_sprite_frame(p, spritesheet, frame_id, dst_pos, scale) {
+  const dst_dims = spritesheet.frame_size.scale(scale);
+  const src_pos = spritesheet.get_coords(frame_id);
+  const src_dims = spritesheet.frame_size;
+  p.image(
+    spritesheet.image,
+    dst_pos.x,
+    dst_pos.y,
+    dst_dims.x,
+    dst_dims.y,
+    src_pos.x,
+    src_pos.y,
+    src_dims.x,
+    src_dims.y
+  );
+}
+
+class Sprite {
+  /**
+   * Constructor
+   * @param {Spritesheet} spritesheet The sprite sheet
+   * @param {number} start_frame The first frame in the animation
+   * @param {number} frame_count The number of frames in the animation
+   * @param {Point} offset A point
+   */
+  constructor(spritesheet, start_frame, frame_count, offset) {
+    this.spritesheet = spritesheet;
+    this.start_frame = start_frame;
+    this.frame_count = frame_count;
+    this.offset = offset;
+  }
+
+  /**
+   * Get the frame number for a given time value. This floors the t value
+   * and cycles at the end of the animation
+   * @param {number} t A real number animation time measured in animation frames
+   * @returns {number} The integer frame number in range
+   */
+  get_frame(t) {
+    const offset = mod(Math.floor(t), this.frame_count);
+    return this.start_frame + offset;
+  }
+
+  static from_row(spritesheet, row, frame_count, offset) {
+    const start_frame = row * spritesheet.grid_dims.x;
+    return new Sprite(spritesheet, start_frame, frame_count, offset);
+  }
+}
+
+/**
+ * Draw the sprite on the screen
+ * @param {any} p p5 drawing context
+ * @param {Sprite} sprite The sprite to draw
+ * @param {number} animation_time The time value to use for selecting a sprite frame
+ * @param {Point} position The point on the screen to draw the sprite's origin
+ * @param {number} scale Upscale factor
+ */
+function blit_sprite(p, sprite, animation_time, position, scale) {
+  const spritesheet = sprite.spritesheet;
+  const frame_id = sprite.get_frame(animation_time);
+
+  blit_sprite_frame(p, spritesheet, frame_id, position, scale);
+}
 
 class Tileset {
   /**
@@ -60,64 +167,6 @@ function blit_tile(p, tileset, frame_id, dst_pos, scale) {
     src_pos.y,
     src_size,
     src_size
-  );
-}
-
-class Spritesheet {
-  /**
-   * Constructor
-   * @param {any} image p5.Image instance
-   * @param {Point} frame_size Frame size as a direction
-   */
-  constructor(image, frame_size) {
-    const { x, y } = frame_size;
-    if (image.width % x !== 0 || image.height % y !== 0) {
-      throw new Error(
-        "image must be divisible by frame_dimensions in both dimensions"
-      );
-    }
-
-    this.image = image;
-    this.frame_size = frame_size;
-    this.grid_dims = Point.direction(image.width / x, image.height / y);
-  }
-
-  /**
-   * Get the pixel coordinates within the spritesheet for the top left corner
-   * of the specified frame
-   * @param {number} frame_id The frame number
-   * @returns {Point} The frame
-   */
-  get_coords(frame_id) {
-    const width = this.grid_dims.x;
-    const x = frame_id % width;
-    const y = Math.floor(frame_id / width);
-    return Point.point(x * this.frame_size.x, y * this.frame_size.y);
-  }
-}
-
-/**
- * Low-level sprite drawing function
- * @param {any} p p5 instance
- * @param {Spritesheet} spritesheet the spritesheet to reference
- * @param {number} frame_id The frame in the sprite
- * @param {Point} dst_pos The position on the screen to display the sprite
- * @param {number} scale the scale factor for drawing on the screen
- */
-function blit_sprite_frame(p, spritesheet, frame_id, dst_pos, scale) {
-  const dst_dims = spritesheet.frame_size.scale(scale);
-  const src_pos = spritesheet.get_coords(frame_id);
-  const src_dims = spritesheet.frame_size;
-  p.image(
-    spritesheet.image,
-    dst_pos.x,
-    dst_pos.y,
-    dst_dims.x,
-    dst_dims.y,
-    src_pos.x,
-    src_pos.y,
-    src_dims.x,
-    src_dims.y
   );
 }
 
@@ -244,6 +293,8 @@ export const sketch = (p) => {
   const tilesets = {};
   const spritesheets = {};
   const tilemaps = {};
+  const sprites = {};
+  let current_sprite = undefined;
 
   p.preload = () => {
     images.tileset = p.loadImage("./sprites/placeholder-tileset.png");
@@ -261,6 +312,62 @@ export const sketch = (p) => {
       Point.direction(TILE_SIZE, 2 * TILE_SIZE)
     );
 
+    // the character is 2 cells tall, but its origin is at the bottom one
+    const BOTTOM_HALF = Point.direction(0, TILE_SIZE);
+    const WALK_LENGTH = 4;
+    sprites.walk_right = Sprite.from_row(
+      spritesheets.walk,
+      0,
+      WALK_LENGTH,
+      BOTTOM_HALF
+    );
+    sprites.walk_up = Sprite.from_row(
+      spritesheets.walk,
+      1,
+      WALK_LENGTH,
+      BOTTOM_HALF
+    );
+    sprites.walk_left = Sprite.from_row(
+      spritesheets.walk,
+      2,
+      WALK_LENGTH,
+      BOTTOM_HALF
+    );
+    sprites.walk_down = Sprite.from_row(
+      spritesheets.walk,
+      3,
+      WALK_LENGTH,
+      BOTTOM_HALF
+    );
+
+    const IDLE_LENGTH = 2;
+    sprites.idle_right = Sprite.from_row(
+      spritesheets.walk,
+      4,
+      IDLE_LENGTH,
+      BOTTOM_HALF
+    );
+    sprites.idle_up = Sprite.from_row(
+      spritesheets.walk,
+      5,
+      IDLE_LENGTH,
+      BOTTOM_HALF
+    );
+    sprites.idle_left = Sprite.from_row(
+      spritesheets.walk,
+      6,
+      IDLE_LENGTH,
+      BOTTOM_HALF
+    );
+    sprites.idle_down = Sprite.from_row(
+      spritesheets.walk,
+      7,
+      IDLE_LENGTH,
+      BOTTOM_HALF
+    );
+
+    current_sprite = sprites.idle_right;
+
     p.noSmooth();
   };
 
@@ -268,12 +375,15 @@ export const sketch = (p) => {
     p.background(0);
 
     blit_tilemap(p, tilemaps.background, Point.ORIGIN, TILE_SCALE);
-    blit_sprite_frame(
-      p,
-      spritesheets.walk,
-      2 * 4 + (Math.floor(p.frameCount / 3.5) % 4),
-      Point.point(1 * TILE_SCALE * TILE_SIZE, 6 * TILE_SCALE * TILE_SIZE),
-      TILE_SCALE
-    );
+
+    const t = p.frameCount / 16.0;
+
+    if (current_sprite) {
+      const sprite_pos = Point.point(
+        1 * TILE_SCALE * TILE_SIZE,
+        6 * TILE_SCALE * TILE_SIZE
+      );
+      blit_sprite(p, current_sprite, t, sprite_pos, TILE_SCALE);
+    }
   };
 };
