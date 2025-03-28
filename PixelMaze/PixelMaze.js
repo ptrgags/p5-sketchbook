@@ -151,22 +151,61 @@ MAZE.for_each((index, cell) => {
     }
   }
 
-  // If we're connected on the right, add 3 floor tiles to make a corridor
+  // If we're connected on the right, draw a corridor. 3 floor tiles, and
+  // 6 wall tiles above it
   if (cell.is_connected(GridDirection.RIGHT)) {
     // Middle of the 3 tiles, hence + 1
     const dst_row = row_offset + 1;
     for (let i = 0; i < 3; i++) {
       const dst_col = col_offset + 3 + i;
-      TILEMAP.set(new Index2D(dst_row, dst_col), Tiles.FLOOR);
+
+      // Draw one floor tile
+      const floor_index = new Index2D(dst_row, dst_col);
+      TILEMAP.set(floor_index, Tiles.FLOOR);
+
+      // The two tiles above it are the wall. Since the corridor is in the
+      // middle, the bottom of the wall will always fit in the grid, but the
+      // top might be cropped a bit.
+      const wall_bottom = floor_index.up();
+      TILEMAP.set(wall_bottom, Tiles.WALL);
+
+      const wall_top = wall_bottom.up();
+      if (wall_top) {
+        TILEMAP.set(wall_top, Tiles.WALL);
+      }
     }
   }
 
-  // Similarly for the vertical corridors
+  // The vertical corridors are similar, except the walls are placed a bit
+  // differently
   if (cell.is_connected(GridDirection.DOWN)) {
     const dst_col = col_offset + 1;
     for (let i = 0; i < 3; i++) {
       const dst_row = row_offset + 3 + i;
-      TILEMAP.set(new Index2D(dst_row, dst_col), Tiles.FLOOR);
+
+      const floor_index = new Index2D(dst_row, dst_col);
+      TILEMAP.set(floor_index, Tiles.FLOOR);
+
+      if (i > 0) {
+        const left_wall = floor_index.left();
+        TILEMAP.set(left_wall, Tiles.WALL);
+
+        const right_wall = floor_index.right();
+        TILEMAP.set(right_wall, Tiles.WALL);
+      }
+    }
+  }
+
+  // For cells below us, we still need a wall above the room even if there
+  // was no connection. Each wall is 2 tiles high, so we write a 2x3 rectangle
+  // of cells
+  if (cell_y + 1 < MAZE.rows && !cell.is_connected(GridDirection.DOWN)) {
+    for (let i = 1; i < 3; i++) {
+      const dst_row = row_offset + 3 + i;
+      for (let j = 0; j < 3; j++) {
+        const dst_col = col_offset + j;
+        TILEMAP.set(new Index2D(dst_row, dst_col), Tiles.WALL);
+      }
     }
   }
 });
