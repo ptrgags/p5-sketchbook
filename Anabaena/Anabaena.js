@@ -72,12 +72,6 @@ class AnabaenaCatenula {
     const to_point = point.sub(front);
 
     const velocity = to_point.limit_length(MAX_SPEED);
-
-    /*if (is_nearly(velocity.ideal_norm_sqr(), 0)) {
-      return;
-    }*/
-
-    //this.look_direction = velocity.normalize();
     const target = front.add(velocity);
     this.chain.move(target);
   }
