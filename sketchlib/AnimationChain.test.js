@@ -6,11 +6,13 @@ import { PGA_MATCHERS } from "../pga2d/pga_matchers";
 expect.extend(PGA_MATCHERS);
 
 describe("Joint", () => {
-  it("constraint_follow with the same point returns same point", () => {
+  it("constraint_follow with the same point throws", () => {
     const point = Point.point(1, 0);
     const follow_dist = 1.0;
-    // TODO... what should actually happen here?
-    expect(false).toBe(true);
+
+    expect(() => {
+      Joint.constraint_follow(point, point, follow_dist);
+    }).toThrowError("set length of null vector");
   });
 
   it("constraint_follow with large separation moves the point closer", () => {

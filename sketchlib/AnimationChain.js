@@ -173,6 +173,8 @@ export class AnimationChain {
       this.head.follow(target);
     }
 
+    // For cases where the individual nodes are changing in size, we still
+    // need to update the positions of the rest of the chain.
     for (let i = 1; i < this.joints.length; i++) {
       const prev = this.joints[i - 1];
       const curr = this.joints[i];
