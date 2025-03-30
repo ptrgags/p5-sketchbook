@@ -14,6 +14,11 @@
       const p5_sketch = new p5(sketch, "sketch");
     </script>
     <link rel="stylesheet" href="../styles/layout.css" />
+    <script
+      id="MathJax-script"
+      async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+    ></script>
   </head>
   <body>
     <sketchbook-navbar></sketchbook-navbar>
@@ -24,6 +29,74 @@
         <p>
           Move the mouse (desktop) or touch and drag the canvas (mobile) to move
           the bacterium around.
+        </p>
+        <p>
+          This sketch is a combination of the animation technique used in the
+          <a href="../Worm/">Worm</a> sketch, but also uses an L-system to
+          simulate bacterial growth.
+        </p>
+        <p>
+          The L-system I'm using is based on the L-system described in
+          <cite
+            >Section 1.2 of
+            <a href="https://algorithmicbotany.org/papers/#abop"
+              >The Algorithmic Beauty of Plants</a
+            >
+            by Prezemyslaw Prusinkiewicz and Aristid Lindenmayer</cite
+          >
+          and other publications by the same authors. However, there are some
+          slight differences in the timing in how I made this simulation. Here
+          are the rules I used.
+        </p>
+        <p>DIAGRAM of the rules below</p>
+        <ul>
+          <li>
+            The bacteria cells have two phases of growth. Short (\(S\)) when the
+            cell is first grown, and Long (\(L\)) when the cell is preparing to
+            divide into two. I colored the short cells blue and the long cells
+            green just to distinguish them.
+          </li>
+          <li>
+            In order for the cells to grow in the correct order, we have to
+            assign an orientation to each cell, either forward \(\rightarrow\)
+            or backward \(\leftarrow\).
+          </li>
+          <li>Short cells do not change in length until they mature</li>
+          <li>
+            Short cells mature into long cells pointing in the same direction
+            and start at the same length
+          </li>
+          <li>
+            Long cells grow linearly until they are twice their original length
+            when the next cell division happens.
+          </li>
+          <li>
+            When a long cell divides, it splits into a long cell and a short
+            cell. The new long cell points the opposite direction. If the
+            original long cell is visualized as an arrow, the long cell goes at
+            the tail, and the short cell goes at the tip. In other words, the
+            new cells point "outwards"
+          </li>
+        </ul>
+        <p>
+          The formal substitution rules can be written as an L-system as
+          follows. Note that even though conceptually there are only 2
+          subsitution rules (maturation and cell division), you need to use 4
+          rules to correctly handle the orientation and order of the symbols
+        </p>
+        <!-- prettier-ignore -->
+        <p>
+            $$
+            \newcommand{\la}[1]{\overset{\leftarrow}{#1}}
+            \newcommand{\ra}[1]{\overset{\rightarrow}{#1}}
+
+            \begin{align} 
+                \text{start} &= \ra{S} \\
+                \ra{S} &\to \ra{L} \\
+                \la{S} &\to \la{L} \\
+                \ra{L} &\to \la{L}\ra{S} \\
+                \la{L} &\to \la{S}\ra{L} \\
+            \end{align}$$
         </p>
       </div>
     </div>

@@ -7,7 +7,6 @@ import { prevent_mobile_scroll } from "../sketchlib/prevent_mobile_scroll.js";
 import { LSystem } from "./LSystem.js";
 import { sec_to_frames, Tween } from "../sketchlib/Tween.js";
 import { AnimationChain, Joint } from "../sketchlib/AnimationChain.js";
-import { is_nearly } from "../sketchlib/is_nearly.js";
 import { CirclePrimitive, GroupPrimitive } from "../sketchlib/primitives.js";
 import { Color, Style } from "../sketchlib/Style.js";
 
