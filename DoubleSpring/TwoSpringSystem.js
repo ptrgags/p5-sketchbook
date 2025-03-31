@@ -1,3 +1,20 @@
+import { PhasePoint } from "../sketchlib/VectorSpace";
+
+class HorizontalSpring {
+  /**
+   *
+   * @param {number} spring_constant The spring's stiffness, k
+   * @param {number} rest_length The rest length
+   * @param {number} width The width of the spring for drawing
+   * @param {PhasePoint<number>} initial_phase The starting position of the system.
+   */
+  constructor(spring_constant, rest_length, width, initial_phase) {
+    (this.spring_constant = spring_constant), (this.rest_length = rest_length);
+    this.width = width;
+    this.initial_phase = initial_phase;
+  }
+}
+
 /**
  * from physics.graphics import horizontal_spring, vertical_wall, horizontal_wall
 from physics.rungekutta import RungeKuttaSimulation

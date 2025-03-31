@@ -1,11 +1,4 @@
-/**
- * A set of static functions that perform vector addition/scalar multiplication
- * for some arbitrary type.
- * @template V The vector type
- * @typedef {Object} VectorSpace
- * @property {function(V, V): V} add
- * @property {function(number, V): V} scale
- */
+import "./VectorSpace.js";
 
 /**
  * A 4th order Runge-Kutta integrator. This offers greater precision than
