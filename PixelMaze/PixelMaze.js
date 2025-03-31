@@ -11,77 +11,6 @@ import { Tilemap } from "./Tilemap.js";
 const TILE_SIZE = 16;
 const TILE_SCALE = 2;
 
-/**
- * Low-level sprite drawing function
- * @param {any} p p5 instance
- * @param {Spritesheet} spritesheet the spritesheet to reference
- * @param {number} frame_id The frame in the sprite
- * @param {Point} dst_pos The position on the screen to display the sprite
- * @param {number} scale the scale factor for drawing on the screen
- */
-/*
-function blit_sprite_frame(p, spritesheet, frame_id, dst_pos, scale) {
-  const dst_dims = spritesheet.frame_size.scale(scale);
-  const src_pos = spritesheet.get_coords(frame_id);
-  const src_dims = spritesheet.frame_size;
-  p.image(
-    spritesheet.image,
-    dst_pos.x,
-    dst_pos.y,
-    dst_dims.x,
-    dst_dims.y,
-    src_pos.x,
-    src_pos.y,
-    src_dims.x,
-    src_dims.y
-  );
-}
-  */
-
-/**
- * Draw the sprite on the screen
- * @param {any} p p5 drawing context
- * @param {Sprite} sprite The sprite to draw
- * @param {number} animation_time The time value to use for selecting a sprite frame
- * @param {Point} position The point on the screen to draw the sprite's origin
- * @param {number} scale Upscale factor
- */
-/*
-function blit_sprite(p, sprite, animation_time, position, scale) {
-  const spritesheet = sprite.spritesheet;
-  const frame_id = sprite.get_frame(animation_time);
-
-  blit_sprite_frame(p, spritesheet, frame_id, position, scale);
-}
-  */
-
-/**
- * Low-level tile drawing function
- * @param {any} p p5 instance
- * @param {Tileset} tileset the spritesheet to reference
- * @param {number} frame_id The frame in the sprite
- * @param {Point} dst_pos The position on the screen to display the sprite
- * @param {number} scale the scale factor for drawing on the screen
- */
-/*
-function blit_tile(p, tileset, frame_id, dst_pos, scale) {
-  const dst_size = scale * tileset.tile_size;
-  const src_pos = tileset.get_coords(frame_id);
-  const src_size = tileset.tile_size;
-  p.image(
-    tileset.image,
-    dst_pos.x,
-    dst_pos.y,
-    dst_size,
-    dst_size,
-    src_pos.x,
-    src_pos.y,
-    src_size,
-    src_size
-  );
-}
-  */
-
 const MAZE_ROWS = 4;
 const MAZE_COLS = 3;
 const MAZE = generate_maze(MAZE_ROWS, MAZE_COLS);
@@ -247,33 +176,6 @@ export const sketch = (p) => {
     canvas = p.createCanvas(500, 700).elt;
 
     parse_resources(RESOURCE_MANIFEST, p5_resources, resources);
-    /*
-
-    tilesets.basic = new Tileset(images.tileset, TILE_SIZE);
-    tilemaps.background = new Tilemap(tilesets.basic, INDICES);
-
-    spritesheets.character = new Spritesheet(
-      images.character,
-      Point.direction(TILE_SIZE, 2 * TILE_SIZE)
-    );
-
-    // the character is 2 cells tall, but its origin is at the bottom one
-    const BOTTOM_HALF = Point.direction(0, TILE_SIZE);
-    const WALK_LENGTH = 4;
-    sprites.walk = make_cardinal_direction_sprites(
-      spritesheets.character,
-      0,
-      WALK_LENGTH,
-      BOTTOM_HALF
-    );
-
-    const IDLE_LENGTH = 2;
-    sprites.idle = make_cardinal_direction_sprites(
-      spritesheets.character,
-      4,
-      IDLE_LENGTH,
-      BOTTOM_HALF
-    );*/
 
     current_sprite = new P5Sprite(
       p5_resources.images.character,
