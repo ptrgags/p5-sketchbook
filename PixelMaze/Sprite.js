@@ -32,7 +32,7 @@ export class Sprite {
     if (end_frame < min_frame || end_frame > max_frame) {
       throw new Error(`animation too long, image has only ${max_frame} frames`);
     }
-    this.frames = spritesheet;
+    this.spritesheet = spritesheet;
     this.start_frame = start_frame;
     this.frame_count = frame_count;
     this.origin = origin;

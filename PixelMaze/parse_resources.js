@@ -1,6 +1,6 @@
-import { Point } from "../pga2d/objects";
-import { ImageFrames } from "./ImageFrames";
-import { Sprite } from "./Sprite";
+import { Point } from "../pga2d/objects.js";
+import { ImageFrames } from "./ImageFrames.js";
+import { Sprite } from "./Sprite.js";
 
 function parse_image_frames(p5_images, manifest, image_frames) {
   for (const [id, tileset_info] of Object.entries(manifest)) {
@@ -45,9 +45,5 @@ export function parse_resources(manifest, p5_resources, resources) {
     manifest.image_frames,
     resources.image_frames
   );
-  parse_sprites(
-    manifest.image_frames,
-    resources.image_frames,
-    resources.sprites
-  );
+  parse_sprites(manifest.sprites, resources.image_frames, resources.sprites);
 }

@@ -2,9 +2,11 @@ import { Point } from "../pga2d/objects.js";
 import { Grid, Index2D } from "../sketchlib/Grid.js";
 import { GridDirection } from "../sketchlib/GridDiection.js";
 import { generate_maze } from "../sketchlib/RandomDFSMaze.js";
+import { blit_sprite, blit_tilemap, P5Sprite, P5Tilemap } from "./blit.js";
 import { parse_resources } from "./parse_resources.js";
 import { preload_p5_resources } from "./preload.js";
 import { Sprite } from "./Sprite.js";
+import { Tilemap } from "./Tilemap.js";
 
 const TILE_SIZE = 16;
 const TILE_SCALE = 2;
@@ -17,6 +19,7 @@ const TILE_SCALE = 2;
  * @param {Point} dst_pos The position on the screen to display the sprite
  * @param {number} scale the scale factor for drawing on the screen
  */
+/*
 function blit_sprite_frame(p, spritesheet, frame_id, dst_pos, scale) {
   const dst_dims = spritesheet.frame_size.scale(scale);
   const src_pos = spritesheet.get_coords(frame_id);
@@ -33,6 +36,7 @@ function blit_sprite_frame(p, spritesheet, frame_id, dst_pos, scale) {
     src_dims.y
   );
 }
+  */
 
 /**
  * Draw the sprite on the screen
@@ -42,12 +46,14 @@ function blit_sprite_frame(p, spritesheet, frame_id, dst_pos, scale) {
  * @param {Point} position The point on the screen to draw the sprite's origin
  * @param {number} scale Upscale factor
  */
+/*
 function blit_sprite(p, sprite, animation_time, position, scale) {
   const spritesheet = sprite.spritesheet;
   const frame_id = sprite.get_frame(animation_time);
 
   blit_sprite_frame(p, spritesheet, frame_id, position, scale);
 }
+  */
 
 /**
  * Low-level tile drawing function
@@ -57,6 +63,7 @@ function blit_sprite(p, sprite, animation_time, position, scale) {
  * @param {Point} dst_pos The position on the screen to display the sprite
  * @param {number} scale the scale factor for drawing on the screen
  */
+/*
 function blit_tile(p, tileset, frame_id, dst_pos, scale) {
   const dst_size = scale * tileset.tile_size;
   const src_pos = tileset.get_coords(frame_id);
@@ -73,6 +80,7 @@ function blit_tile(p, tileset, frame_id, dst_pos, scale) {
     src_size
   );
 }
+  */
 
 const MAZE_ROWS = 4;
 const MAZE_COLS = 3;
@@ -170,6 +178,7 @@ MAZE.for_each((index, cell) => {
  * @param {Point} origin The pixel coords of where the top left corner of the grid will appear
  * @param {number} scale The scale factor for upscaling tiles
  */
+/*
 function blit_tilemap(p, tilemap, origin, scale) {
   const { tileset, indices } = tilemap;
   indices.for_each((index, tile_id) => {
@@ -177,7 +186,7 @@ function blit_tilemap(p, tilemap, origin, scale) {
     const position = Point.direction(j, i).scale(scale * tileset.tile_size);
     blit_tile(p, tileset, tile_id, origin.add(position), scale);
   });
-}
+}*/
 
 const ORIGIN_CHARACTER = Point.direction(0, TILE_SIZE);
 const RESOURCE_MANIFEST = {
@@ -227,7 +236,8 @@ export const sketch = (p) => {
     sprites: {},
   };
 
-  let current_sprite = undefined;
+  let current_sprite;
+  let tilemap;
 
   p.preload = () => {
     preload_p5_resources(p, RESOURCE_MANIFEST, p5_resources);
@@ -265,7 +275,14 @@ export const sketch = (p) => {
       BOTTOM_HALF
     );*/
 
-    current_sprite = resources.sprites.walk[GridDirection.LEFT];
+    current_sprite = new P5Sprite(
+      p5_resources.images.character,
+      resources.sprites.walk[GridDirection.LEFT]
+    );
+    tilemap = new P5Tilemap(
+      p5_resources.images.tileset,
+      new Tilemap(resources.image_frames.tileset_basic, INDICES)
+    );
 
     p.noSmooth();
   };
@@ -273,16 +290,15 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    blit_tilemap(p, tilemaps.background, Point.ORIGIN, TILE_SCALE);
+    p.push();
+    p.scale(TILE_SCALE, TILE_SCALE);
+    blit_tilemap(p, tilemap, Point.ORIGIN);
 
     const t = p.frameCount / 16.0;
 
-    if (current_sprite) {
-      const sprite_pos = Point.point(
-        1 * TILE_SCALE * TILE_SIZE,
-        6 * TILE_SCALE * TILE_SIZE
-      );
-      blit_sprite(p, current_sprite, t, sprite_pos, TILE_SCALE);
-    }
+    const sprite_pos = Point.direction(1, 6).scale(TILE_SIZE);
+    blit_sprite(p, current_sprite, t, sprite_pos);
+
+    p.pop();
   };
 };
