@@ -151,8 +151,8 @@ export const sketch = (p) => {
 
     //const t = p.frameCount / 16.0;
 
-    player.update();
-    const { position, sprite, t } = player.draw();
+    player.update(p.frameCount);
+    const { position, sprite, t } = player.draw(p.frameCount);
     blit_sprite(
       p,
       new P5Sprite(p5_resources.images.character, sprite),
