@@ -1,45 +1,13 @@
 import { Point } from "../pga2d/objects.js";
 import { Grid, Index2D } from "../sketchlib/Grid.js";
 import { GridDirection } from "../sketchlib/GridDiection.js";
-import { mod } from "../sketchlib/mod.js";
 import { generate_maze } from "../sketchlib/RandomDFSMaze.js";
+import { parse_resources } from "./parse_resources.js";
+import { preload_p5_resources } from "./preload.js";
+import { Sprite } from "./Sprite.js";
 
 const TILE_SIZE = 16;
 const TILE_SCALE = 2;
-
-class Spritesheet {
-  /**
-   * Constructor
-   * @param {any} image p5.Image instance
-   * @param {Point} frame_size Frame size as a direction
-   */
-  constructor(image, frame_size) {
-    const { x, y } = frame_size;
-    if (image.width % x !== 0 || image.height % y !== 0) {
-      throw new Error(
-        "image must be divisible by frame_dimensions in both dimensions"
-      );
-    }
-
-    this.image = image;
-    this.frame_size = frame_size;
-    this.grid_dims = Point.direction(image.width / x, image.height / y);
-    this.frame_count = this.grid_dims.x * this.grid_dims.y;
-  }
-
-  /**
-   * Get the pixel coordinates within the spritesheet for the top left corner
-   * of the specified frame
-   * @param {number} frame_id The frame number
-   * @returns {Point} The frame
-   */
-  get_coords(frame_id) {
-    const width = this.grid_dims.x;
-    const x = frame_id % width;
-    const y = Math.floor(frame_id / width);
-    return Point.point(x * this.frame_size.x, y * this.frame_size.y);
-  }
-}
 
 /**
  * Low-level sprite drawing function
@@ -67,42 +35,6 @@ function blit_sprite_frame(p, spritesheet, frame_id, dst_pos, scale) {
 }
 
 /**
- * A Sprite is an animation of one or more frames taken from a spritesheet.
- * This doesn't handle any timing information, just the frames and looping.
- */
-class Sprite {
-  /**
-   * Constructor
-   * @param {Spritesheet} spritesheet The sprite sheet
-   * @param {number} start_frame The first frame in the animation
-   * @param {number} frame_count The number of frames in the animation
-   * @param {Point} offset A point
-   */
-  constructor(spritesheet, start_frame, frame_count, offset) {
-    this.spritesheet = spritesheet;
-    this.start_frame = start_frame;
-    this.frame_count = frame_count;
-    this.offset = offset;
-  }
-
-  /**
-   * Get the frame number for a given time value. This floors the t value
-   * and cycles at the end of the animation
-   * @param {number} t A real number animation time measured in animation frames
-   * @returns {number} The integer frame number in range
-   */
-  get_frame(t) {
-    const offset = mod(Math.floor(t), this.frame_count);
-    return this.start_frame + offset;
-  }
-
-  static from_row(spritesheet, row, frame_count, offset) {
-    const start_frame = row * spritesheet.grid_dims.x;
-    return new Sprite(spritesheet, start_frame, frame_count, offset);
-  }
-}
-
-/**
  * Draw the sprite on the screen
  * @param {any} p p5 drawing context
  * @param {Sprite} sprite The sprite to draw
@@ -115,60 +47,6 @@ function blit_sprite(p, sprite, animation_time, position, scale) {
   const frame_id = sprite.get_frame(animation_time);
 
   blit_sprite_frame(p, spritesheet, frame_id, position, scale);
-}
-
-/**
- * Given a spritesheet containing 4 rows (one for each of the cardinal directions)
- * create sprites in the same order as GridDirection
- * @param {Spritesheet} spritesheet The spritesheet
- * @param {number} start_row The first row of the character animation
- * @param {number} frame_count The number of frames in each animation
- * @param {Point} origin The origin for each sprite animation
- * @returns {Sprite[]} An array of 4 sprites that can be indexed by a GridDirection
- */
-function make_cardinal_direction_sprites(
-  spritesheet,
-  start_row,
-  frame_count,
-  origin
-) {
-  const right = Sprite.from_row(spritesheet, start_row, frame_count, origin);
-  const up = Sprite.from_row(spritesheet, start_row + 1, frame_count, origin);
-  const left = Sprite.from_row(spritesheet, start_row + 2, frame_count, origin);
-  const down = Sprite.from_row(spritesheet, start_row + 3, frame_count, origin);
-  return [right, up, left, down];
-}
-
-class Tileset {
-  /**
-   *
-   * @param {any} image p5.Image instance
-   * @param {number} tile_size Width of a single square tile
-   */
-  constructor(image, tile_size) {
-    if (image.width % tile_size !== 0 || image.height % tile_size !== 0) {
-      throw new Error("image must be divisible by tile_size");
-    }
-    this.image = image;
-    this.tile_size = tile_size;
-    this.grid_dims = Point.direction(
-      image.width / tile_size,
-      image.height / tile_size
-    );
-  }
-
-  /**
-   * Get the pixel coordinates within the tileset for the top left corner
-   * of the specified tile
-   * @param {number} tile_id The frame number
-   * @returns {Point} The coordinates for this frame
-   */
-  get_coords(tile_id) {
-    const width = this.grid_dims.x;
-    const x = tile_id % width;
-    const y = Math.floor(tile_id / width);
-    return Point.point(x * this.tile_size, y * this.tile_size);
-  }
 }
 
 /**
@@ -301,34 +179,65 @@ function blit_tilemap(p, tilemap, origin, scale) {
   });
 }
 
-class Tilemap {
-  /**
-   * Constructor
-   * @param {Tileset} tileset The tileset with the image data
-   * @param {Grid<number>} indices The tile indices into the tileset
-   */
-  constructor(tileset, indices) {
-    this.tileset = tileset;
-    this.indices = indices;
-  }
-}
+const ORIGIN_CHARACTER = Point.direction(0, TILE_SIZE);
+const RESOURCE_MANIFEST = {
+  images: {
+    tileset: "./sprites/placeholder-tileset.png",
+    character: "./sprites/placeholder-character.png",
+  },
+  image_frames: {
+    tileset_basic: {
+      image: "tileset",
+      frame_size: Point.direction(TILE_SIZE, TILE_SIZE),
+    },
+    character: {
+      image: "character",
+      frame_size: Point.point(TILE_SIZE, 2 * TILE_SIZE),
+    },
+  },
+  sprites: {
+    walk: {
+      type: "directional",
+      spritesheet: "character",
+      start_row: 0,
+      frame_count: 4,
+      origin: ORIGIN_CHARACTER,
+    },
+    idle: {
+      type: "directional",
+      spritesheet: "character",
+      start_row: 4,
+      frame_count: 2,
+      origin: ORIGIN_CHARACTER,
+    },
+  },
+};
 
 export const sketch = (p) => {
   let canvas;
-  const images = {};
-  const tilesets = {};
-  const spritesheets = {};
-  const tilemaps = {};
-  const sprites = {};
+
+  // p5.js specific resources
+  const p5_resources = {
+    images: {},
+  };
+
+  // logical resources that do not depend on p5.js
+  const resources = {
+    image_frames: {},
+    sprites: {},
+  };
+
   let current_sprite = undefined;
 
   p.preload = () => {
-    images.tileset = p.loadImage("./sprites/placeholder-tileset.png");
-    images.character = p.loadImage("./sprites/placeholder-walk-cycle.png");
+    preload_p5_resources(p, RESOURCE_MANIFEST, p5_resources);
   };
 
   p.setup = () => {
     canvas = p.createCanvas(500, 700).elt;
+
+    parse_resources(RESOURCE_MANIFEST, p5_resources, resources);
+    /*
 
     tilesets.basic = new Tileset(images.tileset, TILE_SIZE);
     tilemaps.background = new Tilemap(tilesets.basic, INDICES);
@@ -354,9 +263,9 @@ export const sketch = (p) => {
       4,
       IDLE_LENGTH,
       BOTTOM_HALF
-    );
+    );*/
 
-    current_sprite = sprites.walk[GridDirection.LEFT];
+    current_sprite = resources.sprites.walk[GridDirection.LEFT];
 
     p.noSmooth();
   };

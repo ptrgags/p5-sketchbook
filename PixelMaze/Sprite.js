@@ -9,18 +9,18 @@ import { ImageFrames } from "./ImageFrames.js";
 export class Sprite {
   /**
    * Constructor
-   * @param {ImageFrames} image_frames The image frames to use
+   * @param {ImageFrames} spritesheet The layout of the sprite sheet
    * @param {number} start_frame The frame ID of the first frame in the animation
    * @param {number} frame_count How many frames in the animation (must be positive)
    * @param {Point} origin Origin of the sprite as a direction in pixels
    */
-  constructor(image_frames, start_frame, frame_count, origin) {
+  constructor(spritesheet, start_frame, frame_count, origin) {
     if (frame_count < 1) {
       throw new Error("frame_count must be positive");
     }
 
     const min_frame = 0;
-    const max_frame = image_frames.frame_count;
+    const max_frame = spritesheet.frame_count;
 
     if (start_frame < min_frame || start_frame >= max_frame) {
       throw new Error(
@@ -32,7 +32,7 @@ export class Sprite {
     if (end_frame < min_frame || end_frame > max_frame) {
       throw new Error(`animation too long, image has only ${max_frame} frames`);
     }
-    this.frames = image_frames;
+    this.frames = spritesheet;
     this.start_frame = start_frame;
     this.frame_count = frame_count;
     this.origin = origin;
@@ -74,12 +74,7 @@ export class Sprite {
    * @param {Point} origin The origin
    * @returns {Sprite[]} An array of 4 sprites that can be indexed by a GridDirection
    */
-  static make_direction_animations(
-    image_frames,
-    start_row,
-    frame_count,
-    origin
-  ) {
+  static make_direction_sprites(image_frames, start_row, frame_count, origin) {
     const right = Sprite.from_row(image_frames, start_row, frame_count, origin);
     const up = Sprite.from_row(
       image_frames,

@@ -62,10 +62,10 @@ describe("Sprite", () => {
     expect(result).toEqual(expected);
   });
 
-  it("make_direction_animations computes correct sprites", () => {
+  it("make_direction_sprites computes correct sprites", () => {
     const image_frames = make_image_frames();
 
-    const result = Sprite.make_direction_animations(
+    const result = Sprite.make_direction_sprites(
       image_frames,
       4,
       2,
