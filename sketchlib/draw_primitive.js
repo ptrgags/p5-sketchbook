@@ -1,3 +1,5 @@
+import { Point } from "../pga2d/objects.js";
+import { Motor } from "../pga2d/versors.js";
 import {
   LinePrimitive,
   RectPrimitive,
@@ -7,6 +9,7 @@ import {
   PointPrimitive,
   CirclePrimitive,
   BeziergonPrimitive,
+  VectorPrimitive,
 } from "./primitives.js";
 
 function draw_rect(p, rect) {
@@ -38,6 +41,28 @@ function draw_polygon(p, polygon) {
     p.vertex(vertex.x, vertex.y);
   }
   p.endShape(p.CLOSE);
+}
+
+const ARROW_ANGLE = Math.PI / 6;
+
+/**
+ * Draw a vector as an arrow. This only uses lines so styling only
+ * comes from a stroke
+ * @param {any} p p5 context
+ * @param {VectorPrimitive} vector The vector to draw
+ */
+function draw_vector(p, vector) {
+  const { tail, tip } = vector;
+  p.line(tail.x, tail.y, tip.x, tip.y);
+  const rotate = Motor.rotation(tip, ARROW_ANGLE);
+  const inv_rotate = rotate.reverse();
+
+  const tip_back = Point.lerp(tail, tip, 0.8);
+  const tip_left = rotate.transform_point(tip_back);
+  const tip_right = inv_rotate.transform_point(tip_back);
+
+  p.line(tip_left.x, tip_left.y, tip.x, tip.y);
+  p.line(tip_right.x, tip_right.y, tip.x, tip.y);
 }
 
 function draw_beziergon(p, beziergon) {
@@ -93,6 +118,8 @@ export function draw_primitive(p, primitive) {
     draw_rect(p, primitive);
   } else if (primitive instanceof LinePrimitive) {
     draw_line(p, primitive);
+  } else if (primitive instanceof VectorPrimitive) {
+    draw_vector(p, primitive);
   } else if (primitive instanceof PolygonPrimitive) {
     draw_polygon(p, primitive);
   } else if (primitive instanceof BeziergonPrimitive) {

@@ -11,6 +11,7 @@ import {
   CirclePrimitive,
   GroupPrimitive,
   LinePrimitive,
+  VectorPrimitive,
 } from "../sketchlib/primitives.js";
 import { Color, Style } from "../sketchlib/Style.js";
 
@@ -36,13 +37,14 @@ const STYLE_CELL_S = new Style()
 const STYLE_CELL_L = new Style()
   .with_stroke(COLOR_CELL_L)
   .with_width(CELL_THICKNESS);
+const STYLE_ARROW = new Style().with_stroke(Color.BLACK).with_width(2);
 
 class AnabaenaCatenula {
   constructor() {
     /**
      * @type {LSystem}
      */
-    this.polarized_fibonacci = new LSystem("s", {
+    this.polarized_fibonacci = new LSystem("S", {
       // lowercase letters point to the right, uppercase letters point to the left
       s: "l",
       S: "L",
@@ -188,10 +190,11 @@ class AnabaenaCatenula {
     this.move_towards(mouse);
   }
 
-  render() {
+  render(show_arrows) {
     const positions = this.chain.get_positions();
     const l_cells = [];
     const s_cells = [];
+    const arrows = [];
     for (let i = 1; i < positions.length; i++) {
       const prev = positions[i - 1];
       const curr = positions[i];
@@ -205,12 +208,25 @@ class AnabaenaCatenula {
       const cell = new LinePrimitive(start, end);
       const cell_list = symbol === "s" || symbol === "S" ? s_cells : l_cells;
       cell_list.push(cell);
+
+      const arrow =
+        symbol === "s" || symbol === "l"
+          ? new VectorPrimitive(start, end)
+          : new VectorPrimitive(end, start);
+
+      arrows.push(arrow);
     }
 
-    return new GroupPrimitive([
+    const primitives = [
       new GroupPrimitive(l_cells, STYLE_CELL_L),
       new GroupPrimitive(s_cells, STYLE_CELL_S),
-    ]);
+    ];
+
+    if (show_arrows) {
+      primitives.push(new GroupPrimitive(arrows, STYLE_ARROW));
+    }
+
+    return new GroupPrimitive(primitives);
   }
 }
 
@@ -219,9 +235,15 @@ const BACTERIA = new AnabaenaCatenula();
 export const sketch = (p) => {
   let canvas;
   let mouse = INITIAL_POSITION;
+  let show_arrows = false;
   p.setup = () => {
     canvas = p.createCanvas(WIDTH, HEIGHT).elt;
     prevent_mobile_scroll(canvas);
+
+    const checkbox = document.getElementById("arrows");
+    checkbox.addEventListener("change", (e) => {
+      show_arrows = e.target.checked;
+    });
   };
 
   p.draw = () => {
@@ -229,7 +251,7 @@ export const sketch = (p) => {
 
     BACTERIA.update(mouse, p.frameCount);
 
-    draw_primitive(p, BACTERIA.render());
+    draw_primitive(p, BACTERIA.render(show_arrows));
   };
 
   p.mouseMoved = () => {
