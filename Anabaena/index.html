@@ -103,6 +103,49 @@
                 \la{L} &\to \la{S}\ra{L} \\
             \end{align}$$
         </p>
+        <p>
+          One interesting detail about this L-system is the overall growth
+          pattern follows the Fibonacci sequence. For example, let's look at the
+          lengths of the first several iterations:
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Cells</th>
+              <th>Length</th>
+            </tr>
+          </thead>
+          <tr>
+            <td>\(\ra{S}\) (start)</td>
+            <td>1</td>
+          </tr>
+          <tr>
+            <td>\(\ra{L}\)</td>
+            <td>1</td>
+          </tr>
+          <tr>
+            <td>\(\la{L}\ra{S}\)</td>
+            <td>2</td>
+          </tr>
+          <tr>
+            <td>\( \la{S}\ra{L} \ra{L} \)</td>
+            <td>3</td>
+          </tr>
+          <tr>
+            <td>\( \la{L} \la{L}\ra{S} \la{L}\ra{S} \)</td>
+            <td>5</td>
+          </tr>
+          <tr>
+            <td>\( \la{S}\ra{L} \la{S}\ra{L} \ra{L} \la{S}\ra{L} \ra{L} \)</td>
+            <td>8</td>
+          </tr>
+        </table>
+        <p>
+          Huh, while writing the above, I just noticed another pattern: In any
+          given iteration, all the L cells face the same way. Likewise, all the
+          S cells face the same way. However, the L cells and S cells face in
+          opposite directions.
+        </p>
       </div>
     </div>
   </body>
