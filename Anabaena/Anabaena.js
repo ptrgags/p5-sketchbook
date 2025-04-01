@@ -7,7 +7,11 @@ import { prevent_mobile_scroll } from "../sketchlib/prevent_mobile_scroll.js";
 import { LSystem } from "./LSystem.js";
 import { sec_to_frames, Tween } from "../sketchlib/Tween.js";
 import { AnimationChain, Joint } from "../sketchlib/AnimationChain.js";
-import { CirclePrimitive, GroupPrimitive } from "../sketchlib/primitives.js";
+import {
+  CirclePrimitive,
+  GroupPrimitive,
+  LinePrimitive,
+} from "../sketchlib/primitives.js";
 import { Color, Style } from "../sketchlib/Style.js";
 
 const INITIAL_POSITION = Point.point(WIDTH / 2, HEIGHT - 50);
@@ -15,18 +19,23 @@ const MIN_BEND_ANGLE = (7 * Math.PI) / 8;
 
 const LENGTH_SHORT = 20;
 const LENGTH_LONG = 2 * LENGTH_SHORT;
+const LENGTH_BEFORE_SPLIT = 3 * LENGTH_SHORT;
+
 const DURATION_GROWTH = sec_to_frames(1);
 const MAX_SYMBOLS = 100;
 const MAX_SPEED = 10;
 
+// light blue
 const COLOR_CELL_S = Color.from_hex_code("#4cbac0");
-const COLOR_CELL_L = Color.from_hex_code("#5cb28f");
+// dark sea green
+const COLOR_CELL_L = Color.from_hex_code("#419977");
+const CELL_THICKNESS = 20;
 const STYLE_CELL_S = new Style()
-  .with_fill(COLOR_CELL_S)
-  .with_stroke(Color.BLACK);
+  .with_stroke(COLOR_CELL_S)
+  .with_width(CELL_THICKNESS);
 const STYLE_CELL_L = new Style()
-  .with_fill(COLOR_CELL_L)
-  .with_stroke(Color.BLACK);
+  .with_stroke(COLOR_CELL_L)
+  .with_width(CELL_THICKNESS);
 
 class AnabaenaCatenula {
   constructor() {
@@ -43,11 +52,22 @@ class AnabaenaCatenula {
     this.current_symbols = this.polarized_fibonacci.start_symbol;
 
     /**
-     * @type {Tween}
+     * Tween used for S cells that grow into L cells
+     * @type {Tween<number>}
      */
     this.growth_tween = Tween.scalar(
       LENGTH_SHORT,
       LENGTH_LONG,
+      0,
+      DURATION_GROWTH
+    );
+
+    /**
+     * Tween used for L cells that grow bigger before splitting
+     */
+    this.split_tween = Tween.scalar(
+      LENGTH_LONG,
+      LENGTH_BEFORE_SPLIT,
       0,
       DURATION_GROWTH
     );
@@ -112,8 +132,13 @@ class AnabaenaCatenula {
     this.chain = new AnimationChain(split_joints, MIN_BEND_ANGLE);
   }
 
+  /**
+   * Grow the animation chain in between splits
+   * @param {number} frame The frame number
+   */
   grow(frame) {
-    const long_length = this.growth_tween.get_value(frame);
+    const short_length = this.growth_tween.get_value(frame);
+    const long_length = this.split_tween.get_value(frame);
 
     const n = this.chain.length;
     const longer_joints = new Array(n);
@@ -122,7 +147,7 @@ class AnabaenaCatenula {
       const old_joint = this.chain.get_joint(i);
       const symbol = this.current_symbols.charAt(i - 1);
       if (symbol === "s" || symbol === "S") {
-        longer_joints[i] = old_joint;
+        longer_joints[i] = new Joint(old_joint.position, short_length);
       } else {
         longer_joints[i] = new Joint(old_joint.position, long_length);
       }
@@ -131,6 +156,11 @@ class AnabaenaCatenula {
     this.chain = new AnimationChain(longer_joints, MIN_BEND_ANGLE);
   }
 
+  /**
+   * Depending on where we are in the simulation, either grow cells or
+   * split them.
+   * @param {number} frame The frame number
+   */
   grow_or_split(frame) {
     if (
       this.current_symbols.length > MAX_SYMBOLS &&
@@ -142,11 +172,17 @@ class AnabaenaCatenula {
     if (this.growth_tween.is_done(frame)) {
       this.split();
       this.growth_tween.restart(frame, DURATION_GROWTH);
+      this.split_tween.restart(frame, DURATION_GROWTH);
     } else {
       this.grow(frame);
     }
   }
 
+  /**
+   * Update the simulation
+   * @param {Point} mouse Mouse coordinates
+   * @param {number} frame frame number
+   */
   update(mouse, frame) {
     this.grow_or_split(frame);
     this.move_towards(mouse);
@@ -154,34 +190,26 @@ class AnabaenaCatenula {
 
   render() {
     const positions = this.chain.get_positions();
-    const circles_l = [];
-    const circles_s = [];
+    const l_cells = [];
+    const s_cells = [];
     for (let i = 1; i < positions.length; i++) {
       const prev = positions[i - 1];
       const curr = positions[i];
       const symbol = this.current_symbols.charAt(i - 1);
 
-      if (symbol === "s" || symbol === "S") {
-        const midpoint = prev.add(curr);
-        const radius = prev.sub(curr).ideal_norm() / 2;
-        const circle = new CirclePrimitive(midpoint, radius);
+      // Move the end points slightly apart so the result looks like distinct
+      // cells
+      const start = Point.lerp(prev, curr, 0.15);
+      const end = Point.lerp(prev, curr, 0.85);
 
-        circles_s.push(circle);
-      } else {
-        const forward = prev.sub(curr).normalize();
-        const radius = LENGTH_SHORT / 2;
-
-        const center_offset = forward.scale(radius);
-
-        let circle_a = new CirclePrimitive(curr.add(center_offset), radius);
-        let circle_b = new CirclePrimitive(prev.sub(center_offset), radius);
-        circles_l.push(circle_a, circle_b);
-      }
+      const cell = new LinePrimitive(start, end);
+      const cell_list = symbol === "s" || symbol === "S" ? s_cells : l_cells;
+      cell_list.push(cell);
     }
 
     return new GroupPrimitive([
-      new GroupPrimitive(circles_l, STYLE_CELL_L),
-      new GroupPrimitive(circles_s, STYLE_CELL_S),
+      new GroupPrimitive(l_cells, STYLE_CELL_L),
+      new GroupPrimitive(s_cells, STYLE_CELL_S),
     ]);
   }
 }
