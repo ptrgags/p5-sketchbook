@@ -32,7 +32,8 @@
       <div class="description">
         <p>
           Move the mouse (desktop) or touch and drag the canvas (mobile) to move
-          the bacterium around.
+          the bacteria around. The "show cell orientation" checkbox turns on
+          arrows to help illustrate the math described below.
         </p>
         <p>
           This sketch is a combination of the animation technique used in the
@@ -40,53 +41,53 @@
           simulate bacterial growth.
         </p>
         <p>
-          The L-system I'm using is based on the L-system described in
-          <cite
-            >Section 1.2 of
+          The L-system I'm using is based on the ones found in Sections 1.2 and
+          6.2.1 of
+          <cite>
             <a href="https://algorithmicbotany.org/papers/#abop"
               >The Algorithmic Beauty of Plants</a
-            >
-            by Prezemyslaw Prusinkiewicz and Aristid Lindenmayer</cite
+            ></cite
           >
-          and other publications by the same authors. However, there are some
-          slight differences in the timing in how I made this simulation. Here
-          are the rules I used.
+          by Prezemyslaw Prusinkiewicz and Aristid Lindenmayer. Here's how I
+          would summarize the rules:
         </p>
-        <p>DIAGRAM of the rules below</p>
+        <img
+          width="800"
+          class="figure"
+          alt="illustration of the rules listed below"
+          src="./2025-04-01_AnabaenaExplainer.png"
+        />
         <ul>
           <li>
-            The bacteria cells have two phases of growth. Short (\(S\)) when the
-            cell is first grown, and Long (\(L\)) when the cell is preparing to
-            divide into two. I colored the short cells blue and the long cells
-            green just to distinguish them.
+            The bacteria cells have two phases of life Young cells (\(S\) for
+            "short") and adult cells (\(L\) for "long").
           </li>
           <li>
-            In order for the cells to grow in the correct order, we have to
-            assign an orientation to each cell, either forward \(\rightarrow\)
-            or backward \(\leftarrow\).
-          </li>
-          <li>Short cells do not change in length until they mature</li>
-          <li>
-            Short cells mature into long cells pointing in the same direction
-            and start at the same length
+            We need to distinguish the front of the cell (\(\rightarrow\)) from
+            the back of the cell (\(\leftarrow\)) to determine the correct
+            placement of cell division.
           </li>
           <li>
-            Long cells grow linearly until they are twice their original length
-            when the next cell division happens.
+            <b>Start Rule:</b> I start the simulation with a single short cell
+          </li>
+          <li><b>Growth Rule:</b>All cells grow linearly</li>
+          <li>
+            <b>Subsitution Rule 1:</b> Short cells mature into long cells when
+            they reach a certain length (2x in this simulation). The orientation
+            remains the same.
           </li>
           <li>
-            When a long cell divides, it splits into a long cell and a short
-            cell. The new long cell points the opposite direction. If the
-            original long cell is visualized as an arrow, the long cell goes at
-            the tail, and the short cell goes at the tip. In other words, the
-            new cells point "outwards"
+            <b>Substitution Rule 2:</b> Long cells grow until they're long
+            enough to divide (3x length of short cell in this simulation). The
+            cells divide into two cells. The front of the old cell becomes a
+            short cell facing the same direction. The back of the old cell
+            becomes a long cell, but now is facing backwards.
           </li>
         </ul>
         <p>
-          The formal substitution rules can be written as an L-system as
-          follows. Note that even though conceptually there are only 2
-          subsitution rules (maturation and cell division), you need to use 4
-          rules to correctly handle the orientation and order of the symbols
+          The substitution rules can be written more formally as the following
+          L-system. Notice that you need 4 rules instead of 2 to handle the
+          orientation of the cells.
         </p>
         <!-- prettier-ignore -->
         <p>

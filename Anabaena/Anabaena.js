@@ -242,6 +242,7 @@ export const sketch = (p) => {
 
     const checkbox = document.getElementById("arrows");
     checkbox.addEventListener("change", (e) => {
+      // @ts-ignore
       show_arrows = e.target.checked;
     });
   };
