@@ -37,7 +37,8 @@
         </p>
         <p>
           This sketch is a combination of the animation technique used in the
-          <a href="../Worm/">Worm</a> sketch, but also uses an L-system to
+          <a href="../Worm/">Worm</a> sketch, but also uses an
+          <a href="https://en.wikipedia.org/wiki/L-system">L-system</a> to
           simulate bacterial growth.
         </p>
         <p>
@@ -59,8 +60,8 @@
         />
         <ul>
           <li>
-            The bacteria cells have two phases of life Young cells (\(S\) for
-            "short") and adult cells (\(L\) for "long").
+            The bacteria cells have two phases of life. Young cells (labeled
+            \(S\) for "short") and adult cells (labeled \(L\) for "long").
           </li>
           <li>
             We need to distinguish the front of the cell (\(\rightarrow\)) from
@@ -68,26 +69,27 @@
             placement of cell division.
           </li>
           <li>
-            <b>Start Rule:</b> I start the simulation with a single short cell
+            <b>Start Rule:</b> Start with a single cell. I chose to start with a
+            single short cell.
           </li>
-          <li><b>Growth Rule:</b>All cells grow linearly</li>
+          <li><b>Growth Rule:</b> All cells grow linearly.</li>
           <li>
-            <b>Subsitution Rule 1:</b> Short cells mature into long cells when
-            they reach a certain length (2x in this simulation). The orientation
-            remains the same.
+            <b>Subsitution Rule 1 (Maturation):</b> Short cells mature into long
+            cells when they reach a certain length (2x in this simulation). The
+            orientation remains the same.
           </li>
           <li>
-            <b>Substitution Rule 2:</b> Long cells grow until they're long
-            enough to divide (3x length of short cell in this simulation). The
-            cells divide into two cells. The front of the old cell becomes a
-            short cell facing the same direction. The back of the old cell
-            becomes a long cell, but now is facing backwards.
+            <b>Substitution Rule 2 (Cell Division):</b> Long cells grow until
+            they are big enough to divide (3x length of short cell in this
+            simulation). The cells divide into two cells. The front of the old
+            cell becomes a short cell facing the same direction. The back of the
+            old cell becomes a long cell, facing backwards.
           </li>
         </ul>
         <p>
-          The substitution rules can be written more formally as the following
-          L-system. Notice that you need 4 rules instead of 2 to handle the
-          orientation of the cells.
+          The substitution rules can be written as the following L-system.
+          Notice that you need 4 rules instead of 2 to handle the
+          forward/backward versions of each symbol.
         </p>
         <!-- prettier-ignore -->
         <p>
@@ -104,9 +106,12 @@
             \end{align}$$
         </p>
         <p>
-          One interesting detail about this L-system is the overall growth
-          pattern follows the Fibonacci sequence. For example, let's look at the
-          lengths of the first several iterations:
+          <cite>The Algorithmic Beauty of Plants</cite> also mentions another
+          curious detail in Section 1.9. The <i>anabaena</i> L-system describes
+          growth that follows the
+          <a href="https://en.wikipedia.org/wiki/Fibonacci_sequence"
+            >Fibonacci sequence</a
+          >. This can be seen by examining the length of each string of symbols:
         </p>
         <table>
           <thead>
