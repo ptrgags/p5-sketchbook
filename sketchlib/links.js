@@ -78,13 +78,6 @@ export const LINKS = [
     year: "2020",
   },
   {
-    // Due to the é, I have to list the links explicitly here.
-    link: "./Bezier/",
-    thumbnail: "thumbnails/bezier-curve.png",
-    title: "Bézier Curve",
-    year: "2016",
-  },
-  {
     title: "Hex Grid",
     year: "2016",
   },
