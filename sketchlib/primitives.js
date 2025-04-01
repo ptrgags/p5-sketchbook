@@ -28,6 +28,21 @@ export class LinePrimitive {
   }
 }
 
+/**
+ * Draw an arrow from tail to tip
+ */
+export class VectorPrimitive {
+  /**
+   * Constructor
+   * @param {Point} tail The tail end of the arrow
+   * @param {Point} tip The tip end of the arrow
+   */
+  constructor(tail, tip) {
+    this.tail = tail;
+    this.tip = tip;
+  }
+}
+
 export class BezierPrimitive {
   constructor(a, b, c, d) {
     this.a = a;
@@ -132,5 +147,5 @@ export class GroupPrimitive {
 }
 
 /**
- * @typedef {GroupPrimitive | BezierPrimitive | PolygonPrimitive | BezierPrimitive | LinePrimitive | RectPrimitive | CirclePrimitive | PointPrimitive} Primitive
+ * @typedef {GroupPrimitive | BezierPrimitive | PolygonPrimitive | BezierPrimitive | LinePrimitive | RectPrimitive | CirclePrimitive | PointPrimitive | BeziergonPrimitive | VectorPrimitive} Primitive
  */

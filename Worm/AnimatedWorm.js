@@ -9,7 +9,7 @@ import {
 import { Style } from "../sketchlib/Style.js";
 import { Color } from "../sketchlib/Style.js";
 import { Motor } from "../pga2d/versors.js";
-import { AnimationChain, Joint } from "./AnimationChain.js";
+import { AnimationChain, Joint } from "../sketchlib/AnimationChain.js";
 import { is_nearly } from "../sketchlib/is_nearly.js";
 import { GooglyEye } from "./GooglyEye.js";
 
