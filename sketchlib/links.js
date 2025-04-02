@@ -1,6 +1,10 @@
 // Links for all of the sketches. Links are added to the page in this order
 export const LINKS = [
   {
+    title: "Anabaena",
+    year: "2025",
+  },
+  {
     title: "Mosaic Slider",
     year: "2025",
   },
@@ -76,13 +80,6 @@ export const LINKS = [
   {
     title: "Primrose Field",
     year: "2020",
-  },
-  {
-    // Due to the é, I have to list the links explicitly here.
-    link: "./Bezier/",
-    thumbnail: "thumbnails/bezier-curve.png",
-    title: "Bézier Curve",
-    year: "2016",
   },
   {
     title: "Hex Grid",

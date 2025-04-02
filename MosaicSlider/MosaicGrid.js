@@ -5,7 +5,7 @@ import { GroupPrimitive, RectPrimitive } from "../sketchlib/primitives.js";
 import { Color, Style } from "../sketchlib/Style.js";
 import { PixelSwapPair } from "./PixelSwapPair.js";
 import { in_bounds } from "../sketchlib/in_bounds.js";
-import { sec_to_frames } from "./Tween.js";
+import { sec_to_frames } from "../sketchlib/Tween.js";
 
 const ROWS = 16;
 const COLS = 16;
