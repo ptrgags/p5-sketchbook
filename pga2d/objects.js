@@ -54,6 +54,10 @@ export class Point {
     return new Point(0, -y, x);
   }
 
+  static dir_from_angle(theta) {
+    return Point.direction(Math.cos(theta), Math.sin(theta));
+  }
+
   /**
    * Construct from a bivector
    * @param {Even} bivec The bivector that represents this point.
