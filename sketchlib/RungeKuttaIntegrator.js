@@ -7,7 +7,7 @@ import "./VectorSpace.js";
  */
 export class RungeKuttaIntegrator {
   /**
-   * @param {VectorSpace<V>} vector_space The underlying vector space over V
+   * @param {import("./VectorSpace.js").VectorSpace<V>} vector_space The underlying vector space over V
    * @param {function(number, V): V} motion_equation The equation of motion that takes
    * a state vector and current time and returns the instananeous time derivative of each variable
    * @param {V} initial_state The initial state at time 0

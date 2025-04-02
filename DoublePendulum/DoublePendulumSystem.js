@@ -1,5 +1,139 @@
-class DoublePendulumSystem {
-  constructor() {}
+import { Point } from "../pga2d/objects.js";
+import { GroupPrimitive, LinePrimitive } from "../sketchlib/primitives.js";
+import { RungeKuttaIntegrator } from "../sketchlib/RungeKuttaIntegrator.js";
+import { Color, Style } from "../sketchlib/Style.js";
+import { ValueHistory } from "../sketchlib/ValueHistory.js";
+import { GeneralizedCoordinates } from "../sketchlib/VectorSpace.js";
+
+const ARM_STYLE = new Style()
+  .with_stroke(new Color(255, 255, 255))
+  .with_width(2);
+
+export class Pendulum {
+  /**
+   *
+   * @param {number} mass The mass of the pendulum's bob
+   * @param {number} length The length of the pendulum
+   */
+  constructor(mass, length) {
+    this.mass = mass;
+    this.length = length;
+  }
+}
+
+export class DoublePendulumSystem {
+  constructor(pendulum1, pendulum2, initial_state, history_size) {
+    this.pendulum1 = pendulum1;
+    this.pendulum2 = pendulum2;
+
+    this.simulation = new RungeKuttaIntegrator(
+      GeneralizedCoordinates,
+      (t, state) => this.motion(state),
+      initial_state
+    );
+    this.history = new ValueHistory(history_size);
+    this.history.push(initial_state);
+
+    /*
+        this.bob_size1 = bob_r1
+        this.bob_size2 = bob_r2
+        this.l1 = l1
+        this.l2 = l2
+        
+        #These are in POLAR coordinates [r, theta]
+        self.bob_pos_rest1 = Vector(l1, -HALF_PI)
+        self.bob_pos_rest2 = Vector(l2, -HALF_PI)
+        
+        self.history_origin1 = self.bob_pos_rest1
+        self.history_origin2 = self.bob_pos_rest2
+        */
+  }
+
+  /**
+   *
+   * @param {number} dt The dt value for this step
+   */
+  step(dt) {
+    this.simulation.update(dt);
+    this.history.push(this.simulation.state);
+  }
+
+  /**
+   *
+   * @param {number[]} state The generalized coordinates [theta1, theta_dot1, theta2, theta_dot2] for the given state
+   * @returns {number[]} The instantaneous derivatives [theta_dot1, alpha1, theta_dot2, alpha2]
+   */
+  motion(state) {
+    const [theta1, theta_dot1, theta2, theta_dot2] = state;
+
+    const { mass: m1, length: l1 } = this.pendulum1;
+    const { mass: m2, length: l2 } = this.pendulum2;
+
+    const g = 9.81;
+
+    // convenience substitutions
+    const M = m1 + m2;
+    const m2_half = m2 / 2.0;
+
+    // Trig functions
+    const a = theta1 - theta2;
+    const cos_a = Math.cos(a);
+    const sin_a = Math.sin(a);
+    const cos_sq_a = cos_a * cos_a;
+    const b = theta1 - 2.0 * theta2;
+    const sin_b = Math.sin(b);
+    const th1_dot_sq = theta_dot1 * theta_dot1;
+    const th2_dot_sq = theta_dot2 * theta_dot2;
+    const sin_th1 = Math.sin(theta1);
+    const sin_th2 = Math.sin(theta2);
+
+    // Denominators for the two equations are similar
+    const denom = M - m2 * cos_sq_a;
+    const denom1 = -denom * l1;
+    const denom2 = denom * l2;
+
+    // Numerator for angular acceleration 1
+    const term1 = l1 * m2 * th1_dot_sq * sin_a * cos_a;
+    const term2 = th2_dot_sq * l2 * m2 * sin_a;
+    const term3 = g * m1 * sin_th1;
+    const term4 = g * m2_half * sin_th1;
+    const term5 = g * m2_half * sin_b;
+    const num1 = term1 + term2 + term3 + term4 + term5;
+
+    // Numerator for angular acceleration 2
+    const term6 = -th1_dot_sq * l1 * sin_a;
+    const term7 = g * sin_th2;
+    const half_one = -M * (term6 + term7);
+    const term8 = th2_dot_sq * l2 * m2 * sin_a;
+    const term9 = g * M * sin_th1;
+    const half_two = (term8 + term9) * cos_a;
+    const num2 = half_one + half_two;
+
+    // Angular acceleration
+    const alpha1 = num1 / denom1;
+    const alpha2 = num2 / denom2;
+
+    return [theta_dot1, alpha1, theta_dot2, alpha2];
+  }
+
+  render(anchor_point) {
+    const [theta1, , theta2] = this.simulation.state;
+
+    const PIXEL_SCALE = 100;
+    const bob_offset1 = Point.dir_from_angle(Math.PI / 2 - theta1).scale(
+      this.pendulum1.length * PIXEL_SCALE
+    );
+    const bob_offset2 = Point.dir_from_angle(Math.PI / 2 - theta2).scale(
+      this.pendulum2.length * PIXEL_SCALE
+    );
+    const bob_position1 = anchor_point.add(bob_offset1);
+    const bob_position2 = bob_position1.add(bob_offset2);
+
+    const arm1 = new LinePrimitive(anchor_point, bob_position1);
+    const arm2 = new LinePrimitive(bob_position1, bob_position2);
+
+    return new GroupPrimitive([arm1, arm2], ARM_STYLE);
+  }
 }
 
 /*from physics.graphics import circle

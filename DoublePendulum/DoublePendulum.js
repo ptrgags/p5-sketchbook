@@ -1,4 +1,13 @@
+import { Point } from "../pga2d/objects.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
+import { draw_primitive } from "../sketchlib/draw_primitive.js";
+import { DoublePendulumSystem, Pendulum } from "./DoublePendulumSystem.js";
+
+const PENDULUM1 = new Pendulum(1.0, 1.0);
+const PENDULUM2 = new Pendulum(1.0, 1.0);
+const INITIAL_STATE = [0.9 * Math.PI, 0.0, Math.PI / 2, 0.0];
+const SYSTEM = new DoublePendulumSystem(PENDULUM1, PENDULUM2, INITIAL_STATE);
+const DELTA_TIME = 0.01;
 
 export const sketch = (p) => {
   p.setup = () => {
@@ -12,6 +21,11 @@ export const sketch = (p) => {
 
   p.draw = () => {
     p.background(0);
+
+    const center_offset = Point.point(p.width / 2, p.height / 2);
+    draw_primitive(p, SYSTEM.render(center_offset));
+
+    SYSTEM.step(DELTA_TIME);
   };
 };
 
