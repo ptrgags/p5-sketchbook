@@ -92,7 +92,7 @@ export const sketch = (p) => {
     player = new Player(
       resources.sprites.walk,
       resources.sprites.idle,
-      Point.direction(1, 6).scale(TILE_SIZE)
+      Point.direction(4, 9).scale(TILE_SIZE)
     );
 
     p.noSmooth();
