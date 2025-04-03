@@ -2,13 +2,13 @@ import { Grid, Index2D } from "./Grid.js";
 import { Random } from "./random.js";
 import { DFS } from "./DFS.js";
 import { FlagSet } from "./FlagSet.js";
-import { GridDirection } from "./GridDiection.js";
+import { Direction, opposite } from "./Direction.js";
 import { GridDFSTraversal } from "./GridDFSTraversal.js";
 
 export class MazeCell {
   constructor(index) {
     this.index = index;
-    this.connection_flags = new FlagSet(0, GridDirection.COUNT);
+    this.connection_flags = new FlagSet(0, Direction.COUNT);
   }
 
   is_connected(direction) {
@@ -16,7 +16,7 @@ export class MazeCell {
   }
 
   static connect_neighbors(cell_a, cell_b, dir_ab) {
-    const dir_ba = GridDirection.opposite(dir_ab);
+    const dir_ba = opposite(dir_ab);
     cell_a.connection_flags.set_flag(dir_ab);
     cell_b.connection_flags.set_flag(dir_ba);
   }

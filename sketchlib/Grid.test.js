@@ -1,6 +1,6 @@
 import { describe, it, expect, test } from "vitest";
 import { Grid, griderator, Index2D } from "./Grid";
-import { GridDirection } from "./GridDiection";
+import { Direction } from "./Direction";
 
 describe("Index2D", () => {
   it("throws for negative row", () => {
@@ -86,10 +86,10 @@ describe("Index2D", () => {
     });
 
     test.each([
-      ["right", 1, 6, GridDirection.RIGHT],
-      ["up", 0, 5, GridDirection.UP],
-      ["left", 1, 4, GridDirection.LEFT],
-      ["down", 2, 5, GridDirection.DOWN],
+      ["right", 1, 6, Direction.RIGHT],
+      ["up", 0, 5, Direction.UP],
+      ["left", 1, 4, Direction.LEFT],
+      ["down", 2, 5, Direction.DOWN],
     ])(
       "with adjacent cell returns the correct direction: %s",
       (label, i, j, expected) => {

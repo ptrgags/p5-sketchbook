@@ -1,4 +1,4 @@
-import { GridDirection } from "./GridDiection.js";
+import { Direction } from "./Direction.js";
 
 /**
  * Iterate over a 2D range of values, performing an action at each step.
@@ -84,7 +84,7 @@ export class Index2D {
   /**
    * Compute the direction to a neighboring cell.
    * @param {Index2D} other Another cell
-   * @returns {GridDirection|undefined} If the cell neighbors this one, the grid direction is returned. Else undefined is returned to indicate not adjacent.
+   * @returns {Direction|undefined} If the cell neighbors this one, the grid direction is returned. Else undefined is returned to indicate not adjacent.
    */
   direction_to(other) {
     const { i: ai, j: aj } = this;
@@ -94,19 +94,19 @@ export class Index2D {
     const dj = bj - aj;
 
     if (dj === 1 && di === 0) {
-      return GridDirection.RIGHT;
+      return Direction.RIGHT;
     }
 
     if (dj === -1 && di === 0) {
-      return GridDirection.LEFT;
+      return Direction.LEFT;
     }
 
     if (dj === 0 && di === 1) {
-      return GridDirection.DOWN;
+      return Direction.DOWN;
     }
 
     if (dj === 0 && di === -1) {
-      return GridDirection.UP;
+      return Direction.UP;
     }
 
     return undefined;

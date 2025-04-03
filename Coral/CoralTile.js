@@ -1,14 +1,17 @@
 import { ControlPoint } from "./ControlPoint.js";
 import { Point } from "../pga2d/objects.js";
 import { Rect } from "./Rect.js";
-import { GridDirection } from "../sketchlib/GridDiection.js";
 import { FlagSet } from "../sketchlib/FlagSet.js";
+import { Direction } from "../sketchlib/Direction.js";
 
 const DIR_LEFT = Point.DIR_X.neg();
 const DIR_RIGHT = Point.DIR_X;
 const DIR_UP = Point.DIR_Y;
 const DIR_DOWN = Point.DIR_Y.neg();
 
+/**
+ * @enum {number}
+ */
 export const Quadrant = {
   SOUTHEAST: 0,
   NORTHEAST: 1,
@@ -22,10 +25,10 @@ export class CoralTile {
     this.quad = quad;
     this.connection_flags = connection_flags;
 
-    const connects_down = connection_flags.has_flag(GridDirection.DOWN);
-    const connects_right = connection_flags.has_flag(GridDirection.RIGHT);
-    const connects_up = connection_flags.has_flag(GridDirection.UP);
-    const connects_left = connection_flags.has_flag(GridDirection.LEFT);
+    const connects_down = connection_flags.has_flag(Direction.DOWN);
+    const connects_right = connection_flags.has_flag(Direction.RIGHT);
+    const connects_up = connection_flags.has_flag(Direction.UP);
+    const connects_left = connection_flags.has_flag(Direction.LEFT);
 
     const se_dir = connects_down ? DIR_UP : DIR_RIGHT;
     const ne_dir = connects_right ? DIR_LEFT : DIR_UP;
@@ -106,7 +109,7 @@ export class CoralTile {
       throw new Error("connections must be an int");
     }
 
-    const connection_flags = new FlagSet(connections, GridDirection.COUNT);
+    const connection_flags = new FlagSet(connections, Direction.COUNT);
 
     if (!Array.isArray(control_points) || control_points.length !== 4) {
       throw new Error("control_points must be an array of length 4");
