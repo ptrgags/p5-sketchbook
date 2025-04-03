@@ -154,6 +154,8 @@ export const sketch = (p) => {
     if (DPad.is_dpad_key(p.key)) {
       DPAD.pressed(p.key);
       player.handle_input(DPAD.direction);
+    } else if (p.key === "z") {
+      player.handle_run(true);
     }
   };
 
@@ -161,6 +163,8 @@ export const sketch = (p) => {
     if (DPad.is_dpad_key(p.key)) {
       DPAD.released(p.key);
       player.handle_input(DPAD.direction);
+    } else if (p.key === "z") {
+      player.handle_run(false);
     }
   };
 };

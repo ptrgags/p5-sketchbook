@@ -12,11 +12,14 @@ const MovementState = {
 };
 Object.freeze(MovementState);
 
+// How fast to update the animation t value for sprites
 const ANIMATION_SPEED_SLOW = 0.1;
 const ANIMATION_SPEED_MEDIUM = 0.2;
-const ANIMATION_SPEED_FAST = 0.4;
+const ANIMATION_SPEED_FAST = 0.41;
 
-const WALK_DURATION = sec_to_frames(0.2);
+// How long the position tweens should take
+const DURATION_WALK = sec_to_frames(0.2);
+const DURATION_WALK_IN_PLACE = sec_to_frames(0.15);
 
 export class Player {
   constructor(walk_sprites, idle_sprites, position) {
@@ -28,15 +31,21 @@ export class Player {
     this.state = MovementState.IDLE;
 
     this.animation_t = 0;
-    this.animation_speed = ANIMATION_SPEED_FAST;
+    this.animation_speed = ANIMATION_SPEED_SLOW;
 
     this.input_direction = undefined;
 
     this.movement_tween = undefined;
+
+    this.is_running = false;
   }
 
   handle_input(direction) {
     this.input_direction = direction;
+  }
+
+  handle_run(run_button_pressed) {
+    this.is_running = run_button_pressed;
   }
 
   find_destination_cell(tilemap, position, direction) {
@@ -68,7 +77,7 @@ export class Player {
         this.position,
         destination,
         start_frame,
-        WALK_DURATION
+        DURATION_WALK
       );
       this.animation_speed = ANIMATION_SPEED_MEDIUM;
     } else {
@@ -78,7 +87,7 @@ export class Player {
         this.position,
         this.position,
         start_frame,
-        WALK_DURATION
+        DURATION_WALK_IN_PLACE
       );
       // Render the walk cycle slower to look like we're obstructed
       this.animation_speed = ANIMATION_SPEED_SLOW;
@@ -88,24 +97,13 @@ export class Player {
   }
 
   /**
-   *
+   * Update logic for the IDLE state
    * @param {number} frame The frame number
    * @param {Tilemap} tilemap the tilemap
    */
   update_idle(frame, tilemap) {
     if (this.input_direction === this.direction) {
       this.start_moving(tilemap, frame);
-      /*
-      const offset = to_y_down(this.input_direction).scale(TILE_SIZE);
-      const destination = this.position.add(offset);
-      this.movement_tween = new Tween(
-        this.position,
-        destination,
-        frame,
-        WALK_DURATION
-      );
-      this.state = MovementState.MOVING;
-      */
     } else if (this.input_direction !== undefined) {
       // turn in place
       this.direction = this.input_direction;
@@ -113,7 +111,7 @@ export class Player {
   }
 
   /**
-   *
+   * update logic for the MOVING state
    * @param {number} frame The frame number
    * @param {Tilemap} tilemap the tilemap
    */
@@ -123,22 +121,12 @@ export class Player {
       // still moving, so restart the animation
       this.position = this.movement_tween.end_value;
       this.start_moving(tilemap, frame);
-      /*
-      
-      const offset = to_y_down(this.input_direction).scale(TILE_SIZE);
-      const destination = this.position.add(offset);
-      this.movement_tween = new Tween(
-        this.position,
-        destination,
-        frame,
-        WALK_DURATION
-      );
-      */
       this.direction = this.input_direction;
     } else if (is_done) {
       // go back to idling
       this.position = this.movement_tween.end_value;
       this.state = MovementState.IDLE;
+      this.animation_speed = ANIMATION_SPEED_SLOW;
       this.movement_tween = undefined;
       this.destination = undefined;
     }
@@ -151,7 +139,9 @@ export class Player {
    */
   update(frame, tilemap) {
     // Update the animation
-    this.animation_t += this.animation_speed;
+    this.animation_t += this.is_running
+      ? ANIMATION_SPEED_FAST
+      : this.animation_speed;
 
     if (this.state === MovementState.IDLE) {
       this.update_idle(frame, tilemap);
