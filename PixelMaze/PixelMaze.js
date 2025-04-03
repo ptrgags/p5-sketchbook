@@ -101,7 +101,7 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    player.update(p.frameCount);
+    player.update(p.frameCount, tilemap.tilemap);
     const { position, sprite, t } = player.draw(p.frameCount);
 
     const VIEWPORT_DIMENSIONS = Point.direction(WIDTH, HEIGHT);

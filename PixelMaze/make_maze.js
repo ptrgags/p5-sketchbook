@@ -5,7 +5,7 @@ import { generate_maze, MazeCell } from "../sketchlib/RandomDFSMaze.js";
 /**
  * @enum {number}
  */
-const Tiles = {
+export const Tiles = {
   CEILING: 0,
   WALL: 1,
   FLOOR: 2,

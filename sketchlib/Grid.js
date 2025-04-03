@@ -257,6 +257,31 @@ export class Grid {
     return index.down();
   }
 
+  /**
+   * Get a neighbor from the grid.
+   * @param {Index2D} index the index to check
+   * @param {Direction} direction The direction to the adjacent cell
+   * @returns {Index2D | undefined} The neighbor, or undefined if at the edge
+   * of the grid.
+   */
+  get_neighbor(index, direction) {
+    switch (direction) {
+      case Direction.RIGHT:
+        return this.right(index);
+      case Direction.UP:
+        return index.up();
+      case Direction.LEFT:
+        return index.left();
+      case Direction.DOWN:
+        return this.down(index);
+    }
+  }
+
+  /**
+   * Check if an index is in the bounds of the grid
+   * @param {Index2D} index The index to check
+   * @returns {boolean} true if the index is in bounds
+   */
   in_bounds(index) {
     const { i, j } = index;
 
