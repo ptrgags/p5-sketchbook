@@ -1,9 +1,8 @@
 import { Point } from "../pga2d/objects.js";
 import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
-import { Grid, Index2D } from "../sketchlib/Grid.js";
-import { GridDirection } from "../sketchlib/GridDiection.js";
-import { generate_maze } from "../sketchlib/RandomDFSMaze.js";
+import { Direction } from "../sketchlib/Direction.js";
 import { blit_sprite, blit_tilemap, P5Sprite, P5Tilemap } from "./blit.js";
+import { DPad } from "./DPad.js";
 import { make_maze } from "./make_maze.js";
 import { parse_resources } from "./parse_resources.js";
 import { Player } from "./Player.js";
@@ -51,50 +50,6 @@ const RESOURCE_MANIFEST = {
   },
 };
 
-const ARROW_KEYS = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"];
-
-class DPad {
-  constructor() {
-    this.direction = undefined;
-
-    this.keys_down = [false, false, false, false];
-  }
-
-  pressed(key) {
-    const direction = DPad.get_direction(key);
-    this.keys_down[direction] = true;
-    this.direction = direction;
-  }
-
-  released(key) {
-    const direction = DPad.get_direction(key);
-    this.keys_down[direction] = false;
-
-    // If there were other arrow keys pressed, switch to the first one
-    // we find.
-    const index = this.keys_down.findIndex((x) => x === true);
-    if (index !== -1) {
-      this.direction = index;
-    } else {
-      this.direction = undefined;
-    }
-  }
-
-  static get_direction(key) {
-    switch (key) {
-      case "ArrowLeft":
-        return GridDirection.LEFT;
-      case "ArrowRight":
-        return GridDirection.RIGHT;
-      case "ArrowUp":
-        return GridDirection.UP;
-      case "ArrowDown":
-        return GridDirection.DOWN;
-    }
-    return undefined;
-  }
-}
-
 const DPAD = new DPad();
 
 export const sketch = (p) => {
@@ -126,7 +81,7 @@ export const sketch = (p) => {
 
     current_sprite = new P5Sprite(
       p5_resources.images.character,
-      resources.sprites.walk[GridDirection.LEFT]
+      resources.sprites.walk[Direction.LEFT]
     );
     tilemap = new P5Tilemap(
       p5_resources.images.tileset,
@@ -167,14 +122,14 @@ export const sketch = (p) => {
   };
 
   p.keyPressed = () => {
-    if (ARROW_KEYS.includes(p.key)) {
+    if (DPad.is_dpad_key(p.key)) {
       DPAD.pressed(p.key);
       player.handle_input(DPAD.direction);
     }
   };
 
   p.keyReleased = () => {
-    if (ARROW_KEYS.includes(p.key)) {
+    if (DPad.is_dpad_key(p.key)) {
       DPAD.released(p.key);
       player.handle_input(DPAD.direction);
     }

@@ -1,6 +1,7 @@
 import { sec_to_frames, Tween } from "../MosaicSlider/Tween.js";
-import { Point } from "../pga2d/objects.js";
-import { GridDirection } from "../sketchlib/GridDiection.js";
+import { Direction, to_y_down } from "../sketchlib/Direction.js";
+
+const TILE_SIZE = 16;
 
 const MovementState = {
   IDLE: 0,
@@ -17,7 +18,7 @@ const WALK_DURATION = sec_to_frames(0.2);
 export class Player {
   constructor(walk_sprites, idle_sprites, position) {
     this.position = position;
-    this.direction = GridDirection.RIGHT;
+    this.direction = Direction.RIGHT;
     this.walk_sprites = walk_sprites;
     this.idle_sprites = idle_sprites;
 
@@ -37,7 +38,8 @@ export class Player {
 
   update_idle(frame) {
     if (this.input_direction === this.direction) {
-      const destination = this.position.add(Point.direction(16, 0));
+      const offset = to_y_down(this.input_direction).scale(TILE_SIZE);
+      const destination = this.position.add(offset);
       this.movement_tween = new Tween(
         this.position,
         destination,
@@ -56,7 +58,8 @@ export class Player {
     if (is_done && this.input_direction !== undefined) {
       // still moving, so restart the animation
       this.position = this.movement_tween.end_value;
-      const destination = this.position.add(Point.direction(16, 0));
+      const offset = to_y_down(this.input_direction).scale(TILE_SIZE);
+      const destination = this.position.add(offset);
       this.movement_tween = new Tween(
         this.position,
         destination,

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Direction, opposite, to_pga_direction } from "./Direction.js";
+import { Direction, opposite, to_y_up, to_y_down } from "./Direction.js";
 import { Point } from "../pga2d/objects.js";
 import { PGA_MATCHERS } from "../pga2d/pga_matchers";
 
@@ -28,29 +28,55 @@ describe("Direction", () => {
     expect(down_opp).toBe(up);
   });
 
-  describe("to_pga_direction", () => {
+  describe("to_y_up", () => {
     it("RIGHT corresponds to +x", () => {
-      const result = to_pga_direction(Direction.RIGHT);
+      const result = to_y_up(Direction.RIGHT);
 
       expect(result).toBePoint(Point.DIR_X);
     });
 
     it("LEFT corresponds to -x", () => {
-      const result = to_pga_direction(Direction.LEFT);
+      const result = to_y_up(Direction.LEFT);
 
       expect(result).toBePoint(Point.DIR_X.scale(-1));
     });
 
     it("UP corresponds to +y", () => {
-      const result = to_pga_direction(Direction.UP);
+      const result = to_y_up(Direction.UP);
 
       expect(result).toBePoint(Point.DIR_Y);
     });
 
     it("DOWN corresponds to -y", () => {
-      const result = to_pga_direction(Direction.DOWN);
+      const result = to_y_up(Direction.DOWN);
 
       expect(result).toBePoint(Point.DIR_Y.scale(-1));
+    });
+  });
+
+  describe("to_y_down", () => {
+    it("RIGHT corresponds to +x", () => {
+      const result = to_y_down(Direction.RIGHT);
+
+      expect(result).toBePoint(Point.DIR_X);
+    });
+
+    it("LEFT corresponds to -x", () => {
+      const result = to_y_down(Direction.LEFT);
+
+      expect(result).toBePoint(Point.DIR_X.scale(-1));
+    });
+
+    it("UP corresponds to -y", () => {
+      const result = to_y_down(Direction.UP);
+
+      expect(result).toBePoint(Point.DIR_Y.neg());
+    });
+
+    it("DOWN corresponds to +y", () => {
+      const result = to_y_down(Direction.DOWN);
+
+      expect(result).toBePoint(Point.DIR_Y);
     });
   });
 });
