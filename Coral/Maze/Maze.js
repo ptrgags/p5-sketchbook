@@ -1,7 +1,6 @@
 import { GroupPrimitive } from "../../sketchlib/primitives.js";
-import { Color, Style } from "../../sketchlib/Style.js";
 import { draw_primitive } from "../../sketchlib/draw_primitive.js";
-import { generate_maze } from "./RandomDFSMaze.js";
+import { generate_maze } from "../../sketchlib/RandomDFSMaze.js";
 import { CoralTile } from "../CoralTile.js";
 import { Rect } from "../Rect.js";
 import {

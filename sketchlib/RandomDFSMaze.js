@@ -1,9 +1,9 @@
-import { Grid, Index2D } from "../../sketchlib/Grid.js";
-import { Random } from "../../sketchlib/random.js";
-import { DFS } from "../../sketchlib/DFS.js";
-import { FlagSet } from "../../sketchlib/FlagSet.js";
-import { GridDirection } from "../../sketchlib/GridDiection.js";
-import { GridDFSTraversal } from "../../sketchlib/GridDFSTraversal.js";
+import { Grid, Index2D } from "./Grid.js";
+import { Random } from "./random.js";
+import { DFS } from "./DFS.js";
+import { FlagSet } from "./FlagSet.js";
+import { GridDirection } from "./GridDiection.js";
+import { GridDFSTraversal } from "./GridDFSTraversal.js";
 
 export class MazeCell {
   constructor(index) {
@@ -60,6 +60,12 @@ export class RandomDFSMazeTraversal {
   }
 }
 
+/**
+ * Generate a maze using DFS
+ * @param {number} rows The number of rows
+ * @param {number} cols The number of cols
+ * @returns {Grid<MazeCell>} A grid of cells connected like a maze
+ */
 export function generate_maze(rows, cols) {
   const grid = new Grid(rows, cols);
   grid.fill((index) => {
