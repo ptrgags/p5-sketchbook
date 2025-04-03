@@ -10,7 +10,7 @@ import { preload_p5_resources } from "./preload.js";
 import { Tilemap } from "./Tilemap.js";
 
 const TILE_SIZE = 16;
-const TILE_SCALE = 2;
+const TILE_SCALE = 1;
 
 const MAZE_ROWS = 4;
 const MAZE_COLS = 3;
@@ -69,6 +69,7 @@ export const sketch = (p) => {
   let current_sprite;
   let tilemap;
   let player;
+  let viewport_offset = Point.ORIGIN;
 
   p.preload = () => {
     preload_p5_resources(p, RESOURCE_MANIFEST, p5_resources);
@@ -100,23 +101,51 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    p.push();
-    p.scale(TILE_SCALE, TILE_SCALE);
-    blit_tilemap(p, tilemap, Point.ORIGIN);
-
-    //const t = p.frameCount / 16.0;
-
     player.update(p.frameCount);
     const { position, sprite, t } = player.draw(p.frameCount);
+
+    const VIEWPORT_DIMENSIONS = Point.direction(WIDTH, HEIGHT);
+    const VIEWPORT_MARGIN = Point.direction(2 * TILE_SIZE, 3 * TILE_SIZE);
+
+    const { x, y } = position.sub(VIEWPORT_DIMENSIONS.scale(0.5));
+    viewport_offset = Point.direction(Math.round(x), Math.round(y));
+    //viewport_offset.x = Math.round(viewport_offset.x);
+    //viewport_offset.y = Math.round(viewport_offset.y);
+
+    /*
+    const from_viewport = position.sub(viewport_offset);
+
+    let viewport_x = viewport_offset.x;
+    if (from_viewport.x < VIEWPORT_MARGIN.x) {
+      viewport_x = position.x - VIEWPORT_MARGIN.x;
+    } else {
+      viewport_x =
+        position.x + TILE_SIZE + VIEWPORT_MARGIN.x - VIEWPORT_DIMENSIONS.x;
+    }
+
+    let viewport_y = viewport_offset.y;
+    if (from_viewport.y < VIEWPORT_MARGIN.y) {
+      // TODO: The TILE_SIZE should be pulled from sprite direction
+      viewport_y = position.y - TILE_SIZE - VIEWPORT_MARGIN.y;
+    } else {
+      viewport_y =
+        position.y + TILE_SIZE + VIEWPORT_MARGIN.y - VIEWPORT_DIMENSIONS.y;
+    }
+
+    viewport_offset = Point.direction(viewport_x, viewport_y);
+    */
+
+    p.push();
+    p.scale(TILE_SCALE, TILE_SCALE);
+
+    blit_tilemap(p, tilemap, viewport_offset.neg());
+
     blit_sprite(
       p,
       new P5Sprite(p5_resources.images.character, sprite),
       t,
-      position
+      position.sub(viewport_offset)
     );
-
-    //const sprite_pos = Point.direction(1, 6).scale(TILE_SIZE);
-    //blit_sprite(p, current_sprite, t, sprite_pos);
 
     p.pop();
   };
