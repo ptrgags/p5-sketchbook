@@ -9,11 +9,44 @@ import { prevent_mobile_scroll } from "../sketchlib/prevent_mobile_scroll.js";
 // clouds, sky, grass, dirt
 const INITIAL_COLORS = ["#ccf0ef", "#5697d8", "#456538", "#633912"];
 
+class SoundManager {
+  constructor() {
+    this.player = undefined;
+    this.audio_ready = true;
+  }
+
+  async init() {
+    // idempotent
+    if (this.init_requested) {
+      return;
+    }
+
+    this.init_requested = true;
+
+    await Tone.start();
+    this.player = new Tone.Player("./sounds/whish.wav").toDestination();
+    this.player.volume.value = -9;
+    await Tone.loaded();
+
+    this.audio_ready = true;
+  }
+
+  async play_sound() {
+    if (!this.audio_ready) {
+      return;
+    }
+
+    this.player.start();
+  }
+}
+
+const SOUND = new SoundManager();
+
 export const sketch = (p) => {
   let canvas;
 
   const colors = INITIAL_COLORS.map((x) => Color.from_hex_code(x));
-  const mosaic = new InteractiveMosaic(colors);
+  const mosaic = new InteractiveMosaic(colors, SOUND);
 
   function init_color_pickers() {
     for (const [i, color] of colors.entries()) {
@@ -68,16 +101,19 @@ export const sketch = (p) => {
   };
 
   p.mousePressed = () => {
+    SOUND.init();
     const mouse = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
     mosaic.mouse_press(mouse);
   };
 
   p.mouseDragged = () => {
+    SOUND.init();
     const mouse = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
     mosaic.mouse_drag(mouse);
   };
 
   p.mouseReleased = () => {
+    SOUND.init();
     mosaic.mouse_release();
   };
 };

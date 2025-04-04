@@ -21,7 +21,7 @@ export class InteractiveMosaic {
    * Constructor
    * @param {Color[]} colors An array of 4 colors to apply to the four quadrants of the mosaic grid
    */
-  constructor(colors) {
+  constructor(colors, sound) {
     this.grid = new MosaicGrid(colors);
     this.state = SliderState.IDLE;
 
@@ -33,6 +33,8 @@ export class InteractiveMosaic {
     this.swap_pair = undefined;
     this.mouse = Point.point(0, 0);
     this.mouse_down = false;
+
+    this.sound = sound;
   }
 
   /**
@@ -71,6 +73,7 @@ export class InteractiveMosaic {
     // If the mouse moved to one of the selected cell's neighbors, start
     // the swapping animation
     if (this.dst_index) {
+      this.sound.play_sound();
       this.swap_pair = this.grid.pop_out_pair(
         this.src_index,
         this.dst_index,
