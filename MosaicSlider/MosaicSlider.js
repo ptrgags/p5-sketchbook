@@ -4,43 +4,23 @@ import { draw_primitive } from "../sketchlib/draw_primitive.js";
 import { fix_mouse_coords } from "../sketchlib/fix_mouse_coords.js";
 import { InteractiveMosaic } from "./InteractiveMosaic.js";
 import { prevent_mobile_scroll } from "../sketchlib/prevent_mobile_scroll.js";
+import { SoundManager } from "./SoundManager.js";
 
 //const INITIAL_COLORS = ["#231f20", "#bb4430", "#7ebdc2", "#f3dfa2"];
 // clouds, sky, grass, dirt
 const INITIAL_COLORS = ["#ccf0ef", "#5697d8", "#456538", "#633912"];
 
-class SoundManager {
-  constructor() {
-    this.player = undefined;
-    this.audio_ready = true;
-  }
+const SOUND_MANIFEST = {
+  sfx: {
+    whish: {
+      url: "./sounds/whish.wav",
+      volume: -9,
+    },
+  },
+};
 
-  async init() {
-    // idempotent
-    if (this.init_requested) {
-      return;
-    }
-
-    this.init_requested = true;
-
-    await Tone.start();
-    this.player = new Tone.Player("./sounds/whish.wav").toDestination();
-    this.player.volume.value = -9;
-    await Tone.loaded();
-
-    this.audio_ready = true;
-  }
-
-  async play_sound() {
-    if (!this.audio_ready) {
-      return;
-    }
-
-    this.player.start();
-  }
-}
-
-const SOUND = new SoundManager();
+//@ts-ignore
+const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
 
 export const sketch = (p) => {
   let canvas;
@@ -90,6 +70,10 @@ export const sketch = (p) => {
 
     init_color_pickers();
     init_image_save_button();
+
+    mosaic.events.addEventListener("start-swap", () => {
+      SOUND.play_sfx("whish");
+    });
   };
 
   p.draw = () => {

@@ -34,7 +34,7 @@ export class InteractiveMosaic {
     this.mouse = Point.point(0, 0);
     this.mouse_down = false;
 
-    this.sound = sound;
+    this.events = new EventTarget();
   }
 
   /**
@@ -73,7 +73,8 @@ export class InteractiveMosaic {
     // If the mouse moved to one of the selected cell's neighbors, start
     // the swapping animation
     if (this.dst_index) {
-      this.sound.play_sound();
+      // Dispatch an event to cue a sound effect
+      this.events.dispatchEvent(new CustomEvent("start-swap"));
       this.swap_pair = this.grid.pop_out_pair(
         this.src_index,
         this.dst_index,
