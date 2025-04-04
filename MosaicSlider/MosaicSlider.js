@@ -4,16 +4,29 @@ import { draw_primitive } from "../sketchlib/draw_primitive.js";
 import { fix_mouse_coords } from "../sketchlib/fix_mouse_coords.js";
 import { InteractiveMosaic } from "./InteractiveMosaic.js";
 import { prevent_mobile_scroll } from "../sketchlib/prevent_mobile_scroll.js";
+import { SoundManager } from "./SoundManager.js";
 
 //const INITIAL_COLORS = ["#231f20", "#bb4430", "#7ebdc2", "#f3dfa2"];
 // clouds, sky, grass, dirt
 const INITIAL_COLORS = ["#ccf0ef", "#5697d8", "#456538", "#633912"];
 
+const SOUND_MANIFEST = {
+  sfx: {
+    whish: {
+      url: "./sounds/whish.wav",
+      volume: -9,
+    },
+  },
+};
+
+//@ts-ignore
+const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
+
 export const sketch = (p) => {
   let canvas;
 
   const colors = INITIAL_COLORS.map((x) => Color.from_hex_code(x));
-  const mosaic = new InteractiveMosaic(colors);
+  const mosaic = new InteractiveMosaic(colors, SOUND);
 
   function init_color_pickers() {
     for (const [i, color] of colors.entries()) {
@@ -57,6 +70,10 @@ export const sketch = (p) => {
 
     init_color_pickers();
     init_image_save_button();
+
+    mosaic.events.addEventListener("start-swap", () => {
+      SOUND.play_sfx("whish");
+    });
   };
 
   p.draw = () => {
@@ -68,16 +85,19 @@ export const sketch = (p) => {
   };
 
   p.mousePressed = () => {
+    SOUND.init();
     const mouse = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
     mosaic.mouse_press(mouse);
   };
 
   p.mouseDragged = () => {
+    SOUND.init();
     const mouse = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
     mosaic.mouse_drag(mouse);
   };
 
   p.mouseReleased = () => {
+    SOUND.init();
     mosaic.mouse_release();
   };
 };
