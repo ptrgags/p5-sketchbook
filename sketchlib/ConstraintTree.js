@@ -18,19 +18,27 @@ export class Constraint {
 const ROT90 = Motor.rotation(Point.ORIGIN, Math.PI / 2);
 
 /**
- * Take two unit directions and compute the direction halfway between.
+ * Take two unit directions and compute the direction halfway between
  * @param {Point} a The first unit direction
  * @param {Point} b The first unit direction
  * @param {Point} tiebreak If the vectors are at 180 degrees, return this
  * direction
- * @return {Point} The halfway direction as a unit direction
+ * @return {Point} The halfway direction CCW from a to b as a unit direction
  */
 function halfway(a, b, tiebreak) {
+  // Tie break for straight angles
   if (is_nearly(a.dot(b), -1)) {
     return tiebreak;
   }
 
-  return a.add(b).normalize();
+  const { x: ax, y: ay } = a;
+  const { x: bx, y: by } = b;
+  const sign_vee = Math.sign(ax * by - ay * bx);
+  if (sign_vee < 1) {
+    return a.add(b).normalize();
+  }
+
+  return a.add(b).normalize().neg();
 }
 
 export class ConstraintJoint {
@@ -69,8 +77,8 @@ export class ConstraintJoint {
     // Four cardinal directions from the perspective of this point
     const dir_forward = this.orientation;
     const dir_backward = dir_forward.neg();
-    const dir_left = ROT90.transform_point(dir_forward);
-    const dir_right = ROT90.transform_point(dir_backward);
+    const dir_left = ROT90.transform_point(dir_forward).neg();
+    const dir_right = ROT90.transform_point(dir_backward).neg();
 
     // root node puts a vertex at the top to complete the loop
     if (parent === undefined) {
@@ -106,24 +114,31 @@ export class ConstraintJoint {
     // Recurse to the first child
     this.children[0].get_outline_vertices(output, this);
 
-    // Points between pairs of children
+    // For additional branches, interleave a vertex between the branches with the recursive calls.
+    for (let i = 1; i < this.children.length; i++) {
+      const dir_left_child = to_children[i - 1];
+      const dir_right_child = to_children[i];
+      const dir_between = halfway(
+        dir_left_child,
+        dir_right_child,
+        dir_backward
+      );
+      const between_point = this.position.add(
+        dir_between.scale(this.body_radius)
+      );
+      output.push(between_point);
+
+      this.children[i].get_outline_vertices(output, this);
+    }
 
     // Point on the right after all the children
     const dir_after = halfway(
-      dir_forward,
       to_children[to_children.length - 1],
+      dir_forward,
       dir_right
     );
     const after_point = this.position.add(dir_after.scale(this.body_radius));
     output.push(after_point);
-
-    // Recursively put the list of points together
-    // output.push(before_point)
-    // children[0].get_outline_vertices(output, this)
-    // for remaining children i=1...n-1:
-    //    output.push(between_points[i - 1])
-    //    children[i].get_outline_vertice(output, this)
-    // output.push(after_point)
   }
 
   /**
