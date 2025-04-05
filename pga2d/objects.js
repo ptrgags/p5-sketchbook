@@ -63,6 +63,14 @@ export class Point {
     return new Point(xy, xo, yo);
   }
 
+  to_direction() {
+    return Point.direction(this.x, this.y);
+  }
+
+  to_point() {
+    return Point.point(this.x, this.y);
+  }
+
   /**
    * @type {number}
    */

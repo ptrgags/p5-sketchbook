@@ -38,6 +38,10 @@ export class Sprite {
     this.origin = origin;
   }
 
+  get frame_size() {
+    return this.spritesheet.frame_size;
+  }
+
   /**
    * Get the frame ID for a given animation time
    * @param {number} t The animation time measured in frames since start of the animation

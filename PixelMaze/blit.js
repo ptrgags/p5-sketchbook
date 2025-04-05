@@ -1,6 +1,5 @@
 import { Point } from "../pga2d/objects.js";
 import { ImageFrames } from "./ImageFrames.js";
-import { Sprite } from "./Sprite.js";
 import { Tilemap } from "./Tilemap.js";
 
 /**
@@ -54,7 +53,14 @@ export class P5Sprite {
  */
 export function blit_sprite(p, p5_sprite, t, position) {
   const frame_id = p5_sprite.get_frame_id(t);
-  blit_frame(p, p5_sprite.p5_image, p5_sprite.spritesheet, frame_id, position);
+  const origin = p5_sprite.sprite.origin;
+  blit_frame(
+    p,
+    p5_sprite.p5_image,
+    p5_sprite.spritesheet,
+    frame_id,
+    position.sub(origin)
+  );
 }
 
 export class P5Tilemap {

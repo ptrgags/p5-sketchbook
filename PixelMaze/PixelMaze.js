@@ -8,12 +8,13 @@ import { parse_resources } from "./parse_resources.js";
 import { Player } from "./Player.js";
 import { preload_p5_resources } from "./preload.js";
 import { Tilemap } from "./Tilemap.js";
+import { Viewport } from "./Viewport.js";
 
 const TILE_SIZE = 16;
 const TILE_SCALE = 1;
 
-const MAZE_ROWS = 4;
-const MAZE_COLS = 3;
+const MAZE_ROWS = 8;
+const MAZE_COLS = 4;
 const INDICES = make_maze(MAZE_ROWS, MAZE_COLS);
 
 const ORIGIN_CHARACTER = Point.direction(0, TILE_SIZE);
@@ -51,6 +52,14 @@ const RESOURCE_MANIFEST = {
 };
 
 const DPAD = new DPad();
+
+const VIEWPORT_MARGIN = Point.direction(2 * TILE_SIZE, 3 * TILE_SIZE);
+const VIEWPORT = new Viewport(
+  Point.ORIGIN,
+  Point.direction(WIDTH, HEIGHT),
+  VIEWPORT_MARGIN,
+  TILE_SCALE
+);
 
 export const sketch = (p) => {
   let canvas;
@@ -92,7 +101,7 @@ export const sketch = (p) => {
     player = new Player(
       resources.sprites.walk,
       resources.sprites.idle,
-      Point.direction(4, 9).scale(TILE_SIZE)
+      Point.direction(4, 9).scale(TILE_SIZE).to_point()
     );
 
     p.noSmooth();
@@ -104,47 +113,18 @@ export const sketch = (p) => {
     player.update(p.frameCount, tilemap.tilemap);
     const { position, sprite, t } = player.draw(p.frameCount);
 
-    const VIEWPORT_DIMENSIONS = Point.direction(WIDTH, HEIGHT);
-    const VIEWPORT_MARGIN = Point.direction(2 * TILE_SIZE, 3 * TILE_SIZE);
-
-    const { x, y } = position.sub(VIEWPORT_DIMENSIONS.scale(0.5));
-    viewport_offset = Point.direction(Math.round(x), Math.round(y));
-    //viewport_offset.x = Math.round(viewport_offset.x);
-    //viewport_offset.y = Math.round(viewport_offset.y);
-
-    /*
-    const from_viewport = position.sub(viewport_offset);
-
-    let viewport_x = viewport_offset.x;
-    if (from_viewport.x < VIEWPORT_MARGIN.x) {
-      viewport_x = position.x - VIEWPORT_MARGIN.x;
-    } else {
-      viewport_x =
-        position.x + TILE_SIZE + VIEWPORT_MARGIN.x - VIEWPORT_DIMENSIONS.x;
-    }
-
-    let viewport_y = viewport_offset.y;
-    if (from_viewport.y < VIEWPORT_MARGIN.y) {
-      // TODO: The TILE_SIZE should be pulled from sprite direction
-      viewport_y = position.y - TILE_SIZE - VIEWPORT_MARGIN.y;
-    } else {
-      viewport_y =
-        position.y + TILE_SIZE + VIEWPORT_MARGIN.y - VIEWPORT_DIMENSIONS.y;
-    }
-
-    viewport_offset = Point.direction(viewport_x, viewport_y);
-    */
+    VIEWPORT.track_sprite(position, sprite);
 
     p.push();
     p.scale(TILE_SCALE, TILE_SCALE);
 
-    blit_tilemap(p, tilemap, viewport_offset.neg());
+    blit_tilemap(p, tilemap, VIEWPORT.get_tilemap_origin());
 
     blit_sprite(
       p,
       new P5Sprite(p5_resources.images.character, sprite),
       t,
-      position.sub(viewport_offset)
+      VIEWPORT.map_to_screen(position)
     );
 
     p.pop();
