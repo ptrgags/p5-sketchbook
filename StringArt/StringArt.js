@@ -26,9 +26,11 @@ export const sketch = (p) => {
   function configure_slider(id, index) {
     const slider = document.getElementById(id);
 
+    // @ts-ignore
     slider.value = coefficients[index];
 
     slider.addEventListener("input", (e) => {
+      // @ts-ignore
       coefficients[index] = parseInt(e.target.value);
     });
     slider.addEventListener("change", update_coefficients);
@@ -37,9 +39,11 @@ export const sketch = (p) => {
   function configure_animate_checkbox() {
     const checkbox = document.getElementById("animate");
 
+    // @ts-ignore
     checkbox.checked = false;
 
     checkbox.addEventListener("change", (e) => {
+      // @ts-ignore
       animate = e.target.checked;
     });
   }
@@ -47,9 +51,11 @@ export const sketch = (p) => {
   function configure_lines_checkbox() {
     const checkbox = document.getElementById("show-lines");
 
+    // @ts-ignore
     checkbox.checked = true;
 
     checkbox.addEventListener("change", (e) => {
+      // @ts-ignore
       show_lines = e.target.checked;
     });
   }

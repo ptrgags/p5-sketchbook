@@ -1,7 +1,7 @@
 import { Point } from "../pga2d/objects.js";
 import { GroupPrimitive, RectPrimitive } from "../sketchlib/primitives.js";
 import { Style } from "../sketchlib/Style.js";
-import { Tween } from "./Tween.js";
+import { Tween } from "../sketchlib/Tween.js";
 
 export class PixelSwapPair {
   /**
@@ -27,13 +27,13 @@ export class PixelSwapPair {
     this.style_b = style_b;
     this.position_a = position_a;
     this.position_b = position_b;
-    this.tween_ab = new Tween(
+    this.tween_ab = Tween.point(
       this.position_a,
       this.position_b,
       start_frame,
       duration_frames
     );
-    this.tween_ba = new Tween(
+    this.tween_ba = Tween.point(
       this.position_b,
       this.position_a,
       start_frame,

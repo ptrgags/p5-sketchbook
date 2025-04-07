@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../libraries/p5.min.js"
+    ></script>
+    <script type="module">
+      import { sketch } from "./Anabaena.js";
+      import "../sketchlib/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../styles/layout.css" />
+    <script
+      id="MathJax-script"
+      async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+    ></script>
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>Anabaena Catenula (2025)</h1>
+      <div>
+        <input type="checkbox" id="arrows" />
+        <label for="arrows">Show cell orientation</label>
+      </div>
+      <div id="sketch"></div>
+      <div class="description">
+        <p>
+          Move the mouse (desktop) or touch and drag the canvas (mobile) to move
+          the bacteria around. The "show cell orientation" checkbox turns on
+          arrows to help illustrate the math described below.
+        </p>
+        <p>
+          This sketch is a combination of the animation technique used in the
+          <a href="../Worm/">Worm</a> sketch, but also uses an
+          <a href="https://en.wikipedia.org/wiki/L-system">L-system</a> to
+          simulate bacterial growth.
+        </p>
+        <p>
+          The L-system I'm using is based on the ones found in Sections 1.2 and
+          6.2.1 of
+          <cite>
+            <a href="https://algorithmicbotany.org/papers/#abop"
+              >The Algorithmic Beauty of Plants</a
+            ></cite
+          >
+          by Prezemyslaw Prusinkiewicz and Aristid Lindenmayer. Here's how I
+          would summarize the rules:
+        </p>
+        <img
+          width="800"
+          class="figure"
+          alt="illustration of the rules listed below"
+          src="./2025-04-01_AnabaenaExplainer.png"
+        />
+        <ul>
+          <li>
+            The bacteria cells have two phases of life. Young cells (labeled
+            \(S\) for "short") and adult cells (labeled \(L\) for "long").
+          </li>
+          <li>
+            We need to distinguish the front of the cell (\(\rightarrow\)) from
+            the back of the cell (\(\leftarrow\)) to determine the correct
+            placement of cell division.
+          </li>
+          <li>
+            <b>Start Rule:</b> Start with a single cell. I chose to start with a
+            single short cell.
+          </li>
+          <li><b>Growth Rule:</b> All cells grow linearly.</li>
+          <li>
+            <b>Subsitution Rule 1 (Maturation):</b> Short cells mature into long
+            cells when they reach a certain length (2x in this simulation). The
+            orientation remains the same.
+          </li>
+          <li>
+            <b>Substitution Rule 2 (Cell Division):</b> Long cells grow until
+            they are big enough to divide (3x length of short cell in this
+            simulation). The cells divide into two cells. The front of the old
+            cell becomes a short cell facing the same direction. The back of the
+            old cell becomes a long cell, facing backwards.
+          </li>
+        </ul>
+        <p>
+          The substitution rules can be written as the following L-system.
+          Notice that you need 4 rules instead of 2 to handle the
+          forward/backward versions of each symbol.
+        </p>
+        <!-- prettier-ignore -->
+        <p>
+            $$
+            \newcommand{\la}[1]{\overset{\leftarrow}{#1}}
+            \newcommand{\ra}[1]{\overset{\rightarrow}{#1}}
+
+            \begin{align} 
+                \text{start} &= \ra{S} \\
+                \ra{S} &\to \ra{L} \\
+                \la{S} &\to \la{L} \\
+                \ra{L} &\to \la{L}\ra{S} \\
+                \la{L} &\to \la{S}\ra{L} \\
+            \end{align}$$
+        </p>
+        <p>
+          <cite>The Algorithmic Beauty of Plants</cite> also mentions another
+          curious detail in Section 1.9. The <i>anabaena</i> L-system describes
+          growth that follows the
+          <a href="https://en.wikipedia.org/wiki/Fibonacci_sequence"
+            >Fibonacci sequence</a
+          >. This can be seen by examining the length of each string of symbols:
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Cells</th>
+              <th>Length</th>
+            </tr>
+          </thead>
+          <tr>
+            <td>\(\ra{S}\) (start)</td>
+            <td>1</td>
+          </tr>
+          <tr>
+            <td>\(\ra{L}\)</td>
+            <td>1</td>
+          </tr>
+          <tr>
+            <td>\(\la{L}\ra{S}\)</td>
+            <td>2</td>
+          </tr>
+          <tr>
+            <td>\( \la{S}\ra{L} \ra{L} \)</td>
+            <td>3</td>
+          </tr>
+          <tr>
+            <td>\( \la{L} \la{L}\ra{S} \la{L}\ra{S} \)</td>
+            <td>5</td>
+          </tr>
+          <tr>
+            <td>\( \la{S}\ra{L} \la{S}\ra{L} \ra{L} \la{S}\ra{L} \ra{L} \)</td>
+            <td>8</td>
+          </tr>
+        </table>
+        <p>
+          Huh, while writing the above, I just noticed another pattern: In any
+          given iteration, all the L cells face the same way. Likewise, all the
+          S cells face the same way. However, the L cells and S cells face in
+          opposite directions.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

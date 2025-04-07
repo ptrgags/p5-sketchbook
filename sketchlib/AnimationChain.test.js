@@ -6,6 +6,15 @@ import { PGA_MATCHERS } from "../pga2d/pga_matchers";
 expect.extend(PGA_MATCHERS);
 
 describe("Joint", () => {
+  it("constraint_follow with the same point throws", () => {
+    const point = Point.point(1, 0);
+    const follow_dist = 1.0;
+
+    expect(() => {
+      Joint.constraint_follow(point, point, follow_dist);
+    }).toThrowError("set length of null vector");
+  });
+
   it("constraint_follow with large separation moves the point closer", () => {
     const point = Point.point(1, 0);
     const target = Point.point(0, -1);

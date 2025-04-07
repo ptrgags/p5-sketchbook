@@ -1,5 +1,11 @@
 import { Point } from "../pga2d/objects.js";
 import { Motor } from "../pga2d/versors.js";
+import { GroupPrimitive, LinePrimitive, PointPrimitive } from "./primitives.js";
+import { Color, Style } from "./Style.js";
+
+const COLOR_SPINE = new Color(255, 255, 255);
+const SPINE_STYLE = new Style().with_stroke(COLOR_SPINE);
+const CENTER_STYLE = new Style().with_fill(COLOR_SPINE);
 
 /**
  * A joint in an AnimationChain
@@ -142,6 +148,20 @@ export class AnimationChain {
     return this.joints.map((x) => x.position);
   }
 
+  render_spine() {
+    const lines = new Array(this.joints.length - 1);
+    const positions = this.get_positions();
+    for (let i = 0; i < lines.length; i++) {
+      lines[i] = new LinePrimitive(positions[i], positions[i + 1]);
+    }
+    const spine_group = new GroupPrimitive(lines, SPINE_STYLE);
+
+    const centers = positions.map((x) => new PointPrimitive(x));
+    const centers_group = new GroupPrimitive(centers, CENTER_STYLE);
+
+    return new GroupPrimitive([spine_group, centers_group]);
+  }
+
   /**
    * Move the head of the chain to target, then move the rest of the chain
    * behind it.
@@ -149,11 +169,12 @@ export class AnimationChain {
    */
   move(target) {
     // If we're already at the target, nothing to do!
-    if (this.head.position.equals(target)) {
-      return;
+    if (!this.head.position.equals(target)) {
+      this.head.follow(target);
     }
 
-    this.head.follow(target);
+    // For cases where the individual nodes are changing in size, we still
+    // need to update the positions of the rest of the chain.
     for (let i = 1; i < this.joints.length; i++) {
       const prev = this.joints[i - 1];
       const curr = this.joints[i];
