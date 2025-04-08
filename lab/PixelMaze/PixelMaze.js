@@ -87,6 +87,13 @@ export const sketch = (p) => {
   p.setup = () => {
     canvas = p.createCanvas(WIDTH, HEIGHT).elt;
 
+    // Turn off keyboard events so the arrow keys don't scroll the page
+    window.addEventListener("keydown", (e) => {
+      if (DPad.is_dpad_key(e.code)) {
+        e.preventDefault();
+      }
+    });
+
     parse_resources(RESOURCE_MANIFEST, p5_resources, resources);
 
     current_sprite = new P5Sprite(
@@ -134,17 +141,23 @@ export const sketch = (p) => {
     if (DPad.is_dpad_key(p.key)) {
       DPAD.pressed(p.key);
       player.handle_input(DPAD.direction);
-    } else if (p.key === "z") {
+      return false;
+    } else if (p.key === "x") {
       player.handle_run(true);
+      return false;
     }
+    return true;
   };
 
   p.keyReleased = () => {
     if (DPad.is_dpad_key(p.key)) {
       DPAD.released(p.key);
       player.handle_input(DPAD.direction);
-    } else if (p.key === "z") {
+      return false;
+    } else if (p.key === "x") {
       player.handle_run(false);
+      return false;
     }
+    return true;
   };
 };
