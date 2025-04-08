@@ -69,21 +69,24 @@ export class Viewport {
   }
 
   /**
+   *
+   * @param {Point} point Point in map pixels
+   * @returns {Point} A point in map pixels, rounded to nearest pixel to avoid
+   * seams when rendering
+   */
+  map_to_viewport(point) {
+    const { x, y } = point.sub(this.position);
+    return Point.point(Math.round(x), Math.round(y));
+  }
+
+  /**
    * Convert map coordinates to screen coordinates
    * @param {Point} point The point in map pixels
    * @returns {Point} The point in screen pixels. This is rounded to the nearest
    * integer to avoid seams when rendered
    */
   map_to_screen(point) {
-    const { x, y } = point.sub(this.position); //.scale(this.upscale_factor);
+    const { x, y } = point.sub(this.position).scale(this.upscale_factor);
     return Point.point(Math.round(x), Math.round(y));
-  }
-
-  /**
-   * The origin of the tilemap in screen pixels
-   * @type {Point}
-   */
-  get tilemap_origin() {
-    return this.map_to_screen(Point.ORIGIN);
   }
 }

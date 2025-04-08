@@ -124,13 +124,13 @@ export const sketch = (p) => {
     p.push();
     p.scale(VIEWPORT.upscale_factor, VIEWPORT.upscale_factor);
 
-    blit_tilemap(p, tilemap, VIEWPORT.tilemap_origin);
+    blit_tilemap(p, tilemap, VIEWPORT.map_to_viewport(Point.ORIGIN));
 
     blit_sprite(
       p,
       new P5Sprite(p5_resources.images.character, sprite),
       t,
-      VIEWPORT.map_to_screen(position)
+      VIEWPORT.map_to_viewport(position)
     );
 
     p.pop();

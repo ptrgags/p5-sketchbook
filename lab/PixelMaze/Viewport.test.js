@@ -32,16 +32,6 @@ function make_character_sprite() {
 describe("Viewport", () => {
   describe("no upscale factor", () => {
     const NO_UPSCALE = 1;
-    it("tilemap_origin is the negation of the viewport position", () => {
-      const position = Point.point(32, 48);
-      const viewport = make_viewport(position, NO_UPSCALE);
-
-      const result = viewport.tilemap_origin;
-
-      const expected = Point.point(-32, -48);
-      expect(result).toBePoint(expected);
-    });
-
     it("map_to_screen computes position in screen space", () => {
       const position = Point.point(32, 48);
       const viewport = make_viewport(position, NO_UPSCALE);
@@ -109,15 +99,6 @@ describe("Viewport", () => {
 
   describe("with upscale factor", () => {
     const UPSCALE = 2;
-    it("tilemap_origin is the negation of the viewport position", () => {
-      const position = Point.point(32, 48);
-      const viewport = make_viewport(position, UPSCALE);
-
-      const result = viewport.tilemap_origin;
-
-      const expected = Point.point(-64, -96);
-      expect(result).toBePoint(expected);
-    });
 
     it("map_to_screen computes position in screen space", () => {
       const position = Point.point(32, 48);
