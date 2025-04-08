@@ -1,5 +1,6 @@
 import { Point } from "../../pga2d/objects.js";
 import { ImageFrames } from "./ImageFrames.js";
+import { Sprite } from "./Sprite.js";
 import { Tilemap } from "./Tilemap.js";
 
 /**
@@ -28,10 +29,14 @@ function blit_frame(p, p5_image, image_frames, frame_id, position) {
 }
 
 export class P5Sprite {
+  /**
+   * Constructor
+   * @param {any} p5_image p5.Image to be drawn with this sprite
+   * @param {Sprite} sprite The sprite animation
+   */
   constructor(p5_image, sprite) {
     this.p5_image = p5_image;
     this.sprite = sprite;
-
     // TODO: check that the dimensions match
   }
 
