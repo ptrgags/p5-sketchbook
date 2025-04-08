@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { Point, Line } from "./objects";
 import { PGA_MATCHERS } from "./pga_matchers";
+import { PI } from "../sketchlib/math_consts";
 
 expect.extend(PGA_MATCHERS);
 
@@ -89,6 +90,15 @@ describe("Point", () => {
   });
 
   describe("ideal", () => {
+    it("dir_from_angle computes cosine and sine", () => {
+      const angle = (2 * PI) / 3;
+
+      const result = Point.dir_from_angle(angle);
+
+      const expected = Point.direction(-0.5, Math.sqrt(3) / 2);
+      expect(result).toBePoint(expected);
+    });
+
     it("gets the underlying x and y components", () => {
       const a = Point.direction(-3, 5);
 
@@ -117,7 +127,7 @@ describe("Point", () => {
     it("ideal norm returns the magnitude of x and y components", () => {
       const a = Point.direction(3, 4);
 
-      const result = a.ideal_norm();
+      const result = a.ideal_norm_sqr();
 
       // 3^2 + 4^2
       expect(result).toBe(25);
@@ -126,10 +136,70 @@ describe("Point", () => {
     it("ideal magnitude returns the magnitude of x and y components", () => {
       const a = Point.direction(3, 4);
 
-      const result = a.ideal_mag();
+      const result = a.ideal_norm();
 
       // sqrt(3^2 + 4^2) = sqrt(25) = 5
       expect(result).toBeCloseTo(5);
+    });
+
+    it("limit_length with short direction does not change vector", () => {
+      const a = Point.direction(1, 2);
+      const max_length = 100;
+
+      const result = a.limit_length(max_length);
+
+      expect(result).toEqual(a);
+    });
+
+    it("limit_length with long direction snaps to max length", () => {
+      const a = Point.direction(300, 400);
+      const max_length = 100;
+
+      const result = a.limit_length(max_length);
+
+      // original vector has magnitude 500 (3-4-5 triangle scaled by 100)
+      // the new magnitude is 100, which is 1/5 exactly.
+      // 300 / 5  = 60
+      // 400 / 5  = 80
+      const expected = Point.direction(60, 80);
+      expect(result).toEqual(expected);
+    });
+
+    it("set_length with zero length direction throws error", () => {
+      const a = Point.ZERO;
+      const length = 100;
+
+      expect(() => {
+        a.set_length(length);
+      }).toThrowError("null vector");
+    });
+
+    it("set_length with short direction snaps to length", () => {
+      const a = Point.direction(3, 4);
+      const length = 100;
+
+      const result = a.set_length(length);
+
+      // original vector has magnitude 5 (3-4-5 triangle)
+      // the new magnitude is 100, which is 1/5 exactly.
+      // 300 / 5  = 60
+      // 400 / 5  = 80
+      const expected = Point.direction(60, 80);
+      expect(result).toBePoint(expected);
+    });
+
+    it("set_length with long direction snaps to max length", () => {
+      const a = Point.direction(300, 400);
+      const max_length = 100;
+
+      const result = a.set_length(max_length);
+
+      // original vector has magnitude 500 (3-4-5 triangle scaled by 100)
+      // the new magnitude is 100, which is 1/5 exactly.
+      // 300 / 5  = 60
+      // 400 / 5  = 80
+      const expected = Point.direction(60, 80);
+      expect(result).toBePoint(expected);
     });
 
     it("scale performs scalar multiplication", () => {

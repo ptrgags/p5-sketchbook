@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+      "checkJs": true,
+      "target": "ES2020",
+      "moduleResolution": "nodenext",
+      "module": "nodenext"
+    },
+    "exclude": ["node_modules", "**/node_modules/*"]
+  }

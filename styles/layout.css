@@ -16,6 +16,10 @@ p {
   margin: 10px;
 }
 
+li {
+  margin: 10px;
+}
+
 nav {
   background-color: var(--background-light);
   padding: 10px;
@@ -48,6 +52,29 @@ a:hover {
 .description {
   padding: 20px;
   width: 50%;
+}
+
+#sketch {
+  min-height: 700px;
+}
+
+.figure {
+  display: block;
+  margin: 0 auto;
+  max-width: 80%;
+}
+
+table {
+  margin: 0 auto;
+}
+
+thead {
+  background-color: var(--background-light);
+}
+
+th,
+td {
+  padding: 8px;
 }
 
 @media screen and (max-width: 700px) {

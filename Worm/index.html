@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../libraries/p5.min.js"
+    ></script>
+    <script type="module">
+      import { sketch } from "./Worm.js";
+      import "../sketchlib/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../styles/layout.css" />
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>Worm (2025)</h1>
+      <div id="sketch"></div>
+      <div class="description">
+        <p>
+          Move the mouse (desktop) or touch and drag the canvas (mobile) to move
+          the worm around.
+        </p>
+        <p>
+          A while ago, I came across a fun animation technique from
+          <a
+            href="https://www.youtube.com/watch?v=qlfh_rv6khY&ab_channel=argonaut"
+            >This YouTube video by user argonaut</a
+          >. You start with a chain of joints. There are simple constraints on
+          how to update the positions, starting on one end of the chain and
+          working towards the other. While not a realistic simulation, this
+          method is relatively simple to implement and has a fun cartoon
+          creature vibe. There are two main constraints in use here:
+        </p>
+        <ol>
+          <li>
+            Each joint follows a fixed distance behind the previous one. This
+            causes the head of the worm to drag along the rest of the body.
+          </li>
+          <li>
+            The angle between any 3 consecutive joints must be at least a
+            minimum size. This prevents the curve from getting too pinched, and
+            also creates S-bends like a snake.
+          </li>
+        </ol>
+        <p>
+          I didn't implement any self-collision detection, so the worm can go
+          through itself. This is not realistic, but it's amusing to create
+          loops and watch as they unwind once they reach the tail.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

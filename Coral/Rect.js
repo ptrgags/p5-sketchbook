@@ -1,9 +1,6 @@
 import { Point } from "../pga2d/objects.js";
 import { Grid } from "../sketchlib/Grid.js";
-
-function clamp(x, min, max) {
-  return Math.max(Math.min(x, max), min);
-}
+import { clamp } from "../sketchlib/clamp.js";
 
 export class Rect {
   constructor(x, y, width, height) {

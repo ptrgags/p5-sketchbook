@@ -9,6 +9,6 @@
   "author": "Peter Gagliardi",
   "license": "Apache-2.0",
   "devDependencies": {
-    "vitest": "^2.1.1"
+    "vitest": "^3.0.5"
   }
 }

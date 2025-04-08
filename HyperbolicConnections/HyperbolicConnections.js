@@ -2,6 +2,7 @@ import { fix_mouse_coords } from "../sketchlib/fix_mouse_coords.js";
 import { Palette } from "./palette.js";
 import { Boundary, PAIR_COUNT } from "./boundaries.js";
 import { VERTEX_SHADER, FRAGMENT_SHADER } from "./shaders.js";
+import { prevent_mobile_scroll } from "../sketchlib/prevent_mobile_scroll.js";
 
 // The boundary pattern is generated randomly in chunks of the same
 // color. This is the largest number of boundary point pairs generated
@@ -72,6 +73,8 @@ export const sketch = (p) => {
     boundary.print();
 
     canvas = p.createCanvas(500, 700, p.WEBGL).elt;
+    prevent_mobile_scroll(canvas);
+
     poincare_shader = p.createShader(
       VERTEX_SHADER,
       FRAGMENT_SHADER(PAIR_COUNT)
