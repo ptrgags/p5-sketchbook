@@ -1,11 +1,24 @@
 import { Direction } from "../../sketchlib/Direction.js";
 
 export const ARROW_KEYS = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"];
-export const WASD_KEYS = ["KeyW", "KeyA", "KeyS", "KeyD"];
+export const WASD_KEYS = [
+  "w",
+  "a",
+  "s",
+  "d",
+  "W",
+  "A",
+  "S",
+  "D",
+  "KeyW",
+  "KeyA",
+  "KeyS",
+  "KeyD",
+];
 
 /**
  * @typedef {"ArrowLeft" | "ArrowRight" | "ArrowUp" | "ArrowDown"} ArrowKey
- * @typedef {"KeyW" | "KeyA" | "KeyS" | "KeyD"} WASDKey
+ * @typedef {"w" | "a" | "s" | "d" | "W" | "A" | "S" | "D" | "KeyW" | "KeyA" | "KeyS" | "KeyD"} WASDKey
  */
 
 export class DPad {
@@ -52,15 +65,22 @@ export class DPad {
   static get_direction(key) {
     switch (key) {
       case "ArrowLeft":
+      case "a":
+      case "A":
       case "KeyA":
         return Direction.LEFT;
       case "ArrowRight":
+      case "d":
+      case "D":
       case "KeyD":
         return Direction.RIGHT;
       case "ArrowUp":
+      case "w":
       case "KeyW":
         return Direction.UP;
       case "ArrowDown":
+      case "s":
+      case "S":
       case "KeyS":
         return Direction.DOWN;
     }
