@@ -55,6 +55,15 @@ export class Point {
   }
 
   /**
+   * Get a direction from an angle
+   * @param {number} theta Counterclockwise angle in radians
+   * @returns {Point} A direction with the coordinates (cos(theta), sin(theta))
+   */
+  static dir_from_angle(theta) {
+    return Point.direction(Math.cos(theta), Math.sin(theta));
+  }
+
+  /**
    * Construct from a bivector
    * @param {Even} bivec The bivector that represents this point.
    */
