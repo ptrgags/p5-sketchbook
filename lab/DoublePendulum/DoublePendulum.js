@@ -38,6 +38,7 @@ export const sketch = (p) => {
 
     const center_offset = Point.point(WIDTH / 2, (3 * HEIGHT) / 4);
     const pendulum_animation = SYSTEM.render(center_offset);
+    const [history1, history2] = SYSTEM.render_history(center_offset);
 
     const phase_origin = Point.point(WIDTH / 2, HEIGHT / 4);
     const phase_axes = SYSTEM.render_phase_axes(
@@ -45,6 +46,7 @@ export const sketch = (p) => {
       THETA_SCALE,
       THETA_DOT_SCALE
     );
+
     const [phase1, phase2] = SYSTEM.render_phase(
       phase_origin,
       THETA_SCALE,
@@ -52,6 +54,8 @@ export const sketch = (p) => {
     );
 
     const scene = new GroupPrimitive([
+      history1,
+      history2,
       pendulum_animation,
       phase_axes,
       phase1,

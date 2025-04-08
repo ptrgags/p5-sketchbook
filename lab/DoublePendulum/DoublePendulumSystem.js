@@ -22,6 +22,8 @@ const ARM_STYLE = new Style()
 const STYLE_PHASE1 = new Style().with_stroke(new Color(255, 255, 0));
 const STYLE_PHASE2 = new Style().with_stroke(new Color(0, 255, 255));
 
+const PIXELS_PER_METER = 100;
+
 export class Pendulum {
   /**
    * Constructor
@@ -209,29 +211,68 @@ export class DoublePendulumSystem {
     return new GroupPrimitive(primitives, STYLE_AXIS);
   }
 
-  render(anchor_point) {
+  angles_to_positions(origin, theta1, theta2) {
+    const offset1 = Point.dir_from_angle(Math.PI / 2 - theta1).scale(
+      this.pendulum1.length * PIXELS_PER_METER
+    );
+    const offset2 = Point.dir_from_angle(Math.PI / 2 - theta2).scale(
+      this.pendulum2.length * PIXELS_PER_METER
+    );
+
+    const bob_position1 = origin.add(offset1);
+    const bob_position2 = bob_position1.add(offset2);
+
+    return [bob_position1, bob_position2];
+  }
+
+  render_history(origin) {
+    const states = [...this.history];
+    const positions = states.map(([theta1, , theta2]) => {
+      return this.angles_to_positions(origin, theta1, theta2);
+    });
+
+    const history1 = [];
+    const history2 = [];
+    for (let i = 0; i < positions.length - 1; i++) {
+      const [prev1, prev2] = positions[i];
+      const [curr1, curr2] = positions[i + 1];
+
+      const line1 = new LinePrimitive(prev1, curr1);
+      const line2 = new LinePrimitive(prev2, curr2);
+
+      history1.push(line1);
+      history2.push(line2);
+    }
+
+    return [
+      new GroupPrimitive(history1, STYLE_PHASE1),
+      new GroupPrimitive(history2, STYLE_PHASE2),
+    ];
+  }
+
+  /**
+   * Render the double pendulum animation
+   * @param {Point} origin The point to draw the animation at in pixels
+   * @returns {GroupPrimitive}
+   */
+  render(origin) {
     const [theta1, , theta2] = this.simulation.state;
-
-    const PIXEL_SCALE = 100;
-    const bob_offset1 = Point.dir_from_angle(Math.PI / 2 - theta1).scale(
-      this.pendulum1.length * PIXEL_SCALE
+    const [bob_position1, bob_position2] = this.angles_to_positions(
+      origin,
+      theta1,
+      theta2
     );
-    const bob_offset2 = Point.dir_from_angle(Math.PI / 2 - theta2).scale(
-      this.pendulum2.length * PIXEL_SCALE
-    );
-    const bob_position1 = anchor_point.add(bob_offset1);
-    const bob_position2 = bob_position1.add(bob_offset2);
 
-    const arm1 = new LinePrimitive(anchor_point, bob_position1);
+    const arm1 = new LinePrimitive(origin, bob_position1);
     const arm2 = new LinePrimitive(bob_position1, bob_position2);
 
     const bob1 = new CirclePrimitive(
       bob_position1,
-      PIXEL_SCALE * this.pendulum1.bob_radius
+      PIXELS_PER_METER * this.pendulum1.bob_radius
     );
     const bob2 = new CirclePrimitive(
       bob_position2,
-      PIXEL_SCALE * this.pendulum2.bob_radius
+      PIXELS_PER_METER * this.pendulum2.bob_radius
     );
 
     return new GroupPrimitive([arm1, arm2, bob1, bob2], ARM_STYLE);
