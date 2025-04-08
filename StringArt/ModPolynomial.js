@@ -1,6 +1,4 @@
-function mod(x, m) {
-  return ((x % m) + m) % m;
-}
+import { mod } from "../sketchlib/mod.js";
 
 function format_power_term(coefficient, power_str) {
   if (coefficient == 0) {
