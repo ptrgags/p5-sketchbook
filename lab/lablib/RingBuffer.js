@@ -1,9 +1,16 @@
-export class ValueHistory {
+/**
+ * @template T
+ */
+
+export class RingBuffer {
   /**
-   *
+   * Constructor
    * @param {number} capacity The capacity of the underlying ring buffer
    */
   constructor(capacity) {
+    /**
+     * @type {T[]}
+     */
     this.values = new Array(capacity);
     this.capacity = capacity;
     this.length = 0;
@@ -11,6 +18,10 @@ export class ValueHistory {
     this.end = 0;
   }
 
+  /**
+   * Push an item to the end of the buffer
+   * @param {T} value
+   */
   push(value) {
     this.values[this.end] = value;
     this.end++;
@@ -24,11 +35,12 @@ export class ValueHistory {
     }
   }
 
-  get history() {
-    const result = new Array(this.length);
+  /**
+   * Iterate over the elements from oldest to newest
+   */
+  *[Symbol.iterator]() {
     for (let i = 0; i < this.length; i++) {
-      result[i] = this.values[(this.start + i) % this.capacity];
+      yield this.values[(this.start + i) % this.capacity];
     }
-    return result;
   }
 }

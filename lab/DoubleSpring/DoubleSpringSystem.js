@@ -6,7 +6,7 @@ import {
 } from "../../sketchlib/primitives.js";
 import { RungeKuttaIntegrator } from "../../sketchlib/RungeKuttaIntegrator.js";
 import { Color, Style } from "../../sketchlib/Style.js";
-import { ValueHistory } from "../../sketchlib/ValueHistory.js";
+import { RingBuffer } from "../lablib/RingBuffer.js";
 import { GeneralizedCoordinates } from "../../sketchlib/VectorSpace.js";
 
 const PIXELS_PER_METER = 100;
@@ -15,6 +15,8 @@ const Y_METERS = Point.DIR_Y.scale(-PIXELS_PER_METER);
 const NUM_COILS = 10;
 
 const STYLE_AXIS = new Style().with_stroke(new Color(255, 255, 255));
+const STYLE_PHASE1 = new Style().with_stroke(new Color(255, 255, 0));
+const STYLE_PHASE2 = new Style().with_stroke(new Color(0, 255, 255));
 
 export class Spring {
   /**
@@ -71,7 +73,7 @@ export class DoubleSpringSystem {
       (t, state) => this.motion(state),
       initial_state
     );
-    this.history = new ValueHistory(history_size);
+    this.history = new RingBuffer(history_size);
     this.history.push(initial_state);
   }
 
@@ -101,10 +103,46 @@ export class DoubleSpringSystem {
   }
 
   /**
-   * Render axes for
+   *
+   * @param {Point} origin The origin of the phase plot in pixels
+   * @param {number} x_scale The scale of the position axis in pixels/meter
+   * @param {number} v_scale The scale of the velocity axis in pixels / (m/s)
+   * @returns {[GroupPrimitive, GroupPrimitive]} The two phase plots
+   */
+  render_phase(origin, x_scale, v_scale) {
+    const x_dir = Point.DIR_X.scale(x_scale);
+    const v_dir = Point.DIR_Y.scale(-v_scale);
+
+    const states = [...this.history];
+    const points1 = states.map(([x1, v1, ,]) =>
+      origin.add(x_dir.scale(x1)).add(v_dir.scale(v1))
+    );
+    const points2 = states.map(([, , x2, v2]) =>
+      origin.add(x_dir.scale(x2)).add(v_dir.scale(v2))
+    );
+
+    const phase1 = [];
+    const phase2 = [];
+    for (let i = 0; i < states.length - 1; i++) {
+      const line1 = new LinePrimitive(points1[i], points1[i + 1]);
+      const line2 = new LinePrimitive(points2[i], points2[i + 1]);
+
+      phase1.push(line1);
+      phase2.push(line2);
+    }
+
+    return [
+      new GroupPrimitive(phase1, STYLE_PHASE1),
+      new GroupPrimitive(phase2, STYLE_PHASE2),
+    ];
+  }
+
+  /**
+   * Render position/velocity axes on the screen for a phase plot
    * @param {Point} origin The origin of the coordinate system
    * @param {number} x_scale Scale of the position axis in pixels/meter
    * @param {number} v_scale Scale of the velocity axis in pixels / (m/s)
+   * @returns {GroupPrimitive}
    */
   render_phase_axes(origin, x_scale, v_scale) {
     const x_dir = Point.DIR_X.scale(x_scale);
@@ -164,71 +202,3 @@ export class DoubleSpringSystem {
     );
   }
 }
-
-/**
- * from physics.graphics import horizontal_spring, vertical_wall, horizontal_wall
-from physics.rungekutta import RungeKuttaSimulation
-from physics.vectors import Vector
-
-class TwoSpringSystem(object):
-    def __init__(self, k1, k2, m1, m2, l1, l2, w1, w2, initial_state, history_size = 100):
-        self.k1 = k1
-        self.k2 = k2
-        self.m1 = m1
-        self.m2 = m2
-        self.simulation = RungeKuttaSimulation(self.motion, initial_state, history_size = history_size)
-        self.state = initial_state
-        
-        w = max(w1, w2)
-        l = l1 + l2
-        
-        self.wall_pos= Vector(-w / 4.0, -w * 3.0 / 2.0)
-        self.wall_dims = Vector(w / 4.0, w * 2.0)
-        self.floor_pos = Vector(0, w / 2.0)
-        self.floor_dims = Vector(l * 2.0, w / 4.0)
-        
-        self.spring1_pos = Vector(0, -w1 / 2.0)
-        self.spring1_dims_rest = Vector(l1, w1)
-        self.spring2_pos_rest = Vector(l1 + w1, -w2 / 2.0)
-        self.spring2_dims_rest = Vector(l2, w2) 
-        
-        self.bob1_pos_rest = Vector(l1, -w1 / 2.0)
-        self.bob1_dims = Vector(w1, w1)
-        self.bob2_pos_rest = Vector(l1 + w1 + l2, -w2 / 2.0)
-        self.bob2_dims = Vector(w2, w2)
-        
-        self.history_origin1 = Vector(l1 + w / 2.0, 0)
-        self.history_origin2 = Vector(l1 + w1 + l2 + w2 / 2.0, 0)
-                               
-    
-    def draw_history(self, origin, scale, c=color(255, 0, 0)):
-        pushMatrix()
-        translate(*origin)
-        stroke(c)
-        for past_x1, _, past_x2, _ in self.simulation.history:
-            point(*(scale * (self.history_origin1 + [past_x1, 0])))
-            point(*(scale * (self.history_origin2 + [past_x1 + past_x2, 0])))
-        popMatrix()
-    
-    def draw_phase(self, origin, x_scale, v_scale, c, component = 0):
-        pushMatrix()
-        translate(*origin)
-        stroke(c)
-        index = component * 2
-        past = [state[index:index + 2] for state in self.simulation.history]
-        for x, v in past:
-            point(x_scale * x, v_scale * v)
-        popMatrix()
-    
-    def draw_phase_axes(self, origin, x_scale, v_scale, x_limits, v_limits, c=color(255, 255, 255)):
-        pushMatrix()
-        translate(*origin)
-        stroke(c)
-        x_min, x_max = x_limits * x_scale
-        line(x_min, 0, x_max, 0)
-        text("x", x_max, 10)
-        v_min, v_max = v_limits * v_scale
-        line(0, v_min, 0, v_max)
-        text("v", 10, -v_max)
-        popMatrix()
- */

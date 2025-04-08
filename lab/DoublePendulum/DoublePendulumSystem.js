@@ -2,7 +2,7 @@ import { Point } from "../../pga2d/objects.js";
 import { GroupPrimitive, LinePrimitive } from "../../sketchlib/primitives.js";
 import { RungeKuttaIntegrator } from "../../sketchlib/RungeKuttaIntegrator.js";
 import { Color, Style } from "../../sketchlib/Style.js";
-import { ValueHistory } from "../../sketchlib/ValueHistory.js";
+import { RingBuffer } from "../lablib/RingBuffer.js";
 import { GeneralizedCoordinates } from "../../sketchlib/VectorSpace.js";
 
 const ARM_STYLE = new Style()
@@ -38,7 +38,7 @@ export class DoublePendulumSystem {
       (t, state) => this.motion(state),
       initial_state
     );
-    this.history = new ValueHistory(history_size);
+    this.history = new RingBuffer(history_size);
     this.history.push(initial_state);
 
     /*
