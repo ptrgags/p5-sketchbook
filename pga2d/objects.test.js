@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { Point, Line } from "./objects";
 import { PGA_MATCHERS } from "./pga_matchers";
+import { PI } from "../sketchlib/math_consts";
 
 expect.extend(PGA_MATCHERS);
 
@@ -89,6 +90,15 @@ describe("Point", () => {
   });
 
   describe("ideal", () => {
+    it("dir_from_angle computes cosine and sine", () => {
+      const angle = (2 * PI) / 3;
+
+      const result = Point.dir_from_angle(angle);
+
+      const expected = Point.direction(-0.5, Math.sqrt(3) / 2);
+      expect(result).toBePoint(expected);
+    });
+
     it("gets the underlying x and y components", () => {
       const a = Point.direction(-3, 5);
 
