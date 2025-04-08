@@ -6,6 +6,4 @@ function preload_images(p, manifest, resources) {
 
 export function preload_p5_resources(p, manifest, resources) {
   preload_images(p, manifest.images, resources.images);
-
-  // Eventually sound goes here
 }
