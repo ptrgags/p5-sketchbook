@@ -9,17 +9,24 @@ import { Color, Style } from "../../sketchlib/Style.js";
 import { ValueHistory } from "../../sketchlib/ValueHistory.js";
 import { GeneralizedCoordinates } from "../../sketchlib/VectorSpace.js";
 
+const PIXELS_PER_METER = 100;
+const X_METERS = Point.DIR_X.scale(PIXELS_PER_METER);
+const Y_METERS = Point.DIR_Y.scale(-PIXELS_PER_METER);
+const NUM_COILS = 10;
+
 export class Spring {
   /**
    * Constructor
-   * @param {number} spring_constant The spring constant k
-   * @param {number} mass The mass of the bob connected to the spring m
-   * @param {number} rest_length The rest length of the spring in meters
+   * @param {number} spring_constant The spring constant k in N/m
+   * @param {number} rest_length The rest length of the spring in m
+   * @param {number} bob_mass The mass of the bob connected to the spring m in kg
+   * @param {number} bob_width The width of the bob in m
    */
-  constructor(spring_constant, mass, rest_length) {
+  constructor(spring_constant, rest_length, bob_mass, bob_width) {
     this.spring_constant = spring_constant;
-    this.mass = mass;
     this.rest_length = rest_length;
+    this.bob_mass = bob_mass;
+    this.bob_width = bob_width;
   }
 }
 
@@ -32,8 +39,8 @@ function render_horizontal_spring(position, dimensions, num_coils) {
 
   for (let i = 0; i < num_coils; i++) {
     const a = position.add(delta_x.scale(i));
-    const b = position.add(delta_x.scale(i + 0.5)).add(delta_y);
-    const c = position.add(delta_x.scale(i + 1));
+    const b = a.add(delta_x.scale(0.5)).add(delta_y);
+    const c = a.add(delta_x);
 
     const diag_down = new LinePrimitive(a, b);
     const diag_up = new LinePrimitive(b, c);
@@ -73,13 +80,11 @@ export class DoubleSpringSystem {
    */
   motion(state) {
     const [x1, v1, x2, v2] = state;
-    const a1 =
-      (this.spring2.spring_constant * (x2 - x1) -
-        this.spring1.spring_constant * x1) /
-      this.spring1.mass;
-    const a2 =
-      (this.spring2.spring_constant * x1 - this.spring2.spring_constant * x2) /
-      this.spring2.mass;
+    const { spring_constant: k1, bob_mass: m1 } = this.spring1;
+    const { spring_constant: k2, bob_mass: m2 } = this.spring2;
+
+    const a1 = (k2 * (x2 - x1) - k1 * x1) / m1;
+    const a2 = (k2 * x1 - k2 * x2) / m2;
 
     return [v1, a1, v2, a2];
   }
@@ -95,60 +100,41 @@ export class DoubleSpringSystem {
 
   /**
    * Render the spring system
-   * @param {Point} origin The origin
+   * @param {Point} origin The origin in screen pixels
    * @returns {GroupPrimitive} The primtitive to render
    */
   render(origin) {
     const [x1, , x2] = this.simulation.state;
 
-    const PIXEL_SCALE = 100;
+    const wall = new LinePrimitive(origin, origin.add(Y_METERS));
+    const floor = new LinePrimitive(origin, origin.add(X_METERS.scale(4)));
 
-    const wall = new LinePrimitive(
-      origin,
-      origin.add(Point.DIR_Y.scale(-PIXEL_SCALE))
-    );
-    const floor = new LinePrimitive(
-      origin,
-      origin.add(Point.DIR_X.scale(4 * PIXEL_SCALE))
-    );
+    const { rest_length: l1, bob_width: w1 } = this.spring1;
+    const { rest_length: l2, bob_width: w2 } = this.spring2;
 
-    const BOB_WIDTH = 0.5;
-    const bob_height = origin.add(Point.DIR_Y.scale(-PIXEL_SCALE * BOB_WIDTH));
-
-    const bob1_position = bob_height.add(
-      Point.DIR_X.scale(PIXEL_SCALE * (this.spring1.rest_length + x1))
-    );
+    const bob_height = origin.add(Y_METERS.scale(w1));
+    const bob1_position = bob_height.add(X_METERS.scale(l1 + x1));
     const bob1 = new RectPrimitive(
       bob1_position,
-      Point.direction(BOB_WIDTH, BOB_WIDTH).scale(PIXEL_SCALE)
+      Point.direction(w1, w1).scale(PIXELS_PER_METER)
     );
 
-    const NUM_COILS = 10;
     const spring1 = render_horizontal_spring(
       bob_height,
-      Point.direction(
-        PIXEL_SCALE * (this.spring1.rest_length + x1),
-        BOB_WIDTH * PIXEL_SCALE
-      ),
+      X_METERS.scale(l1 + x1).add(Y_METERS.scale(-w1)),
       NUM_COILS
     );
 
-    const rest_length =
-      this.spring1.rest_length + BOB_WIDTH + this.spring2.rest_length;
-    const bob2_position = bob_height.add(
-      Point.DIR_X.scale(PIXEL_SCALE * (rest_length + x2))
-    );
+    const rest_length2 = l1 + w1 + l2;
+    const bob2_position = bob_height.add(X_METERS.scale(rest_length2 + x2));
     const bob2 = new RectPrimitive(
       bob2_position,
-      Point.direction(BOB_WIDTH, BOB_WIDTH).scale(PIXEL_SCALE)
+      Point.direction(w2, w2).scale(PIXELS_PER_METER)
     );
 
     const spring2 = render_horizontal_spring(
-      bob1_position.add(Point.DIR_X.scale(PIXEL_SCALE * BOB_WIDTH)),
-      Point.direction(
-        PIXEL_SCALE * (this.spring2.rest_length + (x2 - x1)),
-        BOB_WIDTH * PIXEL_SCALE
-      ),
+      bob1_position.add(X_METERS.scale(w1)),
+      X_METERS.scale(l2 + (x2 - x1)).add(Y_METERS.scale(-w2)),
       NUM_COILS
     );
 

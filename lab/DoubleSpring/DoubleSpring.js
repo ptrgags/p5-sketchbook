@@ -3,14 +3,21 @@ import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
 import { draw_primitive } from "../../sketchlib/draw_primitive.js";
 import { DoubleSpringSystem, Spring } from "./DoubleSpringSystem.js";
 
-const SPRING1 = new Spring(5.0, 0.5, 1.0);
-const SPRING2 = new Spring(5.0, 0.5, 1.0);
+const SPRING_CONSTANT = 5.0;
+const REST_LENGTH = 1.0;
+const BOB_MASS = 0.5;
+const BOB_WIDTH = 0.4;
+
+// Both springs will be identical in size
+const SPRING = new Spring(SPRING_CONSTANT, REST_LENGTH, BOB_MASS, BOB_WIDTH);
+// start with the springs slightly compressed
 const INITIAL_STATE = [-0.5, 0.0, -0.5, 0.0];
 const HISTORY_SIZE = 1000;
 
 const SYSTEM = new DoubleSpringSystem(
-  SPRING1,
-  SPRING2,
+  // The two springs are identical for this sketch
+  SPRING,
+  SPRING,
   INITIAL_STATE,
   HISTORY_SIZE
 );
@@ -38,26 +45,6 @@ export const sketch = (p) => {
 };
 
 /**
- * import fix_path
-from TwoSpringSystem import TwoSpringSystem
-from physics.vectors import Vector
-
-k1 = 5.0
-m1 = 0.5
-k2 = 5.0
-m2 = 0.5
-l1 = 1.0
-l2 = 1.0
-w1 = 0.4
-w2 = 0.4
-
-SCALE=100
-INITIAL_STATE = [-0.5, 0.0, -0.5, 0.0]
-
-def setup():
-    global system
-    size(640, 480)
-    system = TwoSpringSystem(k1, k2, m1, m2, l1, l2, w1, w2, INITIAL_STATE, 200)
 
 def draw():
     system.step()
@@ -78,5 +65,3 @@ def draw():
         system.draw_phase(phase_origin, 100, 20, c, i)
     system.draw_phase_axes(phase_origin, 100, 20, Vector(-0.6, 0.6), Vector(-3, 3))
  */
-
-// also I'll need this:
