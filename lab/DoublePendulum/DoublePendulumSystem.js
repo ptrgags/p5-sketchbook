@@ -57,20 +57,6 @@ export class DoublePendulumSystem {
     );
     this.history = new RingBuffer(history_size);
     this.history.push(initial_state);
-
-    /*
-        this.bob_size1 = bob_r1
-        this.bob_size2 = bob_r2
-        this.l1 = l1
-        this.l2 = l2
-        
-        #These are in POLAR coordinates [r, theta]
-        self.bob_pos_rest1 = Vector(l1, -HALF_PI)
-        self.bob_pos_rest2 = Vector(l2, -HALF_PI)
-        
-        self.history_origin1 = self.bob_pos_rest1
-        self.history_origin2 = self.bob_pos_rest2
-        */
   }
 
   /**
