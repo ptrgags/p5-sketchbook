@@ -1,5 +1,9 @@
 import { Point } from "../../pga2d/objects.js";
-import { GroupPrimitive } from "../../sketchlib/primitives.js";
+import {
+  GroupPrimitive,
+  LinePrimitive,
+  RectPrimitive,
+} from "../../sketchlib/primitives.js";
 import { RungeKuttaIntegrator } from "../../sketchlib/RungeKuttaIntegrator.js";
 import { Color, Style } from "../../sketchlib/Style.js";
 import { ValueHistory } from "../../sketchlib/ValueHistory.js";
@@ -76,8 +80,42 @@ export class DoubleSpringSystem {
    * @returns {GroupPrimitive} The primtitive to render
    */
   render(origin) {
+    const [x1, , x2] = this.simulation.state;
+
+    const PIXEL_SCALE = 100;
+
+    const wall = new LinePrimitive(
+      origin,
+      origin.add(Point.DIR_Y.scale(-PIXEL_SCALE))
+    );
+    const floor = new LinePrimitive(
+      origin,
+      origin.add(Point.DIR_X.scale(4 * PIXEL_SCALE))
+    );
+
+    const BOB_WIDTH = 0.5;
+    const bob_height = origin.add(Point.DIR_Y.scale(-PIXEL_SCALE * BOB_WIDTH));
+
+    const bob1_position = bob_height.add(
+      Point.DIR_X.scale(PIXEL_SCALE * (this.spring1.rest_length + x1))
+    );
+    const bob1 = new RectPrimitive(
+      bob1_position,
+      Point.direction(BOB_WIDTH, BOB_WIDTH).scale(PIXEL_SCALE)
+    );
+
+    const rest_length =
+      this.spring1.rest_length + BOB_WIDTH + this.spring2.rest_length;
+    const bob2_position = bob_height.add(
+      Point.DIR_X.scale(PIXEL_SCALE * (rest_length + x2))
+    );
+    const bob2 = new RectPrimitive(
+      bob2_position,
+      Point.direction(BOB_WIDTH, BOB_WIDTH).scale(PIXEL_SCALE)
+    );
+
     return new GroupPrimitive(
-      [],
+      [wall, floor, bob1, bob2],
       new Style().with_stroke(new Color(255, 0, 0))
     );
   }

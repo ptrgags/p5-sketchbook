@@ -30,7 +30,7 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    const origin = Point.point(0, HEIGHT / 2);
+    const origin = Point.point(10, HEIGHT / 2);
     draw_primitive(p, SYSTEM.render(origin));
 
     SYSTEM.step(DELTA_TIME);
