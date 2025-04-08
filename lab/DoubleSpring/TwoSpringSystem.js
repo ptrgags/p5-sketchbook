@@ -1,4 +1,4 @@
-import { PhasePoint } from "../sketchlib/VectorSpace";
+import { PhasePoint } from "../../sketchlib/VectorSpace";
 
 class HorizontalSpring {
   /**

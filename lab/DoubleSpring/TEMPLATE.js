@@ -1,4 +1,4 @@
-import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
+import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
 
 export const sketch = (p) => {
   p.setup = () => {

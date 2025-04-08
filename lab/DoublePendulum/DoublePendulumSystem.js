@@ -1,9 +1,9 @@
-import { Point } from "../pga2d/objects.js";
-import { GroupPrimitive, LinePrimitive } from "../sketchlib/primitives.js";
-import { RungeKuttaIntegrator } from "../sketchlib/RungeKuttaIntegrator.js";
-import { Color, Style } from "../sketchlib/Style.js";
-import { ValueHistory } from "../sketchlib/ValueHistory.js";
-import { GeneralizedCoordinates } from "../sketchlib/VectorSpace.js";
+import { Point } from "../../pga2d/objects.js";
+import { GroupPrimitive, LinePrimitive } from "../../sketchlib/primitives.js";
+import { RungeKuttaIntegrator } from "../../sketchlib/RungeKuttaIntegrator.js";
+import { Color, Style } from "../../sketchlib/Style.js";
+import { ValueHistory } from "../../sketchlib/ValueHistory.js";
+import { GeneralizedCoordinates } from "../../sketchlib/VectorSpace.js";
 
 const ARM_STYLE = new Style()
   .with_stroke(new Color(255, 255, 255))
@@ -22,6 +22,13 @@ export class Pendulum {
 }
 
 export class DoublePendulumSystem {
+  /**
+   *
+   * @param {Pendulum} pendulum1 The upper pendulum
+   * @param {Pendulum} pendulum2 The lower pendulum
+   * @param {number[]} initial_state The initial state: [theta1, theta_dot1, theta2, theta_dot2]
+   * @param {number} history_size How many points of history to keep
+   */
   constructor(pendulum1, pendulum2, initial_state, history_size) {
     this.pendulum1 = pendulum1;
     this.pendulum2 = pendulum2;
