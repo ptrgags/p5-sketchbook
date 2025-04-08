@@ -15,6 +15,7 @@ const Y_METERS = Point.DIR_Y.scale(-PIXELS_PER_METER);
 const NUM_COILS = 10;
 
 const STYLE_AXIS = new Style().with_stroke(new Color(255, 255, 255));
+const STYLE_WALLS = new Style().with_stroke(new Color(255, 255, 255));
 const STYLE_PHASE1 = new Style().with_stroke(new Color(255, 255, 0));
 const STYLE_PHASE2 = new Style().with_stroke(new Color(0, 255, 255));
 
@@ -39,7 +40,7 @@ export class Spring {
  * @param {Point} position Position of the top left corner of the spring in pixels
  * @param {Point} dimensions Direction encoding the width of the height in pixels
  * @param {number} num_coils How many coils to draw
- * @returns {GroupPrimitive} The
+ * @returns {GroupPrimitive} The lines in the spring
  */
 function render_horizontal_spring(position, dimensions, num_coils) {
   const { x: w, y: h } = dimensions;
@@ -57,10 +58,7 @@ function render_horizontal_spring(position, dimensions, num_coils) {
     const diag_up = new LinePrimitive(b, c);
     wires.push(diag_down, diag_up);
   }
-  return new GroupPrimitive(
-    wires,
-    new Style().with_stroke(new Color(255, 255, 0)).with_width(2)
-  );
+  return new GroupPrimitive(wires);
 }
 
 export class DoubleSpringSystem {
@@ -203,9 +201,10 @@ export class DoubleSpringSystem {
       NUM_COILS
     );
 
-    return new GroupPrimitive(
-      [wall, floor, bob1, bob2, spring1, spring2],
-      new Style().with_stroke(new Color(255, 0, 0))
-    );
+    const walls = new GroupPrimitive([wall, floor], STYLE_WALLS);
+    const left_spring = new GroupPrimitive([bob1, spring1], STYLE_PHASE1);
+    const right_spring = new GroupPrimitive([bob2, spring2], STYLE_PHASE2);
+
+    return new GroupPrimitive([walls, left_spring, right_spring]);
   }
 }

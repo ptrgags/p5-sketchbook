@@ -67,29 +67,3 @@ export const sketch = (p) => {
     SYSTEM.step(DELTA_TIME);
   };
 };
-
-/**
-
-def setup():
-    global system
-    size(640, 480)
-    system = DoublePendulumSystem(l1, l2, m1, m2, 20, 20, INITIAL_STATE)
-
-def draw():
-    system.step()
-    
-    center = Vector(width/2.0, height / 2.0)
-    phase_origin = center + Vector(0, -150)
-    
-    background(0)
-    noFill()
-    
-    colors = [color(0, 255, 0), color(255, 255, 0)]
-    
-    system.draw_history(center, SCALE)
-    system.draw(center, SCALE, colors)
-    
-    system.draw_phase(phase_origin, 10, 3, colors[0])
-    system.draw_phase(phase_origin, 10, 3, colors[1], 1)
-    system.draw_phase_axes(phase_origin, 10, 3, Vector(0, TAU), Vector(-10, 10))
- */
