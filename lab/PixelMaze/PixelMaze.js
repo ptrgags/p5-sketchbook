@@ -78,7 +78,6 @@ export const sketch = (p) => {
   let current_sprite;
   let tilemap;
   let player;
-  let viewport_offset = Point.ORIGIN;
 
   p.preload = () => {
     preload_p5_resources(p, RESOURCE_MANIFEST, p5_resources);
