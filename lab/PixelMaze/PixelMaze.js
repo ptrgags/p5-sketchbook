@@ -141,10 +141,12 @@ export const sketch = (p) => {
       DPAD.pressed(p.key);
       player.handle_input(DPAD.direction);
       return false;
-    } else if (p.key === "x") {
+    }
+    // you have to walk before you can run
+    /*else if (p.key === "x") {
       player.handle_run(true);
       return false;
-    }
+    }*/
     return true;
   };
 
@@ -153,10 +155,12 @@ export const sketch = (p) => {
       DPAD.released(p.key);
       player.handle_input(DPAD.direction);
       return false;
-    } else if (p.key === "x") {
+    }
+
+    /*else if (p.key === "x") {
       player.handle_run(false);
       return false;
-    }
+    }*/
     return true;
   };
 };
