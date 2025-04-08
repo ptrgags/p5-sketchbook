@@ -197,8 +197,6 @@ class TwoSpringSystem(object):
         self.history_origin1 = Vector(l1 + w / 2.0, 0)
         self.history_origin2 = Vector(l1 + w1 + l2 + w2 / 2.0, 0)
                                
-    def step(self):
-        self.state = next(self.simulation)
     
     def motion(self, state):
         x1, v1, x2, v2 = state
@@ -236,62 +234,4 @@ class TwoSpringSystem(object):
         line(0, v_min, 0, v_max)
         text("v", 10, -v_max)
         popMatrix()
-
-    def draw(self, origin, scale, colors):
-        spring_x1, _, spring_x2, _ = self.state
-        
-        pushMatrix()
-        translate(*origin)
-        stroke(255)
-        #Wall
-        x, y = self.wall_pos * scale
-        w, h = self.wall_dims * scale
-        vertical_wall(x, y, w, h, 10, right=True)
-        
-        #Floor
-        x, y = self.floor_pos * scale
-        w, h = self.floor_dims * scale
-        horizontal_wall(x, y, w, h, 20, top=True)
-        
-        stroke(colors[0])
-        #Spring1
-        x, y = self.spring1_pos * scale
-        w, h = (self.spring1_dims_rest + [spring_x1, 0]) * scale
-        horizontal_spring(x, y, w, h, 10)
-    
-        #Bob1
-        x, y = (self.bob1_pos_rest + [spring_x1, 0]) * scale
-        w, h = self.bob1_dims * scale
-        rect(x, y, w, h)        
-        
-        stroke(colors[1])
-        #Spring2
-        x, y = (self.spring2_pos_rest + [spring_x1, 0]) * scale
-        w, h = (self.spring2_dims_rest + [spring_x2, 0]) * scale
-        horizontal_spring(x, y, w, h, 10)
-    
-        #Bob2
-        x, y = (self.bob2_pos_rest + [spring_x1 + spring_x2, 0]) * scale
-        w, h = self.bob2_dims * scale
-        rect(x, y, w, h)       
-        popMatrix()
  */
-
-/*
-def horizontal_spring(x, y, w, h, coils):
-    '''
-    Draw a spring on the screen horizontally
-    x -- the x coordinate of the top left corner
-    y -- the y component of the top left corner
-    w -- width of the spring
-    h -- height of the spring
-    coils -- the number of coils to draw for this spring
-    '''
-    dx = float(w) / coils
-    pushMatrix()
-    translate(x, y)
-    for i in xrange(coils):
-        line(i * dx, 0, (i + 0.5) * dx, h)
-        line((i + 0.5) * dx, h, (i + 1) * dx, 0)
-    popMatrix()
-*/
