@@ -1,4 +1,4 @@
-import { Point } from "../pga2d/objects.js";
+import { Point } from "../../pga2d/objects.js";
 
 /**
  * Class for managing frames of a spritesheet or tile

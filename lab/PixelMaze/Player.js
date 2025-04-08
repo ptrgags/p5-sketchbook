@@ -1,6 +1,6 @@
-import { sec_to_frames, Tween } from "../MosaicSlider/Tween.js";
-import { Direction, to_y_down } from "../sketchlib/Direction.js";
-import { Index2D } from "../sketchlib/Grid.js";
+import { sec_to_frames, Tween } from "../../sketchlib/Tween.js";
+import { Direction, to_y_down } from "../../sketchlib/Direction.js";
+import { Index2D } from "../../sketchlib/Grid.js";
 import { Tiles } from "./make_maze.js";
 import { Tilemap } from "./Tilemap.js";
 
@@ -73,7 +73,7 @@ export class Player {
     );
 
     if (destination !== undefined) {
-      this.movement_tween = new Tween(
+      this.movement_tween = Tween.point(
         this.position,
         destination,
         start_frame,
@@ -83,7 +83,7 @@ export class Player {
     } else {
       // Walk in place by setting start and end position to the current
       // position
-      this.movement_tween = new Tween(
+      this.movement_tween = Tween.point(
         this.position,
         this.position,
         start_frame,

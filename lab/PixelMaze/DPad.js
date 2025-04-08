@@ -1,4 +1,4 @@
-import { Direction } from "../sketchlib/Direction.js";
+import { Direction } from "../../sketchlib/Direction.js";
 
 export const ARROW_KEYS = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"];
 export const WASD_KEYS = ["KeyW", "KeyA", "KeyS", "KeyD"];

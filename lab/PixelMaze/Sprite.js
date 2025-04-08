@@ -1,5 +1,5 @@
-import { Point } from "../pga2d/objects.js";
-import { mod } from "../sketchlib/mod.js";
+import { Point } from "../../pga2d/objects.js";
+import { mod } from "../../sketchlib/mod.js";
 import { ImageFrames } from "./ImageFrames.js";
 
 /**

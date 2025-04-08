@@ -1,4 +1,4 @@
-import { Point } from "../pga2d/objects.js";
+import { Point } from "../../pga2d/objects.js";
 import { ImageFrames } from "./ImageFrames.js";
 import { Sprite } from "./Sprite.js";
 

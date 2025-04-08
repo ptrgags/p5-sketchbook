@@ -1,6 +1,6 @@
-import { Grid, Index2D } from "../sketchlib/Grid.js";
-import { Direction } from "../sketchlib/Direction.js";
-import { generate_maze, MazeCell } from "../sketchlib/RandomDFSMaze.js";
+import { Grid, Index2D } from "../../sketchlib/Grid.js";
+import { Direction } from "../../sketchlib/Direction.js";
+import { generate_maze, MazeCell } from "../../sketchlib/RandomDFSMaze.js";
 
 /**
  * @enum {number}

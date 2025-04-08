@@ -1,6 +1,6 @@
-import { Point } from "../pga2d/objects.js";
-import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
-import { Direction } from "../sketchlib/Direction.js";
+import { Point } from "../../pga2d/objects.js";
+import { HEIGHT, WIDTH } from "../../sketchlib/dimensions.js";
+import { Direction } from "../../sketchlib/Direction.js";
 import { blit_sprite, blit_tilemap, P5Sprite, P5Tilemap } from "./blit.js";
 import { DPad } from "./DPad.js";
 import { make_maze } from "./make_maze.js";

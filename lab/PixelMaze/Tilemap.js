@@ -1,4 +1,4 @@
-import { Grid } from "../sketchlib/Grid.js";
+import { Grid } from "../../sketchlib/Grid.js";
 import { ImageFrames } from "./ImageFrames.js";
 
 /**

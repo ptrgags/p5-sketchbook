@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { ImageFrames } from "./ImageFrames";
-import { Point } from "../pga2d/objects";
-import { Grid, Index2D } from "../sketchlib/Grid";
+import { Point } from "../../pga2d/objects";
+import { Grid, Index2D } from "../../sketchlib/Grid";
 import { Tilemap } from "./Tilemap.js";
 
 function make_tileset() {

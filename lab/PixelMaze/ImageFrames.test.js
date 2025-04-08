@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { ImageFrames } from "./ImageFrames.js";
-import { Point } from "../pga2d/objects.js";
-import { PGA_MATCHERS } from "../pga2d/pga_matchers";
+import { Point } from "../../pga2d/objects.js";
+import { PGA_MATCHERS } from "../../pga2d/pga_matchers.js";
 
 expect.extend(PGA_MATCHERS);
 
