@@ -4,10 +4,10 @@ import {
   LinePrimitive,
   RectPrimitive,
 } from "../../sketchlib/primitives.js";
-import { RungeKuttaIntegrator } from "../../sketchlib/RungeKuttaIntegrator.js";
+import { RungeKuttaIntegrator } from "../lablib/RungeKuttaIntegrator.js";
 import { Color, Style } from "../../sketchlib/Style.js";
 import { RingBuffer } from "../lablib/RingBuffer.js";
-import { GeneralizedCoordinates } from "../../sketchlib/VectorSpace.js";
+import { GeneralizedCoordinates } from "../lablib/VectorSpace.js";
 
 const PIXELS_PER_METER = 100;
 const X_METERS = Point.DIR_X.scale(PIXELS_PER_METER);

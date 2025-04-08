@@ -4,10 +4,10 @@ import {
   GroupPrimitive,
   LinePrimitive,
 } from "../../sketchlib/primitives.js";
-import { RungeKuttaIntegrator } from "../../sketchlib/RungeKuttaIntegrator.js";
+import { RungeKuttaIntegrator } from "../lablib/RungeKuttaIntegrator.js";
 import { Color, Style } from "../../sketchlib/Style.js";
 import { RingBuffer } from "../lablib/RingBuffer.js";
-import { GeneralizedCoordinates } from "../../sketchlib/VectorSpace.js";
+import { GeneralizedCoordinates } from "../lablib/VectorSpace.js";
 import { PI, TAU } from "../../sketchlib/math_consts.js";
 import { mod } from "../../sketchlib/mod.js";
 
