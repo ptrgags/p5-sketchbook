@@ -26,6 +26,28 @@ export class Spring {
   }
 }
 
+function render_horizontal_spring(position, dimensions, num_coils) {
+  const { x: w, y: h } = dimensions;
+
+  const delta_x = Point.direction(w / num_coils, 0);
+  const delta_y = Point.DIR_Y.scale(h);
+  const wires = [];
+
+  for (let i = 0; i < num_coils; i++) {
+    const a = position.add(delta_x.scale(i));
+    const b = position.add(delta_x.scale(i + 0.5)).add(delta_y);
+    const c = position.add(delta_x.scale(i + 1));
+
+    const diag_down = new LinePrimitive(a, b);
+    const diag_up = new LinePrimitive(b, c);
+    wires.push(diag_down, diag_up);
+  }
+  return new GroupPrimitive(
+    wires,
+    new Style().with_stroke(new Color(255, 255, 0)).with_width(2)
+  );
+}
+
 export class DoubleSpringSystem {
   /**
    * Constructor
@@ -104,6 +126,16 @@ export class DoubleSpringSystem {
       Point.direction(BOB_WIDTH, BOB_WIDTH).scale(PIXEL_SCALE)
     );
 
+    const NUM_COILS = 10;
+    const spring1 = render_horizontal_spring(
+      bob_height,
+      Point.direction(
+        PIXEL_SCALE * (this.spring1.rest_length + x1),
+        BOB_WIDTH * PIXEL_SCALE
+      ),
+      NUM_COILS
+    );
+
     const rest_length =
       this.spring1.rest_length + BOB_WIDTH + this.spring2.rest_length;
     const bob2_position = bob_height.add(
@@ -114,8 +146,17 @@ export class DoubleSpringSystem {
       Point.direction(BOB_WIDTH, BOB_WIDTH).scale(PIXEL_SCALE)
     );
 
+    const spring2 = render_horizontal_spring(
+      bob1_position.add(Point.DIR_X.scale(PIXEL_SCALE * BOB_WIDTH)),
+      Point.direction(
+        PIXEL_SCALE * (this.spring2.rest_length + (x2 - x1)),
+        BOB_WIDTH * PIXEL_SCALE
+      ),
+      NUM_COILS
+    );
+
     return new GroupPrimitive(
-      [wall, floor, bob1, bob2],
+      [wall, floor, bob1, bob2, spring1, spring2],
       new Style().with_stroke(new Color(255, 0, 0))
     );
   }
@@ -235,3 +276,22 @@ class TwoSpringSystem(object):
         rect(x, y, w, h)       
         popMatrix()
  */
+
+/*
+def horizontal_spring(x, y, w, h, coils):
+    '''
+    Draw a spring on the screen horizontally
+    x -- the x coordinate of the top left corner
+    y -- the y component of the top left corner
+    w -- width of the spring
+    h -- height of the spring
+    coils -- the number of coils to draw for this spring
+    '''
+    dx = float(w) / coils
+    pushMatrix()
+    translate(x, y)
+    for i in xrange(coils):
+        line(i * dx, 0, (i + 0.5) * dx, h)
+        line((i + 0.5) * dx, h, (i + 1) * dx, 0)
+    popMatrix()
+*/
