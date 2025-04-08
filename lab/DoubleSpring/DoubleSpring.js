@@ -1,4 +1,21 @@
+import { Point } from "../../pga2d/objects.js";
 import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
+import { draw_primitive } from "../../sketchlib/draw_primitive.js";
+import { DoubleSpringSystem, Spring } from "./DoubleSpringSystem.js";
+
+const SPRING1 = new Spring(5.0, 0.5, 1.0);
+const SPRING2 = new Spring(5.0, 0.5, 1.0);
+const INITIAL_STATE = [-0.5, 0.0, -0.5, 0.0];
+const HISTORY_SIZE = 1000;
+
+const SYSTEM = new DoubleSpringSystem(
+  SPRING1,
+  SPRING2,
+  INITIAL_STATE,
+  HISTORY_SIZE
+);
+
+const DELTA_TIME = 0.01;
 
 export const sketch = (p) => {
   p.setup = () => {
@@ -12,6 +29,11 @@ export const sketch = (p) => {
 
   p.draw = () => {
     p.background(0);
+
+    const origin = Point.point(0, HEIGHT / 2);
+    draw_primitive(p, SYSTEM.render(origin));
+
+    SYSTEM.step(DELTA_TIME);
   };
 };
 

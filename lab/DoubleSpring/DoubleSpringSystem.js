@@ -1,17 +1,85 @@
-import { PhasePoint } from "../../sketchlib/VectorSpace";
+import { Point } from "../../pga2d/objects.js";
+import { GroupPrimitive } from "../../sketchlib/primitives.js";
+import { RungeKuttaIntegrator } from "../../sketchlib/RungeKuttaIntegrator.js";
+import { Color, Style } from "../../sketchlib/Style.js";
+import { ValueHistory } from "../../sketchlib/ValueHistory.js";
+import {
+  GeneralizedCoordinates,
+  PhasePoint,
+} from "../../sketchlib/VectorSpace.js";
 
-class HorizontalSpring {
+export class Spring {
   /**
-   *
-   * @param {number} spring_constant The spring's stiffness, k
-   * @param {number} rest_length The rest length
-   * @param {number} width The width of the spring for drawing
-   * @param {PhasePoint<number>} initial_phase The starting position of the system.
+   * Constructor
+   * @param {number} spring_constant The spring constant k
+   * @param {number} mass The mass of the bob connected to the spring m
+   * @param {number} rest_length The rest length of the spring in meters
    */
-  constructor(spring_constant, rest_length, width, initial_phase) {
-    (this.spring_constant = spring_constant), (this.rest_length = rest_length);
-    this.width = width;
-    this.initial_phase = initial_phase;
+  constructor(spring_constant, mass, rest_length) {
+    this.spring_constant = spring_constant;
+    this.mass = mass;
+    this.rest_length = rest_length;
+  }
+}
+
+export class DoubleSpringSystem {
+  /**
+   * Constructor
+   * @param {Spring} spring1 The left spring, attached to the wall
+   * @param {Spring} spring2 The right spring, attached to the first spring
+   * @param {number[]} initial_state The initial state of the system, [x1, v1, x2, v2]
+   * @param {number} history_size The number of points of history to keep
+   */
+  constructor(spring1, spring2, initial_state, history_size) {
+    this.spring1 = spring1;
+    this.spring2 = spring2;
+
+    this.simulation = new RungeKuttaIntegrator(
+      GeneralizedCoordinates,
+      (t, state) => this.motion(state),
+      initial_state
+    );
+    this.history = new ValueHistory(this.history);
+    this.history.push(initial_state);
+  }
+
+  /**
+   * Equation of motion for the two spring system.
+   * @param {number[]} state the state variables [x1, v1, x2, v2]
+   * @returns {number[]} The next state
+   */
+  motion(state) {
+    const [x1, v1, x2, v2] = state;
+    const a1 =
+      (this.spring2.spring_constant * (x2 - x1) -
+        this.spring1.spring_constant * x1) /
+      this.spring1.mass;
+    const a2 =
+      (this.spring2.spring_constant * x1 - this.spring2.spring_constant * x2) /
+      this.spring2.mass;
+
+    return [v1, a1, v2, a2];
+  }
+
+  /**
+   * Perform one simulation step
+   * @param {number} dt The time step
+   */
+  step(dt) {
+    this.simulation.update(dt);
+    this.history.push(this.simulation.state);
+  }
+
+  /**
+   * Render the spring system
+   * @param {Point} origin The origin
+   * @returns {GroupPrimitive} The primtitive to render
+   */
+  render(origin) {
+    return new GroupPrimitive(
+      [],
+      new Style().with_stroke(new Color(255, 0, 0))
+    );
   }
 }
 
