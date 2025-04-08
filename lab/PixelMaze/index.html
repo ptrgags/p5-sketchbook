@@ -1,0 +1,73 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../../libraries/p5.min.js"
+    ></script>
+    <script type="module">
+      import { sketch } from "./PixelMaze.js";
+      import "../../sketchlib/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../../styles/layout.css" />
+  </head>
+
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>Pixel Maze (2025)</h1>
+      <div id="sketch"></div>
+      <div class="description">
+        <p>
+          Arrow keys to walk around. That's it. There aren't any exits or
+          mechanics yet. Stay tuned!
+        </p>
+        <p>Notes:</p>
+        <ul>
+          <li>
+            Add a run button to make the character animate faster and also speed
+            up the position animation
+          </li>
+          <li>Try adding easing curves for better in-betweens</li>
+          <li>
+            Right now this requires a keyboard to move around... I need to make
+            an alternative. Perhaps an overlay with a d-pad and overlays
+          </li>
+          <li>
+            Wall decoration - I have a nicer tileset with brick walls and
+            rounded corners, but I'll need to add some code to determine where
+            to place the tiles
+          </li>
+          <li>
+            The tileset also had some trim around where the walls meet the
+            ceiling. I realized there's a simpler way to place the corner tiles,
+            but I'll have to think through the math a bit
+          </li>
+          <li>Make a nicer character sprite.</li>
+          <li>
+            This sketch laid the foundation for pixel art rendering in my
+            sketches. I still need to clean up and test more of the code to be
+            reusable
+          </li>
+          <li>
+            Adding a sound effect for when the character runs into a wall would
+            be nice for feedback.
+          </li>
+          <li>
+            Render just the tiles visible in the viewport, not the whole map
+          </li>
+          <li>
+            Add an entrance at the bottom of the map, and an exit at the top
+          </li>
+          <li>
+            Add stuff you can interact with to the maze. I'm thinking doors and
+            locks.
+          </li>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

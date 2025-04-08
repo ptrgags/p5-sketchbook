@@ -1,16 +1,16 @@
 import { describe, it, expect } from "vitest";
-import { Rect } from "./Rect";
-import { CoralTile } from "./CoralTile";
-import { GridDirection } from "../sketchlib/GridDiection";
-import { FlagSet } from "../sketchlib/FlagSet";
-import { ControlPoint } from "./ControlPoint";
-import { Point } from "../pga2d/objects";
+import { Rect } from "./Rect.js";
+import { CoralTile } from "./CoralTile.js";
+import { Direction } from "../sketchlib/Direction.js";
+import { FlagSet } from "../sketchlib/FlagSet.js";
+import { ControlPoint } from "./ControlPoint.js";
+import { Point } from "../pga2d/objects.js";
 
 describe("CoralTile", () => {
   const QUAD = new Rect(0, 0, 200, 200);
 
   it("to_json serializes default tile", () => {
-    const flags_right_up = new FlagSet(0b0011, GridDirection.COUNT);
+    const flags_right_up = new FlagSet(0b0011, Direction.COUNT);
     const tile = new CoralTile(QUAD, flags_right_up);
 
     const result = tile.to_json();

@@ -1,14 +1,14 @@
-import { Grid, Index2D } from "../../sketchlib/Grid.js";
-import { Random } from "../../sketchlib/random.js";
-import { DFS } from "../../sketchlib/DFS.js";
-import { FlagSet } from "../../sketchlib/FlagSet.js";
-import { GridDirection } from "../../sketchlib/GridDiection.js";
-import { GridDFSTraversal } from "../../sketchlib/GridDFSTraversal.js";
+import { Grid, Index2D } from "./Grid.js";
+import { Random } from "./random.js";
+import { DFS } from "./DFS.js";
+import { FlagSet } from "./FlagSet.js";
+import { Direction, opposite } from "./Direction.js";
+import { GridDFSTraversal } from "./GridDFSTraversal.js";
 
 export class MazeCell {
   constructor(index) {
     this.index = index;
-    this.connection_flags = new FlagSet(0, GridDirection.COUNT);
+    this.connection_flags = new FlagSet(0, Direction.COUNT);
   }
 
   is_connected(direction) {
@@ -16,7 +16,7 @@ export class MazeCell {
   }
 
   static connect_neighbors(cell_a, cell_b, dir_ab) {
-    const dir_ba = GridDirection.opposite(dir_ab);
+    const dir_ba = opposite(dir_ab);
     cell_a.connection_flags.set_flag(dir_ab);
     cell_b.connection_flags.set_flag(dir_ba);
   }
@@ -60,6 +60,12 @@ export class RandomDFSMazeTraversal {
   }
 }
 
+/**
+ * Generate a maze using DFS
+ * @param {number} rows The number of rows
+ * @param {number} cols The number of cols
+ * @returns {Grid<MazeCell>} A grid of cells connected like a maze
+ */
 export function generate_maze(rows, cols) {
   const grid = new Grid(rows, cols);
   grid.fill((index) => {

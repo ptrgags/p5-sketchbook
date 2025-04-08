@@ -1,4 +1,4 @@
-import { GridDirection } from "./GridDiection.js";
+import { Direction } from "./Direction.js";
 
 /**
  * Iterate over a 2D range of values, performing an action at each step.
@@ -84,7 +84,7 @@ export class Index2D {
   /**
    * Compute the direction to a neighboring cell.
    * @param {Index2D} other Another cell
-   * @returns {GridDirection|undefined} If the cell neighbors this one, the grid direction is returned. Else undefined is returned to indicate not adjacent.
+   * @returns {Direction|undefined} If the cell neighbors this one, the grid direction is returned. Else undefined is returned to indicate not adjacent.
    */
   direction_to(other) {
     const { i: ai, j: aj } = this;
@@ -94,19 +94,19 @@ export class Index2D {
     const dj = bj - aj;
 
     if (dj === 1 && di === 0) {
-      return GridDirection.RIGHT;
+      return Direction.RIGHT;
     }
 
     if (dj === -1 && di === 0) {
-      return GridDirection.LEFT;
+      return Direction.LEFT;
     }
 
     if (dj === 0 && di === 1) {
-      return GridDirection.DOWN;
+      return Direction.DOWN;
     }
 
     if (dj === 0 && di === -1) {
-      return GridDirection.UP;
+      return Direction.UP;
     }
 
     return undefined;
@@ -257,6 +257,31 @@ export class Grid {
     return index.down();
   }
 
+  /**
+   * Get a neighbor from the grid.
+   * @param {Index2D} index the index to check
+   * @param {Direction} direction The direction to the adjacent cell
+   * @returns {Index2D | undefined} The neighbor, or undefined if at the edge
+   * of the grid.
+   */
+  get_neighbor(index, direction) {
+    switch (direction) {
+      case Direction.RIGHT:
+        return this.right(index);
+      case Direction.UP:
+        return index.up();
+      case Direction.LEFT:
+        return index.left();
+      case Direction.DOWN:
+        return this.down(index);
+    }
+  }
+
+  /**
+   * Check if an index is in the bounds of the grid
+   * @param {Index2D} index The index to check
+   * @returns {boolean} true if the index is in bounds
+   */
   in_bounds(index) {
     const { i, j } = index;
 
