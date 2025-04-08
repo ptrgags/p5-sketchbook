@@ -70,21 +70,21 @@ export class Viewport {
   }
 
   /**
-   * Compute the origin of the tilemap so that the viewport will render
-   * as described, taking into account the upscale factor
-   * @returns {Point} The screenspace point in pixels. This is rounded to the
-   * nearest integer to ensure the tilemap won't have seams when rendered.
+   * Convert map coordinates to screen coordinates
+   * @param {Point} point The point in map pixels
+   * @returns {Point} The point in screen pixels. This is rounded to the nearest
+   * integer to avoid seams when rendered
    */
-  get_tilemap_origin() {
-    const { x, y } = this.position
-      .to_direction()
-      .neg()
-      .scale(this.upscale_factor);
-    return Point.point(Math.round(x), Math.round(y));
-  }
-
   map_to_screen(point) {
     const { x, y } = point.sub(this.position).scale(this.upscale_factor);
     return Point.point(Math.round(x), Math.round(y));
+  }
+
+  /**
+   * The origin of the tilemap in screen pixels
+   * @type {Point}
+   */
+  get tilemap_origin() {
+    return this.map_to_screen(Point.ORIGIN);
   }
 }

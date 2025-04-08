@@ -124,7 +124,7 @@ export const sketch = (p) => {
     p.push();
     p.scale(TILE_SCALE, TILE_SCALE);
 
-    blit_tilemap(p, tilemap, VIEWPORT.get_tilemap_origin());
+    blit_tilemap(p, tilemap, VIEWPORT.tilemap_origin);
 
     blit_sprite(
       p,
