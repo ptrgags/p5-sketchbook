@@ -1,22 +1,37 @@
 import { Point } from "../../pga2d/objects.js";
-import { GroupPrimitive, LinePrimitive } from "../../sketchlib/primitives.js";
+import {
+  CirclePrimitive,
+  GroupPrimitive,
+  LinePrimitive,
+} from "../../sketchlib/primitives.js";
 import { RungeKuttaIntegrator } from "../../sketchlib/RungeKuttaIntegrator.js";
 import { Color, Style } from "../../sketchlib/Style.js";
 import { RingBuffer } from "../lablib/RingBuffer.js";
 import { GeneralizedCoordinates } from "../../sketchlib/VectorSpace.js";
+import { PI, TAU } from "../../sketchlib/math_consts.js";
+import { mod } from "../../sketchlib/mod.js";
+
+const STYLE_AXIS = new Style()
+  .with_stroke(new Color(255, 255, 255))
+  .with_width(2);
 
 const ARM_STYLE = new Style()
   .with_stroke(new Color(255, 255, 255))
   .with_width(2);
 
+const STYLE_PHASE1 = new Style().with_stroke(new Color(255, 255, 0));
+const STYLE_PHASE2 = new Style().with_stroke(new Color(0, 255, 255));
+
 export class Pendulum {
   /**
-   *
+   * Constructor
    * @param {number} mass The mass of the pendulum's bob
-   * @param {number} length The length of the pendulum
+   * @param {number} length The length of the pendulum arm
+   * @param {number} bob_radius The radius of the pendulum's bob
    */
-  constructor(mass, length) {
+  constructor(mass, length, bob_radius) {
     this.mass = mass;
+    this.bob_radius = bob_radius;
     this.length = length;
   }
 }
@@ -123,6 +138,77 @@ export class DoublePendulumSystem {
     return [theta_dot1, alpha1, theta_dot2, alpha2];
   }
 
+  /**
+   * Render the phase plot for the angles and angular velocities
+   * @param {Point} origin The origin of the phase plot in pixels
+   * @param {number} theta_scale The scale of the angle axis in pixels/radian
+   * @param {number} theta_dot_scale The scale of the angular velocity axis in pixels / (rad/sec)
+   * @returns {[GroupPrimitive, GroupPrimitive]} The two phase plots
+   */
+  render_phase(origin, theta_scale, theta_dot_scale) {
+    const theta_dir = Point.DIR_X.scale(theta_scale);
+    const theta_dot_dir = Point.DIR_Y.scale(-theta_dot_scale);
+
+    const states = [...this.history];
+    const points1 = states.map(([theta1, theta_dot1, ,]) => {
+      const reduced_theta = mod(theta1 - PI, TAU) - PI;
+      return origin
+        .add(theta_dir.scale(reduced_theta))
+        .add(theta_dot_dir.scale(theta_dot1));
+    });
+
+    const points2 = states.map(([, , theta2, theta_dot2]) => {
+      const reduced_theta = mod(theta2 - PI, TAU) - PI;
+      return origin
+        .add(theta_dir.scale(reduced_theta))
+        .add(theta_dot_dir.scale(theta_dot2));
+    });
+
+    const phase1 = [];
+    const phase2 = [];
+    for (let i = 0; i < states.length - 1; i++) {
+      const a1 = points1[i];
+      const b1 = points1[i + 1];
+
+      // If we looped around the boundary, don't draw the line
+      if (Math.abs(a1.x - b1.x) < 0.8 * TAU) {
+        const line1 = new LinePrimitive(a1, b1);
+        phase1.push(line1);
+      }
+
+      const a2 = points2[i];
+      const b2 = points2[i + 1];
+      if (Math.abs(a2.x - b2.x) < 0.8 * TAU) {
+        const line2 = new LinePrimitive(a2, b2);
+        phase2.push(line2);
+      }
+    }
+
+    return [
+      new GroupPrimitive(phase1, STYLE_PHASE1),
+      new GroupPrimitive(phase2, STYLE_PHASE2),
+    ];
+  }
+
+  /**
+   * Render position/velocity axes on the screen for a phase plot
+   * @param {Point} origin The origin of the coordinate system
+   * @param {number} theta_scale Scale of the position axis in pixels/meter
+   * @param {number} theta_dot_scale Scale of the velocity axis in pixels / (m/s)
+   * @returns {GroupPrimitive}
+   */
+  render_phase_axes(origin, theta_scale, theta_dot_scale) {
+    const theta_dir = Point.DIR_X.scale(theta_scale);
+    const theta_dot_dir = Point.DIR_Y.scale(-theta_dot_scale);
+
+    const primitives = [
+      new LinePrimitive(origin.sub(theta_dir), origin.add(theta_dir)),
+      new LinePrimitive(origin.sub(theta_dot_dir), origin.add(theta_dot_dir)),
+    ];
+
+    return new GroupPrimitive(primitives, STYLE_AXIS);
+  }
+
   render(anchor_point) {
     const [theta1, , theta2] = this.simulation.state;
 
@@ -139,7 +225,16 @@ export class DoublePendulumSystem {
     const arm1 = new LinePrimitive(anchor_point, bob_position1);
     const arm2 = new LinePrimitive(bob_position1, bob_position2);
 
-    return new GroupPrimitive([arm1, arm2], ARM_STYLE);
+    const bob1 = new CirclePrimitive(
+      bob_position1,
+      PIXEL_SCALE * this.pendulum1.bob_radius
+    );
+    const bob2 = new CirclePrimitive(
+      bob_position2,
+      PIXEL_SCALE * this.pendulum2.bob_radius
+    );
+
+    return new GroupPrimitive([arm1, arm2, bob1, bob2], ARM_STYLE);
   }
 }
 

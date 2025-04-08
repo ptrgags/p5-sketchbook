@@ -34,6 +34,13 @@ export class Spring {
   }
 }
 
+/**
+ * Render zig-zag lines to look like a spring
+ * @param {Point} position Position of the top left corner of the spring in pixels
+ * @param {Point} dimensions Direction encoding the width of the height in pixels
+ * @param {number} num_coils How many coils to draw
+ * @returns {GroupPrimitive} The
+ */
 function render_horizontal_spring(position, dimensions, num_coils) {
   const { x: w, y: h } = dimensions;
 
