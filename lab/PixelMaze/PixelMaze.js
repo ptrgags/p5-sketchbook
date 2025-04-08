@@ -11,10 +11,10 @@ import { Tilemap } from "./Tilemap.js";
 import { Viewport } from "./Viewport.js";
 
 const TILE_SIZE = 16;
-const TILE_SCALE = 1;
+const TILE_SCALE = 2;
 
-const MAZE_ROWS = 8;
-const MAZE_COLS = 4;
+const MAZE_ROWS = 20;
+const MAZE_COLS = 20;
 const INDICES = make_maze(MAZE_ROWS, MAZE_COLS);
 
 const ORIGIN_CHARACTER = Point.direction(0, TILE_SIZE);
@@ -30,7 +30,7 @@ const RESOURCE_MANIFEST = {
     },
     character: {
       image: "character",
-      frame_size: Point.point(TILE_SIZE, 2 * TILE_SIZE),
+      frame_size: Point.direction(TILE_SIZE, 2 * TILE_SIZE),
     },
   },
   sprites: {
@@ -53,7 +53,7 @@ const RESOURCE_MANIFEST = {
 
 const DPAD = new DPad();
 
-const VIEWPORT_MARGIN = Point.direction(2 * TILE_SIZE, 3 * TILE_SIZE);
+const VIEWPORT_MARGIN = Point.direction(3, 3).scale(TILE_SIZE);
 const VIEWPORT = new Viewport(
   Point.ORIGIN,
   Point.direction(WIDTH, HEIGHT),
@@ -107,7 +107,7 @@ export const sketch = (p) => {
     player = new Player(
       resources.sprites.walk,
       resources.sprites.idle,
-      Point.direction(4, 9).scale(TILE_SIZE).to_point()
+      Point.direction(4, 10).scale(TILE_SIZE).to_point()
     );
 
     p.noSmooth();
@@ -122,7 +122,7 @@ export const sketch = (p) => {
     VIEWPORT.track_sprite(position, sprite);
 
     p.push();
-    p.scale(TILE_SCALE, TILE_SCALE);
+    p.scale(VIEWPORT.upscale_factor, VIEWPORT.upscale_factor);
 
     blit_tilemap(p, tilemap, VIEWPORT.tilemap_origin);
 

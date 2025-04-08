@@ -61,7 +61,7 @@ function format_point_diff(received, expected) {
   const r_bivec = received.bivec;
   const e_bivec = expected.bivec;
   diff_float_property(diffs, r_bivec, e_bivec, "yo", "x");
-  diff_float_property(diffs, r_bivec, e_bivec, "xo", "y");
+  diff_float_property(diffs, r_bivec, e_bivec, "xo", "-y");
   diff_float_property(diffs, r_bivec, e_bivec, "xy", "weight");
 
   return "actual | expected\n" + diffs.join("\n");

@@ -49,9 +49,8 @@ export class Viewport {
    * @param {Sprite} sprite the sprite to get information about its origin and dimensions
    */
   track_sprite(sprite_position, sprite) {
-    const sprite_pos_viewport = sprite_position.sub(this.position).to_point();
-
-    const sprite_top_left = sprite_pos_viewport.sub(sprite.origin);
+    // corners of the sprite in map pixels
+    const sprite_top_left = sprite_position.sub(sprite.origin);
     const sprite_bottom_right = sprite_top_left.add(sprite.frame_size);
 
     // Constrain the viewport so there's at least the margin in all direction.
@@ -76,7 +75,7 @@ export class Viewport {
    * integer to avoid seams when rendered
    */
   map_to_screen(point) {
-    const { x, y } = point.sub(this.position).scale(this.upscale_factor);
+    const { x, y } = point.sub(this.position); //.scale(this.upscale_factor);
     return Point.point(Math.round(x), Math.round(y));
   }
 

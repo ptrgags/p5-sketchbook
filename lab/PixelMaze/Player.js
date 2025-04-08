@@ -18,8 +18,8 @@ const ANIMATION_SPEED_MEDIUM = 0.2;
 const ANIMATION_SPEED_FAST = 0.41;
 
 // How long the position tweens should take
-const DURATION_WALK = sec_to_frames(0.2);
-const DURATION_WALK_IN_PLACE = sec_to_frames(0.15);
+const DURATION_WALK = sec_to_frames(0.1);
+const DURATION_WALK_IN_PLACE = sec_to_frames(0.2);
 
 export class Player {
   constructor(walk_sprites, idle_sprites, position) {
