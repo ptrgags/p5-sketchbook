@@ -14,6 +14,8 @@ const X_METERS = Point.DIR_X.scale(PIXELS_PER_METER);
 const Y_METERS = Point.DIR_Y.scale(-PIXELS_PER_METER);
 const NUM_COILS = 10;
 
+const STYLE_AXIS = new Style().with_stroke(new Color(255, 255, 255));
+
 export class Spring {
   /**
    * Constructor
@@ -69,7 +71,7 @@ export class DoubleSpringSystem {
       (t, state) => this.motion(state),
       initial_state
     );
-    this.history = new ValueHistory(this.history);
+    this.history = new ValueHistory(history_size);
     this.history.push(initial_state);
   }
 
@@ -99,8 +101,26 @@ export class DoubleSpringSystem {
   }
 
   /**
+   * Render axes for
+   * @param {Point} origin The origin of the coordinate system
+   * @param {number} x_scale Scale of the position axis in pixels/meter
+   * @param {number} v_scale Scale of the velocity axis in pixels / (m/s)
+   */
+  render_phase_axes(origin, x_scale, v_scale) {
+    const x_dir = Point.DIR_X.scale(x_scale);
+    const v_dir = Point.DIR_Y.scale(-v_scale);
+
+    const primitives = [
+      new LinePrimitive(origin.sub(x_dir), origin.add(x_dir)),
+      new LinePrimitive(origin.sub(v_dir), origin.add(v_dir)),
+    ];
+
+    return new GroupPrimitive(primitives, STYLE_AXIS);
+  }
+
+  /**
    * Render the spring system
-   * @param {Point} origin The origin in screen pixels
+   * @param {Point} origin The bottom left corner of where the animation will be drawn in pixels
    * @returns {GroupPrimitive} The primtitive to render
    */
   render(origin) {
@@ -180,12 +200,6 @@ class TwoSpringSystem(object):
         self.history_origin1 = Vector(l1 + w / 2.0, 0)
         self.history_origin2 = Vector(l1 + w1 + l2 + w2 / 2.0, 0)
                                
-    
-    def motion(self, state):
-        x1, v1, x2, v2 = state
-        a1 = (self.k2 * x2 - self.k1 * x1 - self.k2 * x1) / self.m1
-        a2 = (self.k2 * x1 - self.k2 * x2) / self.m2
-        return Vector(v1, a1, v2, a2)
     
     def draw_history(self, origin, scale, c=color(255, 0, 0)):
         pushMatrix()
