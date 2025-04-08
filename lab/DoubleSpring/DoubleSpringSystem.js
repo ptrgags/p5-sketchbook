@@ -7,10 +7,7 @@ import {
 import { RungeKuttaIntegrator } from "../../sketchlib/RungeKuttaIntegrator.js";
 import { Color, Style } from "../../sketchlib/Style.js";
 import { ValueHistory } from "../../sketchlib/ValueHistory.js";
-import {
-  GeneralizedCoordinates,
-  PhasePoint,
-} from "../../sketchlib/VectorSpace.js";
+import { GeneralizedCoordinates } from "../../sketchlib/VectorSpace.js";
 
 export class Spring {
   /**
