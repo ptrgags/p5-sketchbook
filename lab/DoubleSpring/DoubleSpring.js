@@ -8,23 +8,30 @@ const SPRING_CONSTANT = 5.0;
 const REST_LENGTH = 1.0;
 const BOB_MASS = 0.5;
 const BOB_WIDTH = 0.4;
-
-const X_SCALE = 100;
-const V_SCALE = 30;
-
-// Both springs will be identical in size
+// All springs will be the same, I'm only varying the initial positions
 const SPRING = new Spring(SPRING_CONSTANT, REST_LENGTH, BOB_MASS, BOB_WIDTH);
-// start with the springs slightly compressed
-const INITIAL_STATE = [-0.5, 0.0, -1, 0.0];
-const HISTORY_SIZE = 10000;
 
-const SYSTEM = new DoubleSpringSystem(
-  // The two springs are identical for this sketch
-  SPRING,
-  SPRING,
-  INITIAL_STATE,
-  HISTORY_SIZE
-);
+/**
+ * Make initial state with slight changes in position
+ * @param {number} spring_index Which spring it is
+ * @returns {number[]} initial state
+ */
+function vary_position(spring_index) {
+  const delta_x = 0.1 * spring_index;
+  return [-0.5 + delta_x, 0.5, 0.5, 0.5];
+}
+
+const N = 5;
+const HISTORY_SIZE = 100;
+const SPRING_SYSTEMS = new Array(N);
+for (let i = 0; i < N; i++) {
+  SPRING_SYSTEMS[i] = new DoubleSpringSystem(
+    SPRING,
+    SPRING,
+    vary_position(i),
+    HISTORY_SIZE
+  );
+}
 
 const DELTA_TIME = 0.01;
 
@@ -41,26 +48,34 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    const origin = Point.point(10, (3 * HEIGHT) / 4);
-    const spring_animation = SYSTEM.render(origin);
+    const spring_animations = SPRING_SYSTEMS.map((system, i) => {
+      const origin = Point.point(10, 100 * i + 100);
+      return system.render(origin);
+    });
 
-    const phase_origin = Point.point(WIDTH / 2, HEIGHT / 4);
-    const phase_axes = SYSTEM.render_phase_axes(phase_origin, X_SCALE, V_SCALE);
-    const [phase1, phase2] = SYSTEM.render_phase(
+    const animations = new GroupPrimitive(spring_animations);
+
+    const X_SCALE = 300;
+    const V_SCALE = 30;
+    const phase_origin = Point.point(WIDTH / 2, (7 * HEIGHT) / 8);
+    const phase_axes = SPRING_SYSTEMS[0].render_phase_axes(
       phase_origin,
       X_SCALE,
       V_SCALE
     );
 
+    const phase_animations = SPRING_SYSTEMS.flatMap((system) => {
+      return system.render_phase(phase_origin, X_SCALE, V_SCALE);
+    });
+
     const scene = new GroupPrimitive([
-      spring_animation,
+      ...animations,
       phase_axes,
-      phase1,
-      phase2,
+      ...phase_animations,
     ]);
 
     draw_primitive(p, scene);
 
-    SYSTEM.step(DELTA_TIME);
+    SPRING_SYSTEMS.forEach((x) => x.step(DELTA_TIME));
   };
 };

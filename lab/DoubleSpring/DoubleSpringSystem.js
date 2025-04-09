@@ -168,12 +168,11 @@ export class DoubleSpringSystem {
    */
   render(origin) {
     const [x1, , x2] = this.simulation.state;
-
-    const wall = new LinePrimitive(origin, origin.add(Y_METERS));
-    const floor = new LinePrimitive(origin, origin.add(X_METERS.scale(4)));
-
     const { rest_length: l1, bob_width: w1 } = this.spring1;
     const { rest_length: l2, bob_width: w2 } = this.spring2;
+
+    const wall = new LinePrimitive(origin, origin.add(Y_METERS.scale(w1)));
+    const floor = new LinePrimitive(origin, origin.add(X_METERS.scale(4)));
 
     const bob_height = origin.add(Y_METERS.scale(w1));
     const bob1_position = bob_height.add(X_METERS.scale(l1 + x1));
