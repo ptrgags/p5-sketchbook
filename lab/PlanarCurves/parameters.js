@@ -1,9 +1,4 @@
-import {
-  random_walk_curvature,
-  gamepad_curvature,
-  pointer_curvature,
-  midi_curvature,
-} from "./curvature.js";
+import { random_walk_curvature } from "./curvature.js";
 import { Palette } from "./palette.js";
 
 export class Parameters {
@@ -41,35 +36,4 @@ Parameters.RANDOM_WALK = new Parameters({
   position_variation: [0, 5],
   angle_variation: Math.PI / 8,
   curvature_func: random_walk_curvature,
-});
-
-Parameters.GAMEPAD = new Parameters({
-  coolors_url:
-    "https://coolors.co/ca7df9-9e65f9-724cf9-3980e9-00b4d8-48cae4-90e0ef",
-  position_variation: [3, 5],
-  initial_angle: Math.PI / 2,
-  angle_variation: Math.PI / 24,
-  curvature_func: gamepad_curvature,
-  curvature_amplitude: 0.01,
-  iters_per_update: 5,
-  max_points_per_curve: -1,
-});
-
-Parameters.POINTER = new Parameters({
-  coolors_url: "https://coolors.co/540d6e-ee4266-ffd23f-3bceac-0ead69",
-  curvature_func: pointer_curvature,
-  curvature_amplitude: 0.2,
-  iters_per_update: 2,
-  angle_variation: Math.PI / 24,
-  max_points_per_curve: 10000,
-});
-
-Parameters.MIDI = new Parameters({
-  coolors_url:
-    "https://coolors.co/004b23-006400-007200-008000-38b000-70e000-9ef01a-ccff33",
-  curvature_func: midi_curvature,
-  curvature_amplitude: 0.1,
-  iters_per_update: 4,
-  angle_variation: Math.PI / 24,
-  max_points_per_curve: 5000,
 });
