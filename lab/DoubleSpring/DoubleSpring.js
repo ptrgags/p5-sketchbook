@@ -74,18 +74,6 @@ export const sketch = (p) => {
       ...phase_animations,
     ]);
 
-    /*
-    const X_SCALE = 100;
-const V_SCALE = 30;
-    const phase_origin = Point.point(WIDTH / 2, HEIGHT / 4);
-    const phase_axes = SYSTEM.render_phase_axes(phase_origin, X_SCALE, V_SCALE);
-    const [phase1, phase2] = SYSTEM.render_phase(
-      phase_origin,
-      X_SCALE,
-      V_SCALE
-    );
-    */
-
     draw_primitive(p, scene);
 
     SPRING_SYSTEMS.forEach((x) => x.step(DELTA_TIME));
