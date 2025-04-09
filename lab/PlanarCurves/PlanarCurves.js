@@ -1,16 +1,8 @@
 import { Parameters } from "./parameters.js";
-import { GamepadAxisControls } from "./gamepad.js";
-import { MidiControls } from "./midi.js";
-import { PointerControls } from "./pointer.js";
 import { signed_random } from "./curvature.js";
 
 const PARAMETERS = Parameters.RANDOM_WALK;
-
 const CURVES = new Array(PARAMETERS.num_curves);
-const GAMEPAD = new GamepadAxisControls();
-
-const midi_enabled = PARAMETERS === Parameters.MIDI;
-const MIDI = new MidiControls(midi_enabled);
 
 class PlanarCurve {
   constructor(initial_position, initial_angle, line_color, curvature_func) {
@@ -76,10 +68,8 @@ function init_curves() {
 }
 
 export const sketch = (p) => {
-  let pointer;
   p.setup = () => {
     const canvas = p.createCanvas(500, 700);
-    pointer = new PointerControls(canvas);
     init_curves();
   };
 
@@ -95,7 +85,5 @@ export const sketch = (p) => {
         curve.update(PARAMETERS.delta_arc_length);
       }
     }
-
-    GAMEPAD.update();
   };
 };
