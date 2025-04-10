@@ -27,6 +27,7 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
+    draw_primitive(p, DPAD.render());
     draw_primitive(p, DPAD.debug_render());
   };
 

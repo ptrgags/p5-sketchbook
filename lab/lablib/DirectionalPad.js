@@ -2,6 +2,7 @@ import { Point } from "../../pga2d/objects.js";
 import { Direction, to_y_down } from "../../sketchlib/Direction.js";
 import {
   GroupPrimitive,
+  PolygonPrimitive,
   RectPrimitive,
   VectorPrimitive,
 } from "../../sketchlib/primitives.js";
@@ -86,6 +87,84 @@ export class DirectionalPad {
 
   mouse_released() {
     this.clear_value();
+  }
+
+  render() {
+    const center = this.rect.center;
+    const top_left = this.rect.position;
+    const bottom_right = this.rect.position.add(this.rect.dimensions);
+
+    const across = Point.direction(this.rect.dimensions.x, 0);
+    const down = Point.direction(0, this.rect.dimensions.x);
+    const top_right = top_left.add(across);
+    const bottom_left = top_right.add(down);
+
+    const mid_ul = Point.lerp(top_left, bottom_right, 0.25);
+    const mid_dr = Point.lerp(top_left, bottom_right, 0.75);
+    const mid_dl = Point.lerp(bottom_left, top_right, 0.25);
+    const mid_ur = Point.lerp(bottom_left, top_right, 0.75);
+
+    const edge_rd = Point.lerp(bottom_right, top_right, 0.25);
+    const edge_ru = Point.lerp(bottom_right, top_right, 0.75);
+    const edge_ul = Point.lerp(top_left, top_right, 0.25);
+    const edge_ur = Point.lerp(top_left, top_right, 0.75);
+    const edge_ld = Point.lerp(bottom_left, top_left, 0.25);
+    const edge_lu = Point.lerp(bottom_left, top_left, 0.75);
+    const edge_dl = Point.lerp(bottom_left, bottom_right, 0.25);
+    const edge_dr = Point.lerp(bottom_left, bottom_right, 0.75);
+
+    const right_button = new PolygonPrimitive([
+      center,
+      mid_dr,
+      edge_dr,
+      edge_ur,
+      mid_ur,
+    ]);
+
+    const up_button = new PolygonPrimitive([
+      center,
+      mid_ur,
+      edge_ur,
+      edge_ul,
+      mid_ul,
+    ]);
+
+    const left_button = new PolygonPrimitive([
+      center,
+      mid_ul,
+      edge_ul,
+      edge_dr,
+      mid_dl,
+    ]);
+
+    const down_button = new PolygonPrimitive([
+      center,
+      mid_dl,
+      edge_dl,
+      edge_dr,
+      mid_dr,
+    ]);
+
+    const buttons = [right_button, up_button, left_button, down_button];
+
+    const idle_buttons = [];
+    const pressed_buttons = [];
+
+    for (const [direction, x] of buttons.entries()) {
+      if (this.direction_pressed === direction) {
+        pressed_buttons.push(x);
+      } else {
+        idle_buttons.push(x);
+      }
+    }
+
+    const STYLE_IDLE = Style.DEFAULT_STROKE;
+    const STYLE_PRESSED = Style.DEFAULT_STROKE_FILL;
+
+    const idle_group = new GroupPrimitive(pressed_buttons, STYLE_IDLE);
+    const pressed_group = new GroupPrimitive(pressed_buttons, STYLE_PRESSED);
+
+    return new GroupPrimitive([idle_group, pressed_group]);
   }
 
   debug_render() {
