@@ -4,7 +4,6 @@ import { CoralTile } from "../CoralTile.js";
 import { InteractiveTangent, InteractiveVertex } from "./interactive.js";
 import { find_splines } from "../find_splines.js";
 import { FlagSet } from "../../sketchlib/FlagSet.js";
-import { GridDirection } from "../../sketchlib/GridDiection.js";
 import { Style } from "../../sketchlib/Style.js";
 import {
   render_quad,
@@ -25,6 +24,7 @@ import {
   SPLINE_STYLE,
 } from "../styles.js";
 import { Color } from "../../sketchlib/Style.js";
+import { Direction } from "../../sketchlib/Direction.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -43,10 +43,7 @@ const CONNECTION_ORDER = [
 ];
 
 const TILES = SMALL_QUADS.map(({ i, j }, quad) => {
-  const connection_flags = new FlagSet(
-    CONNECTION_ORDER[i][j],
-    GridDirection.COUNT
-  );
+  const connection_flags = new FlagSet(CONNECTION_ORDER[i][j], Direction.COUNT);
   return new CoralTile(quad, connection_flags);
 });
 
