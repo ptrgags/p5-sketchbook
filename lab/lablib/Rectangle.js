@@ -4,7 +4,7 @@ import { HEIGHT, WIDTH } from "../../sketchlib/dimensions.js";
 /**
  * Mathematical description of a rectangle with a corner and dimensions.
  *
- * Not to be confused with RectPrimitive, which
+ * Not to be confused with RectPrimitive, which is for rendering a rectangle
  */
 export class Rectangle {
   /**
@@ -40,6 +40,10 @@ export class Rectangle {
   }
 }
 
+/**
+ * A rectangle that sets the boundary of the screen
+ * @type {Rectangle}
+ */
 export const SCREEN_RECT = new Rectangle(
   Point.ORIGIN,
   Point.direction(WIDTH, HEIGHT)

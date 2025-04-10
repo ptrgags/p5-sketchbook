@@ -9,6 +9,10 @@ import {
 import { Style } from "../../sketchlib/Style.js";
 import { Rectangle } from "./Rectangle.js";
 
+/**
+ * A virtual pad of 4 directional buttons, modeled after the D-pad on
+ * a gamepad or handheld console
+ */
 export class DirectionalPad {
   /**
    * Constructor
@@ -32,6 +36,12 @@ export class DirectionalPad {
      * @type {Direction | undefined}
      */
     this.direction_pressed = undefined;
+
+    /**
+     * Cached geometry computed on the first call to render()
+     * @type {PolygonPrimitive[] | undefined}
+     */
+    this.button_geometry = undefined;
   }
 
   clear_value() {
@@ -69,6 +79,10 @@ export class DirectionalPad {
     }
   }
 
+  /**
+   * Mouse pressed handler
+   * @param {Point} point The mouse coordinates relative to the canvas in pixels
+   */
   mouse_pressed(point) {
     if (this.rect.contains(point)) {
       this.update_value(point);
@@ -77,6 +91,10 @@ export class DirectionalPad {
     }
   }
 
+  /**
+   * Mouse dragged handler
+   * @param {Point} point The mouse coordinates relative to the canvas in pixels
+   */
   mouse_dragged(point) {
     if (this.rect.contains(point)) {
       this.update_value(point);
@@ -85,10 +103,17 @@ export class DirectionalPad {
     }
   }
 
+  /**
+   * Mouse released handler
+   */
   mouse_released() {
     this.clear_value();
   }
 
+  /**
+   * Render a virtual D-pad
+   * @returns {GroupPrimitive} the 4 buttons, suitable for a mobile overlay
+   */
   render() {
     const center = this.rect.center;
     const top_left = this.rect.position;
