@@ -24,7 +24,7 @@ for (let i = 0; i < INITIAL_POINTS; i++) {
 const POLYLINE = new DifferentialPolyline(points, QUADTREE);
 const POLYLINE2 = new DifferentialPolyline(points2, QUADTREE);
 
-const BASE_STYLE = new Style().with_stroke(new Color(0, 0, 0)).with_width(2);
+const BASE_STYLE = new Style({ stroke: Color.BLACK, width: 2 });
 const STYLE_POLYLINE1 = BASE_STYLE.with_fill(new Color(255, 127, 0));
 const STYLE_POLYLINE2 = BASE_STYLE.with_fill(new Color(0, 127, 0));
 
@@ -90,10 +90,10 @@ export const sketch = (p) => {
 
     if (show_ref_geometry) {
       const poly1 = POLYLINE.make_polyline(
-        STYLE_POLYLINE1.with_stroke(new Color(255, 255, 255))
+        STYLE_POLYLINE1.with_stroke(Color.WHITE)
       );
       const poly2 = POLYLINE2.make_polyline(
-        STYLE_POLYLINE2.with_stroke(new Color(255, 255, 255))
+        STYLE_POLYLINE2.with_stroke(Color.WHITE)
       );
       draw_primitive(p, poly1);
       draw_primitive(p, poly2);
