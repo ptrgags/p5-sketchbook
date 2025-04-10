@@ -11,16 +11,11 @@ import { GeneralizedCoordinates } from "../lablib/VectorSpace.js";
 import { PI, TAU } from "../../sketchlib/math_consts.js";
 import { mod } from "../../sketchlib/mod.js";
 
-const STYLE_AXIS = new Style()
-  .with_stroke(new Color(255, 255, 255))
-  .with_width(2);
+const STYLE_AXIS = Style.DEFAULT_STROKE.with_width(2);
+const ARM_STYLE = STYLE_AXIS;
 
-const ARM_STYLE = new Style()
-  .with_stroke(new Color(255, 255, 255))
-  .with_width(2);
-
-const STYLE_PHASE1 = new Style().with_stroke(new Color(255, 255, 0));
-const STYLE_PHASE2 = new Style().with_stroke(new Color(0, 255, 255));
+const STYLE_PHASE1 = new Style({ stroke: Color.YELLOW });
+const STYLE_PHASE2 = new Style({ stroke: Color.CYAN });
 
 const PIXELS_PER_METER = 100;
 

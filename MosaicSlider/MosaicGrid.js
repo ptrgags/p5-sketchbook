@@ -15,7 +15,7 @@ const MARGIN_Y = (HEIGHT - ROWS * SQUARE_SIZE) / 2;
 const STRIDE = Point.direction(SQUARE_SIZE, SQUARE_SIZE);
 const CORNER = Point.point(MARGIN_X, MARGIN_Y);
 const SWAP_DURATION = sec_to_frames(1 / 16);
-const PIXEL_STYLE = new Style().with_stroke(Color.BLACK).with_width(2);
+const PIXEL_STYLE = new Style({ stroke: Color.BLACK, width: 2 });
 
 /**
  * Color each quadrant of the grid a different color
@@ -48,7 +48,7 @@ export class MosaicGrid {
     this.colors = colors;
     this.styles = colors.map((x) => PIXEL_STYLE.with_fill(x));
     // Add an additional style for hole pixels.
-    this.styles.push(new Style());
+    this.styles.push(Style.INVISIBLE);
 
     this.primitive = this.create_primitive();
     this.primitive_dirty = false;

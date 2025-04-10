@@ -1,9 +1,11 @@
 import { Style, Color } from "../sketchlib/Style.js";
-const THICK = new Style().with_width(4);
-
-export const GRID_STYLE = new Style()
-  .with_stroke(new Color(127, 127, 127))
-  .with_width(0.5);
+const THICK = new Style({
+  width: 4,
+});
+export const GRID_STYLE = new Style({
+  stroke: new Color(127, 127, 127),
+  width: 0.5,
+});
 export const WALL_STYLE = THICK.with_stroke(new Color(85, 59, 112));
 export const CONNECTION_STYLE = THICK.with_stroke(new Color(33, 41, 102));
 

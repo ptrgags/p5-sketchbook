@@ -14,10 +14,10 @@ const X_METERS = Point.DIR_X.scale(PIXELS_PER_METER);
 const Y_METERS = Point.DIR_Y.scale(-PIXELS_PER_METER);
 const NUM_COILS = 10;
 
-const STYLE_AXIS = new Style().with_stroke(new Color(255, 255, 255));
-const STYLE_WALLS = new Style().with_stroke(new Color(255, 255, 255));
-const STYLE_PHASE1 = new Style().with_stroke(new Color(255, 255, 0));
-const STYLE_PHASE2 = new Style().with_stroke(new Color(0, 255, 255));
+const STYLE_AXIS = Style.DEFAULT_STROKE;
+const STYLE_WALLS = Style.DEFAULT_STROKE;
+const STYLE_PHASE1 = new Style({ stroke: Color.YELLOW });
+const STYLE_PHASE2 = new Style({ stroke: Color.CYAN });
 
 export class Spring {
   /**

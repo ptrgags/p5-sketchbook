@@ -3,9 +3,8 @@ import { Motor } from "../pga2d/versors.js";
 import { GroupPrimitive, LinePrimitive, PointPrimitive } from "./primitives.js";
 import { Color, Style } from "./Style.js";
 
-const COLOR_SPINE = new Color(255, 255, 255);
-const SPINE_STYLE = new Style().with_stroke(COLOR_SPINE);
-const CENTER_STYLE = new Style().with_fill(COLOR_SPINE);
+const SPINE_STYLE = Style.DEFAULT_STROKE;
+const CENTER_STYLE = new Style({ fill: Color.WHITE });
 
 /**
  * A joint in an AnimationChain
