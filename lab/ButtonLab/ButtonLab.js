@@ -2,6 +2,7 @@ import { Point } from "../../pga2d/objects.js";
 import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
 import { draw_primitive } from "../../sketchlib/draw_primitive.js";
 import { fix_mouse_coords } from "../../sketchlib/fix_mouse_coords.js";
+import { prevent_mobile_scroll } from "../../sketchlib/prevent_mobile_scroll.js";
 import { DirectionalPad } from "../lablib/DirectionalPad.js";
 import { Rectangle, SCREEN_RECT } from "../lablib/Rectangle.js";
 
@@ -19,12 +20,14 @@ export const sketch = (p) => {
       undefined,
       document.getElementById("sketch-canvas")
     ).elt;
+
+    prevent_mobile_scroll(canvas);
   };
 
   p.draw = () => {
     p.background(0);
 
-    draw_primitive(p, DPAD.render());
+    draw_primitive(p, DPAD.debug_render());
   };
 
   p.mousePressed = () => {

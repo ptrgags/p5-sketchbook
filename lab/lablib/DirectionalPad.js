@@ -1,5 +1,5 @@
 import { Point } from "../../pga2d/objects.js";
-import { Direction } from "../../sketchlib/Direction.js";
+import { Direction, to_y_down } from "../../sketchlib/Direction.js";
 import {
   GroupPrimitive,
   RectPrimitive,
@@ -88,7 +88,12 @@ export class DirectionalPad {
     this.clear_value();
   }
 
-  render() {
+  debug_render() {
+    const boundary = new RectPrimitive(
+      this.rect.position,
+      this.rect.dimensions
+    );
+
     const center = this.rect.center;
     const half_dimensions = this.rect.dimensions.scale(0.5);
     const arrow_offset = Point.direction(
@@ -97,11 +102,22 @@ export class DirectionalPad {
     );
     const value_arrow = new VectorPrimitive(center, center.add(arrow_offset));
 
-    const boundary = new RectPrimitive(
-      this.rect.position,
-      this.rect.dimensions
+    const direction =
+      this.direction_pressed !== undefined
+        ? to_y_down(this.direction_pressed)
+        : Point.ZERO;
+    const direction_offset = Point.direction(
+      direction.x * half_dimensions.x,
+      direction.y * half_dimensions.y
+    );
+    const direction_arrow = new VectorPrimitive(
+      center,
+      center.add(direction_offset)
     );
 
-    return new GroupPrimitive([boundary, value_arrow], Style.DEFAULT_STROKE);
+    return new GroupPrimitive(
+      [boundary, value_arrow, direction_arrow],
+      Style.DEFAULT_STROKE
+    );
   }
 }
