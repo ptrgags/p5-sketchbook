@@ -7,7 +7,7 @@ import { DirectionalPad } from "../lablib/DirectionalPad.js";
 import { Rectangle, SCREEN_RECT } from "../lablib/Rectangle.js";
 
 const DPAD = new DirectionalPad(
-  new Rectangle(Point.point(10, 10), Point.direction(200, 400)),
+  new Rectangle(Point.point(10, 10), Point.direction(200, 200)),
   0.01
 );
 
@@ -28,7 +28,6 @@ export const sketch = (p) => {
     p.background(0);
 
     draw_primitive(p, DPAD.render());
-    draw_primitive(p, DPAD.debug_render());
   };
 
   p.mousePressed = () => {

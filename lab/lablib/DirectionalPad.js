@@ -95,9 +95,9 @@ export class DirectionalPad {
     const bottom_right = this.rect.position.add(this.rect.dimensions);
 
     const across = Point.direction(this.rect.dimensions.x, 0);
-    const down = Point.direction(0, this.rect.dimensions.x);
+    const down = Point.direction(0, this.rect.dimensions.y);
     const top_right = top_left.add(across);
-    const bottom_left = top_right.add(down);
+    const bottom_left = top_left.add(down);
 
     const mid_ul = Point.lerp(top_left, bottom_right, 0.25);
     const mid_dr = Point.lerp(top_left, bottom_right, 0.75);
@@ -116,8 +116,8 @@ export class DirectionalPad {
     const right_button = new PolygonPrimitive([
       center,
       mid_dr,
-      edge_dr,
-      edge_ur,
+      edge_rd,
+      edge_ru,
       mid_ur,
     ]);
 
@@ -132,8 +132,8 @@ export class DirectionalPad {
     const left_button = new PolygonPrimitive([
       center,
       mid_ul,
-      edge_ul,
-      edge_dr,
+      edge_lu,
+      edge_ld,
       mid_dl,
     ]);
 
@@ -158,10 +158,10 @@ export class DirectionalPad {
       }
     }
 
-    const STYLE_IDLE = Style.DEFAULT_STROKE;
-    const STYLE_PRESSED = Style.DEFAULT_STROKE_FILL;
+    const STYLE_IDLE = Style.DEFAULT_STROKE.with_width(2);
+    const STYLE_PRESSED = Style.DEFAULT_STROKE_FILL.with_width(2);
 
-    const idle_group = new GroupPrimitive(pressed_buttons, STYLE_IDLE);
+    const idle_group = new GroupPrimitive(idle_buttons, STYLE_IDLE);
     const pressed_group = new GroupPrimitive(pressed_buttons, STYLE_PRESSED);
 
     return new GroupPrimitive([idle_group, pressed_group]);
