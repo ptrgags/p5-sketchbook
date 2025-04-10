@@ -111,10 +111,12 @@ export class DirectionalPad {
   }
 
   /**
-   * Render a virtual D-pad
-   * @returns {GroupPrimitive} the 4 buttons, suitable for a mobile overlay
+   * Make geometry for the four buttons. This only needs to be
+   * computed once
+   * @private
+   * @returns {PolygonPrimitive[]} The 4 buttons as pentagons
    */
-  render() {
+  make_button_geometry() {
     const center = this.rect.center;
     const top_left = this.rect.position;
     const bottom_right = this.rect.position.add(this.rect.dimensions);
@@ -169,13 +171,22 @@ export class DirectionalPad {
       edge_dr,
       mid_dr,
     ]);
+    return [right_button, up_button, left_button, down_button];
+  }
 
-    const buttons = [right_button, up_button, left_button, down_button];
+  /**
+   * Render a virtual D-pad
+   * @returns {GroupPrimitive} the 4 buttons, suitable for a mobile overlay
+   */
+  render() {
+    if (this.button_geometry === undefined) {
+      this.button_geometry = this.make_button_geometry();
+    }
 
     const idle_buttons = [];
     const pressed_buttons = [];
 
-    for (const [direction, x] of buttons.entries()) {
+    for (const [direction, x] of this.button_geometry.entries()) {
       if (this.direction_pressed === direction) {
         pressed_buttons.push(x);
       } else {
