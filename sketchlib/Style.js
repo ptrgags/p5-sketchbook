@@ -138,7 +138,7 @@ export class Style {
 Style.INVISIBLE = Object.freeze(new Style({}));
 Style.DEFAULT_STROKE = Object.freeze(new Style({ stroke: Color.WHITE }));
 Style.DEFAULT_FILL = Object.freeze(
-  new Style({ stroke: Color.from_hex_code("#6eb2e8") })
+  new Style({ fill: Color.from_hex_code("#6eb2e8") })
 );
 Style.DEFAULT_STROKE_FILL = Object.freeze(
   Style.DEFAULT_FILL.with_stroke(Color.WHITE)
