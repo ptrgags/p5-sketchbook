@@ -1,8 +1,10 @@
 import { Point } from "../../pga2d/objects.js";
 import { HEIGHT, WIDTH } from "../../sketchlib/dimensions.js";
 import { Direction } from "../../sketchlib/Direction.js";
+import { draw_primitive } from "../../sketchlib/draw_primitive.js";
+import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
+import { DirectionalPad, DirectionInput } from "../lablib/DirectionalPad.js";
 import { blit_sprite, blit_tilemap, P5Sprite, P5Tilemap } from "./blit.js";
-import { DPad } from "./DPad.js";
 import { make_maze } from "./make_maze.js";
 import { parse_resources } from "./parse_resources.js";
 import { Player } from "./Player.js";
@@ -51,7 +53,8 @@ const RESOURCE_MANIFEST = {
   },
 };
 
-const DPAD = new DPad();
+const MOUSE = new CanvasMouseHandler();
+const DPAD = new DirectionalPad();
 
 const VIEWPORT_MARGIN = Point.direction(3, 3).scale(TILE_SIZE);
 const VIEWPORT = new Viewport(
@@ -86,13 +89,6 @@ export const sketch = (p) => {
   p.setup = () => {
     canvas = p.createCanvas(WIDTH, HEIGHT).elt;
 
-    // Turn off keyboard events so the arrow keys don't scroll the page
-    window.addEventListener("keydown", (e) => {
-      if (DPad.is_dpad_key(e.code)) {
-        e.preventDefault();
-      }
-    });
-
     parse_resources(RESOURCE_MANIFEST, p5_resources, resources);
 
     current_sprite = new P5Sprite(
@@ -111,11 +107,15 @@ export const sketch = (p) => {
     );
 
     p.noSmooth();
+
+    MOUSE.setup(canvas);
+    DPAD.setup();
   };
 
   p.draw = () => {
     p.background(0);
 
+    player.update_direction(DPAD.direction.digital);
     player.update(p.frameCount, tilemap.tilemap);
     const { position, sprite, t } = player.draw(p.frameCount);
 
@@ -134,33 +134,41 @@ export const sketch = (p) => {
     );
 
     p.pop();
+
+    draw_primitive(p, DPAD.render());
   };
 
-  p.keyPressed = () => {
-    if (DPad.is_dpad_key(p.key)) {
-      DPAD.pressed(p.key);
-      player.handle_input(DPAD.direction);
-      return false;
-    }
+  p.keyPressed = (/** @type {KeyboardEvent} */ e) => {
+    const code = e.code;
+    DPAD.key_pressed(code);
+
     // you have to walk before you can run
     /*else if (p.key === "x") {
       player.handle_run(true);
       return false;
     }*/
-    return true;
   };
 
-  p.keyReleased = () => {
-    if (DPad.is_dpad_key(p.key)) {
-      DPAD.released(p.key);
-      player.handle_input(DPAD.direction);
-      return false;
-    }
+  p.keyReleased = (/** @type {KeyboardEvent} */ e) => {
+    const code = e.code;
+    DPAD.key_released(code);
 
     /*else if (p.key === "x") {
       player.handle_run(false);
       return false;
     }*/
-    return true;
   };
+
+  MOUSE.mouse_pressed(p, (input) => {
+    DPAD.mouse_pressed(input.mouse_coords);
+  });
+
+  p.mouseReleased = () => {
+    // Even if the mouse is off the canvas, release the D-pad
+    DPAD.mouse_released();
+  };
+
+  MOUSE.mouse_dragged(p, (input) => {
+    DPAD.mouse_dragged(input);
+  });
 };

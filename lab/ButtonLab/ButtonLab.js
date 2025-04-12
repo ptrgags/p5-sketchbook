@@ -5,11 +5,11 @@ import { draw_primitive } from "../../sketchlib/draw_primitive.js";
 import { CirclePrimitive, GroupPrimitive } from "../../sketchlib/primitives.js";
 import { Style } from "../../sketchlib/Style.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
-import { DirectionalPad } from "../lablib/DirectionalPad.js";
+import { TouchDPad } from "../lablib/TouchDPad.js";
 import { Rectangle } from "../lablib/Rectangle.js";
 
 const MOUSE = new CanvasMouseHandler();
-const DPAD = new DirectionalPad(
+const DPAD = new TouchDPad(
   new Rectangle(Point.point(10, 10), Point.direction(200, 200)),
   0.01
 );
@@ -33,10 +33,8 @@ export const sketch = (p) => {
   };
 
   function move_circle() {
-    if (DPAD.direction_pressed !== undefined) {
-      const direction = to_y_down(DPAD.direction_pressed);
-      position = position.add(direction.scale(SPEED));
-    }
+    const direction = to_y_down(DPAD.direction.digital);
+    position = position.add(direction.scale(SPEED));
   }
 
   p.draw = () => {

@@ -52,6 +52,12 @@ describe("Direction", () => {
 
       expect(result).toBePoint(Point.DIR_Y.scale(-1));
     });
+
+    it("with undefined returns ZERO", () => {
+      const result = to_y_up(undefined);
+
+      expect(result).toBePoint(Point.ZERO);
+    });
   });
 
   describe("to_y_down", () => {
@@ -77,6 +83,12 @@ describe("Direction", () => {
       const result = to_y_down(Direction.DOWN);
 
       expect(result).toBePoint(Point.DIR_Y);
+    });
+
+    it("with undefined returns ZERO", () => {
+      const result = to_y_down(undefined);
+
+      expect(result).toBePoint(Point.ZERO);
     });
   });
 });

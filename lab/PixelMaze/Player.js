@@ -3,6 +3,7 @@ import { Direction, to_y_down } from "../../sketchlib/Direction.js";
 import { Index2D } from "../../sketchlib/Grid.js";
 import { Tiles } from "./make_maze.js";
 import { Tilemap } from "./Tilemap.js";
+import { DirectionInput } from "../lablib/DirectionInput.js";
 
 const TILE_SIZE = 16;
 
@@ -40,10 +41,18 @@ export class Player {
     this.is_running = false;
   }
 
-  handle_input(direction) {
+  /**
+   * Update direction
+   * @param {Direction | undefined} direction The new direction value
+   */
+  update_direction(direction) {
     this.input_direction = direction;
   }
 
+  /**
+   * Handle the run button pressed.
+   * @param {boolean} run_button_pressed True if the run button is pressed
+   */
   handle_run(run_button_pressed) {
     this.is_running = run_button_pressed;
   }
