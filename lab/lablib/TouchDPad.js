@@ -18,7 +18,7 @@ export class TouchDPad {
   /**
    * Constructor
    * @param {Rectangle} rect The boundary rectangle within which the d-pad will be on the screen
-   * @param {number} dead_zone_radius The size of the dead zone
+   * @param {number} dead_zone_radius The size of the dead zone in _normalized coordinates_
    */
   constructor(rect, dead_zone_radius) {
     this.rect = rect;
@@ -61,7 +61,7 @@ export class TouchDPad {
     const raw_value = Point.direction(x / x_scale, y / y_scale);
 
     // Allow a deadzone in the middle of the DPAD
-    if (this.value.ideal_norm_sqr() < this.dead_zone_radius_sqr) {
+    if (raw_value.ideal_norm_sqr() < this.dead_zone_radius_sqr) {
       this.value = Point.ZERO;
       this.direction_pressed = undefined;
     }

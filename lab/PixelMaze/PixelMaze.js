@@ -1,7 +1,8 @@
 import { Point } from "../../pga2d/objects.js";
 import { HEIGHT, WIDTH } from "../../sketchlib/dimensions.js";
 import { Direction } from "../../sketchlib/Direction.js";
-import { KeyboardDPad } from "../lablib/KeyboardDPad.js";
+import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
+import { DirectionalPad, DirectionInput } from "../lablib/DirectionalPad.js";
 import { blit_sprite, blit_tilemap, P5Sprite, P5Tilemap } from "./blit.js";
 import { make_maze } from "./make_maze.js";
 import { parse_resources } from "./parse_resources.js";
@@ -51,7 +52,8 @@ const RESOURCE_MANIFEST = {
   },
 };
 
-const DPAD = new KeyboardDPad("both");
+const MOUSE = new CanvasMouseHandler();
+const DPAD = new DirectionalPad();
 
 const VIEWPORT_MARGIN = Point.direction(3, 3).scale(TILE_SIZE);
 const VIEWPORT = new Viewport(
@@ -106,6 +108,17 @@ export const sketch = (p) => {
     p.noSmooth();
 
     DPAD.setup();
+
+    /**
+     * @param {CustomEvent} e The event type
+     */
+    const on_direction = (e) => {
+      /** @type {DirectionInput}  */
+      const directional_input = e.detail;
+      player.handle_direction_input(directional_input);
+    };
+    DPAD.events.addEventListener("key-pressed", on_direction);
+    DPAD.events.addEventListener("key-released", on_direction);
   };
 
   p.draw = () => {
@@ -133,11 +146,8 @@ export const sketch = (p) => {
 
   p.keyPressed = (/** @type {KeyboardEvent} */ e) => {
     const code = e.code;
-    if (DPAD.is_dpad_key(code)) {
-      DPAD.pressed(code);
-      player.handle_input(DPAD.direction);
-      return false;
-    }
+    DPAD.key_pressed(code);
+
     // you have to walk before you can run
     /*else if (p.key === "x") {
       player.handle_run(true);
@@ -147,11 +157,8 @@ export const sketch = (p) => {
   };
 
   p.keyReleased = (/** @type {KeyboardEvent} */ e) => {
-    if (DPAD.is_dpad_key(p.key)) {
-      DPAD.released(p.key);
-      player.handle_input(DPAD.direction);
-      return false;
-    }
+    const code = e.code;
+    DPAD.key_released(code);
 
     /*else if (p.key === "x") {
       player.handle_run(false);

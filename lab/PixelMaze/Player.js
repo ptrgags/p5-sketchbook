@@ -3,6 +3,7 @@ import { Direction, to_y_down } from "../../sketchlib/Direction.js";
 import { Index2D } from "../../sketchlib/Grid.js";
 import { Tiles } from "./make_maze.js";
 import { Tilemap } from "./Tilemap.js";
+import { DirectionInput } from "../lablib/DirectionalPad.js";
 
 const TILE_SIZE = 16;
 
@@ -40,8 +41,12 @@ export class Player {
     this.is_running = false;
   }
 
-  handle_input(direction) {
-    this.input_direction = direction;
+  /**
+   * Handle directional input
+   * @param {DirectionInput} input The directional input from a DirectionalPad
+   */
+  handle_direction_input(input) {
+    this.input_direction = input.digital;
   }
 
   handle_run(run_button_pressed) {
