@@ -110,22 +110,12 @@ export const sketch = (p) => {
 
     MOUSE.setup(canvas);
     DPAD.setup();
-
-    /**
-     * @param {CustomEvent} e The event type
-     */
-    const on_direction = (e) => {
-      /** @type {DirectionInput}  */
-      const directional_input = e.detail;
-      player.handle_direction_input(directional_input);
-    };
-    DPAD.events.addEventListener("dir-pressed", on_direction);
-    DPAD.events.addEventListener("dir-released", on_direction);
   };
 
   p.draw = () => {
     p.background(0);
 
+    player.update_direction(DPAD.direction.digital);
     player.update(p.frameCount, tilemap.tilemap);
     const { position, sprite, t } = player.draw(p.frameCount);
 

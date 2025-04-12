@@ -42,12 +42,11 @@ export class Player {
   }
 
   /**
-   * Handle an arrow/WASD/virtual D-pad input event. This works for both
-   * pressed/released events, as we only care about the current state.
-   * @param {DirectionInput} input The directional input from a DirectionalPad
+   * Update direction
+   * @param {Direction | undefined} direction The new direction value
    */
-  handle_direction_input(input) {
-    this.input_direction = input.digital;
+  update_direction(direction) {
+    this.input_direction = direction;
   }
 
   /**

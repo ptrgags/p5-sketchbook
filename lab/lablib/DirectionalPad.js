@@ -1,6 +1,5 @@
 import { Point } from "../../pga2d/objects.js";
 import { HEIGHT } from "../../sketchlib/dimensions.js";
-import { Direction, to_y_down } from "../../sketchlib/Direction.js";
 import { GroupPrimitive } from "../../sketchlib/primitives.js";
 import { DirectionInput } from "./DirectionInput.js";
 import { KeyboardDPad } from "./KeyboardDPad.js";
@@ -40,6 +39,13 @@ export class DirectionalPad {
     return new GroupPrimitive([]);
   }
 
+  get direction() {
+    return DirectionInput.first_nonzero(
+      this.keyboard_dpad.direction,
+      this.touch_dpad.direction
+    );
+  }
+
   /**
    * Handle the key pressed event
    * @param {string} code The key code
@@ -51,9 +57,6 @@ export class DirectionalPad {
 
     // Update the keyboard state
     this.keyboard_dpad.pressed(code);
-    this.events.dispatchEvent(
-      new CustomEvent("dir-pressed", { detail: this.keyboard_dpad.direction })
-    );
   }
 
   /**
@@ -66,18 +69,10 @@ export class DirectionalPad {
     }
 
     this.keyboard_dpad.released(code);
-
-    this.events.dispatchEvent(
-      new CustomEvent("dir-released", { detail: this.keyboard_dpad.direction })
-    );
   }
 
   mouse_pressed(mouse_coords) {
     this.touch_dpad.mouse_pressed(mouse_coords);
-
-    this.events.dispatchEvent(
-      new CustomEvent("dir-pressed", { detail: this.touch_dpad.direction })
-    );
   }
 
   /**
@@ -85,18 +80,10 @@ export class DirectionalPad {
    */
   mouse_dragged(mouse_input) {
     this.touch_dpad.mouse_dragged(mouse_input);
-
-    this.events.dispatchEvent(
-      new CustomEvent("dir-pressed", { detail: this.touch_dpad.direction })
-    );
   }
 
   mouse_released() {
     this.touch_dpad.mouse_released();
-
-    this.events.dispatchEvent(
-      new CustomEvent("dir-released", { detail: this.touch_dpad.direction })
-    );
   }
 }
 export { DirectionInput };
