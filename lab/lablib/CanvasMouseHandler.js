@@ -67,15 +67,19 @@ export class CanvasMouseHandler {
   mouse_released(p, callback) {
     p.mouseReleased = (/**@type {MouseEvent} */ e) => {
       const mouse = fix_mouse_coords(this.canvas, p.mouseX, p.mouseY);
-      if (!SCREEN_RECT.contains(mouse)) {
-        return;
+      const in_canvas = SCREEN_RECT.contains(mouse);
+      if (in_canvas && e.cancelable) {
+        e.preventDefault();
       }
 
-      e.preventDefault();
+      const in_canvas_state = in_canvas
+        ? MouseInCanvas.IN_CANVAS
+        : MouseInCanvas.NOT_IN_CANVAS;
+
       const input = new MouseInput(
         mouse,
         MousePressed.NOT_PRESSED,
-        MouseInCanvas.IN_CANVAS
+        in_canvas_state
       );
       callback(input);
     };
