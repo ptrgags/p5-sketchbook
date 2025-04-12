@@ -1,6 +1,7 @@
 import { Point } from "../../pga2d/objects.js";
 import { HEIGHT } from "../../sketchlib/dimensions.js";
 import { Direction, to_y_down } from "../../sketchlib/Direction.js";
+import { GroupPrimitive } from "../../sketchlib/primitives.js";
 import { DirectionInput } from "./DirectionInput.js";
 import { KeyboardDPad } from "./KeyboardDPad.js";
 import { MouseInput } from "./MouseInput.js";
@@ -29,6 +30,14 @@ export class DirectionalPad {
 
   setup() {
     this.keyboard_dpad.setup();
+  }
+
+  render() {
+    if (this.touch_pad_visible) {
+      return this.touch_dpad.render();
+    }
+
+    return new GroupPrimitive([]);
   }
 
   /**
