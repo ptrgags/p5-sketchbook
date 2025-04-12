@@ -12,6 +12,8 @@ export class ToggleButton {
   constructor(rect, initial_value) {
     this.button = new TouchButton(rect);
     this.value = initial_value;
+
+    this.pressed = false;
   }
 
   get rect() {
@@ -30,14 +32,21 @@ export class ToggleButton {
 
   mouse_pressed(mouse_coords) {
     this.button.mouse_pressed(mouse_coords);
+
+    // Set a flag to indicate that the button was actually clicked
+    if (this.rect.contains(mouse_coords)) {
+      this.pressed = true;
+    }
   }
 
   mouse_released(mouse_coords) {
     this.button.mouse_released(mouse_coords);
 
-    if (this.rect.contains(mouse_coords)) {
+    if (this.pressed && this.rect.contains(mouse_coords)) {
       this.value = !this.value;
     }
+
+    this.pressed = false;
   }
 
   mouse_moved(mouse_coords) {
