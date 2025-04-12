@@ -66,12 +66,8 @@ export class DirectionalPad {
   mouse_pressed(mouse_coords) {
     this.touch_dpad.mouse_pressed(mouse_coords);
 
-    const input = new DirectionInput(
-      this.touch_dpad.direction_pressed,
-      this.touch_dpad.value
-    );
     this.events.dispatchEvent(
-      new CustomEvent("dir-pressed", { detail: input })
+      new CustomEvent("dir-pressed", { detail: this.touch_dpad.direction })
     );
   }
 
@@ -81,24 +77,16 @@ export class DirectionalPad {
   mouse_dragged(mouse_input) {
     this.touch_dpad.mouse_dragged(mouse_input);
 
-    const input = new DirectionInput(
-      this.touch_dpad.direction_pressed,
-      this.touch_dpad.value
-    );
     this.events.dispatchEvent(
-      new CustomEvent("dir-pressed", { detail: input })
+      new CustomEvent("dir-pressed", { detail: this.touch_dpad.direction })
     );
   }
 
   mouse_released() {
     this.touch_dpad.mouse_released();
 
-    const input = new DirectionInput(
-      this.touch_dpad.direction_pressed,
-      this.touch_dpad.value
-    );
     this.events.dispatchEvent(
-      new CustomEvent("dir-released", { detail: input })
+      new CustomEvent("dir-released", { detail: this.touch_dpad.direction })
     );
   }
 }

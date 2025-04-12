@@ -7,6 +7,7 @@ import {
   VectorPrimitive,
 } from "../../sketchlib/primitives.js";
 import { Style } from "../../sketchlib/Style.js";
+import { DirectionInput } from "./DirectionInput.js";
 import { MouseInCanvas, MouseInput } from "./MouseInput.js";
 import { Rectangle } from "./Rectangle.js";
 
@@ -24,19 +25,7 @@ export class TouchDPad {
     this.rect = rect;
     this.dead_zone_radius_sqr = dead_zone_radius * dead_zone_radius;
 
-    /**
-     * The analog value from [-1, 1] on both axes depending on the mouse
-     * position relative to the center of the boundary rectangle. This is
-     * stored as a Point.direction
-     * @type {Point}
-     */
-    this.value = Point.ZERO;
-
-    /**
-     * Which cardinal direction was pressed
-     * @type {Direction | undefined}
-     */
-    this.direction_pressed = undefined;
+    this.direction = DirectionInput.NO_INPUT;
 
     /**
      * Cached geometry computed on the first call to render()
@@ -45,39 +34,35 @@ export class TouchDPad {
     this.button_geometry = undefined;
   }
 
-  clear_value() {
-    this.value = Point.ZERO;
-    this.direction_pressed = undefined;
-  }
-
   /**
    * Once the point is determined to be in the rectangle, this function
    * @param {Point} point The mouse/touch position
    */
-  update_value(point) {
+  update_direction(point) {
     // Compute the coordinates from the center
     const { x, y } = point.sub(this.rect.center);
     const { x: x_scale, y: y_scale } = this.rect.dimensions.scale(0.5);
-    const raw_value = Point.direction(x / x_scale, y / y_scale);
+    const analog_value = Point.direction(x / x_scale, y / y_scale);
 
     // Allow a deadzone in the middle of the DPAD
-    if (raw_value.ideal_norm_sqr() < this.dead_zone_radius_sqr) {
-      this.value = Point.ZERO;
-      this.direction_pressed = undefined;
+    if (analog_value.ideal_norm_sqr() < this.dead_zone_radius_sqr) {
+      this.direction = DirectionInput.NO_INPUT;
+      return;
     }
 
-    this.value = raw_value;
-
-    const is_horizontal = Math.abs(this.value.x) > Math.abs(this.value.y);
-    if (is_horizontal && this.value.x > 0) {
-      this.direction_pressed = Direction.RIGHT;
+    const is_horizontal = Math.abs(analog_value.x) > Math.abs(analog_value.y);
+    let digital_direction;
+    if (is_horizontal && analog_value.x > 0) {
+      digital_direction = Direction.RIGHT;
     } else if (is_horizontal) {
-      this.direction_pressed = Direction.LEFT;
-    } else if (this.value.y > 0) {
-      this.direction_pressed = Direction.DOWN;
+      digital_direction = Direction.LEFT;
+    } else if (analog_value.y > 0) {
+      digital_direction = Direction.DOWN;
     } else {
-      this.direction_pressed = Direction.UP;
+      digital_direction = Direction.UP;
     }
+
+    this.direction = new DirectionInput(digital_direction, analog_value);
   }
 
   /**
@@ -86,9 +71,9 @@ export class TouchDPad {
    */
   mouse_pressed(point) {
     if (this.rect.contains(point)) {
-      this.update_value(point);
+      this.update_direction(point);
     } else {
-      this.clear_value();
+      this.direction = DirectionInput.NO_INPUT;
     }
   }
 
@@ -101,9 +86,9 @@ export class TouchDPad {
       mouse_input.in_canvas === MouseInCanvas.NOT_IN_CANVAS ||
       !this.rect.contains(mouse_input.mouse_coords)
     ) {
-      this.clear_value();
+      this.direction = DirectionInput.NO_INPUT;
     } else {
-      this.update_value(mouse_input.mouse_coords);
+      this.update_direction(mouse_input.mouse_coords);
     }
   }
 
@@ -112,7 +97,7 @@ export class TouchDPad {
    * release the D-pad buttons
    */
   mouse_released() {
-    this.clear_value();
+    this.direction = DirectionInput.NO_INPUT;
   }
 
   /**
@@ -192,7 +177,7 @@ export class TouchDPad {
     const pressed_buttons = [];
 
     for (const [direction, x] of this.button_geometry.entries()) {
-      if (this.direction_pressed === direction) {
+      if (this.direction.digital === direction) {
         pressed_buttons.push(x);
       } else {
         idle_buttons.push(x);
@@ -213,30 +198,28 @@ export class TouchDPad {
       this.rect.position,
       this.rect.dimensions
     );
-
     const center = this.rect.center;
     const half_dimensions = this.rect.dimensions.scale(0.5);
-    const arrow_offset = Point.direction(
-      this.value.x * half_dimensions.x,
-      this.value.y * half_dimensions.y
-    );
-    const value_arrow = new VectorPrimitive(center, center.add(arrow_offset));
 
-    const direction =
-      this.direction_pressed !== undefined
-        ? to_y_down(this.direction_pressed)
-        : Point.ZERO;
-    const direction_offset = Point.direction(
-      direction.x * half_dimensions.x,
-      direction.y * half_dimensions.y
+    const analog_direction = this.direction.analog;
+    const analog_offset = Point.direction(
+      analog_direction.x * half_dimensions.x,
+      analog_direction.y * half_dimensions.y
     );
-    const direction_arrow = new VectorPrimitive(
+    const analog_arrow = new VectorPrimitive(center, center.add(analog_offset));
+
+    const digital_direction = to_y_down(this.direction.digital);
+    const digital_offset = Point.direction(
+      digital_direction.x * half_dimensions.x,
+      digital_direction.y * half_dimensions.y
+    );
+    const digital_arrow = new VectorPrimitive(
       center,
-      center.add(direction_offset)
+      center.add(digital_offset)
     );
 
     return new GroupPrimitive(
-      [boundary, value_arrow, direction_arrow],
+      [boundary, analog_arrow, digital_arrow],
       Style.DEFAULT_STROKE
     );
   }

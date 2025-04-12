@@ -33,10 +33,8 @@ export const sketch = (p) => {
   };
 
   function move_circle() {
-    if (DPAD.direction_pressed !== undefined) {
-      const direction = to_y_down(DPAD.direction_pressed);
-      position = position.add(direction.scale(SPEED));
-    }
+    const direction = to_y_down(DPAD.direction.digital);
+    position = position.add(direction.scale(SPEED));
   }
 
   p.draw = () => {
