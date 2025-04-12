@@ -20,11 +20,6 @@ export class DirectionalPad {
     );
     this.keyboard_dpad = new KeyboardDPad("both");
     this.touch_pad_visible = true;
-
-    /**
-     * @type {EventTarget}
-     */
-    this.events = new EventTarget();
   }
 
   setup() {
