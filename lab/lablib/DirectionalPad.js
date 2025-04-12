@@ -7,6 +7,7 @@ import {
   VectorPrimitive,
 } from "../../sketchlib/primitives.js";
 import { Style } from "../../sketchlib/Style.js";
+import { MouseInCanvas, MouseInput } from "./MouseInput.js";
 import { Rectangle } from "./Rectangle.js";
 
 /**
@@ -93,18 +94,22 @@ export class DirectionalPad {
 
   /**
    * Mouse dragged handler
-   * @param {Point} point The mouse coordinates relative to the canvas in pixels
+   * @param {MouseInput} mouse_input The sanitized mouse input event
    */
-  mouse_dragged(point) {
-    if (this.rect.contains(point)) {
-      this.update_value(point);
-    } else {
+  mouse_dragged(mouse_input) {
+    if (
+      mouse_input.in_canvas === MouseInCanvas.NOT_IN_CANVAS ||
+      !this.rect.contains(mouse_input.mouse_coords)
+    ) {
       this.clear_value();
+    } else {
+      this.update_value(mouse_input.mouse_coords);
     }
   }
 
   /**
-   * Mouse released handler
+   * Mouse released handler - regardless of where the mouse is,
+   * release the D-pad buttons
    */
   mouse_released() {
     this.clear_value();
