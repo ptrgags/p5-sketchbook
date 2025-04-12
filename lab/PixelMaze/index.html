@@ -22,49 +22,51 @@
       <div id="sketch"></div>
       <div class="description">
         <p>
-          Arrow keys to walk around. That's it. There aren't any exits or
-          mechanics yet. Stay tuned!
+          Arrow keys or virtual direction pad to explore the maze. That's all
+          for now (stay tuned!).
         </p>
-        <p>Notes:</p>
+        <p>UPDATE 2025-04-12 - I added a virtual direction pad for mobile</p>
+        <p>Notes: (ordered by priority)</p>
         <ul>
           <li>
-            Add a run button to make the character animate faster and also speed
-            up the position animation
-          </li>
-          <li>Try adding easing curves for better in-betweens</li>
-          <li>
-            Right now this requires a keyboard to move around... I need to make
-            an alternative. Perhaps an overlay with a d-pad and overlays
+            🟢Add an entrance at the bottom of the map, and an exit at the top
           </li>
           <li>
-            Wall decoration - I have a nicer tileset with brick walls and
-            rounded corners, but I'll need to add some code to determine where
-            to place the tiles
+            🟢Add stuff you can interact with to the maze. I'm thinking doors
+            and locks.
           </li>
           <li>
-            The tileset also had some trim around where the walls meet the
-            ceiling. I realized there's a simpler way to place the corner tiles,
-            but I'll have to think through the math a bit
+            🟡Add a run button to make the character animate faster and also
+            speed up the position animation
           </li>
-          <li>Make a nicer character sprite.</li>
           <li>
-            This sketch laid the foundation for pixel art rendering in my
+            🟡This sketch laid the foundation for pixel art rendering in my
             sketches. I still need to clean up and test more of the code to be
             reusable
           </li>
           <li>
-            Adding a sound effect for when the character runs into a wall would
-            be nice for feedback.
+            🟡Profiling things in the performance, drawing the tilemap is enough
+            to drop the framerate from 60 to ~53 FPS on desktop. Try rendering
+            just the tiles in the viewport, not the whole map. If that's still
+            too slow, consider other methods (maybe render to an off-screen
+            texture and cache that across frames? the tilemap is mostly static
+            unless the viewport moves).
+          </li>
+          <li>🟠Try adding easing curves for better in-betweens</li>
+          <li>
+            🟠Wall decoration - I have a nicer tileset with brick walls and
+            rounded corners, but I'll need to add some code to determine where
+            to place the tiles
           </li>
           <li>
-            Render just the tiles visible in the viewport, not the whole map
+            🟠The tileset also had some trim around where the walls meet the
+            ceiling. I realized there's a simpler way to place the corner tiles,
+            but I'll have to think through the math a bit
           </li>
+          <li>🟠Make a nicer character sprite.</li>
           <li>
-            Add an entrance at the bottom of the map, and an exit at the top
-          </li>
-          <li>
-            Add stuff you can interact with to the maze. I'm thinking doors and
-            locks.
+            🟠Adding a sound effect for when the character runs into a wall
+            would be nice for feedback.
           </li>
         </ul>
       </div>
