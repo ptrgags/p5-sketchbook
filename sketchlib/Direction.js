@@ -34,7 +34,7 @@ export function opposite(direction) {
 
 /**
  * Return a (y-up) PGA direction. This is helpful when working with math
- * @param {Direction} direction The direction constant
+ * @param {Direction | undefined} direction The direction constant
  * @returns {Point} A PGA direction object corresponding to the same direction
  */
 export function to_y_up(direction) {
@@ -48,12 +48,14 @@ export function to_y_up(direction) {
     case Direction.DOWN:
       return Point.DIR_Y.neg();
   }
+
+  return Point.ZERO;
 }
 
 /**
  * Return a (y-down) PGA direction. This is helpful when working in pixel
  * coordinates
- * @param {Direction} direction the direction constant
+ * @param {Direction | undefined} direction the direction constant
  * @returns {Point} a PGA direction corresponding to the direction
  */
 export function to_y_down(direction) {
@@ -67,4 +69,5 @@ export function to_y_down(direction) {
     case Direction.DOWN:
       return Point.DIR_Y;
   }
+  return Point.ZERO;
 }
