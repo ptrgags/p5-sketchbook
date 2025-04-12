@@ -7,7 +7,10 @@ import { SCREEN_RECT } from "./Rectangle.js";
  */
 
 /**
- * Class that helps set up canvas events
+ * Class that helps set up mouse events that detect whether the mouse is
+ * on the canvas or out of the canvas.
+ *
+ * This class directly interacts with a p5 sketch
  */
 export class CanvasMouseHandler {
   constructor() {
