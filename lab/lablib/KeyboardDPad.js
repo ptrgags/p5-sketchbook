@@ -1,6 +1,5 @@
 import { Point } from "../../pga2d/objects.js";
 import { Direction } from "../../sketchlib/Direction.js";
-import { ARROW_KEYS } from "../PixelMaze/DPad.js";
 
 export const ARROW_CODES = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"];
 export const WASD_CODES = ["KeyW", "KeyA", "KeyS", "KeyD"];
@@ -106,7 +105,7 @@ export class KeyboardDPad {
       case "wasd":
         return WASD_CODES.includes(code);
       case "both":
-        return ARROW_KEYS.includes(code) || WASD_CODES.includes(code);
+        return ARROW_CODES.includes(code) || WASD_CODES.includes(code);
     }
   }
 }

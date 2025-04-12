@@ -3,7 +3,6 @@ import { HEIGHT, WIDTH } from "../../sketchlib/dimensions.js";
 import { Direction } from "../../sketchlib/Direction.js";
 import { KeyboardDPad } from "../lablib/KeyboardDPad.js";
 import { blit_sprite, blit_tilemap, P5Sprite, P5Tilemap } from "./blit.js";
-import { DPad } from "./DPad.js";
 import { make_maze } from "./make_maze.js";
 import { parse_resources } from "./parse_resources.js";
 import { Player } from "./Player.js";
@@ -87,13 +86,6 @@ export const sketch = (p) => {
   p.setup = () => {
     canvas = p.createCanvas(WIDTH, HEIGHT).elt;
 
-    // Turn off keyboard events so the arrow keys don't scroll the page
-    window.addEventListener("keydown", (e) => {
-      if (DPad.is_dpad_key(e.code)) {
-        e.preventDefault();
-      }
-    });
-
     parse_resources(RESOURCE_MANIFEST, p5_resources, resources);
 
     current_sprite = new P5Sprite(
@@ -112,6 +104,8 @@ export const sketch = (p) => {
     );
 
     p.noSmooth();
+
+    DPAD.setup();
   };
 
   p.draw = () => {
