@@ -10,7 +10,7 @@ import { Rectangle } from "../lablib/Rectangle.js";
 
 const MOUSE = new CanvasMouseHandler();
 const DPAD = new DirectionalPad(
-  new Rectangle(Point.point(-2, 10), Point.direction(200, 200)),
+  new Rectangle(Point.point(10, 10), Point.direction(200, 200)),
   0.01
 );
 
