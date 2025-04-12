@@ -2,13 +2,11 @@ import { Point } from "../../pga2d/objects.js";
 import { WIDTH, HEIGHT, SCREEN_CENTER } from "../../sketchlib/dimensions.js";
 import { to_y_down } from "../../sketchlib/Direction.js";
 import { draw_primitive } from "../../sketchlib/draw_primitive.js";
-import { fix_mouse_coords } from "../../sketchlib/fix_mouse_coords.js";
-import { prevent_mobile_scroll } from "../../sketchlib/prevent_mobile_scroll.js";
 import { CirclePrimitive, GroupPrimitive } from "../../sketchlib/primitives.js";
 import { Style } from "../../sketchlib/Style.js";
 import { MouseHandler } from "../lablib/better_mouse_events.js";
 import { DirectionalPad } from "../lablib/DirectionalPad.js";
-import { Rectangle, SCREEN_RECT } from "../lablib/Rectangle.js";
+import { Rectangle } from "../lablib/Rectangle.js";
 
 const MOUSE = new MouseHandler();
 const DPAD = new DirectionalPad(
