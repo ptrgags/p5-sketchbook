@@ -81,9 +81,12 @@ export class KeyboardDPad {
 
     // If there were other arrow keys pressed, switch to the first one
     // we find.
-    const index = this.keys_down.findIndex((x) => x === true);
-    if (index !== -1) {
-      this.direction = new DirectionInput(direction, to_y_down(direction));
+    const fallback_direction = this.keys_down.findIndex((x) => x === true);
+    if (fallback_direction !== -1) {
+      this.direction = new DirectionInput(
+        fallback_direction,
+        to_y_down(fallback_direction)
+      );
     } else {
       this.direction = DirectionInput.NO_INPUT;
     }
