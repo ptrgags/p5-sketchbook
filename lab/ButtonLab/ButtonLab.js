@@ -8,6 +8,7 @@ import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { TouchDPad } from "../lablib/TouchDPad.js";
 import { Rectangle } from "../lablib/Rectangle.js";
 import { ButtonState, TouchButton } from "../lablib/TouchButton.js";
+import { ToggleButton } from "../lablib/ToggleButton.js";
 
 const MOUSE = new CanvasMouseHandler();
 const DPAD = new TouchDPad(
@@ -16,6 +17,11 @@ const DPAD = new TouchDPad(
 );
 const BUTTON = new TouchButton(
   new Rectangle(Point.point(350, 50), Point.direction(100, 100))
+);
+
+const TOGGLE = new ToggleButton(
+  new Rectangle(Point.point(10, 300), Point.direction(100, 100)),
+  false
 );
 
 const SPEED = 4;
@@ -55,27 +61,33 @@ export const sketch = (p) => {
     const circle_group = new GroupPrimitive([circle], style);
     const dpad = DPAD.render();
     const button = BUTTON.debug_render();
+    const toggle = TOGGLE.debug_render();
 
-    const scene = new GroupPrimitive([circle_group, dpad, button]);
+    const scene = new GroupPrimitive([circle_group, dpad, button, toggle]);
     draw_primitive(p, scene);
   };
 
   MOUSE.mouse_pressed(p, (input) => {
     DPAD.mouse_pressed(input.mouse_coords);
     BUTTON.mouse_pressed(input.mouse_coords);
+    TOGGLE.mouse_pressed(input.mouse_coords);
   });
 
   MOUSE.mouse_moved(p, (input) => {
     BUTTON.mouse_moved(input.mouse_coords);
+    TOGGLE.mouse_moved(input.mouse_coords);
   });
 
   MOUSE.mouse_released(p, (input) => {
     // Even if the mouse is off the canvas, release the DPAD input
     DPAD.mouse_released();
     BUTTON.mouse_released(input.mouse_coords);
+    TOGGLE.mouse_released(input.mouse_coords);
   });
 
   MOUSE.mouse_dragged(p, (input) => {
     DPAD.mouse_dragged(input);
+    BUTTON.mouse_dragged(input.mouse_coords);
+    TOGGLE.mouse_dragged(input.mouse_coords);
   });
 };
