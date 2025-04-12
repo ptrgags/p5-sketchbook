@@ -9,7 +9,7 @@ import { SCREEN_RECT } from "./Rectangle.js";
 /**
  * Class that helps set up canvas events
  */
-export class MouseHandler {
+export class CanvasMouseHandler {
   constructor() {
     /**
      * @type {HTMLCanvasElement}

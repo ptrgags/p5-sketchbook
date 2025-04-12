@@ -4,11 +4,11 @@ import { to_y_down } from "../../sketchlib/Direction.js";
 import { draw_primitive } from "../../sketchlib/draw_primitive.js";
 import { CirclePrimitive, GroupPrimitive } from "../../sketchlib/primitives.js";
 import { Style } from "../../sketchlib/Style.js";
-import { MouseHandler } from "../lablib/better_mouse_events.js";
+import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { DirectionalPad } from "../lablib/DirectionalPad.js";
 import { Rectangle } from "../lablib/Rectangle.js";
 
-const MOUSE = new MouseHandler();
+const MOUSE = new CanvasMouseHandler();
 const DPAD = new DirectionalPad(
   new Rectangle(Point.point(-2, 10), Point.direction(200, 200)),
   0.01
