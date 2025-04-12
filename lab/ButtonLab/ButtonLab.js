@@ -6,14 +6,11 @@ import { fix_mouse_coords } from "../../sketchlib/fix_mouse_coords.js";
 import { prevent_mobile_scroll } from "../../sketchlib/prevent_mobile_scroll.js";
 import { CirclePrimitive, GroupPrimitive } from "../../sketchlib/primitives.js";
 import { Style } from "../../sketchlib/Style.js";
-import {
-  mouse_dragged,
-  mouse_pressed,
-  mouse_released,
-} from "../lablib/better_mouse_events.js";
+import { MouseHandler } from "../lablib/better_mouse_events.js";
 import { DirectionalPad } from "../lablib/DirectionalPad.js";
 import { Rectangle, SCREEN_RECT } from "../lablib/Rectangle.js";
 
+const MOUSE = new MouseHandler();
 const DPAD = new DirectionalPad(
   new Rectangle(Point.point(-2, 10), Point.direction(200, 200)),
   0.01
@@ -34,7 +31,7 @@ export const sketch = (p) => {
       document.getElementById("sketch-canvas")
     ).elt;
 
-    prevent_mobile_scroll(canvas);
+    MOUSE.setup(canvas);
   };
 
   function move_circle() {
@@ -60,39 +57,16 @@ export const sketch = (p) => {
     draw_primitive(p, scene);
   };
 
-  mouse_pressed(p, canvas, (input) => {
+  MOUSE.mouse_pressed(p, (input) => {
     DPAD.mouse_pressed(input.mouse_coords);
-  });
-
-  /*
-  mouse_dragged(p, canvas, (input) => {
-    DPAD.mouse_dragged(input);
   });
 
   p.mouseReleased = () => {
     // Even if the mouse is off the canvas, release the DPAD input
     DPAD.mouse_released();
   };
-  */
 
-  /*
-  p.mousePressed = () => {
-    const mouse = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
-    if (!SCREEN_RECT.contains(mouse)) {
-      return;
-    }
-
-    DPAD.mouse_pressed(mouse);
-  };*/
-
-  /*
-  p.mouseDragged = () => {
-    const mouse = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
-    if (!SCREEN_RECT.contains(mouse)) {
-      return;
-    }
-
-    DPAD.mouse_dragged(mouse);
-  };
-  */
+  MOUSE.mouse_dragged(p, (input) => {
+    DPAD.mouse_dragged(input);
+  });
 };

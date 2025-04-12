@@ -102,9 +102,9 @@ export class DirectionalPad {
       !this.rect.contains(mouse_input.mouse_coords)
     ) {
       this.clear_value();
+    } else {
+      this.update_value(mouse_input.mouse_coords);
     }
-
-    this.update_value(mouse_input.mouse_coords);
   }
 
   /**
