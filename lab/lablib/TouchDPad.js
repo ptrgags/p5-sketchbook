@@ -14,7 +14,7 @@ import { Rectangle } from "./Rectangle.js";
  * A virtual pad of 4 directional buttons, modeled after the D-pad on
  * a gamepad or handheld console
  */
-export class DirectionalPad {
+export class TouchDPad {
   /**
    * Constructor
    * @param {Rectangle} rect The boundary rectangle within which the d-pad will be on the screen
