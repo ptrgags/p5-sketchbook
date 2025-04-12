@@ -1,7 +1,9 @@
 import { Point } from "../../pga2d/objects.js";
 import { HEIGHT } from "../../sketchlib/dimensions.js";
-import { Direction } from "../../sketchlib/Direction.js";
+import { Direction, to_y_down } from "../../sketchlib/Direction.js";
+import { DirectionInput } from "./DirectionInput.js";
 import { KeyboardDPad } from "./KeyboardDPad.js";
+import { MouseInput } from "./MouseInput.js";
 import { Rectangle } from "./Rectangle.js";
 import { TouchDPad } from "./TouchDPad.js";
 
@@ -9,20 +11,6 @@ const DPAD_DIMENSIONS = Point.direction(200, 200);
 const MARGIN = 10;
 const DPAD_ORIGIN = Point.point(MARGIN, HEIGHT - DPAD_DIMENSIONS.y - MARGIN);
 const DEAD_ZONE_RADIUS = 0.01;
-
-export class DirectionInput {
-  /**
-   *
-   * @param {Direction | undefined} digital The direction that was pressed as a
-   * cardinal direction, or undefined if there's no input
-   * @param {Point} analog The direction that was pressed as an analog value.
-   * It is either Point.ZERO (no input)
-   */
-  constructor(digital, analog) {
-    this.digital = digital;
-    this.analog = analog;
-  }
-}
 
 export class DirectionalPad {
   constructor() {
@@ -32,6 +20,10 @@ export class DirectionalPad {
     );
     this.keyboard_dpad = new KeyboardDPad("both");
     this.touch_pad_visible = true;
+
+    /**
+     * @type {EventTarget}
+     */
     this.events = new EventTarget();
   }
 
@@ -50,8 +42,9 @@ export class DirectionalPad {
 
     // Update the keyboard state
     this.keyboard_dpad.pressed(code);
-
-    // Check if we should emit a direction pressed event
+    this.events.dispatchEvent(
+      new CustomEvent("dir-pressed", { detail: this.keyboard_dpad.direction })
+    );
   }
 
   /**
@@ -65,6 +58,48 @@ export class DirectionalPad {
 
     this.keyboard_dpad.released(code);
 
-    // check if we should emit a direction pressed event
+    this.events.dispatchEvent(
+      new CustomEvent("dir-released", { detail: this.keyboard_dpad.direction })
+    );
+  }
+
+  mouse_pressed(mouse_coords) {
+    this.touch_dpad.mouse_pressed(mouse_coords);
+
+    const input = new DirectionInput(
+      this.touch_dpad.direction_pressed,
+      this.touch_dpad.value
+    );
+    this.events.dispatchEvent(
+      new CustomEvent("dir-pressed", { detail: input })
+    );
+  }
+
+  /**
+   * @param {MouseInput} mouse_input Mouse input state
+   */
+  mouse_dragged(mouse_input) {
+    this.touch_dpad.mouse_dragged(mouse_input);
+
+    const input = new DirectionInput(
+      this.touch_dpad.direction_pressed,
+      this.touch_dpad.value
+    );
+    this.events.dispatchEvent(
+      new CustomEvent("dir-pressed", { detail: input })
+    );
+  }
+
+  mouse_released() {
+    this.touch_dpad.mouse_released();
+
+    const input = new DirectionInput(
+      this.touch_dpad.direction_pressed,
+      this.touch_dpad.value
+    );
+    this.events.dispatchEvent(
+      new CustomEvent("dir-released", { detail: input })
+    );
   }
 }
+export { DirectionInput };

@@ -117,8 +117,8 @@ export const sketch = (p) => {
       const directional_input = e.detail;
       player.handle_direction_input(directional_input);
     };
-    DPAD.events.addEventListener("key-pressed", on_direction);
-    DPAD.events.addEventListener("key-released", on_direction);
+    DPAD.events.addEventListener("dir-pressed", on_direction);
+    DPAD.events.addEventListener("dir-released", on_direction);
   };
 
   p.draw = () => {
@@ -153,7 +153,6 @@ export const sketch = (p) => {
       player.handle_run(true);
       return false;
     }*/
-    return true;
   };
 
   p.keyReleased = (/** @type {KeyboardEvent} */ e) => {
@@ -164,6 +163,18 @@ export const sketch = (p) => {
       player.handle_run(false);
       return false;
     }*/
-    return true;
   };
+
+  MOUSE.mouse_pressed(p, (input) => {
+    DPAD.mouse_pressed(input.mouse_coords);
+  });
+
+  p.mouseReleased = () => {
+    // Even if the mouse is off the canvas, release the D-pad
+    DPAD.mouse_released();
+  };
+
+  MOUSE.mouse_dragged(p, (input) => {
+    DPAD.mouse_dragged(input);
+  });
 };

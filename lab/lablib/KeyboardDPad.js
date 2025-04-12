@@ -1,5 +1,6 @@
 import { Point } from "../../pga2d/objects.js";
-import { Direction } from "../../sketchlib/Direction.js";
+import { Direction, to_y_down } from "../../sketchlib/Direction.js";
+import { DirectionInput } from "./DirectionInput.js";
 
 export const ARROW_CODES = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"];
 export const WASD_CODES = ["KeyW", "KeyA", "KeyS", "KeyD"];
@@ -48,15 +49,10 @@ export class KeyboardDPad {
    * @param {"arrows" | "wasd" | "both"} keys_allowed Whether to use arrows, WASD or both
    */
   constructor(keys_allowed) {
-    this.value = Point.ZERO;
-
-    /**
-     * @type {Direction}
-     */
-    this.direction_pressed = undefined;
-
     this.keys_down = [false, false, false, false];
     this.keys_allowed = keys_allowed;
+
+    this.direction = DirectionInput.NO_INPUT;
   }
 
   setup() {
@@ -72,7 +68,7 @@ export class KeyboardDPad {
   pressed(dpad_code) {
     const direction = get_direction(dpad_code);
     this.keys_down[direction] = true;
-    this.direction = direction;
+    this.direction = new DirectionInput(direction, to_y_down(direction));
   }
 
   /**
@@ -87,9 +83,9 @@ export class KeyboardDPad {
     // we find.
     const index = this.keys_down.findIndex((x) => x === true);
     if (index !== -1) {
-      this.direction = index;
+      this.direction = new DirectionInput(direction, to_y_down(direction));
     } else {
-      this.direction = undefined;
+      this.direction = DirectionInput.NO_INPUT;
     }
   }
 
