@@ -8,7 +8,7 @@ import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { TouchDPad } from "../lablib/TouchDPad.js";
 import { Rectangle } from "../lablib/Rectangle.js";
 import { ButtonState, TouchButton } from "../lablib/TouchButton.js";
-import { ToggleButton } from "../lablib/ToggleButton.js";
+import { ToggleButton, ToggleState } from "../lablib/ToggleButton.js";
 
 const MOUSE = new CanvasMouseHandler();
 const DPAD = new TouchDPad(
@@ -21,7 +21,7 @@ const BUTTON = new TouchButton(
 
 const TOGGLE = new ToggleButton(
   new Rectangle(Point.point(10, 300), Point.direction(100, 100)),
-  false
+  ToggleState.STATE_A
 );
 
 const SPEED = 4;
