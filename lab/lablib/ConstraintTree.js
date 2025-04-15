@@ -1,7 +1,7 @@
-import { Point } from "../pga2d/objects.js";
-import { Motor } from "../pga2d/versors.js";
-import { is_nearly } from "./is_nearly.js";
-import { Particle } from "./Particle.js";
+import { Point } from "../../pga2d/objects.js";
+import { Motor } from "../../pga2d/versors.js";
+import { is_nearly } from "../../sketchlib/is_nearly.js";
+import { Particle } from "../../sketchlib/Particle.js";
 
 export class Constraint {
   /**
@@ -43,7 +43,7 @@ function halfway(a, b, tiebreak) {
 
 export class ConstraintJoint {
   /**
-   *
+   * Constructor
    * @param {Point} position - Initial position as a point
    * @param {Point} orientation - A unit direction pointing in the "forwards" direction
    * @param {number} body_radius The radius of the body
@@ -65,6 +65,35 @@ export class ConstraintJoint {
     this.angle_constraint = angle_constraint;
     this.body_radius = body_radius;
     this.children = children ?? [];
+  }
+
+  /**
+   * Move the root node to a target, and have all the other nodes follow it.
+   * @param {Point} target The point to move to
+   */
+  follow_root(target) {
+    // If we moved to a new point, move the node and rotate to face the
+    // target. Otherwise, just stay put
+    if (!target.equals(this.position)) {
+      this.orientation = target.sub(this.position).normalize();
+      this.position = target;
+    }
+
+    for (const child of this.children) {
+      child.follow_recursive(this);
+    }
+  }
+
+  /**
+   * Following method for all the nodes of the tree except the root.
+   * @param {ConstraintJoint} parent The parent node to follow
+   */
+  follow_recursive(parent) {
+    // Compute the new position and orientation based on the constraints
+
+    for (const child of this.children) {
+      child.follow_recursive(this);
+    }
   }
 
   /**
@@ -158,13 +187,27 @@ export class ConstraintTree {
   /**
    * A tree of joints
    * @param {ConstraintJoint} root The root node of the tree
+   * @param {number} max_acceleration maximum acceleration of the root node
    */
-  constructor(root) {
+  constructor(root, max_acceleration) {
     this.root = root;
     this.particle = new Particle(this.root.position, Point.ZERO);
+    this.max_acceleration = max_acceleration;
   }
 
-  update() {}
+  /**
+   * Update the animation for this frame
+   * @param {Point} target The destination point
+   * @param {number} dt The time delta
+   */
+  update(target, dt) {
+    const position = this.root.position;
+    const acceleration = target.sub(position).set_length(this.max_acceleration);
+    this.particle.update(dt, acceleration);
+
+    //this.root.follow_root(this.particle.position);
+    this.root.follow_root(target);
+  }
 
   /**
    * Get the vertices for an outline of the tree. These can be interpolated
