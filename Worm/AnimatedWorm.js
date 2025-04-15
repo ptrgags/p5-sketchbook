@@ -28,12 +28,12 @@ const ROT90 = Motor.rotation(Point.ORIGIN, Math.PI / 2);
 const ROT45 = Motor.rotation(Point.ORIGIN, Math.PI / 4);
 const DEBUG_SHOW_SPINE = false;
 
-const COLOR_SPINE = new Color(255, 255, 255);
-const SPINE_STYLE = new Style().with_stroke(COLOR_SPINE);
-const CENTER_STYLE = new Style().with_fill(COLOR_SPINE);
-const WORM_STYLE = new Style()
-  .with_fill(new Color(255, 122, 151))
-  .with_stroke(new Color(127, 61, 76));
+const SPINE_STYLE = new Style({ stroke: Color.WHITE });
+const CENTER_STYLE = new Style({ fill: Color.WHITE });
+const WORM_STYLE = new Style({
+  fill: new Color(255, 122, 151),
+  stroke: new Color(127, 61, 76),
+});
 
 /**
  * A cute animated worm with googly eyes, animated with AnimationChain

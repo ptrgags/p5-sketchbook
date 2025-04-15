@@ -31,13 +31,18 @@ const COLOR_CELL_S = Color.from_hex_code("#4cbac0");
 // dark sea green
 const COLOR_CELL_L = Color.from_hex_code("#419977");
 const CELL_THICKNESS = 20;
-const STYLE_CELL_S = new Style()
-  .with_stroke(COLOR_CELL_S)
-  .with_width(CELL_THICKNESS);
-const STYLE_CELL_L = new Style()
-  .with_stroke(COLOR_CELL_L)
-  .with_width(CELL_THICKNESS);
-const STYLE_ARROW = new Style().with_stroke(Color.BLACK).with_width(2);
+const STYLE_CELL_S = new Style({
+  stroke: COLOR_CELL_S,
+  width: CELL_THICKNESS,
+});
+const STYLE_CELL_L = new Style({
+  stroke: COLOR_CELL_L,
+  width: CELL_THICKNESS,
+});
+const STYLE_ARROW = new Style({
+  stroke: Color.BLACK,
+  width: 2,
+});
 
 class AnabaenaCatenula {
   constructor() {

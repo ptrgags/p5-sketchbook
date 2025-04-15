@@ -68,7 +68,6 @@ export const LINKS = [
     title: "Growing Flowers",
     year: "2023",
   },
-
   {
     title: "Origami Tiles",
     year: "2021",

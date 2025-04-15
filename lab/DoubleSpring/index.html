@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../../libraries/p5.min.js"
+    ></script>
+    <script type="module">
+      import { sketch } from "./DoubleSpring.js";
+      import "../../sketchlib/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../../styles/layout.css" />
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>Double Spring 🧪 (2016, 2025)</h1>
+      <div class="sketch">
+        <canvas id="sketch-canvas" width="500" height="700"></canvas>
+      </div>
+      <div class="description">
+        Notes:
+        <ul>
+          <li>
+            UPDATE 2025-04-09 - I tried the idea of stacking springs
+            side-by-side. It looks like my choice of initial conditions aren't
+            actually producing chaotic behavior (It does however produce a
+            pretty graph!). That said, even a double pendulum has regions that
+            are more stable than others, see
+            <a href="https://youtu.be/n7JK4Ht8k8M?si=90l4qSCRF5SY0ccu"
+              >this video</a
+            >. it might be worth making a plot like that of position 2 vs
+            position 1 rather than this phase plot (velocity vs position) to
+            help explore this more.
+          </li>
+          <li>
+            Link to <a href="../DoublePendulum/">Double Pendulum</a>. Text will
+            be similar to what was used on that page to link to this one.
+          </li>
+          <li>
+            Mention
+            <a href="https://youtu.be/GoOVCgcw65M">the YouTube video </a> I made
+            from my original version
+          </li>
+          <li>Color the springs with two values to give it a sense of depth</li>
+          <li>Pick a color theme</li>
+          <li>
+            Document the equations of motion in a README file and link to it
+            here
+          </li>
+          <li>Add a diagram of the forces</li>
+          <li>
+            What kinds of visualization(s) do I want to make with this?
+            <ul>
+              <li>
+                Several copies of the spring system side-by-side with slightly
+                different initial state to better show the chaotic nature?
+              </li>
+              <li>
+                Interactively pull the end of the spring to set the start
+                position?
+              </li>
+              <li>
+                Separate the phase plots and put them next to each spring's rest
+                position?
+              </li>
+              <li>Visualize the positions and velocities as vectors?</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

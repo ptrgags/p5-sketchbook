@@ -1,8 +1,8 @@
 import { Point } from "../pga2d/objects.js";
 import { LinePrimitive, RectPrimitive } from "../sketchlib/primitives.js";
-import { GridDirection } from "../sketchlib/GridDiection.js";
 import { Rect } from "./Rect.js";
 import { CoralTile } from "./CoralTile.js";
+import { Direction } from "../sketchlib/Direction.js";
 
 /**
  * Render the boundaries and cross-bars of a quad to uncolored geometry
@@ -41,7 +41,7 @@ export function render_tile_connections(tile) {
   const flags = tile.connection_flags;
   const center = quad.uv_to_world(Point.point(0.5, 0.5));
   const primitives = [];
-  for (let i = 0; i < GridDirection.COUNT; i++) {
+  for (let i = 0; i < Direction.COUNT; i++) {
     if (!flags.has_flag(i)) {
       continue;
     }
@@ -65,13 +65,13 @@ const WALLS = [
  * Render the walls of a maze (walls on sides of grid cells with no connections)
  *
  * @param {CoralTile} tile The tile to render
- * @returns {LinePrimitive} The lines representing wall segments.
+ * @returns {LinePrimitive[]} The lines representing wall segments.
  */
 export function render_tile_walls(tile) {
   const quad = tile.quad;
   const flags = tile.connection_flags;
   const primitives = [];
-  for (let i = 0; i < GridDirection.COUNT; i++) {
+  for (let i = 0; i < Direction.COUNT; i++) {
     if (flags.has_flag(i)) {
       continue;
     }

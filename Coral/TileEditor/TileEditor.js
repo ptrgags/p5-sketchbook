@@ -4,7 +4,6 @@ import { CoralTile } from "../CoralTile.js";
 import { InteractiveTangent, InteractiveVertex } from "./interactive.js";
 import { find_splines } from "../find_splines.js";
 import { FlagSet } from "../../sketchlib/FlagSet.js";
-import { GridDirection } from "../../sketchlib/GridDiection.js";
 import { Style } from "../../sketchlib/Style.js";
 import {
   render_quad,
@@ -25,6 +24,7 @@ import {
   SPLINE_STYLE,
 } from "../styles.js";
 import { Color } from "../../sketchlib/Style.js";
+import { Direction } from "../../sketchlib/Direction.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -43,10 +43,7 @@ const CONNECTION_ORDER = [
 ];
 
 const TILES = SMALL_QUADS.map(({ i, j }, quad) => {
-  const connection_flags = new FlagSet(
-    CONNECTION_ORDER[i][j],
-    GridDirection.COUNT
-  );
+  const connection_flags = new FlagSet(CONNECTION_ORDER[i][j], Direction.COUNT);
   return new CoralTile(quad, connection_flags);
 });
 
@@ -72,10 +69,10 @@ const SELECTION_ORDER = [...TANGENTS, ...VERTICES];
 const SPLINES = find_splines(TILES);
 
 // These styles are only used in this sketch
-export const HIGHLIGHT_STYLE = new Style().with_fill(new Color(0, 0, 255));
-export const VERTEX_STYLE = new Style().with_fill(new Color(255, 255, 0));
-export const TANGENT_TIP_STYLE = new Style().with_fill(new Color(0, 255, 0));
-export const TANGENT_STYLE = new Style().with_stroke(new Color(0, 255, 0));
+export const HIGHLIGHT_STYLE = new Style({ fill: Color.CYAN });
+export const VERTEX_STYLE = new Style({ fill: Color.YELLOW });
+export const TANGENT_TIP_STYLE = new Style({ fill: Color.GREEN });
+export const TANGENT_STYLE = new Style({ fill: Color.GREEN });
 
 function render_control_points(tiles) {
   const tangent_lines = [];

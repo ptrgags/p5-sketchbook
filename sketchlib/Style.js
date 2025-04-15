@@ -60,21 +60,45 @@ export class Color {
     return new Color(red, green, blue);
   }
 }
+// Basic 8 colors for quick prototyping. In practice, these colors are harsh
+// so for final sketches, pick colors more intentionally
 Color.BLACK = Object.freeze(new Color(0, 0, 0));
+Color.RED = Object.freeze(new Color(255, 0, 0));
+Color.GREEN = Object.freeze(new Color(0, 255, 0));
+Color.BLUE = Object.freeze(new Color(0, 0, 255));
+Color.YELLOW = Object.freeze(new Color(255, 255, 0));
+Color.MAGENTA = Object.freeze(new Color(255, 0, 255));
+Color.CYAN = Object.freeze(new Color(0, 255, 255));
+Color.WHITE = Object.freeze(new Color(255, 255, 255));
+
+/**
+ * @typedef {Object} StyleDescriptor
+ * @property {Color} [stroke] The stroke color
+ * @property {number} [width] The stroke width
+ * @property {Color} [fill] The fill color
+ */
 
 export class Style {
-  constructor() {
-    this.stroke = undefined;
-    this.fill = undefined;
-    this.stroke_width = 1;
+  /**
+   * Constructor
+   * @param {StyleDescriptor} options The options for the style
+   */
+  constructor(options) {
+    this.stroke = options.stroke;
+    this.fill = options.fill;
+    this.stroke_width = options.width ?? 1;
   }
 
+  /**
+   * Make a copy of this style.
+   * @returns {Style} A copy of the style
+   */
   clone() {
-    const result = new Style();
-    result.stroke = this.stroke;
-    result.fill = this.fill;
-    result.stroke_width = this.stroke_width;
-    return result;
+    return new Style({
+      stroke: this.stroke,
+      fill: this.fill,
+      width: this.stroke_width,
+    });
   }
 
   /**
@@ -88,15 +112,34 @@ export class Style {
     return result;
   }
 
+  /**
+   * Create a new style that's equivalent to this one but with a new fill color
+   * @param {Color} fill The new fill color
+   * @returns {Style} The new style
+   */
   with_fill(fill) {
     const result = this.clone();
     result.fill = fill;
     return result;
   }
 
+  /**
+   * Create a new style that's equivalent to this one but with a new stroke width
+   * @param {number} width The new stroke width
+   * @returns {Style} The new style
+   */
   with_width(width) {
     const result = this.clone();
     result.stroke_width = width;
     return result;
   }
 }
+
+Style.INVISIBLE = Object.freeze(new Style({}));
+Style.DEFAULT_STROKE = Object.freeze(new Style({ stroke: Color.WHITE }));
+Style.DEFAULT_FILL = Object.freeze(
+  new Style({ fill: Color.from_hex_code("#6eb2e8") })
+);
+Style.DEFAULT_STROKE_FILL = Object.freeze(
+  Style.DEFAULT_FILL.with_stroke(Color.WHITE)
+);

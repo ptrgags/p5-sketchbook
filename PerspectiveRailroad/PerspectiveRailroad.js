@@ -20,9 +20,9 @@ const BOTTOM_SIDE = new Line(0, 1, HEIGHT);
 const RAIL_WIDTH = 30;
 const RAIL_HEIGHT = 50;
 
-const DEFAULT_STYLE = new Style().with_stroke(new Color(0, 0, 0));
+const DEFAULT_STYLE = new Style({ stroke: Color.BLACK });
 const GROUND_STYLE = DEFAULT_STYLE.with_fill(new Color(135, 201, 162));
-const SKY_STYLE = new Style().with_fill(new Color(30, 173, 235));
+const SKY_STYLE = new Style({ fill: new Color(30, 173, 235) });
 const RAIL_STYLE = DEFAULT_STYLE.with_fill(new Color(71, 70, 69));
 const TIE_STYLE = DEFAULT_STYLE.with_fill(new Color(99, 59, 26));
 
@@ -81,7 +81,7 @@ const MAX_ITERATIONS = 500;
  * @param {Point} point_a The bottom left corner of the sidewalk
  * @param {Point} point_b The bottom right corner of the sidewalk. It must be at the same y-value as point_a.
  * @param {Point} vp Vanishing point where rectangles converge
- * @param {number1} vertical_spacing vertical spacing in px between the first two lines.
+ * @param {number} vertical_spacing vertical spacing in px between the first two lines.
  * @returns {object} An object with data representing the lines and points of the pattern.
  */
 function even_spaced_rectangles(point_a, point_b, vp, vertical_spacing) {
