@@ -1,5 +1,6 @@
 import { Point } from "../../pga2d/objects.js";
 import { Motor } from "../../pga2d/versors.js";
+import { clamp } from "../../sketchlib/clamp.js";
 import { is_nearly } from "../../sketchlib/is_nearly.js";
 import { Particle } from "../../sketchlib/Particle.js";
 
@@ -89,7 +90,52 @@ export class ConstraintJoint {
    * @param {ConstraintJoint} parent The parent node to follow
    */
   follow_recursive(parent) {
-    // Compute the new position and orientation based on the constraints
+    const from_parent = this.position.sub(parent.position);
+    const dir_from_parent = from_parent.normalize();
+    const dist_from_parent = from_parent.ideal_norm();
+
+    // Angle constraint =============================================
+
+    // Relative to the parent's orientation, the angle constraint is measured
+    // from the "backwards" direction - a positive angle is CCW from there,
+    // a negative one is CW. Let's find directions for the left and right
+    // constraint bounds
+    const backward = parent.orientation.neg();
+    const { minimum: theta1, maximum: theta2 } = this.angle_constraint;
+    const dir_left = Motor.rotation(Point.ORIGIN, theta1).transform_point(
+      backward
+    );
+    const dir_right = Motor.rotation(Point.ORIGIN, theta2).transform_point(
+      backward
+    );
+
+    // Get the sign of the angle between the current direction and the
+    // left/right boundaries. If both of these are positive, we're within
+    // the bounds and should keep the same angle. Otherwise, snap to the
+    // closest boundary
+    const left_sin = dir_left.join(dir_from_parent).ideal_norm();
+    const right_sin = dir_from_parent.join(dir_right).ideal_norm();
+
+    let direction;
+    if (left_sin > 0 || right_sin > 0) {
+      direction = dir_from_parent;
+    } else if (Math.abs(left_sin) < Math.abs(right_sin)) {
+      direction = dir_left;
+    } else {
+      direction = dir_right;
+    }
+
+    // Length constraint =============================================
+
+    // This one's easier, just clamp the length to range
+    const { minimum: r1, maximum: r2 } = this.length_constraint;
+    const length = clamp(dist_from_parent, r1, r2);
+
+    // Update joint ==================================================
+
+    this.orientation = direction.neg();
+    const offset = direction.scale(length);
+    this.position = parent.position.add(offset);
 
     for (const child of this.children) {
       child.follow_recursive(this);

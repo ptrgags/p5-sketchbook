@@ -60,8 +60,8 @@ const CHAIN = new ConstraintTree(
 );
 
 const TREE_HEAD = Point.point(WIDTH / 2, HEIGHT / 2);
-const ANGLE_LEFT = new Constraint(-Math.PI / 4, 0);
-const ANGLE_RIGHT = new Constraint(0, Math.PI);
+const ANGLE_LEFT = new Constraint(-Math.PI / 4, -Math.PI / 4);
+const ANGLE_RIGHT = new Constraint(Math.PI / 3, Math.PI / 4);
 const BRANCH_LENGTH = 50;
 const TREE = new ConstraintTree(
   new ConstraintJoint(TREE_HEAD, UP, RADIUS_MED, undefined, undefined, [
