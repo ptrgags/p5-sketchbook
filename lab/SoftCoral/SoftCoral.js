@@ -1,18 +1,18 @@
-import { Point } from "../pga2d/objects.js";
+import { Point } from "../../pga2d/objects.js";
 import {
   Constraint,
   ConstraintJoint,
   ConstraintTree,
-} from "../sketchlib/ConstraintTree.js";
-import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
-import { draw_primitive } from "../sketchlib/draw_primitive.js";
+} from "../../sketchlib/ConstraintTree.js";
+import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
+import { draw_primitive } from "../../sketchlib/draw_primitive.js";
 import {
   BeziergonPrimitive,
   GroupPrimitive,
   PointPrimitive,
   VectorPrimitive,
-} from "../sketchlib/primitives.js";
-import { Color, Style } from "../sketchlib/Style.js";
+} from "../../sketchlib/primitives.js";
+import { Color, Style } from "../../sketchlib/Style.js";
 
 const RADIUS_THIN = 20;
 const RADIUS_MED = 40;
@@ -102,10 +102,10 @@ const TREE = new ConstraintTree(
 );
 
 const COLOR_CORAL = new Color(255, 127, 80);
-const STYLE_OUTLINE = new Style().with_stroke(COLOR_CORAL).with_width(4);
+const STYLE_OUTLINE = new Style({ stroke: COLOR_CORAL, width: 4 });
 
-const STYLE_POINTS = new Style().with_fill(new Color(255, 255, 255));
-const STYLE_SPINE = new Style().with_stroke(new Color(255, 255, 255));
+const STYLE_POINTS = Style.DEFAULT_STROKE_FILL;
+const STYLE_SPINE = Style.DEFAULT_STROKE;
 
 export const sketch = (p) => {
   p.setup = () => {
@@ -158,7 +158,7 @@ export const sketch = (p) => {
       STYLE_SPINE
     );
 
-    const scene = new GroupPrimitive([outlines, spines /*point_group*/]);
+    const scene = new GroupPrimitive([outlines, spines, point_group]);
     draw_primitive(p, scene);
   };
 };
