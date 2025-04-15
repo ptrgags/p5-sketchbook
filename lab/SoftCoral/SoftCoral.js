@@ -130,12 +130,16 @@ export const sketch = (p) => {
 
     const t = p.frameCount / 100;
 
-    const rotating_point = Point.dir_from_angle(-(TAU / 3) * t)
-      .scale(200)
-      .add(SCREEN_CENTER)
-      .to_point();
+    const [a, b, c] = [0, 1, 2].map((k) => {
+      return Point.dir_from_angle(-(TAU / 3) * t + (TAU / 3) * k)
+        .scale(200)
+        .add(SCREEN_CENTER)
+        .to_point();
+    });
 
-    TREE.update(rotating_point, TIME_DELTA);
+    DOT.update(a, TIME_DELTA);
+    CHAIN.update(b, TIME_DELTA);
+    TREE.update(c, TIME_DELTA);
 
     const dot_outline_vertices = DOT.get_outline_vertices();
     const dot_beziergon =
@@ -155,10 +159,14 @@ export const sketch = (p) => {
     );
 
     const points = [
+      /*
       ...dot_outline_vertices,
       ...chain_outline_vertices,
       ...tree_vertices,
-      rotating_point,
+      */
+      a,
+      b,
+      c,
     ].map((x) => new PointPrimitive(x));
     const point_group = new GroupPrimitive(points, STYLE_POINTS);
 
@@ -176,7 +184,7 @@ export const sketch = (p) => {
       STYLE_SPINE
     );
 
-    const scene = new GroupPrimitive([outlines, spines /*point_group*/]);
+    const scene = new GroupPrimitive([outlines, spines, point_group]);
     draw_primitive(p, scene);
   };
 };

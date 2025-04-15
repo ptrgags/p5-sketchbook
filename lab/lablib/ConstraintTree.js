@@ -247,9 +247,11 @@ export class ConstraintTree {
    * @param {number} dt The time delta
    */
   update(target, dt) {
+    /*
     const position = this.root.position;
     const acceleration = target.sub(position).set_length(this.max_acceleration);
     this.particle.update(dt, acceleration);
+    */
 
     //this.root.follow_root(this.particle.position);
     this.root.follow_root(target);
