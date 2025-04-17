@@ -4,6 +4,59 @@ import { clamp } from "../../sketchlib/clamp.js";
 import { is_nearly } from "../../sketchlib/is_nearly.js";
 import { Particle } from "../../sketchlib/Particle.js";
 
+export class AngleConstraint {
+  /**
+   * Constructor
+   * @param {number} theta1 Minimum angle
+   * @param {number} theta2 Maximum angle
+   */
+  constructor(theta1, theta2) {
+    this.theta1 = theta1;
+    this.theta2 = theta2;
+  }
+
+  /**
+   * Instead of [theta1, theta2], specify the constraint as angle +/- spread
+   * @param {number} angle The angle of the center of the range in radians
+   * @param {number} spread positive angle from center of range to the CCW max angle
+   */
+  static from_angle_spread(angle, spread) {
+    const theta1 = angle - spread;
+    const theta2 = angle + spread;
+    return new AngleConstraint(theta1, theta2);
+  }
+
+  /**
+   *
+   * @param {Point} dir_backward The "backwards" direction relative to the parent node
+   * @param {Point} dir_current The current direction from the parent node to the child node
+   * @returns {Point} the constrained direction
+   */
+  constrain(dir_backward, dir_current) {
+    const dir_left = Motor.rotation(Point.ORIGIN, this.theta1).transform_point(
+      dir_backward
+    );
+    const dir_right = Motor.rotation(Point.ORIGIN, this.theta2).transform_point(
+      dir_backward
+    );
+
+    // Get the sign of the angle between the current direction and the
+    // left/right boundaries. If both of these are positive, we're within
+    // the bounds and should keep the same angle. Otherwise, snap to the
+    // closest boundary
+    const left_sin = dir_left.join(dir_current).ideal_norm();
+    const right_sin = dir_current.join(dir_right).ideal_norm();
+
+    if (left_sin > 0 || right_sin > 0) {
+      return dir_current;
+    } else if (Math.abs(left_sin) < Math.abs(right_sin)) {
+      return dir_left;
+    } else {
+      return dir_right;
+    }
+  }
+}
+
 export class Constraint {
   /**
    * A constraint that a value must be between [min, max]
@@ -49,7 +102,7 @@ export class ConstraintJoint {
    * @param {Point} orientation - A unit direction pointing in the "forwards" direction
    * @param {number} body_radius The radius of the body
    * @param {Constraint} [length_constraint] The length constraint
-   * @param {Constraint} [angle_constraint] Angle constraint [theta_min, theta_max], measured CCW from the relative backwards direction
+   * @param {AngleConstraint} [angle_constraint] Angle constraint [theta_min, theta_max], measured CCW from the relative backwards direction
    * @param {ConstraintJoint[]} [children] Children
    */
   constructor(
@@ -100,7 +153,7 @@ export class ConstraintJoint {
     // from the "backwards" direction - a positive angle is CCW from there,
     // a negative one is CW. Let's find directions for the left and right
     // constraint bounds
-    const backward = parent.orientation.neg();
+    /*const backward = parent.orientation.neg();
     const { minimum: theta1, maximum: theta2 } = this.angle_constraint;
     const dir_left = Motor.rotation(Point.ORIGIN, theta1).transform_point(
       backward
@@ -124,6 +177,13 @@ export class ConstraintJoint {
     } else {
       direction = dir_right;
     }
+      */
+
+    const dir_backward = parent.orientation.neg();
+    const direction = this.angle_constraint.constrain(
+      dir_backward,
+      dir_from_parent
+    );
 
     // Length constraint =============================================
 

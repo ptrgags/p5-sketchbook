@@ -1,5 +1,6 @@
 import { Point } from "../../pga2d/objects.js";
 import {
+  AngleConstraint,
   Constraint,
   ConstraintJoint,
   ConstraintTree,
@@ -36,7 +37,7 @@ const DOT = new ConstraintTree(
 const CHAIN_HEAD = Point.point(WIDTH / 2 + WIDTH / 4, HEIGHT / 2 - WIDTH / 4);
 const CHAIN_OFFSET = Point.DIR_Y.scale(100);
 const CHAIN_FOLLOW = new Constraint(100, 100);
-const CHAIN_ANGLE = new Constraint(-Math.PI / 4, Math.PI / 4);
+const CHAIN_ANGLE = new AngleConstraint(-Math.PI / 4, Math.PI / 4);
 const CHAIN = new ConstraintTree(
   new ConstraintJoint(CHAIN_HEAD, UP, RADIUS_MED, undefined, undefined, [
     new ConstraintJoint(
@@ -60,8 +61,8 @@ const CHAIN = new ConstraintTree(
 );
 
 const TREE_HEAD = Point.point(WIDTH / 2, HEIGHT / 2);
-const ANGLE_LEFT = new Constraint(-Math.PI / 4, -Math.PI / 4);
-const ANGLE_RIGHT = new Constraint(Math.PI / 3, Math.PI / 4);
+const ANGLE_LEFT = new AngleConstraint(-Math.PI / 4, -Math.PI / 4);
+const ANGLE_RIGHT = new AngleConstraint(Math.PI / 3, Math.PI / 3);
 const BRANCH_LENGTH = 50;
 const TREE = new ConstraintTree(
   new ConstraintJoint(TREE_HEAD, UP, RADIUS_MED, undefined, undefined, [
