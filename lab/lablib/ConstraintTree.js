@@ -49,7 +49,12 @@ export class AngleConstraint {
 
     if (left_sin > 0 || right_sin > 0) {
       return dir_current;
-    } else if (Math.abs(left_sin) < Math.abs(right_sin)) {
+    }
+
+    const left_dot = dir_left.dot(dir_current);
+    const right_dot = dir_right.dot(dir_current);
+
+    if (left_dot > right_dot) {
       return dir_left;
     } else {
       return dir_right;
