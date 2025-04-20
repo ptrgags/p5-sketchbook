@@ -38,6 +38,11 @@ export class AngleConstraint {
     const dir_left = Motor.rotation(Point.ORIGIN, this.theta1).transform_point(
       dir_backward
     );
+
+    if (this.theta1 === this.theta2) {
+      return dir_left;
+    }
+
     const dir_right = Motor.rotation(Point.ORIGIN, this.theta2).transform_point(
       dir_backward
     );

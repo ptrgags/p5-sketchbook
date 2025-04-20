@@ -15,6 +15,7 @@ import {
 } from "../../sketchlib/primitives.js";
 import { Color, Style } from "../../sketchlib/Style.js";
 import { TAU } from "../../sketchlib/math_consts.js";
+import { fix_mouse_coords } from "../../sketchlib/fix_mouse_coords.js";
 
 const RADIUS_THIN = 20;
 const RADIUS_MED = 40;
@@ -61,8 +62,8 @@ const CHAIN = new ConstraintTree(
 );
 
 const TREE_HEAD = Point.point(WIDTH / 2, HEIGHT / 2);
-const ANGLE_LEFT = new AngleConstraint(-Math.PI / 2, Math.PI / 2);
-const ANGLE_RIGHT = new AngleConstraint(Math.PI / 2, Math.PI / 2);
+const ANGLE_LEFT = new AngleConstraint(-Math.PI / 4, -Math.PI / 4);
+const ANGLE_RIGHT = new AngleConstraint(Math.PI / 4, Math.PI / 4);
 const BRANCH_LENGTH = 50;
 const TREE = new ConstraintTree(
   new ConstraintJoint(TREE_HEAD, UP, RADIUS_MED, undefined, undefined, [
@@ -117,13 +118,14 @@ const STYLE_SPINE = Style.DEFAULT_STROKE;
 const TIME_DELTA = 0.1;
 
 export const sketch = (p) => {
+  let canvas;
   p.setup = () => {
-    p.createCanvas(
+    canvas = p.createCanvas(
       WIDTH,
       HEIGHT,
       undefined,
       document.getElementById("sketch-canvas")
-    );
+    ).elt;
   };
 
   p.draw = () => {
@@ -140,7 +142,7 @@ export const sketch = (p) => {
 
     DOT.update(a, TIME_DELTA);
     CHAIN.update(b, TIME_DELTA);
-    TREE.update(c, TIME_DELTA);
+    //TREE.update(c, TIME_DELTA);
 
     const dot_outline_vertices = DOT.get_outline_vertices();
     const dot_beziergon =
@@ -186,4 +188,10 @@ export const sketch = (p) => {
     const scene = new GroupPrimitive([outlines, spines, point_group, debug_chain]);
     draw_primitive(p, scene);
   };
+
+  p.mouseMoved = () => {
+    const mouse = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
+
+    TREE.update(mouse, TIME_DELTA)
+  }
 };
