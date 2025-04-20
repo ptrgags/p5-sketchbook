@@ -94,6 +94,10 @@ export class PolygonPrimitive {
 }
 
 export class BeziergonPrimitive {
+  /**
+   * Constructor
+   * @param {BezierPrimitive[]} curves The curves that make up the border
+   */
   constructor(curves) {
     this.curves = curves;
   }
@@ -102,6 +106,11 @@ export class BeziergonPrimitive {
     yield* this.curves;
   }
 
+  /**
+   * Interpolate a set of points with a smooth curve
+   * @param {Point[]} points The points to interpolate into a Bezier polygon
+   * @returns {BeziergonPrimitive} the computed beziergon
+   */
   static interpolate_points(points) {
     const bezier_curves = [];
     const n = points.length;

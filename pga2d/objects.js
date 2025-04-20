@@ -357,6 +357,15 @@ export class Line {
   }
 
   /**
+   * Get the ideal norm of the point, i.e. the o component. This indicates
+   * distance from the origin.
+   * @returns {number}
+   */
+  ideal_norm() {
+    return this.vec.o;
+  }
+
+  /**
    * Find the meet of two lines. This is their point of intersection, or for parallel lines
    * an ideal point in the direction the lines point (this is 90 degrees clockwise of their normals)
    * @param {Line} other The line to intersect with
