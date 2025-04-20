@@ -289,12 +289,12 @@ export class ConstraintJoint {
   }
 
   /**
-   * Get the edges of the tree
-   * @param {[Point, Point][]} result The list of edges to populate
+   * Get the edges (parent, child) for the tree
+   * @param {[ConstraintJoint, ConstraintJoint][]} result The list of edges to populate
    */
   get_edges(result) {
     for (const child of this.children) {
-      result.push([child.position, this.position]);
+      result.push([this, child]);
 
       child.get_edges(result);
     }
@@ -354,7 +354,7 @@ export class ConstraintTree {
 
   /**
    *
-   * @returns {[Point, Point][]}
+   * @returns {[ConstraintJoint, ConstraintJoint][]}
    */
   get_tree_edges() {
     const result = [];
@@ -377,8 +377,30 @@ export class ConstraintTree {
     })
     const orientation_vectors = new GroupPrimitive(orientation_prims, Style.DEFAULT_STROKE);
 
+    const edges = [];
+    this.root.get_edges(edges);
+
+    const LINE_LENGTH = 40;
+    const angle_lines = edges.flatMap(([parent, child]) => {
+      const center = parent.position;
+      const backwards = parent.orientation.neg();
+      const { theta1, theta2 } = child.angle_constraint;
+      const left = Motor.rotation(Point.ORIGIN, theta1).transform_point(backwards);
+      const right = Motor.rotation(Point.ORIGIN, theta2).transform_point(backwards);
+
+
+      const left_end = center.add(left.scale(LINE_LENGTH));
+      const right_end = center.add(right.scale(LINE_LENGTH));
+      return [
+        new LinePrimitive(center, left_end),
+        new LinePrimitive(center, right_end)
+      ]
+    })
+    const group_angles = new GroupPrimitive(angle_lines, Style.DEFAULT_STROKE);
+
     return new GroupPrimitive([
       circles,
+      group_angles,
       orientation_vectors
     ])
   }

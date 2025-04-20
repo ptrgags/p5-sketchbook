@@ -174,18 +174,20 @@ export const sketch = (p) => {
     const point_group = new GroupPrimitive(points, STYLE_POINTS);
 
     // Render as vectors
-    const chain_spine_vectors = CHAIN.get_tree_edges().map(
+    /*const chain_spine_vectors = CHAIN.get_tree_edges().map(
       (x) => new VectorPrimitive(...x)
-    );
+    );*/
 
+    /*
     const spines = new GroupPrimitive(
       [...chain_spine_vectors],
       STYLE_SPINE
     );
+    */
 
     const debug_chain = TREE.debug_render();
 
-    const scene = new GroupPrimitive([outlines, spines, point_group, debug_chain]);
+    const scene = new GroupPrimitive([outlines, /*spines,*/ point_group, debug_chain]);
     draw_primitive(p, scene);
   };
 
