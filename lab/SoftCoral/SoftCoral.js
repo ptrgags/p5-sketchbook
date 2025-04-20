@@ -61,8 +61,8 @@ const CHAIN = new ConstraintTree(
 );
 
 const TREE_HEAD = Point.point(WIDTH / 2, HEIGHT / 2);
-const ANGLE_LEFT = new AngleConstraint(-Math.PI / 4, -Math.PI / 4);
-const ANGLE_RIGHT = new AngleConstraint(Math.PI / 3, Math.PI / 3);
+const ANGLE_LEFT = new AngleConstraint(-Math.PI / 2, Math.PI / 2);
+const ANGLE_RIGHT = new AngleConstraint(Math.PI / 2, Math.PI / 2);
 const BRANCH_LENGTH = 50;
 const TREE = new ConstraintTree(
   new ConstraintJoint(TREE_HEAD, UP, RADIUS_MED, undefined, undefined, [
@@ -176,16 +176,14 @@ export const sketch = (p) => {
       (x) => new VectorPrimitive(...x)
     );
 
-    const tree_spine_vectors = TREE.get_tree_edges().map(
-      (x) => new VectorPrimitive(...x)
-    );
-
     const spines = new GroupPrimitive(
-      [...chain_spine_vectors, ...tree_spine_vectors],
+      [...chain_spine_vectors],
       STYLE_SPINE
     );
 
-    const scene = new GroupPrimitive([outlines, spines, point_group]);
+    const debug_chain = TREE.debug_render();
+
+    const scene = new GroupPrimitive([outlines, spines, point_group, debug_chain]);
     draw_primitive(p, scene);
   };
 };

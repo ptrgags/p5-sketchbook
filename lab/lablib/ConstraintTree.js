@@ -3,6 +3,8 @@ import { Motor } from "../../pga2d/versors.js";
 import { clamp } from "../../sketchlib/clamp.js";
 import { is_nearly } from "../../sketchlib/is_nearly.js";
 import { Particle } from "../../sketchlib/Particle.js";
+import { CirclePrimitive, GroupPrimitive, LinePrimitive, VectorPrimitive } from "../../sketchlib/primitives.js";
+import { Style } from "../../sketchlib/Style.js";
 
 export class AngleConstraint {
   /**
@@ -292,6 +294,18 @@ export class ConstraintJoint {
       child.get_edges(result);
     }
   }
+
+  /**
+   * Gather up all joints into a single list
+   * @param {ConstraintJoint[]} joints The joints to render
+   */
+  get_all_joints(joints) {
+    joints.push(this);
+
+    for (const child of this.children) {
+      child.get_all_joints(joints)
+    }
+  }
 }
 
 export class ConstraintTree {
@@ -341,5 +355,26 @@ export class ConstraintTree {
     const result = [];
     this.root.get_edges(result);
     return result;
+  }
+
+  debug_render() {
+    const joints = [];
+    this.root.get_all_joints(joints);
+
+    const circle_prims = joints.map(joint => {
+      return new CirclePrimitive(joint.position, joint.body_radius);
+    })
+    const circles = new GroupPrimitive(circle_prims, Style.DEFAULT_STROKE);
+
+    const orientation_prims = joints.map(joint => {
+      const offset = joint.orientation.scale(30);
+      return new VectorPrimitive(joint.position, joint.position.add(offset));
+    })
+    const orientation_vectors = new GroupPrimitive(orientation_prims, Style.DEFAULT_STROKE);
+
+    return new GroupPrimitive([
+      circles,
+      orientation_vectors
+    ])
   }
 }
