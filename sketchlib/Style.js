@@ -13,17 +13,22 @@ function format_hex_u8(value_u8) {
   return hex_value;
 }
 
+/**
+ * sRGBA color with values in the range [0, 255]
+ */
 export class Color {
   /**
    * Constructor
    * @param {number} r The red component from 0 to 255
    * @param {number} g The green component from 0 to 255
    * @param {number} b The blue component from 0 to 255
+   * @param {number} [a = 255] the alpha component from 0 to 255
    */
-  constructor(r, g, b) {
+  constructor(r, g, b, a) {
     this.r = r;
     this.g = g;
     this.b = b;
+    this.a = a ?? 255;
   }
 
   /**
