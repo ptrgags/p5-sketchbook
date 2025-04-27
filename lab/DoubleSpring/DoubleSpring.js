@@ -2,7 +2,6 @@ import { Point } from "../../pga2d/objects.js";
 import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
 import { draw_primitive } from "../../sketchlib/draw_primitive.js";
 import { GroupPrimitive } from "../../sketchlib/primitives.js";
-import { Style } from "../../sketchlib/Style.js";
 import { Oklch } from "../lablib/Oklch.js";
 import { DoubleSpringSystem, Spring } from "./DoubleSpringSystem.js";
 
@@ -14,20 +13,13 @@ const LIGHT_YELLOW = new Oklch(0.82, 0.1246, 93.18);
 const DARK_PURPLE = new Oklch(0.5, 0.1246, 285.88);
 const LIGHT_BLUE = new Oklch(0.76, 0.1246, 209.65);
 
-const PALETTE_A = [
-  DARK_ORANGE,
-  Oklch.lerp(DARK_ORANGE, LIGHT_YELLOW, 0.25),
-  Oklch.lerp(DARK_ORANGE, LIGHT_YELLOW, 0.5),
-  Oklch.lerp(DARK_ORANGE, LIGHT_YELLOW, 0.75),
-  LIGHT_YELLOW,
-];
+const PALETTE_A = Oklch.gradient(DARK_ORANGE, LIGHT_YELLOW, N);
 const PALETTE_B = Oklch.gradient(DARK_PURPLE, LIGHT_BLUE, N);
 
 const SPRING_CONSTANT = 5.0;
 const REST_LENGTH = 1.0;
 const BOB_MASS = 0.5;
 const BOB_WIDTH = 0.4;
-// All springs will be the same, I'm only varying the initial positions
 
 /**
  * Build a spring

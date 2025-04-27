@@ -8,7 +8,6 @@ import { RungeKuttaIntegrator } from "../lablib/RungeKuttaIntegrator.js";
 import { Style } from "../../sketchlib/Style.js";
 import { RingBuffer } from "../lablib/RingBuffer.js";
 import { GeneralizedCoordinates } from "../lablib/VectorSpace.js";
-import { Color } from "../../sketchlib/Color.js";
 import { Oklch } from "../lablib/Oklch.js";
 
 const PIXELS_PER_METER = 100;
