@@ -113,15 +113,21 @@ export class Oklch {
   }
 
   /**
-   * Compute a gradient
-   * @param {Oklch} start_color The first color in the gradient
-   * @param {Oklch} end_color The last color
-   * @param {number} num_steps How many gradient steps. E.g. 3 means the result will be an array of 3 colors. There must be at least 2 color steps
-   * @returns {Oklch[]} Interpolated colors including the start and end
+   * Compute a gradient from start_color to end_color
+   * @param {Oklch} start_color The first color in the gradient.
+   * @param {Oklch} end_color The last color in the gradient.
+   * @param {number} num_steps How many gradient steps. E.g. 3 means the result
+   * will be an array of 3 colors. If there is only a single step, the start
+   * color will be returned
+   * @returns {Oklch[]} Interpolated colors.
    */
   static gradient(start_color, end_color, num_steps) {
-    if (num_steps < 2) {
-      throw new Error("num_steps must be at least 2");
+    if (num_steps === 0) {
+      return [];
+    }
+
+    if (num_steps === 1) {
+      return [start_color];
     }
 
     const result = new Array(num_steps);

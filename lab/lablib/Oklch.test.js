@@ -118,9 +118,65 @@ describe("Oklch", () => {
     it("with t > 1 throws", () => {
       const a = new Oklch(0.4, 0.05, 300, 0);
       const b = new Oklch(0.8, 0.1, 100, 1);
+
       expect(() => {
         return Oklch.lerp(a, b, 2);
       }).toThrowError("must be in [0, 1]");
+    });
+  });
+
+  describe("gradient", () => {
+    it("with 0 steps returns empty array", () => {
+      const a = new Oklch(0.4, 0.1, 300);
+      const b = new Oklch(0.8, 0.1, 300);
+
+      const result = Oklch.gradient(a, b, 0);
+
+      expect(result).toEqual([]);
+    });
+
+    it("with 1 step returns start color", () => {
+      const a = new Oklch(0.4, 0.1, 300);
+      const b = new Oklch(0.8, 0.1, 300);
+
+      const result = Oklch.gradient(a, b, 1);
+
+      expect(result).toEqual([a]);
+    });
+
+    it("with 2 steps returns start and end color", () => {
+      const a = new Oklch(0.4, 0.1, 300);
+      const b = new Oklch(0.8, 0.1, 300);
+
+      const result = Oklch.gradient(a, b, 2);
+
+      expect(result).toEqual([a, b]);
+    });
+
+    it("with 3 steps returns start, end and 50 percent mix", () => {
+      const a = new Oklch(0.3, 0.1, 100);
+      const b = new Oklch(0.4, 0.1, 300);
+
+      const result = Oklch.gradient(a, b, 3);
+
+      const expected_mid = new Oklch(0.35, 0.1, 200);
+      expect(result).toEqual([a, expected_mid, b]);
+    });
+
+    it("with several steps produces gradient", () => {
+      const a = new Oklch(0, 0, 0);
+      const b = new Oklch(1, 0.25, 100);
+
+      const result = Oklch.gradient(a, b, 5);
+
+      const expected = [
+        new Oklch(0, 0, 0),
+        new Oklch(0.25, 0.0625, 25),
+        new Oklch(0.5, 0.125, 50),
+        new Oklch(0.75, 0.1875, 75),
+        new Oklch(1, 0.25, 100),
+      ];
+      expect(result).toEqual(expected);
     });
   });
 });
