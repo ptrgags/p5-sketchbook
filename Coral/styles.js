@@ -1,4 +1,5 @@
-import { Style, Color } from "../sketchlib/Style.js";
+import { Color } from "../sketchlib/Color.js";
+import { Style } from "../sketchlib/Style.js";
 const THICK = new Style({
   width: 4,
 });

@@ -5,11 +5,12 @@ import {
   LinePrimitive,
 } from "../../sketchlib/primitives.js";
 import { RungeKuttaIntegrator } from "../lablib/RungeKuttaIntegrator.js";
-import { Color, Style } from "../../sketchlib/Style.js";
+import { Style } from "../../sketchlib/Style.js";
 import { RingBuffer } from "../lablib/RingBuffer.js";
 import { GeneralizedCoordinates } from "../lablib/VectorSpace.js";
 import { PI, TAU } from "../../sketchlib/math_consts.js";
 import { mod } from "../../sketchlib/mod.js";
+import { Color } from "../../sketchlib/Color.js";
 
 const STYLE_AXIS = Style.DEFAULT_STROKE.with_width(2);
 const ARM_STYLE = STYLE_AXIS;
