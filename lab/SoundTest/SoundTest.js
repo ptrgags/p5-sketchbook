@@ -41,7 +41,57 @@ const PLAY_GROUP = new GroupPrimitive(
   new Style({ stroke: Color.WHITE })
 );
 
+class PlayButtonScene {
+  draw(p) {
+    const play_button = PLAY.debug_render();
+    const scene = new GroupPrimitive([play_button, PLAY_GROUP]);
+    draw_primitive(p, scene);
+  }
+
+  mouse_pressed(input) {
+    PLAY.mouse_pressed(input.mouse_coords);
+  }
+
+  mouse_moved(input) {
+    PLAY.mouse_moved(input.mouse_coords);
+  }
+
+  mouse_dragged(input) {
+    PLAY.mouse_dragged(input.mouse_coords);
+  }
+
+  mouse_released(input) {
+    if (!SOUND.audio_ready && !SOUND.init_requested) {
+      PLAY.mouse_released(input.mouse_coords);
+    }
+  }
+}
+
+class SoundScene {
+  draw(p) {
+    const sound_toggle = SOUND_TOGGLE.debug_render();
+    draw_primitive(p, sound_toggle);
+  }
+
+  mouse_pressed(input) {
+    SOUND_TOGGLE.mouse_pressed(input.mouse_coords);
+  }
+
+  mouse_moved(input) {
+    SOUND_TOGGLE.mouse_moved(input.mouse_coords);
+  }
+
+  mouse_dragged(input) {
+    SOUND_TOGGLE.mouse_dragged(input.mouse_coords);
+  }
+
+  mouse_released(input) {
+    SOUND_TOGGLE.mouse_released(input.mouse_coords);
+  }
+}
+
 export const sketch = (p) => {
+  let scene = new PlayButtonScene();
   p.setup = () => {
     const canvas = p.createCanvas(
       WIDTH,
@@ -50,52 +100,32 @@ export const sketch = (p) => {
       document.getElementById("sketch-canvas")
     ).elt;
 
+    PLAY.events.addEventListener("click", () => {
+      SOUND.init();
+      scene = new SoundScene();
+    });
+
     MOUSE.setup(canvas);
   };
 
-  function draw_before_play(p) {
-    const play_button = PLAY.debug_render();
-    const scene = new GroupPrimitive([play_button, PLAY_GROUP]);
-    draw_primitive(p, scene);
-  }
-
   p.draw = () => {
     p.background(0);
-
-    if (!SOUND.audio_ready) {
-      draw_before_play(p);
-      return;
-    }
-
-    const sound_toggle = SOUND_TOGGLE.debug_render();
-    draw_primitive(p, sound_toggle);
+    scene.draw(p);
   };
 
   MOUSE.mouse_pressed(p, (input) => {
-    PLAY.mouse_pressed(input.mouse_coords);
-    SOUND_TOGGLE.mouse_pressed(input.mouse_coords);
+    scene.mouse_pressed(input);
   });
 
   MOUSE.mouse_moved(p, (input) => {
-    PLAY.mouse_moved(input.mouse_coords);
-    SOUND_TOGGLE.mouse_moved(input.mouse_coords);
+    scene.mouse_moved(input);
   });
 
   MOUSE.mouse_released(p, (input) => {
-    if (!SOUND.audio_ready && !SOUND.init_requested) {
-      PLAY.mouse_released(input.mouse_coords);
-      // This is terrible, it should be an event.
-      if (PLAY.state === ButtonState.HOVER) {
-        // button clicked
-        SOUND.init();
-      }
-    } else {
-      SOUND_TOGGLE.mouse_released(input.mouse_coords);
-    }
+    scene.mouse_released(input);
   });
 
   MOUSE.mouse_dragged(p, (input) => {
-    PLAY.mouse_dragged(input.mouse_coords);
-    SOUND_TOGGLE.mouse_dragged(input.mouse_coords);
+    scene.mouse_dragged(input);
   });
 };
