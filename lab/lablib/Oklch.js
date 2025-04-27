@@ -19,13 +19,16 @@ function linear_to_srgb(x) {
   return 12.92 * x;
 }
 
+/**
+ * OK Lightness, Chroma Hue color space. This color space has perceptually
+ * uniform lightness as you go around the color wheel, so it's helpful
+ * for creating palettes
+ *
+ * @see https://bottosson.github.io/posts/oklab/
+ */
 export class Oklch {
   /**
-   * OK Lightness, Chroma Hue color space. This color space has perceptually
-   * uniform lightness as you go around the color wheel, so it's helpful
-   * for creating palettes
-   *
-   * @see https://bottosson.github.io/posts/oklab/
+   * Constructor
    * @param {number} lightness The lightness value (0 = black, 1 = white)
    * @param {number} chroma How pure of a hue. 0 is grey, the maximum value
    * @param {number} hue Angle around the color wheel from 0 to 360 degrees.
