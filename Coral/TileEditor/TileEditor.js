@@ -72,7 +72,7 @@ const SPLINES = find_splines(TILES);
 export const HIGHLIGHT_STYLE = new Style({ fill: Color.CYAN });
 export const VERTEX_STYLE = new Style({ fill: Color.YELLOW });
 export const TANGENT_TIP_STYLE = new Style({ fill: Color.GREEN });
-export const TANGENT_STYLE = new Style({ fill: Color.GREEN });
+export const TANGENT_STYLE = new Style({ stroke: Color.GREEN, width: 1.5 });
 
 function render_control_points(tiles) {
   const tangent_lines = [];
