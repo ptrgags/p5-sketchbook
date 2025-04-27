@@ -4,8 +4,9 @@ import {
   RectPrimitive,
   GroupPrimitive,
 } from "../sketchlib/primitives.js";
-import { Color, Style } from "../sketchlib/Style.js";
+import { Style } from "../sketchlib/Style.js";
 import { draw_primitive } from "../sketchlib/draw_primitive.js";
+import { Color } from "../sketchlib/Color.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;

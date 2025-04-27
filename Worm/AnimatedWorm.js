@@ -7,7 +7,7 @@ import {
   PointPrimitive,
 } from "../sketchlib/primitives.js";
 import { Style } from "../sketchlib/Style.js";
-import { Color } from "../sketchlib/Style.js";
+import { Color } from "../sketchlib/Color.js";
 import { Motor } from "../pga2d/versors.js";
 import { AnimationChain, Joint } from "../sketchlib/AnimationChain.js";
 import { is_nearly } from "../sketchlib/is_nearly.js";

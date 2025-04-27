@@ -1,5 +1,5 @@
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
-import { Color } from "../sketchlib/Style.js";
+import { Color } from "../sketchlib/Color.js";
 import { draw_primitive } from "../sketchlib/draw_primitive.js";
 import { fix_mouse_coords } from "../sketchlib/fix_mouse_coords.js";
 import { InteractiveMosaic } from "./InteractiveMosaic.js";

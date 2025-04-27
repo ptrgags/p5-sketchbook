@@ -23,7 +23,7 @@ import {
   CONNECTION_STYLE,
   SPLINE_STYLE,
 } from "../styles.js";
-import { Color } from "../../sketchlib/Style.js";
+import { Color } from "../../sketchlib/Color.js";
 import { Direction } from "../../sketchlib/Direction.js";
 
 const WIDTH = 500;
