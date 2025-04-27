@@ -7,7 +7,6 @@ import { Color } from "./Color.js";
  * @property {Color} [fill] The fill color
  */
 
-
 /**
  * A Style describes the stroke/fill properties of drawing primitives
  */
@@ -76,4 +75,3 @@ Style.DEFAULT_FILL = Object.freeze(
 Style.DEFAULT_STROKE_FILL = Object.freeze(
   Style.DEFAULT_FILL.with_stroke(Color.WHITE)
 );
-
