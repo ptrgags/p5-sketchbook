@@ -9,6 +9,7 @@ import { Style } from "../../sketchlib/Style.js";
 import { RingBuffer } from "../lablib/RingBuffer.js";
 import { GeneralizedCoordinates } from "../lablib/VectorSpace.js";
 import { Color } from "../../sketchlib/Color.js";
+import { Oklch } from "../lablib/Oklch.js";
 
 const PIXELS_PER_METER = 100;
 const X_METERS = Point.DIR_X.scale(PIXELS_PER_METER);
@@ -17,8 +18,6 @@ const NUM_COILS = 10;
 
 const STYLE_AXIS = Style.DEFAULT_STROKE;
 const STYLE_WALLS = Style.DEFAULT_STROKE;
-const STYLE_PHASE1 = new Style({ stroke: Color.YELLOW });
-const STYLE_PHASE2 = new Style({ stroke: Color.CYAN });
 
 export class Spring {
   /**
@@ -27,12 +26,20 @@ export class Spring {
    * @param {number} rest_length The rest length of the spring in m
    * @param {number} bob_mass The mass of the bob connected to the spring m in kg
    * @param {number} bob_width The width of the bob in m
+   * @param {Oklch} color The color for styling the spring
    */
-  constructor(spring_constant, rest_length, bob_mass, bob_width) {
+  constructor(spring_constant, rest_length, bob_mass, bob_width, color) {
     this.spring_constant = spring_constant;
     this.rest_length = rest_length;
     this.bob_mass = bob_mass;
     this.bob_width = bob_width;
+
+    this.spring_style = new Style({ stroke: color.to_srgb() });
+    this.bob_style = new Style({
+      stroke: color.adjust_lightness(-0.3).to_srgb(),
+      fill: color.to_srgb(),
+      width: 2,
+    });
   }
 }
 
@@ -41,9 +48,10 @@ export class Spring {
  * @param {Point} position Position of the top left corner of the spring in pixels
  * @param {Point} dimensions Direction encoding the width of the height in pixels
  * @param {number} num_coils How many coils to draw
+ * @param {Style} style The style to render the lines with.
  * @returns {GroupPrimitive} The lines in the spring
  */
-function render_horizontal_spring(position, dimensions, num_coils) {
+function render_horizontal_spring(position, dimensions, num_coils, style) {
   const { x: w, y: h } = dimensions;
 
   const delta_x = Point.direction(w / num_coils, 0);
@@ -59,7 +67,7 @@ function render_horizontal_spring(position, dimensions, num_coils) {
     const diag_up = new LinePrimitive(b, c);
     wires.push(diag_down, diag_up);
   }
-  return new GroupPrimitive(wires);
+  return new GroupPrimitive(wires, style);
 }
 
 export class DoubleSpringSystem {
@@ -138,8 +146,8 @@ export class DoubleSpringSystem {
     }
 
     return [
-      new GroupPrimitive(phase1, STYLE_PHASE1),
-      new GroupPrimitive(phase2, STYLE_PHASE2),
+      new GroupPrimitive(phase1, this.spring1.spring_style),
+      new GroupPrimitive(phase2, this.spring2.spring_style),
     ];
   }
 
@@ -165,9 +173,10 @@ export class DoubleSpringSystem {
   /**
    * Render the spring system
    * @param {Point} origin The bottom left corner of where the animation will be drawn in pixels
+   * @param {Style} left_spring_style The color of the left spring
    * @returns {GroupPrimitive} The primtitive to render
    */
-  render(origin) {
+  render(origin, left_spring_style) {
     const [x1, , x2] = this.simulation.state;
     const { rest_length: l1, bob_width: w1 } = this.spring1;
     const { rest_length: l2, bob_width: w2 } = this.spring2;
@@ -182,10 +191,11 @@ export class DoubleSpringSystem {
       Point.direction(w1, w1).scale(PIXELS_PER_METER)
     );
 
-    const spring1 = render_horizontal_spring(
+    const left_spring = render_horizontal_spring(
       bob_height,
       X_METERS.scale(l1 + x1).add(Y_METERS.scale(-w1)),
-      NUM_COILS
+      NUM_COILS,
+      this.spring1.spring_style
     );
 
     const rest_length2 = l1 + w1 + l2;
@@ -195,16 +205,23 @@ export class DoubleSpringSystem {
       Point.direction(w2, w2).scale(PIXELS_PER_METER)
     );
 
-    const spring2 = render_horizontal_spring(
+    const right_spring = render_horizontal_spring(
       bob1_position.add(X_METERS.scale(w1)),
       X_METERS.scale(l2 + (x2 - x1)).add(Y_METERS.scale(-w2)),
-      NUM_COILS
+      NUM_COILS,
+      this.spring2.spring_style
     );
 
     const walls = new GroupPrimitive([wall, floor], STYLE_WALLS);
-    const left_spring = new GroupPrimitive([bob1, spring1], STYLE_PHASE1);
-    const right_spring = new GroupPrimitive([bob2, spring2], STYLE_PHASE2);
+    const left_bob = new GroupPrimitive([bob1], this.spring1.bob_style);
+    const right_bob = new GroupPrimitive([bob2], this.spring2.bob_style);
 
-    return new GroupPrimitive([walls, left_spring, right_spring]);
+    return new GroupPrimitive([
+      walls,
+      left_spring,
+      right_spring,
+      left_bob,
+      right_bob,
+    ]);
   }
 }

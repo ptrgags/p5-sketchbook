@@ -2,14 +2,43 @@ import { Point } from "../../pga2d/objects.js";
 import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
 import { draw_primitive } from "../../sketchlib/draw_primitive.js";
 import { GroupPrimitive } from "../../sketchlib/primitives.js";
+import { Style } from "../../sketchlib/Style.js";
+import { Oklch } from "../lablib/Oklch.js";
 import { DoubleSpringSystem, Spring } from "./DoubleSpringSystem.js";
+
+const N = 5;
+const HISTORY_SIZE = 100;
+
+const DARK_ORANGE = new Oklch(0.54, 0.1246, 43.41);
+const LIGHT_YELLOW = new Oklch(0.82, 0.1246, 93.18);
+const DARK_PURPLE = new Oklch(0.5, 0.1246, 285.88);
+const LIGHT_BLUE = new Oklch(0.76, 0.1246, 209.65);
+
+const PALETTE_A = [
+  DARK_ORANGE,
+  Oklch.lerp(DARK_ORANGE, LIGHT_YELLOW, 0.25),
+  Oklch.lerp(DARK_ORANGE, LIGHT_YELLOW, 0.5),
+  Oklch.lerp(DARK_ORANGE, LIGHT_YELLOW, 0.75),
+  LIGHT_YELLOW,
+];
+const PALETTE_B = Oklch.gradient(DARK_PURPLE, LIGHT_BLUE, N);
 
 const SPRING_CONSTANT = 5.0;
 const REST_LENGTH = 1.0;
 const BOB_MASS = 0.5;
 const BOB_WIDTH = 0.4;
 // All springs will be the same, I'm only varying the initial positions
-const SPRING = new Spring(SPRING_CONSTANT, REST_LENGTH, BOB_MASS, BOB_WIDTH);
+
+/**
+ * Build a spring
+ * @param {"left" | "right"} selected_spring Which of the two springs to color
+ * @param {number} index The index of the spring in [0, N)
+ */
+function make_spring(selected_spring, index) {
+  const palette = selected_spring === "left" ? PALETTE_A : PALETTE_B;
+  const color = palette[index];
+  return new Spring(SPRING_CONSTANT, REST_LENGTH, BOB_MASS, BOB_WIDTH, color);
+}
 
 /**
  * Make initial state with slight changes in position
@@ -21,13 +50,11 @@ function vary_position(spring_index) {
   return [-0.5 + delta_x, 0.5, 0.5, 0.5];
 }
 
-const N = 5;
-const HISTORY_SIZE = 100;
 const SPRING_SYSTEMS = new Array(N);
 for (let i = 0; i < N; i++) {
   SPRING_SYSTEMS[i] = new DoubleSpringSystem(
-    SPRING,
-    SPRING,
+    make_spring("left", i),
+    make_spring("right", i),
     vary_position(i),
     HISTORY_SIZE
   );
@@ -64,7 +91,7 @@ export const sketch = (p) => {
       V_SCALE
     );
 
-    const phase_animations = SPRING_SYSTEMS.flatMap((system) => {
+    const phase_animations = SPRING_SYSTEMS.flatMap((system, i) => {
       return system.render_phase(phase_origin, X_SCALE, V_SCALE);
     });
 

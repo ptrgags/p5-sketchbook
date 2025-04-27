@@ -38,6 +38,15 @@ export class Oklch {
     this.alpha = alpha ?? 1.0;
   }
 
+  /**
+   * Adjust the lightness component, returning a new color
+   * @param {number} delta How much to increase (+) or decrease (-) the lightness
+   * @returns {Oklch} The new color
+   */
+  adjust_lightness(delta) {
+    return new Oklch(this.lightness + delta, this.chroma, this.hue, this.alpha);
+  }
+
   to_srgb() {
     // convert Oklch -> Oklab
     const { lightness, chroma, hue, alpha } = this;
@@ -101,5 +110,26 @@ export class Oklch {
     const hue = lerp(ah, bh, t);
     const alpha = lerp(aa, ba, t);
     return new Oklch(lightness, chroma, hue, alpha);
+  }
+
+  /**
+   * Compute a gradient
+   * @param {Oklch} start_color The first color in the gradient
+   * @param {Oklch} end_color The last color
+   * @param {number} num_steps How many gradient steps. E.g. 3 means the result will be an array of 3 colors. There must be at least 2 color steps
+   * @returns {Oklch[]} Interpolated colors including the start and end
+   */
+  static gradient(start_color, end_color, num_steps) {
+    if (num_steps < 2) {
+      throw new Error("num_steps must be at least 2");
+    }
+
+    const result = new Array(num_steps);
+    for (let i = 0; i < num_steps; i++) {
+      const t = i / (num_steps - 1);
+      result[i] = Oklch.lerp(start_color, end_color, t);
+    }
+
+    return result;
   }
 }
