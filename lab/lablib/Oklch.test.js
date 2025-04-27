@@ -10,6 +10,44 @@ describe("Oklch", () => {
     expect(color).toEqual(expected);
   });
 
+  describe("adjust_lightness", () => {
+    it("with positive delta increases brightness", () => {
+      const color = new Oklch(0.5, 0.1, 300);
+
+      const result = color.adjust_lightness(0.1);
+
+      const expected = new Oklch(0.6, 0.1, 300);
+      expect(result).toEqual(expected);
+    });
+
+    it("with negative delta decreases brightness", () => {
+      const color = new Oklch(0.5, 0.1, 300);
+
+      const result = color.adjust_lightness(-0.1);
+
+      const expected = new Oklch(0.4, 0.1, 300);
+      expect(result).toEqual(expected);
+    });
+
+    it("clamps negative value", () => {
+      const color = new Oklch(0.5, 0.1, 300);
+
+      const result = color.adjust_lightness(-0.8);
+
+      const expected = new Oklch(0, 0.1, 300);
+      expect(result).toEqual(expected);
+    });
+
+    it("clamps out of range value", () => {
+      const color = new Oklch(0.5, 0.1, 300);
+
+      const result = color.adjust_lightness(0.8);
+
+      const expected = new Oklch(1, 0.1, 300);
+      expect(result).toEqual(expected);
+    });
+  });
+
   // NOTE: oklch.com uses the npm module culori which has slightly different
   // conversion coefficients than in the blog post... so I don't really
   // have a good source of truth. So these tests are to catch regressions.

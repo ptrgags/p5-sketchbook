@@ -44,7 +44,8 @@ export class Oklch {
    * @returns {Oklch} The new color
    */
   adjust_lightness(delta) {
-    return new Oklch(this.lightness + delta, this.chroma, this.hue, this.alpha);
+    const l = clamp(this.lightness + delta, 0, 1);
+    return new Oklch(l, this.chroma, this.hue, this.alpha);
   }
 
   to_srgb() {
