@@ -13,8 +13,10 @@ import { Color } from "../../sketchlib/Color.js";
  * @returns {number} The nonlinear value
  */
 function linear_to_srgb(x) {
-  if (x >= 0.0031308) return (1.055 * x) ^ (1.0 / 2.4 - 0.055);
-  else return 12.92 * x;
+  if (x >= 0.0031308) {
+    return Math.pow(1.055 * x, 1.0 / 2.4) - 0.055;
+  }
+  return 12.92 * x;
 }
 
 export class Oklch {
@@ -37,6 +39,7 @@ export class Oklch {
   }
 
   to_srgb() {
+    // convert Oklch -> Oklab
     const { lightness, chroma, hue, alpha } = this;
     const hue_radians = (hue * Math.PI) / 180;
     const a = chroma * Math.cos(hue_radians);
@@ -86,6 +89,10 @@ export class Oklch {
    * @returns {Oklch}
    */
   static lerp(a, b, t) {
+    if (t < 0 || t > 1) {
+      throw new Error("t must be in [0, 1]");
+    }
+
     const { lightness: al, chroma: ac, hue: ah, alpha: aa } = a;
     const { lightness: bl, chroma: bc, hue: bh, alpha: ba } = b;
 
