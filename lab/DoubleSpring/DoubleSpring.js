@@ -83,7 +83,7 @@ export const sketch = (p) => {
       V_SCALE
     );
 
-    const phase_animations = SPRING_SYSTEMS.flatMap((system, i) => {
+    const phase_animations = SPRING_SYSTEMS.flatMap((system) => {
       return system.render_phase(phase_origin, X_SCALE, V_SCALE);
     });
 
