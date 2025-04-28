@@ -30,6 +30,36 @@ export class SoundManager {
       this.synth.triggerAttackRelease("C3", "4n", time);
     }, "2n").start(0);
 
+    this.square = new this.tone.Synth({
+      oscillator: { type: "triangle" },
+    }).toDestination();
+    this.square.volume.value = -3;
+    this.arp = new this.tone.Pattern(
+      (time, note) => {
+        this.square.triggerAttackRelease(note, "16n", time);
+      },
+      ["C4", "E4", "F4", "G4", "G#4"],
+      "upDown"
+    ).start("1:0");
+    this.arp.interval = "16n";
+
+    this.poly = new this.tone.PolySynth(this.tone.Synth).toDestination();
+    this.poly.volume.value = -6;
+    this.cycle = new this.tone.Sequence(
+      (time, note) => {
+        this.poly.triggerAttackRelease(note, "8n", time);
+      },
+      ["C5", "C5", ["B4", "Eb5"], ["B4", "C#5", undefined]],
+      "4n"
+    ).start("2:0");
+    this.counter_cycle = new this.tone.Sequence(
+      (time, note) => {
+        this.poly.triggerAttackRelease(note, "8n", time);
+      },
+      ["C4", undefined, "D4", ["F4", undefined, "G4"], undefined],
+      "4n"
+    ).start("3:0");
+
     const transport = this.tone.getTransport();
     transport.bpm.value = 128;
     transport.start();
@@ -42,7 +72,7 @@ export class SoundManager {
    * @param {boolean} sound_on true if the sound should turn on
    */
   toggle_sound(sound_on) {
-    const FADE_SEC = 0.1;
+    const FADE_SEC = 1.0;
     const next_volume_db = sound_on ? 0 : -Infinity;
     // While you could set the destination's mute property, that abrupt change
     // can sound like crackling audio, so fade the volume quickly instead.
