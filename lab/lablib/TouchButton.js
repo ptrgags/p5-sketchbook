@@ -75,12 +75,16 @@ export class TouchButton {
    * @param {Point} mouse_coords The mouse coords from the event
    */
   mouse_released(mouse_coords) {
-    if (this.rect.contains(mouse_coords)) {
-      this.events.dispatchEvent(new CustomEvent("click"));
-      this.state = ButtonState.HOVER;
-    } else {
+    if (!this.rect.contains(mouse_coords)) {
       this.state = ButtonState.IDLE;
+      return;
     }
+
+    if (this.is_pressed) {
+      this.events.dispatchEvent(new CustomEvent("click"));
+    }
+
+    this.state = ButtonState.HOVER;
   }
 
   /**

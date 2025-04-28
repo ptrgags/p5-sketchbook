@@ -35,8 +35,14 @@ export class ToggleButton {
   constructor(rect, initial_value) {
     this.button = new TouchButton(rect);
     this.toggle_state = initial_value;
+    this.events = new EventTarget();
 
-    this.pressed = false;
+    this.button.events.addEventListener("click", () => {
+      this.toggle_state = toggle(this.toggle_state);
+      this.events.dispatchEvent(
+        new CustomEvent("toggle", { detail: this.toggle_state })
+      );
+    });
   }
 
   /**
@@ -68,11 +74,6 @@ export class ToggleButton {
    */
   mouse_pressed(mouse_coords) {
     this.button.mouse_pressed(mouse_coords);
-
-    // Set a flag to indicate that the button was actually clicked
-    if (this.rect.contains(mouse_coords)) {
-      this.pressed = true;
-    }
   }
 
   /**
@@ -81,12 +82,6 @@ export class ToggleButton {
    */
   mouse_released(mouse_coords) {
     this.button.mouse_released(mouse_coords);
-
-    if (this.pressed && this.rect.contains(mouse_coords)) {
-      this.toggle_state = toggle(this.toggle_state);
-    }
-
-    this.pressed = false;
   }
 
   /**

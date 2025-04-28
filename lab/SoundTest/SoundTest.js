@@ -105,6 +105,15 @@ export const sketch = (p) => {
       scene = new SoundScene();
     });
 
+    SOUND_TOGGLE.events.addEventListener(
+      "toggle",
+      (/**@type {CustomEvent}**/ e) => {
+        const state = e.detail;
+        const sound_on = state === SOUND_ON;
+        SOUND.toggle_sound(sound_on);
+      }
+    );
+
     MOUSE.setup(canvas);
   };
 
