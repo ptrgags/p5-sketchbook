@@ -28,7 +28,9 @@ export class SoundManager {
     }).toDestination();
     this.pedal = new this.tone.Loop((time) => {
       this.synth.triggerAttackRelease("C3", "4n", time);
-    }, "2n").start(0);
+    }, "2n")
+      .start("0:0")
+      .stop("8:0");
 
     this.square = new this.tone.Synth({
       oscillator: { type: "triangle" },
@@ -40,10 +42,16 @@ export class SoundManager {
       },
       ["C4", "E4", "F4", "G4", "G#4"],
       "upDown"
-    ).start("1:0");
+    )
+      .start("1:0")
+      .stop("12:0")
+      .start("16:0")
+      .stop("22:0");
     this.arp.interval = "16n";
 
-    this.poly = new this.tone.PolySynth(this.tone.Synth).toDestination();
+    this.poly = new this.tone.PolySynth(this.tone.Synth, {
+      oscillator: { type: "fmsine4" },
+    }).toDestination();
     this.poly.volume.value = -6;
     this.cycle = new this.tone.Sequence(
       (time, note) => {
@@ -51,14 +59,18 @@ export class SoundManager {
       },
       ["C5", "C5", ["B4", "Eb5"], ["B4", "C#5", undefined]],
       "4n"
-    ).start("2:0");
+    )
+      .start("2:0")
+      .stop("16:0");
     this.counter_cycle = new this.tone.Sequence(
       (time, note) => {
         this.poly.triggerAttackRelease(note, "8n", time);
       },
-      ["C4", undefined, "D4", ["F4", undefined, "G4"], undefined],
-      "4n"
-    ).start("3:0");
+      ["C6", "A5", ["F5", undefined, "G5"]],
+      "8n"
+    )
+      .start("4:0")
+      .stop("20:0");
 
     const transport = this.tone.getTransport();
     transport.bpm.value = 128;
