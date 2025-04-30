@@ -31,9 +31,6 @@ export class SoundManager {
     this.init_patterns();
 
     this.audio_ready = true;
-
-    this.melody_a();
-    this.melody_b();
   }
 
   /**
@@ -151,9 +148,13 @@ export class SoundManager {
     patterns.phase_c = phase_c;
   }
 
-  melody_a() {
+  stop_the_music() {
     const transport = this.tone.getTransport();
     transport.cancel();
+  }
+
+  melody_a() {
+    this.stop_the_music();
 
     const { pedal, scale_arp, cycle_a, cycle_b } = this.patterns;
 
@@ -168,12 +169,13 @@ export class SoundManager {
       .start("28:0")
       .stop("32:0");
 
-    transport.start();
+    const transport = this.tone.getTransport();
+    transport.position = 0;
+    transport.start("+0.1", "0:0");
   }
 
   melody_b() {
-    const transport = this.tone.getTransport();
-    transport.cancel();
+    this.stop_the_music();
 
     const { phase_a, phase_b, phase_c } = this.patterns;
 
@@ -184,6 +186,8 @@ export class SoundManager {
     phase_b.start("0:0").stop("30:0");
     phase_c.start("0:0").stop("30:0");
 
-    transport.start();
+    const transport = this.tone.getTransport();
+    transport.position = 0;
+    transport.start("+0.1", "0:0");
   }
 }

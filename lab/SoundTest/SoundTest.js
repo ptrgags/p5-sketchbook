@@ -11,7 +11,7 @@ import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { Rectangle, SCREEN_RECT } from "../lablib/Rectangle.js";
 import { SoundManager } from "../lablib/SoundManager.js";
 import { ToggleButton, ToggleState } from "../lablib/ToggleButton.js";
-import { ButtonState, TouchButton } from "../lablib/TouchButton.js";
+import { TouchButton } from "../lablib/TouchButton.js";
 
 const MOUSE = new CanvasMouseHandler();
 const PLAY = new TouchButton(SCREEN_RECT);
@@ -39,6 +39,24 @@ const PLAY_TRIANGLE = new PolygonPrimitive([
 const PLAY_GROUP = new GroupPrimitive(
   [PLAY_TRIANGLE],
   new Style({ stroke: Color.WHITE })
+);
+
+const MELODY_BUTTON_SIZE = 150;
+const MELODY_A_BUTTON = new TouchButton(
+  new Rectangle(
+    Point.point(50, HEIGHT / 2 - MELODY_BUTTON_SIZE / 2),
+    Point.direction(MELODY_BUTTON_SIZE, MELODY_BUTTON_SIZE)
+  )
+);
+
+const MELODY_B_BUTTON = new TouchButton(
+  new Rectangle(
+    Point.point(
+      WIDTH - 50 - MELODY_BUTTON_SIZE,
+      HEIGHT / 2 - MELODY_BUTTON_SIZE / 2
+    ),
+    Point.direction(MELODY_BUTTON_SIZE, MELODY_BUTTON_SIZE)
+  )
 );
 
 class PlayButtonScene {
@@ -70,23 +88,35 @@ class PlayButtonScene {
 class SoundScene {
   draw(p) {
     const sound_toggle = SOUND_TOGGLE.debug_render();
-    draw_primitive(p, sound_toggle);
+    const melody_a = MELODY_A_BUTTON.debug_render();
+    const melody_b = MELODY_B_BUTTON.debug_render();
+
+    const scene = new GroupPrimitive([sound_toggle, melody_a, melody_b]);
+    draw_primitive(p, scene);
   }
 
   mouse_pressed(input) {
     SOUND_TOGGLE.mouse_pressed(input.mouse_coords);
+    MELODY_A_BUTTON.mouse_pressed(input.mouse_coords);
+    MELODY_B_BUTTON.mouse_pressed(input.mouse_coords);
   }
 
   mouse_moved(input) {
     SOUND_TOGGLE.mouse_moved(input.mouse_coords);
+    MELODY_A_BUTTON.mouse_moved(input.mouse_coords);
+    MELODY_B_BUTTON.mouse_moved(input.mouse_coords);
   }
 
   mouse_dragged(input) {
     SOUND_TOGGLE.mouse_dragged(input.mouse_coords);
+    MELODY_A_BUTTON.mouse_dragged(input.mouse_coords);
+    MELODY_B_BUTTON.mouse_dragged(input.mouse_coords);
   }
 
   mouse_released(input) {
     SOUND_TOGGLE.mouse_released(input.mouse_coords);
+    MELODY_A_BUTTON.mouse_released(input.mouse_coords);
+    MELODY_B_BUTTON.mouse_released(input.mouse_coords);
   }
 }
 
@@ -113,6 +143,14 @@ export const sketch = (p) => {
         SOUND.toggle_sound(sound_on);
       }
     );
+
+    MELODY_A_BUTTON.events.addEventListener("click", () => {
+      SOUND.melody_a();
+    });
+
+    MELODY_B_BUTTON.events.addEventListener("click", () => {
+      SOUND.melody_b();
+    });
 
     MOUSE.setup(canvas);
   };
