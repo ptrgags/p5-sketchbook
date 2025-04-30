@@ -4,6 +4,7 @@ import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
 import { draw_primitive } from "../../sketchlib/draw_primitive.js";
 import {
   GroupPrimitive,
+  LinePrimitive,
   PolygonPrimitive,
 } from "../../sketchlib/primitives.js";
 import { Style } from "../../sketchlib/Style.js";
@@ -19,12 +20,64 @@ const PLAY = new TouchButton(SCREEN_RECT);
 const SOUND_ON = ToggleState.STATE_A;
 const SOUND_OFF = ToggleState.STATE_B;
 const SOUND_TOGGLE_SIZE = 50;
+const SOUND_TOGGLE_CORNER = Point.point(WIDTH - SOUND_TOGGLE_SIZE, 0);
 const SOUND_TOGGLE = new ToggleButton(
   new Rectangle(
-    Point.point(WIDTH - SOUND_TOGGLE_SIZE, 0),
+    SOUND_TOGGLE_CORNER,
     Point.direction(SOUND_TOGGLE_SIZE, SOUND_TOGGLE_SIZE)
   ),
   SOUND_ON
+);
+
+const SPEAKER_CONE = new PolygonPrimitive([
+  SOUND_TOGGLE_CORNER.add(Point.direction(8, 4)),
+  SOUND_TOGGLE_CORNER.add(Point.direction(8, SOUND_TOGGLE_SIZE - 4)),
+  SOUND_TOGGLE_CORNER.add(
+    Point.direction(
+      SOUND_TOGGLE_SIZE / 2,
+      SOUND_TOGGLE_SIZE - SOUND_TOGGLE_SIZE / 3
+    )
+  ),
+  SOUND_TOGGLE_CORNER.add(
+    Point.direction(SOUND_TOGGLE_SIZE / 2, SOUND_TOGGLE_SIZE / 3)
+  ),
+]);
+const SPEAKER_BASE = new PolygonPrimitive([
+  SOUND_TOGGLE_CORNER.add(
+    Point.direction(SOUND_TOGGLE_SIZE / 2, SOUND_TOGGLE_SIZE / 3)
+  ),
+  SOUND_TOGGLE_CORNER.add(
+    Point.direction(
+      SOUND_TOGGLE_SIZE / 2,
+      SOUND_TOGGLE_SIZE - SOUND_TOGGLE_SIZE / 3
+    )
+  ),
+  SOUND_TOGGLE_CORNER.add(
+    Point.direction(
+      SOUND_TOGGLE_SIZE / 2 + 10,
+      SOUND_TOGGLE_SIZE - SOUND_TOGGLE_SIZE / 3
+    )
+  ),
+  SOUND_TOGGLE_CORNER.add(
+    Point.direction(SOUND_TOGGLE_SIZE / 2 + 10, SOUND_TOGGLE_SIZE / 3)
+  ),
+]);
+
+const SPEAKER = new GroupPrimitive(
+  [SPEAKER_BASE, SPEAKER_CONE],
+  new Style({ stroke: Color.WHITE })
+);
+
+const SPEAKER_SLASH = new GroupPrimitive(
+  [
+    new LinePrimitive(
+      SOUND_TOGGLE_CORNER.add(Point.direction(2, 2)),
+      SOUND_TOGGLE_CORNER.add(
+        Point.direction((3 * SOUND_TOGGLE_SIZE) / 4 - 2, SOUND_TOGGLE_SIZE - 2)
+      )
+    ),
+  ],
+  new Style({ stroke: Color.RED })
 );
 
 //@ts-ignore
@@ -88,11 +141,16 @@ class PlayButtonScene {
 
 class SoundScene {
   draw(p) {
-    const sound_toggle = SOUND_TOGGLE.debug_render();
+    //const sound_toggle = SOUND_TOGGLE.debug_render();
     const melody_a = MELODY_A_BUTTON.debug_render();
     const melody_b = MELODY_B_BUTTON.debug_render();
 
-    const scene = new GroupPrimitive([sound_toggle, melody_a, melody_b]);
+    const speaker =
+      SOUND_TOGGLE.toggle_state == SOUND_OFF
+        ? [SPEAKER, SPEAKER_SLASH]
+        : [SPEAKER];
+
+    const scene = new GroupPrimitive([...speaker, melody_a, melody_b]);
     draw_primitive(p, scene);
 
     p.push();
