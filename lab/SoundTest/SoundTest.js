@@ -41,10 +41,11 @@ const PLAY_GROUP = new GroupPrimitive(
   new Style({ stroke: Color.WHITE })
 );
 
+const MARGIN = 50;
 const MELODY_BUTTON_SIZE = 150;
 const MELODY_A_BUTTON = new TouchButton(
   new Rectangle(
-    Point.point(50, HEIGHT / 2 - MELODY_BUTTON_SIZE / 2),
+    Point.point(MARGIN, HEIGHT / 2 - MELODY_BUTTON_SIZE / 2),
     Point.direction(MELODY_BUTTON_SIZE, MELODY_BUTTON_SIZE)
   )
 );
@@ -52,7 +53,7 @@ const MELODY_A_BUTTON = new TouchButton(
 const MELODY_B_BUTTON = new TouchButton(
   new Rectangle(
     Point.point(
-      WIDTH - 50 - MELODY_BUTTON_SIZE,
+      WIDTH - MARGIN - MELODY_BUTTON_SIZE,
       HEIGHT / 2 - MELODY_BUTTON_SIZE / 2
     ),
     Point.direction(MELODY_BUTTON_SIZE, MELODY_BUTTON_SIZE)
@@ -93,6 +94,14 @@ class SoundScene {
 
     const scene = new GroupPrimitive([sound_toggle, melody_a, melody_b]);
     draw_primitive(p, scene);
+
+    p.push();
+    p.fill(255);
+    p.textSize(24);
+    p.textAlign(p.CENTER);
+    p.text("Melody A", MARGIN + MELODY_BUTTON_SIZE / 2, HEIGHT / 2);
+    p.text("Melody B", WIDTH - MARGIN - MELODY_BUTTON_SIZE / 2, HEIGHT / 2);
+    p.pop();
   }
 
   mouse_pressed(input) {

@@ -62,7 +62,7 @@ export class SoundManager {
     const poly = new this.tone.PolySynth(this.tone.Synth, {
       oscillator: { type: "fmsine2" },
     }).toDestination();
-    poly.volume.value = -6;
+    poly.volume.value = -9;
 
     this.synths.sine = sine;
     this.synths.square = square;
