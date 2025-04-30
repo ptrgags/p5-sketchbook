@@ -9,7 +9,9 @@ export class SoundManager {
     this.init_requested = false;
     this.audio_ready = false;
 
+    // these may be stored a different way
     this.synths = {};
+    this.patterns = {};
   }
 
   async init() {
@@ -21,62 +23,16 @@ export class SoundManager {
 
     await this.tone.start();
 
-    this.synth = new this.tone.Synth({
-      oscillator: {
-        type: "sine",
-      },
-    }).toDestination();
-    this.pedal = new this.tone.Loop((time) => {
-      this.synth.triggerAttackRelease("C3", "4n", time);
-    }, "2n")
-      .start("0:0")
-      .stop("8:0");
-
-    this.square = new this.tone.Synth({
-      oscillator: { type: "triangle" },
-    }).toDestination();
-    this.square.volume.value = -3;
-    this.arp = new this.tone.Pattern(
-      (time, note) => {
-        this.square.triggerAttackRelease(note, "16n", time);
-      },
-      ["C4", "E4", "F4", "G4", "G#4"],
-      "upDown"
-    )
-      .start("1:0")
-      .stop("12:0")
-      .start("16:0")
-      .stop("22:0");
-    this.arp.interval = "16n";
-
-    this.poly = new this.tone.PolySynth(this.tone.Synth, {
-      oscillator: { type: "fmsine4" },
-    }).toDestination();
-    this.poly.volume.value = -6;
-    this.cycle = new this.tone.Sequence(
-      (time, note) => {
-        this.poly.triggerAttackRelease(note, "8n", time);
-      },
-      ["C5", "C5", ["B4", "Eb5"], ["B4", "C#5", undefined]],
-      "4n"
-    )
-      .start("2:0")
-      .stop("16:0");
-    this.counter_cycle = new this.tone.Sequence(
-      (time, note) => {
-        this.poly.triggerAttackRelease(note, "8n", time);
-      },
-      ["C6", "A5", ["F5", undefined, "G5"]],
-      "8n"
-    )
-      .start("4:0")
-      .stop("20:0");
+    this.init_synths();
 
     const transport = this.tone.getTransport();
     transport.bpm.value = 128;
-    transport.start();
+
+    this.init_patterns();
 
     this.audio_ready = true;
+
+    this.melody_a();
   }
 
   /**
@@ -92,4 +48,99 @@ export class SoundManager {
   }
 
   // Temporary methods (prototyping only)
+
+  init_synths() {
+    const sine = new this.tone.Synth({
+      oscillator: {
+        type: "sine",
+      },
+    }).toDestination();
+
+    const square = new this.tone.Synth({
+      oscillator: { type: "triangle" },
+    }).toDestination();
+    square.volume.value = -3;
+
+    const poly = new this.tone.PolySynth(this.tone.Synth, {
+      oscillator: { type: "fmsine2" },
+    }).toDestination();
+    poly.volume.value = -6;
+
+    this.synths.sine = sine;
+    this.synths.square = square;
+    this.synths.poly = poly;
+  }
+
+  init_patterns() {
+    const patterns = this.patterns;
+    const pedal = new this.tone.Loop((time) => {
+      this.synths.sine.triggerAttackRelease("C3", "4n", time);
+    }, "2n");
+
+    // Not sure what you call this but it sounds kinda neat
+    const NOTES = ["C", "E", "F", "G", "G#", "B"];
+    // Notes at different octaves
+    const NOTES3 = NOTES.map((x) => `${x}3`);
+    const NOTES4 = NOTES.map((x) => `${x}4`);
+    const NOTES5 = NOTES.map((x) => `${x}5`);
+
+    const scale_arp = new this.tone.Part(
+      (time, note) => {
+        const [index, duration] = note;
+        this.synths.square.triggerAttackRelease(NOTES4[index], duration, time);
+      },
+      [
+        ["0:0", [0, "4n"]],
+        ["0:1", [1, "4n"]],
+        ["0:2", [2, "4n"]],
+        ["0:3", [3, "4n"]],
+        ["1:0", [4, "4n."]],
+        ["1:2", [5, "4n."]],
+      ]
+    );
+    scale_arp.loop = true;
+    scale_arp.loopStart = "0:0";
+    scale_arp.loopEnd = "2:0";
+
+    const cycle_a = new this.tone.Sequence(
+      (time, note) => {
+        this.synths.poly.triggerAttackRelease(NOTES5[note], "8n", time);
+      },
+      [0, undefined, 1, 2, undefined, 4],
+      "8n"
+    );
+
+    const cycle_b = new this.tone.Sequence(
+      (time, note) => {
+        this.synths.poly.triggerAttackRelease(NOTES5[note], "8n", time);
+      },
+      [0, 4, [1, 2], 3, [0, undefined, 3]],
+      "8n"
+    );
+
+    patterns.pedal = pedal;
+    patterns.scale_arp = scale_arp;
+    patterns.cycle_a = cycle_a;
+    patterns.cycle_b = cycle_b;
+  }
+
+  melody_a() {
+    const transport = this.tone.getTransport();
+    transport.cancel();
+
+    const { pedal, scale_arp, cycle_a, cycle_b } = this.patterns;
+
+    pedal.start("0:0").stop("34:0");
+    scale_arp.start("2:0").stop("24:0");
+    cycle_a.start("8:0").stop("20:0").start("24:0").stop("28:0");
+    cycle_b
+      .start("8:0")
+      .stop("16:0")
+      .start("20:0")
+      .stop("24:0")
+      .start("28:0")
+      .stop("32:0");
+
+    transport.start();
+  }
 }
