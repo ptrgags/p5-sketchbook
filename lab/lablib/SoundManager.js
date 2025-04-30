@@ -33,6 +33,7 @@ export class SoundManager {
     this.audio_ready = true;
 
     this.melody_a();
+    this.melody_b();
   }
 
   /**
@@ -118,10 +119,36 @@ export class SoundManager {
       "8n"
     );
 
+    // Three scales initially the same, but with different lengths
+    const phase_a = new this.tone.Sequence(
+      (time, note) => {
+        this.synths.poly.triggerAttackRelease(NOTES3[note], "8n", time);
+      },
+      [0, 1, 2, 3, 2, 1],
+      "8n"
+    );
+    const phase_b = new this.tone.Sequence(
+      (time, note) => {
+        this.synths.poly.triggerAttackRelease(NOTES4[note], "8n", time);
+      },
+      [0, 1, 2, 3, 4, 3, 2, 1],
+      "8n"
+    );
+    const phase_c = new this.tone.Sequence(
+      (time, note) => {
+        this.synths.poly.triggerAttackRelease(NOTES5[note], "8n", time);
+      },
+      [0, 1, 2, 3, 4, 5, 4, 3, 2, 1],
+      "8n"
+    );
+
     patterns.pedal = pedal;
     patterns.scale_arp = scale_arp;
     patterns.cycle_a = cycle_a;
     patterns.cycle_b = cycle_b;
+    patterns.phase_a = phase_a;
+    patterns.phase_b = phase_b;
+    patterns.phase_c = phase_c;
   }
 
   melody_a() {
@@ -140,6 +167,22 @@ export class SoundManager {
       .stop("24:0")
       .start("28:0")
       .stop("32:0");
+
+    transport.start();
+  }
+
+  melody_b() {
+    const transport = this.tone.getTransport();
+    transport.cancel();
+
+    const { phase_a, phase_b, phase_c } = this.patterns;
+
+    // The sequences are 6, 8, 10 quarter notes
+    // lcm(6, 8, 10) = lcm(2*3, 2^3, 2*5) = 2^3*3*5 = 120 quarter notes
+    // 120 quarter notes = 30 measures
+    phase_a.start("0:0").stop("30:0");
+    phase_b.start("0:0").stop("30:0");
+    phase_c.start("0:0").stop("30:0");
 
     transport.start();
   }
