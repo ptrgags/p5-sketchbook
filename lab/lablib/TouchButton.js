@@ -24,6 +24,20 @@ export class TouchButton {
   constructor(rect) {
     this.rect = rect;
     this.state = ButtonState.IDLE;
+
+    /**
+     * Events for the button
+     * click(void) - if the button was released after being pressed
+     * @type {EventTarget}
+     */
+    this.events = new EventTarget();
+  }
+
+  /**
+   * Check if the button is currently pressed
+   */
+  get is_pressed() {
+    return this.state === ButtonState.PRESSED;
   }
 
   get_debug_style() {
@@ -61,11 +75,16 @@ export class TouchButton {
    * @param {Point} mouse_coords The mouse coords from the event
    */
   mouse_released(mouse_coords) {
-    if (this.rect.contains(mouse_coords)) {
-      this.state = ButtonState.HOVER;
-    } else {
+    if (!this.rect.contains(mouse_coords)) {
       this.state = ButtonState.IDLE;
+      return;
     }
+
+    if (this.is_pressed) {
+      this.events.dispatchEvent(new CustomEvent("click"));
+    }
+
+    this.state = ButtonState.HOVER;
   }
 
   /**

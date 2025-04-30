@@ -53,10 +53,9 @@ export const sketch = (p) => {
 
     move_circle();
 
-    const style =
-      BUTTON.state === ButtonState.PRESSED
-        ? Style.DEFAULT_STROKE.with_fill(Color.BLUE)
-        : Style.DEFAULT_STROKE_FILL;
+    const style = BUTTON.is_pressed
+      ? Style.DEFAULT_STROKE.with_fill(Color.BLUE)
+      : Style.DEFAULT_STROKE_FILL;
 
     const circle = new CirclePrimitive(position, 20);
     const circle_group = new GroupPrimitive([circle], style);

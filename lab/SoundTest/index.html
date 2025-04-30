@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../../libraries/p5.min.js"
+    ></script>
+    <script src="https://unpkg.com/tone@15.0.4/build/Tone.js"></script>
+    <script type="module">
+      import { sketch } from "./SoundTest.js";
+      import "../../sketchlib/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../../styles/layout.css" />
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>Sound Test (2025)</h1>
+      <div class="sketch">
+        <canvas id="sketch-canvas" width="500" height="700"></canvas>
+      </div>
+      <div class="description">
+        <p>Click the buttons to select between two different melodies</p>
+        <p>Notes:</p>
+        <ul>
+          <li>
+            This is a sandbox for trying out Tone.js. This way I can add sound
+            effects, synthesizers, and music to my sketches.
+          </li>
+          <li>
+            I want to do some computational music again, though I'm still
+            building the scaffolding to do this the way I want. I want to
+            implement some ideas from a mix of sources I've been reading about,
+            namely
+            <cite>The Haskell School of Music</cite> by Paul Hudak and Donya
+            Quick, <cite>A Geometry of Music</cite> bu Dmitri Tymoczko, and some
+            concepts from
+            <a href="https://tidalcycles.org/docs/reference/cycles"
+              >Tidal Cycles</a
+            >. More on this to come.
+          </li>
+          <li>
+            There's plenty more Tone.js can do (sampled audio, connecting audio
+            nodes to make custom synthesizers, provide timing information so I
+            could e.g. sync a visualization). This sketch will serve as a
+            sandbox for experiments.
+          </li>
+          <li>
+            The sound toggle button should be factored out into a reusable
+            class, anything with sound will need that.
+          </li>
+          <li>
+            Some more game engine concepts like "scenes/rooms" and "objects"
+            would be helpful to add to this repo as I add more interactive
+            elements to my code.
+          </li>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>
