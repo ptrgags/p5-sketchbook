@@ -1,3 +1,10 @@
+import { N2, N4, N8 } from "./music/durations.js";
+import { MidiPitch } from "./music/pitch_conversions.js";
+import { B, C, C3, E, F, G, GS, REST } from "./music/pitches.js";
+import { Melody, Note } from "./music/Score.js";
+import { Rational } from "./Rational.js";
+import { compile_part } from "./tone_helpers/compile_music.js";
+
 export class SoundManager {
   /**
    * Constructor
@@ -71,9 +78,12 @@ export class SoundManager {
 
   init_patterns() {
     const patterns = this.patterns;
-    const pedal = new this.tone.Loop((time) => {
-      this.synths.sine.triggerAttackRelease("C3", "4n", time);
-    }, "2n");
+
+    const pedal_score = Melody.parse([C3, N4], [REST, N4]);
+    const pedal = compile_part(this.tone, this.synths.sine, pedal_score);
+    pedal.loop = true;
+    pedal.loopStart = "0:0";
+    pedal.loopEnd = "0:2";
 
     // Not sure what you call this but it sounds kinda neat
     const NOTES = ["C", "E", "F", "G", "G#", "B"];
@@ -82,20 +92,27 @@ export class SoundManager {
     const NOTES4 = NOTES.map((x) => `${x}4`);
     const NOTES5 = NOTES.map((x) => `${x}5`);
 
-    const scale_arp = new this.tone.Part(
-      (time, note) => {
-        const [index, duration] = note;
-        this.synths.square.triggerAttackRelease(NOTES4[index], duration, time);
-      },
-      [
-        ["0:0", [0, "4n"]],
-        ["0:1", [1, "4n"]],
-        ["0:2", [2, "4n"]],
-        ["0:3", [3, "4n"]],
-        ["1:0", [4, "4n."]],
-        ["1:2", [5, "4n."]],
-      ]
-    );
+    const SCALE = [C, E, F, G, GS, B];
+    const N4D = new Rational(3, 8);
+
+    const arp_score = Melody.parse(
+      // score in scale degrees
+      // Measure 1
+      [0, N4],
+      [1, N4],
+      [2, N4],
+      [3, N4],
+      // Measure 2
+      [4, N4D],
+      [REST, N8],
+      [5, N4D],
+      [REST, N8]
+    ).map_pitch((scale_degree) => {
+      // Convert to MIDI notes starting at C4
+      const pitch_class = SCALE[scale_degree];
+      return MidiPitch.from_pitch_octave(pitch_class, 4);
+    });
+    const scale_arp = compile_part(this.tone, this.synths.square, arp_score);
     scale_arp.loop = true;
     scale_arp.loopStart = "0:0";
     scale_arp.loopEnd = "2:0";
