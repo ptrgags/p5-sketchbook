@@ -1,3 +1,4 @@
+import { N1, N2, N4 } from "../music/durations.js";
 import { Rational } from "../Rational.js";
 
 /**
@@ -11,13 +12,4 @@ export function to_tone_time(time_rational) {
   const remainder_measures = time_rational.real % 1.0;
   const remainder_beats = remainder_measures * 4;
   return `${measures}:${remainder_beats}`;
-}
-
-/**
- * Convert a duration in fractions of a measure to a Tone.js duration string like 4n for quarter note
- * @param {Rational} dur_rational Duration as a rational number
- * @returns {string} The Tone.js duration in measures:quarter_notes
- */
-export function to_tone_duration(dur_rational) {
-  return "4n";
 }
