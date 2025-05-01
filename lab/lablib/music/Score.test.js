@@ -36,7 +36,7 @@ describe("Melody", () => {
     });
   });
 
-  describe("from_tuples", () => {
+  describe("parse", () => {
     it("parses melody from array", () => {
       /**
        * @type {[number | undefined, Rational][]}
@@ -47,7 +47,7 @@ describe("Melody", () => {
         [G4, N4],
       ];
 
-      const result = Melody.from_tuples(...tuples);
+      const result = Melody.parse(...tuples);
 
       const expected = new Melody(
         new Note(C4, N4),

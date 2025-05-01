@@ -64,11 +64,12 @@ export class Melody {
   }
 
   /**
+   * Parse a melody from an array
    * @template P
    * @param  {...[P|undefined, Rational]} tuples either (pitch, duration) or (REST, duration)
    * @returns {Melody<P>} The parsed melody
    */
-  static from_tuples(...tuples) {
+  static parse(...tuples) {
     const values = [];
     for (const tuple of tuples) {
       const [pitch, duration] = tuple;

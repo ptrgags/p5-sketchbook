@@ -79,7 +79,7 @@ export class SoundManager {
   init_patterns() {
     const patterns = this.patterns;
 
-    const pedal_score = Melody.from_tuples([C3, N4], [REST, N4]);
+    const pedal_score = Melody.parse([C3, N4], [REST, N4]);
     const pedal = compile_part(this.tone, this.synths.sine, pedal_score);
     pedal.loop = true;
     pedal.loopStart = "0:0";
@@ -95,7 +95,7 @@ export class SoundManager {
     const SCALE = [C, E, F, G, GS, B];
     const N4D = new Rational(3, 8);
 
-    const arp_score = Melody.from_tuples(
+    const arp_score = Melody.parse(
       // score in scale degrees
       // Measure 1
       [0, N4],
