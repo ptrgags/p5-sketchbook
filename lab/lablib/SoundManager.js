@@ -1,6 +1,6 @@
 import { N2, N4, N8 } from "./music/durations.js";
 import { MidiPitch } from "./music/pitch_conversions.js";
-import { B, C, E, F, G, GS, REST } from "./music/pitches.js";
+import { B, C, C3, E, F, G, GS, REST } from "./music/pitches.js";
 import { Melody, Note } from "./music/Score.js";
 import { Rational } from "./Rational.js";
 import { compile_part } from "./tone_helpers/compile_music.js";
@@ -78,9 +78,12 @@ export class SoundManager {
 
   init_patterns() {
     const patterns = this.patterns;
-    const pedal = new this.tone.Loop((time) => {
-      this.synths.sine.triggerAttackRelease("C3", "4n", time);
-    }, "2n");
+
+    const pedal_score = Melody.from_tuples([C3, N4], [REST, N4]);
+    const pedal = compile_part(this.tone, this.synths.sine, pedal_score);
+    pedal.loop = true;
+    pedal.loopStart = "0:0";
+    pedal.loopEnd = "0:2";
 
     // Not sure what you call this but it sounds kinda neat
     const NOTES = ["C", "E", "F", "G", "G#", "B"];
@@ -109,41 +112,10 @@ export class SoundManager {
       const pitch_class = SCALE[scale_degree];
       return MidiPitch.from_pitch_octave(pitch_class, 4);
     });
-
-    /*
-    
-    const arp_notes = [0, 1, 2, 3, 4, 5];
-    const arp_durations = [N4, N4, N4, N4, N2, N2];
-    const arp_pattern = arp_notes.map((scale_step, i) => {
-      const pitch_class = SCALE[scale_step];
-      const octave = 4;
-      const pitch = MidiPitch.from_pitch_octave(pitch_class, octave);
-      const duration = arp_durations[i];
-      return new Note(pitch, duration);
-    });
-    const arp_score = new Melody(...arp_pattern);
-    */
-
     const scale_arp = compile_part(this.tone, this.synths.square, arp_score);
     scale_arp.loop = true;
     scale_arp.loopStart = "0:0";
     scale_arp.loopEnd = "2:0";
-
-    /*
-    const scale_arp = new this.tone.Part(
-      (time, note) => {
-        const [index, duration] = note;
-        this.synths.square.triggerAttackRelease(NOTES4[index], duration, time);
-      },
-      [
-        ["0:0", [0, "4n"]],
-        ["0:1", [1, "4n"]],
-        ["0:2", [2, "4n"]],
-        ["0:3", [3, "4n"]],
-        ["1:0", [4, "2n"]],
-        ["1:2", [5, "2n"]],
-      ]
-    );*/
 
     const cycle_a = new this.tone.Sequence(
       (time, note) => {
