@@ -1,6 +1,8 @@
-import { N2, N4 } from "./music/durations.js";
+import { N2, N4, N8 } from "./music/durations.js";
 import { MidiPitch } from "./music/pitch_conversions.js";
+import { B, C, E, F, G, GS, REST } from "./music/pitches.js";
 import { Melody, Note } from "./music/Score.js";
+import { Rational } from "./Rational.js";
 import { compile_part } from "./tone_helpers/compile_music.js";
 
 export class SoundManager {
@@ -87,7 +89,29 @@ export class SoundManager {
     const NOTES4 = NOTES.map((x) => `${x}4`);
     const NOTES5 = NOTES.map((x) => `${x}5`);
 
-    const SCALE = [0, 4, 5, 7, 8, 11];
+    const SCALE = [C, E, F, G, GS, B];
+    const N4D = new Rational(3, 8);
+
+    const arp_score = Melody.from_tuples(
+      // score in scale degrees
+      // Measure 1
+      [0, N4],
+      [1, N4],
+      [2, N4],
+      [3, N4],
+      // Measure 2
+      [4, N4D],
+      [REST, N8],
+      [5, N4D],
+      [REST, N8]
+    ).map_pitch((scale_degree) => {
+      // Convert to MIDI notes starting at C4
+      const pitch_class = SCALE[scale_degree];
+      return MidiPitch.from_pitch_octave(pitch_class, 4);
+    });
+
+    /*
+    
     const arp_notes = [0, 1, 2, 3, 4, 5];
     const arp_durations = [N4, N4, N4, N4, N2, N2];
     const arp_pattern = arp_notes.map((scale_step, i) => {
@@ -98,6 +122,7 @@ export class SoundManager {
       return new Note(pitch, duration);
     });
     const arp_score = new Melody(...arp_pattern);
+    */
 
     const scale_arp = compile_part(this.tone, this.synths.square, arp_score);
     scale_arp.loop = true;

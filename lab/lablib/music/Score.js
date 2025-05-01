@@ -44,4 +44,39 @@ export class Melody {
       return accum.add(x.duration);
     }, Rational.ZERO);
   }
+
+  /**
+   * Map the pitch type to a new type
+   * @template Q The new pitch type
+   * @param {function(P): Q} convert_pitch
+   * @return {Melody<Q>} A new melody with pitches of the destination type
+   */
+  map_pitch(convert_pitch) {
+    const new_values = this.values.map((x) => {
+      if (x instanceof Note) {
+        return new Note(convert_pitch(x.pitch), x.duration);
+      }
+
+      return x;
+    });
+
+    return new Melody(...new_values);
+  }
+
+  /**
+   * @template P
+   * @param  {...[P|undefined, Rational]} tuples either (pitch, duration) or (REST, duration)
+   * @returns {Melody<P>} The parsed melody
+   */
+  static from_tuples(...tuples) {
+    const values = [];
+    for (const tuple of tuples) {
+      const [pitch, duration] = tuple;
+      const note =
+        pitch === undefined ? new Rest(duration) : new Note(pitch, duration);
+      values.push(note);
+    }
+
+    return new Melody(...values);
+  }
 }

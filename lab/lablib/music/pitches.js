@@ -12,6 +12,9 @@ export const A = 9;
 export const AS = 10;
 export const B = 11;
 
+// Undefined means rest
+export const REST = undefined;
+
 // Named MIDI notes
 export const C_1 = 0;
 export const CS_1 = 1;
