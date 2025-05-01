@@ -4,7 +4,8 @@
   "description": "Algorithmic art using p5.js",
   "main": "index.js",
   "scripts": {
-    "test": "vitest"
+    "test": "vitest run",
+    "watch": "vitest"
   },
   "author": "Peter Gagliardi",
   "license": "Apache-2.0",

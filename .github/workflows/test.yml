@@ -10,4 +10,4 @@ jobs:
       - name: Install npm packages
         run: npm install
       - name: run tests
-        run: npx vitest run
+        run: npm test
