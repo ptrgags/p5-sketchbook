@@ -1,0 +1,13 @@
+name: "Run Unit Tests"
+on:
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install npm packages
+        run: npm install
+      - name: run tests
+        run: npx vitest run
