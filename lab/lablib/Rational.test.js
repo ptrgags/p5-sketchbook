@@ -47,4 +47,34 @@ describe("Rational", () => {
       }).toThrowError("cannot divide 0 by 0");
     });
   });
+
+  describe("quotient and remainder", () => {
+    it("quotient returns the integer quotient", () => {
+      const a = new Rational(7, 5);
+
+      const result = a.quotient;
+
+      // 7/5 = 1 remainder 2
+      const expected = 1;
+      expect(result).toBe(expected);
+    });
+
+    it("remainder returns the integer remainder", () => {
+      const a = new Rational(7, 5);
+
+      const result = a.remainder;
+
+      const expected = 2;
+      expect(result).toBe(expected);
+    });
+
+    it("remainder of negative rational is positive", () => {
+      const a = new Rational(-7, 5);
+
+      const result = a.remainder;
+
+      const expected = 3;
+      expect(result).toBe(expected);
+    });
+  });
 });

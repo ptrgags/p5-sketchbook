@@ -38,8 +38,33 @@ export class Rational {
     const sign = Math.sign(numerator) * Math.sign(denominator);
 
     const d = gcd(a, b);
-    this.numerator = sign * (numerator / d);
-    this.denominator = denominator / d;
+    this.numerator = sign * (a / d);
+    this.denominator = b / d;
+  }
+
+  /**
+   * Get the quotient (integer part of numerator/denominator)
+   * @type {number}
+   */
+  get quotient() {
+    return Math.floor(this.numerator / this.denominator);
+  }
+
+  /**
+   * Get the integer remainder of numerator/denominator. This will always
+   * be an integer in [0, denominator)
+   * @type {number}
+   */
+  get remainder() {
+    return mod(this.numerator, this.denominator);
+  }
+
+  /**
+   * Convert to a number
+   * @type {number}
+   */
+  get real() {
+    return this.numerator / this.denominator;
   }
 
   /**
