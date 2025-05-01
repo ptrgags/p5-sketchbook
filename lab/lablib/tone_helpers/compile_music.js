@@ -11,7 +11,6 @@ import { to_tone_pitch } from "./to_tone_pitch.js";
 export function compile_part(tone, instrument, midi_melody) {
   const events = [];
   let offset = Rational.ZERO;
-
   for (const note of midi_melody.values) {
     if (note instanceof Rest) {
       offset = offset.add(note.duration);
@@ -23,6 +22,7 @@ export function compile_part(tone, instrument, midi_melody) {
     const dur = to_tone_duration(note.duration);
 
     events.push([start, [pitch, dur]]);
+    offset = offset.add(note.duration);
   }
 
   return new tone.Part((time, note) => {
