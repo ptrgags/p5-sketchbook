@@ -5,7 +5,7 @@ import { Rational } from "../Rational.js";
 
 describe("Melody", () => {
   it("duration computes sum of notes", () => {
-    const melody = new Melody([new Note(3, N4), new Rest(N8), new Note(4, N4)]);
+    const melody = new Melody(new Note(3, N4), new Rest(N8), new Note(4, N4));
 
     const result = melody.duration;
 

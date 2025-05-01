@@ -28,13 +28,14 @@ export class Note {
 
 /**
  * Notes arranged in a sequence in time.
+ * @template P the pitch type
  */
 export class Melody {
   /**
    * Constructor
-   * @param {(Rest | Note)[]} values Values to put in sequence
+   * @param {(Rest | Note<P>)[]} values Values to put in sequence
    */
-  constructor(values) {
+  constructor(...values) {
     this.values = values;
   }
 

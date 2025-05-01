@@ -1,3 +1,7 @@
+import { N2, N4 } from "./music/durations";
+import { Melody, Note } from "./music/Score.js";
+import { compile_part } from "./tone_helpers/compile_music";
+
 export class SoundManager {
   /**
    * Constructor
@@ -82,6 +86,24 @@ export class SoundManager {
     const NOTES4 = NOTES.map((x) => `${x}4`);
     const NOTES5 = NOTES.map((x) => `${x}5`);
 
+    const SCALE = [0, 4, 5, 7, 8, 11];
+    const arp_notes = [0, 1, 2, 3, 4, 5];
+    const arp_durations = [N4, N4, N4, N4, N2, N2];
+    const arp_pattern = arp_notes.map((scale_step, i) => {
+      const octave = 4;
+      const pitch_class = SCALE[scale_step];
+      const pitch = octave * 12 + pitch_class;
+      const duration = arp_durations[i];
+      return new Note(pitch, duration);
+    });
+    const arp_score = new Melody(...arp_pattern);
+
+    const scale_arp = compile_part(this.tone, this.synths.square, arp_score);
+    scale_arp.loop = true;
+    scale_arp.loopStart = "0:0";
+    scale_arp.loopEnd = "2:0";
+
+    /*
     const scale_arp = new this.tone.Part(
       (time, note) => {
         const [index, duration] = note;
@@ -95,10 +117,7 @@ export class SoundManager {
         ["1:0", [4, "4n."]],
         ["1:2", [5, "4n."]],
       ]
-    );
-    scale_arp.loop = true;
-    scale_arp.loopStart = "0:0";
-    scale_arp.loopEnd = "2:0";
+    );*/
 
     const cycle_a = new this.tone.Sequence(
       (time, note) => {
