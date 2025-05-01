@@ -1,4 +1,4 @@
-import { mod } from "../../sketchlib/mod";
+import { mod } from "../../sketchlib/mod.js";
 
 /**
  * Greatest common divisor

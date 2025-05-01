@@ -1,7 +1,7 @@
-import { N2, N4 } from "./music/durations";
-import { MidiPitch } from "./music/pitch_conversions";
+import { N2, N4 } from "./music/durations.js";
+import { MidiPitch } from "./music/pitch_conversions.js";
 import { Melody, Note } from "./music/Score.js";
-import { compile_part } from "./tone_helpers/compile_music";
+import { compile_part } from "./tone_helpers/compile_music.js";
 
 export class SoundManager {
   /**

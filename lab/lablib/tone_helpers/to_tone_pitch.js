@@ -1,4 +1,4 @@
-import { MidiPitch } from "../music/pitch_conversions";
+import { MidiPitch } from "../music/pitch_conversions.js";
 
 const PITCH_CLASSES = [
   "C",
