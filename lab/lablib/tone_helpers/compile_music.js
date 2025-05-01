@@ -1,14 +1,6 @@
 import { Melody, Rest } from "../music/Score.js";
 import { Rational } from "../Rational.js";
-
-/**
- * Convert a MIDI pitch to a tone pitch
- * @param {number} midi_pitch The MIDI pitch number
- * @returns
- */
-export function to_tone_pitch(midi_pitch) {
-  return "C4";
-}
+import { to_tone_pitch } from "./to_tone_pitch.js";
 
 /**
  * Convert a rational number of measures to a Tone.js m:q string

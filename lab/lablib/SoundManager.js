@@ -1,4 +1,5 @@
 import { N2, N4 } from "./music/durations";
+import { MidiPitch } from "./music/pitch_conversions";
 import { Melody, Note } from "./music/Score.js";
 import { compile_part } from "./tone_helpers/compile_music";
 
@@ -90,9 +91,9 @@ export class SoundManager {
     const arp_notes = [0, 1, 2, 3, 4, 5];
     const arp_durations = [N4, N4, N4, N4, N2, N2];
     const arp_pattern = arp_notes.map((scale_step, i) => {
-      const octave = 4;
       const pitch_class = SCALE[scale_step];
-      const pitch = octave * 12 + pitch_class;
+      const octave = 4;
+      const pitch = MidiPitch.from_pitch_octave(pitch_class, octave);
       const duration = arp_durations[i];
       return new Note(pitch, duration);
     });
