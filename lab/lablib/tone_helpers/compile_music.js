@@ -1,4 +1,4 @@
-import { Melody, Note, Rest } from "../music/Score.js";
+import { Cycle, Melody, Note, Rest } from "../music/Score.js";
 import { Rational } from "../Rational.js";
 import { to_tone_time } from "./measure_notation.js";
 import { to_tone_pitch } from "./to_tone_pitch.js";
@@ -51,4 +51,28 @@ export function compile_part(tone, instrument, midi_melody) {
     const [pitch, duration] = note;
     instrument.triggerAttackRelease(pitch, duration, time);
   }, events);
+}
+
+export function compile_sequence_pattern(midi_cycle) {
+  return [];
+}
+
+/**
+ * @param {import("tone")} tone the Tone.js library
+ * @param {import("tone").Synth} instrument the instrument to play
+ * @param {Cycle<number>} midi_cycle Cycle of MIDI notes
+ * @returns {import("tone").Sequence} The computed part
+ */
+export function compile_sequence(tone, instrument, midi_cycle) {
+  const pattern = compile_sequence_pattern(midi_cycle);
+  const beat_duration = midi_cycle.duration.mul(midi_cycle.subdivision);
+  const tone_interval = to_tone_time(beat_duration);
+  return new tone.Sequence(
+    (time, note) => {
+      const [pitch, duration] = note;
+      instrument.triggerAttackRelease(pitch, duration, time);
+    },
+    pattern,
+    tone_interval
+  );
 }

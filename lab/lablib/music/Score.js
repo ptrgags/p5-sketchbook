@@ -1,4 +1,5 @@
 import { Rational } from "../Rational.js";
+import { REST } from "./pitches.js";
 
 export class Rest {
   /**
@@ -154,6 +155,37 @@ export class Cycle {
   map_pitch(convert_pitch) {
     const converted = this.children.map((x) => x.map_pitch(convert_pitch));
     return new Cycle(this.duration, ...converted);
+  }
+
+  /**
+   * Parse a cycle from an array
+   * @example
+   * const cycle = Cycle.parse(N1, [C4, D4, [E4, F4], G4]);
+   * @template P
+   * @param {Rational} cycle_length Length of one cycle
+   * @param  {(P | P[])[]} notes List of pitch values or arrays thereof. Arrays are interpreted as nested cycles
+   * @returns {Cycle<P>} The comuted cyles
+   */
+  static parse(cycle_length, notes) {
+    const children = [];
+    const subdivision = new Rational(1, notes.length);
+    const beat_length = cycle_length.mul(subdivision);
+    for (const note of notes) {
+      let child;
+      if (note === REST) {
+        child = new Rest(subdivision);
+      } else if (Array.isArray(note)) {
+        // Interpret arrays
+        child = Cycle.parse(beat_length, note);
+      } else {
+        // Numbers are interpreted as notes as long as the cycle length
+        child = new Note(note, subdivision);
+      }
+
+      children.push(child);
+    }
+
+    return new Cycle(cycle_length, ...children);
   }
 }
 

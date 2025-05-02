@@ -81,6 +81,18 @@ export class Rational {
     // The constructor puts the fraction in lowest terms
     return new Rational(numerator, denominator);
   }
+
+  /**
+   * Multiply two rational numbers
+   * @param {Rational} other Another rational number
+   * @returns {Rational} The product
+   */
+  mul(other) {
+    const { numerator: a, denominator: b } = this;
+    const { numerator: c, denominator: d } = other;
+
+    return new Rational(a * c, b * c);
+  }
 }
 
 Rational.ZERO = Object.freeze(new Rational(0, 1));

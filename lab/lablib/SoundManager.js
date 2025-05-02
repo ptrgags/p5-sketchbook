@@ -1,9 +1,26 @@
-import { N2, N4, N8 } from "./music/durations.js";
+import { N1, N2, N4, N8 } from "./music/durations.js";
 import { MidiPitch } from "./music/pitch_conversions.js";
 import { B, C, C3, E, F, G, GS, REST } from "./music/pitches.js";
-import { Melody, Note } from "./music/Score.js";
+import { Cycle, Melody, Note } from "./music/Score.js";
 import { Rational } from "./Rational.js";
-import { compile_part } from "./tone_helpers/compile_music.js";
+import {
+  compile_part,
+  compile_sequence,
+} from "./tone_helpers/compile_music.js";
+
+/**
+ * Convert a scale to a pitch, using a fixed octave
+ * @param {number[]} scale Array of pitch classes for the scale
+ * @param {number} octave octave number
+ * @returns {function(number):number} A callback function for transforming
+ * scale degrees to pitches
+ */
+function scale_to_pitch(scale, octave) {
+  return (scale_degree) => {
+    const pitch_class = scale[scale_degree];
+    return MidiPitch.from_pitch_octave(pitch_class, octave);
+  };
+}
 
 export class SoundManager {
   /**
@@ -93,10 +110,14 @@ export class SoundManager {
     const NOTES5 = NOTES.map((x) => `${x}5`);
 
     const SCALE = [C, E, F, G, GS, B];
+    const SCALE3 = scale_to_pitch(SCALE, 3);
+    const SCALE4 = scale_to_pitch(SCALE, 4);
+    const SCALE5 = scale_to_pitch(SCALE, 5);
+
     const N4D = new Rational(3, 8);
 
+    // scores are expressed in scale degrees then converted to pitches
     const arp_score = Melody.parse(
-      // score in scale degrees
       // Measure 1
       [0, N4],
       [1, N4],
@@ -107,16 +128,41 @@ export class SoundManager {
       [REST, N8],
       [5, N4D],
       [REST, N8]
-    ).map_pitch((scale_degree) => {
-      // Convert to MIDI notes starting at C4
-      const pitch_class = SCALE[scale_degree];
-      return MidiPitch.from_pitch_octave(pitch_class, 4);
-    });
+    ).map_pitch(SCALE4);
     const scale_arp = compile_part(this.tone, this.synths.square, arp_score);
     scale_arp.loop = true;
     scale_arp.loopStart = "0:0";
     scale_arp.loopEnd = "2:0";
 
+    const cycle_length = N1;
+    const cycle_a_score = Cycle.parse(cycle_length, [
+      0,
+      REST,
+      1,
+      2,
+      REST,
+      4,
+    ]).map_pitch(SCALE5);
+    const cycle_a = compile_sequence(
+      this.tone,
+      this.synths.poly,
+      cycle_a_score
+    );
+
+    const cycle_b_score = Cycle.parse(cycle_length, [
+      0,
+      4,
+      [1, 2],
+      3,
+      [0, REST, 3],
+    ]).map_pitch(SCALE5);
+    const cycle_b = compile_sequence(
+      this.tone,
+      this.synths.poly,
+      cycle_b_score
+    );
+
+    /*
     const cycle_a = new this.tone.Sequence(
       (time, note) => {
         this.synths.poly.triggerAttackRelease(NOTES5[note], "8n", time);
@@ -132,6 +178,7 @@ export class SoundManager {
       [0, 4, [1, 2], 3, [0, undefined, 3]],
       "8n"
     );
+    */
 
     // Three scales initially the same, but with different lengths
     const phase_a = new this.tone.Sequence(
