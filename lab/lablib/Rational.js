@@ -19,6 +19,19 @@ function gcd(a, b) {
 }
 
 /**
+ * like Math.sign, but sign_nonzero(0) = 1, not 0.
+ * @param {number} x Input number
+ * @returns {number} 1 if x is >= 0, -1 otherwise
+ */
+function sign_nonzero(x) {
+  if (x < 0) {
+    return -1;
+  }
+
+  return 1;
+}
+
+/**
  * Rational number a / b stored in lowest terms. For negative fractions,
  * this is normalized so the negative sign is in the numerator
  */
@@ -35,7 +48,7 @@ export class Rational {
 
     const a = Math.abs(numerator);
     const b = Math.abs(denominator);
-    const sign = Math.sign(numerator) * Math.sign(denominator);
+    const sign = sign_nonzero(numerator) * sign_nonzero(denominator);
 
     const d = gcd(a, b);
     this.numerator = sign * (a / d);
@@ -80,6 +93,18 @@ export class Rational {
 
     // The constructor puts the fraction in lowest terms
     return new Rational(numerator, denominator);
+  }
+
+  /**
+   * Multiply two rational numbers
+   * @param {Rational} other Another rational number
+   * @returns {Rational} The product
+   */
+  mul(other) {
+    const { numerator: a, denominator: b } = this;
+    const { numerator: c, denominator: d } = other;
+
+    return new Rational(a * c, b * d);
   }
 }
 
