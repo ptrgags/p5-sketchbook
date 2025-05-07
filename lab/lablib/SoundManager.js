@@ -102,13 +102,6 @@ export class SoundManager {
     pedal.loopStart = "0:0";
     pedal.loopEnd = "0:2";
 
-    // Not sure what you call this but it sounds kinda neat
-    const NOTES = ["C", "E", "F", "G", "G#", "B"];
-    // Notes at different octaves
-    const NOTES3 = NOTES.map((x) => `${x}3`);
-    const NOTES4 = NOTES.map((x) => `${x}4`);
-    const NOTES5 = NOTES.map((x) => `${x}5`);
-
     const SCALE = [C, E, F, G, GS, B];
     const SCALE3 = scale_to_pitch(SCALE, 3);
     const SCALE4 = scale_to_pitch(SCALE, 4);
@@ -161,26 +154,32 @@ export class SoundManager {
     );
 
     // Three scales initially the same, but with different lengths
-    const phase_a = new this.tone.Sequence(
-      (time, note) => {
-        this.synths.poly.triggerAttackRelease(NOTES3[note], "8n", time);
-      },
-      [0, 1, 2, 3, 2, 1],
-      "8n"
+    const phase_a_score = Cycle.parse(
+      new Rational(6, 8),
+      [0, 1, 2, 3, 2, 1]
+    ).map_pitch(SCALE3);
+    const phase_a = compile_sequence(
+      this.tone,
+      this.synths.poly,
+      phase_a_score
     );
-    const phase_b = new this.tone.Sequence(
-      (time, note) => {
-        this.synths.poly.triggerAttackRelease(NOTES4[note], "8n", time);
-      },
-      [0, 1, 2, 3, 4, 3, 2, 1],
-      "8n"
+    const phase_b_score = Cycle.parse(
+      new Rational(1, 1),
+      [0, 1, 2, 3, 4, 3, 2, 1]
+    ).map_pitch(SCALE3);
+    const phase_b = compile_sequence(
+      this.tone,
+      this.synths.poly,
+      phase_b_score
     );
-    const phase_c = new this.tone.Sequence(
-      (time, note) => {
-        this.synths.poly.triggerAttackRelease(NOTES5[note], "8n", time);
-      },
-      [0, 1, 2, 3, 4, 5, 4, 3, 2, 1],
-      "8n"
+    const phase_c_score = Cycle.parse(
+      new Rational(10, 8),
+      [0, 1, 2, 3, 4, 5, 4, 3, 2, 1]
+    ).map_pitch(SCALE3);
+    const phase_c = compile_sequence(
+      this.tone,
+      this.synths.poly,
+      phase_c_score
     );
 
     patterns.pedal = pedal;
