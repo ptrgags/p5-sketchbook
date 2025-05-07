@@ -15,6 +15,13 @@ describe("Rational", () => {
       const expected = new Rational(1, 3);
       expect(rational).toEqual(expected);
     });
+
+    it("infinity is stored as 1/0", () => {
+      const inf = Rational.INF;
+
+      expect(inf.numerator).toBe(1);
+      expect(inf.denominator).toBe(0);
+    });
   });
 
   describe("add", () => {
@@ -75,6 +82,33 @@ describe("Rational", () => {
 
       const expected = 3;
       expect(result).toBe(expected);
+    });
+  });
+
+  describe("mul", () => {
+    it("computes product in lowest terms", () => {
+      const a = new Rational(-3, 4);
+      const b = new Rational(1, 3);
+
+      const result = a.mul(b);
+
+      // -3/4 * 1/3 = -3/12 = -1/4
+      const expected = new Rational(-1, 4);
+      expect(result).toEqual(expected);
+    });
+
+    it("0 times infinity throws error", () => {
+      const a = Rational.INF;
+      const b = Rational.ZERO;
+      expect(() => {
+        return a.mul(b);
+      }).toThrowError("cannot divide 0 by 0");
+    });
+
+    it("inf times inf returns inf", () => {
+      const result = Rational.INF.mul(Rational.INF);
+
+      expect(result).toEqual(Rational.INF);
     });
   });
 });

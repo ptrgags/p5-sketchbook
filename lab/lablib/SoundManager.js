@@ -150,35 +150,15 @@ export class SoundManager {
     );
 
     const cycle_b_score = Cycle.parse(cycle_length, [
-      0,
-      4,
-      [1, 2],
-      3,
-      [0, REST, 3],
+      [0, 3],
+      [5, REST],
+      [0, 4, 2, 4],
     ]).map_pitch(SCALE5);
     const cycle_b = compile_sequence(
       this.tone,
       this.synths.poly,
       cycle_b_score
     );
-
-    /*
-    const cycle_a = new this.tone.Sequence(
-      (time, note) => {
-        this.synths.poly.triggerAttackRelease(NOTES5[note], "8n", time);
-      },
-      [0, undefined, 1, 2, undefined, 4],
-      "8n"
-    );
-
-    const cycle_b = new this.tone.Sequence(
-      (time, note) => {
-        this.synths.poly.triggerAttackRelease(NOTES5[note], "8n", time);
-      },
-      [0, 4, [1, 2], 3, [0, undefined, 3]],
-      "8n"
-    );
-    */
 
     // Three scales initially the same, but with different lengths
     const phase_a = new this.tone.Sequence(
