@@ -1,5 +1,5 @@
 import { REST } from "../music/pitches.js";
-import { Cycle, Melody, Note, Rest } from "../music/Score.js";
+import { MusicCycle, Melody, Note, Rest } from "../music/Score.js";
 import { Rational } from "../Rational.js";
 import { to_tone_time } from "./measure_notation.js";
 import { to_tone_pitch } from "./to_tone_pitch.js";
@@ -68,7 +68,7 @@ export function compile_sequence_pattern(midi_cycle) {
       continue;
     }
 
-    if (child instanceof Cycle) {
+    if (child instanceof MusicCycle) {
       const sub_cycle = compile_sequence_pattern(child);
       beats.push(sub_cycle);
       continue;
@@ -83,7 +83,7 @@ export function compile_sequence_pattern(midi_cycle) {
 /**
  * @param {import("tone")} tone the Tone.js library
  * @param {import("tone").Synth} instrument the instrument to play
- * @param {Cycle<number>} midi_cycle Cycle of MIDI notes
+ * @param {MusicCycle<number>} midi_cycle Cycle of MIDI notes
  * @returns {import("tone").Sequence} The computed part
  */
 export function compile_sequence(tone, instrument, midi_cycle) {
@@ -101,4 +101,23 @@ export function compile_sequence(tone, instrument, midi_cycle) {
     pattern,
     tone_interval
   );
+}
+
+/**
+ * Compile music to a Tone.js Part or Sequence
+ * @param {import("tone")} tone The Tone.js library
+ * @param {import("tone").Synth} instrument
+ * @param {import("../music/Score.js").Music<number>} music
+ * @return {import("tone").Sequence | import("tone").Part} The compiled music
+ */
+export function compile_music(tone, instrument, music) {
+  if (music instanceof Melody) {
+    return compile_part(tone, instrument, music);
+  }
+
+  if (music instanceof MusicCycle) {
+    return compile_sequence(tone, instrument, music);
+  }
+
+  throw new Error("Only Melody and Cycle are currently supported");
 }
