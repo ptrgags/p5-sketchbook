@@ -1,26 +1,40 @@
 import { REST } from "../music/pitches.js";
-import { MusicCycle, Melody, Note, Rest } from "../music/Score.js";
+import { MusicCycle, Melody, Note, Rest, Harmony, MusicLoop } from "../music/Score.js";
+import { Gap, Loop, Parallel, Sequential } from "../music/Timeline.js";
 import { Rational } from "../Rational.js";
 import { to_tone_time } from "./measure_notation.js";
 import { to_tone_pitch } from "./to_tone_pitch.js";
 
+
+/**
+ * Compile a single note to a musical clip
+ * @param {import("tone")} tone Tone.js library
+ * @param {import("tone").Synth} instrument ToneJS instrument to play 
+ * @param {Note<number>} midi_note The MIDI note to play
+ * @returns {import("tone").ToneEvent} A tone event
+ */
+export function compile_note(tone, instrument, midi_note) {
+  const event = [to_tone_pitch(midi_note.pitch), to_tone_time(midi_note.duration)];
+  return new tone.ToneEvent((time, note) => {
+    const [pitch, duration] = note;
+    instrument.triggerAttackRelease(pitch, duration, time);
+  }, event);
+}
+
 /**
  * Compile a Melody to the events to pass into Tone.Part Exposed as this method
  * can be tested without needing dependencies on Tone.js
- * @param {Melody<number>} midi_melody Melody in MIDI note values
+ * @param {(Gap | Note<number>)[]} midi_notes Melody in MIDI note values
  * @returns {[string, [string, string]][]} Array of (start_time, (pitch, duration))
  * events to pass into the Tone.Part constructor
  */
-export function compile_part_events(midi_melody) {
+export function compile_part_events(midi_notes) {
   const events = [];
   let offset = Rational.ZERO;
-  for (const note of midi_melody.children) {
+  for (const note of midi_notes) {
     if (note instanceof Rest) {
       offset = offset.add(note.duration);
-      continue;
-    }
-
-    if (note instanceof Note) {
+    } else if (note instanceof Note) {
       const start = to_tone_time(offset);
       const pitch = to_tone_pitch(note.pitch);
       const dur = to_tone_time(note.duration);
@@ -32,10 +46,7 @@ export function compile_part_events(midi_melody) {
 
       events.push(event);
       offset = offset.add(note.duration);
-      continue;
     }
-
-    throw new Error("other musical types not implemented");
   }
   return events;
 }
@@ -43,15 +54,134 @@ export function compile_part_events(midi_melody) {
 /**
  * @param {import("tone")} tone the Tone.js library
  * @param {import("tone").Synth} instrument the instrument to play
- * @param {Melody<number>} midi_melody Melody of MIDI pitches
+ * @param {(Gap | Note<number>)[]} midi_notes Melody of MIDI pitches
  * @returns {import("tone").Part} The computed part
  */
-export function compile_part(tone, instrument, midi_melody) {
-  const events = compile_part_events(midi_melody);
+export function make_part(tone, instrument, midi_notes) {
+  const events = compile_part_events(midi_notes);
   return new tone.Part((time, note) => {
     const [pitch, duration] = note;
     instrument.triggerAttackRelease(pitch, duration, time);
   }, events);
+}
+
+/**
+ * When melodies have a mix of notes and container types, group them into
+ * Melody blocks
+ * @template P
+ * @param {Melody<P>} melody 
+ * @returns {import("../music/Timeline.js").Timeline<Note<P>>[]} An array of
+ * container
+ */
+function normalize_melody(melody) {
+  const children = [];
+
+  let current_run = [];
+  for (const child of melody.children) {
+    if (child instanceof Rest || child instanceof Note) {
+      current_run.push(child);
+      continue;
+    }
+
+    if (current_run.length > 0) {
+      children.push(new Melody(...current_run));
+      current_run = [];
+    }
+
+    children.push(child);
+  }
+
+  if (current_run.length > 0) {
+    children.push(new Melody(...current_run));
+  }
+
+  return children;
+}
+
+
+/**
+ * @param {import("tone")} tone the Tone.js library
+ * @param {import("tone").Synth} instrument the instrument to play
+ * @param {Melody<number>} midi_melody Melody of MIDI pitches
+ * @returns {Gap | ToneClip | Sequential<ToneClip>} A sequence of generated clips, or undefined if there were no notes
+ */
+export function compile_melody(tone, instrument, midi_melody) {
+  const clips = [];
+
+  /** @type {(Gap | Note<number>)[]} */
+  let loose_notes = [];
+  for (const child of midi_melody.children) {
+    // Gather up loose notes/rests to combine into a single clip.
+    if (child instanceof Rest || child instanceof Note) {
+      loose_notes.push(child);
+      continue;
+    }
+
+    // Upon encountering a container type, wrap up the previous run of loose
+    // notes.
+    if (loose_notes.length > 0) {
+      const part = make_part(tone, instrument, loose_notes);
+      const duration = loose_notes.reduce((acc, x) => acc.add(x.duration), Rational.ZERO);
+      const clip = new ToneClip(part, duration);
+      clips.push(clip);
+      loose_notes = [];
+    }
+
+    if (child instanceof Melody) {
+      const clip = compile_melody(tone, instrument, child);
+      clips.push(clip);
+    } else if (child instanceof Harmony) {
+      const clip = compile_harmony(tone, instrument, child);
+      clips.push(clip);
+    } else if (child instanceof MusicCycle) {
+      const clip = compile_cycle(tone, instrument, child);
+      clips.push(clip);
+    } else {
+      // MusicLoop
+      const clip = compile_loop(tone, instrument, child);
+      clips.push(clip);
+    }
+  }
+
+  if (clips.length == 0) {
+    return new Gap(midi_melody.duration);
+  }
+
+  if (clips.length == 1) {
+    return clips[0];
+  }
+
+  return new Sequential(...clips);
+}
+
+/**
+ * @param {import("tone")} tone the Tone.js library
+ * @param {import("tone").Synth} instrument the instrument to play
+ * @param {Harmony<number>} midi_harmony Harmony of MIDI pitches
+ * @returns {Gap | ToneClip | Parallel<ToneClip>} A sequence of generated clips, or undefined if there were no notes
+ */
+export function compile_harmony(tone, instrument, midi_harmony) {
+  throw new Error("not implemented");
+}
+
+/**
+ * @param {import("tone")} tone the Tone.js library
+ * @param {import("tone").Synth} instrument the instrument to play
+ * @param {MusicCycle<number>} midi_cycle Melody of MIDI pitches
+ * @returns {Gap | ToneClip | Sequential<ToneClip>} A sequence of generated clips, or undefined if there were no notes
+ */
+export function compile_cycle(tone, instrument, midi_cycle) {
+  throw new Error("not implemented");
+}
+
+/**
+ * @param {import("tone")} tone the Tone.js library
+ * @param {import("tone").Synth} instrument the instrument to play
+ * @param {MusicLoop<number>} midi_loop Loop of MIDI pitches
+ * @returns {Gap | ToneClip | Sequential<ToneClip>} A sequence of generated clips, or undefined if there were no notes
+ */
+export function compile_loop(tone, instrument, midi_loop) {
+  throw new Error("not implemented");
 }
 
 export function compile_sequence_pattern(midi_cycle) {
@@ -103,20 +233,51 @@ export function compile_sequence(tone, instrument, midi_cycle) {
   );
 }
 
+export class ToneClip {
+  /**
+   * Constructor
+   * @param {import("tone").ToneEvent} material The 
+   * @param {Rational} duration The duration of the clip in measures
+   */
+  constructor(material, duration) {
+    this.material = material;
+    this.duration = duration;
+  }
+}
+
 /**
  * Compile music to a Tone.js Part or Sequence
  * @param {import("tone")} tone The Tone.js library
  * @param {import("tone").Synth} instrument
  * @param {import("../music/Score.js").Music<number>} music
- * @return {import("tone").Sequence | import("tone").Part} The compiled music
+ * @return {import("../music/Timeline.js").Timeline<ToneClip> | undefined} The compiled music clips, or undefined if the timeline is empty
  */
 export function compile_music(tone, instrument, music) {
+  if (music instanceof Note) {
+    const note = compile_note(tone, instrument, music);
+    return new ToneClip(note, music.duration);
+  }
+
+  // A single gap compiles to silence
+  if (music instanceof Gap) {
+    return undefined;
+  }
+
   if (music instanceof Melody) {
-    return compile_part(tone, instrument, music);
+    return compile_melody(tone, instrument, music);
+  }
+
+  if (music instanceof Harmony) {
+    throw new Error("not implemented")
   }
 
   if (music instanceof MusicCycle) {
-    return compile_sequence(tone, instrument, music);
+    const sequence = compile_sequence(tone, instrument, music);
+    return new ToneClip(sequence, music.duration);
+  }
+
+  if (music instanceof Loop) {
+    throw new Error("not implemented");
   }
 
   throw new Error("Only Melody and Cycle are currently supported");
