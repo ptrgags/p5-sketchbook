@@ -15,10 +15,14 @@ import { to_tone_pitch } from "./to_tone_pitch.js";
  */
 export function compile_note(tone, instrument, midi_note) {
   const event = [to_tone_pitch(midi_note.pitch), to_tone_time(midi_note.duration)];
-  return new tone.ToneEvent((time, note) => {
+  const tone_event = new tone.ToneEvent((time, note) => {
     const [pitch, duration] = note;
     instrument.triggerAttackRelease(pitch, duration, time);
   }, event);
+
+  tone_event.loop = true;
+
+  return tone_event;
 }
 
 /**
@@ -59,10 +63,13 @@ export function compile_part_events(midi_notes) {
  */
 export function make_part(tone, instrument, midi_notes) {
   const events = compile_part_events(midi_notes);
-  return new tone.Part((time, note) => {
+  const part = new tone.Part((time, note) => {
     const [pitch, duration] = note;
     instrument.triggerAttackRelease(pitch, duration, time);
   }, events);
+
+  part.loop = true;
+  return part;
 }
 
 /**
@@ -103,7 +110,7 @@ function normalize_melody(melody) {
  * @param {import("tone")} tone the Tone.js library
  * @param {import("tone").Synth} instrument the instrument to play
  * @param {Melody<number>} midi_melody Melody of MIDI pitches
- * @returns {Gap | ToneClip | Sequential<ToneClip>} A sequence of generated clips, or undefined if there were no notes
+ * @returns {import("../music/Timeline.js").Timeline<ToneClip>} A sequence of generated clips, or undefined if there were no notes
  */
 export function compile_melody(tone, instrument, midi_melody) {
   const clips = [];
@@ -164,26 +171,51 @@ export function compile_harmony(tone, instrument, midi_harmony) {
   throw new Error("not implemented");
 }
 
+export function is_simple_cycle(music) {
+  if (music instanceof Gap || music instanceof Note) {
+    return true
+  }
+
+  if (music instanceof MusicCycle) {
+    return music.children.every(x => is_simple_cycle(music));
+  }
+
+  return false;
+}
+
 /**
  * @param {import("tone")} tone the Tone.js library
  * @param {import("tone").Synth} instrument the instrument to play
  * @param {MusicCycle<number>} midi_cycle Melody of MIDI pitches
- * @returns {Gap | ToneClip | Sequential<ToneClip>} A sequence of generated clips, or undefined if there were no notes
+ * @returns {ToneClip} A sequence of generated clips, or undefined if there were no notes
  */
 export function compile_cycle(tone, instrument, midi_cycle) {
-  throw new Error("not implemented");
+  if (is_simple_cycle(midi_cycle)) {
+    const seq = compile_sequence(tone, instrument, midi_cycle)
+    return new ToneClip(seq, midi_cycle.duration);
+  }
+
+  // a complex cycle will take more thought.
+  throw new Error("complex cycles not implemented");
 }
 
 /**
  * @param {import("tone")} tone the Tone.js library
  * @param {import("tone").Synth} instrument the instrument to play
  * @param {MusicLoop<number>} midi_loop Loop of MIDI pitches
- * @returns {Gap | ToneClip | Sequential<ToneClip>} A sequence of generated clips, or undefined if there were no notes
+ * @returns {Loop<ToneClip>} A sequence of generated clips, or undefined if there were no notes
  */
 export function compile_loop(tone, instrument, midi_loop) {
   throw new Error("not implemented");
 }
 
+
+
+/**
+ * 
+ * @param {MusicCycle<number>} midi_cycle 
+ * @returns 
+ */
 export function compile_sequence_pattern(midi_cycle) {
   const beats = [];
   for (const child of midi_cycle.children) {
@@ -224,13 +256,16 @@ export function compile_sequence(tone, instrument, midi_cycle) {
   // TODO: Need to compute this, but determining how to pass this to Cycle
   // would require something other than an array
   const note_duration = "16n";
-  return new tone.Sequence(
+  const seq = new tone.Sequence(
     (time, pitch) => {
       instrument.triggerAttackRelease(pitch, note_duration, time);
     },
     pattern,
     tone_interval
   );
+  seq.loop = true;
+
+  return seq;
 }
 
 export class ToneClip {
