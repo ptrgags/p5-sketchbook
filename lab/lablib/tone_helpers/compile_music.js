@@ -1,5 +1,5 @@
 import { REST } from "../music/pitches.js";
-import { MusicCycle, Melody, Note, Rest, Harmony, MusicLoop } from "../music/Score.js";
+import { MusicCycle, Melody, Note, Rest, Harmony, MusicLoop, Score } from "../music/Score.js";
 import { Gap, Loop, Parallel, Sequential } from "../music/Timeline.js";
 import { Rational } from "../Rational.js";
 import { to_tone_time } from "./measure_notation.js";
@@ -285,7 +285,7 @@ export class ToneClip {
  * @param {import("tone")} tone The Tone.js library
  * @param {import("tone").Synth} instrument
  * @param {import("../music/Score.js").Music<number>} music
- * @return {import("../music/Timeline.js").Timeline<ToneClip> | undefined} The compiled music clips, or undefined if the timeline is empty
+ * @return {import("../music/Timeline.js").Timeline<ToneClip>} The compiled music clips, or undefined if the timeline is empty
  */
 export function compile_music(tone, instrument, music) {
   if (music instanceof Note) {
@@ -295,7 +295,7 @@ export function compile_music(tone, instrument, music) {
 
   // A single gap compiles to silence
   if (music instanceof Gap) {
-    return undefined;
+    return music;
   }
 
   if (music instanceof Melody) {
@@ -316,4 +316,21 @@ export function compile_music(tone, instrument, music) {
   }
 
   throw new Error("Only Melody and Cycle are currently supported");
+}
+
+/**
+ * 
+ * @param {import("tone")} tone 
+ * @param {{[id: string]: import("tone").Synth}} instruments 
+ * @param {Score<number>} score 
+ * @returns {import("../music/Timeline.js").Timeline<ToneClip>} A timeline of music clips ready for scheduling.
+ */
+export function compile_score(tone, instruments, score) {
+  const clips = [];
+  for (const [instrument_id, music] of score.parts) {
+    const clip = compile_music(tone, instruments[instrument_id], music);
+    clips.push(clip);
+  }
+
+  return new Parallel(...clips);
 }

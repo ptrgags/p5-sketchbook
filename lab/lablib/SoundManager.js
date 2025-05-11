@@ -4,7 +4,7 @@ import { MidiPitch } from "./music/pitch_conversions.js";
 import { B, C, C3, E, F, G, GS, REST } from "./music/pitches.js";
 import { parse_melody, parse_cycle, map_pitch, MusicLoop, Melody, Rest, Harmony, Score } from "./music/Score.js";
 import { Rational } from "./Rational.js";
-import { compile_music } from "./tone_helpers/compile_music.js";
+import { compile_music, compile_score } from "./tone_helpers/compile_music.js";
 import { schedule_clips } from "./tone_helpers/schedule_music.js";
 
 /**
@@ -53,7 +53,7 @@ export class SoundManager {
     const transport = this.tone.getTransport();
     transport.bpm.value = 128;
 
-    this.init_patterns();
+    this.init_scores();
 
     this.audio_ready = true;
   }
@@ -94,7 +94,7 @@ export class SoundManager {
     this.synths.poly = poly;
   }
 
-  init_patterns() {
+  init_scores() {
     const patterns = this.patterns;
 
     const pedal = parse_melody([C3, N4], [REST, N4]);
@@ -192,7 +192,10 @@ export class SoundManager {
 
     const score_b = new Score(["poly", phase_part]);
 
-    this.scores = { score_a, score_b };
+    this.scores = {
+      score_a: compile_score(this.tone, this.synths, score_a),
+      score_b: compile_score(this.tone, this.synths, score_b)
+    };
 
     /*
     patterns.pedal = pedal;
@@ -213,9 +216,8 @@ export class SoundManager {
   melody_a() {
     this.stop_the_music();
 
+    /*
     const { pedal, scale_arp, cycle_a, cycle_b } = this.patterns;
-
-    schedule_clips(Rational.ZERO, pedal);
 
     pedal.start("0:0").stop("34:0");
     scale_arp.start("2:0").stop("24:0");
@@ -227,6 +229,8 @@ export class SoundManager {
       .stop("24:0")
       .start("28:0")
       .stop("32:0");
+      */
+    schedule_clips(Rational.ZERO, this.scores.score_a);
 
     const transport = this.tone.getTransport();
     transport.position = 0;
@@ -236,6 +240,9 @@ export class SoundManager {
   melody_b() {
     this.stop_the_music();
 
+    schedule_clips(Rational.ZERO, this.scores.score_b);
+
+    /*
     const { phase_a, phase_b, phase_c } = this.patterns;
 
     // The sequences are 6, 8, 10 quarter notes
@@ -244,6 +251,7 @@ export class SoundManager {
     phase_a.start("0:0").stop("30:0");
     phase_b.start("0:0").stop("30:0");
     phase_c.start("0:0").stop("30:0");
+    */
 
     const transport = this.tone.getTransport();
     transport.position = 0;
