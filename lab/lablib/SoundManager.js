@@ -1,4 +1,3 @@
-import { Loop } from "tone";
 import { N1, N2, N4, N8 } from "./music/durations.js";
 import { MidiPitch } from "./music/pitch_conversions.js";
 import { B, C, C3, E, F, G, GS, REST } from "./music/pitches.js";

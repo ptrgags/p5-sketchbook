@@ -1,7 +1,7 @@
-import { Cycle, Gap, Loop, Parallel, Sequential } from "../music/Timeline";
-import { Rational } from "../Rational";
-import { ToneClip } from "./compile_music";
-import { to_tone_time } from "./measure_notation";
+import { Cycle, Gap, Loop, Parallel, Sequential } from "../music/Timeline.js";
+import { Rational } from "../Rational.js";
+import { ToneClip } from "./compile_music.js";
+import { to_tone_time } from "./measure_notation.js";
 
 /**
  * 
