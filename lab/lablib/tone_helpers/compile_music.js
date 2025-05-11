@@ -165,10 +165,18 @@ export function compile_melody(tone, instrument, midi_melody) {
  * @param {import("tone")} tone the Tone.js library
  * @param {import("tone").Synth} instrument the instrument to play
  * @param {Harmony<number>} midi_harmony Harmony of MIDI pitches
- * @returns {Gap | ToneClip | Parallel<ToneClip>} A sequence of generated clips, or undefined if there were no notes
+ * @returns {Parallel<ToneClip>} A sequence of generated clips, or undefined if there were no notes
  */
 export function compile_harmony(tone, instrument, midi_harmony) {
-  throw new Error("not implemented");
+  const clips = [];
+
+  // TODO: this is not ideal for chords.
+  for (const child of midi_harmony.children) {
+    const child_clip = compile_music(tone, instrument, child);
+    clips.push(child_clip);
+  }
+
+  return new Parallel(...clips);
 }
 
 export function is_simple_cycle(music) {
@@ -177,7 +185,7 @@ export function is_simple_cycle(music) {
   }
 
   if (music instanceof MusicCycle) {
-    return music.children.every(x => is_simple_cycle(music));
+    return music.children.every(x => is_simple_cycle(x));
   }
 
   return false;
@@ -311,8 +319,6 @@ export function compile_music(tone, instrument, music) {
   if (music instanceof Loop) {
     return compile_loop(tone, instrument, music);
   }
-
-  throw new Error("Only Melody and Cycle are currently supported");
 }
 
 /**
