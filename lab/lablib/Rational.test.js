@@ -111,4 +111,41 @@ describe("Rational", () => {
       expect(result).toEqual(Rational.INF);
     });
   });
+
+  describe("max", () => {
+    it("max of number and itself is same number", () => {
+      const a = new Rational(2, 3);
+
+      const result = a.max(a);
+
+      expect(result).toBe(a);
+    });
+
+    it("with two positive numbers returns correct maximum", () => {
+      const a = new Rational(2, 3);
+      const b = new Rational(3, 2);
+
+      const result = a.max(b);
+
+      expect(result).toBe(b);
+    });
+
+    it("with two negative numbers returns correct maximum", () => {
+      const a = new Rational(-5, 6);
+      const b = new Rational(-3, 5);
+
+      const result = a.max(b);
+
+      expect(result).toBe(b);
+    });
+
+    it("with negative and positive numbers returns positive one", () => {
+      const a = new Rational(5, 6);
+      const b = new Rational(-3, 5);
+
+      const result = a.max(b);
+
+      expect(result).toBe(a);
+    });
+  });
 });

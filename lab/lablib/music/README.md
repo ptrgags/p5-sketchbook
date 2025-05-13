@@ -11,9 +11,9 @@ This is a blend of a few different ideas from various resources on computational
 
 - (AGoM) _A Geometry of Music_ by Dmitri Tymoczko
     - This book discusses 5 musical symmetries (OPTIC) - octave, permutation, transposition, inversion, and cardinality.
-    - It also describes different pitch space geometries depending on which symmetries are chosen. For example, ordered pairs of pitch classes form a mobius strip
+    - It also describes different pitch space geometries depending on which symmetries are chosen. For example, ordered pairs of pitch classes form a mobius strip.
 - (HSOM) _Haskell School of Music_ by Paul Hudak and Donya Quick
-    - This book describes music in Haskell by combining notes with "sequential composition" (putting notes one after another in time) and "parallel composition" (stacking notes to be played simultaneously)
+    - This book describes music in Haskell by combining notes with "sequential composition" (putting notes one after another in time) and "parallel composition" (stacking notes to be played simultaneously).
 - [Tidal Cycles](https://tidalcycles.org/docs/reference/cycles)
     - This Haskell music library defines a "cycle" - a fixed-length loop of time
     where you can insert music events, spaced evenly. Cycles can be nested

@@ -1,11 +1,13 @@
 import { describe, it, expect } from "vitest";
-import { Cycle, Melody, Note, Rest } from "../music/Score";
+import { MusicCycle, Melody, Note, Rest } from "../music/Score";
 import { compile_part_events, compile_sequence_pattern } from "./compile_music";
 import { N1, N2, N4 } from "../music/durations";
 import { C4, E4, G4, REST } from "../music/pitches";
+import { Gap, Sequential } from "../music/Timeline";
 
 describe("compile_part_events", () => {
   it("with empty melody returns empty array", () => {
+    /** @type{Melody<number>} */
     const empty = new Melody();
 
     const result = compile_part_events(empty);
@@ -14,9 +16,9 @@ describe("compile_part_events", () => {
   });
 
   it("with only rests returns empty array", () => {
-    const empty = new Melody(new Rest(N4), new Rest(N2));
+    const rests = new Melody(new Rest(N4), new Rest(N2));
 
-    const result = compile_part_events(empty);
+    const result = compile_part_events(rests);
 
     expect(result).toEqual([]);
   });
@@ -52,7 +54,7 @@ describe("compile_part_events", () => {
 
 describe("compile_sequence_pattern", () => {
   it("with empty sequence returns empty array", () => {
-    const empty = new Cycle(N1);
+    const empty = new MusicCycle(N1);
 
     const result = compile_sequence_pattern(empty);
 
@@ -60,7 +62,7 @@ describe("compile_sequence_pattern", () => {
   });
 
   it("with notes and rests returns flat array", () => {
-    const cycle = new Cycle(
+    const cycle = new MusicCycle(
       N1,
       new Note(C4, N2),
       new Rest(N4),
@@ -77,12 +79,12 @@ describe("compile_sequence_pattern", () => {
   it("with nested cycles returns nested array", () => {
     const note = new Note(C4, N4);
     const rest = new Rest(N4);
-    const cycle = new Cycle(
+    const cycle = new MusicCycle(
       N1,
       note,
-      new Cycle(N1, note, note),
-      new Cycle(N1, note, new Cycle(N1, rest, rest, note)),
-      new Cycle(N1, note, rest, note)
+      new MusicCycle(N1, note, note),
+      new MusicCycle(N1, note, new MusicCycle(N1, rest, rest, note)),
+      new MusicCycle(N1, note, rest, note)
     );
 
     const result = compile_sequence_pattern(cycle);

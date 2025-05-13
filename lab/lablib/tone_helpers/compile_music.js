@@ -1,20 +1,30 @@
 import { REST } from "../music/pitches.js";
-import { MusicCycle, Melody, Note, Rest, Harmony, MusicLoop, Score } from "../music/Score.js";
+import {
+  MusicCycle,
+  Melody,
+  Note,
+  Rest,
+  Harmony,
+  MusicLoop,
+  Score,
+} from "../music/Score.js";
 import { Gap, Loop, Parallel, Sequential } from "../music/Timeline.js";
 import { Rational } from "../Rational.js";
 import { to_tone_time } from "./measure_notation.js";
 import { to_tone_pitch } from "./to_tone_pitch.js";
 
-
 /**
  * Compile a single note to a musical clip
  * @param {import("tone")} tone Tone.js library
- * @param {import("tone").Synth} instrument ToneJS instrument to play 
+ * @param {import("tone").Synth} instrument ToneJS instrument to play
  * @param {Note<number>} midi_note The MIDI note to play
  * @returns {ToneClip} A tone event
  */
 export function compile_note(tone, instrument, midi_note) {
-  const event = [to_tone_pitch(midi_note.pitch), to_tone_time(midi_note.duration)];
+  const event = [
+    to_tone_pitch(midi_note.pitch),
+    to_tone_time(midi_note.duration),
+  ];
   const tone_event = new tone.ToneEvent((time, note) => {
     const [pitch, duration] = note;
     instrument.triggerAttackRelease(pitch, duration, time);
@@ -76,7 +86,7 @@ export function make_part(tone, instrument, midi_notes) {
  * When melodies have a mix of notes and container types, group them into
  * Melody blocks
  * @template P
- * @param {Melody<P>} melody 
+ * @param {Melody<P>} melody
  * @returns {import("../music/Timeline.js").Timeline<Note<P>>[]} An array of
  * container
  */
@@ -105,7 +115,6 @@ function normalize_melody(melody) {
   return children;
 }
 
-
 /**
  * @param {import("tone")} tone the Tone.js library
  * @param {import("tone").Synth} instrument the instrument to play
@@ -128,7 +137,10 @@ export function compile_melody(tone, instrument, midi_melody) {
     // notes.
     if (loose_notes.length > 0) {
       const part = make_part(tone, instrument, loose_notes);
-      const duration = loose_notes.reduce((acc, x) => acc.add(x.duration), Rational.ZERO);
+      const duration = loose_notes.reduce(
+        (acc, x) => acc.add(x.duration),
+        Rational.ZERO
+      );
       const clip = new ToneClip(part, duration);
       clips.push(clip);
       loose_notes = [];
@@ -181,11 +193,11 @@ export function compile_harmony(tone, instrument, midi_harmony) {
 
 export function is_simple_cycle(music) {
   if (music instanceof Gap || music instanceof Note) {
-    return true
+    return true;
   }
 
   if (music instanceof MusicCycle) {
-    return music.children.every(x => is_simple_cycle(x));
+    return music.children.every((x) => is_simple_cycle(x));
   }
 
   return false;
@@ -199,18 +211,17 @@ export function is_simple_cycle(music) {
  */
 export function compile_cycle(tone, instrument, midi_cycle) {
   if (is_simple_cycle(midi_cycle)) {
-    return compile_sequence(tone, instrument, midi_cycle)
+    return compile_sequence(tone, instrument, midi_cycle);
   }
 
   // a complex cycle will take more thought.
   throw new Error("complex cycles not implemented");
 }
 
-
 /**
- * 
- * @param {MusicCycle<number>} midi_cycle 
- * @returns 
+ *
+ * @param {MusicCycle<number>} midi_cycle
+ * @returns
  */
 export function compile_sequence_pattern(midi_cycle) {
   const beats = [];
@@ -278,7 +289,7 @@ export function compile_loop(tone, instrument, midi_loop) {
 export class ToneClip {
   /**
    * Constructor
-   * @param {import("tone").ToneEvent} material The 
+   * @param {import("tone").ToneEvent} material The
    * @param {Rational} duration The duration of the clip in measures
    */
   constructor(material, duration) {
@@ -322,10 +333,10 @@ export function compile_music(tone, instrument, music) {
 }
 
 /**
- * 
- * @param {import("tone")} tone 
- * @param {{[id: string]: import("tone").Synth}} instruments 
- * @param {Score<number>} score 
+ *
+ * @param {import("tone")} tone
+ * @param {{[id: string]: import("tone").Synth}} instruments
+ * @param {Score<number>} score
  * @returns {import("../music/Timeline.js").Timeline<ToneClip>} A timeline of music clips ready for scheduling.
  */
 export function compile_score(tone, instruments, score) {
