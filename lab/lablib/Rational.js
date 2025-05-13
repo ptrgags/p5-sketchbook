@@ -106,6 +106,19 @@ export class Rational {
 
     return new Rational(a * c, b * d);
   }
+
+  /**
+   * Compute the maximum of two rational numbers
+   * @param {Rational} other Another rational number to compare with
+   * @returns {Rational} The larger rational number
+   */
+  max(other) {
+    if (this.real >= other.real) {
+      return this;
+    }
+
+    return other;
+  }
 }
 
 Rational.ZERO = Object.freeze(new Rational(0, 1));

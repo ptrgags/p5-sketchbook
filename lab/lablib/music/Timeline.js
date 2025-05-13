@@ -61,10 +61,13 @@ export class Parallel {
 
   /**
    * Compute the duration as the max of the children's durations
-   * @type {number}
+   * @type {Rational}
    */
   get duration() {
-    return this.children.reduce((accum, x) => Math.max(accum, x.duration), 0);
+    return this.children.reduce(
+      (accum, x) => accum.max(x.duration),
+      Rational.ZERO
+    );
   }
 }
 

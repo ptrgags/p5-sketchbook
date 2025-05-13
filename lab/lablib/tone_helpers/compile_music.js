@@ -1,5 +1,6 @@
 import { REST } from "../music/pitches.js";
 import { MusicCycle, Melody, Note, Rest } from "../music/Score.js";
+import { Gap, Sequential } from "../music/Timeline.js";
 import { Rational } from "../Rational.js";
 import { to_tone_time } from "./measure_notation.js";
 import { to_tone_pitch } from "./to_tone_pitch.js";
@@ -7,7 +8,7 @@ import { to_tone_pitch } from "./to_tone_pitch.js";
 /**
  * Compile a Melody to the events to pass into Tone.Part Exposed as this method
  * can be tested without needing dependencies on Tone.js
- * @param {Melody<number>} midi_melody Melody in MIDI note values
+ * @param {Sequential<Note<number> | Gap>} midi_melody Melody in MIDI note values
  * @returns {[string, [string, string]][]} Array of (start_time, (pitch, duration))
  * events to pass into the Tone.Part constructor
  */
