@@ -95,6 +95,11 @@ export class Rational {
     return new Rational(numerator, denominator);
   }
 
+  /**
+   * Subtract two rational numbers
+   * @param {Rational} other Another rational number
+   * @returns {Rational} The difference between the rational numbers
+   */
   sub(other) {
     const { numerator: a, denominator: b } = this;
     const { numerator: c, denominator: d } = other;
@@ -127,6 +132,19 @@ export class Rational {
     }
 
     return other;
+  }
+
+  /**
+   * Check if two rational numbers are the same number
+   * @param {Rational} other The other rational number
+   * @returns {boolean} true if the rational numbers are the same
+   */
+  equals(other) {
+    const { numerator: a, denominator: b } = this;
+    const { numerator: c, denominator: d } = other;
+    // Since numerator/denominator are stored in lowest terms, this is a
+    // simple equality test
+    return a === c && b === d;
   }
 }
 

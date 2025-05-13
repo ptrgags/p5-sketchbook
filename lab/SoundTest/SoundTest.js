@@ -13,7 +13,11 @@ import { Rectangle, SCREEN_RECT } from "../lablib/Rectangle.js";
 import { SoundManager } from "../lablib/SoundManager.js";
 import { ToggleButton, ToggleState } from "../lablib/ToggleButton.js";
 import { TouchButton } from "../lablib/TouchButton.js";
-import { layered_melody, phase_scale } from "./example_scores.js";
+import {
+  layered_melody,
+  phase_scale,
+  symmetry_melody,
+} from "./example_scores.js";
 
 const MOUSE = new CanvasMouseHandler();
 const PLAY = new TouchButton(SCREEN_RECT);

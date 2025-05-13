@@ -1,5 +1,5 @@
 import { Harmony, Melody, MusicCycle, MusicLoop, Note, Rest } from "./Score.js";
-import { Gap } from "./Timeline";
+import { Gap } from "./Timeline.js";
 
 /**
  * sdrawkcab cisum eht yalP

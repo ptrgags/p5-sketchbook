@@ -164,4 +164,32 @@ describe("Rational", () => {
       expect(result).toBe(a);
     });
   });
+
+  describe("equals", () => {
+    it("a rational number equals itself", () => {
+      const a = new Rational(-2, 3);
+
+      const result = a.equals(a);
+
+      expect(result).toBe(true);
+    });
+
+    it("with two equivalent fractions returns true", () => {
+      const a = new Rational(2, 3);
+      const b = new Rational(4, 6);
+
+      const result = a.equals(b);
+
+      expect(result).toBe(true);
+    });
+
+    it("with two different fractions returns false", () => {
+      const a = new Rational(3, 4);
+      const b = new Rational(-2, 3);
+
+      const result = a.equals(b);
+
+      expect(result).toBe(false);
+    });
+  });
 });

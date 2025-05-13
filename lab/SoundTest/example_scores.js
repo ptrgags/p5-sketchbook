@@ -1,7 +1,7 @@
-import { N1, N2, N4, N8 } from "../lablib/music/durations";
-import { MidiPitch } from "../lablib/music/pitch_conversions";
-import { A, B, C, C3, D, E, F, G, GS, REST } from "../lablib/music/pitches";
-import { retrograde } from "../lablib/music/retrograde";
+import { N1, N2, N4, N8 } from "../lablib/music/durations.js";
+import { MidiPitch } from "../lablib/music/pitch_conversions.js";
+import { A, B, C, C3, D, E, F, G, GS, REST } from "../lablib/music/pitches.js";
+import { retrograde } from "../lablib/music/retrograde.js";
 import {
   Harmony,
   map_pitch,
@@ -12,9 +12,9 @@ import {
   parse_melody,
   Rest,
   Score,
-} from "../lablib/music/Score";
-import { transpose_scale_degree } from "../lablib/music/transpose";
-import { Rational } from "../lablib/Rational";
+} from "../lablib/music/Score.js";
+import { transpose_scale_degree } from "../lablib/music/transpose.js";
+import { Rational } from "../lablib/Rational.js";
 
 /**
  * Convert a scale to a pitch, using a fixed octave
