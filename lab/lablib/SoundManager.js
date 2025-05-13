@@ -1,12 +1,9 @@
 import { N1, N2, N4, N8 } from "./music/durations.js";
 import { MidiPitch } from "./music/pitch_conversions.js";
 import { B, C, C3, E, F, G, GS, REST } from "./music/pitches.js";
-import { Cycle, Melody, Note } from "./music/Score.js";
+import { parse_melody, parse_cycle, map_pitch } from "./music/Score.js";
 import { Rational } from "./Rational.js";
-import {
-  compile_part,
-  compile_sequence,
-} from "./tone_helpers/compile_music.js";
+import { compile_music } from "./tone_helpers/compile_music.js";
 
 /**
  * Convert a scale to a pitch, using a fixed octave
@@ -96,8 +93,8 @@ export class SoundManager {
   init_patterns() {
     const patterns = this.patterns;
 
-    const pedal_score = Melody.parse([C3, N4], [REST, N4]);
-    const pedal = compile_part(this.tone, this.synths.sine, pedal_score);
+    const pedal_score = parse_melody([C3, N4], [REST, N4]);
+    const pedal = compile_music(this.tone, this.synths.sine, pedal_score);
     pedal.loop = true;
     pedal.loopStart = "0:0";
     pedal.loopEnd = "0:2";
@@ -110,77 +107,59 @@ export class SoundManager {
     const N4D = new Rational(3, 8);
 
     // scores are expressed in scale degrees then converted to pitches
-    const arp_score = Melody.parse(
-      // Measure 1
-      [0, N4],
-      [1, N4],
-      [2, N4],
-      [3, N4],
-      // Measure 2
-      [4, N4D],
-      [REST, N8],
-      [5, N4D],
-      [REST, N8]
-    ).map_pitch(SCALE4);
-    const scale_arp = compile_part(this.tone, this.synths.square, arp_score);
+    const arp_score = map_pitch(
+      SCALE4,
+      parse_melody(
+        // Measure 1
+        [0, N4],
+        [1, N4],
+        [2, N4],
+        [3, N4],
+        // Measure 2
+        [4, N4D],
+        [REST, N8],
+        [5, N4D],
+        [REST, N8]
+      )
+    );
+    const scale_arp = compile_music(this.tone, this.synths.square, arp_score);
     scale_arp.loop = true;
     scale_arp.loopStart = "0:0";
     scale_arp.loopEnd = "2:0";
 
     const cycle_length = N1;
-    const cycle_a_score = Cycle.parse(cycle_length, [
-      0,
-      REST,
-      1,
-      2,
-      REST,
-      4,
-    ]).map_pitch(SCALE5);
-    const cycle_a = compile_sequence(
-      this.tone,
-      this.synths.poly,
-      cycle_a_score
+    const cycle_a_score = map_pitch(
+      SCALE5,
+      parse_cycle(cycle_length, [0, REST, 1, 2, REST, 4])
     );
+    const cycle_a = compile_music(this.tone, this.synths.poly, cycle_a_score);
 
-    const cycle_b_score = Cycle.parse(cycle_length, [
-      [0, 3],
-      [5, REST],
-      [0, 4, 2, 4],
-    ]).map_pitch(SCALE5);
-    const cycle_b = compile_sequence(
-      this.tone,
-      this.synths.poly,
-      cycle_b_score
+    const cycle_b_score = map_pitch(
+      SCALE5,
+      parse_cycle(cycle_length, [
+        [0, 3],
+        [5, REST],
+        [0, 4, 2, 4],
+      ])
     );
+    const cycle_b = compile_music(this.tone, this.synths.poly, cycle_b_score);
 
     // Three scales initially the same, but with different lengths
-    const phase_a_score = Cycle.parse(
-      new Rational(6, 8),
-      [0, 1, 2, 3, 2, 1]
-    ).map_pitch(SCALE3);
-    const phase_a = compile_sequence(
-      this.tone,
-      this.synths.poly,
-      phase_a_score
+    const phase_a_score = map_pitch(
+      SCALE3,
+      parse_cycle(new Rational(6, 8), [0, 1, 2, 3, 2, 1])
     );
-    const phase_b_score = Cycle.parse(
-      new Rational(1, 1),
-      [0, 1, 2, 3, 4, 3, 2, 1]
-    ).map_pitch(SCALE3);
-    const phase_b = compile_sequence(
-      this.tone,
-      this.synths.poly,
-      phase_b_score
+    const phase_a = compile_music(this.tone, this.synths.poly, phase_a_score);
+    const phase_b_score = map_pitch(
+      SCALE3,
+      parse_cycle(new Rational(1, 1), [0, 1, 2, 3, 4, 3, 2, 1])
     );
-    const phase_c_score = Cycle.parse(
-      new Rational(10, 8),
-      [0, 1, 2, 3, 4, 5, 4, 3, 2, 1]
-    ).map_pitch(SCALE3);
-    const phase_c = compile_sequence(
-      this.tone,
-      this.synths.poly,
-      phase_c_score
+    const phase_b = compile_music(this.tone, this.synths.poly, phase_b_score);
+    const phase_c_score = map_pitch(
+      SCALE3,
+      parse_cycle(new Rational(10, 8), [0, 1, 2, 3, 4, 5, 4, 3, 2, 1])
     );
+    const phase_c = compile_music(this.tone, this.synths.poly, phase_c_score);
 
     patterns.pedal = pedal;
     patterns.scale_arp = scale_arp;
