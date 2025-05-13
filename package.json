@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "vitest run",
-    "watch": "vitest"
+    "test-watch": "vitest"
   },
   "author": "Peter Gagliardi",
   "license": "Apache-2.0",
