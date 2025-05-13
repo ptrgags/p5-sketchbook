@@ -8,31 +8,34 @@ import {
   MusicLoop,
   Score,
 } from "../music/Score.js";
-import { Gap, Loop, Parallel, Sequential } from "../music/Timeline.js";
+import {
+  Gap,
+  Loop,
+  Parallel,
+  Sequential,
+  timeline_map,
+} from "../music/Timeline.js";
 import { Rational } from "../Rational.js";
 import { to_tone_time } from "./measure_notation.js";
 import { to_tone_pitch } from "./to_tone_pitch.js";
+import {
+  CycleDescriptor,
+  make_part_clip,
+  make_sequence_clip,
+  PartDescriptor,
+  ToneClip,
+} from "./tone_clips.js";
 
 /**
- * Compile a single note to a musical clip
- * @param {import("tone")} tone Tone.js library
- * @param {import("tone").Synth} instrument ToneJS instrument to play
- * @param {Note<number>} midi_note The MIDI note to play
- * @returns {ToneClip} A tone event
+ * Precompile a lone note to a part. Usually overkill, but it makes scheduling
+ * more consistent.
+ * @param {Note<number>} note a note expressed as MIDI note number
+ * @returns
  */
-export function compile_note(tone, instrument, midi_note) {
-  const event = [
-    to_tone_pitch(midi_note.pitch),
-    to_tone_time(midi_note.duration),
-  ];
-  const tone_event = new tone.ToneEvent((time, note) => {
-    const [pitch, duration] = note;
-    instrument.triggerAttackRelease(pitch, duration, time);
-  }, event);
-
-  tone_event.loop = true;
-
-  return new ToneClip(tone_event, midi_note.duration);
+export function precompile_note(note) {
+  return new PartDescriptor(note.duration, [
+    ["0:0", [to_tone_pitch(note.pitch), to_tone_time(note.duration)]],
+  ]);
 }
 
 /**
@@ -42,7 +45,7 @@ export function compile_note(tone, instrument, midi_note) {
  * @returns {[string, [string, string]][]} Array of (start_time, (pitch, duration))
  * events to pass into the Tone.Part constructor
  */
-export function compile_part_events(midi_notes) {
+export function make_part_events(midi_notes) {
   const events = [];
   let offset = Rational.ZERO;
   for (const note of midi_notes) {
@@ -66,63 +69,12 @@ export function compile_part_events(midi_notes) {
 }
 
 /**
- * @param {import("tone")} tone the Tone.js library
- * @param {import("tone").Synth} instrument the instrument to play
- * @param {(Gap | Note<number>)[]} midi_notes Melody of MIDI pitches
- * @returns {import("tone").Part} The computed part
- */
-export function make_part(tone, instrument, midi_notes) {
-  const events = compile_part_events(midi_notes);
-  const part = new tone.Part((time, note) => {
-    const [pitch, duration] = note;
-    instrument.triggerAttackRelease(pitch, duration, time);
-  }, events);
-
-  part.loop = true;
-  return part;
-}
-
-/**
- * When melodies have a mix of notes and container types, group them into
- * Melody blocks
- * @template P
- * @param {Melody<P>} melody
- * @returns {import("../music/Timeline.js").Timeline<Note<P>>[]} An array of
- * container
- */
-function normalize_melody(melody) {
-  const children = [];
-
-  let current_run = [];
-  for (const child of melody.children) {
-    if (child instanceof Rest || child instanceof Note) {
-      current_run.push(child);
-      continue;
-    }
-
-    if (current_run.length > 0) {
-      children.push(new Melody(...current_run));
-      current_run = [];
-    }
-
-    children.push(child);
-  }
-
-  if (current_run.length > 0) {
-    children.push(new Melody(...current_run));
-  }
-
-  return children;
-}
-
-/**
- * @param {import("tone")} tone the Tone.js library
- * @param {import("tone").Synth} instrument the instrument to play
+ * Precompile sequential musical structure
  * @param {Melody<number>} midi_melody Melody of MIDI pitches
- * @returns {import("../music/Timeline.js").Timeline<ToneClip>} A sequence of generated clips, or undefined if there were no notes
+ * @returns {import("../music/Timeline.js").Timeline<PartDescriptor | CycleDescriptor>} A sequence of generated clips, or undefined if there were no notes
  */
-export function compile_melody(tone, instrument, midi_melody) {
-  const clips = [];
+export function precompile_melody(midi_melody) {
+  const descriptors = [];
 
   /** @type {(Gap | Note<number>)[]} */
   let loose_notes = [];
@@ -136,61 +88,69 @@ export function compile_melody(tone, instrument, midi_melody) {
     // Upon encountering a container type, wrap up the previous run of loose
     // notes.
     if (loose_notes.length > 0) {
-      const part = make_part(tone, instrument, loose_notes);
+      const events = make_part_events(loose_notes);
       const duration = loose_notes.reduce(
         (acc, x) => acc.add(x.duration),
         Rational.ZERO
       );
-      const clip = new ToneClip(part, duration);
-      clips.push(clip);
+
+      const descriptor = new PartDescriptor(duration, events);
+
+      descriptors.push(descriptor);
       loose_notes = [];
     }
 
     if (child instanceof Melody) {
-      const clip = compile_melody(tone, instrument, child);
-      clips.push(clip);
+      const descriptor = precompile_melody(child);
+      descriptors.push(descriptor);
     } else if (child instanceof Harmony) {
-      const clip = compile_harmony(tone, instrument, child);
-      clips.push(clip);
+      const descriptor = precompile_harmony(child);
+      descriptors.push(descriptor);
     } else if (child instanceof MusicCycle) {
-      const clip = compile_cycle(tone, instrument, child);
-      clips.push(clip);
+      const descriptor = precompile_cycle(child);
+      descriptors.push(descriptor);
     } else {
       // MusicLoop
-      const clip = compile_loop(tone, instrument, child);
-      clips.push(clip);
+      const descriptor = precompile_loop(child);
+      descriptors.push(descriptor);
     }
   }
 
-  if (clips.length == 0) {
+  if (descriptors.length == 0) {
     return new Gap(midi_melody.duration);
   }
 
-  if (clips.length == 1) {
-    return clips[0];
+  if (descriptors.length == 1) {
+    return descriptors[0];
   }
 
-  return new Sequential(...clips);
+  return new Sequential(...descriptors);
 }
 
 /**
- * @param {import("tone")} tone the Tone.js library
- * @param {import("tone").Synth} instrument the instrument to play
+ * Precompile parallel music structure
  * @param {Harmony<number>} midi_harmony Harmony of MIDI pitches
- * @returns {Parallel<ToneClip>} A sequence of generated clips, or undefined if there were no notes
+ * @returns {Parallel<PartDescriptor | CycleDescriptor>} A sequence of generated clips, or undefined if there were no notes
  */
-export function compile_harmony(tone, instrument, midi_harmony) {
+export function precompile_harmony(midi_harmony) {
   const clips = [];
 
   // TODO: this is not ideal for chords.
   for (const child of midi_harmony.children) {
-    const child_clip = compile_music(tone, instrument, child);
+    const child_clip = precompile_music(child);
     clips.push(child_clip);
   }
 
   return new Parallel(...clips);
 }
 
+/**
+ * Recursively check if music is a simple cycle, i.e. a Cycle of only
+ * notes, rests or sub-cycles thereof
+ * @template P
+ * @param {import("../music/Score.js").Music<P>} music Music to check
+ * @returns {boolean} True if the music is a simple cycle
+ */
 export function is_simple_cycle(music) {
   if (music instanceof Gap || music instanceof Note) {
     return true;
@@ -204,30 +164,15 @@ export function is_simple_cycle(music) {
 }
 
 /**
- * @param {import("tone")} tone the Tone.js library
- * @param {import("tone").Synth} instrument the instrument to play
- * @param {MusicCycle<number>} midi_cycle Melody of MIDI pitches
- * @returns {ToneClip} A sequence of generated clips, or undefined if there were no notes
+ * Translate a simple cycle to sequence notation that Tone.js uses
+ * @param {MusicCycle<number>} simple_cycle A simple cycle
+ * @returns {import("./tone_clips.js").CyclePattern} the computed pattern
  */
-export function compile_cycle(tone, instrument, midi_cycle) {
-  if (is_simple_cycle(midi_cycle)) {
-    return compile_sequence(tone, instrument, midi_cycle);
-  }
-
-  // a complex cycle will take more thought.
-  throw new Error("complex cycles not implemented");
-}
-
-/**
- *
- * @param {MusicCycle<number>} midi_cycle
- * @returns
- */
-export function compile_sequence_pattern(midi_cycle) {
+export function make_sequence_pattern(simple_cycle) {
   const beats = [];
-  for (const child of midi_cycle.children) {
+  for (const child of simple_cycle.children) {
     if (child instanceof Rest) {
-      beats.push(REST);
+      beats.push(undefined);
       continue;
     }
 
@@ -238,7 +183,7 @@ export function compile_sequence_pattern(midi_cycle) {
     }
 
     if (child instanceof MusicCycle) {
-      const sub_cycle = compile_sequence_pattern(child);
+      const sub_cycle = make_sequence_pattern(child);
       beats.push(sub_cycle);
       continue;
     }
@@ -250,86 +195,84 @@ export function compile_sequence_pattern(midi_cycle) {
 }
 
 /**
- * @param {import("tone")} tone the Tone.js library
- * @param {import("tone").Synth} instrument the instrument to play
- * @param {MusicCycle<number>} midi_cycle Cycle of MIDI notes
- * @returns {ToneClip} The computed part
+ * Precompile a cycle
+ * @param {MusicCycle<number>} midi_cycle Melody of MIDI pitches
+ * @returns {import("../music/Timeline.js").Timeline<PartDescriptor | CycleDescriptor>} The precompiled clips
  */
-export function compile_sequence(tone, instrument, midi_cycle) {
-  const pattern = compile_sequence_pattern(midi_cycle);
-  const beat_duration = midi_cycle.duration.mul(midi_cycle.subdivision);
-  const tone_interval = to_tone_time(beat_duration);
+function precompile_cycle(midi_cycle) {
+  if (is_simple_cycle(midi_cycle)) {
+    const pattern = make_sequence_pattern(midi_cycle);
+    const cycle_duration = midi_cycle.duration;
+    const beat_length = cycle_duration.mul(midi_cycle.subdivision);
+    const interval = to_tone_time(beat_length);
+    return new CycleDescriptor(cycle_duration, interval, pattern);
+  }
 
-  // TODO: Need to compute this, but determining how to pass this to Cycle
-  // would require something other than an array
-  const note_duration = "16n";
-  const seq = new tone.Sequence(
-    (time, pitch) => {
-      instrument.triggerAttackRelease(pitch, note_duration, time);
-    },
-    pattern,
-    tone_interval
-  );
-  seq.loop = true;
-
-  return new ToneClip(seq, midi_cycle.duration);
+  // a complex cycle will take more thought.
+  throw new Error("complex cycles not implemented");
 }
 
 /**
- * @param {import("tone")} tone the Tone.js library
- * @param {import("tone").Synth} instrument the instrument to play
+ * Precompile a loop
  * @param {MusicLoop<number>} midi_loop Loop of MIDI pitches
- * @returns {Loop<ToneClip>} A sequence of generated clips, or undefined if there were no notes
+ * @returns {Loop<PartDescriptor | CycleDescriptor>} A sequence of generated clips, or undefined if there were no notes
  */
-export function compile_loop(tone, instrument, midi_loop) {
-  const child = compile_music(tone, instrument, midi_loop.child);
+function precompile_loop(midi_loop) {
+  const child = precompile_music(midi_loop.child);
   return new Loop(midi_loop.duration, child);
 }
 
-export class ToneClip {
-  /**
-   * Constructor
-   * @param {import("tone").ToneEvent} material The
-   * @param {Rational} duration The duration of the clip in measures
-   */
-  constructor(material, duration) {
-    this.material = material;
-    this.duration = duration;
-  }
-}
-
 /**
- * Compile music to a Tone.js Part or Sequence
- * @param {import("tone")} tone The Tone.js library
- * @param {import("tone").Synth} instrument
+ * Prepare to compile musical material to ToneJS types. This produces data
+ * types to be passed to functions from tone_clips.js. Splitting this out
+ * is helpful for unit testing and debugging, as Tone.js types are rather
+ * opaque due to the callback functions.
  * @param {import("../music/Score.js").Music<number>} music
- * @return {import("../music/Timeline.js").Timeline<ToneClip>} The compiled music clips, or undefined if the timeline is empty
+ * @return {import("../music/Timeline.js").Timeline<PartDescriptor | CycleDescriptor>} The precompiled clips
  */
-export function compile_music(tone, instrument, music) {
+export function precompile_music(music) {
   // A single gap compiles to silence
   if (music instanceof Gap) {
     return music;
   }
 
   if (music instanceof Note) {
-    return compile_note(tone, instrument, music);
+    return precompile_note(music);
   }
 
   if (music instanceof Melody) {
-    return compile_melody(tone, instrument, music);
+    return precompile_melody(music);
   }
 
   if (music instanceof Harmony) {
-    return compile_harmony(tone, instrument, music);
+    return precompile_harmony(music);
   }
 
   if (music instanceof MusicCycle) {
-    return compile_cycle(tone, instrument, music);
+    return precompile_cycle(music);
   }
 
   if (music instanceof Loop) {
-    return compile_loop(tone, instrument, music);
+    return precompile_loop(music);
   }
+}
+
+/**
+ * Compile the music to a set of ToneJS-compatible clips ready for scheduling.
+ * @param {import("tone")} tone The Tone.js library
+ * @param {import("tone").Synth} instrument
+ * @param {import("../music/Score.js").Music<number>} music
+ * @return {import("../music/Timeline.js").Timeline<ToneClip>} The compiled music clips
+ */
+export function compile_music(tone, instrument, music) {
+  const precompiled = precompile_music(music);
+  return timeline_map((x) => {
+    if (x instanceof PartDescriptor) {
+      return make_part_clip(tone, instrument, x);
+    }
+
+    return make_sequence_clip(tone, instrument, x);
+  }, precompiled);
 }
 
 /**
