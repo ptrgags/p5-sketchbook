@@ -55,6 +55,22 @@ describe("Rational", () => {
     });
   });
 
+  describe("sub", () => {
+    it("computes subtraction with common denominator", () => {
+      const a = new Rational(1, 8);
+      const b = new Rational(2, 8);
+
+      const result = b.sub(a);
+
+      const expected = new Rational(1, 8);
+      expect(result).toEqual(expected);
+    });
+
+    it.todo("computes subtraction with different denominators");
+
+    it.todo("subtraction of inf and inf throws error");
+  });
+
   describe("quotient and remainder", () => {
     it("quotient returns the integer quotient", () => {
       const a = new Rational(7, 5);

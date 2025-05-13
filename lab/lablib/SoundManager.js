@@ -1,24 +1,19 @@
 import { N1, N2, N4, N8 } from "./music/durations.js";
 import { MidiPitch } from "./music/pitch_conversions.js";
 import { B, C, C3, E, F, G, GS, REST } from "./music/pitches.js";
-import { parse_melody, parse_cycle, map_pitch, MusicLoop, Melody, Rest, Harmony, Score } from "./music/Score.js";
+import {
+  parse_melody,
+  parse_cycle,
+  map_pitch,
+  MusicLoop,
+  Melody,
+  Rest,
+  Harmony,
+  Score,
+} from "./music/Score.js";
 import { Rational } from "./Rational.js";
 import { compile_music, compile_score } from "./tone_helpers/compile_music.js";
 import { schedule_clips } from "./tone_helpers/schedule_music.js";
-
-/**
- * Convert a scale to a pitch, using a fixed octave
- * @param {number[]} scale Array of pitch classes for the scale
- * @param {number} octave octave number
- * @returns {function(number):number} A callback function for transforming
- * scale degrees to pitches
- */
-function scale_to_pitch(scale, octave) {
-  return (scale_degree) => {
-    const pitch_class = scale[scale_degree];
-    return MidiPitch.from_pitch_octave(pitch_class, octave);
-  };
-}
 
 export class SoundManager {
   /**
@@ -51,8 +46,6 @@ export class SoundManager {
 
     const transport = this.tone.getTransport();
     transport.bpm.value = 128;
-
-    this.init_scores();
 
     this.audio_ready = true;
   }
@@ -93,6 +86,17 @@ export class SoundManager {
     this.synths.poly = poly;
   }
 
+  /**
+   * Compile and save a score
+   * @param {string} score_id The score ID to use. This must be the same as
+   * the ID used for play_score() later.
+   * @param {Score<number>} score Score expressed in MIDI note numbers
+   */
+  register_score(score_id, score) {
+    const compiled = compile_score(this.tone, this.synths, score);
+    this.scores[score_id] = compiled;
+  }
+
   init_scores() {
     const patterns = this.patterns;
 
@@ -103,6 +107,7 @@ export class SoundManager {
     pedal.loopEnd = "0:2";
     */
 
+    /*
     const SCALE = [C, E, F, G, GS, B];
     const SCALE3 = scale_to_pitch(SCALE, 3);
     const SCALE4 = scale_to_pitch(SCALE, 4);
@@ -126,10 +131,13 @@ export class SoundManager {
         [REST, N8]
       )
     );
+    */
+
     /*scale_arp.loop = true;
     scale_arp.loopStart = "0:0";
     scale_arp.loopEnd = "2:0";*/
 
+    /*
     const cycle_length = N1;
     const cycle_a = map_pitch(
       SCALE5,
@@ -145,18 +153,17 @@ export class SoundManager {
       ])
     );
 
-
-
     const sine_part = new MusicLoop(new Rational(34, 1), pedal);
     const square_part = new Melody(
       new Rest(new Rational(2, 1)),
-      new MusicLoop(new Rational(22, 1), scale_arp));
+      new MusicLoop(new Rational(22, 1), scale_arp)
+    );
     const poly_part = new Harmony(
       new Melody(
         new Rest(new Rational(8, 1)),
         new MusicLoop(new Rational(12, 1), cycle_a),
         new Rest(new Rational(4, 1)),
-        new MusicLoop(new Rational(4, 1), cycle_a),
+        new MusicLoop(new Rational(4, 1), cycle_a)
       ),
       new Melody(
         new Rest(new Rational(8, 1)),
@@ -164,10 +171,14 @@ export class SoundManager {
         new Rest(new Rational(4, 1)),
         new MusicLoop(new Rational(4, 1), cycle_b),
         new Rest(new Rational(4, 1)),
-        new MusicLoop(new Rational(4, 1), cycle_b),
+        new MusicLoop(new Rational(4, 1), cycle_b)
       )
-    )
-    const score_a = new Score(["sine", sine_part], ["square", square_part], ["poly", poly_part])
+    );
+    const score_a = new Score(
+      ["sine", sine_part],
+      ["square", square_part],
+      ["poly", poly_part]
+    );
 
     // Three scales initially the same, but with different lengths
     const phase_a = map_pitch(
@@ -183,18 +194,18 @@ export class SoundManager {
       parse_cycle(new Rational(10, 8), [0, 1, 2, 3, 4, 5, 4, 3, 2, 1])
     );
 
-    const phase_part = new MusicLoop(new Rational(30, 1), new Harmony(
-      phase_a,
-      phase_b,
-      phase_c
-    ))
+    const phase_part = new MusicLoop(
+      new Rational(30, 1),
+      new Harmony(phase_a, phase_b, phase_c)
+    );
 
     const score_b = new Score(["poly", phase_part]);
 
     this.scores = {
       score_a: compile_score(this.tone, this.synths, score_a),
-      score_b: compile_score(this.tone, this.synths, score_b)
+      score_b: compile_score(this.tone, this.synths, score_b),
     };
+    */
 
     /*
     patterns.pedal = pedal;
@@ -210,6 +221,21 @@ export class SoundManager {
   stop_the_music() {
     const transport = this.tone.getTransport();
     transport.cancel();
+  }
+
+  play_score(score_id) {
+    const score = this.scores[score_id];
+    if (score === undefined) {
+      throw new Error(`can't play unregistered score ${score_id}`);
+    }
+
+    this.stop_the_music();
+
+    schedule_clips(Rational.ZERO, score);
+
+    const transport = this.tone.getTransport();
+    transport.position = 0;
+    transport.start("+0.1", "0:0");
   }
 
   melody_a() {

@@ -13,6 +13,7 @@ import { Rectangle, SCREEN_RECT } from "../lablib/Rectangle.js";
 import { SoundManager } from "../lablib/SoundManager.js";
 import { ToggleButton, ToggleState } from "../lablib/ToggleButton.js";
 import { TouchButton } from "../lablib/TouchButton.js";
+import { layered_melody, phase_scale } from "./example_scores.js";
 
 const MOUSE = new CanvasMouseHandler();
 const PLAY = new TouchButton(SCREEN_RECT);
@@ -113,6 +114,13 @@ const MELODY_B_BUTTON = new TouchButton(
   )
 );
 
+const MELODY_C_BUTTON = new TouchButton(
+  new Rectangle(
+    Point.point(MARGIN, HEIGHT / 2 + MELODY_BUTTON_SIZE / 2),
+    Point.direction(MELODY_BUTTON_SIZE, MELODY_BUTTON_SIZE)
+  )
+);
+
 class PlayButtonScene {
   draw(p) {
     const play_button = PLAY.debug_render();
@@ -144,13 +152,19 @@ class SoundScene {
     //const sound_toggle = SOUND_TOGGLE.debug_render();
     const melody_a = MELODY_A_BUTTON.debug_render();
     const melody_b = MELODY_B_BUTTON.debug_render();
+    const melody_c = MELODY_C_BUTTON.debug_render();
 
     const speaker =
       SOUND_TOGGLE.toggle_state == SOUND_OFF
         ? [SPEAKER, SPEAKER_SLASH]
         : [SPEAKER];
 
-    const scene = new GroupPrimitive([...speaker, melody_a, melody_b]);
+    const scene = new GroupPrimitive([
+      ...speaker,
+      melody_a,
+      melody_b,
+      melody_c,
+    ]);
     draw_primitive(p, scene);
 
     p.push();
@@ -159,6 +173,12 @@ class SoundScene {
     p.textAlign(p.CENTER);
     p.text("Melody A", MARGIN + MELODY_BUTTON_SIZE / 2, HEIGHT / 2);
     p.text("Melody B", WIDTH - MARGIN - MELODY_BUTTON_SIZE / 2, HEIGHT / 2);
+    p.text(
+      "Melody C",
+      MARGIN + MELODY_BUTTON_SIZE / 2,
+      HEIGHT / 2 + MELODY_BUTTON_SIZE
+    );
+
     p.pop();
   }
 
@@ -166,24 +186,28 @@ class SoundScene {
     SOUND_TOGGLE.mouse_pressed(input.mouse_coords);
     MELODY_A_BUTTON.mouse_pressed(input.mouse_coords);
     MELODY_B_BUTTON.mouse_pressed(input.mouse_coords);
+    MELODY_C_BUTTON.mouse_pressed(input.mouse_coords);
   }
 
   mouse_moved(input) {
     SOUND_TOGGLE.mouse_moved(input.mouse_coords);
     MELODY_A_BUTTON.mouse_moved(input.mouse_coords);
     MELODY_B_BUTTON.mouse_moved(input.mouse_coords);
+    MELODY_C_BUTTON.mouse_moved(input.mouse_coords);
   }
 
   mouse_dragged(input) {
     SOUND_TOGGLE.mouse_dragged(input.mouse_coords);
     MELODY_A_BUTTON.mouse_dragged(input.mouse_coords);
     MELODY_B_BUTTON.mouse_dragged(input.mouse_coords);
+    MELODY_C_BUTTON.mouse_dragged(input.mouse_coords);
   }
 
   mouse_released(input) {
     SOUND_TOGGLE.mouse_released(input.mouse_coords);
     MELODY_A_BUTTON.mouse_released(input.mouse_coords);
     MELODY_B_BUTTON.mouse_released(input.mouse_coords);
+    MELODY_C_BUTTON.mouse_released(input.mouse_coords);
   }
 }
 
@@ -197,8 +221,11 @@ export const sketch = (p) => {
       document.getElementById("sketch-canvas")
     ).elt;
 
-    PLAY.events.addEventListener("click", () => {
-      SOUND.init();
+    PLAY.events.addEventListener("click", async () => {
+      await SOUND.init();
+      SOUND.register_score("melody_a", layered_melody());
+      SOUND.register_score("melody_b", phase_scale());
+      SOUND.register_score("melody_c", symmetry_melody());
       scene = new SoundScene();
     });
 
@@ -212,11 +239,15 @@ export const sketch = (p) => {
     );
 
     MELODY_A_BUTTON.events.addEventListener("click", () => {
-      SOUND.melody_a();
+      SOUND.play_score("melody_a");
     });
 
     MELODY_B_BUTTON.events.addEventListener("click", () => {
-      SOUND.melody_b();
+      SOUND.play_score("melody_b");
+    });
+
+    MELODY_C_BUTTON.events.addEventListener("click", () => {
+      SOUND.play_score("melody_c");
     });
 
     MOUSE.setup(canvas);
