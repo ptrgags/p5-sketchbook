@@ -110,6 +110,7 @@ export function phase_scale() {
     [0, 1, 2, 3, 4, 5, 4, 3, 2, 1]
   );
 
+  // lcm(6, 8, 10) = 120, divide by 4 to get number of measures, 30
   const phase_part_scale = new MusicLoop(
     new Rational(30, 1),
     new Harmony(phase_a, phase_b, phase_c)

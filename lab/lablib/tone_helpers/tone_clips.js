@@ -1,4 +1,5 @@
 import { Rational } from "../Rational.js";
+import { to_tone_time } from "./measure_notation.js";
 
 export class PartDescriptor {
   /**
@@ -37,6 +38,8 @@ export function make_part_clip(tone, instrument, descriptor) {
   }, descriptor.events);
 
   part.loop = true;
+  part.loopStart = "0:0";
+  part.loopEnd = to_tone_time(descriptor.duration);
   return new ToneClip(part, descriptor.duration);
 }
 
