@@ -81,9 +81,14 @@ export class SoundManager {
     }).toDestination();
     poly.volume.value = -9;
 
+    const supersaw = new this.tone.PolySynth(this.tone.Synth, {
+      oscillator: { type: "fatsawtooth" },
+    });
+
     this.synths.sine = sine;
     this.synths.square = square;
     this.synths.poly = poly;
+    this.synths.supersaw = supersaw;
   }
 
   /**
@@ -231,7 +236,11 @@ export class SoundManager {
 
     this.stop_the_music();
 
-    schedule_clips(Rational.ZERO, score);
+    const schedule = schedule_clips(Rational.ZERO, score);
+    console.log(schedule);
+    for (const [clip, start_time, end_time] of schedule) {
+      clip.material.start(start_time).stop(end_time);
+    }
 
     const transport = this.tone.getTransport();
     transport.position = 0;
@@ -255,7 +264,8 @@ export class SoundManager {
       .start("28:0")
       .stop("32:0");
       */
-    schedule_clips(Rational.ZERO, this.scores.score_a);
+    const clips = schedule_clips(Rational.ZERO, this.scores.score_a);
+    console.log(clips);
 
     const transport = this.tone.getTransport();
     transport.position = 0;
