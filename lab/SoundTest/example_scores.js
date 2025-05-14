@@ -111,9 +111,11 @@ export function phase_scale() {
   );
 
   // lcm(6, 8, 10) = 120, divide by 4 to get number of measures, 30
-  const phase_part_scale = new MusicLoop(
-    new Rational(30, 1),
-    new Harmony(phase_a, phase_b, phase_c)
+  const total_duration = new Rational(30, 1);
+  const phase_part_scale = new Harmony(
+    new MusicLoop(total_duration, phase_a),
+    new MusicLoop(total_duration, phase_b),
+    new MusicLoop(total_duration, phase_c)
   );
 
   const phase_part_midi = map_pitch(SCALE3, phase_part_scale);
@@ -132,14 +134,29 @@ const MAJOR_SCALE = scale_degree_to_pitch(MAJOR_SCALE_PITCHES, 4);
 
 export function symmetry_melody() {
   // The top line plays a short motif while the bottom line holds a long note.
-  const top_motif = parse_melody([0, N4], [2, N2], [4, N8], [2, N8], [8, N1]);
-  const bottom_motif = new Note(0, N1.mul(Rational.ONE));
+  const top_motif = parse_melody(
+    [0, N4],
+    [2, N2],
+    [4, N8],
+    [2, N8],
+    [7, N4],
+    [6, N4],
+    [5, N4],
+    [4, N4]
+  );
+  const bottom_motif = new Note(0, new Rational(2, 1));
 
   const motif_scale = new Harmony(top_motif, bottom_motif);
 
   const motif_third = transpose_scale_degree(2, motif_scale);
   const motif_sixth = transpose_scale_degree(4, motif_scale);
   const motif_ninth = transpose_scale_degree(8, motif_scale);
+
+  const final_chord = new Harmony(
+    new Note(0, N1),
+    new Note(2, N1),
+    new Note(4, N1)
+  );
 
   const sequence = new Melody(
     motif_scale,
@@ -148,7 +165,7 @@ export function symmetry_melody() {
     motif_ninth
   );
   const sequence_retrograde = retrograde(sequence);
-  const part_scale = new Melody(sequence, sequence_retrograde);
+  const part_scale = new Melody(sequence, sequence_retrograde, final_chord);
 
   const part_midi = map_pitch(MAJOR_SCALE, part_scale);
 

@@ -69,7 +69,7 @@ export class SoundManager {
 
     const supersaw = new this.tone.PolySynth(this.tone.Synth, {
       oscillator: { type: "fatsawtooth" },
-    });
+    }).toDestination();
 
     this.synths.sine = sine;
     this.synths.square = square;
@@ -102,7 +102,6 @@ export class SoundManager {
     this.stop_the_music();
 
     const schedule = schedule_clips(Rational.ZERO, score);
-    console.log(schedule);
     for (const [clip, start_time, end_time] of schedule) {
       clip.material.start(start_time).stop(end_time);
     }
