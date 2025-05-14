@@ -1,14 +1,14 @@
 import { Cycle, Gap, Loop, Parallel, Sequential } from "../music/Timeline.js";
 import { Rational } from "../Rational.js";
 import { to_tone_time } from "./measure_notation.js";
-import { ToneClip } from "./tone_clips.js";
 
 /**
  * Schedule a cropped version of the loop's child.
+ * @template {import("../music/Timeline.js").TimeInterval} T
  * @param {Rational} offset
  * @param {Rational} crop_duration
- * @param {Loop<ToneClip>} loop
- * @returns {[ToneClip, string, string][]}
+ * @param {Loop<T>} loop
+ * @returns {[T, string, string][]}
  */
 function crop_loop(offset, crop_duration, loop) {
   const { duration, child } = loop;
@@ -16,14 +16,6 @@ function crop_loop(offset, crop_duration, loop) {
   if (child instanceof Gap) {
     // No events to schedule
     return [];
-  }
-
-  if (child instanceof ToneClip) {
-    const start = offset;
-    const end = start.add(crop_duration);
-    const start_time = to_tone_time(start);
-    const end_time = to_tone_time(end);
-    return [[child, start_time, end_time]];
   }
 
   if (child instanceof Sequential) {
@@ -41,20 +33,28 @@ function crop_loop(offset, crop_duration, loop) {
   if (child instanceof Cycle) {
     throw new Error("not implemented: crop nested loop");
   }
+
+  // child is type T
+  const start = offset;
+  const end = start.add(crop_duration);
+  const start_time = to_tone_time(start);
+  const end_time = to_tone_time(end);
+  return [[child, start_time, end_time]];
 }
 
 /**
  * Schedule a loop repeating to the end
+ * @template {import("../music/Timeline.js").TimeInterval} T
  * @param {Rational} offset
- * @param {Loop<ToneClip>} loop
- * @returns {[ToneClip, string, string][]}
+ * @param {Loop<T>} loop
+ * @returns {[T, string, string][]}
  */
 function repeat_loop(offset, loop) {
   const { duration, child } = loop;
 
   const schedule = [];
 
-  const full_repeats = Math.floor(child.duration.real / duration.real);
+  const full_repeats = Math.floor(duration.real / child.duration.real);
   for (let i = 0; i < full_repeats; i++) {
     const repeat_offset = offset.add(child.duration.mul(new Rational(i, 1)));
     const child_clips = schedule_clips(repeat_offset, child);
@@ -74,9 +74,10 @@ function repeat_loop(offset, loop) {
 
 /**
  *
+ * @template {import("../music/Timeline.js").TimeInterval} T
  * @param {Rational} offset
- * @param {Loop<ToneClip>} loop
- * @returns {[ToneClip, string, string][]}
+ * @param {Loop<T>} loop
+ * @returns {[T, string, string][]}
  */
 function schedule_loop(offset, loop) {
   const { duration, child } = loop;
@@ -91,29 +92,25 @@ function schedule_loop(offset, loop) {
 
 /**
  * Schedule a cycle of inner clips
+ * @template {import("../music/Timeline.js").TimeInterval} T
  * @param {Rational} offset
- * @param {Cycle<ToneClip>} clips
- * @returns {[ToneClip, string, string][]}
+ * @param {Cycle<T>} clips
+ * @returns {[T, string, string][]}
  */
 function schedule_cycle(offset, clips) {
-  return [];
+  throw new Error("not implemented: complex cycle");
 }
 
 /**
  * Schedule clips
+ * @template {import("../music/Timeline.js").TimeInterval} T
  * @param {Rational} offset
- * @param {import("../music/Timeline").Timeline<ToneClip>} clips
- * @return {[ToneClip, string, string][]} Sequence of clips to schedule.
+ * @param {import("../music/Timeline").Timeline<T>} clips
+ * @return {[T, string, string][]} Sequence of clips to schedule.
  */
 export function schedule_clips(offset, clips) {
   if (clips instanceof Gap) {
     return [];
-  } else if (clips instanceof ToneClip) {
-    const start = offset;
-    const end = start.add(clips.duration);
-    const start_time = to_tone_time(start);
-    const end_time = to_tone_time(end);
-    return [[clips, start_time, end_time]];
   } else if (clips instanceof Sequential) {
     let start = offset;
     const schedule = [];
@@ -129,5 +126,12 @@ export function schedule_clips(offset, clips) {
     return schedule_loop(offset, clips);
   } else if (clips instanceof Cycle) {
     return schedule_cycle(offset, clips);
+  } else {
+    // Plain interval
+    const start = offset;
+    const end = start.add(clips.duration);
+    const start_time = to_tone_time(start);
+    const end_time = to_tone_time(end);
+    return [[clips, start_time, end_time]];
   }
 }
