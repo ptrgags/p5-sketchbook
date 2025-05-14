@@ -32,7 +32,7 @@ import {
  * @param {Note<number>} note a note expressed as MIDI note number
  * @returns
  */
-export function precompile_note(note) {
+function precompile_note(note) {
   return new PartDescriptor(note.duration, [
     ["0:0", [to_tone_pitch(note.pitch), to_tone_time(note.duration)]],
   ]);
@@ -45,7 +45,7 @@ export function precompile_note(note) {
  * @returns {[string, [string, string]][]} Array of (start_time, (pitch, duration))
  * events to pass into the Tone.Part constructor
  */
-export function make_part_events(midi_notes) {
+function make_part_events(midi_notes) {
   const events = [];
   let offset = Rational.ZERO;
   for (const note of midi_notes) {
@@ -69,11 +69,23 @@ export function make_part_events(midi_notes) {
 }
 
 /**
+ * Make a single ToneJS part descriptor from an array of notes
+ * @param {(Gap | Note<number>)[]} notes MIDI notes
+ * @returns {PartDescriptor} The computed part descriptor
+ */
+function make_melody_part(notes) {
+  const events = make_part_events(notes);
+  const duration = notes.reduce((acc, x) => acc.add(x.duration), Rational.ZERO);
+
+  return new PartDescriptor(duration, events);
+}
+
+/**
  * Precompile sequential musical structure
  * @param {Melody<number>} midi_melody Melody of MIDI pitches
  * @returns {import("../music/Timeline.js").Timeline<PartDescriptor | CycleDescriptor>} A sequence of generated clips, or undefined if there were no notes
  */
-export function precompile_melody(midi_melody) {
+function precompile_melody(midi_melody) {
   const descriptors = [];
 
   /** @type {(Gap | Note<number>)[]} */
@@ -88,14 +100,7 @@ export function precompile_melody(midi_melody) {
     // Upon encountering a container type, wrap up the previous run of loose
     // notes.
     if (loose_notes.length > 0) {
-      const events = make_part_events(loose_notes);
-      const duration = loose_notes.reduce(
-        (acc, x) => acc.add(x.duration),
-        Rational.ZERO
-      );
-
-      const descriptor = new PartDescriptor(duration, events);
-
+      const descriptor = make_melody_part(loose_notes);
       descriptors.push(descriptor);
       loose_notes = [];
     }
@@ -116,6 +121,11 @@ export function precompile_melody(midi_melody) {
     }
   }
 
+  if (loose_notes.length > 0) {
+    const descriptor = make_melody_part(loose_notes);
+    descriptors.push(descriptor);
+  }
+
   if (descriptors.length == 0) {
     return new Gap(midi_melody.duration);
   }
@@ -132,7 +142,7 @@ export function precompile_melody(midi_melody) {
  * @param {Harmony<number>} midi_harmony Harmony of MIDI pitches
  * @returns {Parallel<PartDescriptor | CycleDescriptor>} A sequence of generated clips, or undefined if there were no notes
  */
-export function precompile_harmony(midi_harmony) {
+function precompile_harmony(midi_harmony) {
   const clips = [];
 
   // TODO: this is not ideal for chords.
@@ -151,7 +161,7 @@ export function precompile_harmony(midi_harmony) {
  * @param {import("../music/Score.js").Music<P>} music Music to check
  * @returns {boolean} True if the music is a simple cycle
  */
-export function is_simple_cycle(music) {
+function is_simple_cycle(music) {
   if (music instanceof Gap || music instanceof Note) {
     return true;
   }
@@ -168,7 +178,7 @@ export function is_simple_cycle(music) {
  * @param {MusicCycle<number>} simple_cycle A simple cycle
  * @returns {import("./tone_clips.js").CyclePattern} the computed pattern
  */
-export function make_sequence_pattern(simple_cycle) {
+function make_sequence_pattern(simple_cycle) {
   const beats = [];
   for (const child of simple_cycle.children) {
     if (child instanceof Rest) {
@@ -227,6 +237,8 @@ function precompile_loop(midi_loop) {
  * types to be passed to functions from tone_clips.js. Splitting this out
  * is helpful for unit testing and debugging, as Tone.js types are rather
  * opaque due to the callback functions.
+ * Exported only for testing
+ * @private
  * @param {import("../music/Score.js").Music<number>} music
  * @return {import("../music/Timeline.js").Timeline<PartDescriptor | CycleDescriptor>} The precompiled clips
  */
