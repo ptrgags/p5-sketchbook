@@ -66,9 +66,22 @@ describe("Rational", () => {
       expect(result).toEqual(expected);
     });
 
-    it.todo("computes subtraction with different denominators");
+    it("computes subtraction with different denominators", () => {
+      const a = new Rational(1, 3);
+      const b = new Rational(1, 2);
 
-    it.todo("subtraction of inf and inf throws error");
+      const result = a.sub(b);
+
+      // 1/3 - 1/2 = 2/6 - 3/6 = -1/6
+      const expected = new Rational(-1, 6);
+      expect(result).toEqual(expected);
+    });
+
+    it("subtraction of inf and inf throws error", () => {
+      expect(() => {
+        return Rational.INF.sub(Rational.INF);
+      }).toThrowError("cannot divide 0 by 0");
+    });
   });
 
   describe("quotient and remainder", () => {
