@@ -55,6 +55,35 @@ describe("Rational", () => {
     });
   });
 
+  describe("sub", () => {
+    it("computes subtraction with common denominator", () => {
+      const a = new Rational(1, 8);
+      const b = new Rational(2, 8);
+
+      const result = b.sub(a);
+
+      const expected = new Rational(1, 8);
+      expect(result).toEqual(expected);
+    });
+
+    it("computes subtraction with different denominators", () => {
+      const a = new Rational(1, 3);
+      const b = new Rational(1, 2);
+
+      const result = a.sub(b);
+
+      // 1/3 - 1/2 = 2/6 - 3/6 = -1/6
+      const expected = new Rational(-1, 6);
+      expect(result).toEqual(expected);
+    });
+
+    it("subtraction of inf and inf throws error", () => {
+      expect(() => {
+        return Rational.INF.sub(Rational.INF);
+      }).toThrowError("cannot divide 0 by 0");
+    });
+  });
+
   describe("quotient and remainder", () => {
     it("quotient returns the integer quotient", () => {
       const a = new Rational(7, 5);
@@ -146,6 +175,34 @@ describe("Rational", () => {
       const result = a.max(b);
 
       expect(result).toBe(a);
+    });
+  });
+
+  describe("equals", () => {
+    it("a rational number equals itself", () => {
+      const a = new Rational(-2, 3);
+
+      const result = a.equals(a);
+
+      expect(result).toBe(true);
+    });
+
+    it("with two equivalent fractions returns true", () => {
+      const a = new Rational(2, 3);
+      const b = new Rational(4, 6);
+
+      const result = a.equals(b);
+
+      expect(result).toBe(true);
+    });
+
+    it("with two different fractions returns false", () => {
+      const a = new Rational(3, 4);
+      const b = new Rational(-2, 3);
+
+      const result = a.equals(b);
+
+      expect(result).toBe(false);
     });
   });
 });

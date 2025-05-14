@@ -133,7 +133,7 @@ export function map_pitch(pitch_func, music) {
 }
 
 /**
- * @typedef {number} Instrument
+ * @typedef {string} Instrument
  */
 
 /**
