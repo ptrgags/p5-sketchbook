@@ -70,6 +70,7 @@ export class SoundManager {
     const supersaw = new this.tone.PolySynth(this.tone.Synth, {
       oscillator: { type: "fatsawtooth" },
     }).toDestination();
+    supersaw.volume.value = -9;
 
     this.synths.sine = sine;
     this.synths.square = square;
