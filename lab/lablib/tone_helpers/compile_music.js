@@ -30,7 +30,7 @@ import {
  * Precompile a lone note to a part. Usually overkill, but it makes scheduling
  * more consistent.
  * @param {Note<number>} note a note expressed as MIDI note number
- * @returns
+ * @returns {PartDescriptor} A part for the single note.
  */
 function precompile_note(note) {
   return new PartDescriptor(note.duration, [
@@ -272,8 +272,8 @@ export function precompile_music(music) {
 /**
  * Compile the music to a set of ToneJS-compatible clips ready for scheduling.
  * @param {import("tone")} tone The Tone.js library
- * @param {import("tone").Synth} instrument
- * @param {import("../music/Score.js").Music<number>} music
+ * @param {import("tone").Synth} instrument The instrument that will play the material
+ * @param {import("../music/Score.js").Music<number>} music The musical material
  * @return {import("../music/Timeline.js").Timeline<ToneClip>} The compiled music clips
  */
 export function compile_music(tone, instrument, music) {
@@ -288,10 +288,11 @@ export function compile_music(tone, instrument, music) {
 }
 
 /**
- *
- * @param {import("tone")} tone
- * @param {{[id: string]: import("tone").Synth}} instruments
- * @param {Score<number>} score
+ * Compile a score to a set of ToneJS compatible clips ready for scheduling. This
+ * bakes the instruments into the callbacks
+ * @param {import("tone")} tone the Tone.js library
+ * @param {{[id: string]: import("tone").Synth}} instruments The set of available instruments
+ * @param {Score<number>} score The score of music
  * @returns {import("../music/Timeline.js").Timeline<ToneClip>} A timeline of music clips ready for scheduling.
  */
 export function compile_score(tone, instruments, score) {

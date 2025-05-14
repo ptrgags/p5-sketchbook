@@ -5,10 +5,10 @@ import { to_tone_time } from "./measure_notation.js";
 /**
  * Schedule a cropped version of the loop's child.
  * @template {import("../music/Timeline.js").TimeInterval} T
- * @param {Rational} offset
- * @param {Rational} crop_duration
- * @param {Loop<T>} loop
- * @returns {[T, string, string][]}
+ * @param {Rational} offset The start of the loop in the overall timeline
+ * @param {Rational} crop_duration The desired length after cropping
+ * @param {Loop<T>} loop The loop to crop
+ * @returns {[T, string, string][]} The event(s) to schedule for the cropped loop
  */
 function crop_loop(offset, crop_duration, loop) {
   const { duration, child } = loop;
@@ -43,11 +43,12 @@ function crop_loop(offset, crop_duration, loop) {
 }
 
 /**
- * Schedule a loop repeating to the end
+ * Schedule a loop repeating to the end. This will produce several entries
+ * for the same event with different start/end times.
  * @template {import("../music/Timeline.js").TimeInterval} T
- * @param {Rational} offset
- * @param {Loop<T>} loop
- * @returns {[T, string, string][]}
+ * @param {Rational} offset Starting of the first loop in the overall timeline
+ * @param {Loop<T>} loop The loop to repeat
+ * @returns {[T, string, string][]} The events to schedule from the repeated loop.
  */
 function repeat_loop(offset, loop) {
   const { duration, child } = loop;
@@ -73,11 +74,11 @@ function repeat_loop(offset, loop) {
 }
 
 /**
- *
+ * Schedule a loop, repeating/cropping as necessary
  * @template {import("../music/Timeline.js").TimeInterval} T
- * @param {Rational} offset
- * @param {Loop<T>} loop
- * @returns {[T, string, string][]}
+ * @param {Rational} offset The start of the first loop in the overall timeline
+ * @param {Loop<T>} loop The loop to schedule
+ * @returns {[T, string, string][]} The events for this loop
  */
 function schedule_loop(offset, loop) {
   const { duration, child } = loop;
@@ -93,20 +94,20 @@ function schedule_loop(offset, loop) {
 /**
  * Schedule a cycle of inner clips
  * @template {import("../music/Timeline.js").TimeInterval} T
- * @param {Rational} offset
- * @param {Cycle<T>} clips
- * @returns {[T, string, string][]}
+ * @param {Rational} offset The start of the cycle in the overall timeline
+ * @param {Cycle<T>} cycle The cycle to schedule
+ * @returns {[T, string, string][]} The scheduled events
  */
-function schedule_cycle(offset, clips) {
+function schedule_cycle(offset, cycle) {
   throw new Error("not implemented: complex cycle");
 }
 
 /**
- * Schedule clips
+ * Schedule clips, producing a list of events and start/end times.
  * @template {import("../music/Timeline.js").TimeInterval} T
- * @param {Rational} offset
- * @param {import("../music/Timeline").Timeline<T>} clips
- * @return {[T, string, string][]} Sequence of clips to schedule.
+ * @param {Rational} offset Start of the music in the overall timeline
+ * @param {import("../music/Timeline").Timeline<T>} clips The music clips to schedule
+ * @return {[T, string, string][]} Sequence of events to schedule
  */
 export function schedule_clips(offset, clips) {
   if (clips instanceof Gap) {
