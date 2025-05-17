@@ -9,6 +9,8 @@ import {
 } from "../../sketchlib/primitives.js";
 import { Style } from "../../sketchlib/Style.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
+import { MuteButton } from "../lablib/MuteButton.js";
+import { PlayButtonScene } from "../lablib/PlayButtonScene.js";
 import { Rectangle, SCREEN_RECT } from "../lablib/Rectangle.js";
 import { SoundManager } from "../lablib/SoundManager.js";
 import { ToggleButton, ToggleState } from "../lablib/ToggleButton.js";
@@ -21,71 +23,17 @@ import {
 
 const MOUSE = new CanvasMouseHandler();
 
-const SOUND_ON = ToggleState.STATE_A;
-const SOUND_OFF = ToggleState.STATE_B;
-const SOUND_TOGGLE_SIZE = 50;
-const SOUND_TOGGLE_CORNER = Point.point(WIDTH - SOUND_TOGGLE_SIZE, 0);
-const SOUND_TOGGLE = new ToggleButton(
-  new Rectangle(
-    SOUND_TOGGLE_CORNER,
-    Point.direction(SOUND_TOGGLE_SIZE, SOUND_TOGGLE_SIZE)
-  ),
-  SOUND_ON
-);
-
-const SPEAKER_CONE = new PolygonPrimitive([
-  SOUND_TOGGLE_CORNER.add(Point.direction(8, 4)),
-  SOUND_TOGGLE_CORNER.add(Point.direction(8, SOUND_TOGGLE_SIZE - 4)),
-  SOUND_TOGGLE_CORNER.add(
-    Point.direction(
-      SOUND_TOGGLE_SIZE / 2,
-      SOUND_TOGGLE_SIZE - SOUND_TOGGLE_SIZE / 3
-    )
-  ),
-  SOUND_TOGGLE_CORNER.add(
-    Point.direction(SOUND_TOGGLE_SIZE / 2, SOUND_TOGGLE_SIZE / 3)
-  ),
-]);
-const SPEAKER_BASE = new PolygonPrimitive([
-  SOUND_TOGGLE_CORNER.add(
-    Point.direction(SOUND_TOGGLE_SIZE / 2, SOUND_TOGGLE_SIZE / 3)
-  ),
-  SOUND_TOGGLE_CORNER.add(
-    Point.direction(
-      SOUND_TOGGLE_SIZE / 2,
-      SOUND_TOGGLE_SIZE - SOUND_TOGGLE_SIZE / 3
-    )
-  ),
-  SOUND_TOGGLE_CORNER.add(
-    Point.direction(
-      SOUND_TOGGLE_SIZE / 2 + 10,
-      SOUND_TOGGLE_SIZE - SOUND_TOGGLE_SIZE / 3
-    )
-  ),
-  SOUND_TOGGLE_CORNER.add(
-    Point.direction(SOUND_TOGGLE_SIZE / 2 + 10, SOUND_TOGGLE_SIZE / 3)
-  ),
-]);
-
-const SPEAKER = new GroupPrimitive(
-  [SPEAKER_BASE, SPEAKER_CONE],
-  new Style({ stroke: Color.WHITE })
-);
-
-const SPEAKER_SLASH = new GroupPrimitive(
-  [
-    new LinePrimitive(
-      SOUND_TOGGLE_CORNER.add(Point.direction(2, 2)),
-      SOUND_TOGGLE_CORNER.add(
-        Point.direction((3 * SOUND_TOGGLE_SIZE) / 4 - 2, SOUND_TOGGLE_SIZE - 2)
-      )
-    ),
-  ],
-  new Style({ stroke: Color.RED })
-);
+/**@type {import("../lablib/SoundManager.js").SoundManifest} */
+const SOUND_MANIFEST = {
+  scores: {
+    melody_a: layered_melody(),
+    melody_b: phase_scale(),
+    melody_c: symmetry_melody(),
+  },
+};
 
 //@ts-ignore
-const SOUND = new SoundManager(Tone);
+const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
 
 const MARGIN = 50;
 const MELODY_BUTTON_SIZE = 150;
@@ -114,23 +62,25 @@ const MELODY_C_BUTTON = new TouchButton(
 );
 
 class SoundScene {
+  constructor(sound) {
+    this.sound = sound;
+    this.mute_button = new MuteButton();
+
+    this.mute_button.events.addEventListener(
+      "change",
+      (/** @type {CustomEvent}*/ e) => {
+        this.sound.toggle_sound(e.detail.sound_on);
+      }
+    );
+  }
+
   draw(p) {
-    //const sound_toggle = SOUND_TOGGLE.debug_render();
+    const mute = this.mute_button.render();
     const melody_a = MELODY_A_BUTTON.debug_render();
     const melody_b = MELODY_B_BUTTON.debug_render();
     const melody_c = MELODY_C_BUTTON.debug_render();
 
-    const speaker =
-      SOUND_TOGGLE.toggle_state == SOUND_OFF
-        ? [SPEAKER, SPEAKER_SLASH]
-        : [SPEAKER];
-
-    const scene = new GroupPrimitive([
-      ...speaker,
-      melody_a,
-      melody_b,
-      melody_c,
-    ]);
+    const scene = new GroupPrimitive([mute, melody_a, melody_b, melody_c]);
     draw_primitive(p, scene);
 
     p.push();
@@ -149,28 +99,28 @@ class SoundScene {
   }
 
   mouse_pressed(input) {
-    SOUND_TOGGLE.mouse_pressed(input.mouse_coords);
+    this.mute_button.mouse_pressed(input);
     MELODY_A_BUTTON.mouse_pressed(input.mouse_coords);
     MELODY_B_BUTTON.mouse_pressed(input.mouse_coords);
     MELODY_C_BUTTON.mouse_pressed(input.mouse_coords);
   }
 
   mouse_moved(input) {
-    SOUND_TOGGLE.mouse_moved(input.mouse_coords);
+    this.mute_button.mouse_moved(input);
     MELODY_A_BUTTON.mouse_moved(input.mouse_coords);
     MELODY_B_BUTTON.mouse_moved(input.mouse_coords);
     MELODY_C_BUTTON.mouse_moved(input.mouse_coords);
   }
 
   mouse_dragged(input) {
-    SOUND_TOGGLE.mouse_dragged(input.mouse_coords);
+    this.mute_button.mouse_dragged(input);
     MELODY_A_BUTTON.mouse_dragged(input.mouse_coords);
     MELODY_B_BUTTON.mouse_dragged(input.mouse_coords);
     MELODY_C_BUTTON.mouse_dragged(input.mouse_coords);
   }
 
   mouse_released(input) {
-    SOUND_TOGGLE.mouse_released(input.mouse_coords);
+    this.mute_button.mouse_released(input.mouse_coords);
     MELODY_A_BUTTON.mouse_released(input.mouse_coords);
     MELODY_B_BUTTON.mouse_released(input.mouse_coords);
     MELODY_C_BUTTON.mouse_released(input.mouse_coords);
@@ -178,6 +128,7 @@ class SoundScene {
 }
 
 export const sketch = (p) => {
+  /** @type {PlayButtonScene | SoundScene} */
   let scene = new PlayButtonScene();
   p.setup = () => {
     const canvas = p.createCanvas(
@@ -186,23 +137,6 @@ export const sketch = (p) => {
       undefined,
       document.getElementById("sketch-canvas")
     ).elt;
-
-    PLAY.events.addEventListener("click", async () => {
-      await SOUND.init();
-      SOUND.register_score("melody_a", layered_melody());
-      SOUND.register_score("melody_b", phase_scale());
-      SOUND.register_score("melody_c", symmetry_melody());
-      scene = new SoundScene();
-    });
-
-    SOUND_TOGGLE.events.addEventListener(
-      "toggle",
-      (/**@type {CustomEvent}**/ e) => {
-        const state = e.detail;
-        const sound_on = state === SOUND_ON;
-        SOUND.toggle_sound(sound_on);
-      }
-    );
 
     MELODY_A_BUTTON.events.addEventListener("click", () => {
       SOUND.play_score("melody_a");
@@ -221,7 +155,11 @@ export const sketch = (p) => {
 
   p.draw = () => {
     p.background(0);
-    scene.draw(p);
+
+    scene.update();
+
+    const scene_primitive = scene.render();
+    draw_primitive(p, scene_primitive);
   };
 
   MOUSE.mouse_pressed(p, (input) => {

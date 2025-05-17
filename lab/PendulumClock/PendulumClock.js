@@ -1,19 +1,35 @@
 import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
 import { draw_primitive } from "../../sketchlib/draw_primitive.js";
+import { GroupPrimitive } from "../../sketchlib/primitives.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
+import { MuteButton } from "../lablib/MuteButton.js";
 import { PlayButtonScene } from "../lablib/PlayButtonScene.js";
 import { SoundManager } from "../lablib/SoundManager.js";
 import { Clock } from "./Clock.js";
 
 const MOUSE = new CanvasMouseHandler();
 
+/** @type {import("../lablib/SoundManager.js").SoundManifest} */
+const SOUND_MANIFEST = {
+  scores: {},
+};
+
 //@ts-ignore
-const SOUND = new SoundManager(Tone);
+const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
 
 class PendulumClockScene {
-  constructor() {
+  constructor(sound) {
+    this.sound = sound;
     this.clock = new Clock();
+    this.mute_button = new MuteButton();
     this.events = new EventTarget();
+
+    this.mute_button.events.addEventListener(
+      "change",
+      (/** @type {CustomEvent}*/ e) => {
+        this.sound.toggle_sound(e.detail.sound_on);
+      }
+    );
   }
 
   update() {
@@ -21,13 +37,23 @@ class PendulumClockScene {
   }
 
   render() {
-    return this.clock.render();
+    const clock = this.clock.render();
+    const mute_button = this.mute_button.render();
+    return new GroupPrimitive([clock, mute_button]);
   }
 
-  mouse_pressed() {}
-  mouse_moved() {}
-  mouse_dragged() {}
-  mouse_released() {}
+  mouse_pressed(input) {
+    this.mute_button.mouse_pressed(input);
+  }
+  mouse_moved(input) {
+    this.mute_button.mouse_moved(input);
+  }
+  mouse_dragged(input) {
+    this.mute_button.mouse_dragged(input);
+  }
+  mouse_released(input) {
+    this.mute_button.mouse_released(input);
+  }
 }
 
 export const sketch = (p) => {
@@ -44,7 +70,7 @@ export const sketch = (p) => {
     MOUSE.setup(canvas);
 
     scene.events.addEventListener("scene-change", () => {
-      scene = new PendulumClockScene();
+      scene = new PendulumClockScene(SOUND);
     });
   };
 

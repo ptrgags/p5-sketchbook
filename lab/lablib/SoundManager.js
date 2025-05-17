@@ -3,13 +3,22 @@ import { Rational } from "./Rational.js";
 import { compile_score } from "./tone_helpers/compile_music.js";
 import { schedule_clips } from "./tone_helpers/schedule_music.js";
 
+/**
+ * @typedef {{[id: string]: Score}} ScoreDeclarations
+ *
+ * @typedef {{scores: ScoreDeclarations}} SoundManifest
+ */
+
 export class SoundManager {
   /**
    * Constructor
    * @param {import('tone')} tone_module The Tone.js module
+   * @param {SoundManifest} manifest The manifest of sounds and scores to declare once initialized
    */
-  constructor(tone_module) {
+  constructor(tone_module, manifest) {
     this.tone = tone_module;
+
+    this.manifest = manifest;
 
     this.init_requested = false;
     this.audio_ready = false;
@@ -31,6 +40,7 @@ export class SoundManager {
     await this.tone.start();
 
     this.init_synths();
+    this.process_manifest();
 
     const transport = this.tone.getTransport();
     transport.bpm.value = 128;
@@ -48,6 +58,12 @@ export class SoundManager {
     // While you could set the destination's mute property, that abrupt change
     // can sound like crackling audio, so fade the volume quickly instead.
     this.tone.getDestination().volume.rampTo(next_volume_db, FADE_SEC);
+  }
+
+  process_manifest() {
+    for (const [score_id, score] of Object.entries(this.manifest.scores)) {
+      this.register_score(score_id, score);
+    }
   }
 
   init_synths() {
