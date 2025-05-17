@@ -7,10 +7,13 @@ import { schedule_clips } from "./tone_helpers/schedule_music.js";
  * @typedef {{[id: string]: Score}} ScoreDeclarations
  *
  * @typedef {{
+ *  bpm?: number,
  *  scores?: ScoreDeclarations,
  *  sfx?: ScoreDeclarations
  * }} SoundManifest
  */
+
+const DEFAULT_BPM = 128;
 
 export class SoundManager {
   /**
@@ -48,7 +51,7 @@ export class SoundManager {
     this.process_manifest();
 
     const transport = this.tone.getTransport();
-    transport.bpm.value = 128;
+    transport.bpm.value = this.manifest.bpm ?? DEFAULT_BPM;
 
     this.audio_ready = true;
   }
@@ -99,10 +102,21 @@ export class SoundManager {
     }).toDestination();
     supersaw.volume.value = -9;
 
+    const bell = new this.tone.FMSynth({
+      envelope: {
+        attack: 0,
+        decay: 1.0,
+        sustain: 0.0,
+        release: 1.0,
+      },
+    }).toDestination();
+    bell.volume.value = -3;
+
     this.synths.sine = sine;
     this.synths.square = square;
     this.synths.poly = poly;
     this.synths.supersaw = supersaw;
+    this.synths.bell = bell;
   }
 
   /**

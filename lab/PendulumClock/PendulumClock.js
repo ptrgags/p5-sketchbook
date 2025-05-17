@@ -19,17 +19,18 @@ import {
 const MOUSE = new CanvasMouseHandler();
 
 const TICK_TOCK = new Score([
-  "sine",
+  "bell",
   new Melody(
-    new Note(C4, N16),
-    new Note(D4, N16),
-    new Note(C4, N16),
-    new Note(G4, N16)
+    new Note(C4, N16)
+    //new Note(D4, N16),
+    //new Note(C4, N16),
+    //new Note(G4, N16)
   ),
 ]);
 
 /** @type {import("../lablib/SoundManager.js").SoundManifest} */
 const SOUND_MANIFEST = {
+  bpm: 60,
   sfx: {
     tick_tock: TICK_TOCK,
     ...WESTMINSTER_QUARTERS_SCORES,
