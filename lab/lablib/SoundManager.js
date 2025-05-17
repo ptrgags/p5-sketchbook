@@ -6,7 +6,10 @@ import { schedule_clips } from "./tone_helpers/schedule_music.js";
 /**
  * @typedef {{[id: string]: Score}} ScoreDeclarations
  *
- * @typedef {{scores: ScoreDeclarations}} SoundManifest
+ * @typedef {{
+ *  scores?: ScoreDeclarations,
+ *  sfx?: ScoreDeclarations
+ * }} SoundManifest
  */
 
 export class SoundManager {
@@ -22,12 +25,14 @@ export class SoundManager {
 
     this.init_requested = false;
     this.audio_ready = false;
+    this.transport_playing = false;
 
     // these may be stored a different way
     this.synths = {};
     this.patterns = {};
 
     this.scores = {};
+    this.sfx = {};
   }
 
   async init() {
@@ -61,8 +66,14 @@ export class SoundManager {
   }
 
   process_manifest() {
-    for (const [score_id, score] of Object.entries(this.manifest.scores)) {
+    const scores = this.manifest.scores ?? {};
+    for (const [score_id, score] of Object.entries(scores)) {
       this.register_score(score_id, score);
+    }
+
+    const sfx = this.manifest.sfx ?? {};
+    for (const [sfx_id, score] of Object.entries(sfx)) {
+      this.register_sfx(sfx_id, score);
     }
   }
 
@@ -105,6 +116,17 @@ export class SoundManager {
     this.scores[score_id] = compiled;
   }
 
+  /**
+   * Register a sound effect. These are short scores that can be triggered
+   * immediately
+   * @param {string} sfx_id The ID of the sfx
+   * @param {Score<number>} score Score expressed in MIDI note numbers
+   */
+  register_sfx(sfx_id, score) {
+    const compiled = compile_score(this.tone, this.synths, score);
+    this.sfx[sfx_id] = compiled;
+  }
+
   stop_the_music() {
     const transport = this.tone.getTransport();
     transport.cancel();
@@ -126,5 +148,27 @@ export class SoundManager {
     const transport = this.tone.getTransport();
     transport.position = 0;
     transport.start("+0.1", "0:0");
+    this.transport_playing = true;
+  }
+
+  play_sfx(sfx_id) {
+    const sfx_score = this.sfx[sfx_id];
+    if (sfx_score === undefined) {
+      throw new Error(`can't play unregistered SFX ${sfx_id}`);
+    }
+
+    const schedule = schedule_clips(Rational.ZERO, sfx_score);
+    const A_LITTLE_BIT = 0.1;
+    const now = this.tone.now() + A_LITTLE_BIT;
+    for (const [clip, start_time, end_time] of schedule) {
+      const start = this.tone.Time(start_time).toSeconds();
+      const end = this.tone.Time(end_time).toSeconds();
+      clip.material.start(now + start).stop(now + end);
+    }
+
+    if (!this.transport_playing) {
+      const transport = this.tone.getTransport();
+      transport.start(0);
+    }
   }
 }

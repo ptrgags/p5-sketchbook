@@ -21,6 +21,10 @@ export class ClockTime {
     this.milliseconds = milliseconds;
   }
 
+  get half_seconds() {
+    return this.seconds * 2 + Math.floor(this.milliseconds / 500);
+  }
+
   get total_seconds() {
     return (
       this.hours * SECONDS_PER_HOUR +

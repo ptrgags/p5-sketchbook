@@ -2,6 +2,9 @@ import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
 import { draw_primitive } from "../../sketchlib/draw_primitive.js";
 import { GroupPrimitive } from "../../sketchlib/primitives.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
+import { N1, N16, N2, N4 } from "../lablib/music/durations.js";
+import { B3, C4, E4, FS4, G4, GS4 } from "../lablib/music/pitches.js";
+import { Melody, Note, parse_melody, Score } from "../lablib/music/Score.js";
 import { MuteButton } from "../lablib/MuteButton.js";
 import { PlayButtonScene } from "../lablib/PlayButtonScene.js";
 import { SoundManager } from "../lablib/SoundManager.js";
@@ -9,9 +12,44 @@ import { Clock } from "./Clock.js";
 
 const MOUSE = new CanvasMouseHandler();
 
+// Bell changes for the Westminster Quarters
+// See https://en.wikipedia.org/wiki/Westminster_Quarters#Description
+const CHANGES = [
+  parse_melody([GS4, N2], [FS4, N2], [E4, N2], [B3, N1]),
+  parse_melody([E4, N2], [GS4, N2], [FS4, N2], [B3, N1]),
+  parse_melody([E4, N2], [FS4, N2], [GS4, N2], [E4, N1]),
+  parse_melody([GS4, N2], [E4, N2], [FS4, N2], [B3, N1]),
+  parse_melody([B3, N2], [FS4, N2], [GS4, N2], [E4, N1]),
+];
+const WESTMINSTER_QUARTERS = [
+  CHANGES[0],
+  new Melody(CHANGES[1], CHANGES[2]),
+  new Melody(CHANGES[3], CHANGES[4], CHANGES[1]),
+  new Melody(CHANGES[1], CHANGES[2], CHANGES[3], CHANGES[4]),
+];
+
+function wrap_score(score) {
+  return new Score(["square", score]);
+}
+
+const TICK = new Score(["sine", new Note(C4, N16)]);
+const TOCK = new Score(["sine", new Note(G4, N16)]);
+const MINUTE_MELODY = new Score([
+  "square",
+  new Melody(new Note(C4, N16), new Note(E4, N16), new Note(G4, N16)),
+]);
+
 /** @type {import("../lablib/SoundManager.js").SoundManifest} */
 const SOUND_MANIFEST = {
-  scores: {},
+  sfx: {
+    tick: TICK,
+    tock: TOCK,
+    minute: MINUTE_MELODY,
+    quarter: wrap_score(WESTMINSTER_QUARTERS[0]),
+    half_hour: wrap_score(WESTMINSTER_QUARTERS[1]),
+    third_quarter: wrap_score(WESTMINSTER_QUARTERS[2]),
+    hour: wrap_score(WESTMINSTER_QUARTERS[3]),
+  },
 };
 
 //@ts-ignore
@@ -30,6 +68,18 @@ class PendulumClockScene {
         this.sound.toggle_sound(e.detail.sound_on);
       }
     );
+
+    const clock_events = this.clock.events;
+    clock_events.addEventListener("second", () => {
+      //this.sound.play_sfx("tick");
+    });
+    clock_events.addEventListener("half-second", () => {
+      //this.sound.play_sfx("tock");
+    });
+    clock_events.addEventListener("minute", () => {
+      //this.sound.play_sfx("quarter");
+      this.sound.play_sfx("hour");
+    });
   }
 
   update() {
