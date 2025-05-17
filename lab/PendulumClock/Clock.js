@@ -123,36 +123,18 @@ export class Clock {
     this.current_time = ClockTime.now();
     this.events = new EventTarget();
 
-    this.prev_half_seconds = this.current_time.half_seconds;
+    this.prev_seconds = this.current_time.seconds;
   }
 
   update() {
     this.current_time = ClockTime.now();
 
     if (this.current_time.half_seconds !== this.prev_half_seconds) {
-      const event_id = this.classify_tick();
-      this.events.dispatchEvent(new CustomEvent(event_id));
+      this.events.dispatchEvent(
+        new CustomEvent("tick", { detail: this.current_time })
+      );
     }
     this.prev_half_seconds = this.current_time.half_seconds;
-  }
-
-  classify_tick() {
-    const { minutes, seconds } = this.current_time;
-    const half_second = this.current_time.half_seconds % 2;
-
-    if (minutes === 0 && seconds === 0 && half_second === 0) {
-      return "hour";
-    }
-
-    if (seconds === 0 && half_second === 0) {
-      return "minute";
-    }
-
-    if (half_second === 0) {
-      return "second";
-    }
-
-    return "half-second";
   }
 
   render() {

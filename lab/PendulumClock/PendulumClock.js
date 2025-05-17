@@ -2,53 +2,37 @@ import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
 import { draw_primitive } from "../../sketchlib/draw_primitive.js";
 import { GroupPrimitive } from "../../sketchlib/primitives.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
-import { N1, N16, N2, N4 } from "../lablib/music/durations.js";
-import { B3, C4, E4, FS4, G4, GS4 } from "../lablib/music/pitches.js";
-import { Melody, Note, parse_melody, Score } from "../lablib/music/Score.js";
+import { N16 } from "../lablib/music/durations.js";
+import { C4, D4, E4, G4 } from "../lablib/music/pitches.js";
+
+import { Melody, Note, Score } from "../lablib/music/Score.js";
 import { MuteButton } from "../lablib/MuteButton.js";
 import { PlayButtonScene } from "../lablib/PlayButtonScene.js";
 import { SoundManager } from "../lablib/SoundManager.js";
 import { Clock } from "./Clock.js";
+import { ClockTime } from "./ClockTime.js";
+import {
+  WESTMINSTER_QUARTERS_SCORES,
+  WESTMINSTER_SCORE_LENGTHS,
+} from "./westminster_quarters.js";
 
 const MOUSE = new CanvasMouseHandler();
 
-// Bell changes for the Westminster Quarters
-// See https://en.wikipedia.org/wiki/Westminster_Quarters#Description
-const CHANGES = [
-  parse_melody([GS4, N2], [FS4, N2], [E4, N2], [B3, N1]),
-  parse_melody([E4, N2], [GS4, N2], [FS4, N2], [B3, N1]),
-  parse_melody([E4, N2], [FS4, N2], [GS4, N2], [E4, N1]),
-  parse_melody([GS4, N2], [E4, N2], [FS4, N2], [B3, N1]),
-  parse_melody([B3, N2], [FS4, N2], [GS4, N2], [E4, N1]),
-];
-const WESTMINSTER_QUARTERS = [
-  CHANGES[0],
-  new Melody(CHANGES[1], CHANGES[2]),
-  new Melody(CHANGES[3], CHANGES[4], CHANGES[1]),
-  new Melody(CHANGES[1], CHANGES[2], CHANGES[3], CHANGES[4]),
-];
-
-function wrap_score(score) {
-  return new Score(["square", score]);
-}
-
-const TICK = new Score(["sine", new Note(C4, N16)]);
-const TOCK = new Score(["sine", new Note(G4, N16)]);
-const MINUTE_MELODY = new Score([
-  "square",
-  new Melody(new Note(C4, N16), new Note(E4, N16), new Note(G4, N16)),
+const TICK_TOCK = new Score([
+  "sine",
+  new Melody(
+    new Note(C4, N16),
+    new Note(D4, N16),
+    new Note(C4, N16),
+    new Note(G4, N16)
+  ),
 ]);
 
 /** @type {import("../lablib/SoundManager.js").SoundManifest} */
 const SOUND_MANIFEST = {
   sfx: {
-    tick: TICK,
-    tock: TOCK,
-    minute: MINUTE_MELODY,
-    quarter: wrap_score(WESTMINSTER_QUARTERS[0]),
-    half_hour: wrap_score(WESTMINSTER_QUARTERS[1]),
-    third_quarter: wrap_score(WESTMINSTER_QUARTERS[2]),
-    hour: wrap_score(WESTMINSTER_QUARTERS[3]),
+    tick_tock: TICK_TOCK,
+    ...WESTMINSTER_QUARTERS_SCORES,
   },
 };
 
@@ -69,17 +53,43 @@ class PendulumClockScene {
       }
     );
 
-    const clock_events = this.clock.events;
-    clock_events.addEventListener("second", () => {
-      //this.sound.play_sfx("tick");
+    this.next_available_second = 0;
+
+    this.clock.events.addEventListener("tick", (/**@type {CustomEvent}*/ e) => {
+      /**@type {ClockTime} */
+      const time = e.detail;
+
+      this.clock_sound(time);
     });
-    clock_events.addEventListener("half-second", () => {
-      //this.sound.play_sfx("tock");
-    });
-    clock_events.addEventListener("minute", () => {
-      //this.sound.play_sfx("quarter");
-      this.sound.play_sfx("hour");
-    });
+  }
+
+  /**
+   * Play a tick sound or chimes depending on where we are in the hour
+   * @param {ClockTime} time
+   */
+  clock_sound(time) {
+    const { hours, minutes, seconds } = time;
+
+    if (minutes === 0 && seconds === 0) {
+      // convert to 12 hour time
+      const n = hours % 2;
+      const hour12 = n === 0 ? 12 : n;
+      const chime_id = `hour${hour12}`;
+
+      this.sound.play_sfx(chime_id);
+      this.next_available_second = WESTMINSTER_SCORE_LENGTHS[chime_id];
+    } else if (minutes === 15 && seconds === 0) {
+      this.sound.play_sfx("quarter1");
+      this.next_available_second = WESTMINSTER_SCORE_LENGTHS.quarter1;
+    } else if (minutes === 30 && seconds === 0) {
+      this.sound.play_sfx("quarter2");
+      this.next_available_second = WESTMINSTER_SCORE_LENGTHS.quarter2;
+    } else if (minutes === 45 && seconds === 0) {
+      this.sound.play_sfx("quarter3");
+      this.next_available_second = WESTMINSTER_SCORE_LENGTHS.quarter3;
+    } else if (seconds >= this.next_available_second) {
+      this.sound.play_sfx("tick_tock");
+    }
   }
 
   update() {
