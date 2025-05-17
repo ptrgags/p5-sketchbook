@@ -20,7 +20,6 @@ import {
 } from "./example_scores.js";
 
 const MOUSE = new CanvasMouseHandler();
-const PLAY = new TouchButton(SCREEN_RECT);
 
 const SOUND_ON = ToggleState.STATE_A;
 const SOUND_OFF = ToggleState.STATE_B;
@@ -87,17 +86,6 @@ const SPEAKER_SLASH = new GroupPrimitive(
 
 //@ts-ignore
 const SOUND = new SoundManager(Tone);
-
-const TRIANGLE_WIDTH = 200;
-const PLAY_TRIANGLE = new PolygonPrimitive([
-  Point.point(WIDTH / 2 - TRIANGLE_WIDTH / 2, HEIGHT / 2 - TRIANGLE_WIDTH / 2),
-  Point.point(WIDTH / 2 - TRIANGLE_WIDTH / 2, HEIGHT / 2 + TRIANGLE_WIDTH / 2),
-  Point.point(WIDTH / 2 + TRIANGLE_WIDTH / 2, HEIGHT / 2),
-]);
-const PLAY_GROUP = new GroupPrimitive(
-  [PLAY_TRIANGLE],
-  new Style({ stroke: Color.WHITE })
-);
 
 const MARGIN = 50;
 const MELODY_BUTTON_SIZE = 150;
