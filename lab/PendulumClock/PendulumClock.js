@@ -20,10 +20,18 @@ const MAX_HOURS = 12;
  * Simpler interface for a 12-hour clock time in the local timezone.
  */
 class ClockTime {
-  constructor(hours, minutes, seconds) {
+  /**
+   * Constructor
+   * @param {number} hours Integer number of hours
+   * @param {number} minutes Integer number of minutes
+   * @param {number} seconds Integer number of seconds
+   * @param {number} milliseconds Integr number of milliseconds
+   */
+  constructor(hours, minutes, seconds, milliseconds) {
     this.hours = hours;
     this.minutes = minutes;
     this.seconds = seconds;
+    this.milliseconds = milliseconds;
   }
 
   get total_seconds() {
@@ -68,7 +76,8 @@ class ClockTime {
     const hours = date.getHours() % MAX_HOURS;
     const minutes = date.getMinutes();
     const seconds = date.getSeconds();
-    return new ClockTime(hours, minutes, seconds);
+    const milliseconds = date.getMilliseconds();
+    return new ClockTime(hours, minutes, seconds, milliseconds);
   }
 
   /**
@@ -151,6 +160,42 @@ function render_clock_hands(time) {
   return new GroupPrimitive([hour_minute, second]);
 }
 
+const ARM_LENGTH = HEIGHT / 2;
+const BOB_RADIUS = OUTER_RADIUS / 3;
+const STYLE_ARM = new Style({
+  stroke: Color.from_hex_code("#555555"),
+  width: 8,
+});
+const STYLE_BOB = new Style({
+  stroke: Color.from_hex_code("#666666"),
+  fill: Color.from_hex_code("#777777"),
+});
+
+/**
+ * Render an animated pendulum based on the current seconds.
+ * @param {ClockTime} time The current time to determine what second we're at
+ */
+function render_pendulum(time) {
+  // The pendulum will have a period of 2 seconds, so the math for the
+  // percentage looks a little different
+  const milliseconds = (time.seconds % 2) * 1000 + time.milliseconds;
+  const percent_of_period = milliseconds / 2000;
+
+  const angle_variation = (PI / 24) * Math.cos(percent_of_period * TAU);
+  const angle = PI / 2 + angle_variation;
+  const dir = Point.dir_from_angle(angle);
+
+  const bob_center = CLOCK_CENTER.add(dir.scale(ARM_LENGTH));
+
+  const arm = new LinePrimitive(CLOCK_CENTER, bob_center);
+
+  const bob = new CirclePrimitive(bob_center, BOB_RADIUS);
+
+  const pendulum_arm = new GroupPrimitive([arm], STYLE_ARM);
+  const pendulum_bob = new GroupPrimitive([bob], STYLE_BOB);
+  return new GroupPrimitive([pendulum_arm, pendulum_bob]);
+}
+
 export const sketch = (p) => {
   p.setup = () => {
     p.createCanvas(
@@ -167,7 +212,9 @@ export const sketch = (p) => {
     const now = ClockTime.now();
 
     const hands = render_clock_hands(now);
+    const pendulum = render_pendulum(now);
 
+    draw_primitive(p, pendulum);
     draw_primitive(p, CLOCK_FACE);
     draw_primitive(p, hands);
   };
