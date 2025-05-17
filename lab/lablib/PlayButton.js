@@ -1,11 +1,13 @@
-import { Point } from "../../pga2d/objects";
-import { Color } from "../../sketchlib/Color";
-import { HEIGHT, WIDTH } from "../../sketchlib/dimensions";
-import { draw_primitive } from "../../sketchlib/draw_primitive";
-import { GroupPrimitive, PolygonPrimitive } from "../../sketchlib/primitives";
-import { Style } from "../../sketchlib/Style";
-import { SCREEN_RECT } from "./Rectangle";
-import { TouchButton } from "./TouchButton";
+import { Point } from "../../pga2d/objects.js";
+import { Color } from "../../sketchlib/Color.js";
+import { HEIGHT, WIDTH } from "../../sketchlib/dimensions.js";
+import {
+  GroupPrimitive,
+  PolygonPrimitive,
+} from "../../sketchlib/primitives.js";
+import { Style } from "../../sketchlib/Style.js";
+import { SCREEN_RECT } from "./Rectangle.js";
+import { TouchButton } from "./TouchButton.js";
 
 const TRIANGLE_WIDTH = 200;
 const PLAY_TRIANGLE = new PolygonPrimitive([
@@ -23,6 +25,10 @@ export class PlayButton {
     this.button = new TouchButton(SCREEN_RECT);
   }
 
+  get events() {
+    return this.button.events;
+  }
+
   render() {
     const button_back = this.button.debug_render();
     return new GroupPrimitive([button_back, PLAY_GROUP]);
@@ -34,5 +40,13 @@ export class PlayButton {
 
   mouse_moved(input) {
     this.button.mouse_dragged(input.mouse_coords);
+  }
+
+  mouse_dragged(input) {
+    this.button.mouse_dragged(input.mouse_coords);
+  }
+
+  mouse_released(input) {
+    this.button.mouse_released(input.mouse_coords);
   }
 }

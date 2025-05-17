@@ -113,32 +113,6 @@ const MELODY_C_BUTTON = new TouchButton(
   )
 );
 
-class PlayButtonScene {
-  draw(p) {
-    const play_button = PLAY.debug_render();
-    const scene = new GroupPrimitive([play_button, PLAY_GROUP]);
-    draw_primitive(p, scene);
-  }
-
-  mouse_pressed(input) {
-    PLAY.mouse_pressed(input.mouse_coords);
-  }
-
-  mouse_moved(input) {
-    PLAY.mouse_moved(input.mouse_coords);
-  }
-
-  mouse_dragged(input) {
-    PLAY.mouse_dragged(input.mouse_coords);
-  }
-
-  mouse_released(input) {
-    if (!SOUND.audio_ready && !SOUND.init_requested) {
-      PLAY.mouse_released(input.mouse_coords);
-    }
-  }
-}
-
 class SoundScene {
   draw(p) {
     //const sound_toggle = SOUND_TOGGLE.debug_render();
