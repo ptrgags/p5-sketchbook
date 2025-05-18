@@ -129,12 +129,12 @@ export class Clock {
   update() {
     this.current_time = ClockTime.now();
 
-    if (this.current_time.half_seconds !== this.prev_half_seconds) {
+    if (this.current_time.seconds !== this.prev_seconds) {
       this.events.dispatchEvent(
         new CustomEvent("tick", { detail: this.current_time })
       );
     }
-    this.prev_half_seconds = this.current_time.half_seconds;
+    this.prev_seconds = this.current_time.seconds;
   }
 
   render() {

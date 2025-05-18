@@ -2,10 +2,10 @@ import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
 import { draw_primitive } from "../../sketchlib/draw_primitive.js";
 import { GroupPrimitive } from "../../sketchlib/primitives.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
-import { N16 } from "../lablib/music/durations.js";
-import { C4, D4, E4, G4 } from "../lablib/music/pitches.js";
+import { N16, N32, N8 } from "../lablib/music/durations.js";
+import { A3, C4, D4, E4, G4 } from "../lablib/music/pitches.js";
 
-import { Melody, Note, Score } from "../lablib/music/Score.js";
+import { Melody, Note, Rest, Score } from "../lablib/music/Score.js";
 import { MuteButton } from "../lablib/MuteButton.js";
 import { PlayButtonScene } from "../lablib/PlayButtonScene.js";
 import { SoundManager } from "../lablib/SoundManager.js";
@@ -19,13 +19,9 @@ import {
 const MOUSE = new CanvasMouseHandler();
 
 const TICK_TOCK = new Score([
-  "bell",
-  new Melody(
-    new Note(C4, N16)
-    //new Note(D4, N16),
-    //new Note(C4, N16),
-    //new Note(G4, N16)
-  ),
+  "tick",
+  //new Note(C4, N16),
+  new Melody(new Note(A3, N8), new Note(C4, N16), new Note(C4, N16)),
 ]);
 
 /** @type {import("../lablib/SoundManager.js").SoundManifest} */
@@ -88,8 +84,12 @@ class PendulumClockScene {
     } else if (minutes === 45 && seconds === 0) {
       this.sound.play_sfx("quarter3");
       this.next_available_second = WESTMINSTER_SCORE_LENGTHS.quarter3;
-    } else if (seconds >= this.next_available_second) {
+    } else if (seconds === 0) {
+      this.sound.play_sfx("hour11");
+      this.next_available_second = WESTMINSTER_SCORE_LENGTHS.hour11;
+    } else if (seconds > Math.ceil(this.next_available_second)) {
       this.sound.play_sfx("tick_tock");
+      this.next_available_second = 0;
     }
   }
 

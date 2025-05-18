@@ -105,18 +105,44 @@ export class SoundManager {
     const bell = new this.tone.FMSynth({
       envelope: {
         attack: 0,
-        decay: 1.0,
+        decay: 2.0,
         sustain: 0.0,
-        release: 1.0,
+        release: 2.0,
       },
     }).toDestination();
     bell.volume.value = -3;
+
+    const tick = new this.tone.FMSynth({
+      modulationIndex: 25,
+      // C:M ratio
+      harmonicity: 2,
+      oscillator: {
+        type: "sine",
+      },
+      modulation: {
+        type: "sine",
+      },
+      modulationEnvelope: {
+        attack: 0,
+        sustain: 1,
+        decay: 0,
+        release: 0,
+      },
+      envelope: {
+        attack: 0,
+        decay: 0.05,
+        sustain: 0.0,
+        release: 0.05,
+      },
+    }).toDestination();
+    tick.volume.value = -2;
 
     this.synths.sine = sine;
     this.synths.square = square;
     this.synths.poly = poly;
     this.synths.supersaw = supersaw;
     this.synths.bell = bell;
+    this.synths.tick = tick;
   }
 
   /**
@@ -172,17 +198,22 @@ export class SoundManager {
     }
 
     const schedule = schedule_clips(Rational.ZERO, sfx_score);
-    const A_LITTLE_BIT = 0.1;
+    const A_LITTLE_BIT = 0; //0.05;
     const now = this.tone.now() + A_LITTLE_BIT;
     for (const [clip, start_time, end_time] of schedule) {
       const start = this.tone.Time(start_time).toSeconds();
       const end = this.tone.Time(end_time).toSeconds();
-      clip.material.start(now + start).stop(now + end);
+      try {
+        clip.material.start(now + start).stop(now + end);
+      } catch (e) {
+        console.error("scheduling error", e);
+      }
     }
 
     if (!this.transport_playing) {
       const transport = this.tone.getTransport();
-      transport.start(0);
+      transport.start(this.tone.now());
+      this.transport_playing = true;
     }
   }
 }

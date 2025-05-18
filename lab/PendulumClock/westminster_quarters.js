@@ -6,17 +6,17 @@ import {
   parse_melody,
   Score,
 } from "../lablib/music/Score.js";
-import { N1, N2, N4 } from "../lablib/music/durations.js";
+import { N1, N2, N4, N8 } from "../lablib/music/durations.js";
 import { B3, E3, E4, FS4, GS4 } from "../lablib/music/pitches.js";
 
 // Bell changes for the Westminster Quarters
 // See https://en.wikipedia.org/wiki/Westminster_Quarters#Description
 const CHANGES = [
-  parse_melody([GS4, N4], [FS4, N4], [E4, N4], [B3, N2]),
-  parse_melody([E4, N4], [GS4, N4], [FS4, N4], [B3, N2]),
-  parse_melody([E4, N4], [FS4, N4], [GS4, N4], [E4, N2]),
-  parse_melody([GS4, N4], [E4, N4], [FS4, N4], [B3, N2]),
-  parse_melody([B3, N4], [FS4, N4], [GS4, N4], [E4, N2]),
+  parse_melody([GS4, N8], [FS4, N8], [E4, N8], [B3, N4]),
+  parse_melody([E4, N8], [GS4, N8], [FS4, N8], [B3, N4]),
+  parse_melody([E4, N8], [FS4, N8], [GS4, N8], [E4, N4]),
+  parse_melody([GS4, N8], [E4, N8], [FS4, N8], [B3, N4]),
+  parse_melody([B3, N8], [FS4, N8], [GS4, N8], [E4, N4]),
 ];
 
 // Each quarter hour plays a different set of changes, increasingly long
@@ -30,7 +30,7 @@ const FOURTH_QUARTER = new Melody(
   CHANGES[4]
 );
 
-const HOUR_BELL = new Note(E3, N1);
+const HOUR_BELL = new Note(E3, N2);
 
 /**
  * Make a score for the chimes at the selected hour. This is four quarters
@@ -39,8 +39,8 @@ const HOUR_BELL = new Note(E3, N1);
  * @returns {Score}
  */
 function make_hour_score(hour) {
-  // Every hour the hour bell rings n times, for a whole note each.
-  const hour_chimes = new MusicLoop(new Rational(hour, 1), HOUR_BELL);
+  // Every hour the hour bell rings n times, for a half note each.
+  const hour_chimes = new MusicLoop(new Rational(hour, 2), HOUR_BELL);
   const hour_part = new Melody(FOURTH_QUARTER, hour_chimes);
   return new Score(["bell", hour_part]);
 }
@@ -67,8 +67,8 @@ export const WESTMINSTER_QUARTERS_SCORES = {
 };
 
 // 3 quarter notes + 1 half note
-const QUARTER_LENGTH = 5;
-const HOUR_BELL_LENGTH = 4;
+const QUARTER_LENGTH = 2.5;
+const HOUR_BELL_LENGTH = 2;
 
 /**
  * @type {{[key: string]: number}}
