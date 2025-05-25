@@ -23,7 +23,25 @@
       <div class="sketch">
         <canvas id="sketch-canvas" width="500" height="700"></canvas>
       </div>
-      <div class="description">DESCRIPTION GOES HERE</div>
+      <div class="description">
+        <p>
+          To further test the sound system, I made a simple pendulum clock that
+          makes a ticking melody each second, and plays the
+          <a href="https://en.wikipedia.org/wiki/Westminster_Quarters"
+            >Westminster Quarters</a
+          >
+          each quarter hour.
+        </p>
+        <p>
+          I found that Tone.js is good about consistent timing (e.g. triggering
+          sound once a second), but the audio playback is synced to the page
+          load time, not the system clock. This means the ticking melody may be
+          slightly out of phase with the movement of the clock hands, and this
+          will vary each time you refresh the page. I don't plan to fix this
+          because the vast majority of uses for music in my artworks will not
+          need to be synced to the clock like this.
+        </p>
+      </div>
     </div>
   </body>
 </html>
