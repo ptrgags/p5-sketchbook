@@ -120,6 +120,40 @@ export class BeziergonPrimitive {
 }
 
 /**
+ * Temporary for now
+ * @private
+ */
+export class TextStyle {
+  /**
+   *
+   * @param {number} size
+   * @param {"left" | "center"} align How to align the text
+   */
+  constructor(size, align) {
+    this.size = size;
+    this.align = align;
+  }
+}
+
+/**
+ * Temporary, I need to
+ * @private
+ */
+export class TextPrimitive {
+  /**
+   *
+   * @param {string} text The text to display
+   * @param {Point} position The position to anchor the text
+   * @param {TextStyle} text_style The style for the text
+   */
+  constructor(text, position, text_style) {
+    this.text = text;
+    this.position = position;
+    this.text_style = text_style;
+  }
+}
+
+/**
  * A logical grouping of primitives to be rendered together, in the order
  * listed in the primitives array. This is the main way to apply styling to
  * primitives.
@@ -147,5 +181,5 @@ export class GroupPrimitive {
 }
 
 /**
- * @typedef {GroupPrimitive | BezierPrimitive | PolygonPrimitive | BezierPrimitive | LinePrimitive | RectPrimitive | CirclePrimitive | PointPrimitive | BeziergonPrimitive | VectorPrimitive} Primitive
+ * @typedef {GroupPrimitive | BezierPrimitive | PolygonPrimitive | BezierPrimitive | LinePrimitive | RectPrimitive | CirclePrimitive | PointPrimitive | BeziergonPrimitive | VectorPrimitive | TextPrimitive} Primitive
  */
