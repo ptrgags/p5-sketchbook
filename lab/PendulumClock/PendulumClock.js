@@ -20,7 +20,6 @@ const MOUSE = new CanvasMouseHandler();
 
 const TICK_TOCK = new Score([
   "tick",
-  //new Note(C4, N16),
   new Melody(new Note(A3, N8), new Note(C4, N16), new Note(C4, N16)),
 ]);
 
@@ -84,9 +83,6 @@ class PendulumClockScene {
     } else if (minutes === 45 && seconds === 0) {
       this.sound.play_sfx("quarter3");
       this.next_available_second = WESTMINSTER_SCORE_LENGTHS.quarter3;
-    } else if (seconds === 0) {
-      this.sound.play_sfx("hour11");
-      this.next_available_second = WESTMINSTER_SCORE_LENGTHS.hour11;
     } else if (seconds > Math.ceil(this.next_available_second)) {
       this.sound.play_sfx("tick_tock");
       this.next_available_second = 0;
