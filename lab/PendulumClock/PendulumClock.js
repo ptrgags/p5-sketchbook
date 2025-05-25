@@ -49,7 +49,7 @@ class PendulumClockScene {
       }
     );
 
-    this.next_available_second = 0;
+    this.next_available_second = -1;
 
     this.clock.events.addEventListener("tick", (/**@type {CustomEvent}*/ e) => {
       /**@type {ClockTime} */
@@ -85,7 +85,7 @@ class PendulumClockScene {
       this.next_available_second = WESTMINSTER_SCORE_LENGTHS.quarter3;
     } else if (seconds > Math.ceil(this.next_available_second)) {
       this.sound.play_sfx("tick_tock");
-      this.next_available_second = 0;
+      this.next_available_second = -1;
     }
   }
 
