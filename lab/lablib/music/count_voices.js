@@ -1,4 +1,4 @@
-import { Cycle, Gap, Loop, Parallel, Sequential } from "./Timeline";
+import { Cycle, Gap, Loop, Parallel, Sequential } from "./Timeline.js";
 
 /**
  * Count the number of distinct parallel lines in the timeline.
