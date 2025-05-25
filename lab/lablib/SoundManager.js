@@ -3,22 +3,39 @@ import { Rational } from "./Rational.js";
 import { compile_score } from "./tone_helpers/compile_music.js";
 import { schedule_clips } from "./tone_helpers/schedule_music.js";
 
+/**
+ * @typedef {{[id: string]: Score}} ScoreDeclarations
+ *
+ * @typedef {{
+ *  bpm?: number,
+ *  scores?: ScoreDeclarations,
+ *  sfx?: ScoreDeclarations
+ * }} SoundManifest
+ */
+
+const DEFAULT_BPM = 128;
+
 export class SoundManager {
   /**
    * Constructor
    * @param {import('tone')} tone_module The Tone.js module
+   * @param {SoundManifest} manifest The manifest of sounds and scores to declare once initialized
    */
-  constructor(tone_module) {
+  constructor(tone_module, manifest) {
     this.tone = tone_module;
+
+    this.manifest = manifest;
 
     this.init_requested = false;
     this.audio_ready = false;
+    this.transport_playing = false;
 
     // these may be stored a different way
     this.synths = {};
     this.patterns = {};
 
     this.scores = {};
+    this.sfx = {};
   }
 
   async init() {
@@ -31,9 +48,10 @@ export class SoundManager {
     await this.tone.start();
 
     this.init_synths();
+    this.process_manifest();
 
     const transport = this.tone.getTransport();
-    transport.bpm.value = 128;
+    transport.bpm.value = this.manifest.bpm ?? DEFAULT_BPM;
 
     this.audio_ready = true;
   }
@@ -48,6 +66,18 @@ export class SoundManager {
     // While you could set the destination's mute property, that abrupt change
     // can sound like crackling audio, so fade the volume quickly instead.
     this.tone.getDestination().volume.rampTo(next_volume_db, FADE_SEC);
+  }
+
+  process_manifest() {
+    const scores = this.manifest.scores ?? {};
+    for (const [score_id, score] of Object.entries(scores)) {
+      this.register_score(score_id, score);
+    }
+
+    const sfx = this.manifest.sfx ?? {};
+    for (const [sfx_id, score] of Object.entries(sfx)) {
+      this.register_sfx(sfx_id, score);
+    }
   }
 
   init_synths() {
@@ -72,10 +102,47 @@ export class SoundManager {
     }).toDestination();
     supersaw.volume.value = -9;
 
+    const bell = new this.tone.FMSynth({
+      envelope: {
+        attack: 0,
+        decay: 2.0,
+        sustain: 0.0,
+        release: 2.0,
+      },
+    }).toDestination();
+    bell.volume.value = -3;
+
+    const tick = new this.tone.FMSynth({
+      modulationIndex: 25,
+      // C:M ratio
+      harmonicity: 2,
+      oscillator: {
+        type: "sine",
+      },
+      modulation: {
+        type: "sine",
+      },
+      modulationEnvelope: {
+        attack: 0,
+        sustain: 1,
+        decay: 0,
+        release: 0,
+      },
+      envelope: {
+        attack: 0,
+        decay: 0.05,
+        sustain: 0.0,
+        release: 0.05,
+      },
+    }).toDestination();
+    tick.volume.value = -2;
+
     this.synths.sine = sine;
     this.synths.square = square;
     this.synths.poly = poly;
     this.synths.supersaw = supersaw;
+    this.synths.bell = bell;
+    this.synths.tick = tick;
   }
 
   /**
@@ -87,6 +154,17 @@ export class SoundManager {
   register_score(score_id, score) {
     const compiled = compile_score(this.tone, this.synths, score);
     this.scores[score_id] = compiled;
+  }
+
+  /**
+   * Register a sound effect. These are short scores that can be triggered
+   * immediately
+   * @param {string} sfx_id The ID of the sfx
+   * @param {Score<number>} score Score expressed in MIDI note numbers
+   */
+  register_sfx(sfx_id, score) {
+    const compiled = compile_score(this.tone, this.synths, score);
+    this.sfx[sfx_id] = compiled;
   }
 
   stop_the_music() {
@@ -110,5 +188,32 @@ export class SoundManager {
     const transport = this.tone.getTransport();
     transport.position = 0;
     transport.start("+0.1", "0:0");
+    this.transport_playing = true;
+  }
+
+  play_sfx(sfx_id) {
+    const sfx_score = this.sfx[sfx_id];
+    if (sfx_score === undefined) {
+      throw new Error(`can't play unregistered SFX ${sfx_id}`);
+    }
+
+    const schedule = schedule_clips(Rational.ZERO, sfx_score);
+    const A_LITTLE_BIT = 0; //0.05;
+    const now = this.tone.now() + A_LITTLE_BIT;
+    for (const [clip, start_time, end_time] of schedule) {
+      const start = this.tone.Time(start_time).toSeconds();
+      const end = this.tone.Time(end_time).toSeconds();
+      try {
+        clip.material.start(now + start).stop(now + end);
+      } catch (e) {
+        console.error("scheduling error", e);
+      }
+    }
+
+    if (!this.transport_playing) {
+      const transport = this.tone.getTransport();
+      transport.start(this.tone.now());
+      this.transport_playing = true;
+    }
   }
 }

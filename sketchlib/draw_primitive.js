@@ -10,6 +10,7 @@ import {
   CirclePrimitive,
   BeziergonPrimitive,
   VectorPrimitive,
+  TextPrimitive,
 } from "./primitives.js";
 
 function draw_rect(p, rect) {
@@ -80,6 +81,27 @@ function draw_bezier(p, bezier) {
   p.bezier(a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y);
 }
 
+/**
+ * Draw text. This will likely change to move the text styling to the
+ * GroupPrimitive level
+ * @private
+ * @param {any} p p5.js context
+ * @param {TextPrimitive} text_primitive the text primitive to render
+ */
+function draw_text(p, text_primitive) {
+  p.push();
+
+  p.textSize(text_primitive.text_style.size);
+
+  if (text_primitive.text_style.align === "center") {
+    p.textAlign(p.CENTER);
+  }
+
+  const { x, y } = text_primitive.position;
+  p.text(text_primitive.text, x, y);
+  p.pop();
+}
+
 function apply_style(p, style) {
   if (style.stroke) {
     const { r, g, b } = style.stroke;
@@ -128,6 +150,8 @@ export function draw_primitive(p, primitive) {
     draw_bezier(p, primitive);
   } else if (primitive instanceof PointPrimitive) {
     draw_point(p, primitive);
+  } else if (primitive instanceof TextPrimitive) {
+    draw_text(p, primitive);
   } else if (primitive instanceof CirclePrimitive) {
     draw_circle(p, primitive);
   } else {
