@@ -145,6 +145,17 @@ export class SoundManager {
     this.synths.tick = tick;
   }
 
+  get time() {
+    const transport = this.tone.getTransport();
+    const [measures, beats, sixteenths] = transport.position
+      .toString()
+      .split(":");
+
+    return (
+      parseFloat(measures) + parseFloat(beats) / 4 + parseFloat(sixteenths) / 16
+    );
+  }
+
   /**
    * Compile and save a score
    * @param {string} score_id The score ID to use. This must be the same as

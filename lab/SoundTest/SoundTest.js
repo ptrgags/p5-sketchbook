@@ -4,6 +4,7 @@ import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
 import { draw_primitive } from "../../sketchlib/draw_primitive.js";
 import {
   GroupPrimitive,
+  LinePrimitive,
   TextPrimitive,
   TextStyle,
 } from "../../sketchlib/primitives.js";
@@ -158,7 +159,15 @@ class SoundScene {
     const primitives = [mute, melody_a, melody_b, melody_c, this.button_labels];
 
     if (this.selected_melody !== undefined) {
-      primitives.push(RENDERED_TIMELINES[this.selected_melody]);
+      const current_time = SOUND.time;
+      const x = current_time * MEASURE_DIMENSIONS.x;
+
+      const cursor = new GroupPrimitive(
+        [new LinePrimitive(Point.point(x, 0), Point.point(x, WIDTH / 4))],
+        Style.DEFAULT_STROKE
+      );
+
+      primitives.push(RENDERED_TIMELINES[this.selected_melody], cursor);
     }
 
     return new GroupPrimitive(primitives);
