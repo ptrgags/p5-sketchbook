@@ -1,4 +1,4 @@
-import { Point } from "../../pga2d/objects";
+import { Point } from "../../pga2d/objects.js";
 
 /**
  * A transformation that can be converted to p5 commands. Right now

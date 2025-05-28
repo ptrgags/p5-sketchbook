@@ -2,9 +2,9 @@ import { Point } from "../../pga2d/objects.js";
 import { Color } from "../../sketchlib/Color.js";
 import { HEIGHT, WIDTH } from "../../sketchlib/dimensions.js";
 import { PI, TAU } from "../../sketchlib/math_consts.js";
+import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
 import {
   CirclePrimitive,
-  GroupPrimitive,
   LinePrimitive,
   VectorPrimitive,
 } from "../../sketchlib/rendering/primitives.js";
@@ -31,10 +31,9 @@ const STYLE_CLOCK = new Style({
   width: 5,
   fill: Color.WHITE,
 });
-const CLOCK_FACE = new GroupPrimitive(
-  [CLOCK_CIRCLE, ...CLOCK_HASHES],
-  STYLE_CLOCK
-);
+const CLOCK_FACE = new GroupPrimitive([CLOCK_CIRCLE, ...CLOCK_HASHES], {
+  style: STYLE_CLOCK,
+});
 
 const LENGTH_SECOND_HAND = (OUTER_RADIUS * 9) / 10;
 const LENGTH_MINUTE_HAND = (OUTER_RADIUS * 7) / 10;
@@ -87,8 +86,10 @@ function render_clock_hands(time) {
     width: 4,
   });
 
-  const hour_minute = new GroupPrimitive([hour_hand, minute_hand], style_hands);
-  const second = new GroupPrimitive([second_hand], style_second);
+  const hour_minute = new GroupPrimitive([hour_hand, minute_hand], {
+    style: style_hands,
+  });
+  const second = new GroupPrimitive(second_hand, { style: style_second });
   return new GroupPrimitive([hour_minute, second]);
 }
 
@@ -113,8 +114,8 @@ function render_pendulum(time) {
 
   const bob = new CirclePrimitive(bob_center, BOB_RADIUS);
 
-  const pendulum_arm = new GroupPrimitive([arm], STYLE_ARM);
-  const pendulum_bob = new GroupPrimitive([bob], STYLE_BOB);
+  const pendulum_arm = new GroupPrimitive(arm, { style: STYLE_ARM });
+  const pendulum_bob = new GroupPrimitive(bob, { style: STYLE_BOB });
   return new GroupPrimitive([pendulum_arm, pendulum_bob]);
 }
 

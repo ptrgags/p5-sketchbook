@@ -2,15 +2,15 @@ import { Point } from "../../pga2d/objects.js";
 import { Color } from "../../sketchlib/Color.js";
 import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
 import { draw_primitive } from "../../sketchlib/p5_helpers/draw_primitive.js";
+import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
 import {
-  GroupPrimitive,
   LinePrimitive,
   TextPrimitive,
-  TextStyle,
 } from "../../sketchlib/rendering/primitives.js";
+import { TextStyle } from "../../sketchlib/rendering/TextStyle.js";
 import { Style } from "../../sketchlib/Style.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
-import { render_score, render_timeline } from "../lablib/music/render_score.js";
+import { render_score } from "../lablib/music/render_score.js";
 import { MuteButton } from "../lablib/MuteButton.js";
 import { Oklch } from "../lablib/Oklch.js";
 import { PlayButtonScene } from "../lablib/PlayButtonScene.js";
@@ -68,6 +68,28 @@ const MELODY_BUTTON_DIMENSIONS = Point.direction(
   MELODY_BUTTON_SIZE
 );
 
+const TEXT_STYLE = new TextStyle(24, "center");
+const TEXT_A = new TextPrimitive(
+  "Melody A",
+  Point.point(MARGIN + MELODY_BUTTON_SIZE / 2, HEIGHT / 2)
+);
+const TEXT_B = new TextPrimitive(
+  "Melody B",
+  Point.point(WIDTH - MARGIN - MELODY_BUTTON_SIZE / 2, HEIGHT / 2)
+);
+const TEXT_C = new TextPrimitive(
+  "Melody C",
+  Point.point(MARGIN + MELODY_BUTTON_SIZE / 2, HEIGHT / 2 + MELODY_BUTTON_SIZE)
+);
+
+const TEXT_COLOR = new Style({
+  fill: Color.WHITE,
+});
+const BUTTON_LABELS = new GroupPrimitive([TEXT_A, TEXT_B, TEXT_C], {
+  style: TEXT_COLOR,
+  text_style: TEXT_STYLE,
+});
+
 class SoundScene {
   constructor(sound) {
     this.sound = sound;
@@ -121,33 +143,6 @@ class SoundScene {
       this.selected_melody = "melody_c";
       this.sound.play_score(this.selected_melody);
     });
-
-    const text_style = new TextStyle(24, "center");
-    const text_a = new TextPrimitive(
-      "Melody A",
-      Point.point(MARGIN + MELODY_BUTTON_SIZE / 2, HEIGHT / 2),
-      text_style
-    );
-    const text_b = new TextPrimitive(
-      "Melody B",
-      Point.point(WIDTH - MARGIN - MELODY_BUTTON_SIZE / 2, HEIGHT / 2),
-      text_style
-    );
-    const text_c = new TextPrimitive(
-      "Melody C",
-      Point.point(
-        MARGIN + MELODY_BUTTON_SIZE / 2,
-        HEIGHT / 2 + MELODY_BUTTON_SIZE
-      ),
-      text_style
-    );
-
-    this.button_labels = new GroupPrimitive(
-      [text_a, text_b, text_c],
-      new Style({
-        fill: Color.WHITE,
-      })
-    );
   }
 
   render() {
@@ -156,7 +151,7 @@ class SoundScene {
     const melody_b = this.melody_b_button.debug_render();
     const melody_c = this.melody_c_button.debug_render();
 
-    const primitives = [mute, melody_a, melody_b, melody_c, this.button_labels];
+    const primitives = [mute, melody_a, melody_b, melody_c, BUTTON_LABELS];
 
     if (this.selected_melody !== undefined) {
       const current_time = SOUND.transport_time;
@@ -164,7 +159,7 @@ class SoundScene {
 
       const cursor = new GroupPrimitive(
         [new LinePrimitive(Point.point(x, 0), Point.point(x, WIDTH / 4))],
-        Style.DEFAULT_STROKE
+        { style: Style.DEFAULT_STROKE }
       );
 
       primitives.push(RENDERED_TIMELINES[this.selected_melody], cursor);

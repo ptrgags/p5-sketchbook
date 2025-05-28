@@ -1,6 +1,5 @@
 import { Point } from "../../pga2d/objects.js";
 import {
-  GroupPrimitive,
   LinePrimitive,
   RectPrimitive,
 } from "../../sketchlib/rendering/primitives.js";
@@ -9,6 +8,7 @@ import { Style } from "../../sketchlib/Style.js";
 import { RingBuffer } from "../lablib/RingBuffer.js";
 import { GeneralizedCoordinates } from "../lablib/VectorSpace.js";
 import { Oklch } from "../lablib/Oklch.js";
+import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
 
 const PIXELS_PER_METER = 100;
 const X_METERS = Point.DIR_X.scale(PIXELS_PER_METER);
@@ -66,7 +66,7 @@ function render_horizontal_spring(position, dimensions, num_coils, style) {
     const diag_up = new LinePrimitive(b, c);
     wires.push(diag_down, diag_up);
   }
-  return new GroupPrimitive(wires, style);
+  return new GroupPrimitive(wires, { style });
 }
 
 export class DoubleSpringSystem {
@@ -145,8 +145,8 @@ export class DoubleSpringSystem {
     }
 
     return [
-      new GroupPrimitive(phase1, this.spring1.spring_style),
-      new GroupPrimitive(phase2, this.spring2.spring_style),
+      new GroupPrimitive(phase1, { style: this.spring1.spring_style }),
+      new GroupPrimitive(phase2, { style: this.spring2.spring_style }),
     ];
   }
 
@@ -166,7 +166,7 @@ export class DoubleSpringSystem {
       new LinePrimitive(origin.sub(v_dir), origin.add(v_dir)),
     ];
 
-    return new GroupPrimitive(primitives, STYLE_AXIS);
+    return new GroupPrimitive(primitives, { style: STYLE_AXIS });
   }
 
   /**
@@ -211,9 +211,13 @@ export class DoubleSpringSystem {
       this.spring2.spring_style
     );
 
-    const walls = new GroupPrimitive([wall, floor], STYLE_WALLS);
-    const left_bob = new GroupPrimitive([bob1], this.spring1.bob_style);
-    const right_bob = new GroupPrimitive([bob2], this.spring2.bob_style);
+    const walls = new GroupPrimitive([wall, floor], { style: STYLE_WALLS });
+    const left_bob = new GroupPrimitive(bob1, {
+      style: this.spring1.bob_style,
+    });
+    const right_bob = new GroupPrimitive(bob2, {
+      style: this.spring2.bob_style,
+    });
 
     return new GroupPrimitive([
       walls,

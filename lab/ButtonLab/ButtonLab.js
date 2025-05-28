@@ -2,17 +2,15 @@ import { Point } from "../../pga2d/objects.js";
 import { WIDTH, HEIGHT, SCREEN_CENTER } from "../../sketchlib/dimensions.js";
 import { to_y_down } from "../../sketchlib/Direction.js";
 import { draw_primitive } from "../../sketchlib/p5_helpers/draw_primitive.js";
-import {
-  CirclePrimitive,
-  GroupPrimitive,
-} from "../../sketchlib/rendering/primitives.js";
+import { CirclePrimitive } from "../../sketchlib/rendering/primitives.js";
 import { Style } from "../../sketchlib/Style.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { TouchDPad } from "../lablib/TouchDPad.js";
 import { Rectangle } from "../lablib/Rectangle.js";
-import { ButtonState, TouchButton } from "../lablib/TouchButton.js";
+import { TouchButton } from "../lablib/TouchButton.js";
 import { ToggleButton, ToggleState } from "../lablib/ToggleButton.js";
 import { Color } from "../../sketchlib/Color.js";
+import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
 
 const MOUSE = new CanvasMouseHandler();
 const DPAD = new TouchDPad(
@@ -61,7 +59,7 @@ export const sketch = (p) => {
       : Style.DEFAULT_STROKE_FILL;
 
     const circle = new CirclePrimitive(position, 20);
-    const circle_group = new GroupPrimitive([circle], style);
+    const circle_group = new GroupPrimitive(circle, { style });
     const dpad = DPAD.render();
     const button = BUTTON.debug_render();
     const toggle = TOGGLE.debug_render();

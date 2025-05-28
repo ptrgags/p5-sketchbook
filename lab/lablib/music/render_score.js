@@ -1,8 +1,6 @@
 import { Point } from "../../../pga2d/objects.js";
-import {
-  GroupPrimitive,
-  RectPrimitive,
-} from "../../../sketchlib/rendering/primitives.js";
+import { GroupPrimitive } from "../../../sketchlib/rendering/GroupPrimitive.js";
+import { RectPrimitive } from "../../../sketchlib/rendering/primitives.js";
 import { Style } from "../../../sketchlib/Style.js";
 import { count_voices } from "./count_voices.js";
 import { Harmony, Score } from "./Score.js";
@@ -34,7 +32,7 @@ function render_block(offset, timeline, measure_dimensions) {
  * @param {Point} offset The top left corner where the timeline should be rendered.
  * @param {import("./Timeline.js").Timeline<T>} timeline The timeline of events
  * @param {Point} measure_dimensions Dimensions of a 1 measure x 1 voice block in pixels as a Point.direction
- * @return {import("../../../sketchlib/rendering/primitives.js").Primitive | undefined} A primitive to render, or undefined if there was no content to render.
+ * @return {import("../../../sketchlib/rendering/GroupPrimitive.js").Primitive | undefined} A primitive to render, or undefined if there was no content to render.
  */
 export function render_timeline(offset, timeline, measure_dimensions) {
   if (timeline instanceof Gap) {
@@ -107,7 +105,7 @@ export function render_score(offset, score, measure_dimensions, styles) {
       part,
       measure_dimensions
     );
-    const part_group = new GroupPrimitive([rendered], styles[i]);
+    const part_group = new GroupPrimitive(rendered, { style: styles[i] });
     parts.push(part_group);
 
     voices_so_far += count_voices(part);

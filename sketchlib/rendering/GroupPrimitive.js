@@ -1,10 +1,10 @@
+import { Style } from "../Style.js";
+import { TextStyle } from "./TextStyle.js";
+import { Transform } from "./Transform.js";
+
 /**
  * @typedef {import("./primitives").SimplePrimitive | GroupPrimitive} Primitive
  */
-
-import { Style } from "../Style";
-import { TextStyle } from "./TextStyle";
-import { Transform } from "./Transform";
 
 /**
  * @typedef {{
@@ -35,6 +35,7 @@ export class GroupPrimitive {
     }
     this.primitives = primitives;
 
+    settings = settings ?? {};
     this.style = settings.style;
     this.transform = settings.transform;
     this.text_style = settings.text_style;
@@ -44,3 +45,4 @@ export class GroupPrimitive {
     yield* this.primitives;
   }
 }
+GroupPrimitive.EMPTY = Object.freeze(new GroupPrimitive([]));
