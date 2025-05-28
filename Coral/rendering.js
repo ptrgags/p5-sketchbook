@@ -1,5 +1,8 @@
 import { Point } from "../pga2d/objects.js";
-import { LinePrimitive, RectPrimitive } from "../sketchlib/primitives.js";
+import {
+  LinePrimitive,
+  RectPrimitive,
+} from "../sketchlib/rendering/primitives.js";
 import { Rect } from "./Rect.js";
 import { CoralTile } from "./CoralTile.js";
 import { Direction } from "../sketchlib/Direction.js";

@@ -2,7 +2,7 @@ import { Point } from "../../../pga2d/objects.js";
 import {
   GroupPrimitive,
   RectPrimitive,
-} from "../../../sketchlib/primitives.js";
+} from "../../../sketchlib/rendering/primitives.js";
 import { Style } from "../../../sketchlib/Style.js";
 import { count_voices } from "./count_voices.js";
 import { Harmony, Score } from "./Score.js";
@@ -34,7 +34,7 @@ function render_block(offset, timeline, measure_dimensions) {
  * @param {Point} offset The top left corner where the timeline should be rendered.
  * @param {import("./Timeline.js").Timeline<T>} timeline The timeline of events
  * @param {Point} measure_dimensions Dimensions of a 1 measure x 1 voice block in pixels as a Point.direction
- * @return {import("../../../sketchlib/primitives.js").Primitive | undefined} A primitive to render, or undefined if there was no content to render.
+ * @return {import("../../../sketchlib/rendering/primitives.js").Primitive | undefined} A primitive to render, or undefined if there was no content to render.
  */
 export function render_timeline(offset, timeline, measure_dimensions) {
   if (timeline instanceof Gap) {

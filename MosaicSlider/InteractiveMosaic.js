@@ -1,5 +1,5 @@
 import { Point } from "../pga2d/objects.js";
-import { GroupPrimitive } from "../sketchlib/primitives.js";
+import { GroupPrimitive } from "../sketchlib/rendering/primitives.js";
 import { Color } from "../sketchlib/Color.js";
 import { MosaicGrid } from "./MosaicGrid.js";
 

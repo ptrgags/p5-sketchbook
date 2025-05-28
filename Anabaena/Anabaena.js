@@ -11,7 +11,7 @@ import {
   GroupPrimitive,
   LinePrimitive,
   VectorPrimitive,
-} from "../sketchlib/primitives.js";
+} from "../sketchlib/rendering/primitives.js";
 import { Style } from "../sketchlib/Style.js";
 import { Color } from "../sketchlib/Color.js";
 

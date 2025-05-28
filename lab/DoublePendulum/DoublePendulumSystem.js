@@ -3,7 +3,7 @@ import {
   CirclePrimitive,
   GroupPrimitive,
   LinePrimitive,
-} from "../../sketchlib/primitives.js";
+} from "../../sketchlib/rendering/primitives.js";
 import { RungeKuttaIntegrator } from "../lablib/RungeKuttaIntegrator.js";
 import { Style } from "../../sketchlib/Style.js";
 import { RingBuffer } from "../lablib/RingBuffer.js";

@@ -5,7 +5,7 @@ import {
   PolygonPrimitive,
   RectPrimitive,
   VectorPrimitive,
-} from "../../sketchlib/primitives.js";
+} from "../../sketchlib/rendering/primitives.js";
 import { Style } from "../../sketchlib/Style.js";
 import { DirectionInput } from "./DirectionInput.js";
 import { MouseInCanvas, MouseInput } from "./MouseInput.js";

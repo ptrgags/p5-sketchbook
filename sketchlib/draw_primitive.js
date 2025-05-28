@@ -11,7 +11,7 @@ import {
   BeziergonPrimitive,
   VectorPrimitive,
   TextPrimitive,
-} from "./primitives.js";
+} from "./rendering/primitives.js";
 
 function draw_rect(p, rect) {
   const { x, y } = rect.position;

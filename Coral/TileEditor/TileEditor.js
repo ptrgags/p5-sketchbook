@@ -15,7 +15,7 @@ import {
   GroupPrimitive,
   LinePrimitive,
   PointPrimitive,
-} from "../../sketchlib/primitives.js";
+} from "../../sketchlib/rendering/primitives.js";
 import { draw_primitive } from "../../sketchlib/draw_primitive.js";
 import {
   GRID_STYLE,

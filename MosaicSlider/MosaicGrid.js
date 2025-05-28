@@ -1,7 +1,10 @@
 import { Point } from "../pga2d/objects.js";
 import { Grid, Index2D } from "../sketchlib/Grid.js";
 import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
-import { GroupPrimitive, RectPrimitive } from "../sketchlib/primitives.js";
+import {
+  GroupPrimitive,
+  RectPrimitive,
+} from "../sketchlib/rendering/primitives.js";
 import { Style } from "../sketchlib/Style.js";
 import { PixelSwapPair } from "./PixelSwapPair.js";
 import { in_bounds } from "../sketchlib/in_bounds.js";

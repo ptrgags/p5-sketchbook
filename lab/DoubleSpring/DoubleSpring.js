@@ -1,7 +1,7 @@
 import { Point } from "../../pga2d/objects.js";
 import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
 import { draw_primitive } from "../../sketchlib/draw_primitive.js";
-import { GroupPrimitive } from "../../sketchlib/primitives.js";
+import { GroupPrimitive } from "../../sketchlib/rendering/primitives.js";
 import { Oklch } from "../lablib/Oklch.js";
 import { DoubleSpringSystem, Spring } from "./DoubleSpringSystem.js";
 

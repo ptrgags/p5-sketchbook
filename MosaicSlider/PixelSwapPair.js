@@ -1,5 +1,8 @@
 import { Point } from "../pga2d/objects.js";
-import { GroupPrimitive, RectPrimitive } from "../sketchlib/primitives.js";
+import {
+  GroupPrimitive,
+  RectPrimitive,
+} from "../sketchlib/rendering/primitives.js";
 import { Style } from "../sketchlib/Style.js";
 import { Tween } from "../sketchlib/Tween.js";
 

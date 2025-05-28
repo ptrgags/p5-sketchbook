@@ -1,6 +1,9 @@
 import { Point } from "../pga2d/objects.js";
 import { Color } from "../sketchlib/Color.js";
-import { CirclePrimitive, GroupPrimitive } from "../sketchlib/primitives.js";
+import {
+  CirclePrimitive,
+  GroupPrimitive,
+} from "../sketchlib/rendering/primitives.js";
 import { Style } from "../sketchlib/Style.js";
 
 const STYLE_SCLERA = new Style({ fill: Color.WHITE });

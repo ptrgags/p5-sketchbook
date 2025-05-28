@@ -7,7 +7,7 @@ import {
   LinePrimitive,
   TextPrimitive,
   TextStyle,
-} from "../../sketchlib/primitives.js";
+} from "../../sketchlib/rendering/primitives.js";
 import { Style } from "../../sketchlib/Style.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { render_score, render_timeline } from "../lablib/music/render_score.js";

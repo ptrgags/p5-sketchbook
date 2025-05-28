@@ -4,7 +4,7 @@ import {
   BezierPrimitive,
   GroupPrimitive,
   PolygonPrimitive,
-} from "../sketchlib/primitives.js";
+} from "../sketchlib/rendering/primitives.js";
 import { Random } from "../sketchlib/random.js";
 import { Vector2 } from "./Vector2.js";
 import { DifferentialNode, NEARBY_RADIUS } from "./DifferentialNode.js";

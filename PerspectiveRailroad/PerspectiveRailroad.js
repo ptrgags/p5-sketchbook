@@ -3,7 +3,7 @@ import {
   PolygonPrimitive,
   RectPrimitive,
   GroupPrimitive,
-} from "../sketchlib/primitives.js";
+} from "../sketchlib/rendering/primitives.js";
 import { Style } from "../sketchlib/Style.js";
 import { draw_primitive } from "../sketchlib/draw_primitive.js";
 import { Color } from "../sketchlib/Color.js";

@@ -5,7 +5,7 @@ import {
   GroupPrimitive,
   LinePrimitive,
   PolygonPrimitive,
-} from "../../sketchlib/primitives.js";
+} from "../../sketchlib/rendering/primitives.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Rectangle } from "./Rectangle.js";
 import { ToggleButton, ToggleState } from "./ToggleButton.js";
