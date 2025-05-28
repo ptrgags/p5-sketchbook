@@ -8,6 +8,7 @@ import {
   TextPrimitive,
 } from "../../sketchlib/rendering/primitives.js";
 import { TextStyle } from "../../sketchlib/rendering/TextStyle.js";
+import { Transform } from "../../sketchlib/rendering/Transform.js";
 import { Style } from "../../sketchlib/Style.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { render_score } from "../lablib/music/render_score.js";
@@ -90,6 +91,16 @@ const BUTTON_LABELS = new GroupPrimitive([TEXT_A, TEXT_B, TEXT_C], {
   text_style: TEXT_STYLE,
 });
 
+const TIMELINE_TOP = HEIGHT / 8;
+
+const CURSOR = new GroupPrimitive(
+  new LinePrimitive(
+    Point.point(WIDTH / 2, TIMELINE_TOP),
+    Point.point(WIDTH / 2, TIMELINE_TOP + HEIGHT / 4)
+  ),
+  { style: Style.DEFAULT_STROKE }
+);
+
 class SoundScene {
   constructor(sound) {
     this.sound = sound;
@@ -156,13 +167,13 @@ class SoundScene {
     if (this.selected_melody !== undefined) {
       const current_time = SOUND.transport_time;
       const x = current_time * MEASURE_DIMENSIONS.x;
-
-      const cursor = new GroupPrimitive(
-        [new LinePrimitive(Point.point(x, 0), Point.point(x, WIDTH / 4))],
-        { style: Style.DEFAULT_STROKE }
+      const transform = new Transform(
+        Point.direction(WIDTH / 2 - x, TIMELINE_TOP)
       );
+      const timeline = RENDERED_TIMELINES[this.selected_melody];
+      const shifted = new GroupPrimitive(timeline, { transform });
 
-      primitives.push(RENDERED_TIMELINES[this.selected_melody], cursor);
+      return new GroupPrimitive([...primitives, shifted, CURSOR]);
     }
 
     return new GroupPrimitive(primitives);
