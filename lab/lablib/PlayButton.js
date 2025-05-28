@@ -13,7 +13,7 @@ const PLAY_TRIANGLE = new PolygonPrimitive([
   Point.point(WIDTH / 2 - TRIANGLE_WIDTH / 2, HEIGHT / 2 + TRIANGLE_WIDTH / 2),
   Point.point(WIDTH / 2 + TRIANGLE_WIDTH / 2, HEIGHT / 2),
 ]);
-const PLAY_GROUP = new GroupPrimitive([PLAY_TRIANGLE], {
+const PLAY_GROUP = new GroupPrimitive(PLAY_TRIANGLE, {
   style: new Style({ stroke: Color.WHITE }),
 });
 
