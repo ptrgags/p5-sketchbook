@@ -1,12 +1,13 @@
 import { Point } from "../pga2d/objects.js";
 import { Grid, Index2D } from "../sketchlib/Grid.js";
 import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
-import { GroupPrimitive, RectPrimitive } from "../sketchlib/primitives.js";
+import { RectPrimitive } from "../sketchlib/rendering/primitives.js";
 import { Style } from "../sketchlib/Style.js";
 import { PixelSwapPair } from "./PixelSwapPair.js";
 import { in_bounds } from "../sketchlib/in_bounds.js";
 import { sec_to_frames } from "../sketchlib/Tween.js";
 import { Color } from "../sketchlib/Color.js";
+import { GroupPrimitive } from "../sketchlib/rendering/GroupPrimitive.js";
 
 const ROWS = 16;
 const COLS = 16;
@@ -145,7 +146,7 @@ export class MosaicGrid {
       by_colors[color_index].push(rect);
     });
     const color_groups = by_colors.map((x, i) => {
-      return new GroupPrimitive(x, this.styles[i]);
+      return new GroupPrimitive(x, { style: this.styles[i] });
     });
     return new GroupPrimitive(color_groups);
   }

@@ -1,5 +1,4 @@
-import { GroupPrimitive } from "../../sketchlib/primitives.js";
-import { draw_primitive } from "../../sketchlib/draw_primitive.js";
+import { draw_primitive } from "../../sketchlib/p5_helpers/draw_primitive.js";
 import { generate_maze } from "../../sketchlib/RandomDFSMaze.js";
 import { CoralTile } from "../CoralTile.js";
 import { Rect } from "../Rect.js";
@@ -16,6 +15,7 @@ import {
   SPLINE_STYLE,
 } from "../styles.js";
 import { Grid } from "../../sketchlib/Grid.js";
+import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -34,7 +34,7 @@ QUADS.fill((index) => {
 const QUAD_PRIMS = QUADS.map_array((_, quad) => {
   return render_quad(quad);
 }).flat();
-const QUAD_GROUP = new GroupPrimitive(QUAD_PRIMS, GRID_STYLE);
+const QUAD_GROUP = new GroupPrimitive(QUAD_PRIMS, { style: GRID_STYLE });
 
 function make_default_tiles(grid) {
   return grid.map((index, cell) => {
@@ -53,7 +53,7 @@ function make_tiles_from_tileset(grid, coral_tiles) {
 function render_splines(tile_grid) {
   const splines = find_splines(tile_grid);
   const spline_prims = splines.flatMap((x) => x.to_bezier_world());
-  return new GroupPrimitive(spline_prims, SPLINE_STYLE);
+  return new GroupPrimitive(spline_prims, { style: SPLINE_STYLE });
 }
 
 function render_connections(tile_grid) {
@@ -62,7 +62,7 @@ function render_connections(tile_grid) {
       return render_tile_connections(tile);
     })
     .flat();
-  return new GroupPrimitive(connection_prims, CONNECTION_STYLE);
+  return new GroupPrimitive(connection_prims, { style: CONNECTION_STYLE });
 }
 
 function render_walls(tile_grid) {
@@ -71,7 +71,7 @@ function render_walls(tile_grid) {
       return render_tile_walls(tile);
     })
     .flat();
-  return new GroupPrimitive(wall_prims, WALL_STYLE);
+  return new GroupPrimitive(wall_prims, { style: WALL_STYLE });
 }
 
 function render_geometry(tile_grid) {
@@ -84,8 +84,9 @@ function render_geometry(tile_grid) {
 function slurp_json(file) {
   const reader = new FileReader();
   const promise = new Promise((resolve, reject) => {
-    reader.addEventListener("load", (e) => {
+    reader.addEventListener("load", (/** @type {ProgressEvent} */ e) => {
       try {
+        //@ts-ignore
         const tileset = JSON.parse(e.target.result);
         resolve(tileset);
       } catch (err) {
@@ -152,6 +153,7 @@ export const sketch = (p) => {
     document.getElementById("import").addEventListener("input", async (e) => {
       clear_errors();
       try {
+        //@ts-ignore
         tileset = await import_tileset(e.target.files);
         update_geometry();
       } catch (err) {

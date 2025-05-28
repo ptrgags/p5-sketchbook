@@ -1,11 +1,11 @@
 import { Point } from "../../pga2d/objects.js";
 import { Color } from "../../sketchlib/Color.js";
 import { WIDTH } from "../../sketchlib/dimensions.js";
+import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
 import {
-  GroupPrimitive,
   LinePrimitive,
   PolygonPrimitive,
-} from "../../sketchlib/primitives.js";
+} from "../../sketchlib/rendering/primitives.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Rectangle } from "./Rectangle.js";
 import { ToggleButton, ToggleState } from "./ToggleButton.js";
@@ -49,21 +49,18 @@ const SPEAKER_BASE = new PolygonPrimitive([
   ),
 ]);
 
-const SPEAKER = new GroupPrimitive(
-  [SPEAKER_BASE, SPEAKER_CONE],
-  new Style({ stroke: Color.WHITE })
-);
+const SPEAKER = new GroupPrimitive([SPEAKER_BASE, SPEAKER_CONE], {
+  style: new Style({ stroke: Color.WHITE }),
+});
 
 const SPEAKER_SLASH = new GroupPrimitive(
-  [
-    new LinePrimitive(
-      SOUND_TOGGLE_CORNER.add(Point.direction(2, 2)),
-      SOUND_TOGGLE_CORNER.add(
-        Point.direction((3 * SOUND_TOGGLE_SIZE) / 4 - 2, SOUND_TOGGLE_SIZE - 2)
-      )
-    ),
-  ],
-  new Style({ stroke: Color.RED })
+  new LinePrimitive(
+    SOUND_TOGGLE_CORNER.add(Point.direction(2, 2)),
+    SOUND_TOGGLE_CORNER.add(
+      Point.direction((3 * SOUND_TOGGLE_SIZE) / 4 - 2, SOUND_TOGGLE_SIZE - 2)
+    )
+  ),
+  { style: new Style({ stroke: Color.RED }) }
 );
 const GROUP_MUTED = new GroupPrimitive([SPEAKER, SPEAKER_SLASH]);
 const GROUP_UNMUTED = SPEAKER;

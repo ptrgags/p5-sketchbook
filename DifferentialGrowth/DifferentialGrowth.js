@@ -2,7 +2,7 @@ import { Rectangle } from "./rectangle.js";
 import { Quadtree } from "./quadtree.js";
 import { DifferentialPolyline } from "./DifferentialPolyline.js";
 import { Style } from "../sketchlib/Style.js";
-import { draw_primitive } from "../sketchlib/draw_primitive.js";
+import { draw_primitive } from "../sketchlib/p5_helpers/draw_primitive.js";
 import { Vector2 } from "./Vector2.js";
 import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
 import { Color } from "../sketchlib/Color.js";

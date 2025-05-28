@@ -1,7 +1,8 @@
 import { Point } from "../pga2d/objects.js";
 import { Motor } from "../pga2d/versors.js";
 import { Color } from "./Color.js";
-import { GroupPrimitive, LinePrimitive, PointPrimitive } from "./primitives.js";
+import { GroupPrimitive } from "./rendering/GroupPrimitive.js";
+import { LinePrimitive, PointPrimitive } from "./rendering/primitives.js";
 import { Style } from "./Style.js";
 
 const SPINE_STYLE = Style.DEFAULT_STROKE;
@@ -154,10 +155,10 @@ export class AnimationChain {
     for (let i = 0; i < lines.length; i++) {
       lines[i] = new LinePrimitive(positions[i], positions[i + 1]);
     }
-    const spine_group = new GroupPrimitive(lines, SPINE_STYLE);
+    const spine_group = new GroupPrimitive(lines, { style: SPINE_STYLE });
 
     const centers = positions.map((x) => new PointPrimitive(x));
-    const centers_group = new GroupPrimitive(centers, CENTER_STYLE);
+    const centers_group = new GroupPrimitive(centers, { style: CENTER_STYLE });
 
     return new GroupPrimitive([spine_group, centers_group]);
   }

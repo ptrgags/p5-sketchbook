@@ -2,11 +2,11 @@ import { Line, Point } from "../pga2d/objects.js";
 import {
   PolygonPrimitive,
   RectPrimitive,
-  GroupPrimitive,
-} from "../sketchlib/primitives.js";
+} from "../sketchlib/rendering/primitives.js";
 import { Style } from "../sketchlib/Style.js";
-import { draw_primitive } from "../sketchlib/draw_primitive.js";
+import { draw_primitive } from "../sketchlib/p5_helpers/draw_primitive.js";
 import { Color } from "../sketchlib/Color.js";
+import { GroupPrimitive } from "../sketchlib/rendering/GroupPrimitive.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -166,13 +166,13 @@ function make_background() {
     Point.point(0, 0),
     Point.direction(WIDTH, VP_RAILS.y)
   );
-  const sky = new GroupPrimitive([sky_prim], SKY_STYLE);
+  const sky = new GroupPrimitive(sky_prim, { style: SKY_STYLE });
 
   const ground_prim = new RectPrimitive(
     Point.point(0, VP_RAILS.y),
     Point.direction(WIDTH, HEIGHT - VP_RAILS.y)
   );
-  const ground = new GroupPrimitive([ground_prim], GROUND_STYLE);
+  const ground = new GroupPrimitive(ground_prim, { style: GROUND_STYLE });
 
   return new GroupPrimitive([sky, ground]);
 }
@@ -240,6 +240,12 @@ function make_ties() {
 }
 
 class AnimatedRails {
+  /**
+   * Constructor
+   * @param {PolygonPrimitive[]} triangles Perspective triangles that make up parts of the rail
+   * @param {number} start_frame First frame of the animation
+   * @param {number} duration_frames Duration of the animation in frames
+   */
   constructor(triangles, start_frame, duration_frames) {
     triangles.forEach((x) => {
       if (x.vertices.length !== 3) {
@@ -303,10 +309,10 @@ export const sketch = (p) => {
     const tie_prims = ANIMATED_TIES.map((x) =>
       x.compute_polygon(p.frameCount)
     ).filter((x) => x !== undefined);
-    const ties = new GroupPrimitive(tie_prims, TIE_STYLE);
+    const ties = new GroupPrimitive(tie_prims, { style: TIE_STYLE });
 
     const rail_prims = ANIMATED_RAILS.compute_polygons(p.frameCount);
-    const rails = new GroupPrimitive(rail_prims, RAIL_STYLE);
+    const rails = new GroupPrimitive(rail_prims, { style: RAIL_STYLE });
 
     const dynamic_geom = new GroupPrimitive([ties, rails]);
 

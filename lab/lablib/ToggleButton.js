@@ -1,6 +1,7 @@
 import { Point } from "../../pga2d/objects.js";
 import { Color } from "../../sketchlib/Color.js";
-import { GroupPrimitive, RectPrimitive } from "../../sketchlib/primitives.js";
+import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
+import { RectPrimitive } from "../../sketchlib/rendering/primitives.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Rectangle } from "./Rectangle.js";
 import { ButtonState, TouchButton } from "./TouchButton.js";
@@ -65,7 +66,7 @@ export class ToggleButton {
         ? Style.DEFAULT_FILL
         : new Style({ fill: Color.MAGENTA });
 
-    return new GroupPrimitive([rect], style);
+    return new GroupPrimitive(rect, { style });
   }
 
   /**

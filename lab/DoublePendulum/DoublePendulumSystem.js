@@ -1,9 +1,8 @@
 import { Point } from "../../pga2d/objects.js";
 import {
   CirclePrimitive,
-  GroupPrimitive,
   LinePrimitive,
-} from "../../sketchlib/primitives.js";
+} from "../../sketchlib/rendering/primitives.js";
 import { RungeKuttaIntegrator } from "../lablib/RungeKuttaIntegrator.js";
 import { Style } from "../../sketchlib/Style.js";
 import { RingBuffer } from "../lablib/RingBuffer.js";
@@ -11,6 +10,7 @@ import { GeneralizedCoordinates } from "../lablib/VectorSpace.js";
 import { PI, TAU } from "../../sketchlib/math_consts.js";
 import { mod } from "../../sketchlib/mod.js";
 import { Color } from "../../sketchlib/Color.js";
+import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
 
 const STYLE_AXIS = Style.DEFAULT_STROKE.with_width(2);
 const ARM_STYLE = STYLE_AXIS;
@@ -169,8 +169,8 @@ export class DoublePendulumSystem {
     }
 
     return [
-      new GroupPrimitive(phase1, STYLE_PHASE1),
-      new GroupPrimitive(phase2, STYLE_PHASE2),
+      new GroupPrimitive(phase1, { style: STYLE_PHASE1 }),
+      new GroupPrimitive(phase2, { style: STYLE_PHASE2 }),
     ];
   }
 
@@ -190,7 +190,7 @@ export class DoublePendulumSystem {
       new LinePrimitive(origin.sub(theta_dot_dir), origin.add(theta_dot_dir)),
     ];
 
-    return new GroupPrimitive(primitives, STYLE_AXIS);
+    return new GroupPrimitive(primitives, { style: STYLE_AXIS });
   }
 
   angles_to_positions(origin, theta1, theta2) {
@@ -227,8 +227,8 @@ export class DoublePendulumSystem {
     }
 
     return [
-      new GroupPrimitive(history1, STYLE_PHASE1),
-      new GroupPrimitive(history2, STYLE_PHASE2),
+      new GroupPrimitive(history1, { style: STYLE_PHASE1 }),
+      new GroupPrimitive(history2, { style: STYLE_PHASE2 }),
     ];
   }
 
@@ -257,6 +257,6 @@ export class DoublePendulumSystem {
       PIXELS_PER_METER * this.pendulum2.bob_radius
     );
 
-    return new GroupPrimitive([arm1, arm2, bob1, bob2], ARM_STYLE);
+    return new GroupPrimitive([arm1, arm2, bob1, bob2], { style: ARM_STYLE });
   }
 }

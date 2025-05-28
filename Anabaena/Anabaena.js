@@ -1,19 +1,19 @@
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { fix_mouse_coords } from "../sketchlib/fix_mouse_coords.js";
 
-import { draw_primitive } from "../sketchlib/draw_primitive.js";
+import { draw_primitive } from "../sketchlib/p5_helpers/draw_primitive.js";
 import { Point } from "../pga2d/objects.js";
 import { prevent_mobile_scroll } from "../sketchlib/prevent_mobile_scroll.js";
 import { LSystem } from "./LSystem.js";
 import { sec_to_frames, Tween } from "../sketchlib/Tween.js";
 import { AnimationChain, Joint } from "../sketchlib/AnimationChain.js";
 import {
-  GroupPrimitive,
   LinePrimitive,
   VectorPrimitive,
-} from "../sketchlib/primitives.js";
+} from "../sketchlib/rendering/primitives.js";
 import { Style } from "../sketchlib/Style.js";
 import { Color } from "../sketchlib/Color.js";
+import { GroupPrimitive } from "../sketchlib/rendering/GroupPrimitive.js";
 
 const INITIAL_POSITION = Point.point(WIDTH / 2, HEIGHT - 50);
 const MIN_BEND_ANGLE = (7 * Math.PI) / 8;
@@ -223,12 +223,12 @@ class AnabaenaCatenula {
     }
 
     const primitives = [
-      new GroupPrimitive(l_cells, STYLE_CELL_L),
-      new GroupPrimitive(s_cells, STYLE_CELL_S),
+      new GroupPrimitive(l_cells, { style: STYLE_CELL_L }),
+      new GroupPrimitive(s_cells, { style: STYLE_CELL_S }),
     ];
 
     if (show_arrows) {
-      primitives.push(new GroupPrimitive(arrows, STYLE_ARROW));
+      primitives.push(new GroupPrimitive(arrows, { style: STYLE_ARROW }));
     }
 
     return new GroupPrimitive(primitives);

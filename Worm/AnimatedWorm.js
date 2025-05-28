@@ -2,16 +2,16 @@ import { Point } from "../pga2d/objects.js";
 import {
   BeziergonPrimitive,
   CirclePrimitive,
-  GroupPrimitive,
   LinePrimitive,
   PointPrimitive,
-} from "../sketchlib/primitives.js";
+} from "../sketchlib/rendering/primitives.js";
 import { Style } from "../sketchlib/Style.js";
 import { Color } from "../sketchlib/Color.js";
 import { Motor } from "../pga2d/versors.js";
 import { AnimationChain, Joint } from "../sketchlib/AnimationChain.js";
 import { is_nearly } from "../sketchlib/is_nearly.js";
 import { GooglyEye } from "./GooglyEye.js";
+import { GroupPrimitive } from "../sketchlib/rendering/GroupPrimitive.js";
 
 const WORM_SEGMENTS = 60;
 const WORM_SEGMENT_SEPARATION = 30;
@@ -120,10 +120,10 @@ export class AnimatedWorm {
     for (let i = 0; i < lines.length; i++) {
       lines[i] = new LinePrimitive(positions[i], positions[i + 1]);
     }
-    const spine_group = new GroupPrimitive(lines, SPINE_STYLE);
+    const spine_group = new GroupPrimitive(lines, { style: SPINE_STYLE });
 
     const centers = positions.map((x) => new PointPrimitive(x));
-    const centers_group = new GroupPrimitive(centers, CENTER_STYLE);
+    const centers_group = new GroupPrimitive(centers, { style: CENTER_STYLE });
 
     return new GroupPrimitive([spine_group, centers_group]);
   }
@@ -199,7 +199,7 @@ export class AnimatedWorm {
     const all_points = left.concat(tail_points, right, head_points);
     const beziergon = BeziergonPrimitive.interpolate_points(all_points);
 
-    return new GroupPrimitive([beziergon], WORM_STYLE);
+    return new GroupPrimitive(beziergon, { style: WORM_STYLE });
   }
 
   render_eyes() {

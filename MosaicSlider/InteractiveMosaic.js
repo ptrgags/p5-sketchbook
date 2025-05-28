@@ -1,6 +1,6 @@
 import { Point } from "../pga2d/objects.js";
-import { GroupPrimitive } from "../sketchlib/primitives.js";
 import { Color } from "../sketchlib/Color.js";
+import { GroupPrimitive } from "../sketchlib/rendering/GroupPrimitive.js";
 import { MosaicGrid } from "./MosaicGrid.js";
 
 const SliderState = {

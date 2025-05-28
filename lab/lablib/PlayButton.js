@@ -1,10 +1,8 @@
 import { Point } from "../../pga2d/objects.js";
 import { Color } from "../../sketchlib/Color.js";
 import { HEIGHT, WIDTH } from "../../sketchlib/dimensions.js";
-import {
-  GroupPrimitive,
-  PolygonPrimitive,
-} from "../../sketchlib/primitives.js";
+import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
+import { PolygonPrimitive } from "../../sketchlib/rendering/primitives.js";
 import { Style } from "../../sketchlib/Style.js";
 import { SCREEN_RECT } from "./Rectangle.js";
 import { TouchButton } from "./TouchButton.js";
@@ -15,10 +13,9 @@ const PLAY_TRIANGLE = new PolygonPrimitive([
   Point.point(WIDTH / 2 - TRIANGLE_WIDTH / 2, HEIGHT / 2 + TRIANGLE_WIDTH / 2),
   Point.point(WIDTH / 2 + TRIANGLE_WIDTH / 2, HEIGHT / 2),
 ]);
-const PLAY_GROUP = new GroupPrimitive(
-  [PLAY_TRIANGLE],
-  new Style({ stroke: Color.WHITE })
-);
+const PLAY_GROUP = new GroupPrimitive(PLAY_TRIANGLE, {
+  style: new Style({ stroke: Color.WHITE }),
+});
 
 export class PlayButton {
   constructor() {

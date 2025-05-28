@@ -1,27 +1,57 @@
-import { Point } from "../pga2d/objects.js";
-import { Style } from "./Style.js";
+import { Point } from "../../pga2d/objects.js";
 
+/**
+ * A single point. This is rendered as a small circle of fixed size.
+ */
 export class PointPrimitive {
+  /**
+   * Constructor
+   * @param {Point} position The position for this point
+   */
   constructor(position) {
     this.position = position;
   }
 }
 
+/**
+ * A circle with a center and radius
+ */
 export class CirclePrimitive {
+  /**
+   * Constructor
+   * @param {Point} position The center of the circle
+   * @param {number} radius The radius of the circle
+   */
   constructor(position, radius) {
     this.position = position;
     this.radius = radius;
   }
 }
 
+/**
+ * Rectangle
+ */
 export class RectPrimitive {
+  /**
+   * Constructor
+   * @param {Point} position The top left corner of the rectangle as a Point.point
+   * @param {Point} dimensions The dimensions of the rectangle as a Point.direction
+   */
   constructor(position, dimensions) {
     this.position = position;
     this.dimensions = dimensions;
   }
 }
 
+/**
+ * Line segment
+ */
 export class LinePrimitive {
+  /**
+   * Constructor
+   * @param {Point} a The start point
+   * @param {Point} b The end point
+   */
   constructor(a, b) {
     this.a = a;
     this.b = b;
@@ -43,7 +73,17 @@ export class VectorPrimitive {
   }
 }
 
+/**
+ * Cubic Bezier curve
+ */
 export class BezierPrimitive {
+  /**
+   * Constructor
+   * @param {Point} a Start point
+   * @param {Point} b First tangent point
+   * @param {Point} c Second tangent point
+   * @param {Point} d End point
+   */
   constructor(a, b, c, d) {
     this.a = a;
     this.b = b;
@@ -51,6 +91,15 @@ export class BezierPrimitive {
     this.d = d;
   }
 
+  /**
+   * Convert from a B-spline to a bezier curve. B-splines can be used to
+   * smooth out a sharp polygon into a smooth curve.
+   * @param {Point} b0 First control point
+   * @param {Point} b1 Second control point
+   * @param {Point} b2 Third control point
+   * @param {Point} b3 Fourth control point
+   * @returns {BezierPrimitive} The equivalent Bezier curve
+   */
   static from_b_spline(b0, b1, b2, b3) {
     // See https://en.wikipedia.org/wiki/B-spline#Cubic_B-Splines
 
@@ -83,7 +132,14 @@ export class BezierPrimitive {
   }
 }
 
+/**
+ * A closed polygon
+ */
 export class PolygonPrimitive {
+  /**
+   * Constructor
+   * @param {Point[]} vertices Vertices of the polygon. Do not repeat the first point, closing the polygon is handled automatically.
+   */
   constructor(vertices) {
     this.vertices = vertices;
   }
@@ -93,7 +149,14 @@ export class PolygonPrimitive {
   }
 }
 
+/**
+ * A curved polygon where the edges are Bezier curves
+ */
 export class BeziergonPrimitive {
+  /**
+   * Constructor
+   * @param {BezierPrimitive[]} curves The
+   */
   constructor(curves) {
     this.curves = curves;
   }
@@ -120,66 +183,20 @@ export class BeziergonPrimitive {
 }
 
 /**
- * Temporary for now
- * @private
- */
-export class TextStyle {
-  /**
-   *
-   * @param {number} size
-   * @param {"left" | "center"} align How to align the text
-   */
-  constructor(size, align) {
-    this.size = size;
-    this.align = align;
-  }
-}
-
-/**
- * Temporary, I need to
- * @private
+ * Text primitive
  */
 export class TextPrimitive {
   /**
-   *
+   * Constructor
    * @param {string} text The text to display
    * @param {Point} position The position to anchor the text
-   * @param {TextStyle} text_style The style for the text
    */
-  constructor(text, position, text_style) {
+  constructor(text, position) {
     this.text = text;
     this.position = position;
-    this.text_style = text_style;
   }
 }
 
 /**
- * A logical grouping of primitives to be rendered together, in the order
- * listed in the primitives array. This is the main way to apply styling to
- * primitives.
- *
- * Note: GroupPrimitive can be nested, but the most specific style will be the
- * one that's applied.
- */
-export class GroupPrimitive {
-  /**
-   * Constructor
-   * @param {Primitive[]} primitives The primitives in this group
-   * @param {Style} [style] An optional style to apply to these primitives.
-   */
-  constructor(primitives, style) {
-    if (!Array.isArray(primitives)) {
-      throw new Error("primitives must be an array of Primitive");
-    }
-    this.primitives = primitives;
-    this.style = style;
-  }
-
-  *[Symbol.iterator]() {
-    yield* this.primitives;
-  }
-}
-
-/**
- * @typedef {GroupPrimitive | BezierPrimitive | PolygonPrimitive | BezierPrimitive | LinePrimitive | RectPrimitive | CirclePrimitive | PointPrimitive | BeziergonPrimitive | VectorPrimitive | TextPrimitive} Primitive
+ * @typedef {BezierPrimitive | PolygonPrimitive | BezierPrimitive | LinePrimitive | RectPrimitive | CirclePrimitive | PointPrimitive | BeziergonPrimitive | VectorPrimitive | TextPrimitive} SimplePrimitive
  */
