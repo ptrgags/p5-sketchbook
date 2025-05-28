@@ -200,7 +200,7 @@ function apply_text_style(p, text_style) {
     ? get_vertical_align(p, text_style.v_align)
     : undefined;
 
-  if (h_align && v_align) {
+  if (h_align || v_align) {
     p.textAlign(h_align, v_align);
   }
 }

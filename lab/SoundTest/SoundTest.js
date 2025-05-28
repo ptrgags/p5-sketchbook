@@ -68,7 +68,7 @@ const MELODY_BUTTON_DIMENSIONS = Point.direction(
   MELODY_BUTTON_SIZE
 );
 
-const TEXT_STYLE = new TextStyle(24, "center");
+const TEXT_STYLE = new TextStyle(24, "center", "center");
 const TEXT_A = new TextPrimitive(
   "Melody A",
   Point.point(MARGIN + MELODY_BUTTON_SIZE / 2, HEIGHT / 2)
