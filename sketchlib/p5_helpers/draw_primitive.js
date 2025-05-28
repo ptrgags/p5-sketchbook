@@ -1,5 +1,5 @@
-import { Point } from "../pga2d/objects.js";
-import { Motor } from "../pga2d/versors.js";
+import { Point } from "../../pga2d/objects.js";
+import { Motor } from "../../pga2d/versors.js";
 import {
   LinePrimitive,
   RectPrimitive,
@@ -11,7 +11,7 @@ import {
   BeziergonPrimitive,
   VectorPrimitive,
   TextPrimitive,
-} from "./rendering/primitives.js";
+} from "../rendering/primitives.js";
 
 function draw_rect(p, rect) {
   const { x, y } = rect.position;

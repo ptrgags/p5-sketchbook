@@ -1,7 +1,7 @@
 import { Point } from "../../pga2d/objects.js";
 import { WIDTH, HEIGHT, SCREEN_CENTER } from "../../sketchlib/dimensions.js";
 import { to_y_down } from "../../sketchlib/Direction.js";
-import { draw_primitive } from "../../sketchlib/draw_primitive.js";
+import { draw_primitive } from "../../sketchlib/p5_helpers/draw_primitive.js";
 import {
   CirclePrimitive,
   GroupPrimitive,

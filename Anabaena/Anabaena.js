@@ -1,7 +1,7 @@
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { fix_mouse_coords } from "../sketchlib/fix_mouse_coords.js";
 
-import { draw_primitive } from "../sketchlib/draw_primitive.js";
+import { draw_primitive } from "../sketchlib/p5_helpers/draw_primitive.js";
 import { Point } from "../pga2d/objects.js";
 import { prevent_mobile_scroll } from "../sketchlib/prevent_mobile_scroll.js";
 import { LSystem } from "./LSystem.js";

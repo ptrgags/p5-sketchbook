@@ -5,7 +5,7 @@ import {
   GroupPrimitive,
 } from "../sketchlib/rendering/primitives.js";
 import { Style } from "../sketchlib/Style.js";
-import { draw_primitive } from "../sketchlib/draw_primitive.js";
+import { draw_primitive } from "../sketchlib/p5_helpers/draw_primitive.js";
 import { Color } from "../sketchlib/Color.js";
 
 const WIDTH = 500;

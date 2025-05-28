@@ -1,6 +1,6 @@
 import { Point } from "../../pga2d/objects.js";
 import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
-import { draw_primitive } from "../../sketchlib/draw_primitive.js";
+import { draw_primitive } from "../../sketchlib/p5_helpers/draw_primitive.js";
 import { GroupPrimitive } from "../../sketchlib/rendering/primitives.js";
 import { DoublePendulumSystem, Pendulum } from "./DoublePendulumSystem.js";
 

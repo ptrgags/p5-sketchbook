@@ -16,7 +16,7 @@ import {
   LinePrimitive,
   PointPrimitive,
 } from "../../sketchlib/rendering/primitives.js";
-import { draw_primitive } from "../../sketchlib/draw_primitive.js";
+import { draw_primitive } from "../../sketchlib/p5_helpers/draw_primitive.js";
 import {
   GRID_STYLE,
   WALL_STYLE,

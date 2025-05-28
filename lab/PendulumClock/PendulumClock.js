@@ -1,5 +1,5 @@
 import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
-import { draw_primitive } from "../../sketchlib/draw_primitive.js";
+import { draw_primitive } from "../../sketchlib/p5_helpers/draw_primitive.js";
 import { GroupPrimitive } from "../../sketchlib/rendering/primitives.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { N16, N32, N8 } from "../lablib/music/durations.js";
