@@ -1,10 +1,10 @@
 import { Point } from "../../pga2d/objects.js";
 import { Motor } from "../../pga2d/versors.js";
+import { GroupPrimitive } from "../rendering/GroupPrimitive.js";
 import {
   LinePrimitive,
   RectPrimitive,
   PolygonPrimitive,
-  GroupPrimitive,
   BezierPrimitive,
   PointPrimitive,
   CirclePrimitive,
@@ -12,7 +12,15 @@ import {
   VectorPrimitive,
   TextPrimitive,
 } from "../rendering/primitives.js";
+import { TextStyle } from "../rendering/TextStyle.js";
+import { Transform } from "../rendering/Transform.js";
+import { Style } from "../Style.js";
 
+/**
+ * Draw a rectangle to the screen
+ * @param {import("p5")} p p5.js library
+ * @param {RectPrimitive} rect The rectangle to draw
+ */
 function draw_rect(p, rect) {
   const { x, y } = rect.position;
   const { x: w, y: h } = rect.dimensions;
@@ -20,11 +28,21 @@ function draw_rect(p, rect) {
 }
 
 const POINT_RADIUS = 4;
+/**
+ * Draw a point as a small circle
+ * @param {import("p5")} p The p5.js library
+ * @param {PointPrimitive} point The point to draw
+ */
 function draw_point(p, point) {
   const { x, y } = point.position;
   p.circle(x, y, 2 * POINT_RADIUS);
 }
 
+/**
+ * Draw a circle
+ * @param {import("p5")} p The p5.js library
+ * @param {CirclePrimitive} circle The circle to draw
+ */
 function draw_circle(p, circle) {
   const { x, y } = circle.position;
   p.circle(x, y, 2 * circle.radius);
@@ -36,6 +54,11 @@ function draw_line(p, line) {
   p.line(a.x, a.y, b.x, b.y);
 }
 
+/**
+ * Draw a closed polygon
+ * @param {import("p5")} p The p5.js library
+ * @param {PolygonPrimitive} polygon The polygon to draw
+ */
 function draw_polygon(p, polygon) {
   p.beginShape();
   for (const vertex of polygon) {
@@ -49,7 +72,7 @@ const ARROW_ANGLE = Math.PI / 6;
 /**
  * Draw a vector as an arrow. This only uses lines so styling only
  * comes from a stroke
- * @param {any} p p5 context
+ * @param {import("p5")} p p5.js library
  * @param {VectorPrimitive} vector The vector to draw
  */
 function draw_vector(p, vector) {
@@ -66,6 +89,11 @@ function draw_vector(p, vector) {
   p.line(tip_right.x, tip_right.y, tip.x, tip.y);
 }
 
+/**
+ * Draw a beziergon as a single shape with bezier vertices
+ * @param {import("p5")} p The p5.js library
+ * @param {BeziergonPrimitive} beziergon The beziergon to draw
+ */
 function draw_beziergon(p, beziergon) {
   p.beginShape();
   const first_point = beziergon.curves[0].a;
@@ -76,32 +104,31 @@ function draw_beziergon(p, beziergon) {
   p.endShape();
 }
 
+/**
+ * Draw a single bezier curve
+ * @param {import("p5")} p The p5.js library
+ * @param {BezierPrimitive} bezier The bezier curve to draw
+ */
 function draw_bezier(p, bezier) {
   const { a, b, c, d } = bezier;
   p.bezier(a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y);
 }
 
 /**
- * Draw text. This will likely change to move the text styling to the
- * GroupPrimitive level
- * @private
- * @param {any} p p5.js context
+ * Draw text.
+ * @param {import("p5")} p p5.js context
  * @param {TextPrimitive} text_primitive the text primitive to render
  */
 function draw_text(p, text_primitive) {
-  p.push();
-
-  p.textSize(text_primitive.text_style.size);
-
-  if (text_primitive.text_style.align === "center") {
-    p.textAlign(p.CENTER);
-  }
-
   const { x, y } = text_primitive.position;
   p.text(text_primitive.text, x, y);
-  p.pop();
 }
 
+/**
+ * Apply stroke and fill styling
+ * @param {import("p5")} p p5.js context
+ * @param {Style} style The style to use
+ */
 function apply_style(p, style) {
   if (style.stroke) {
     const { r, g, b } = style.stroke;
@@ -120,10 +147,92 @@ function apply_style(p, style) {
   p.strokeWeight(style.stroke_width);
 }
 
+/**
+ * Convert string align values to p5.js constants
+ * @param {import("p5")} p p5.js library
+ * @param {"left" | "center" | "right"} h_align The horizontal align value
+ * @returns {import("p5").HORIZ_ALIGN} the corresponding p5.js constant
+ */
+function get_horizontal_align(p, h_align) {
+  switch (h_align) {
+    case "center":
+      return p.CENTER;
+    case "right":
+      return p.RIGHT;
+    default:
+      return p.LEFT;
+  }
+}
+
+/**
+ * Convert string align values to p5.js constants
+ * @param {import("p5")} p p5.js library
+ * @param {"top" | "bottom" | "center" | "baseline"} v_align The vertical align value
+ * @returns {import("p5").VERT_ALIGN} The corresponding p5.js constant
+ */
+function get_vertical_align(p, v_align) {
+  switch (v_align) {
+    case "center":
+      return p.CENTER;
+    case "top":
+      return p.TOP;
+    case "baseline":
+      return p.BASELINE;
+    default:
+      return p.BOTTOM;
+  }
+}
+
+/**
+ * Apply any text styles present in a TextStyle object
+ * @param {import("p5")} p p5.js library
+ * @param {TextStyle} text_style The text style
+ */
+function apply_text_style(p, text_style) {
+  if (text_style.size !== undefined) {
+    p.textSize(text_style.size);
+  }
+
+  const h_align = text_style.h_align
+    ? get_horizontal_align(p, text_style.h_align)
+    : undefined;
+  const v_align = text_style.v_align
+    ? get_vertical_align(p, text_style.v_align)
+    : undefined;
+
+  if (h_align && v_align) {
+    p.textAlign(h_align, v_align);
+  }
+}
+
+/**
+ * Apply a transform
+ * @param {import("p5")} p p5.js library
+ * @param {Transform} transform The transform to apply
+ */
+function apply_transform(p, transform) {
+  const translation = transform.translation;
+  p.translate(translation.x, translation.y);
+}
+
+/**
+ * Draw a group primitive. This will always push a new drawing state, apply
+ * any settings, and pop at the end.
+ * @param {import("p5")} p p5.js library
+ * @param {GroupPrimitive} group the group to render
+ */
 function draw_group(p, group) {
   p.push();
   if (group.style) {
     apply_style(p, group.style);
+  }
+
+  if (group.text_style) {
+    apply_text_style(p, group.text_style);
+  }
+
+  if (group.transform) {
+    apply_transform(p, group.transform);
   }
 
   for (const child of group) {
@@ -133,6 +242,11 @@ function draw_group(p, group) {
   p.pop();
 }
 
+/**
+ * Render a primitive, recursing over groups
+ * @param {import("p5")} p The p5.js drawing library
+ * @param {import("../rendering/GroupPrimitive.js").Primitive} primitive The root primitive to draw
+ */
 export function draw_primitive(p, primitive) {
   if (primitive instanceof GroupPrimitive) {
     draw_group(p, primitive);

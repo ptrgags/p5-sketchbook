@@ -6,8 +6,8 @@ import { Point } from "../../pga2d/objects";
  */
 export class Transform {
   /**
-   *
-   * @param {Point} translation
+   * Constructor
+   * @param {Point} translation The translation amount
    */
   constructor(translation) {
     this.translation = translation;

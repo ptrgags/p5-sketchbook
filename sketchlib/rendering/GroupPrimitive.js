@@ -29,10 +29,12 @@ export class GroupPrimitive {
    * @param {GroupSettings} [settings] Optional settings to apply to everything in the group.
    */
   constructor(primitives, settings) {
+    // For convenience, if there is a single primitive, wrap it in an array
     if (!Array.isArray(primitives)) {
-      throw new Error("primitives must be an array of Primitive");
+      primitives = [primitives];
     }
     this.primitives = primitives;
+
     this.style = settings.style;
     this.transform = settings.transform;
     this.text_style = settings.text_style;

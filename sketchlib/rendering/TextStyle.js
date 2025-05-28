@@ -11,7 +11,7 @@ export class TextStyle {
    */
   constructor(size, h_align, v_align) {
     this.size = size;
-    this.align = h_align;
+    this.h_align = h_align;
     this.v_align = v_align;
   }
 }
