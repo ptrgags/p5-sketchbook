@@ -145,7 +145,12 @@ export class SoundManager {
     this.synths.tick = tick;
   }
 
-  get time() {
+  /**
+   * Get the current transport time as a float, as this is helpful for
+   * animation.
+   * @return {number} The current transport time in measures as a float
+   */
+  get transport_time() {
     const transport = this.tone.getTransport();
     const [measures, beats, sixteenths] = transport.position
       .toString()

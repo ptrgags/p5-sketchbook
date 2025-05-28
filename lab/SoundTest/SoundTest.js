@@ -159,7 +159,7 @@ class SoundScene {
     const primitives = [mute, melody_a, melody_b, melody_c, this.button_labels];
 
     if (this.selected_melody !== undefined) {
-      const current_time = SOUND.time;
+      const current_time = SOUND.transport_time;
       const x = current_time * MEASURE_DIMENSIONS.x;
 
       const cursor = new GroupPrimitive(
