@@ -4,12 +4,15 @@ import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
 import { draw_primitive } from "../../sketchlib/draw_primitive.js";
 import {
   GroupPrimitive,
+  LinePrimitive,
   TextPrimitive,
   TextStyle,
 } from "../../sketchlib/primitives.js";
 import { Style } from "../../sketchlib/Style.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
+import { render_score, render_timeline } from "../lablib/music/render_score.js";
 import { MuteButton } from "../lablib/MuteButton.js";
+import { Oklch } from "../lablib/Oklch.js";
 import { PlayButtonScene } from "../lablib/PlayButtonScene.js";
 import { Rectangle } from "../lablib/Rectangle.js";
 import { SoundManager } from "../lablib/SoundManager.js";
@@ -30,6 +33,30 @@ const SOUND_MANIFEST = {
     melody_c: symmetry_melody(),
   },
 };
+
+const PART_STYLES = Oklch.gradient(
+  new Oklch(0.7, 0.1, 0),
+  new Oklch(0.7, 0.1, 350),
+  5
+).map(
+  (x) =>
+    new Style({
+      stroke: x.adjust_lightness(-0.2).to_srgb(),
+      fill: x.to_srgb(),
+    })
+);
+
+const RENDERED_TIMELINES = {};
+const MEASURE_DIMENSIONS = Point.direction(25, 25);
+
+for (const [key, score] of Object.entries(SOUND_MANIFEST.scores)) {
+  RENDERED_TIMELINES[key] = render_score(
+    Point.ORIGIN,
+    score,
+    MEASURE_DIMENSIONS,
+    PART_STYLES
+  );
+}
 
 //@ts-ignore
 const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
@@ -78,16 +105,21 @@ class SoundScene {
       )
     );
 
+    this.selected_melody = undefined;
+
     this.melody_a_button.events.addEventListener("click", () => {
-      this.sound.play_score("melody_a");
+      this.selected_melody = "melody_a";
+      this.sound.play_score(this.selected_melody);
     });
 
     this.melody_b_button.events.addEventListener("click", () => {
-      this.sound.play_score("melody_b");
+      this.selected_melody = "melody_b";
+      this.sound.play_score(this.selected_melody);
     });
 
     this.melody_c_button.events.addEventListener("click", () => {
-      this.sound.play_score("melody_c");
+      this.selected_melody = "melody_c";
+      this.sound.play_score(this.selected_melody);
     });
 
     const text_style = new TextStyle(24, "center");
@@ -124,13 +156,21 @@ class SoundScene {
     const melody_b = this.melody_b_button.debug_render();
     const melody_c = this.melody_c_button.debug_render();
 
-    return new GroupPrimitive([
-      mute,
-      melody_a,
-      melody_b,
-      melody_c,
-      this.button_labels,
-    ]);
+    const primitives = [mute, melody_a, melody_b, melody_c, this.button_labels];
+
+    if (this.selected_melody !== undefined) {
+      const current_time = SOUND.transport_time;
+      const x = current_time * MEASURE_DIMENSIONS.x;
+
+      const cursor = new GroupPrimitive(
+        [new LinePrimitive(Point.point(x, 0), Point.point(x, WIDTH / 4))],
+        Style.DEFAULT_STROKE
+      );
+
+      primitives.push(RENDERED_TIMELINES[this.selected_melody], cursor);
+    }
+
+    return new GroupPrimitive(primitives);
   }
 
   update() {}

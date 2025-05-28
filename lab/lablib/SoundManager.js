@@ -146,6 +146,22 @@ export class SoundManager {
   }
 
   /**
+   * Get the current transport time as a float, as this is helpful for
+   * animation.
+   * @return {number} The current transport time in measures as a float
+   */
+  get transport_time() {
+    const transport = this.tone.getTransport();
+    const [measures, beats, sixteenths] = transport.position
+      .toString()
+      .split(":");
+
+    return (
+      parseFloat(measures) + parseFloat(beats) / 4 + parseFloat(sixteenths) / 16
+    );
+  }
+
+  /**
    * Compile and save a score
    * @param {string} score_id The score ID to use. This must be the same as
    * the ID used for play_score() later.
