@@ -27,6 +27,11 @@
         <p>Click the buttons to select between three different melodies</p>
         <p>Updates:</p>
         <dl>
+          <dt>2025-05-28</dt>
+          <dd>
+            I added a visualization of the musical timeline with a moving
+            cursor. It's a little basic so far, I may tweak this over time.
+          </dd>
           <dt>2025-05-14</dt>
           <dd>
             I added a third melody that takes a short motif and transforms it
@@ -61,8 +66,21 @@
             sandbox for experiments.
           </li>
           <li>
-            The sound toggle button should be factored out into a reusable
-            class, anything with sound will need that.
+            I'd like to make the timeline move to the left rather than the
+            cursor move to the right. To do this, I'll need to start adding
+            transformations (translations specifically) to my primitive
+            rendering system. Something I've been meaning to do for a while.
+          </li>
+          <li>
+            For drawing loops in the timeline, to do so at a fine granularity
+            would mean rendering the inner music and then copy/pasting it a
+            number of times. However, the tricky bit is the last repeat that in
+            some cases will require cropping the content to a shorter width.
+          </li>
+          <li>
+            For drawing cycles in the timeline, the tricky bit is we want to
+            draw the nested material, but the widths have to be rescaled based
+            on the cycle division.
           </li>
           <li>
             Some more game engine concepts like "scenes/rooms" and "objects"
