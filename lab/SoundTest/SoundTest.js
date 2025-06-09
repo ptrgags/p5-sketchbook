@@ -127,25 +127,6 @@ function make_button_labels(buttons) {
   });
 }
 
-/*
-const TEXT_A = new TextPrimitive(
-  "Melody A",
-  Point.point(MARGIN + MELODY_BUTTON_SIZE / 2, HEIGHT / 2)
-);
-const TEXT_B = new TextPrimitive(
-  "Melody B",
-  Point.point(WIDTH - MARGIN - MELODY_BUTTON_SIZE / 2, HEIGHT / 2)
-);
-const TEXT_C = new TextPrimitive(
-  "Melody C",
-  Point.point(MARGIN + MELODY_BUTTON_SIZE / 2, HEIGHT / 2 + MELODY_BUTTON_SIZE)
-);
-
-const BUTTON_LABELS = new GroupPrimitive([TEXT_A, TEXT_B, TEXT_C], {
-  style: TEXT_COLOR,
-  text_style: TEXT_STYLE,
-});*/
-
 const BUTTON_LABELS = make_button_labels(MELODY_BUTTONS);
 
 const TIMELINE_TOP = HEIGHT / 8;
