@@ -1,3 +1,4 @@
+import { Point } from "../pga2d/objects.js";
 import { Direction } from "./Direction.js";
 
 /**
@@ -110,6 +111,19 @@ export class Index2D {
     }
 
     return undefined;
+  }
+
+  /**
+   * Convert an index (assumed to be row-major) to a point in the world
+   * @param {Point} offset The offset in units of the world as a Point.point
+   * @param {Point} stride A Point.direction for the stride
+   * @returns {Point} A point in the world
+   */
+  to_world(offset, stride) {
+    const { i, j } = this;
+    const { x, y } = offset;
+    const { x: dx, y: dy } = stride;
+    return Point.direction(x + j * dx, y + i * dy);
   }
 }
 
