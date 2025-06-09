@@ -96,7 +96,6 @@ MELODY_BUTTONS.set(
   new MelodyButtonDescriptor("binary_progression", "4-bit Chords")
 );
 
-const FIRST_BUTTON_OFFSET = Point.direction(50, HEIGHT / 2);
 const MELODY_BUTTON_SIZE = 150;
 const MELODY_BUTTON_DIMENSIONS = Point.direction(
   MELODY_BUTTON_SIZE,
@@ -107,6 +106,18 @@ const TEXT_STYLE = new TextStyle(16, "center", "center");
 const TEXT_COLOR = new Style({
   fill: Color.WHITE,
 });
+
+const GRID_BOUNDARY = new Rectangle(
+  Point.point(0, HEIGHT / 2),
+  Point.direction(WIDTH, HEIGHT / 2)
+);
+const GRID_MARGIN = Point.direction(75, 80);
+const [BUTTON_OFFSET, BUTTON_STRIDE] = MELODY_BUTTONS.compute_layout(
+  GRID_BOUNDARY,
+  MELODY_BUTTON_DIMENSIONS,
+  GRID_MARGIN
+);
+
 /**
  * Make the text primitives for the buttons.
  * @param {Grid<MelodyButtonDescriptor>} buttons The button descriptions
@@ -115,8 +126,8 @@ const TEXT_COLOR = new Style({
 function make_button_labels(buttons) {
   const primitives = buttons.map_array((index, descriptor) => {
     const point = index.to_world(
-      FIRST_BUTTON_OFFSET.add(MELODY_BUTTON_CENTER_OFFSET),
-      MELODY_BUTTON_DIMENSIONS
+      BUTTON_OFFSET.add(MELODY_BUTTON_CENTER_OFFSET),
+      BUTTON_STRIDE
     );
     return new TextPrimitive(descriptor.label, point);
   });
@@ -163,10 +174,7 @@ class SoundScene {
     this.selected_melody = undefined;
 
     this.melody_buttons = melodies.map_array((index, descriptor) => {
-      const corner = index.to_world(
-        FIRST_BUTTON_OFFSET,
-        MELODY_BUTTON_DIMENSIONS
-      );
+      const corner = index.to_world(BUTTON_OFFSET, BUTTON_STRIDE);
       const rectangle = new Rectangle(corner, MELODY_BUTTON_DIMENSIONS);
       const button = new TouchButton(rectangle);
       button.events.addEventListener("click", () => {

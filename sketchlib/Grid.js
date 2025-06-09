@@ -1,3 +1,4 @@
+import { Rectangle } from "../lab/lablib/Rectangle.js";
 import { Point } from "../pga2d/objects.js";
 import { Direction } from "./Direction.js";
 
@@ -315,5 +316,33 @@ export class Grid {
       index.left(),
       this.down(index),
     ].filter((x) => x !== undefined && this.in_bounds(x));
+  }
+
+  /**
+   * Evenly space items of item_size within the bounding rectangle according
+   * to the number of rows/columns in this grid.
+   * @param {Rectangle} boundary The bounding rectangle
+   * @param {Point} item_size The size of each item as a Point.direction
+   * @param {Point} margin How much space to leave around the x or y direction (note that this will be doubled). Any remaining space will be used as padding
+   * @return {[Point, Point]} [offset, stride] The computed offset and stride
+   */
+  compute_layout(boundary, item_size, margin) {
+    // If we arranged the items as tightly as possible, how big would this
+    // rectangle be?
+    const total_item_space = Point.direction(
+      item_size.x * this.cols,
+      item_size.y * this.rows
+    );
+    const remaining_space = boundary.dimensions.sub(total_item_space);
+    const padding = remaining_space.sub(margin.scale(2));
+
+    const padding_size = Point.direction(
+      padding.x / (this.cols - 1),
+      padding.y / (this.rows - 1)
+    );
+
+    const offset = boundary.position.add(margin);
+    const stride = item_size.add(padding_size);
+    return [offset, stride];
   }
 }
