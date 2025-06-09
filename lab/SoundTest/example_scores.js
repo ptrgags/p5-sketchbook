@@ -1,6 +1,21 @@
 import { N1, N2, N4, N8 } from "../lablib/music/durations.js";
 import { MidiPitch } from "../lablib/music/pitch_conversions.js";
-import { A, B, C, C3, D, E, F, G, GS, REST } from "../lablib/music/pitches.js";
+import {
+  A,
+  B,
+  B4,
+  C,
+  C3,
+  C4,
+  D,
+  E,
+  E4,
+  F,
+  G,
+  G4,
+  GS,
+  REST,
+} from "../lablib/music/pitches.js";
 import { retrograde } from "../lablib/music/retrograde.js";
 import {
   Harmony,
@@ -13,6 +28,7 @@ import {
   Rest,
   Score,
 } from "../lablib/music/Score.js";
+import { Gap } from "../lablib/music/Timeline.js";
 import { transpose_scale_degree } from "../lablib/music/transpose.js";
 import { Rational } from "../lablib/Rational.js";
 
@@ -170,4 +186,79 @@ export function symmetry_melody() {
   const part_midi = map_pitch(MAJOR_SCALE, part_scale);
 
   return new Score(["supersaw", part_midi]);
+}
+
+/**
+ * Create an integer range [0, n)
+ * Why is this not a built-in function??
+ * @param {number} n The maximum value
+ * @returns {number[]} an array [0, 1, ..., n - 1]
+ */
+function range(n) {
+  return new Array(n).fill(0).map((_, i) => i);
+}
+
+/**
+ * Take a number and convert to bits
+ * @param {number} x
+ * @param {number} width how many bits wide should the results be
+ * @returns An array of size width storing the bits
+ */
+function to_bits(x, width) {
+  const bits = new Array(width).fill(0).map((_, i) => Boolean((x >> i) & 1));
+  bits.reverse();
+  return bits;
+}
+
+/**
+ * Given a pattern of bits and corresponding notes, make a chord
+ *
+ * @template P
+ * @param {Boolean[]} bit_pattern The bits in MSB first order
+ * @param {Note<P>[]} chord_notes The notes to use for the chord
+ * @param {Gap} silence The rest to insert in gaps
+ */
+function bit_chord(bit_pattern, chord_notes, silence) {
+  return new Harmony(
+    ...bit_pattern.map((bit, i) => (bit ? chord_notes[i] : silence))
+  );
+}
+
+export function binary_progression() {
+  const chord_duration = N1;
+  const major_seventh_upwards = [C4, E4, G4, B4].map(
+    (x) => new Note(x, chord_duration)
+  );
+
+  const major_seventh_downwards = [...major_seventh_upwards].reverse();
+
+  const silence = new Rest(chord_duration);
+
+  // For the upper voices, Generate all 4-bit patterns and construct chords
+  // from them.
+  /**
+   * @type {Boolean[][]}
+   */
+  const bit_patterns4 = range(16).map((x) => to_bits(x, 4));
+
+  /**
+   * @type {Melody<Number>}
+   */
+  const upwards_progression = new Melody(
+    ...bit_patterns4.map((x) => bit_chord(x, major_seventh_upwards, silence))
+  );
+  const downwards_progression = new Melody(
+    ...bit_patterns4.map((x) => bit_chord(x, major_seventh_downwards, silence))
+  );
+
+  const full_progression = new Melody(
+    upwards_progression,
+    downwards_progression
+  );
+
+  const bass_drone = C3;
+  const drone = new Note(bass_drone, full_progression.duration);
+
+  const part = new Harmony(full_progression, drone);
+  return new Score(["poly", part]);
 }
