@@ -5,13 +5,16 @@ import {
   B,
   B4,
   C,
+  C2,
   C3,
   C4,
   D,
   E,
+  E3,
   E4,
   F,
   G,
+  G3,
   G4,
   GS,
   REST,
@@ -199,10 +202,10 @@ function range(n) {
 }
 
 /**
- * Take a number and convert to bits
- * @param {number} x
+ * Take a number and convert to bits. They are returned in LSB order
+ * @param {number} x A number
  * @param {number} width how many bits wide should the results be
- * @returns An array of size width storing the bits
+ * @returns An array of size width storing the bits.
  */
 function to_bits(x, width) {
   const bits = new Array(width).fill(0).map((_, i) => Boolean((x >> i) & 1));
@@ -224,13 +227,11 @@ function bit_chord(bit_pattern, chord_notes, silence) {
   );
 }
 
-export function binary_progression() {
+export function binary_chords() {
   const chord_duration = N1;
-  const major_seventh_upwards = [C4, E4, G4, B4].map(
+  const major_seventh = [B4, G4, E4, C4].map(
     (x) => new Note(x, chord_duration)
   );
-
-  const major_seventh_downwards = [...major_seventh_upwards].reverse();
 
   const silence = new Rest(chord_duration);
 
@@ -239,16 +240,17 @@ export function binary_progression() {
   /**
    * @type {Boolean[][]}
    */
-  const bit_patterns4 = range(16).map((x) => to_bits(x, 4));
+  const bits_lsb = range(16).map((x) => to_bits(x, 4));
+  const bits_msb = [...bits_lsb].reverse();
 
   /**
    * @type {Melody<Number>}
    */
   const upwards_progression = new Melody(
-    ...bit_patterns4.map((x) => bit_chord(x, major_seventh_upwards, silence))
+    ...bits_lsb.map((x) => bit_chord(x, major_seventh, silence))
   );
   const downwards_progression = new Melody(
-    ...bit_patterns4.map((x) => bit_chord(x, major_seventh_downwards, silence))
+    ...bits_msb.map((x) => bit_chord(x, major_seventh, silence))
   );
 
   const full_progression = new Melody(
@@ -256,9 +258,8 @@ export function binary_progression() {
     downwards_progression
   );
 
-  const bass_drone = C3;
-  const drone = new Note(bass_drone, full_progression.duration);
+  const rhythm_bass = parse_cycle(N1, [C3, [C3, G3], C3, [C3, G3]]);
+  const rhythm_loop = new MusicLoop(full_progression.duration, rhythm_bass);
 
-  const part = new Harmony(full_progression, drone);
-  return new Score(["poly", part]);
+  return new Score(["supersaw", full_progression], ["square", rhythm_loop]);
 }

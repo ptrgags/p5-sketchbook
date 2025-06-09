@@ -21,7 +21,7 @@ import { Rectangle } from "../lablib/Rectangle.js";
 import { SoundManager } from "../lablib/SoundManager.js";
 import { TouchButton } from "../lablib/TouchButton.js";
 import {
-  binary_progression,
+  binary_chords,
   layered_melody,
   phase_scale,
   symmetry_melody,
@@ -35,7 +35,7 @@ const SOUND_MANIFEST = {
     layered_melody: layered_melody(),
     phase_scale: phase_scale(),
     symmetry_melody: symmetry_melody(),
-    binary_progression: binary_progression(),
+    binary_progression: binary_chords(),
   },
 };
 
