@@ -241,7 +241,6 @@ export function binary_chords() {
    * @type {Boolean[][]}
    */
   const bits_lsb = range(16).map((x) => to_bits(x, 4));
-  const bits_msb = [...bits_lsb].reverse();
 
   /**
    * @type {Melody<Number>}
@@ -249,8 +248,12 @@ export function binary_chords() {
   const upwards_progression = new Melody(
     ...bits_lsb.map((x) => bit_chord(x, major_seventh, silence))
   );
+
+  // For the second half, flip the bit patterns vertically while keeping the
+  // pitches in the same rows. This makes the chord start on the 7th and work
+  // downwards
   const downwards_progression = new Melody(
-    ...bits_msb.map((x) => bit_chord(x, major_seventh, silence))
+    ...bits_lsb.map((x) => bit_chord([...x].reverse(), major_seventh, silence))
   );
 
   const full_progression = new Melody(
