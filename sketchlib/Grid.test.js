@@ -1,6 +1,11 @@
 import { describe, it, expect, test } from "vitest";
 import { Grid, griderator, Index2D } from "./Grid";
 import { Direction } from "./Direction";
+import { Rectangle } from "../lab/lablib/Rectangle";
+import { Point } from "../pga2d/objects";
+import { PGA_MATCHERS } from "../pga2d/pga_matchers";
+
+expect.extend(PGA_MATCHERS);
 
 describe("Index2D", () => {
   it("throws for negative row", () => {
@@ -101,6 +106,30 @@ describe("Index2D", () => {
         expect(result).toBe(expected);
       }
     );
+  });
+
+  describe("to_world", () => {
+    it("computes correct position without offset", () => {
+      const index = new Index2D(1, 3);
+      const offset = Point.ORIGIN;
+      const stride = Point.direction(2, 4);
+
+      const result = index.to_world(offset, stride);
+
+      const expected = Point.direction(6, 4);
+      expect(result).toBePoint(expected);
+    });
+
+    it("computes correct position with offset", () => {
+      const index = new Index2D(1, 3);
+      const offset = Point.point(4, 4);
+      const stride = Point.direction(2, 4);
+
+      const result = index.to_world(offset, stride);
+
+      const expected = Point.direction(10, 8);
+      expect(result).toBePoint(expected);
+    });
   });
 });
 
@@ -387,5 +416,63 @@ describe("Grid", () => {
       new Index2D(2, 0),
     ];
     expect(result).toEqual(expected);
+  });
+
+  describe("compute_layout", () => {
+    it("computes a layout without spacing or margins", () => {
+      const grid = new Grid(2, 2);
+      const boundary = new Rectangle(Point.ORIGIN, Point.direction(4, 4));
+      const item_size = Point.direction(2, 2);
+      const margin = Point.ZERO;
+
+      const [offset, stride] = grid.compute_layout(boundary, item_size, margin);
+
+      const expected_offset = Point.ORIGIN;
+      const expected_stride = Point.direction(2, 2);
+      expect(offset).toBePoint(expected_offset);
+      expect(stride).toBePoint(expected_stride);
+    });
+
+    it("computes a layout with margins", () => {
+      const grid = new Grid(2, 2);
+      const boundary = new Rectangle(Point.ORIGIN, Point.direction(8, 12));
+      const item_size = Point.direction(2, 2);
+      const margin = Point.direction(2, 4);
+
+      const [offset, stride] = grid.compute_layout(boundary, item_size, margin);
+
+      const expected_offset = Point.point(2, 4);
+      const expected_stride = Point.direction(2, 2);
+      expect(offset).toBePoint(expected_offset);
+      expect(stride).toBePoint(expected_stride);
+    });
+
+    it("computes a layout with spacing", () => {
+      const grid = new Grid(2, 2);
+      const boundary = new Rectangle(Point.ORIGIN, Point.direction(8, 10));
+      const item_size = Point.direction(2, 2);
+      const margin = Point.ZERO;
+
+      const [offset, stride] = grid.compute_layout(boundary, item_size, margin);
+
+      const expected_offset = Point.ORIGIN;
+      const expected_stride = Point.direction(6, 8);
+      expect(offset).toBePoint(expected_offset);
+      expect(stride).toBePoint(expected_stride);
+    });
+
+    it("computes a layout with spacing and margins", () => {
+      const grid = new Grid(3, 3);
+      const boundary = new Rectangle(Point.ORIGIN, Point.direction(16, 8));
+      const item_size = Point.direction(2, 2);
+      const margin = Point.direction(4, 1);
+
+      const [offset, stride] = grid.compute_layout(boundary, item_size, margin);
+
+      const expected_offset = Point.point(4, 1);
+      const expected_stride = Point.direction(3, 2);
+      expect(offset).toBePoint(expected_offset);
+      expect(stride).toBePoint(expected_stride);
+    });
   });
 });
