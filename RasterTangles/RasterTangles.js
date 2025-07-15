@@ -5,9 +5,7 @@ const LOW_MASK_COUNT = 5;
 const MED_MASK_COUNT = 6;
 const FINE_MASK_COUNT = 5;
 
-//const PALETTE = ["#fb6107","#f3de2c","#7cb518","#5c8001","#fbb02d"];
 const PALETTE = ["#5f0f40", "#9a031e", "#fb8b24", "#e36414", "#0f4c5c"];
-//const PALETTE = ["#03071e","#370617","#6a040f","#9d0208","#d00000","#dc2f02","#e85d04","#f48c06","#faa307","#ffba08"];
 
 let low_masks = new Array(LOW_MASK_COUNT);
 let med_masks = new Array(MED_MASK_COUNT);
@@ -74,10 +72,6 @@ function raster_tangle(p, root_mask, first_choices, second_choices) {
   img.updatePixels();
   return img;
 }
-
-function generate_tangle() {}
-
-function regenerate_tangle() {}
 
 export const sketch = (p) => {
   let dirty = true;
