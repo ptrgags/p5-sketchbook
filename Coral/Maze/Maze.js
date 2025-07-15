@@ -16,6 +16,7 @@ import {
 } from "../styles.js";
 import { Grid } from "../../sketchlib/Grid.js";
 import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
+import { group, style } from "../../sketchlib/rendering/shorthand.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -34,7 +35,7 @@ QUADS.fill((index) => {
 const QUAD_PRIMS = QUADS.map_array((_, quad) => {
   return render_quad(quad);
 }).flat();
-const QUAD_GROUP = new GroupPrimitive(QUAD_PRIMS, { style: GRID_STYLE });
+const QUAD_GROUP = style(QUAD_PRIMS, GRID_STYLE);
 
 function make_default_tiles(grid) {
   return grid.map((index, cell) => {
@@ -53,7 +54,7 @@ function make_tiles_from_tileset(grid, coral_tiles) {
 function render_splines(tile_grid) {
   const splines = find_splines(tile_grid);
   const spline_prims = splines.flatMap((x) => x.to_bezier_world());
-  return new GroupPrimitive(spline_prims, { style: SPLINE_STYLE });
+  return style(spline_prims, SPLINE_STYLE);
 }
 
 function render_connections(tile_grid) {
@@ -62,7 +63,7 @@ function render_connections(tile_grid) {
       return render_tile_connections(tile);
     })
     .flat();
-  return new GroupPrimitive(connection_prims, { style: CONNECTION_STYLE });
+  return style(connection_prims, CONNECTION_STYLE);
 }
 
 function render_walls(tile_grid) {
@@ -71,14 +72,14 @@ function render_walls(tile_grid) {
       return render_tile_walls(tile);
     })
     .flat();
-  return new GroupPrimitive(wall_prims, { style: WALL_STYLE });
+  return style(wall_prims, WALL_STYLE);
 }
 
 function render_geometry(tile_grid) {
   const connections = render_connections(tile_grid);
   const walls = render_walls(tile_grid);
   const splines = render_splines(tile_grid);
-  return new GroupPrimitive([connections, walls, splines]);
+  return group(connections, walls, splines);
 }
 
 function slurp_json(file) {

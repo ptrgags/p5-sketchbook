@@ -6,6 +6,7 @@ import {
   RectPrimitive,
   VectorPrimitive,
 } from "../../sketchlib/rendering/primitives.js";
+import { group, style } from "../../sketchlib/rendering/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { DirectionInput } from "./DirectionInput.js";
 import { MouseInCanvas, MouseInput } from "./MouseInput.js";
@@ -187,12 +188,10 @@ export class TouchDPad {
     const STYLE_IDLE = Style.DEFAULT_STROKE.with_width(2);
     const STYLE_PRESSED = Style.DEFAULT_STROKE_FILL.with_width(2);
 
-    const idle_group = new GroupPrimitive(idle_buttons, { style: STYLE_IDLE });
-    const pressed_group = new GroupPrimitive(pressed_buttons, {
-      style: STYLE_PRESSED,
-    });
+    const idle_group = style(idle_buttons, STYLE_IDLE);
+    const pressed_group = style(pressed_buttons, STYLE_PRESSED);
 
-    return new GroupPrimitive([idle_group, pressed_group]);
+    return group(idle_group, pressed_group);
   }
 
   debug_render() {
@@ -220,8 +219,6 @@ export class TouchDPad {
       center.add(digital_offset)
     );
 
-    return new GroupPrimitive([boundary, analog_arrow, digital_arrow], {
-      style: Style.DEFAULT_STROKE,
-    });
+    return style([boundary, analog_arrow, digital_arrow], Style.DEFAULT_STROKE);
   }
 }

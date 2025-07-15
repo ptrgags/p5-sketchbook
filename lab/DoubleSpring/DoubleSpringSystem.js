@@ -9,6 +9,7 @@ import { RingBuffer } from "../lablib/RingBuffer.js";
 import { GeneralizedCoordinates } from "../lablib/VectorSpace.js";
 import { Oklch } from "../lablib/Oklch.js";
 import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
+import { group, style } from "../../sketchlib/rendering/shorthand.js";
 
 const PIXELS_PER_METER = 100;
 const X_METERS = Point.DIR_X.scale(PIXELS_PER_METER);
@@ -47,10 +48,10 @@ export class Spring {
  * @param {Point} position Position of the top left corner of the spring in pixels
  * @param {Point} dimensions Direction encoding the width of the height in pixels
  * @param {number} num_coils How many coils to draw
- * @param {Style} style The style to render the lines with.
+ * @param {Style} line_style The style to render the lines with.
  * @returns {GroupPrimitive} The lines in the spring
  */
-function render_horizontal_spring(position, dimensions, num_coils, style) {
+function render_horizontal_spring(position, dimensions, num_coils, line_style) {
   const { x: w, y: h } = dimensions;
 
   const delta_x = Point.direction(w / num_coils, 0);
@@ -66,7 +67,7 @@ function render_horizontal_spring(position, dimensions, num_coils, style) {
     const diag_up = new LinePrimitive(b, c);
     wires.push(diag_down, diag_up);
   }
-  return new GroupPrimitive(wires, { style });
+  return style(wires, line_style);
 }
 
 export class DoubleSpringSystem {
@@ -145,8 +146,8 @@ export class DoubleSpringSystem {
     }
 
     return [
-      new GroupPrimitive(phase1, { style: this.spring1.spring_style }),
-      new GroupPrimitive(phase2, { style: this.spring2.spring_style }),
+      style(phase1, this.spring1.spring_style),
+      style(phase2, this.spring2.spring_style),
     ];
   }
 
@@ -166,16 +167,15 @@ export class DoubleSpringSystem {
       new LinePrimitive(origin.sub(v_dir), origin.add(v_dir)),
     ];
 
-    return new GroupPrimitive(primitives, { style: STYLE_AXIS });
+    return style(primitives, STYLE_AXIS);
   }
 
   /**
    * Render the spring system
    * @param {Point} origin The bottom left corner of where the animation will be drawn in pixels
-   * @param {Style} left_spring_style The color of the left spring
    * @returns {GroupPrimitive} The primtitive to render
    */
-  render(origin, left_spring_style) {
+  render(origin) {
     const [x1, , x2] = this.simulation.state;
     const { rest_length: l1, bob_width: w1 } = this.spring1;
     const { rest_length: l2, bob_width: w2 } = this.spring2;
@@ -211,20 +211,10 @@ export class DoubleSpringSystem {
       this.spring2.spring_style
     );
 
-    const walls = new GroupPrimitive([wall, floor], { style: STYLE_WALLS });
-    const left_bob = new GroupPrimitive(bob1, {
-      style: this.spring1.bob_style,
-    });
-    const right_bob = new GroupPrimitive(bob2, {
-      style: this.spring2.bob_style,
-    });
+    const walls = style([wall, floor], STYLE_WALLS);
+    const left_bob = style(bob1, this.spring1.bob_style);
+    const right_bob = style(bob2, this.spring2.bob_style);
 
-    return new GroupPrimitive([
-      walls,
-      left_spring,
-      right_spring,
-      left_bob,
-      right_bob,
-    ]);
+    return group(walls, left_spring, right_spring, left_bob, right_bob);
   }
 }

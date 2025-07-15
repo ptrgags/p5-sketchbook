@@ -2,6 +2,7 @@ import { Point } from "../pga2d/objects.js";
 import { Color } from "../sketchlib/Color.js";
 import { GroupPrimitive } from "../sketchlib/rendering/GroupPrimitive.js";
 import { CirclePrimitive } from "../sketchlib/rendering/primitives.js";
+import { group, style } from "../sketchlib/rendering/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 
 const STYLE_SCLERA = new Style({ fill: Color.WHITE });
@@ -35,15 +36,15 @@ export class GooglyEye {
       this.position,
       this.sclera_radius
     );
-    const sclera = new GroupPrimitive(sclera_circle, { style: STYLE_SCLERA });
+    const sclera = style(sclera_circle, STYLE_SCLERA);
 
     const pupil_center = this.position.add(
       this.look_direction.scale(this.sclera_radius - this.pupil_radius)
     );
     const pupil_circle = new CirclePrimitive(pupil_center, this.pupil_radius);
-    const pupil = new GroupPrimitive(pupil_circle, { style: STYLE_PUPIL });
+    const pupil = style(pupil_circle, STYLE_PUPIL);
 
-    return new GroupPrimitive([sclera, pupil]);
+    return group(sclera, pupil);
   }
 
   render() {

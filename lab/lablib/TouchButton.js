@@ -2,6 +2,7 @@ import { Point } from "../../pga2d/objects.js";
 import { Color } from "../../sketchlib/Color.js";
 import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
 import { RectPrimitive } from "../../sketchlib/rendering/primitives.js";
+import { style } from "../../sketchlib/rendering/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Rectangle } from "./Rectangle.js";
 
@@ -54,9 +55,8 @@ export class TouchButton {
 
   debug_render() {
     const rect = new RectPrimitive(this.rect.position, this.rect.dimensions);
-    const style = this.get_debug_style();
 
-    return new GroupPrimitive(rect, { style });
+    return style(rect, this.get_debug_style());
   }
 
   /**

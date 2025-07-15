@@ -1,6 +1,7 @@
 import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
 import { draw_primitive } from "../../sketchlib/p5_helpers/draw_primitive.js";
 import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
+import { group } from "../../sketchlib/rendering/shorthand.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { N16, N32, N8 } from "../lablib/music/durations.js";
 import { A3, C4, D4, E4, G4 } from "../lablib/music/pitches.js";
@@ -96,7 +97,7 @@ class PendulumClockScene {
   render() {
     const clock = this.clock.render();
     const mute_button = this.mute_button.render();
-    return new GroupPrimitive([clock, mute_button]);
+    return group(clock, mute_button);
   }
 
   mouse_pressed(input) {

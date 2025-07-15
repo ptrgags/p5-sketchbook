@@ -1,6 +1,7 @@
 import { Point } from "../pga2d/objects.js";
 import { Color } from "../sketchlib/Color.js";
 import { GroupPrimitive } from "../sketchlib/rendering/GroupPrimitive.js";
+import { group } from "../sketchlib/rendering/shorthand.js";
 import { MosaicGrid } from "./MosaicGrid.js";
 
 const SliderState = {
@@ -146,7 +147,7 @@ export class InteractiveMosaic {
     const grid = this.grid.render();
 
     if (this.swap_pair) {
-      return new GroupPrimitive([grid, this.swap_pair.render(frame)]);
+      return group(grid, this.swap_pair.render(frame));
     }
     return grid;
   }

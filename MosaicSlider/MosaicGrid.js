@@ -8,6 +8,7 @@ import { in_bounds } from "../sketchlib/in_bounds.js";
 import { sec_to_frames } from "../sketchlib/Tween.js";
 import { Color } from "../sketchlib/Color.js";
 import { GroupPrimitive } from "../sketchlib/rendering/GroupPrimitive.js";
+import { group, style } from "../sketchlib/rendering/shorthand.js";
 
 const ROWS = 16;
 const COLS = 16;
@@ -146,9 +147,9 @@ export class MosaicGrid {
       by_colors[color_index].push(rect);
     });
     const color_groups = by_colors.map((x, i) => {
-      return new GroupPrimitive(x, { style: this.styles[i] });
+      return style(x, this.styles[i]);
     });
-    return new GroupPrimitive(color_groups);
+    return group(...color_groups);
   }
 
   /**

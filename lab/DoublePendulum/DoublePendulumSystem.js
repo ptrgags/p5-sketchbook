@@ -11,6 +11,7 @@ import { PI, TAU } from "../../sketchlib/math_consts.js";
 import { mod } from "../../sketchlib/mod.js";
 import { Color } from "../../sketchlib/Color.js";
 import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
+import { style } from "../../sketchlib/rendering/shorthand.js";
 
 const STYLE_AXIS = Style.DEFAULT_STROKE.with_width(2);
 const ARM_STYLE = STYLE_AXIS;
@@ -168,10 +169,7 @@ export class DoublePendulumSystem {
       }
     }
 
-    return [
-      new GroupPrimitive(phase1, { style: STYLE_PHASE1 }),
-      new GroupPrimitive(phase2, { style: STYLE_PHASE2 }),
-    ];
+    return [style(phase1, STYLE_PHASE1), style(phase2, STYLE_PHASE2)];
   }
 
   /**
@@ -190,7 +188,7 @@ export class DoublePendulumSystem {
       new LinePrimitive(origin.sub(theta_dot_dir), origin.add(theta_dot_dir)),
     ];
 
-    return new GroupPrimitive(primitives, { style: STYLE_AXIS });
+    return style(primitives, STYLE_AXIS);
   }
 
   angles_to_positions(origin, theta1, theta2) {
@@ -226,10 +224,7 @@ export class DoublePendulumSystem {
       history2.push(line2);
     }
 
-    return [
-      new GroupPrimitive(history1, { style: STYLE_PHASE1 }),
-      new GroupPrimitive(history2, { style: STYLE_PHASE2 }),
-    ];
+    return [style(history1, STYLE_PHASE1), style(history2, STYLE_PHASE2)];
   }
 
   /**
@@ -257,6 +252,6 @@ export class DoublePendulumSystem {
       PIXELS_PER_METER * this.pendulum2.bob_radius
     );
 
-    return new GroupPrimitive([arm1, arm2, bob1, bob2], { style: ARM_STYLE });
+    return style([arm1, arm2, bob1, bob2], ARM_STYLE);
   }
 }

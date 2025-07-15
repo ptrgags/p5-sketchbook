@@ -3,6 +3,7 @@ import { Color } from "../../sketchlib/Color.js";
 import { HEIGHT, WIDTH } from "../../sketchlib/dimensions.js";
 import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
 import { PolygonPrimitive } from "../../sketchlib/rendering/primitives.js";
+import { group, style } from "../../sketchlib/rendering/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { SCREEN_RECT } from "./Rectangle.js";
 import { TouchButton } from "./TouchButton.js";
@@ -13,9 +14,7 @@ const PLAY_TRIANGLE = new PolygonPrimitive([
   Point.point(WIDTH / 2 - TRIANGLE_WIDTH / 2, HEIGHT / 2 + TRIANGLE_WIDTH / 2),
   Point.point(WIDTH / 2 + TRIANGLE_WIDTH / 2, HEIGHT / 2),
 ]);
-const PLAY_GROUP = new GroupPrimitive(PLAY_TRIANGLE, {
-  style: new Style({ stroke: Color.WHITE }),
-});
+const PLAY_GROUP = style(PLAY_TRIANGLE, new Style({ stroke: Color.WHITE }));
 
 export class PlayButton {
   constructor() {
@@ -28,7 +27,7 @@ export class PlayButton {
 
   render() {
     const button_back = this.button.debug_render();
-    return new GroupPrimitive([button_back, PLAY_GROUP]);
+    return group(button_back, PLAY_GROUP);
   }
 
   mouse_pressed(input) {

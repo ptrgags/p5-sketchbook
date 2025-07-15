@@ -66,7 +66,7 @@ export class ToggleButton {
         ? Style.DEFAULT_FILL
         : new Style({ fill: Color.MAGENTA });
 
-    return new GroupPrimitive(rect, { style });
+    return style(rect, { style });
   }
 
   /**
