@@ -10,6 +10,7 @@ import { Circle } from "./circle.js";
 import { mod } from "../sketchlib/mod.js";
 import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
 import { GroupPrimitive } from "../sketchlib/rendering/GroupPrimitive.js";
+import { style } from "../sketchlib/rendering/shorthand.js";
 
 const MAX_EDGE_LENGTH = 150;
 
@@ -225,21 +226,21 @@ export class DifferentialPolyline {
     }
   }
 
-  make_curve(style) {
+  make_curve(line_style) {
     const positions = this.nodes.map((node) =>
       Point.point(node.position.x, node.position.y)
     );
 
     const beziergon = BeziergonPrimitive.interpolate_points(positions);
-    return style(beziergon, { style });
+    return style(beziergon, line_style);
   }
 
-  make_polyline(style) {
+  make_polyline(line_style) {
     const vertices = this.nodes.map((x) =>
       Point.point(x.position.x, x.position.y)
     );
     const polygon = new PolygonPrimitive(vertices);
-    return style(polygon, { style });
+    return style(polygon, line_style);
   }
 
   draw(p, fill_color) {

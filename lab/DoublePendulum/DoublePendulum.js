@@ -2,6 +2,7 @@ import { Point } from "../../pga2d/objects.js";
 import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
 import { draw_primitive } from "../../sketchlib/p5_helpers/draw_primitive.js";
 import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
+import { group } from "../../sketchlib/rendering/shorthand.js";
 import { DoublePendulumSystem, Pendulum } from "./DoublePendulumSystem.js";
 
 const BOB_MASS = 1.0;
@@ -53,14 +54,14 @@ export const sketch = (p) => {
       THETA_DOT_SCALE
     );
 
-    const scene = group([
+    const scene = group(
       history1,
       history2,
       pendulum_animation,
       phase_axes,
       phase1,
-      phase2,
-    ]);
+      phase2
+    );
 
     draw_primitive(p, scene);
 
