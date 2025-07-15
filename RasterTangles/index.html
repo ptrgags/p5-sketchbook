@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../libraries/p5.min.js"
+    ></script>
+    <script type="module">
+      import { sketch } from "./RasterTangles.js";
+      import "../sketchlib/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../styles/layout.css" />
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>Raster Tangles Classic (2022)</h1>
+      <div id="sketch"></div>
+      <div class="controls">
+        <button id="regen">Regenerate Tangle</button>
+      </div>
+      <div class="description">
+        <p>
+          Press the "Regenerate Tangle" button to randomly generate a new image.
+        </p>
+        <p>
+          Raster Tangles is an algorithm for making geometric art by repeatly
+          subdividing an image with various patterns. This was inspired by the
+          doodles I draw on paper.
+        </p>
+        <p>
+          This was the original version of Raster Tangles I made back in 2022.
+          Later in 2024-2025, I made an improved version of the algorithm that
+          adds clearer outlines between regions. You can find that in my
+          <a href="https://github.com/ptrgags/raster-tangles/tree/main"
+            >raster-tangles repository</a
+          >
+          on GitHub. Make sure to take a look at the
+          <a
+            href="https://github.com/ptrgags/raster-tangles/blob/main/raster-tangles.md"
+            >Raster Tangles Guide</a
+          >
+          in that repo, as it has plenty of illustrations of how the algorithm
+          works.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

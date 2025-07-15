@@ -5,16 +5,17 @@ const LOW_MASK_COUNT = 5;
 const MED_MASK_COUNT = 6;
 const FINE_MASK_COUNT = 5;
 
-//const PALETTE = ["#fb6107","#f3de2c","#7cb518","#5c8001","#fbb02d"];
 const PALETTE = ["#5f0f40", "#9a031e", "#fb8b24", "#e36414", "#0f4c5c"];
-//const PALETTE = ["#03071e","#370617","#6a040f","#9d0208","#d00000","#dc2f02","#e85d04","#f48c06","#faa307","#ffba08"];
 
 let low_masks = new Array(LOW_MASK_COUNT);
 let med_masks = new Array(MED_MASK_COUNT);
 let fine_masks = new Array(FINE_MASK_COUNT);
 
-function preload() {}
-
+/**
+ * Convert a p5.image to a Raster Tangles index mask
+ * @param {import('p5').Image} img The p5.js
+ * @returns {Array<number>} An array of mask indices in [0, 7]
+ */
 function img_to_mask(img) {
   const pixel_count = img.width * img.height;
   const result = new Array(pixel_count);
@@ -45,6 +46,15 @@ function img_to_mask(img) {
   return result;
 }
 
+/**
+ * Select many items from the array of choices with replacement.
+ *
+ * @template T
+ * @param {import('p5')} p p5.js context for the random function
+ * @param {Array<T>} choices The items to choose from
+ * @param {number} n The number of selections to make
+ * @returns {Array<T>} An array of length n that contains the random selections
+ */
 function select_many(p, choices, n) {
   const result = new Array(n);
   for (let i = 0; i < n; i++) {
@@ -54,15 +64,30 @@ function select_many(p, choices, n) {
   return result;
 }
 
-function raster_tangle(p, root_mask, first_choices, second_choices) {
+/**
+ * Perform the classic Raster Tangles algorithm. It acts by repeated
+ * subdivision of regions of an image to make an intricate geometric doodle.
+ *
+ * See the {@link https://github.com/ptrgags/raster-tangles/blob/main/raster-tangles.md|Raster Tangles Guide}
+ * in the raster-tangles repo for full explanation. However, note that this sketch
+ * is an older version that doesn't have a concept of outlines. Index 0 is treated
+ * like a background fill color like all the other indices.
+ *
+ * @param {import('p5')} p p5.js context
+ * @param {Array<number>} coarse_mask The image mask for coarse detail. This is the root of the tree of substitutions
+ * @param {Array<Array<number>>} medium_masks The image masks for the medium level of detail. In terms of substitutions, these are the children of the coarse mask
+ * @param {Array<Array<number>>} fine_masks The image masks for the fine level of detail. These are the grandchildren of the coarse mask in the substitution tree.
+ * @returns {import('p5').Image} The generated tangle as a p5.js image
+ */
+function raster_tangle(p, coarse_mask, medium_masks, fine_masks) {
   const img = p.createImage(MASK_WIDTH, MASK_HEIGHT);
   img.loadPixels();
 
   const pixel_count = MASK_WIDTH * MASK_HEIGHT;
   for (let i = 0; i < pixel_count; i++) {
-    const level0 = root_mask[i];
-    const level1 = (level0 << 3) | first_choices[level0][i];
-    const level2 = (level1 << 3) | second_choices[level1][i];
+    const level0 = coarse_mask[i];
+    const level1 = (level0 << 3) | medium_masks[level0][i];
+    const level2 = (level1 << 3) | fine_masks[level1][i];
     const pixel_color = p.color(PALETTE[level2 % PALETTE.length]);
 
     // img.set() is likely redundant, just operate on the pixels array
@@ -75,7 +100,13 @@ function raster_tangle(p, root_mask, first_choices, second_choices) {
   return img;
 }
 
+/**
+ * Sketch function
+ * @param {import("p5")} p p5.js context
+ */
 export const sketch = (p) => {
+  let dirty = true;
+
   p.preload = () => {
     for (let i = 0; i < LOW_MASK_COUNT; i++) {
       low_masks[i] = p.loadImage(`masks/low-${i}.png`);
@@ -91,13 +122,23 @@ export const sketch = (p) => {
   };
 
   p.setup = () => {
-    p.noLoop();
     p.createCanvas(MASK_WIDTH, MASK_HEIGHT);
 
-    // pre-process the masks
+    document.getElementById("regen").addEventListener("click", () => {
+      dirty = true;
+    });
+
+    // Preprocess input images
     low_masks = low_masks.map(img_to_mask);
     med_masks = med_masks.map(img_to_mask);
     fine_masks = fine_masks.map(img_to_mask);
+  };
+
+  p.draw = () => {
+    if (!dirty) {
+      return;
+    }
+    dirty = false;
 
     // Randomly select a root mask
     const root_mask = p.random(low_masks);
