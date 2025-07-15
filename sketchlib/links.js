@@ -80,8 +80,4 @@ export const LINKS = [
     title: "Primrose Field",
     year: "2020",
   },
-  {
-    title: "Hex Grid",
-    year: "2016",
-  },
 ];
