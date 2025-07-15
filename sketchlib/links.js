@@ -71,7 +71,7 @@ export const LINKS = [
   {
     title: "Raster Tangles Classic",
     link: "./RasterTangles",
-    thumbnail: "thumbnails/raster-tangles-classic.png",
+    thumbnail: "thumbnails/raster-tangles.png",
     year: "2022",
   },
   {
