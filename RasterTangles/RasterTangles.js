@@ -75,7 +75,13 @@ function raster_tangle(p, root_mask, first_choices, second_choices) {
   return img;
 }
 
+function generate_tangle() {}
+
+function regenerate_tangle() {}
+
 export const sketch = (p) => {
+  let dirty = true;
+
   p.preload = () => {
     for (let i = 0; i < LOW_MASK_COUNT; i++) {
       low_masks[i] = p.loadImage(`masks/low-${i}.png`);
@@ -91,13 +97,23 @@ export const sketch = (p) => {
   };
 
   p.setup = () => {
-    p.noLoop();
     p.createCanvas(MASK_WIDTH, MASK_HEIGHT);
 
-    // pre-process the masks
+    document.getElementById("regen").addEventListener("click", () => {
+      dirty = true;
+    });
+
+    // Preprocess input images
     low_masks = low_masks.map(img_to_mask);
     med_masks = med_masks.map(img_to_mask);
     fine_masks = fine_masks.map(img_to_mask);
+  };
+
+  p.draw = () => {
+    if (!dirty) {
+      return;
+    }
+    dirty = false;
 
     // Randomly select a root mask
     const root_mask = p.random(low_masks);
