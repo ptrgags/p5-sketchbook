@@ -91,14 +91,14 @@ function render_control_points(tiles) {
   }
 
   // It's important to draw the points over the line
-  const tangent_line_group = new GroupPrimitive(tangent_lines, {
+  const tangent_line_group = style(tangent_lines, {
     style: TANGENT_STYLE,
   });
-  const vertex_group = new GroupPrimitive(vertices, { style: VERTEX_STYLE });
-  const tangent_group = new GroupPrimitive(tangent_tips, {
+  const vertex_group = style(vertices, { style: VERTEX_STYLE });
+  const tangent_group = style(tangent_tips, {
     style: TANGENT_TIP_STYLE,
   });
-  return new GroupPrimitive([tangent_line_group, vertex_group, tangent_group]);
+  return group([tangent_line_group, vertex_group, tangent_group]);
 }
 
 const HIGHLIGHT_RADIUS = 8;
@@ -107,27 +107,27 @@ function highlight_selection(selected_object) {
     selected_object.position_world,
     HIGHLIGHT_RADIUS
   );
-  return new GroupPrimitive([circle], { style: HIGHLIGHT_STYLE });
+  return style([circle], { style: HIGHLIGHT_STYLE });
 }
 
 const QUAD_PRIMS = SMALL_QUADS.map_array((_, quad) => {
   return render_quad(quad);
 }).flat();
-const QUADS = new GroupPrimitive(QUAD_PRIMS, { style: GRID_STYLE });
+const QUADS = style(QUAD_PRIMS, { style: GRID_STYLE });
 
 const CONNECTION_PRIMS = TILES.map_array((_, tile) => {
   return render_tile_connections(tile);
 }).flat();
-const CONNECTIONS = new GroupPrimitive(CONNECTION_PRIMS, {
+const CONNECTIONS = style(CONNECTION_PRIMS, {
   style: CONNECTION_STYLE,
 });
 
 const WALL_PRIMS = TILES.map_array((_, tile) => {
   return render_tile_walls(tile);
 }).flat();
-const WALLS = new GroupPrimitive(WALL_PRIMS, { style: WALL_STYLE });
+const WALLS = style(WALL_PRIMS, { style: WALL_STYLE });
 
-const STATIC_GEOMETRY = new GroupPrimitive([QUADS, CONNECTIONS, WALLS]);
+const STATIC_GEOMETRY = group([QUADS, CONNECTIONS, WALLS]);
 
 // serialize a 16-tile tileset of coral shapes from the tiles in the editor.
 function serialize_tileset(tiles) {
@@ -157,7 +157,7 @@ function you_wouldnt_download_a_json(json, fname) {
 
 function update_spline_primitives() {
   const spline_prims = SPLINES.flatMap((x) => x.to_bezier_world());
-  return new GroupPrimitive(spline_prims, { style: SPLINE_STYLE });
+  return style(spline_prims, { style: SPLINE_STYLE });
 }
 
 export const sketch = (p) => {

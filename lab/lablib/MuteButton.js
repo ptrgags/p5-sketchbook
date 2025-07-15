@@ -49,11 +49,11 @@ const SPEAKER_BASE = new PolygonPrimitive([
   ),
 ]);
 
-const SPEAKER = new GroupPrimitive([SPEAKER_BASE, SPEAKER_CONE], {
+const SPEAKER = style([SPEAKER_BASE, SPEAKER_CONE], {
   style: new Style({ stroke: Color.WHITE }),
 });
 
-const SPEAKER_SLASH = new GroupPrimitive(
+const SPEAKER_SLASH = style(
   new LinePrimitive(
     SOUND_TOGGLE_CORNER.add(Point.direction(2, 2)),
     SOUND_TOGGLE_CORNER.add(
@@ -62,7 +62,7 @@ const SPEAKER_SLASH = new GroupPrimitive(
   ),
   { style: new Style({ stroke: Color.RED }) }
 );
-const GROUP_MUTED = new GroupPrimitive([SPEAKER, SPEAKER_SLASH]);
+const GROUP_MUTED = group([SPEAKER, SPEAKER_SLASH]);
 const GROUP_UNMUTED = SPEAKER;
 
 export class MuteButton {

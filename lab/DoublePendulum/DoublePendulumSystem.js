@@ -169,8 +169,8 @@ export class DoublePendulumSystem {
     }
 
     return [
-      new GroupPrimitive(phase1, { style: STYLE_PHASE1 }),
-      new GroupPrimitive(phase2, { style: STYLE_PHASE2 }),
+      style(phase1, { style: STYLE_PHASE1 }),
+      style(phase2, { style: STYLE_PHASE2 }),
     ];
   }
 
@@ -190,7 +190,7 @@ export class DoublePendulumSystem {
       new LinePrimitive(origin.sub(theta_dot_dir), origin.add(theta_dot_dir)),
     ];
 
-    return new GroupPrimitive(primitives, { style: STYLE_AXIS });
+    return style(primitives, { style: STYLE_AXIS });
   }
 
   angles_to_positions(origin, theta1, theta2) {
@@ -227,8 +227,8 @@ export class DoublePendulumSystem {
     }
 
     return [
-      new GroupPrimitive(history1, { style: STYLE_PHASE1 }),
-      new GroupPrimitive(history2, { style: STYLE_PHASE2 }),
+      style(history1, { style: STYLE_PHASE1 }),
+      style(history2, { style: STYLE_PHASE2 }),
     ];
   }
 
@@ -257,6 +257,6 @@ export class DoublePendulumSystem {
       PIXELS_PER_METER * this.pendulum2.bob_radius
     );
 
-    return new GroupPrimitive([arm1, arm2, bob1, bob2], { style: ARM_STYLE });
+    return style([arm1, arm2, bob1, bob2], { style: ARM_STYLE });
   }
 }

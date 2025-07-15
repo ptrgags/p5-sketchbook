@@ -13,7 +13,7 @@ const PLAY_TRIANGLE = new PolygonPrimitive([
   Point.point(WIDTH / 2 - TRIANGLE_WIDTH / 2, HEIGHT / 2 + TRIANGLE_WIDTH / 2),
   Point.point(WIDTH / 2 + TRIANGLE_WIDTH / 2, HEIGHT / 2),
 ]);
-const PLAY_GROUP = new GroupPrimitive(PLAY_TRIANGLE, {
+const PLAY_GROUP = style(PLAY_TRIANGLE, {
   style: new Style({ stroke: Color.WHITE }),
 });
 
@@ -28,7 +28,7 @@ export class PlayButton {
 
   render() {
     const button_back = this.button.debug_render();
-    return new GroupPrimitive([button_back, PLAY_GROUP]);
+    return group([button_back, PLAY_GROUP]);
   }
 
   mouse_pressed(input) {

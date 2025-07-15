@@ -72,7 +72,7 @@ export const sketch = (p) => {
       return system.render(origin);
     });
 
-    const animations = new GroupPrimitive(spring_animations);
+    const animations = group(spring_animations);
 
     const X_SCALE = 300;
     const V_SCALE = 30;
@@ -87,11 +87,7 @@ export const sketch = (p) => {
       return system.render_phase(phase_origin, X_SCALE, V_SCALE);
     });
 
-    const scene = new GroupPrimitive([
-      ...animations,
-      phase_axes,
-      ...phase_animations,
-    ]);
+    const scene = group([...animations, phase_axes, ...phase_animations]);
 
     draw_primitive(p, scene);
 

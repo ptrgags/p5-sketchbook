@@ -66,7 +66,7 @@ function render_horizontal_spring(position, dimensions, num_coils, style) {
     const diag_up = new LinePrimitive(b, c);
     wires.push(diag_down, diag_up);
   }
-  return new GroupPrimitive(wires, { style });
+  return style(wires, { style });
 }
 
 export class DoubleSpringSystem {
@@ -145,8 +145,8 @@ export class DoubleSpringSystem {
     }
 
     return [
-      new GroupPrimitive(phase1, { style: this.spring1.spring_style }),
-      new GroupPrimitive(phase2, { style: this.spring2.spring_style }),
+      style(phase1, { style: this.spring1.spring_style }),
+      style(phase2, { style: this.spring2.spring_style }),
     ];
   }
 
@@ -166,7 +166,7 @@ export class DoubleSpringSystem {
       new LinePrimitive(origin.sub(v_dir), origin.add(v_dir)),
     ];
 
-    return new GroupPrimitive(primitives, { style: STYLE_AXIS });
+    return style(primitives, { style: STYLE_AXIS });
   }
 
   /**
@@ -211,20 +211,14 @@ export class DoubleSpringSystem {
       this.spring2.spring_style
     );
 
-    const walls = new GroupPrimitive([wall, floor], { style: STYLE_WALLS });
-    const left_bob = new GroupPrimitive(bob1, {
+    const walls = style([wall, floor], { style: STYLE_WALLS });
+    const left_bob = style(bob1, {
       style: this.spring1.bob_style,
     });
-    const right_bob = new GroupPrimitive(bob2, {
+    const right_bob = style(bob2, {
       style: this.spring2.bob_style,
     });
 
-    return new GroupPrimitive([
-      walls,
-      left_spring,
-      right_spring,
-      left_bob,
-      right_bob,
-    ]);
+    return group([walls, left_spring, right_spring, left_bob, right_bob]);
   }
 }

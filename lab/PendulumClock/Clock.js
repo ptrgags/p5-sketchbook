@@ -86,11 +86,11 @@ function render_clock_hands(time) {
     width: 4,
   });
 
-  const hour_minute = new GroupPrimitive([hour_hand, minute_hand], {
+  const hour_minute = style([hour_hand, minute_hand], {
     style: style_hands,
   });
-  const second = new GroupPrimitive(second_hand, { style: style_second });
-  return new GroupPrimitive([hour_minute, second]);
+  const second = style(second_hand, { style: style_second });
+  return group([hour_minute, second]);
 }
 
 /**
@@ -114,9 +114,9 @@ function render_pendulum(time) {
 
   const bob = new CirclePrimitive(bob_center, BOB_RADIUS);
 
-  const pendulum_arm = new GroupPrimitive(arm, { style: STYLE_ARM });
-  const pendulum_bob = new GroupPrimitive(bob, { style: STYLE_BOB });
-  return new GroupPrimitive([pendulum_arm, pendulum_bob]);
+  const pendulum_arm = style(arm, { style: STYLE_ARM });
+  const pendulum_bob = style(bob, { style: STYLE_BOB });
+  return group([pendulum_arm, pendulum_bob]);
 }
 
 export class Clock {
@@ -141,6 +141,6 @@ export class Clock {
   render() {
     const pendulum = render_pendulum(this.current_time);
     const clock_hands = render_clock_hands(this.current_time);
-    return new GroupPrimitive([pendulum, CLOCK_FACE, clock_hands]);
+    return group([pendulum, CLOCK_FACE, clock_hands]);
   }
 }

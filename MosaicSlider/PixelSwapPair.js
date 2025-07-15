@@ -65,11 +65,11 @@ export class PixelSwapPair {
     const square_b = new RectPrimitive(b_position, this.pixel_dimensions);
     const square_a = new RectPrimitive(a_position, this.pixel_dimensions);
 
-    const group_b = new GroupPrimitive([square_b], { style: this.style_b });
-    const group_a = new GroupPrimitive([square_a], { style: this.style_a });
+    const group_b = style([square_b], { style: this.style_b });
+    const group_a = style([square_a], { style: this.style_a });
 
     // square b must be rendered before square a so the pixel we want to
     // move is on top.
-    return new GroupPrimitive([group_b, group_a]);
+    return group([group_b, group_a]);
   }
 }

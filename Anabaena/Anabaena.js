@@ -14,7 +14,7 @@ import {
 import { Style } from "../sketchlib/Style.js";
 import { Color } from "../sketchlib/Color.js";
 import { GroupPrimitive } from "../sketchlib/rendering/GroupPrimitive.js";
-import { style } from "../sketchlib/rendering/shorthand.js";
+import { group, style } from "../sketchlib/rendering/shorthand.js";
 
 const INITIAL_POSITION = Point.point(WIDTH / 2, HEIGHT - 50);
 const MIN_BEND_ANGLE = (7 * Math.PI) / 8;
@@ -229,10 +229,10 @@ class AnabaenaCatenula {
     ];
 
     if (show_arrows) {
-      primitives.push(new GroupPrimitive(arrows, { style: STYLE_ARROW }));
+      primitives.push(style(arrows, STYLE_ARROW));
     }
 
-    return new GroupPrimitive(primitives);
+    return group(...primitives);
   }
 }
 

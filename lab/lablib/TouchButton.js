@@ -56,7 +56,7 @@ export class TouchButton {
     const rect = new RectPrimitive(this.rect.position, this.rect.dimensions);
     const style = this.get_debug_style();
 
-    return new GroupPrimitive(rect, { style });
+    return style(rect, { style });
   }
 
   /**

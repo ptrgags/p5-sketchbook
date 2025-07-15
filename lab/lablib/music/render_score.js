@@ -56,7 +56,7 @@ export function render_timeline(offset, timeline, measure_dimensions) {
       const child_width = child.duration.real * measure_dimensions.x;
       child_offset = child_offset.add(Point.direction(child_width, 0));
     }
-    return new GroupPrimitive(child_blocks.filter((x) => x !== undefined));
+    return group(child_blocks.filter((x) => x !== undefined));
   }
 
   if (timeline instanceof Harmony) {
@@ -74,7 +74,7 @@ export function render_timeline(offset, timeline, measure_dimensions) {
       const child_height = count_voices(child) * measure_dimensions.y;
       child_offset = child_offset.add(Point.direction(0, child_height));
     }
-    return new GroupPrimitive(child_blocks.filter((x) => x !== undefined));
+    return group(child_blocks.filter((x) => x !== undefined));
   }
 
   // For now cycles, loops and individual intervals are rendered as a single
@@ -105,11 +105,11 @@ export function render_score(offset, score, measure_dimensions, styles) {
       part,
       measure_dimensions
     );
-    const part_group = new GroupPrimitive(rendered, { style: styles[i] });
+    const part_group = style(rendered, { style: styles[i] });
     parts.push(part_group);
 
     voices_so_far += count_voices(part);
   }
 
-  return new GroupPrimitive(parts);
+  return group(parts);
 }

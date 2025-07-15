@@ -120,12 +120,12 @@ export class AnimatedWorm {
     for (let i = 0; i < lines.length; i++) {
       lines[i] = new LinePrimitive(positions[i], positions[i + 1]);
     }
-    const spine_group = new GroupPrimitive(lines, { style: SPINE_STYLE });
+    const spine_group = style(lines, { style: SPINE_STYLE });
 
     const centers = positions.map((x) => new PointPrimitive(x));
-    const centers_group = new GroupPrimitive(centers, { style: CENTER_STYLE });
+    const centers_group = style(centers, { style: CENTER_STYLE });
 
-    return new GroupPrimitive([spine_group, centers_group]);
+    return style([spine_group, centers_group]);
   }
 
   compute_circles() {
@@ -199,7 +199,7 @@ export class AnimatedWorm {
     const all_points = left.concat(tail_points, right, head_points);
     const beziergon = BeziergonPrimitive.interpolate_points(all_points);
 
-    return new GroupPrimitive(beziergon, { style: WORM_STYLE });
+    return style(beziergon, { style: WORM_STYLE });
   }
 
   render_eyes() {
@@ -213,7 +213,7 @@ export class AnimatedWorm {
     const right_position = center.add(right_dir.scale(WORM_EYE_SEPARATION));
     left.update(left_position, this.look_direction);
     right.update(right_position, this.look_direction);
-    return new GroupPrimitive([left.render(), right.render()]);
+    return style([left.render(), right.render()]);
   }
 
   render() {
@@ -222,9 +222,9 @@ export class AnimatedWorm {
     const body = this.render_body();
     const eyes = this.render_eyes();
     if (DEBUG_SHOW_SPINE) {
-      return new GroupPrimitive([body, spine, eyes]);
+      return style([body, spine, eyes]);
     } else {
-      return new GroupPrimitive([body, eyes]);
+      return style([body, eyes]);
     }
   }
 }

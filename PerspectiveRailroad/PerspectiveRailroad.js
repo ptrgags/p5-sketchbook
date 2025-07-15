@@ -166,15 +166,15 @@ function make_background() {
     Point.point(0, 0),
     Point.direction(WIDTH, VP_RAILS.y)
   );
-  const sky = new GroupPrimitive(sky_prim, { style: SKY_STYLE });
+  const sky = style(sky_prim, { style: SKY_STYLE });
 
   const ground_prim = new RectPrimitive(
     Point.point(0, VP_RAILS.y),
     Point.direction(WIDTH, HEIGHT - VP_RAILS.y)
   );
-  const ground = new GroupPrimitive(ground_prim, { style: GROUND_STYLE });
+  const ground = style(ground_prim, { style: GROUND_STYLE });
 
-  return new GroupPrimitive([sky, ground]);
+  return group([sky, ground]);
 }
 
 class AnimatedTie {
@@ -309,12 +309,12 @@ export const sketch = (p) => {
     const tie_prims = ANIMATED_TIES.map((x) =>
       x.compute_polygon(p.frameCount)
     ).filter((x) => x !== undefined);
-    const ties = new GroupPrimitive(tie_prims, { style: TIE_STYLE });
+    const ties = style(tie_prims, { style: TIE_STYLE });
 
     const rail_prims = ANIMATED_RAILS.compute_polygons(p.frameCount);
-    const rails = new GroupPrimitive(rail_prims, { style: RAIL_STYLE });
+    const rails = style(rail_prims, { style: RAIL_STYLE });
 
-    const dynamic_geom = new GroupPrimitive([ties, rails]);
+    const dynamic_geom = group([ties, rails]);
 
     draw_primitive(p, BACKGROUND);
     draw_primitive(p, dynamic_geom);

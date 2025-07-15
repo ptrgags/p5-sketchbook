@@ -231,7 +231,7 @@ export class DifferentialPolyline {
     );
 
     const beziergon = BeziergonPrimitive.interpolate_points(positions);
-    return new GroupPrimitive(beziergon, { style });
+    return style(beziergon, { style });
   }
 
   make_polyline(style) {
@@ -239,7 +239,7 @@ export class DifferentialPolyline {
       Point.point(x.position.x, x.position.y)
     );
     const polygon = new PolygonPrimitive(vertices);
-    return new GroupPrimitive(polygon, { style });
+    return style(polygon, { style });
   }
 
   draw(p, fill_color) {

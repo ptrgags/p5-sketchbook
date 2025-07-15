@@ -142,7 +142,7 @@ const BUTTON_LABELS = make_button_labels(MELODY_BUTTONS);
 
 const TIMELINE_TOP = HEIGHT / 8;
 
-const CURSOR = new GroupPrimitive(
+const CURSOR = style(
   new LinePrimitive(
     Point.point(WIDTH / 2, TIMELINE_TOP),
     Point.point(WIDTH / 2, TIMELINE_TOP + HEIGHT / 4)
@@ -201,10 +201,10 @@ class SoundScene {
       const timeline = RENDERED_TIMELINES[this.selected_melody];
       const shifted = new GroupPrimitive(timeline, { transform });
 
-      return new GroupPrimitive([...primitives, shifted, CURSOR]);
+      return group([...primitives, shifted, CURSOR]);
     }
 
-    return new GroupPrimitive(primitives);
+    return group(primitives);
   }
 
   update() {}

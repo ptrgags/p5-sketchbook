@@ -155,12 +155,12 @@ export class AnimationChain {
     for (let i = 0; i < lines.length; i++) {
       lines[i] = new LinePrimitive(positions[i], positions[i + 1]);
     }
-    const spine_group = new GroupPrimitive(lines, { style: SPINE_STYLE });
+    const spine_group = style(lines, { style: SPINE_STYLE });
 
     const centers = positions.map((x) => new PointPrimitive(x));
-    const centers_group = new GroupPrimitive(centers, { style: CENTER_STYLE });
+    const centers_group = style(centers, { style: CENTER_STYLE });
 
-    return new GroupPrimitive([spine_group, centers_group]);
+    return group([spine_group, centers_group]);
   }
 
   /**

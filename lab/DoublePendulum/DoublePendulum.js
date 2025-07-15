@@ -53,7 +53,7 @@ export const sketch = (p) => {
       THETA_DOT_SCALE
     );
 
-    const scene = new GroupPrimitive([
+    const scene = group([
       history1,
       history2,
       pendulum_animation,

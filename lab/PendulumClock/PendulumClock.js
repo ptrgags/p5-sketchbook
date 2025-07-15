@@ -96,7 +96,7 @@ class PendulumClockScene {
   render() {
     const clock = this.clock.render();
     const mute_button = this.mute_button.render();
-    return new GroupPrimitive([clock, mute_button]);
+    return group([clock, mute_button]);
   }
 
   mouse_pressed(input) {

@@ -146,9 +146,9 @@ export class MosaicGrid {
       by_colors[color_index].push(rect);
     });
     const color_groups = by_colors.map((x, i) => {
-      return new GroupPrimitive(x, { style: this.styles[i] });
+      return style(x, { style: this.styles[i] });
     });
-    return new GroupPrimitive(color_groups);
+    return group(color_groups);
   }
 
   /**
