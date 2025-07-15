@@ -19,12 +19,12 @@ export function group(...primitives) {
 /**
  * Apply a style to one or more primitives, creating a group
  * @param {Primitive | Primitive[]} primitives The primitives
- * @param {Style} style The style to apply to all the primitives
+ * @param {Style} style_descriptor The style to apply to all the primitives
  * @returns {GroupPrimitive} The grouped and styled primitives
  */
-export function style(primitives, style) {
+export function style(primitives, style_descriptor) {
   return new GroupPrimitive(primitives, {
-    style,
+    style: style_descriptor,
   });
 }
 
