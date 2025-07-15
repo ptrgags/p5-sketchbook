@@ -8,6 +8,7 @@ import {
   LinePrimitive,
   VectorPrimitive,
 } from "../../sketchlib/rendering/primitives.js";
+import { group, style } from "../../sketchlib/rendering/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { ClockTime } from "./ClockTime.js";
 
@@ -31,9 +32,7 @@ const STYLE_CLOCK = new Style({
   width: 5,
   fill: Color.WHITE,
 });
-const CLOCK_FACE = new GroupPrimitive([CLOCK_CIRCLE, ...CLOCK_HASHES], {
-  style: STYLE_CLOCK,
-});
+const CLOCK_FACE = style([CLOCK_CIRCLE, ...CLOCK_HASHES], STYLE_CLOCK);
 
 const LENGTH_SECOND_HAND = (OUTER_RADIUS * 9) / 10;
 const LENGTH_MINUTE_HAND = (OUTER_RADIUS * 7) / 10;
@@ -86,11 +85,9 @@ function render_clock_hands(time) {
     width: 4,
   });
 
-  const hour_minute = style([hour_hand, minute_hand], {
-    style: style_hands,
-  });
-  const second = style(second_hand, { style: style_second });
-  return group([hour_minute, second]);
+  const hour_minute = style([hour_hand, minute_hand], style_hands);
+  const second = style(second_hand, style_second);
+  return group(hour_minute, second);
 }
 
 /**
@@ -114,9 +111,9 @@ function render_pendulum(time) {
 
   const bob = new CirclePrimitive(bob_center, BOB_RADIUS);
 
-  const pendulum_arm = style(arm, { style: STYLE_ARM });
-  const pendulum_bob = style(bob, { style: STYLE_BOB });
-  return group([pendulum_arm, pendulum_bob]);
+  const pendulum_arm = style(arm, STYLE_ARM);
+  const pendulum_bob = style(bob, STYLE_BOB);
+  return group(pendulum_arm, pendulum_bob);
 }
 
 export class Clock {
@@ -141,6 +138,6 @@ export class Clock {
   render() {
     const pendulum = render_pendulum(this.current_time);
     const clock_hands = render_clock_hands(this.current_time);
-    return group([pendulum, CLOCK_FACE, clock_hands]);
+    return group(pendulum, CLOCK_FACE, clock_hands);
   }
 }

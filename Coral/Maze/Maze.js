@@ -16,7 +16,7 @@ import {
 } from "../styles.js";
 import { Grid } from "../../sketchlib/Grid.js";
 import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
-import { style } from "../../sketchlib/rendering/shorthand.js";
+import { group, style } from "../../sketchlib/rendering/shorthand.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -54,7 +54,7 @@ function make_tiles_from_tileset(grid, coral_tiles) {
 function render_splines(tile_grid) {
   const splines = find_splines(tile_grid);
   const spline_prims = splines.flatMap((x) => x.to_bezier_world());
-  return style(spline_prims, { style: SPLINE_STYLE });
+  return style(spline_prims, SPLINE_STYLE);
 }
 
 function render_connections(tile_grid) {
@@ -63,7 +63,7 @@ function render_connections(tile_grid) {
       return render_tile_connections(tile);
     })
     .flat();
-  return style(connection_prims, { style: CONNECTION_STYLE });
+  return style(connection_prims, CONNECTION_STYLE);
 }
 
 function render_walls(tile_grid) {
@@ -72,14 +72,14 @@ function render_walls(tile_grid) {
       return render_tile_walls(tile);
     })
     .flat();
-  return style(wall_prims, { style: WALL_STYLE });
+  return style(wall_prims, WALL_STYLE);
 }
 
 function render_geometry(tile_grid) {
   const connections = render_connections(tile_grid);
   const walls = render_walls(tile_grid);
   const splines = render_splines(tile_grid);
-  return style([connections, walls, splines]);
+  return group(connections, walls, splines);
 }
 
 function slurp_json(file) {

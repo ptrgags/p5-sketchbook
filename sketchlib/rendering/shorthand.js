@@ -24,7 +24,7 @@ export function group(...primitives) {
  */
 export function style(primitives, style) {
   return new GroupPrimitive(primitives, {
-    style: style,
+    style,
   });
 }
 
@@ -36,6 +36,6 @@ export function style(primitives, style) {
  */
 export function xform(primitives, transform) {
   return new GroupPrimitive(primitives, {
-    transform: transform,
+    transform,
   });
 }

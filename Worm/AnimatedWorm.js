@@ -12,6 +12,7 @@ import { AnimationChain, Joint } from "../sketchlib/AnimationChain.js";
 import { is_nearly } from "../sketchlib/is_nearly.js";
 import { GooglyEye } from "./GooglyEye.js";
 import { GroupPrimitive } from "../sketchlib/rendering/GroupPrimitive.js";
+import { group, style } from "../sketchlib/rendering/shorthand.js";
 
 const WORM_SEGMENTS = 60;
 const WORM_SEGMENT_SEPARATION = 30;
@@ -120,12 +121,12 @@ export class AnimatedWorm {
     for (let i = 0; i < lines.length; i++) {
       lines[i] = new LinePrimitive(positions[i], positions[i + 1]);
     }
-    const spine_group = style(lines, { style: SPINE_STYLE });
+    const spine_group = style(lines, SPINE_STYLE);
 
     const centers = positions.map((x) => new PointPrimitive(x));
-    const centers_group = style(centers, { style: CENTER_STYLE });
+    const centers_group = style(centers, CENTER_STYLE);
 
-    return style([spine_group, centers_group]);
+    return group(spine_group, centers_group);
   }
 
   compute_circles() {
@@ -199,7 +200,7 @@ export class AnimatedWorm {
     const all_points = left.concat(tail_points, right, head_points);
     const beziergon = BeziergonPrimitive.interpolate_points(all_points);
 
-    return style(beziergon, { style: WORM_STYLE });
+    return style(beziergon, WORM_STYLE);
   }
 
   render_eyes() {
@@ -213,7 +214,7 @@ export class AnimatedWorm {
     const right_position = center.add(right_dir.scale(WORM_EYE_SEPARATION));
     left.update(left_position, this.look_direction);
     right.update(right_position, this.look_direction);
-    return style([left.render(), right.render()]);
+    return group(left.render(), right.render());
   }
 
   render() {
@@ -222,9 +223,9 @@ export class AnimatedWorm {
     const body = this.render_body();
     const eyes = this.render_eyes();
     if (DEBUG_SHOW_SPINE) {
-      return style([body, spine, eyes]);
+      return group(body, spine, eyes);
     } else {
-      return style([body, eyes]);
+      return group(body, eyes);
     }
   }
 }

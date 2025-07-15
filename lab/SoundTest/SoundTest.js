@@ -8,6 +8,7 @@ import {
   LinePrimitive,
   TextPrimitive,
 } from "../../sketchlib/rendering/primitives.js";
+import { group, style, xform } from "../../sketchlib/rendering/shorthand.js";
 import { TextStyle } from "../../sketchlib/rendering/TextStyle.js";
 import { Transform } from "../../sketchlib/rendering/Transform.js";
 import { Style } from "../../sketchlib/Style.js";
@@ -147,7 +148,7 @@ const CURSOR = style(
     Point.point(WIDTH / 2, TIMELINE_TOP),
     Point.point(WIDTH / 2, TIMELINE_TOP + HEIGHT / 4)
   ),
-  { style: Style.DEFAULT_STROKE }
+  Style.DEFAULT_STROKE
 );
 
 class SoundScene {
@@ -199,12 +200,12 @@ class SoundScene {
         Point.direction(WIDTH / 2 - x, TIMELINE_TOP)
       );
       const timeline = RENDERED_TIMELINES[this.selected_melody];
-      const shifted = new GroupPrimitive(timeline, { transform });
+      const shifted = xform(timeline, transform);
 
-      return group([...primitives, shifted, CURSOR]);
+      return group(...primitives, shifted, CURSOR);
     }
 
-    return group(primitives);
+    return group(...primitives);
   }
 
   update() {}

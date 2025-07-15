@@ -6,6 +6,7 @@ import {
   LinePrimitive,
   PolygonPrimitive,
 } from "../../sketchlib/rendering/primitives.js";
+import { group, style } from "../../sketchlib/rendering/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Rectangle } from "./Rectangle.js";
 import { ToggleButton, ToggleState } from "./ToggleButton.js";
@@ -49,9 +50,10 @@ const SPEAKER_BASE = new PolygonPrimitive([
   ),
 ]);
 
-const SPEAKER = style([SPEAKER_BASE, SPEAKER_CONE], {
-  style: new Style({ stroke: Color.WHITE }),
-});
+const SPEAKER = style(
+  [SPEAKER_BASE, SPEAKER_CONE],
+  new Style({ stroke: Color.WHITE })
+);
 
 const SPEAKER_SLASH = style(
   new LinePrimitive(
@@ -60,9 +62,9 @@ const SPEAKER_SLASH = style(
       Point.direction((3 * SOUND_TOGGLE_SIZE) / 4 - 2, SOUND_TOGGLE_SIZE - 2)
     )
   ),
-  { style: new Style({ stroke: Color.RED }) }
+  new Style({ stroke: Color.RED })
 );
-const GROUP_MUTED = group([SPEAKER, SPEAKER_SLASH]);
+const GROUP_MUTED = group(SPEAKER, SPEAKER_SLASH);
 const GROUP_UNMUTED = SPEAKER;
 
 export class MuteButton {

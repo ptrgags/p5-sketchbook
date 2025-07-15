@@ -25,6 +25,7 @@ import {
 import { Color } from "../../sketchlib/Color.js";
 import { Direction } from "../../sketchlib/Direction.js";
 import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
+import { group, style } from "../../sketchlib/rendering/shorthand.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -91,14 +92,10 @@ function render_control_points(tiles) {
   }
 
   // It's important to draw the points over the line
-  const tangent_line_group = style(tangent_lines, {
-    style: TANGENT_STYLE,
-  });
-  const vertex_group = style(vertices, { style: VERTEX_STYLE });
-  const tangent_group = style(tangent_tips, {
-    style: TANGENT_TIP_STYLE,
-  });
-  return group([tangent_line_group, vertex_group, tangent_group]);
+  const tangent_line_group = style(tangent_lines, TANGENT_STYLE);
+  const vertex_group = style(vertices, VERTEX_STYLE);
+  const tangent_group = style(tangent_tips, TANGENT_TIP_STYLE);
+  return group(tangent_line_group, vertex_group, tangent_group);
 }
 
 const HIGHLIGHT_RADIUS = 8;
@@ -107,27 +104,25 @@ function highlight_selection(selected_object) {
     selected_object.position_world,
     HIGHLIGHT_RADIUS
   );
-  return style([circle], { style: HIGHLIGHT_STYLE });
+  return style(circle, HIGHLIGHT_STYLE);
 }
 
 const QUAD_PRIMS = SMALL_QUADS.map_array((_, quad) => {
   return render_quad(quad);
 }).flat();
-const QUADS = style(QUAD_PRIMS, { style: GRID_STYLE });
+const QUADS = style(QUAD_PRIMS, GRID_STYLE);
 
 const CONNECTION_PRIMS = TILES.map_array((_, tile) => {
   return render_tile_connections(tile);
 }).flat();
-const CONNECTIONS = style(CONNECTION_PRIMS, {
-  style: CONNECTION_STYLE,
-});
+const CONNECTIONS = style(CONNECTION_PRIMS, CONNECTION_STYLE);
 
 const WALL_PRIMS = TILES.map_array((_, tile) => {
   return render_tile_walls(tile);
 }).flat();
-const WALLS = style(WALL_PRIMS, { style: WALL_STYLE });
+const WALLS = style(WALL_PRIMS, WALL_STYLE);
 
-const STATIC_GEOMETRY = group([QUADS, CONNECTIONS, WALLS]);
+const STATIC_GEOMETRY = group(QUADS, CONNECTIONS, WALLS);
 
 // serialize a 16-tile tileset of coral shapes from the tiles in the editor.
 function serialize_tileset(tiles) {
@@ -157,7 +152,7 @@ function you_wouldnt_download_a_json(json, fname) {
 
 function update_spline_primitives() {
   const spline_prims = SPLINES.flatMap((x) => x.to_bezier_world());
-  return style(spline_prims, { style: SPLINE_STYLE });
+  return style(spline_prims, SPLINE_STYLE);
 }
 
 export const sketch = (p) => {

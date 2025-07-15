@@ -1,6 +1,7 @@
 import { Point } from "../../../pga2d/objects.js";
 import { GroupPrimitive } from "../../../sketchlib/rendering/GroupPrimitive.js";
 import { RectPrimitive } from "../../../sketchlib/rendering/primitives.js";
+import { group, style } from "../../../sketchlib/rendering/shorthand.js";
 import { Style } from "../../../sketchlib/Style.js";
 import { count_voices } from "./count_voices.js";
 import { Harmony, Score } from "./Score.js";
@@ -56,7 +57,7 @@ export function render_timeline(offset, timeline, measure_dimensions) {
       const child_width = child.duration.real * measure_dimensions.x;
       child_offset = child_offset.add(Point.direction(child_width, 0));
     }
-    return group(child_blocks.filter((x) => x !== undefined));
+    return group(...child_blocks.filter((x) => x !== undefined));
   }
 
   if (timeline instanceof Harmony) {
@@ -74,7 +75,7 @@ export function render_timeline(offset, timeline, measure_dimensions) {
       const child_height = count_voices(child) * measure_dimensions.y;
       child_offset = child_offset.add(Point.direction(0, child_height));
     }
-    return group(child_blocks.filter((x) => x !== undefined));
+    return group(...child_blocks.filter((x) => x !== undefined));
   }
 
   // For now cycles, loops and individual intervals are rendered as a single
@@ -105,11 +106,11 @@ export function render_score(offset, score, measure_dimensions, styles) {
       part,
       measure_dimensions
     );
-    const part_group = style(rendered, { style: styles[i] });
+    const part_group = style(rendered, styles[i]);
     parts.push(part_group);
 
     voices_so_far += count_voices(part);
   }
 
-  return group(parts);
+  return group(...parts);
 }

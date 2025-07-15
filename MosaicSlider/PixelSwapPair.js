@@ -1,6 +1,7 @@
 import { Point } from "../pga2d/objects.js";
 import { GroupPrimitive } from "../sketchlib/rendering/GroupPrimitive.js";
 import { RectPrimitive } from "../sketchlib/rendering/primitives.js";
+import { group, style } from "../sketchlib/rendering/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 import { Tween } from "../sketchlib/Tween.js";
 
@@ -65,11 +66,11 @@ export class PixelSwapPair {
     const square_b = new RectPrimitive(b_position, this.pixel_dimensions);
     const square_a = new RectPrimitive(a_position, this.pixel_dimensions);
 
-    const group_b = style([square_b], { style: this.style_b });
-    const group_a = style([square_a], { style: this.style_a });
+    const group_b = style([square_b], this.style_b);
+    const group_a = style([square_a], this.style_a);
 
     // square b must be rendered before square a so the pixel we want to
     // move is on top.
-    return group([group_b, group_a]);
+    return group(group_b, group_a);
   }
 }
