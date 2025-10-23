@@ -1,4 +1,5 @@
 import { Point } from "../../pga2d/objects.js";
+import { ArcAngles } from "../ArcAngles.js";
 
 /**
  * A single point. This is rendered as a small circle of fixed size.
@@ -25,6 +26,23 @@ export class CirclePrimitive {
   constructor(position, radius) {
     this.position = position;
     this.radius = radius;
+  }
+}
+
+/**
+ * Circular arc primitive defined as a circle and start and stop angles
+ */
+export class ArcPrimitive {
+  /**
+   * Constructor
+   * @param {Point} center The center of the circle
+   * @param {number} radius The radius of the circle
+   * @param {ArcAngles} angles The two angles defining the arc
+   */
+  constructor(center, radius, angles) {
+    this.center = center;
+    this.radius = radius;
+    this.angles = angles;
   }
 }
 
@@ -198,5 +216,5 @@ export class TextPrimitive {
 }
 
 /**
- * @typedef {BezierPrimitive | PolygonPrimitive | BezierPrimitive | LinePrimitive | RectPrimitive | CirclePrimitive | PointPrimitive | BeziergonPrimitive | VectorPrimitive | TextPrimitive} SimplePrimitive
+ * @typedef {BezierPrimitive | PolygonPrimitive | BezierPrimitive | LinePrimitive | RectPrimitive | CirclePrimitive | ArcPrimitive | PointPrimitive | BeziergonPrimitive | VectorPrimitive | TextPrimitive} SimplePrimitive
  */
