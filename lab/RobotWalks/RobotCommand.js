@@ -71,5 +71,5 @@ RobotCommand.LEFT_TURN = Object.freeze(
   new RobotCommand([1, 0, 0, 0, 0], 1, "L")
 );
 RobotCommand.RIGHT_TURN = Object.freeze(
-  new RobotCommand([0, 0, 0, 0, 1], 4, "L")
+  new RobotCommand([0, 0, 0, 0, 1], 4, "R")
 );
