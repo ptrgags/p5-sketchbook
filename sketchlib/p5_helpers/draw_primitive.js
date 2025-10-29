@@ -65,7 +65,9 @@ function draw_arc(p, arc) {
   if (angles.is_ccw) {
     [start_angle, end_angle] = [end_angle, start_angle];
   }
-  p.arc(x, y, diameter, diameter, start_angle, end_angle, p.OPEN);
+
+  // Note: p5 is y-down so we need to flip the angles
+  p.arc(x, y, diameter, diameter, -start_angle, -end_angle, p.OPEN);
 }
 
 /**

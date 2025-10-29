@@ -237,17 +237,24 @@ export const sketch = (p) => {
     //draw_primitive(p, BACKGROUND_LAYER);
 
     const current_angle = ANIMATION.get_value(p.frameCount);
+
     const current_arc = new ArcPrimitive(
       SCREEN_CENTER,
       100,
-      new ArcAngles(-Math.PI / 4, current_angle)
+      //new ArcAngles(-Math.PI / 4, current_angle)
+      new ArcAngles(0, (Math.PI / 2) * (p.frameCount / 500))
     );
-    const dynamic_layer = style(current_arc, RED_LINES);
-    //draw_primitive(p, dynamic_layer);
+    const reverse_arc = new ArcPrimitive(
+      SCREEN_CENTER,
+      50,
+      new ArcAngles(0, -(Math.PI / 2) * (p.frameCount / 250))
+    );
+    const dynamic_layer = style([current_arc, reverse_arc], RED_LINES);
+    draw_primitive(p, dynamic_layer);
 
     ROBOT.update(p.frameCount, DPAD.direction.digital);
     const robot_walk = ROBOT.render(p.frameCount);
-    draw_primitive(p, robot_walk);
+    //draw_primitive(p, robot_walk);
   };
 
   p.keyPressed = (/** @type {KeyboardEvent} */ e) => {
