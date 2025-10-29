@@ -18,6 +18,7 @@ import { RobotCommand } from "./RobotCommand.js";
 
 // How many frames to animate each 1/5 turn arc
 const MOVEMENT_DURATION = 200;
+const PIXELS_PER_METER = 100;
 
 const RobotAnimationState = {
   // Idle, waiting for commands
@@ -112,19 +113,37 @@ class Robot {
   }
 
   start_moving(frame, dpad_direction) {
-    const next_command =
+    const step_command =
       dpad_direction === Direction.LEFT
         ? RobotCommand.LEFT_TURN
         : RobotCommand.RIGHT_TURN;
+    const full_command = RobotCommand.compose(step_command, this.command);
 
-    // TODO: Compute these.
-    const computed_center = Point.ORIGIN;
-    const computed_radius = 100;
-    const computed_angles = new ArcAngles(0, (2.0 * PI) / 5);
+    // The robot starts at the center of the screen and moves around
+    const offset = this.command.offset.scale(PIXELS_PER_METER);
+    const computed_center = SCREEN_CENTER.add(offset);
+
+    const prev_orientation = this.command.orientation;
+    const orientation = full_command.orientation;
+
+    // TODO: this only works for CCW arcs!
+    const FIFTH_TURN = (2 * Math.PI) / 5;
+    const computed_angles = new ArcAngles(
+      prev_orientation * FIFTH_TURN,
+      orientation * FIFTH_TURN
+    );
+
+    // Need to do some trigonometry here. See diagram in documentation
+    // TODO: Make diagram
+    const AB = step_command.offset.ideal_norm();
+
+    // (AB/2) / r = sin(fifth_turn / 2)
+    // so r = (AB/2) / sin(fifth_turn / 2)
+    const computed_radius = (0.5 * AB) / Math.sin(FIFTH_TURN / 2);
 
     this.current_arc = new AnimatedArc(
       computed_center,
-      computed_radius,
+      PIXELS_PER_METER * computed_radius,
       computed_angles,
       frame,
       MOVEMENT_DURATION
@@ -250,11 +269,11 @@ export const sketch = (p) => {
       new ArcAngles(0, -(Math.PI / 2) * (p.frameCount / 250))
     );
     const dynamic_layer = style([current_arc, reverse_arc], RED_LINES);
-    draw_primitive(p, dynamic_layer);
+    //draw_primitive(p, dynamic_layer);
 
     ROBOT.update(p.frameCount, DPAD.direction.digital);
     const robot_walk = ROBOT.render(p.frameCount);
-    //draw_primitive(p, robot_walk);
+    draw_primitive(p, robot_walk);
   };
 
   p.keyPressed = (/** @type {KeyboardEvent} */ e) => {
