@@ -14,7 +14,7 @@ import { group, style } from "../../sketchlib/rendering/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Tween } from "../../sketchlib/Tween.js";
 import { DirectionalPad } from "../lablib/DirectionalPad.js";
-import { RobotCommand } from "./RobotCommand.js";
+import { RobotCommand, ROOTS_OF_UNITY } from "./RobotCommand.js";
 
 // How many frames to animate each 1/5 turn arc
 const MOVEMENT_DURATION = 200;
@@ -49,10 +49,8 @@ class AnimatedArc {
     this.center = center;
     this.radius = radius;
     this.angles = angles;
-    this.full_primitive = style(
-      new ArcPrimitive(center, radius, angles),
-      GREY_LINES
-    );
+    this.arc_primitive = new ArcPrimitive(center, radius, angles);
+    this.full_primitive = style(this.arc_primitive, GREY_LINES);
     this.angle_tween = Tween.scalar(
       angles.start_angle,
       angles.end_angle,
@@ -113,42 +111,52 @@ class Robot {
   }
 
   start_moving(frame, dpad_direction) {
-    const step_command =
-      dpad_direction === Direction.LEFT
-        ? RobotCommand.LEFT_TURN
-        : RobotCommand.RIGHT_TURN;
-    const full_command = RobotCommand.compose(step_command, this.command);
+    let command;
+    let center_offset;
+    if (dpad_direction === Direction.LEFT) {
+      command = RobotCommand.LEFT_TURN;
+      center_offset = ROOTS_OF_UNITY[this.command.orientation].neg();
+    } else {
+      command = RobotCommand.RIGHT_TURN;
+      center_offset = ROOTS_OF_UNITY[this.command.orientation];
+    }
 
-    // The robot starts at the center of the screen and moves around
-    const offset = this.command.offset.scale(PIXELS_PER_METER);
-    const computed_center = SCREEN_CENTER.add(offset);
+    const current_position = SCREEN_CENTER.add(
+      this.command.offset.scale(PIXELS_PER_METER)
+    );
+    const arc_center = current_position.add(
+      center_offset.scale(PIXELS_PER_METER)
+    );
 
+    const full_command = RobotCommand.compose(command, this.command);
     const prev_orientation = this.command.orientation;
     const orientation = full_command.orientation;
 
-    // TODO: this only works for CCW arcs!
     const FIFTH_TURN = (2 * Math.PI) / 5;
-    const computed_angles = new ArcAngles(
-      prev_orientation * FIFTH_TURN,
-      orientation * FIFTH_TURN
-    );
 
-    // Need to do some trigonometry here. See diagram in documentation
-    // TODO: Make diagram
-    const AB = step_command.offset.ideal_norm();
-
-    // (AB/2) / r = sin(fifth_turn / 2)
-    // so r = (AB/2) / sin(fifth_turn / 2)
-    const computed_radius = (0.5 * AB) / Math.sin(FIFTH_TURN / 2);
+    let computed_angles;
+    if (dpad_direction === Direction.LEFT) {
+      computed_angles = new ArcAngles(
+        prev_orientation * FIFTH_TURN,
+        orientation * FIFTH_TURN
+      );
+    } else {
+      computed_angles = new ArcAngles(
+        Math.PI - prev_orientation * FIFTH_TURN,
+        Math.PI - orientation * FIFTH_TURN
+      );
+    }
 
     this.current_arc = new AnimatedArc(
-      computed_center,
-      PIXELS_PER_METER * computed_radius,
+      arc_center,
+      // the arcs are always 1 meter in radius
+      PIXELS_PER_METER,
       computed_angles,
       frame,
       MOVEMENT_DURATION
     );
     this.animation_state = RobotAnimationState.MOVING;
+    this.command = full_command;
   }
 
   update_idle(frame, dpad_direction) {
@@ -167,8 +175,15 @@ class Robot {
       throw new Error("Current Arc not set!");
     }
 
-    if (this.current_arc.is_done) {
-      this.start_moving(frame, dpad_direction);
+    if (this.current_arc.is_done(frame)) {
+      this.history.push(this.current_arc.arc_primitive);
+
+      if (
+        dpad_direction === Direction.LEFT ||
+        dpad_direction === Direction.RIGHT
+      ) {
+        this.start_moving(frame, dpad_direction);
+      }
     }
   }
 
@@ -179,21 +194,21 @@ class Robot {
    */
   update(frame, dpad_direction) {
     if (this.animation_state === RobotAnimationState.IDLE) {
-      return this.update_idle(frame, dpad_direction);
+      this.update_idle(frame, dpad_direction);
+      return;
     } else {
-      return this.update_animate(frame, dpad_direction);
+      this.update_animate(frame, dpad_direction);
+      return;
     }
   }
 
   render(frame) {
-    if (this.animation_state === RobotAnimationState.IDLE) {
-      return this.history_primitive;
-    }
-
     if (this.current_arc) {
       const arc_group = this.current_arc.render(frame);
       return group(this.history_primitive, arc_group);
     }
+
+    return this.history_primitive;
   }
 }
 
@@ -279,5 +294,10 @@ export const sketch = (p) => {
   p.keyPressed = (/** @type {KeyboardEvent} */ e) => {
     const code = e.code;
     DPAD.key_pressed(code);
+  };
+
+  p.keyReleased = (/** @type {KeyboardEvent} */ e) => {
+    const code = e.code;
+    DPAD.key_released(code);
   };
 };

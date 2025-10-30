@@ -6,7 +6,7 @@ export const N = 5;
 /**
  * @type {Point[]}
  */
-const ROOTS_OF_UNITY = new Array(N);
+export const ROOTS_OF_UNITY = new Array(N);
 for (let i = 0; i < N; i++) {
   const angle = ((2 * Math.PI) / N) * i;
   ROOTS_OF_UNITY[i] = Point.dir_from_angle(angle);
