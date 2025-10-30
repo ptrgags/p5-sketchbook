@@ -7,19 +7,21 @@ import { draw_primitive } from "../../sketchlib/p5_helpers/draw_primitive.js";
 import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
 import {
   ArcPrimitive,
-  CirclePrimitive,
   LinePrimitive,
-  PolygonPrimitive,
+  PointPrimitive,
 } from "../../sketchlib/rendering/primitives.js";
 import { group, style } from "../../sketchlib/rendering/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Tween } from "../../sketchlib/Tween.js";
 import { DirectionalPad } from "../lablib/DirectionalPad.js";
+import { Oklch } from "../lablib/Oklch.js";
 import { RobotCommand, ROOTS_OF_UNITY } from "./RobotCommand.js";
 
 // How many frames to animate each 1/5 turn arc
 const MOVEMENT_DURATION = 200;
 const PIXELS_PER_METER = 100;
+
+const START_POINT = Point.ORIGIN.add(SCREEN_CENTER);
 
 const RobotAnimationState = {
   // Idle, waiting for commands
@@ -41,11 +43,18 @@ const YELLOW_LINES = new Style({
   width: 4,
 });
 
+const SEA_GREEN = new Oklch(0.7, 0.1, 196);
+const POINT_STYLE = new Style({
+  stroke: SEA_GREEN.adjust_lightness(-0.15).to_srgb(),
+  fill: SEA_GREEN.to_srgb(),
+  width: 2,
+});
+
 class AnimatedArc {
   /**
    * Constructor
-   * @param {Point} center Center of the circle this arc lives on
-   * @param {number} radius Radius of the circle
+   * @param {Point} center Center of the circle this arc lives on in screen space
+   * @param {number} radius Radius of the circle this arc lives on in screen space
    * @param {ArcAngles} angles The angles for the full circular arc
    * @param {number} start_frame Start frame of the animation
    * @param {number} duration Duration of the animation in frames
@@ -56,8 +65,12 @@ class AnimatedArc {
     this.angles = angles;
     this.arc_primitive = new ArcPrimitive(center, radius, angles);
     this.line_primitive = new LinePrimitive(
-      center.add(Point.dir_from_angle(angles.start_angle)),
-      center.add(Point.dir_from_angle(angles.end_angle))
+      center.add(
+        Point.dir_from_angle(-angles.start_angle).scale(PIXELS_PER_METER)
+      ),
+      center.add(
+        Point.dir_from_angle(-angles.end_angle).scale(PIXELS_PER_METER)
+      )
     );
     this.full_primitive = style(this.arc_primitive, GREY_LINES);
     this.angle_tween = Tween.scalar(
@@ -75,6 +88,18 @@ class AnimatedArc {
    */
   is_done(frame) {
     return this.angle_tween.is_done(frame);
+  }
+
+  /**
+   * Get the current position on the arc
+   * @param {number} frame The current frame number
+   * @returns {Point} The current point on the arc
+   */
+  current_position(frame) {
+    const angle = this.angle_tween.get_value(frame);
+    // Flip angle so it's measured CCW
+    const direction = Point.dir_from_angle(-angle);
+    return this.center.add(direction.scale(PIXELS_PER_METER));
   }
 
   /**
@@ -124,6 +149,14 @@ class Robot {
     this.current_arc = undefined;
   }
 
+  current_position(frame) {
+    if (this.animation_state === RobotAnimationState.IDLE) {
+      return START_POINT.add(this.command.offset.scale(PIXELS_PER_METER));
+    }
+
+    return this.current_arc.current_position(frame);
+  }
+
   start_moving(frame, dpad_direction) {
     let command;
     let center_offset;
@@ -135,7 +168,7 @@ class Robot {
       center_offset = ROOTS_OF_UNITY[this.command.orientation];
     }
 
-    const current_position = SCREEN_CENTER.add(
+    const current_position = START_POINT.add(
       this.command.offset.scale(PIXELS_PER_METER)
     );
     const arc_center = current_position.add(
@@ -219,54 +252,28 @@ class Robot {
   }
 
   render(frame) {
+    const current_position = new PointPrimitive(this.current_position(frame));
+    const styled_position = style(current_position, POINT_STYLE);
+
     if (this.current_arc) {
       const arc_group = this.current_arc.render(frame);
-      return group(this.polyline_primitive, this.history_primitive, arc_group);
+      return group(
+        this.polyline_primitive,
+        this.history_primitive,
+        arc_group,
+        styled_position
+      );
     }
 
-    return group(this.polyline_primitive, this.history_primitive);
+    return group(
+      this.polyline_primitive,
+      this.history_primitive,
+      styled_position
+    );
   }
 }
 
-const QUARTER_ARC = new ArcAngles(-Math.PI / 4, Math.PI / 4);
-const arc_primitive = new ArcPrimitive(
-  Point.point(WIDTH / 2, HEIGHT / 2),
-  100,
-  QUARTER_ARC
-);
-
-const BACKGROUND_LAYER = style(arc_primitive, GREY_LINES);
-const ANIMATION = Tween.scalar(-Math.PI / 4, (2 * Math.PI) / 3, 100, 500);
-
-const SAMPLE_PATH = [
-  RobotCommand.LEFT_TURN,
-  RobotCommand.LEFT_TURN,
-  RobotCommand.RIGHT_TURN,
-  RobotCommand.LEFT_TURN,
-  RobotCommand.RIGHT_TURN,
-];
-
-let current = RobotCommand.IDENTITY;
-const START_POINT = Point.ORIGIN.add(SCREEN_CENTER);
-const STEP_LENGTH = 100;
-const PATH = [START_POINT];
-for (const [i, command] of SAMPLE_PATH.entries()) {
-  current = RobotCommand.compose(command, current);
-  const local_offset = command.offset;
-  const global_offset = current.offset;
-
-  // TODO: compute the arc that corresponds to the local offset but scaled up
-  // to world space
-
-  const point = START_POINT.add(global_offset.scale(STEP_LENGTH));
-  PATH.push(point);
-}
-
-const POLY = new PolygonPrimitive(PATH);
-const POLY_LAYER = style(POLY, RED_LINES);
-
 const DPAD = new DirectionalPad();
-
 const ROBOT = new Robot();
 
 export const sketch = (p) => {
@@ -283,24 +290,6 @@ export const sketch = (p) => {
 
   p.draw = () => {
     p.background(0);
-
-    //draw_primitive(p, BACKGROUND_LAYER);
-
-    const current_angle = ANIMATION.get_value(p.frameCount);
-
-    const current_arc = new ArcPrimitive(
-      SCREEN_CENTER,
-      100,
-      //new ArcAngles(-Math.PI / 4, current_angle)
-      new ArcAngles(0, (Math.PI / 2) * (p.frameCount / 500))
-    );
-    const reverse_arc = new ArcPrimitive(
-      SCREEN_CENTER,
-      50,
-      new ArcAngles(0, -(Math.PI / 2) * (p.frameCount / 250))
-    );
-    const dynamic_layer = style([current_arc, reverse_arc], RED_LINES);
-    //draw_primitive(p, dynamic_layer);
 
     ROBOT.update(p.frameCount, DPAD.direction.digital);
     const robot_walk = ROBOT.render(p.frameCount);
