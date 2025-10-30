@@ -8,6 +8,7 @@ import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
 import {
   ArcPrimitive,
   CirclePrimitive,
+  LinePrimitive,
   PolygonPrimitive,
 } from "../../sketchlib/rendering/primitives.js";
 import { group, style } from "../../sketchlib/rendering/shorthand.js";
@@ -35,6 +36,10 @@ const RED_LINES = new Style({
   stroke: Color.RED,
   width: 4,
 });
+const YELLOW_LINES = new Style({
+  stroke: Color.YELLOW,
+  width: 4,
+});
 
 class AnimatedArc {
   /**
@@ -50,6 +55,10 @@ class AnimatedArc {
     this.radius = radius;
     this.angles = angles;
     this.arc_primitive = new ArcPrimitive(center, radius, angles);
+    this.line_primitive = new LinePrimitive(
+      center.add(Point.dir_from_angle(angles.start_angle)),
+      center.add(Point.dir_from_angle(angles.end_angle))
+    );
     this.full_primitive = style(this.arc_primitive, GREY_LINES);
     this.angle_tween = Tween.scalar(
       angles.start_angle,
@@ -102,7 +111,12 @@ class Robot {
      * @type {ArcPrimitive[]}
      */
     this.history = [];
+    /**
+     * @type {LinePrimitive[]}
+     */
+    this.polyline_history = [];
     this.history_primitive = style(this.history, RED_LINES);
+    this.polyline_primitive = style(this.polyline_history, YELLOW_LINES);
 
     /**
      * @type {AnimatedArc | undefined}
@@ -176,7 +190,9 @@ class Robot {
     }
 
     if (this.current_arc.is_done(frame)) {
-      this.history.push(this.current_arc.arc_primitive);
+      const { arc_primitive, line_primitive } = this.current_arc;
+      this.history.push(arc_primitive);
+      this.polyline_history.push(line_primitive);
 
       if (
         dpad_direction === Direction.LEFT ||
@@ -205,10 +221,10 @@ class Robot {
   render(frame) {
     if (this.current_arc) {
       const arc_group = this.current_arc.render(frame);
-      return group(this.history_primitive, arc_group);
+      return group(this.polyline_primitive, this.history_primitive, arc_group);
     }
 
-    return this.history_primitive;
+    return group(this.polyline_primitive, this.history_primitive);
   }
 }
 
