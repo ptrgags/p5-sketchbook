@@ -18,7 +18,7 @@ import { Oklch } from "../lablib/Oklch.js";
 import { RobotCommand, ROOTS_OF_UNITY } from "./RobotCommand.js";
 
 // How many frames to animate each 1/5 turn arc
-const MOVEMENT_DURATION = 200;
+const MOVEMENT_DURATION = 50;
 const PIXELS_PER_METER = 100;
 
 const START_POINT = Point.ORIGIN.add(SCREEN_CENTER);

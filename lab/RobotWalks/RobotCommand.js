@@ -1,4 +1,5 @@
 import { Point } from "../../pga2d/objects.js";
+import { mod } from "../../sketchlib/mod.js";
 
 export const N = 5;
 
@@ -50,17 +51,29 @@ export class RobotCommand {
    * (like function composition)
    *
    * This is a monoid operation.
-   * @param {RobotCommand} a The first robot command
-   * @param {RobotCommand} b The second robot command
+   * @param {RobotCommand} next_command The next robot command to apply
+   * @param {RobotCommand} prev_command The robot command that came before
    */
-  static compose(a, b) {
+  static compose(next_command, prev_command) {
     const weights = new Array(5).fill(0);
+
+    // command a needs to be rotated to the orientation of the robot after
+    // taking command b. This amounts to cycling a's weights to the right by
+    // the same number of places as b's orientation.
+    const cycle_amount = prev_command.orientation;
     for (let i = 0; i < N; i++) {
-      weights[i] = b.weights[(b.orientation + i) % N] + a.weights[i];
+      weights[i] =
+        prev_command.weights[i] +
+        next_command.weights[mod(i - cycle_amount, N)];
     }
 
-    const orientation = (a.orientation + b.orientation) % N;
-    const label = a.label + b.label;
+    // The robot's
+    const orientation =
+      (prev_command.orientation + next_command.orientation) % N;
+
+    // Concatenate the labels. The newest label is on the _left_, like
+    // function application
+    const label = next_command.label + prev_command.label;
 
     return new RobotCommand(weights, orientation, label);
   }
