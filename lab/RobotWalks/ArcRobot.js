@@ -16,19 +16,23 @@ import { AnimatedArc } from "./AnimatedArc.js";
 import { RobotCommand, ROOTS_OF_UNITY } from "./RobotCommand.js";
 
 // How many frames to animate each 1/5 turn arc
-const MOVEMENT_DURATION = 50;
-const PIXELS_PER_METER = 50;
+const MOVEMENT_DURATION = 25;
+const PIXELS_PER_METER = 25;
 const FIFTH_TURN = (2 * Math.PI) / 5;
 
 const START_POINT = Point.ORIGIN.add(SCREEN_CENTER);
 
 const RED_LINES = new Style({
   stroke: Color.RED,
-  width: 4,
+  width: 2,
+});
+const GREY_LINES = new Style({
+  stroke: Color.from_hex_code("#777777"),
+  width: 2,
 });
 const YELLOW_LINES = new Style({
   stroke: Color.YELLOW,
-  width: 4,
+  width: 2,
 });
 
 const SEA_GREEN = new Oklch(0.7, 0.1, 196);
@@ -207,19 +211,12 @@ export class ArcRobot {
     const styled_position = style(current_position, POINT_STYLE);
 
     if (this.current_arc) {
-      const arc_group = this.current_arc.render(frame);
-      return group(
-        this.polyline_primitive,
-        this.history_primitive,
-        arc_group,
-        styled_position
-      );
+      const arc_bg = style(this.current_arc.arc_primitive, GREY_LINES);
+      const arc_fg = style(this.current_arc.render(frame), RED_LINES);
+
+      return group(this.history_primitive, arc_bg, arc_fg, styled_position);
     }
 
-    return group(
-      this.polyline_primitive,
-      this.history_primitive,
-      styled_position
-    );
+    return group(this.history_primitive, styled_position);
   }
 }

@@ -7,20 +7,11 @@ import {
   LinePrimitive,
 } from "../../sketchlib/rendering/primitives.js";
 import { group, style } from "../../sketchlib/rendering/shorthand.js";
-import { Style } from "../../sketchlib/Style.js";
 import { Tween } from "../../sketchlib/Tween.js";
 
-// TODO: should this be a part of the arc, or should it be passed in by
-// caller?
-const GREY_LINES = new Style({
-  stroke: Color.from_hex_code("#333333"),
-  width: 4,
-});
-const RED_LINES = new Style({
-  stroke: Color.RED,
-  width: 4,
-});
-
+/**
+ * Class for managing an animated circular arc.
+ */
 export class AnimatedArc {
   /**
    * Constructor
@@ -37,7 +28,7 @@ export class AnimatedArc {
 
     /**
      * The full arc, this is used for the background, and the owning
-     * ArcRobot will access this to add to the history
+     * ArcRobot will access this for rendering
      * @type {ArcPrimitive}
      */
     this.arc_primitive = new ArcPrimitive(center, radius, angles);
@@ -49,7 +40,7 @@ export class AnimatedArc {
       center.add(Point.dir_from_angle(angles.start_angle).scale(radius)),
       center.add(Point.dir_from_angle(angles.end_angle).scale(radius))
     );
-    this.full_primitive = style(this.arc_primitive, GREY_LINES);
+
     this.angle_tween = Tween.scalar(
       angles.start_angle,
       angles.end_angle,
@@ -79,9 +70,10 @@ export class AnimatedArc {
   }
 
   /**
-   * Render an arc accurate for this frame
+   * Render an arc accurate for this frame. If you want to render the
+   * full arc to show the trajectory, access this.arc_primitive
    * @param {number} frame Frame count
-   * @returns {GroupPrimitive} A primitive to draw
+   * @returns {ArcPrimitive} A primitive to draw
    */
   render(frame) {
     // Compute a partial arc from the start angle to the current value
@@ -95,9 +87,6 @@ export class AnimatedArc {
       this.radius,
       interpolated_angles
     );
-
-    // Draw the full primitive in grey, with the partial arc on top in red.
-    const styled_arc = style(partial_arc, RED_LINES);
-    return group(this.full_primitive, styled_arc);
+    return partial_arc;
   }
 }
