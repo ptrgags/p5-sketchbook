@@ -2,13 +2,13 @@ import { Point } from "../../pga2d/objects.js";
 import { ArcAngles } from "../../sketchlib/ArcAngles.js";
 import { Color } from "../../sketchlib/Color.js";
 import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
-import { ArcPrimitive, LinePrimitive } from "../../sketchlib/rendering/primitives.js";
+import {
+  ArcPrimitive,
+  LinePrimitive,
+} from "../../sketchlib/rendering/primitives.js";
 import { group, style } from "../../sketchlib/rendering/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Tween } from "../../sketchlib/Tween.js";
-
-// TODO: this should not be used in this class!
-const PIXELS_PER_METER = 100;
 
 // TODO: should this be a part of the arc, or should it be passed in by
 // caller?
@@ -26,7 +26,7 @@ export class AnimatedArc {
    * Constructor
    * @param {Point} center Center of the circle this arc lives on in screen space
    * @param {number} radius Radius of the circle this arc lives on in screen space
-   * @param {ArcAngles} angles The angles for the full circular arc
+   * @param {ArcAngles} angles The angles for the full circular arc (!!! in p5.js screen space, postive is clockwise !!!)
    * @param {number} start_frame Start frame of the animation
    * @param {number} duration Duration of the animation in frames
    */
@@ -34,14 +34,20 @@ export class AnimatedArc {
     this.center = center;
     this.radius = radius;
     this.angles = angles;
+
+    /**
+     * The full arc, this is used for the background, and the owning
+     * ArcRobot will access this to add to the history
+     * @type {ArcPrimitive}
+     */
     this.arc_primitive = new ArcPrimitive(center, radius, angles);
+
+    /**
+     * A line from the start point to the end point, mainly for debugging.
+     */
     this.line_primitive = new LinePrimitive(
-      center.add(
-        Point.dir_from_angle(-angles.start_angle).scale(PIXELS_PER_METER)
-      ),
-      center.add(
-        Point.dir_from_angle(-angles.end_angle).scale(PIXELS_PER_METER)
-      )
+      center.add(Point.dir_from_angle(angles.start_angle).scale(radius)),
+      center.add(Point.dir_from_angle(angles.end_angle).scale(radius))
     );
     this.full_primitive = style(this.arc_primitive, GREY_LINES);
     this.angle_tween = Tween.scalar(
@@ -68,9 +74,8 @@ export class AnimatedArc {
    */
   current_position(frame) {
     const angle = this.angle_tween.get_value(frame);
-    // Flip angle so it's measured CCW
-    const direction = Point.dir_from_angle(-angle);
-    return this.center.add(direction.scale(PIXELS_PER_METER));
+    const direction = Point.dir_from_angle(angle);
+    return this.center.add(direction.scale(this.radius));
   }
 
   /**

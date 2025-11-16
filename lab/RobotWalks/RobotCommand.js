@@ -23,7 +23,8 @@ export class RobotCommand {
   }
 
   /**
-   * Get a Point.direction representing the offset from the start
+   * Get a Point.direction representing the offset from the start. Units
+   * are in model space, i.e. meters, y-up
    * @type {Point}
    */
   get offset() {
@@ -58,7 +59,7 @@ export class RobotCommand {
         next_command.weights[mod(i - cycle_amount, N)];
     }
 
-    // The robot's
+    // The robot's orientation is the total rotation from both commands.
     const orientation =
       (prev_command.orientation + next_command.orientation) % N;
 

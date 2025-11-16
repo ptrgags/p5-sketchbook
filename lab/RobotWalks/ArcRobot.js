@@ -3,7 +3,12 @@ import { ArcAngles } from "../../sketchlib/ArcAngles.js";
 import { Color } from "../../sketchlib/Color.js";
 import { SCREEN_CENTER } from "../../sketchlib/dimensions.js";
 import { Direction } from "../../sketchlib/Direction.js";
-import { ArcPrimitive, LinePrimitive, PointPrimitive } from "../../sketchlib/rendering/primitives.js";
+import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
+import {
+  ArcPrimitive,
+  LinePrimitive,
+  PointPrimitive,
+} from "../../sketchlib/rendering/primitives.js";
 import { group, style } from "../../sketchlib/rendering/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Oklch } from "../lablib/Oklch.js";
@@ -12,10 +17,10 @@ import { RobotCommand, ROOTS_OF_UNITY } from "./RobotCommand.js";
 
 // How many frames to animate each 1/5 turn arc
 const MOVEMENT_DURATION = 50;
-const PIXELS_PER_METER = 100;
+const PIXELS_PER_METER = 50;
+const FIFTH_TURN = (2 * Math.PI) / 5;
 
 const START_POINT = Point.ORIGIN.add(SCREEN_CENTER);
-
 
 const RED_LINES = new Style({
   stroke: Color.RED,
@@ -33,6 +38,9 @@ const POINT_STYLE = new Style({
   width: 2,
 });
 
+/**
+ * @enum
+ */
 const RobotAnimationState = {
   // Idle, waiting for commands
   IDLE: 0,
@@ -45,21 +53,42 @@ const RobotAnimationState = {
  */
 export class ArcRobot {
   constructor() {
-    this.animation_state = RobotAnimationState.IDLE;
-    this.command = RobotCommand.IDENTITY;
     /**
-     * List of arcs the robot has already traversed
+     * @type {RobotAnimationState}
+     */
+    this.animation_state = RobotAnimationState.IDLE;
+
+    /**
+     * The sequence of commands that led the robot to its current state.
+     * @type {RobotCommand}
+     */
+    this.command_seq = RobotCommand.IDENTITY;
+
+    /**
+     * List of arcs the robot has already traversed, in pixels
      * @type {ArcPrimitive[]}
      */
     this.history = [];
     /**
+     * Styled version of the history primitive
+     * @type {GroupPrimitive}
+     */
+    this.history_primitive = style(this.history, RED_LINES);
+
+    /**
+     * List of line segments the robot has already traversed, in pixels
      * @type {LinePrimitive[]}
      */
     this.polyline_history = [];
-    this.history_primitive = style(this.history, RED_LINES);
+    /**
+     * Styled version of the polyline history
+     * @type {GroupPrimitive}
+     */
     this.polyline_primitive = style(this.polyline_history, YELLOW_LINES);
 
     /**
+     * If the robot is currently moving, this will be an AnimatedArc for that
+     * segment in pixel space
      * @type {AnimatedArc | undefined}
      */
     this.current_arc = undefined;
@@ -67,59 +96,65 @@ export class ArcRobot {
 
   current_position(frame) {
     if (this.animation_state === RobotAnimationState.IDLE) {
-      return START_POINT.add(this.command.offset.scale(PIXELS_PER_METER));
+      const offset = this.command_seq.offset.scale(PIXELS_PER_METER);
+      return START_POINT.add(offset);
     }
 
     return this.current_arc.current_position(frame);
   }
 
   start_moving(frame, dpad_direction) {
+    // The D-pad key determines whether the arc curves to the left or right.
     let command;
-    let center_offset;
+    // Imagine the robot's orientation as the robot walking CCW around the
+    // unit circle. At each point 1/5 of the way around, the "left" direction
+    // points towards the center of the circle, and the "right" direction
+    // points directly outwards. Furthermore, in model space we defined
+    // the arc radius as 1 meter. So the right direction is _exactly_ the
+    // corresponding root of unity. And left is just its negation.
+    let to_center_model = ROOTS_OF_UNITY[this.command_seq.orientation];
     if (dpad_direction === Direction.LEFT) {
       command = RobotCommand.LEFT_TURN;
-      center_offset = ROOTS_OF_UNITY[this.command.orientation].neg();
+      to_center_model = to_center_model.neg();
     } else {
       command = RobotCommand.RIGHT_TURN;
-      center_offset = ROOTS_OF_UNITY[this.command.orientation];
     }
 
-    const current_position = START_POINT.add(
-      this.command.offset.scale(PIXELS_PER_METER)
-    );
-    const arc_center = current_position.add(
-      center_offset.scale(PIXELS_PER_METER)
-    );
+    const start_offset_model = this.command_seq.offset;
+    // this is still a direction for now
+    const arc_center_model = start_offset_model.add(to_center_model);
 
-    const full_command = RobotCommand.compose(command, this.command);
-    const prev_orientation = this.command.orientation;
-    const orientation = full_command.orientation;
+    // Full command sequence when we append the new command
+    const full_command_seq = RobotCommand.compose(command, this.command_seq);
 
-    const FIFTH_TURN = (2 * Math.PI) / 5;
+    const start_orientation = this.command_seq.orientation;
 
-    let computed_angles;
+    let angles_model;
     if (dpad_direction === Direction.LEFT) {
-      computed_angles = new ArcAngles(
-        prev_orientation * FIFTH_TURN,
-        orientation * FIFTH_TURN
-      );
+      const start_angle = start_orientation * FIFTH_TURN;
+      angles_model = new ArcAngles(start_angle, start_angle + FIFTH_TURN);
     } else {
-      computed_angles = new ArcAngles(
-        Math.PI - prev_orientation * FIFTH_TURN,
-        Math.PI - orientation * FIFTH_TURN
-      );
+      const start_angle = start_orientation * FIFTH_TURN + Math.PI;
+      angles_model = new ArcAngles(start_angle, start_angle - FIFTH_TURN);
     }
 
+    // Model space is y-up, but screen space is y-down
+    const arc_center_screen = START_POINT.add(
+      arc_center_model.flip_y().scale(PIXELS_PER_METER)
+    );
+    const angles_screen = angles_model.flip_y();
+
+    // Create the arc which uses units of screen space (y-down!!)
     this.current_arc = new AnimatedArc(
-      arc_center,
+      arc_center_screen,
       // the arcs are always 1 meter in radius
       PIXELS_PER_METER,
-      computed_angles,
+      angles_screen,
       frame,
       MOVEMENT_DURATION
     );
     this.animation_state = RobotAnimationState.MOVING;
-    this.command = full_command;
+    this.command_seq = full_command_seq;
   }
 
   update_idle(frame, dpad_direction) {

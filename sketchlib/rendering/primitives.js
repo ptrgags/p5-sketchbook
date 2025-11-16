@@ -37,7 +37,7 @@ export class ArcPrimitive {
    * Constructor
    * @param {Point} center The center of the circle
    * @param {number} radius The radius of the circle
-   * @param {ArcAngles} angles The two angles defining the arc
+   * @param {ArcAngles} angles The two angles defining the arc, !!! CLOCKWISE !!! since p5.js is y-down
    */
   constructor(center, radius, angles) {
     this.center = center;

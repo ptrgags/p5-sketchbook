@@ -260,6 +260,19 @@ export class Point {
   }
 
   /**
+   * Return a point of the same type
+   * @param {Point} point The original point
+   * @returns {Point} The result of flipping the y-coordinate
+   */
+  flip_y() {
+    if (this.is_direction) {
+      return Point.direction(this.x, -this.y);
+    }
+
+    return Point.point(this.x, -this.y);
+  }
+
+  /**
    * Compute the dot product of the x and y components of the points.
    * Technically this is the dot product of the duals
    * @param {Point} other The other point
