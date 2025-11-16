@@ -2,16 +2,7 @@ import { Point } from "../../pga2d/objects.js";
 import { mod } from "../../sketchlib/mod.js";
 
 export const N = 5;
-
-// TODO: This should be part of Point
-/**
- * @type {Point[]}
- */
-export const ROOTS_OF_UNITY = new Array(N);
-for (let i = 0; i < N; i++) {
-  const angle = ((2 * Math.PI) / N) * i;
-  ROOTS_OF_UNITY[i] = Point.dir_from_angle(angle);
-}
+export const ROOTS_OF_UNITY = Point.roots_of_unity(N);
 
 const OFFSETS = new Array(N);
 for (let i = 0; i < N; i++) {
