@@ -18,6 +18,8 @@ import { RobotCommand, ROOTS_OF_UNITY } from "./RobotCommand.js";
 // How many frames to animate each 1/5 turn arc
 const MOVEMENT_DURATION = 25;
 const PIXELS_PER_METER = 25;
+const ORIENTATION_LINE_LENGTH = 25;
+
 const FIFTH_TURN = (2 * Math.PI) / 5;
 
 const START_POINT = Point.ORIGIN.add(SCREEN_CENTER);
@@ -105,6 +107,17 @@ export class ArcRobot {
     }
 
     return this.current_arc.current_position(frame);
+  }
+
+  forward_dir(frame) {
+    if (this.animation_state === RobotAnimationState.IDLE) {
+      const orientation = this.command_seq.orientation;
+      // Orientation is measured from north, so add a quarter turn
+      const angle = orientation * FIFTH_TURN + Math.PI / 2;
+      return Point.dir_from_angle(angle).flip_y();
+    }
+
+    return this.current_arc.forward_dir(frame);
   }
 
   start_moving(frame, dpad_direction) {
@@ -207,16 +220,30 @@ export class ArcRobot {
   }
 
   render(frame) {
-    const current_position = new PointPrimitive(this.current_position(frame));
+    const pos = this.current_position(frame);
+    const step_forward = pos.add(
+      this.forward_dir(frame).scale(ORIENTATION_LINE_LENGTH)
+    );
+
+    const current_position = new PointPrimitive(pos);
     const styled_position = style(current_position, POINT_STYLE);
+
+    const orientation_line = new LinePrimitive(pos, step_forward);
+    const styled_orientation = style(orientation_line, YELLOW_LINES);
 
     if (this.current_arc) {
       const arc_bg = style(this.current_arc.arc_primitive, GREY_LINES);
       const arc_fg = style(this.current_arc.render(frame), RED_LINES);
 
-      return group(this.history_primitive, arc_bg, arc_fg, styled_position);
+      return group(
+        this.history_primitive,
+        arc_bg,
+        arc_fg,
+        styled_orientation,
+        styled_position
+      );
     }
 
-    return group(this.history_primitive, styled_position);
+    return group(this.history_primitive, styled_orientation, styled_position);
   }
 }

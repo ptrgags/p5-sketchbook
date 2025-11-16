@@ -70,6 +70,26 @@ export class AnimatedArc {
   }
 
   /**
+   * Get the local "forward" direction in model space at this frame
+   * @param {number} frame The current frame number
+   * @returns {Point} The forward direction as a Point.direction
+   */
+  forward_dir(frame) {
+    // The tangent to the curve will always be a quarter turn away from
+    // the orientation. However, there are two possible tangents. Choose
+    // the one in the direction of the angles.
+    const raw_angle = this.angle_tween.get_value(frame);
+    let angle;
+    if (this.angles.direction === -1) {
+      angle = raw_angle - Math.PI / 2;
+    } else {
+      angle = raw_angle + Math.PI / 2;
+    }
+
+    return Point.dir_from_angle(angle);
+  }
+
+  /**
    * Render an arc accurate for this frame. If you want to render the
    * full arc to show the trajectory, access this.arc_primitive
    * @param {number} frame Frame count
