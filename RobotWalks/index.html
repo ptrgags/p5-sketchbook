@@ -22,7 +22,31 @@
       <div class="sketch">
         <canvas id="sketch-canvas" width="500" height="700"></canvas>
       </div>
-      <div class="description">DESCRIPTION GOES HERE</div>
+      <div class="controls">
+        <button id="reset">Reset</button>
+        <span id="path"></span>
+      </div>
+      <div class="description">
+        <p>
+          Use left/right arrows (or touch the left/right sides of the canvas)
+          to move the robot.
+        </p>
+        <p>This sketch is an interactive version of the printable artworks I made in my <a href="https://github.com/ptrgags/paper-toaster?tab=readme-ov-file#robot-walks-2024-06-10"><code>paper-toaster</code> project.</a>
+          The Paper Toaster sketch is in turn inspired by <a href="https://projecteuler.net/problem=208">Project Euler #208: Robot Walks</a>.
+          The goal is not to solve the original math puzzle about counting the possible paths, but just to visualize the patterns.
+          </p>
+        <p>
+          The robot moves in arcs that are 1/5 of a circle. This angle does not create a regular grid like 1/4 or 1/6 turns would.
+          Depending on the robot's path, sometimes you get satisfying squiggly patterns, other times you get a chaotic pile of overlapping arcs.
+          If you're careful, you can get the robot to make an intricate loop, or patterns with 5-fold rotation symmetry like a flower.
+        </p>
+        <p>
+          Art Challenge: Use the robot to draw a squiggly path around the canvas 
+          without allowing the curve to cross itself. Try to fill as much of the negative space as you can!
+          Here's an example I came up with:
+        </p>
+        <p>IMG: Self-avoiding walk</p>
+      </div>
     </div>
   </body>
 </html>
