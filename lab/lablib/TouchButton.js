@@ -1,6 +1,5 @@
 import { Point } from "../../pga2d/objects.js";
 import { Color } from "../../sketchlib/Color.js";
-import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
 import { RectPrimitive } from "../../sketchlib/rendering/primitives.js";
 import { style } from "../../sketchlib/rendering/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
@@ -30,6 +29,8 @@ export class TouchButton {
     /**
      * Events for the button
      * click(void) - if the button was released after being pressed
+     * pressed(void) - when the button transitions from IDLE/HOVER -> PRESSED, this triggers once
+     * released(void) - when the button transitions from PRESSED -> IDLE/HOVER, this triggers once
      * @type {EventTarget}
      */
     this.events = new EventTarget();
@@ -60,16 +61,32 @@ export class TouchButton {
   }
 
   /**
+   * Transition to a new button state, triggering events when the pressed
+   * state changes
+   * @private
+   * @param {ButtonState} new_state 
+   */
+  transition(new_state) {
+    if (this.is_pressed && new_state !== ButtonState.PRESSED) {
+      this.events.dispatchEvent(new CustomEvent("released"));
+    } else if (!this.is_pressed && new_state === ButtonState.PRESSED) {
+      this.events.dispatchEvent(new CustomEvent("pressed"));
+    }
+
+    this.state = new_state;
+  }
+
+  /**
    * Mouse pressed handler
    * @param {Point} mouse_coords The mouse coords from the event
    */
   mouse_pressed(mouse_coords) {
     if (!this.rect.contains(mouse_coords)) {
-      this.state = ButtonState.IDLE;
+      this.transition(ButtonState.IDLE)
       return;
     }
 
-    this.state = ButtonState.PRESSED;
+    this.transition(ButtonState.PRESSED);
   }
 
   /**
@@ -78,7 +95,7 @@ export class TouchButton {
    */
   mouse_released(mouse_coords) {
     if (!this.rect.contains(mouse_coords)) {
-      this.state = ButtonState.IDLE;
+      this.transition(ButtonState.IDLE)
       return;
     }
 
@@ -86,7 +103,7 @@ export class TouchButton {
       this.events.dispatchEvent(new CustomEvent("click"));
     }
 
-    this.state = ButtonState.HOVER;
+    this.transition(ButtonState.HOVER);
   }
 
   /**
@@ -95,12 +112,12 @@ export class TouchButton {
    */
   mouse_moved(mouse_coords) {
     if (!this.rect.contains(mouse_coords)) {
-      this.state = ButtonState.IDLE;
+      this.transition(ButtonState.IDLE)
       return;
     }
 
     if (this.state !== ButtonState.PRESSED) {
-      this.state = ButtonState.HOVER;
+      this.transition(ButtonState.HOVER)
     }
   }
 
@@ -110,10 +127,10 @@ export class TouchButton {
    */
   mouse_dragged(mouse_coords) {
     if (!this.rect.contains(mouse_coords)) {
-      this.state = ButtonState.IDLE;
+      this.transition(ButtonState.IDLE)
       return;
     }
 
-    this.state = ButtonState.PRESSED;
+    this.transition(ButtonState.PRESSED)
   }
 }
