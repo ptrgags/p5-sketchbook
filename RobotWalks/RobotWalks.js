@@ -48,9 +48,6 @@ export const sketch = (p) => {
     robot.update(p.frameCount, DPAD.direction.digital);
     const robot_walk = robot.render(p.frameCount);
     draw_primitive(p, robot_walk);
-
-    //draw_primitive(p, TOUCH_LEFT.debug_render())
-    //draw_primitive(p, TOUCH_RIGHT.debug_render());
   };
 
   p.keyPressed = (/** @type {KeyboardEvent} */ e) => {
