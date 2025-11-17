@@ -242,6 +242,24 @@ describe("Point", () => {
       expect(result).toBePoint(expected);
     });
 
+    it("flip_y flips y coordinate of points", () => {
+      const point = Point.point(3, 4);
+
+      const result = point.flip_y();
+
+      const expected = Point.point(3, -4);
+      expect(result).toBePoint(expected);
+    })
+
+    it("flip_y flips y coordinate of directions", () => {
+      const dir = Point.direction(3, -4);
+
+      const result = dir.flip_y();
+
+      const expected = Point.direction(3, 4);
+      expect(result).toBePoint(expected);
+    })
+
     it("dot of two directions computes the dot product of components", () => {
       const a = Point.direction(1, 2);
       const b = Point.direction(3, 4);

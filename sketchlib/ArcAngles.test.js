@@ -81,4 +81,13 @@ describe("ArcAngles", () => {
             expect(angles.direction).toBe(1);
         })
     })
+
+    it("flip_y negates angles", () => {
+        const angles = new ArcAngles(-Math.PI / 3, Math.PI / 4);
+        
+        const result = angles.flip_y();
+
+        const expected = new ArcAngles(Math.PI / 3, -Math.PI / 4);
+        expect(result.equals(expected)).toBe(true);
+    })
 })
