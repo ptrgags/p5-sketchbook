@@ -4,6 +4,8 @@ import { mod } from "../sketchlib/mod.js";
 export const N = 5;
 export const ROOTS_OF_UNITY = Point.roots_of_unity(N);
 
+// Displacement between the start and end of the arc. It will always be
+// the difference of two adjacent fifth roots of unity
 const OFFSETS = new Array(N);
 for (let i = 0; i < N; i++) {
   OFFSETS[i] = ROOTS_OF_UNITY[(i + 1) % N].sub(ROOTS_OF_UNITY[i]);

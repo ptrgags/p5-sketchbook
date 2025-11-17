@@ -32,12 +32,17 @@ export class AnimatedArc {
 
     /**
      * A line from the start point to the end point, mainly for debugging.
+     * @type {LinePrimitive}
      */
     this.line_primitive = new LinePrimitive(
       center.add(Point.dir_from_angle(angles.start_angle).scale(radius)),
       center.add(Point.dir_from_angle(angles.end_angle).scale(radius))
     );
 
+    /**
+     * Tween that interpolates the angle of the arc for a given frame
+     * @type {Tween}
+     */
     this.angle_tween = Tween.scalar(
       angles.start_angle,
       angles.end_angle,
