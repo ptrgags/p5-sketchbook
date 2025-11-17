@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { PGA_MATCHERS } from "../../pga2d/pga_matchers";
+import { PGA_MATCHERS } from "../pga2d/pga_matchers";
 import { RobotCommand } from "./RobotCommand";
-import { Point } from "../../pga2d/objects";
+import { Point } from "../pga2d/objects";
 
 expect.extend(PGA_MATCHERS);
 

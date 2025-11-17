@@ -1,6 +1,6 @@
-import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
-import { draw_primitive } from "../../sketchlib/p5_helpers/draw_primitive.js";
-import { DirectionalPad } from "../lablib/DirectionalPad.js";
+import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
+import { draw_primitive } from "../sketchlib/p5_helpers/draw_primitive.js";
+import { DirectionalPad } from "../lab/lablib/DirectionalPad.js";
 import { ArcRobot } from "./ArcRobot.js";
 
 const DPAD = new DirectionalPad();

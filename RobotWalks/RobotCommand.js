@@ -1,5 +1,5 @@
-import { Point } from "../../pga2d/objects.js";
-import { mod } from "../../sketchlib/mod.js";
+import { Point } from "../pga2d/objects.js";
+import { mod } from "../sketchlib/mod.js";
 
 export const N = 5;
 export const ROOTS_OF_UNITY = Point.roots_of_unity(N);

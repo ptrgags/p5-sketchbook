@@ -1,13 +1,10 @@
-import { Point } from "../../pga2d/objects.js";
-import { ArcAngles } from "../../sketchlib/ArcAngles.js";
-import { Color } from "../../sketchlib/Color.js";
-import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
+import { Point } from "../pga2d/objects.js";
+import { ArcAngles } from "../sketchlib/ArcAngles.js";
 import {
   ArcPrimitive,
   LinePrimitive,
-} from "../../sketchlib/rendering/primitives.js";
-import { group, style } from "../../sketchlib/rendering/shorthand.js";
-import { Tween } from "../../sketchlib/Tween.js";
+} from "../sketchlib/rendering/primitives.js";
+import { Tween } from "../sketchlib/Tween.js";
 
 /**
  * Class for managing an animated circular arc.
