@@ -260,6 +260,19 @@ export class Point {
   }
 
   /**
+   * Return a point of the same type
+   * @param {Point} point The original point
+   * @returns {Point} The result of flipping the y-coordinate
+   */
+  flip_y() {
+    if (this.is_direction) {
+      return Point.direction(this.x, -this.y);
+    }
+
+    return Point.point(this.x, -this.y);
+  }
+
+  /**
    * Compute the dot product of the x and y components of the points.
    * Technically this is the dot product of the duals
    * @param {Point} other The other point
@@ -297,6 +310,28 @@ export class Point {
   static lerp(a, b, t) {
     const bivector = Even.lerp(a.bivec, b.bivec, t);
     return Point.from_bivec(bivector);
+  }
+
+  /**
+   * Generate the N n-th roots of unity, i.e. N evenly spaced points around
+   * the unit circle exp(2 * pi * i * k / N), except expressed as
+   * direction objects, not complex numbers.
+   * @param {number} n A positive integer number of roots to generate
+   * @return {Point[]} An array of the N roots
+   */
+  static roots_of_unity(n) {
+    if (n < 1) {
+      throw new Error("n must be a positive integer");
+    }
+
+    const roots = new Array(n);
+
+    for (let i = 0; i < n; i++) {
+      const angle = ((2 * Math.PI) / n) * i;
+      roots[i] = Point.dir_from_angle(angle);
+    }
+
+    return roots;
   }
 }
 Point.ORIGIN = Object.freeze(Point.point(0, 0));

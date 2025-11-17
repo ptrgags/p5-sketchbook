@@ -11,6 +11,7 @@ import {
   BeziergonPrimitive,
   VectorPrimitive,
   TextPrimitive,
+  ArcPrimitive,
 } from "../rendering/primitives.js";
 import { TextStyle } from "../rendering/TextStyle.js";
 import { Transform } from "../rendering/Transform.js";
@@ -48,6 +49,34 @@ function draw_circle(p, circle) {
   p.circle(x, y, 2 * circle.radius);
 }
 
+/**
+ * Draw a circular arc
+ * @param {import("p5")} p the p5.js library
+ * @param {ArcPrimitive} arc The arc to draw
+ */
+function draw_arc(p, arc) {
+  const { center, radius, angles } = arc;
+  const { x, y } = center;
+  const diameter = 2 * radius;
+
+  let { start_angle, end_angle } = angles;
+
+  // p5.js's arc command specifies angles in CW order from start to stop.
+  // If the direction of the arc is backwards, we need to swap the order
+  // of the arguments.
+  if (angles.direction === -1) {
+    [start_angle, end_angle] = [end_angle, start_angle];
+  }
+
+  // Note: p5 is y-down so we need to flip the angles
+  p.arc(x, y, diameter, diameter, start_angle, end_angle, p.OPEN);
+}
+
+/**
+ * Draw a line segment
+ * @param {import("p5")} p The p5.js library
+ * @param {LinePrimitive} line The line segment to draw
+ */
 function draw_line(p, line) {
   const a = line.a;
   const b = line.b;
@@ -268,6 +297,8 @@ export function draw_primitive(p, primitive) {
     draw_text(p, primitive);
   } else if (primitive instanceof CirclePrimitive) {
     draw_circle(p, primitive);
+  } else if (primitive instanceof ArcPrimitive) {
+    draw_arc(p, primitive);
   } else {
     throw new Error(`unknown primitive ${primitive}`);
   }

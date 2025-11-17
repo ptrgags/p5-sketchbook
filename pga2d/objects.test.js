@@ -5,6 +5,19 @@ import { PI } from "../sketchlib/math_consts";
 
 expect.extend(PGA_MATCHERS);
 
+/**
+ * Compare two arrays of points
+ * @param {Point[]} result
+ * @param {Point[]} expected
+ */
+function expect_point_array(result, expected) {
+  expect(result.length).toBe(expected.length);
+
+  for (const [i, res] of result.entries()) {
+    expect(res).toBePoint(expected[i]);
+  }
+}
+
 describe("Point", () => {
   describe("euclidean", () => {
     it("converts to direction", () => {
@@ -229,6 +242,24 @@ describe("Point", () => {
       expect(result).toBePoint(expected);
     });
 
+    it("flip_y flips y coordinate of points", () => {
+      const point = Point.point(3, 4);
+
+      const result = point.flip_y();
+
+      const expected = Point.point(3, -4);
+      expect(result).toBePoint(expected);
+    })
+
+    it("flip_y flips y coordinate of directions", () => {
+      const dir = Point.direction(3, -4);
+
+      const result = dir.flip_y();
+
+      const expected = Point.direction(3, 4);
+      expect(result).toBePoint(expected);
+    })
+
     it("dot of two directions computes the dot product of components", () => {
       const a = Point.direction(1, 2);
       const b = Point.direction(3, 4);
@@ -251,6 +282,76 @@ describe("Point", () => {
     // 3/4 * 2 + 1/4 * -8 = 1/4(6 - 8) = -2/4 = -1/2
     const expected = Point.direction(0.25, -0.5);
     expect(result).toBePoint(expected);
+  });
+
+  describe("roots_of_unity", () => {
+    it("with N < 1 throws error", () => {
+      expect(() => {
+        return Point.roots_of_unity(0);
+      }).toThrowError("n must be a positive integer");
+    });
+
+    it("with N = 1 produces single point", () => {
+      const result = Point.roots_of_unity(1);
+
+      const expected = [Point.DIR_X];
+
+      expect_point_array(result, expected);
+    });
+
+    it("with N = 2 produces 1 and -1", () => {
+      const result = Point.roots_of_unity(2);
+
+      const expected = [Point.DIR_X, Point.DIR_X.neg()];
+
+      expect_point_array(result, expected);
+    });
+
+    it("with N = 4 produces cardinal directions", () => {
+      const result = Point.roots_of_unity(4);
+
+      const expected = [
+        Point.DIR_X,
+        Point.DIR_Y,
+        Point.DIR_X.neg(),
+        Point.DIR_Y.neg(),
+      ];
+      expect_point_array(result, expected);
+    });
+
+    it("with N = 8 produces 8 ordinal directions", () => {
+      const result = Point.roots_of_unity(8);
+
+      // cos(45 deg) = sin(45 deg) = sqrt(2)/2 = sqrt(1/2)
+      const xy45 = Math.SQRT1_2;
+      const ne = Point.direction(xy45, xy45);
+      const nw = Point.direction(-xy45, xy45);
+      const expected = [
+        Point.DIR_X,
+        ne,
+        Point.DIR_Y,
+        nw,
+        Point.DIR_X.neg(),
+        ne.neg(), // southwest
+        Point.DIR_Y.neg(),
+        nw.neg(), // southeast
+      ];
+
+      expect_point_array(result, expected);
+    });
+
+    it("with N = 3 produces correct trig values", () => {
+      const result = Point.roots_of_unity(3);
+
+      const sin60 = Math.sqrt(3) / 2;
+
+      const expected = [
+        Point.DIR_X,
+        Point.direction(-0.5, sin60),
+        Point.direction(-0.5, -sin60),
+      ];
+      expect_point_array(result, expected);
+    });
   });
 });
 
