@@ -4,9 +4,14 @@ import { DirectionalPad } from "../lab/lablib/DirectionalPad.js";
 import { ArcRobot } from "./ArcRobot.js";
 
 const DPAD = new DirectionalPad();
-const ROBOT = new ArcRobot();
 
 export const sketch = (p) => {
+  let robot = new ArcRobot();
+
+  function reset() {
+    robot = new ArcRobot();
+  }
+
   p.setup = () => {
     p.createCanvas(
       WIDTH,
@@ -16,13 +21,15 @@ export const sketch = (p) => {
     );
 
     DPAD.setup();
+
+    document.getElementById("reset").addEventListener("click", reset);
   };
 
   p.draw = () => {
     p.background(0);
 
-    ROBOT.update(p.frameCount, DPAD.direction.digital);
-    const robot_walk = ROBOT.render(p.frameCount);
+    robot.update(p.frameCount, DPAD.direction.digital);
+    const robot_walk = robot.render(p.frameCount);
     draw_primitive(p, robot_walk);
   };
 
