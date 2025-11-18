@@ -201,6 +201,16 @@ export class SoundManager {
       clip.material.start(start_time).stop(end_time);
     }
 
+    const draw = this.tone.getDraw();
+
+    this.test_clip = new this.tone.Part((time, value) => {
+      // It looks like sometimes it calls this with an undefined
+      // value, I guess that means no change?
+      draw.schedule(() => console.log(time, value), time);
+    }, [["0:0", "C4"], ["0:2", "E4"], ["0:4, G4"]])
+    this.test_clip.loop = true;
+    this.test_clip.start("0:0").stop("8:0");
+
     const transport = this.tone.getTransport();
     transport.position = 0;
     transport.start("+0.1", "0:0");
