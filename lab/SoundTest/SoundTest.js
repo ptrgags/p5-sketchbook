@@ -27,6 +27,7 @@ import {
   phase_scale,
   symmetry_melody,
 } from "./example_scores.js";
+import { Piano } from "./Piano.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -161,6 +162,7 @@ class SoundScene {
     this.sound = sound;
     this.mute_button = new MuteButton();
     this.events = new EventTarget();
+    this.piano = new Piano(new Rectangle(Point.point(0, 0), Point.direction(500, 300)))
     this.mute_button.events.addEventListener(
       "change",
       (/** @type {CustomEvent}*/ e) => {
@@ -190,8 +192,10 @@ class SoundScene {
     const mute = this.mute_button.render();
 
     const melody_buttons = this.melody_buttons.map((x) => x.debug_render());
+    
+    const piano = this.piano.render();
 
-    const primitives = [mute, ...melody_buttons, BUTTON_LABELS];
+    const primitives = [mute, ...melody_buttons, BUTTON_LABELS, piano];
 
     if (this.selected_melody !== undefined) {
       const current_time = SOUND.transport_time;
