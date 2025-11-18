@@ -14,6 +14,7 @@ import { Transform } from "../../sketchlib/rendering/Transform.js";
 import { Style } from "../../sketchlib/Style.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { MouseInput } from "../lablib/MouseInput.js";
+import { C4, C5, E4 } from "../lablib/music/pitches.js";
 import { render_score } from "../lablib/music/render_score.js";
 import { MuteButton } from "../lablib/MuteButton.js";
 import { Oklch } from "../lablib/Oklch.js";
@@ -163,13 +164,20 @@ class SoundScene {
     this.mute_button = new MuteButton();
     this.events = new EventTarget();
     this.piano = new Piano(
-      new Rectangle(Point.point(0, 300), Point.direction(500 / 3, 300 / 3))
+      new Rectangle(Point.point(0, 300), Point.direction(500, 300 / 3)),
+      4,
+      3
     );
-    this.piano.set_key(0, true);
-    this.piano.set_key(1, true);
-    this.piano.set_key(5, true);
-    this.piano.set_key(7, true);
-    this.piano.set_key(8, true);
+    // at the end of this, you should see
+    // - C4 pressed (it wasn't released twice)
+    // - E4 not pressed
+    // - C5 pressed
+    this.piano.trigger(C4);
+    this.piano.trigger(E4);
+    this.piano.trigger(C4);
+    this.piano.release(C4);
+    this.piano.release(E4);
+    this.piano.trigger(C5);
 
     this.mute_button.events.addEventListener(
       "change",

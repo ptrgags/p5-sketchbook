@@ -3,9 +3,9 @@ import { Color } from "../../sketchlib/Color.js";
 import { RectPrimitive } from "../../sketchlib/rendering/primitives.js";
 import { group, style } from "../../sketchlib/rendering/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
+import { MidiPitch } from "../lablib/music/pitch_conversions.js";
 import { Rectangle } from "../lablib/Rectangle.js";
 
-const NUM_KEYS = 12;
 const NUM_WHITE_KEYS = 7;
 
 /**
@@ -52,9 +52,6 @@ function make_black_keys(bounding_rect) {
   });
 }
 
-const WHITE_KEY_INDICES = [0, 2, 4, 5, 7, 9, 11];
-const BLACK_KEY_INDICES = [1, 3, 6, 8, 10];
-
 const WHITE = 0;
 const BLACK = 1;
 
@@ -88,7 +85,7 @@ const STYLE_HIGHLIGHT = new Style({
 /**
  * Single octave piano keyboard
  */
-export class Piano {
+export class SingleOctavePiano {
   constructor(bounding_rect) {
     this.white_keys = make_white_keys(bounding_rect);
     this.black_keys = make_black_keys(bounding_rect);
@@ -108,6 +105,13 @@ export class Piano {
    */
   set_key(key_index, is_pressed) {
     this.is_pressed[key_index] = is_pressed;
+  }
+
+  /**
+   * Release all keys
+   */
+  reset() {
+    this.is_pressed.fill(false);
   }
 
   /**
@@ -141,5 +145,105 @@ export class Piano {
     const black_highlights = style(active_black, STYLE_HIGHLIGHT);
 
     return group(white_keys, white_highlights, black_keys, black_highlights);
+  }
+}
+
+/**
+ * Multiple-octave piano visualization. The size and number of octaves is
+ * configurable.
+ */
+export class Piano {
+  /**
+   * Constructor
+   * @param {Rectangle} bounding_rect Bounding rectangle for the whole keyboard
+   * @param {number} octave_start Octave number of the leftmost (lowest) octave
+   * @param {number} num_octaves How many octaves to fit in the bounding box
+   */
+  constructor(bounding_rect, octave_start, num_octaves) {
+    /**
+     * Key press counter for each pitch. On a key press, the counter goes
+     * up, on a release, the counter goes down.
+     * @type {number[]}
+     */
+    this.key_presses = new Array(128).fill(0);
+
+    this.octave_start = octave_start;
+    this.num_octaves = num_octaves;
+
+    const { x: width, y: height } = bounding_rect.dimensions;
+    const octave_width = width / num_octaves;
+    const octave_dimensions = Point.direction(octave_width, height);
+
+    // Create a number of single-octave pianos
+    this.octave_pianos = new Array(this.num_octaves);
+    for (let i = 0; i < num_octaves; i++) {
+      const offset = bounding_rect.position.add(
+        Point.DIR_X.scale(i * octave_width)
+      );
+      this.octave_pianos[i] = new SingleOctavePiano(
+        new Rectangle(offset, octave_dimensions)
+      );
+    }
+  }
+
+  /**
+   * Trigger the specified key of the keyboard. Out of range values will be
+   * ignored.
+   * Duplicate key presses are tracked with a counter so to reset a key,
+   * you need to call release() the same number of times as trigger()
+   * @param {number} midi_note MIDI pitch number in [0, 127]
+   */
+  trigger(midi_note) {
+    const octave = MidiPitch.get_octave(midi_note);
+    if (
+      octave < this.octave_start ||
+      octave >= this.octave_start + this.num_octaves
+    ) {
+      console.warn("Triggering out-of-range note");
+      return;
+    }
+
+    // Increment the counter
+    this.key_presses[midi_note]++;
+
+    const pitch = MidiPitch.get_pitch_class(midi_note);
+    this.octave_pianos[octave - this.octave_start].set_key(pitch, true);
+  }
+
+  /**
+   * Release the specified key of the keyboard. Out-of range values will be
+   * ignored
+   * @param {number} midi_note MIDI pitch number in [0, 127]
+   */
+  release(midi_note) {
+    const octave = MidiPitch.get_octave(midi_note);
+    if (
+      octave < this.octave_start ||
+      octave >= this.octave_start + this.num_octaves
+    ) {
+      console.warn("Releasing out-of-range note");
+      return;
+    }
+
+    // Decrement the counter
+    this.key_presses[midi_note]--;
+
+    if (this.key_presses[midi_note] < 0) {
+      throw new Error(`more releases than triggers for note ${midi_note}!`);
+    } else if (this.key_presses[midi_note] === 0) {
+      // Only release the note if duplicates have been resolved
+      const pitch = MidiPitch.get_pitch_class(midi_note);
+      this.octave_pianos[octave - this.octave_start].set_key(pitch, false);
+    }
+  }
+
+  reset() {
+    this.key_presses.fill(0);
+    this.octave_pianos.forEach((x) => x.reset());
+  }
+
+  render() {
+    const octave_primitives = this.octave_pianos.map((x) => x.render());
+    return group(...octave_primitives);
   }
 }
