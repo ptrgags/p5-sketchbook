@@ -165,7 +165,7 @@ class SoundScene {
     this.events = new EventTarget();
     this.piano = new Piano(
       new Rectangle(Point.point(0, 300), Point.direction(500, 300 / 3)),
-      4,
+      3,
       3
     );
     // at the end of this, you should see
