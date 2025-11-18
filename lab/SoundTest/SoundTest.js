@@ -162,7 +162,15 @@ class SoundScene {
     this.sound = sound;
     this.mute_button = new MuteButton();
     this.events = new EventTarget();
-    this.piano = new Piano(new Rectangle(Point.point(0, 0), Point.direction(500, 300)))
+    this.piano = new Piano(
+      new Rectangle(Point.point(0, 300), Point.direction(500 / 3, 300 / 3))
+    );
+    this.piano.set_key(0, true);
+    this.piano.set_key(1, true);
+    this.piano.set_key(5, true);
+    this.piano.set_key(7, true);
+    this.piano.set_key(8, true);
+
     this.mute_button.events.addEventListener(
       "change",
       (/** @type {CustomEvent}*/ e) => {
@@ -192,7 +200,7 @@ class SoundScene {
     const mute = this.mute_button.render();
 
     const melody_buttons = this.melody_buttons.map((x) => x.debug_render());
-    
+
     const piano = this.piano.render();
 
     const primitives = [mute, ...melody_buttons, BUTTON_LABELS, piano];
