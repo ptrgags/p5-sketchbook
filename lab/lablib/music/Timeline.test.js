@@ -45,6 +45,10 @@ describe("Sequential", () => {
     const expected = new Rational(4, 1);
     expect(result).toEqual(expected);
   });
+
+  describe("from_repeat", () => {
+    // TODO: test that this works
+  });
 });
 
 describe("Parallel", () => {
