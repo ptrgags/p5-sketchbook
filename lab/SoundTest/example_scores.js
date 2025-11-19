@@ -24,7 +24,6 @@ import {
   Harmony,
   map_pitch,
   Melody,
-  MusicLoop,
   Note,
   parse_cycle,
   parse_melody,
@@ -91,25 +90,25 @@ export function layered_melody() {
     ])
   );
 
-  const sine_part = new MusicLoop(new Rational(34, 1), pedal);
+  const sine_part = Melody.from_repeat(pedal, 34);
   const square_part = new Melody(
     new Rest(new Rational(2, 1)),
-    new MusicLoop(new Rational(22, 1), scale_arp)
+    Melody.from_repeat(scale_arp, 22)
   );
   const poly_part = new Harmony(
     new Melody(
       new Rest(new Rational(8, 1)),
-      new MusicLoop(new Rational(12, 1), cycle_a),
+      Melody.from_repeat(cycle_a, 12),
       new Rest(new Rational(4, 1)),
-      new MusicLoop(new Rational(4, 1), cycle_a)
+      Melody.from_repeat(cycle_a, 4)
     ),
     new Melody(
       new Rest(new Rational(8, 1)),
-      new MusicLoop(new Rational(8, 1), cycle_b),
+      Melody.from_repeat(cycle_b, 8),
       new Rest(new Rational(4, 1)),
-      new MusicLoop(new Rational(4, 1), cycle_b),
+      Melody.from_repeat(cycle_b, 4),
       new Rest(new Rational(4, 1)),
-      new MusicLoop(new Rational(4, 1), cycle_b)
+      Melody.from_repeat(cycle_b, 4)
     )
   );
 
@@ -129,12 +128,15 @@ export function phase_scale() {
     [0, 1, 2, 3, 4, 5, 4, 3, 2, 1]
   );
 
-  // lcm(6, 8, 10) = 120, divide by 4 to get number of measures, 30
-  const total_duration = new Rational(30, 1);
+  // lcm(6, 8, 10) = 120 eighth notes duration total
+  // so that means
+  // - phase_a needs to be repeated 120/6 = 20 times
+  // - phase_b needs to be repeated 120/8 = 15 times
+  // - phase_c needs to be repeated 120/10 = 12 times
   const phase_part_scale = new Harmony(
-    new MusicLoop(total_duration, phase_a),
-    new MusicLoop(total_duration, phase_b),
-    new MusicLoop(total_duration, phase_c)
+    Melody.from_repeat(phase_a, 20),
+    Melody.from_repeat(phase_b, 15),
+    Melody.from_repeat(phase_c, 12)
   );
 
   const phase_part_midi = map_pitch(SCALE3, phase_part_scale);
@@ -262,7 +264,10 @@ export function binary_chords() {
   );
 
   const rhythm_bass = parse_cycle(N1, [C3, [C3, G3], C3, [C3, G3]]);
-  const rhythm_loop = new MusicLoop(full_progression.duration, rhythm_bass);
+  const rhythm_loop = Melody.from_repeat(
+    rhythm_bass,
+    full_progression.duration
+  );
 
   return new Score(["supersaw", full_progression], ["square", rhythm_loop]);
 }

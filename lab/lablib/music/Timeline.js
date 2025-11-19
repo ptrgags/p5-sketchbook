@@ -44,6 +44,24 @@ export class Sequential {
       return accum.add(x.duration);
     }, Rational.ZERO);
   }
+
+  /**
+   * Make a sequence by repeating a timeline N times
+   * @template {TimeInterval} T the event type
+   * @param {Timeline<T> | Timeline<T>[]} children
+   * @param {number} repeats Integer number of repeats
+   */
+  static from_repeat(children, repeats) {
+    const repeated = [];
+
+    if (!Array.isArray(children)) {
+      children = [children];
+    }
+    for (let i = 0; i < repeats; i++) {
+      repeated.push(...children);
+    }
+    return new Sequential(...repeated);
+  }
 }
 
 /**
@@ -72,46 +90,8 @@ export class Parallel {
 }
 
 /**
- * A fixed length loop of time that is evenly divided amongst its children.
- * This is based on cycles from Tidal Cycles, but can be used for any sort
- * of event
- * @see {@link https://tidalcycles.org/docs/reference/cycles|Tidal Cycles Reference}
  * @template {TimeInterval} T
- */
-export class Cycle {
-  /**
-   * Constructor
-   * @param {Rational} duration The duration of 1 cycle
-   * @param  {...Timeline<T>} children Children music objects. Each one will receive the same fraction of a cycle
-   */
-  constructor(duration, ...children) {
-    this.duration = duration;
-    this.children = children;
-    this.subdivision = new Rational(1, children.length);
-  }
-}
-
-/**
- * Loop a timeline. If the loop is longer than its contents,
- * the contents are played on loop for the given duration. If it is shorter
- * than its contents, events starting after the end of the loop
- * @template {TimeInterval} T
- */
-export class Loop {
-  /**
-   * Constructor
-   * @param {Rational} duration The length of the clip (this can be different than the child's duration)
-   * @param {Timeline<T>} child The inner timeline
-   */
-  constructor(duration, child) {
-    this.duration = duration;
-    this.child = child;
-  }
-}
-
-/**
- * @template {TimeInterval} T
- * @typedef {T | Gap | Sequential<T> | Parallel<T> | Cycle<T> | Loop<T>} Timeline<T>
+ * @typedef {T | Gap | Sequential<T> | Parallel<T>} Timeline<T>
  */
 
 /**
@@ -135,16 +115,6 @@ export function timeline_map(f, timeline) {
   if (timeline instanceof Parallel) {
     const children = timeline.children.map((x) => timeline_map(f, x));
     return new Parallel(...children);
-  }
-
-  if (timeline instanceof Cycle) {
-    const children = timeline.children.map((x) => timeline_map(f, x));
-    return new Cycle(timeline.duration, ...children);
-  }
-
-  if (timeline instanceof Loop) {
-    const child = timeline_map(f, timeline.child);
-    return new Loop(timeline.duration, child);
   }
 
   // if it's none of the above, then it's a plain T
