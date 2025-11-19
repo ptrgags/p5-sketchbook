@@ -47,20 +47,49 @@ export class Sequential {
 
   /**
    * Make a sequence by repeating a timeline N times
+   * Note that this may create nesting
    * @template {TimeInterval} T the event type
-   * @param {Timeline<T> | Timeline<T>[]} children
-   * @param {number} repeats Integer number of repeats
+   * @param {Timeline<T>} material The material to repeat
+   * @param {number} repeats Postive integer number of repeats
+   * @return {Timeline<T>} if repeats === 1, material is returned as-is. if
+   * repeats >1, returns a Sequential with material listed multiple times.
    */
-  static from_repeat(children, repeats) {
-    const repeated = [];
+  static from_repeat(material, repeats) {
+    if (repeats < 1) {
+      throw new Error("repeats must be a positive integer");
+    }
 
-    if (!Array.isArray(children)) {
-      children = [children];
+    if (repeats === 1) {
+      return material;
     }
-    for (let i = 0; i < repeats; i++) {
-      repeated.push(...children);
-    }
+
+    const repeated = new Array(repeats).fill(material);
     return new Sequential(...repeated);
+  }
+
+  /**
+   * Similar to from_repeat, but instead of specifying the number of
+   * repeats, specify the total duration to loop the clip
+   * @template {TimeInterval} T the event type
+   * @param {Timeline<T>} material The material to loop
+   * @param {Rational} total_duration The total duration to loop in measures
+   */
+  static from_loop(material, total_duration) {
+    const num_repeats = total_duration.div(material.duration);
+    const whole_repeats = num_repeats.quotient;
+    const partial_repeat = num_repeats.remainder;
+
+    if (total_duration.equals(Rational.ZERO)) {
+      throw new Error("total duration must be nonzero");
+    }
+
+    if (partial_repeat !== 0) {
+      // Doing a partial loop requires cropping the material and appending
+      // it to the repeat below
+      throw new Error("Not yet implemented: partial loop");
+    }
+
+    return Sequential.from_repeat(material, whole_repeats);
   }
 }
 

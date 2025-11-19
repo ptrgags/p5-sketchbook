@@ -90,7 +90,7 @@ export function layered_melody() {
     ])
   );
 
-  const sine_part = Melody.from_repeat(pedal, 34);
+  const sine_part = Melody.from_loop(pedal, new Rational(34, 1));
   const square_part = new Melody(
     new Rest(new Rational(2, 1)),
     Melody.from_repeat(scale_arp, 22)
