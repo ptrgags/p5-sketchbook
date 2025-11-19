@@ -39,9 +39,9 @@ export class Rational {
   /**
    * Constructor
    * @param {number} numerator Integer numerator
-   * @param {number} denominator Integer denominator
+   * @param {number} [denominator=1] Integer denominator
    */
-  constructor(numerator, denominator) {
+  constructor(numerator, denominator = 1) {
     if (numerator === 0 && denominator === 0) {
       throw new Error("cannot divide 0 by 0");
     }
@@ -78,6 +78,14 @@ export class Rational {
    */
   get real() {
     return this.numerator / this.denominator;
+  }
+
+  /**
+   * Get the reciprocal of this fraction
+   * @type {Rational}
+   */
+  get reciprocal() {
+    return new Rational(this.denominator, this.numerator);
   }
 
   /**
@@ -119,6 +127,18 @@ export class Rational {
     const { numerator: c, denominator: d } = other;
 
     return new Rational(a * c, b * d);
+  }
+
+  /**
+   * Divide two fractions
+   * @param {Rational} other Another rational number
+   * @returns {Rational} the division of this / other
+   */
+  div(other) {
+    const { numerator: a, denominator: b } = this;
+    const { numerator: c, denominator: d } = other;
+
+    return new Rational(a * d, b * c);
   }
 
   /**
