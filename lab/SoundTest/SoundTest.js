@@ -176,16 +176,6 @@ class SoundScene {
       3,
       3
     );
-    // at the end of this, you should see
-    // - C4 pressed (it wasn't released twice)
-    // - E4 not pressed
-    // - C5 pressed
-    //this.piano.trigger(C4);
-    //this.piano.trigger(E4);
-    //this.piano.trigger(C4);
-    //this.piano.release(C4);
-    //this.piano.release(E4);
-    //this.piano.trigger(C5);
 
     this.mute_button.events.addEventListener(
       "change",
