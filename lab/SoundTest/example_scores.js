@@ -115,10 +115,6 @@ export function layered_melody() {
     )
   );
 
-  //const all_notes = new Harmony(sine_part, square_part, poly_part);
-  //const events = to_note_events(all_notes);
-  //console.log(events);
-
   return new Score(
     ["sine", sine_part],
     ["square", square_part],
