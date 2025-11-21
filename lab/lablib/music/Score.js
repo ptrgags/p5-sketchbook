@@ -78,13 +78,11 @@ export function parse_cycle(cycle_length, notes) {
   for (const note of notes) {
     let child;
     if (note === REST) {
-      child = new Rest(subdivision);
+      child = new Rest(beat_length);
     } else if (Array.isArray(note)) {
-      // Interpret arrays
       child = parse_cycle(beat_length, note);
     } else {
-      // Numbers are interpreted as notes as long as the cycle length
-      child = new Note(note, subdivision);
+      child = new Note(note, beat_length);
     }
 
     children.push(child);

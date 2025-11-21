@@ -1,8 +1,15 @@
 import { describe, it, expect } from "vitest";
-import { map_pitch, Melody, Note, parse_melody, Rest } from "./Score.js";
-import { N2, N4, N8 } from "./durations.js";
+import {
+  map_pitch,
+  Melody,
+  Note,
+  parse_cycle,
+  parse_melody,
+  Rest,
+} from "./Score.js";
+import { N1, N2, N4, N4T, N8 } from "./durations.js";
 import { Rational } from "../Rational.js";
-import { C, C4, E, E4, G4 } from "./pitches.js";
+import { C, C4, E, E4, G4, REST } from "./pitches.js";
 import { MidiPitch } from "./pitch_conversions.js";
 
 describe("Melody", () => {
@@ -49,4 +56,50 @@ describe("parse_melody", () => {
 
     expect(result).toEqual(expected);
   });
+});
+
+describe("parse_cycle", () => {
+  it("parses single note", () => {
+    const cycle = [C4];
+
+    const result = parse_cycle(N4, cycle);
+
+    const expected = new Melody(new Note(C4, N4));
+    expect(result).toEqual(expected);
+  });
+
+  it("parses single rest", () => {
+    const cycle = [REST];
+
+    const result = parse_cycle(N4, cycle);
+
+    const expected = new Melody(new Rest(N4));
+    expect(result).toEqual(expected);
+  });
+
+  it("parses 2-beat cycle", () => {
+    const cycle = [C4, G4];
+
+    const result = parse_cycle(N2, cycle);
+
+    const expected = new Melody(new Note(C4, N4), new Note(G4, N4));
+    expect(result).toEqual(expected);
+  });
+
+  it("parses 3-beat cycle", () => {
+    const cycle = [C4, E4, G4];
+
+    const result = parse_cycle(N2, cycle);
+
+    const expected = new Melody(
+      new Note(C4, N4T),
+      new Note(E4, N4T),
+      new Note(G4, N4T)
+    );
+    expect(result).toEqual(expected);
+  });
+
+  it("parses 4-beat cycle", () => {});
+
+  it("parses nested cycle", () => {});
 });

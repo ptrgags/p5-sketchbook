@@ -129,11 +129,11 @@ export function phase_scale() {
   );
 
   // lcm(6, 8, 10) = 120 eighth notes duration total
-  const total_duration = new Rational(128, 8);
+  const total_duration = new Rational(120, 8);
   const phase_part_scale = new Harmony(
     Melody.from_loop(phase_a, total_duration),
     Melody.from_loop(phase_b, total_duration),
-    Melody.from_loop(phase_c, total_duration),
+    Melody.from_loop(phase_c, total_duration)
   );
 
   const phase_part_midi = map_pitch(SCALE3, phase_part_scale);

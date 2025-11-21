@@ -36,7 +36,7 @@ const SOUND_MANIFEST = {
     layered_melody: layered_melody(),
     phase_scale: phase_scale(),
     symmetry_melody: symmetry_melody(),
-    //binary_progression: binary_chords(),
+    binary_progression: binary_chords(),
   },
 };
 
