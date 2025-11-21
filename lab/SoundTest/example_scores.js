@@ -261,10 +261,7 @@ export function binary_chords() {
   );
 
   const rhythm_bass = parse_cycle(N1, [C3, [C3, G3], C3, [C3, G3]]);
-  const rhythm_loop = Melody.from_repeat(
-    rhythm_bass,
-    full_progression.duration
-  );
+  const rhythm_loop = Melody.from_loop(rhythm_bass, full_progression.duration);
 
   return new Score(["supersaw", full_progression], ["square", rhythm_loop]);
 }

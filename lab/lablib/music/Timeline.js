@@ -39,6 +39,10 @@ export class Sequential {
     this.children = children;
   }
 
+  /**
+   * Compute the duration as the sum of the children durations
+   * @type {Rational}
+   */
   get duration() {
     return this.children.reduce((accum, x) => {
       return accum.add(x.duration);
