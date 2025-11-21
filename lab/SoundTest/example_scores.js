@@ -24,7 +24,6 @@ import {
   Harmony,
   map_pitch,
   Melody,
-  MusicLoop,
   Note,
   parse_cycle,
   parse_melody,
@@ -91,25 +90,25 @@ export function layered_melody() {
     ])
   );
 
-  const sine_part = new MusicLoop(new Rational(34, 1), pedal);
+  const sine_part = Melody.from_loop(pedal, new Rational(34));
   const square_part = new Melody(
-    new Rest(new Rational(2, 1)),
-    new MusicLoop(new Rational(22, 1), scale_arp)
+    new Rest(new Rational(2)),
+    Melody.from_loop(scale_arp, new Rational(22))
   );
   const poly_part = new Harmony(
     new Melody(
-      new Rest(new Rational(8, 1)),
-      new MusicLoop(new Rational(12, 1), cycle_a),
-      new Rest(new Rational(4, 1)),
-      new MusicLoop(new Rational(4, 1), cycle_a)
+      new Rest(new Rational(8)),
+      Melody.from_repeat(cycle_a, 12),
+      new Rest(new Rational(4)),
+      Melody.from_repeat(cycle_a, 4)
     ),
     new Melody(
-      new Rest(new Rational(8, 1)),
-      new MusicLoop(new Rational(8, 1), cycle_b),
-      new Rest(new Rational(4, 1)),
-      new MusicLoop(new Rational(4, 1), cycle_b),
-      new Rest(new Rational(4, 1)),
-      new MusicLoop(new Rational(4, 1), cycle_b)
+      new Rest(new Rational(8)),
+      Melody.from_repeat(cycle_b, 8),
+      new Rest(new Rational(4)),
+      Melody.from_repeat(cycle_b, 4),
+      new Rest(new Rational(4)),
+      Melody.from_repeat(cycle_b, 4)
     )
   );
 
@@ -123,18 +122,18 @@ export function layered_melody() {
 export function phase_scale() {
   // Three scales initially the same, but with different lengths
   const phase_a = parse_cycle(new Rational(6, 8), [0, 1, 2, 3, 2, 1]);
-  const phase_b = parse_cycle(new Rational(1, 1), [0, 1, 2, 3, 4, 3, 2, 1]);
+  const phase_b = parse_cycle(Rational.ONE, [0, 1, 2, 3, 4, 3, 2, 1]);
   const phase_c = parse_cycle(
     new Rational(10, 8),
     [0, 1, 2, 3, 4, 5, 4, 3, 2, 1]
   );
 
-  // lcm(6, 8, 10) = 120, divide by 4 to get number of measures, 30
-  const total_duration = new Rational(30, 1);
+  // lcm(6, 8, 10) = 120 eighth notes duration total
+  const total_duration = new Rational(120, 8);
   const phase_part_scale = new Harmony(
-    new MusicLoop(total_duration, phase_a),
-    new MusicLoop(total_duration, phase_b),
-    new MusicLoop(total_duration, phase_c)
+    Melody.from_loop(phase_a, total_duration),
+    Melody.from_loop(phase_b, total_duration),
+    Melody.from_loop(phase_c, total_duration)
   );
 
   const phase_part_midi = map_pitch(SCALE3, phase_part_scale);
@@ -163,7 +162,7 @@ export function symmetry_melody() {
     [5, N4],
     [4, N4]
   );
-  const bottom_motif = new Note(0, new Rational(2, 1));
+  const bottom_motif = new Note(0, new Rational(2));
 
   const motif_scale = new Harmony(top_motif, bottom_motif);
 
@@ -262,7 +261,7 @@ export function binary_chords() {
   );
 
   const rhythm_bass = parse_cycle(N1, [C3, [C3, G3], C3, [C3, G3]]);
-  const rhythm_loop = new MusicLoop(full_progression.duration, rhythm_bass);
+  const rhythm_loop = Melody.from_loop(rhythm_bass, full_progression.duration);
 
   return new Score(["supersaw", full_progression], ["square", rhythm_loop]);
 }

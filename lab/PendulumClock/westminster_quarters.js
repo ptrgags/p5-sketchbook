@@ -1,11 +1,5 @@
 import { Rational } from "../lablib/Rational.js";
-import {
-  Melody,
-  MusicLoop,
-  Note,
-  parse_melody,
-  Score,
-} from "../lablib/music/Score.js";
+import { Melody, Note, parse_melody, Score } from "../lablib/music/Score.js";
 import { N1, N2, N4, N8 } from "../lablib/music/durations.js";
 import { B3, E3, E4, FS4, GS4 } from "../lablib/music/pitches.js";
 
@@ -40,7 +34,7 @@ const HOUR_BELL = new Note(E3, N2);
  */
 function make_hour_score(hour) {
   // Every hour the hour bell rings n times, for a half note each.
-  const hour_chimes = new MusicLoop(new Rational(hour, 2), HOUR_BELL);
+  const hour_chimes = Melody.from_repeat(HOUR_BELL, hour);
   const hour_part = new Melody(FOURTH_QUARTER, hour_chimes);
   return new Score(["bell", hour_part]);
 }

@@ -1,30 +1,9 @@
-import { REST } from "../music/pitches.js";
-import {
-  MusicCycle,
-  Melody,
-  Note,
-  Rest,
-  Harmony,
-  MusicLoop,
-  Score,
-} from "../music/Score.js";
-import {
-  Gap,
-  Loop,
-  Parallel,
-  Sequential,
-  timeline_map,
-} from "../music/Timeline.js";
+import { Melody, Note, Rest, Harmony, Score } from "../music/Score.js";
+import { Gap, Parallel, Sequential, timeline_map } from "../music/Timeline.js";
 import { Rational } from "../Rational.js";
 import { to_tone_time } from "./measure_notation.js";
 import { to_tone_pitch } from "./to_tone_pitch.js";
-import {
-  CycleDescriptor,
-  make_part_clip,
-  make_sequence_clip,
-  PartDescriptor,
-  ToneClip,
-} from "./tone_clips.js";
+import { make_part_clip, PartDescriptor, ToneClip } from "./tone_clips.js";
 
 /**
  * Precompile a lone note to a part. Usually overkill, but it makes scheduling
@@ -83,7 +62,7 @@ function make_melody_part(notes) {
 /**
  * Precompile sequential musical structure
  * @param {Melody<number>} midi_melody Melody of MIDI pitches
- * @returns {import("../music/Timeline.js").Timeline<PartDescriptor | CycleDescriptor>} A sequence of generated clips, or undefined if there were no notes
+ * @returns {import("../music/Timeline.js").Timeline<PartDescriptor>} A sequence of generated clips, or undefined if there were no notes
  */
 function precompile_melody(midi_melody) {
   const descriptors = [];
@@ -111,13 +90,6 @@ function precompile_melody(midi_melody) {
     } else if (child instanceof Harmony) {
       const descriptor = precompile_harmony(child);
       descriptors.push(descriptor);
-    } else if (child instanceof MusicCycle) {
-      const descriptor = precompile_cycle(child);
-      descriptors.push(descriptor);
-    } else {
-      // MusicLoop
-      const descriptor = precompile_loop(child);
-      descriptors.push(descriptor);
     }
   }
 
@@ -140,7 +112,7 @@ function precompile_melody(midi_melody) {
 /**
  * Precompile parallel music structure
  * @param {Harmony<number>} midi_harmony Harmony of MIDI pitches
- * @returns {Parallel<PartDescriptor | CycleDescriptor>} A sequence of generated clips, or undefined if there were no notes
+ * @returns {Parallel<PartDescriptor>} A sequence of generated clips, or undefined if there were no notes
  */
 function precompile_harmony(midi_harmony) {
   const clips = [];
@@ -155,84 +127,6 @@ function precompile_harmony(midi_harmony) {
 }
 
 /**
- * Recursively check if music is a simple cycle, i.e. a Cycle of only
- * notes, rests or sub-cycles thereof
- * @template P
- * @param {import("../music/Score.js").Music<P>} music Music to check
- * @returns {boolean} True if the music is a simple cycle
- */
-function is_simple_cycle(music) {
-  if (music instanceof Gap || music instanceof Note) {
-    return true;
-  }
-
-  if (music instanceof MusicCycle) {
-    return music.children.every((x) => is_simple_cycle(x));
-  }
-
-  return false;
-}
-
-/**
- * Translate a simple cycle to sequence notation that Tone.js uses
- * @param {MusicCycle<number>} simple_cycle A simple cycle
- * @returns {import("./tone_clips.js").CyclePattern} the computed pattern
- */
-function make_sequence_pattern(simple_cycle) {
-  const beats = [];
-  for (const child of simple_cycle.children) {
-    if (child instanceof Rest) {
-      beats.push(undefined);
-      continue;
-    }
-
-    if (child instanceof Note) {
-      const pitch = to_tone_pitch(child.pitch);
-      beats.push(pitch);
-      continue;
-    }
-
-    if (child instanceof MusicCycle) {
-      const sub_cycle = make_sequence_pattern(child);
-      beats.push(sub_cycle);
-      continue;
-    }
-
-    throw new Error("Other musical types not implemented");
-  }
-
-  return beats;
-}
-
-/**
- * Precompile a cycle
- * @param {MusicCycle<number>} midi_cycle Melody of MIDI pitches
- * @returns {import("../music/Timeline.js").Timeline<PartDescriptor | CycleDescriptor>} The precompiled clips
- */
-function precompile_cycle(midi_cycle) {
-  if (is_simple_cycle(midi_cycle)) {
-    const pattern = make_sequence_pattern(midi_cycle);
-    const cycle_duration = midi_cycle.duration;
-    const beat_length = cycle_duration.mul(midi_cycle.subdivision);
-    const interval = to_tone_time(beat_length);
-    return new CycleDescriptor(cycle_duration, interval, pattern);
-  }
-
-  // a complex cycle will take more thought.
-  throw new Error("complex cycles not implemented");
-}
-
-/**
- * Precompile a loop
- * @param {MusicLoop<number>} midi_loop Loop of MIDI pitches
- * @returns {Loop<PartDescriptor | CycleDescriptor>} A sequence of generated clips, or undefined if there were no notes
- */
-function precompile_loop(midi_loop) {
-  const child = precompile_music(midi_loop.child);
-  return new Loop(midi_loop.duration, child);
-}
-
-/**
  * Prepare to compile musical material to ToneJS types. This produces data
  * types to be passed to functions from tone_clips.js. Splitting this out
  * is helpful for unit testing and debugging, as Tone.js types are rather
@@ -240,7 +134,7 @@ function precompile_loop(midi_loop) {
  * Exported only for testing
  * @private
  * @param {import("../music/Score.js").Music<number>} music
- * @return {import("../music/Timeline.js").Timeline<PartDescriptor | CycleDescriptor>} The precompiled clips
+ * @return {import("../music/Timeline.js").Timeline<PartDescriptor>} The precompiled clips
  */
 export function precompile_music(music) {
   // A single gap compiles to silence
@@ -259,14 +153,6 @@ export function precompile_music(music) {
   if (music instanceof Harmony) {
     return precompile_harmony(music);
   }
-
-  if (music instanceof MusicCycle) {
-    return precompile_cycle(music);
-  }
-
-  if (music instanceof Loop) {
-    return precompile_loop(music);
-  }
 }
 
 /**
@@ -279,11 +165,7 @@ export function precompile_music(music) {
 export function compile_music(tone, instrument, music) {
   const precompiled = precompile_music(music);
   return timeline_map((x) => {
-    if (x instanceof PartDescriptor) {
-      return make_part_clip(tone, instrument, x);
-    }
-
-    return make_sequence_clip(tone, instrument, x);
+    return make_part_clip(tone, instrument, x);
   }, precompiled);
 }
 

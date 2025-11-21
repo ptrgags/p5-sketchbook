@@ -9,6 +9,13 @@ describe("Rational", () => {
       }).toThrowError("cannot divide 0 by 0");
     });
 
+    it("constructor with no second argument creates integer", () => {
+      const integer = new Rational(5);
+
+      const expected = new Rational(5, 1);
+      expect(integer).toEqual(expected);
+    });
+
     it("constructor reduces number to lowest terms", () => {
       const rational = new Rational(4, 12);
 
@@ -114,6 +121,19 @@ describe("Rational", () => {
     });
   });
 
+  describe("reciprocal", () => {
+    it("reciprocal of simple fraction swaps numerator and denominator", () => {
+      const a = new Rational(3, 4);
+
+      const result = a.reciprocal;
+
+      const expected = new Rational(4, 3);
+      expect(result).toEqual(expected);
+    });
+
+    it("reciprocal of negative fraction keeps negative sign in numerator", () => {});
+  });
+
   describe("mul", () => {
     it("computes product in lowest terms", () => {
       const a = new Rational(-3, 4);
@@ -138,6 +158,44 @@ describe("Rational", () => {
       const result = Rational.INF.mul(Rational.INF);
 
       expect(result).toEqual(Rational.INF);
+    });
+  });
+
+  describe("div", () => {
+    it("divides two numbers", () => {
+      const a = new Rational(-3, 4);
+      const b = new Rational(1, 3);
+
+      const result = a.div(b);
+
+      // (-3/4)/(1/3) = (-3 * 3)/(4*1) = -9/4
+      const expected = new Rational(-9, 4);
+      expect(result).toEqual(expected);
+    });
+
+    it("0 div 0 throws error", () => {
+      const a = Rational.ZERO;
+
+      expect(() => {
+        return a.div(a);
+      }).toThrowError("cannot divide 0 by 0");
+    });
+
+    it("inf div inf throws error", () => {
+      const a = Rational.INF;
+
+      expect(() => {
+        return a.div(a);
+      }).toThrowError("cannot divide 0 by 0");
+    });
+
+    it("ONE div x is equal to x.reciprocal", () => {
+      const a = new Rational(3, 4);
+
+      const division = Rational.ONE.div(a);
+      const recip = a.reciprocal;
+
+      expect(division).toEqual(recip);
     });
   });
 
@@ -203,6 +261,15 @@ describe("Rational", () => {
       const result = a.equals(b);
 
       expect(result).toBe(false);
+    });
+
+    it("with equivalent negative fractions returns true", () => {
+      const a = new Rational(-3, 4);
+      const b = new Rational(3, -4);
+
+      const result = a.equals(b);
+
+      expect(result).toBe(true);
     });
   });
 });
