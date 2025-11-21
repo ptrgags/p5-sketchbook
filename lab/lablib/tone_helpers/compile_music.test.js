@@ -1,18 +1,11 @@
 import { describe, it, expect } from "vitest";
-import {
-  MusicCycle,
-  Melody,
-  Note,
-  Rest,
-  Harmony,
-  MusicLoop,
-} from "../music/Score.js";
+import { Melody, Note, Rest, Harmony } from "../music/Score.js";
 import { N1, N2, N4 } from "../music/durations.js";
 import { C4, C5, CS5, E4, G4, REST } from "../music/pitches.js";
 import { precompile_music } from "./compile_music.js";
-import { CycleDescriptor, PartDescriptor } from "./tone_clips.js";
+import { PartDescriptor } from "./tone_clips.js";
 import { Rational } from "../Rational.js";
-import { Loop, Parallel, Sequential } from "../music/Timeline.js";
+import { Parallel, Sequential } from "../music/Timeline.js";
 
 describe("precompile_music", () => {
   it("single note compiles to part", () => {
@@ -119,40 +112,6 @@ describe("precompile_music", () => {
         ["1:1", ["C5", "0:1"]],
       ])
     );
-    expect(result).toEqual(expected);
-  });
-
-  it("simple cycle compiles to single cycle clip", () => {
-    const cycle = new MusicCycle(
-      N1,
-      new Note(C4, N1),
-      new Rest(N1),
-      new Note(C4, N1),
-      new Note(G4, N1)
-    );
-
-    const result = precompile_music(cycle);
-
-    const expected = new CycleDescriptor(N1, "0:1", ["C4", REST, "C4", "G4"]);
-    expect(result).toEqual(expected);
-  });
-
-  it("a loop is compiled to a loop of clips", () => {
-    const loop = new MusicLoop(
-      N1,
-      new Melody(new Note(C4, N4), new Note(G4, N4))
-    );
-
-    const result = precompile_music(loop);
-
-    const expected = new Loop(
-      N1,
-      new PartDescriptor(N2, [
-        ["0:0", ["C4", "0:1"]],
-        ["0:1", ["G4", "0:1"]],
-      ])
-    );
-
     expect(result).toEqual(expected);
   });
 });

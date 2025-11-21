@@ -1,4 +1,4 @@
-import { Cycle, Gap, Loop, Parallel, Sequential } from "./Timeline.js";
+import { Gap, Parallel, Sequential } from "./Timeline.js";
 
 /**
  * Count the number of distinct parallel lines in the timeline.
@@ -11,14 +11,10 @@ export function count_voices(timeline) {
     return 1;
   }
 
-  if (timeline instanceof Sequential || timeline instanceof Cycle) {
+  if (timeline instanceof Sequential) {
     return timeline.children
       .map(count_voices)
       .reduce((acc, x) => Math.max(acc, x));
-  }
-
-  if (timeline instanceof Loop) {
-    return count_voices(timeline.child);
   }
 
   if (timeline instanceof Parallel) {

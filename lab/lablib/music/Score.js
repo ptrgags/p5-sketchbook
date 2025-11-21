@@ -1,13 +1,6 @@
 import { Rational } from "../Rational.js";
 import { REST } from "./pitches.js";
-import {
-  Cycle,
-  Gap,
-  Loop,
-  Parallel,
-  Sequential,
-  timeline_map,
-} from "./Timeline.js";
+import { Gap, Parallel, Sequential, timeline_map } from "./Timeline.js";
 
 /**
  * Pitched note. The choice of pitch space can vary
@@ -69,19 +62,14 @@ export function parse_melody(...tuples) {
 export const Harmony = Parallel;
 
 /**
- * @template P
- * @typedef {Cycle<Note<P>>}
- */
-export const MusicCycle = Cycle;
-
-/**
- * Parse a cycle from an array
+ * Parse a cycle from an array as in Tidal Cycles. Though the result is
+ * turned into a Melody
  * @example
  * const cycle = parse_cycle(N1, [C4, D4, [E4, F4], G4]);
  * @template P
  * @param {Rational} cycle_length Length of one cycle
  * @param  {(P | P[])[]} notes List of pitch values or arrays thereof. Arrays are interpreted as nested cycles
- * @returns {MusicCycle<P>} The comuted cyles
+ * @returns {Melody<P>} The cycle expanded as a melody
  */
 export function parse_cycle(cycle_length, notes) {
   const children = [];
@@ -90,26 +78,18 @@ export function parse_cycle(cycle_length, notes) {
   for (const note of notes) {
     let child;
     if (note === REST) {
-      child = new Rest(subdivision);
+      child = new Rest(beat_length);
     } else if (Array.isArray(note)) {
-      // Interpret arrays
       child = parse_cycle(beat_length, note);
     } else {
-      // Numbers are interpreted as notes as long as the cycle length
-      child = new Note(note, subdivision);
+      child = new Note(note, beat_length);
     }
 
     children.push(child);
   }
 
-  return new Cycle(cycle_length, ...children);
+  return new Melody(...children);
 }
-
-/**
- * @template P
- * @typedef {Loop<Note<P>>} MusicLoop
- */
-export const MusicLoop = Loop;
 
 /**
  * @template P

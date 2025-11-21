@@ -1,4 +1,4 @@
-import { Harmony, Melody, MusicCycle, MusicLoop, Note, Rest } from "./Score.js";
+import { Harmony, Melody, Note, Rest } from "./Score.js";
 import { Gap } from "./Timeline.js";
 
 /**
@@ -35,15 +35,5 @@ export function retrograde(music) {
     });
 
     return new Harmony(...retrograded_children);
-  }
-
-  if (music instanceof MusicLoop) {
-    return new MusicLoop(music.duration, retrograde(music.child));
-  }
-
-  if (music instanceof MusicCycle) {
-    const retrograded_children = music.children.map(retrograde);
-    retrograded_children.reverse();
-    return new MusicCycle(music.duration, ...retrograded_children);
   }
 }

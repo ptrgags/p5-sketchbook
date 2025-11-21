@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { count_voices } from "./count_voices";
-import { Cycle, Gap, Loop, Parallel, Sequential } from "./Timeline";
+import { Gap, Parallel, Sequential } from "./Timeline";
 import { N1, N2, N4, N8 } from "./durations";
 import { C3, C4, E3, G3, G4 } from "./pitches";
 import { Note } from "./Score";
@@ -83,34 +83,6 @@ describe("count_voices", () => {
     const parallel = new Parallel(melody, melody, new Note(C4, N8));
 
     const result = count_voices(parallel);
-
-    const expected = 3;
-    expect(result).toBe(expected);
-  });
-
-  it("with loop returns voices in child", () => {
-    const chord = new Parallel(
-      new Note(C3, N8),
-      new Note(E3, N8),
-      new Note(G4, N8)
-    );
-    const loop = new Loop(N1, chord);
-
-    const result = count_voices(loop);
-
-    const expected = 3;
-    expect(result).toBe(expected);
-  });
-
-  it("with cycle returns maximum voices", () => {
-    const chord = new Parallel(
-      new Note(C3, N8),
-      new Note(E3, N8),
-      new Note(G4, N8)
-    );
-    const cycle = new Cycle(N2, new Note(E3, N4), chord, chord);
-
-    const result = count_voices(cycle);
 
     const expected = 3;
     expect(result).toBe(expected);
