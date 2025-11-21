@@ -1,6 +1,7 @@
 import { Score } from "./music/Score.js";
 import { Rational } from "./Rational.js";
 import { compile_score } from "./tone_helpers/compile_music.js";
+import { to_tone_time } from "./tone_helpers/measure_notation.js";
 import { schedule_clips } from "./tone_helpers/schedule_music.js";
 
 /**
@@ -203,11 +204,14 @@ export class SoundManager {
 
     const draw = this.tone.getDraw();
 
-    this.test_clip = new this.tone.Part((time, value) => {
-      // It looks like sometimes it calls this with an undefined
-      // value, I guess that means no change?
-      draw.schedule(() => console.log(time, value), time);
-    }, [["0:0", "C4"], ["0:2", "E4"], ["0:4, G4"]])
+    this.test_clip = new this.tone.Part(
+      (time, value) => {
+        // It looks like sometimes it calls this with an undefined
+        // value, I guess that means no change?
+        draw.schedule(() => console.log(time, value), time);
+      },
+      [["0:0", "C4"], ["0:2", "E4"], ["0:4, G4"]]
+    );
     this.test_clip.loop = true;
     this.test_clip.start("0:0").stop("8:0");
 
@@ -240,6 +244,26 @@ export class SoundManager {
       const transport = this.tone.getTransport();
       transport.start(this.tone.now());
       this.transport_playing = true;
+    }
+  }
+
+  /**
+   * Prototype of animations based on note events.
+   * @template T
+   * @param {[T, Rational, Rational][]} events
+   * @param {function(T): void} on_start function to call at the start of a note.
+   * @param {function(T): void} on_start function to call at the end of each note.
+   */
+  schedule_cues(events, on_start, on_end) {
+    const transport = this.tone.getTransport();
+    const tone_draw = this.tone.getDraw();
+    for (const [data, start_time, end_time] of events) {
+      transport.schedule((time) => {
+        tone_draw.schedule(() => on_start(data), time);
+      }, to_tone_time(start_time));
+      transport.schedule((time) => {
+        tone_draw.schedule(() => on_end(data), time);
+      }, to_tone_time(end_time));
     }
   }
 }
