@@ -3,7 +3,7 @@ import { Melody, Note, Rest, Harmony } from "../music/Score.js";
 import { N1, N2, N4 } from "../music/durations.js";
 import { C4, C5, CS5, E4, G4, REST } from "../music/pitches.js";
 import { precompile_music } from "./compile_music.js";
-import { CycleDescriptor, PartDescriptor } from "./tone_clips.js";
+import { PartDescriptor } from "./tone_clips.js";
 import { Rational } from "../Rational.js";
 import { Parallel, Sequential } from "../music/Timeline.js";
 

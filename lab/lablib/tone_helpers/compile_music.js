@@ -3,13 +3,7 @@ import { Gap, Parallel, Sequential, timeline_map } from "../music/Timeline.js";
 import { Rational } from "../Rational.js";
 import { to_tone_time } from "./measure_notation.js";
 import { to_tone_pitch } from "./to_tone_pitch.js";
-import {
-  CycleDescriptor,
-  make_part_clip,
-  make_sequence_clip,
-  PartDescriptor,
-  ToneClip,
-} from "./tone_clips.js";
+import { make_part_clip, PartDescriptor, ToneClip } from "./tone_clips.js";
 
 /**
  * Precompile a lone note to a part. Usually overkill, but it makes scheduling
@@ -68,7 +62,7 @@ function make_melody_part(notes) {
 /**
  * Precompile sequential musical structure
  * @param {Melody<number>} midi_melody Melody of MIDI pitches
- * @returns {import("../music/Timeline.js").Timeline<PartDescriptor | CycleDescriptor>} A sequence of generated clips, or undefined if there were no notes
+ * @returns {import("../music/Timeline.js").Timeline<PartDescriptor>} A sequence of generated clips, or undefined if there were no notes
  */
 function precompile_melody(midi_melody) {
   const descriptors = [];
@@ -118,7 +112,7 @@ function precompile_melody(midi_melody) {
 /**
  * Precompile parallel music structure
  * @param {Harmony<number>} midi_harmony Harmony of MIDI pitches
- * @returns {Parallel<PartDescriptor | CycleDescriptor>} A sequence of generated clips, or undefined if there were no notes
+ * @returns {Parallel<PartDescriptor>} A sequence of generated clips, or undefined if there were no notes
  */
 function precompile_harmony(midi_harmony) {
   const clips = [];
@@ -140,7 +134,7 @@ function precompile_harmony(midi_harmony) {
  * Exported only for testing
  * @private
  * @param {import("../music/Score.js").Music<number>} music
- * @return {import("../music/Timeline.js").Timeline<PartDescriptor | CycleDescriptor>} The precompiled clips
+ * @return {import("../music/Timeline.js").Timeline<PartDescriptor>} The precompiled clips
  */
 export function precompile_music(music) {
   // A single gap compiles to silence
@@ -171,11 +165,7 @@ export function precompile_music(music) {
 export function compile_music(tone, instrument, music) {
   const precompiled = precompile_music(music);
   return timeline_map((x) => {
-    if (x instanceof PartDescriptor) {
-      return make_part_clip(tone, instrument, x);
-    }
-
-    return make_sequence_clip(tone, instrument, x);
+    return make_part_clip(tone, instrument, x);
   }, precompiled);
 }
 
