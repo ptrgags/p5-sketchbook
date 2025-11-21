@@ -31,7 +31,6 @@ import {
 import { Gap } from "../lablib/music/Timeline.js";
 import { transpose_scale_degree } from "../lablib/music/transpose.js";
 import { Rational } from "../lablib/Rational.js";
-import { to_note_events } from "./to_note_events.js";
 
 /**
  * Convert a scale to a pitch, using a fixed octave
