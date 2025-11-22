@@ -115,11 +115,13 @@ export function layered_melody() {
     )
   );
 
-  return new Score(
-    ["sine", sine_part],
-    ["square", square_part],
-    ["poly", poly_part]
-  );
+  return new Score({
+    parts: [
+      ["sine", sine_part],
+      ["square", square_part],
+      ["poly", poly_part],
+    ],
+  });
 }
 
 export function phase_scale() {
@@ -140,7 +142,7 @@ export function phase_scale() {
   );
 
   const phase_part_midi = map_pitch(SCALE3, phase_part_scale);
-  return new Score(["poly", phase_part_midi]);
+  return new Score({ parts: [["poly", phase_part_midi]] });
 }
 
 const MAJOR_SCALE_PITCHES = [C, D, E, F, G, A, B];
@@ -190,7 +192,7 @@ export function symmetry_melody() {
 
   const part_midi = map_pitch(MAJOR_SCALE, part_scale);
 
-  return new Score(["supersaw", part_midi]);
+  return new Score({ parts: [["supersaw", part_midi]] });
 }
 
 /**
@@ -266,5 +268,10 @@ export function binary_chords() {
   const rhythm_bass = parse_cycle(N1, [C3, [C3, G3], C3, [C3, G3]]);
   const rhythm_loop = Melody.from_loop(rhythm_bass, full_progression.duration);
 
-  return new Score(["supersaw", full_progression], ["square", rhythm_loop]);
+  return new Score({
+    parts: [
+      ["supersaw", full_progression],
+      ["square", rhythm_loop],
+    ],
+  });
 }

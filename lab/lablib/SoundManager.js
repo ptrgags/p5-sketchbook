@@ -11,7 +11,7 @@ import { schedule_clips } from "./tone_helpers/schedule_music.js";
  * @typedef {{
  *  bpm?: number,
  *  scores?: ScoreDeclarations,
- *  sfx?: ScoreDeclarations
+ *  sfx?: ScoreDeclarations,
  * }} SoundManifest
  */
 
@@ -169,6 +169,15 @@ export class SoundManager {
     return (
       parseFloat(measures) + parseFloat(beats) / 4 + parseFloat(sixteenths) / 16
     );
+  }
+
+  /**
+   * Get the current value of a parameter
+   * @param {string} param_id The ID of the parameter, it must match a parameter declared in the manifest
+   * @returns {number} The current value of the parameter
+   */
+  get_param(param_id) {
+    return 0.0;
   }
 
   /**

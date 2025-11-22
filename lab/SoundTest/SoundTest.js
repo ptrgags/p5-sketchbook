@@ -14,14 +14,10 @@ import { Transform } from "../../sketchlib/rendering/Transform.js";
 import { Style } from "../../sketchlib/Style.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { MouseInput } from "../lablib/MouseInput.js";
-import { C4, C5, E4 } from "../lablib/music/pitches.js";
 import { render_score } from "../lablib/music/render_score.js";
-import { Harmony, Note } from "../lablib/music/Score.js";
-import { to_events } from "../lablib/music/Timeline.js";
 import { MuteButton } from "../lablib/MuteButton.js";
 import { Oklch } from "../lablib/Oklch.js";
 import { PlayButtonScene } from "../lablib/PlayButtonScene.js";
-import { Rational } from "../lablib/Rational.js";
 import { Rectangle } from "../lablib/Rectangle.js";
 import { SoundManager } from "../lablib/SoundManager.js";
 import { TouchButton } from "../lablib/TouchButton.js";
@@ -32,6 +28,7 @@ import {
   symmetry_melody,
 } from "./example_scores.js";
 import { Piano } from "./Piano.js";
+import { SpiralBurst } from "./SpiralBurst.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -171,6 +168,7 @@ class SoundScene {
       3,
       3
     );
+    this.spiral_burst = new SpiralBurst();
 
     this.mute_button.events.addEventListener(
       "change",
@@ -218,7 +216,9 @@ class SoundScene {
 
     const piano = this.piano.render();
 
-    const primitives = [mute, ...melody_buttons, BUTTON_LABELS, piano];
+    const burst = this.spiral_burst.render(SOUND);
+
+    const primitives = [mute, ...melody_buttons, BUTTON_LABELS, piano, burst];
 
     if (this.selected_melody !== undefined) {
       const current_time = SOUND.transport_time;

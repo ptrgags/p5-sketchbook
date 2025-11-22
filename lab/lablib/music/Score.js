@@ -1,4 +1,5 @@
 import { Rational } from "../Rational.js";
+import { ParamInterval } from "./ParamInterval.js";
 import { REST } from "./pitches.js";
 import { Gap, Parallel, Sequential, timeline_map } from "./Timeline.js";
 
@@ -114,6 +115,14 @@ export function map_pitch(pitch_func, music) {
 
 /**
  * @typedef {string} Instrument
+ * @typedef {string} ParamID
+ */
+
+/**
+ * @template P
+ * @typedef {Object} ScoreOptions
+ * @property {[Instrument, Music<P>][]} parts The musical parts
+ * @property {[ParamID, import("./Timeline.js").Timeline<ParamInterval>][]} [params]
  */
 
 /**
@@ -123,9 +132,10 @@ export function map_pitch(pitch_func, music) {
 export class Score {
   /**
    * Constructor
-   * @param  {...[Instrument, Music<P>]} parts
+   * @param {ScoreOptions<P>} options
    */
-  constructor(...parts) {
-    this.parts = parts;
+  constructor(options) {
+    this.parts = options.parts;
+    this.params = options.params ?? [];
   }
 }
