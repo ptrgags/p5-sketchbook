@@ -16,7 +16,7 @@ import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { MouseInput } from "../lablib/MouseInput.js";
 import { C4, C5, E4 } from "../lablib/music/pitches.js";
 import { render_score } from "../lablib/music/render_score.js";
-import { Harmony } from "../lablib/music/Score.js";
+import { Harmony, Note } from "../lablib/music/Score.js";
 import { to_events } from "../lablib/music/Timeline.js";
 import { MuteButton } from "../lablib/MuteButton.js";
 import { Oklch } from "../lablib/Oklch.js";
@@ -44,11 +44,6 @@ const SOUND_MANIFEST = {
     binary_progression: binary_chords(),
   },
 };
-
-const parts = SOUND_MANIFEST.scores.layered_melody.parts;
-const ignore_instruments = new Harmony(...parts.map(([, part]) => part));
-
-const TEST_MELODY_EVENTS = to_events(Rational.ZERO, ignore_instruments);
 
 const PART_STYLES = Oklch.gradient(
   new Oklch(0.7, 0.1, 0),
@@ -190,19 +185,26 @@ class SoundScene {
      */
     this.selected_melody = undefined;
 
+    this.sound.events.addEventListener(
+      "note-on",
+      (/** @type {CustomEvent} */ e) => {
+        this.piano.trigger(e.detail.note.pitch);
+      }
+    );
+    this.sound.events.addEventListener(
+      "note-off",
+      (/** @type {CustomEvent} */ e) => {
+        this.piano.release(e.detail.note.pitch);
+      }
+    );
+
     this.melody_buttons = melodies.map_array((index, descriptor) => {
       const corner = index.to_world(BUTTON_OFFSET, BUTTON_STRIDE);
       const rectangle = new Rectangle(corner, MELODY_BUTTON_DIMENSIONS);
       const button = new TouchButton(rectangle);
       button.events.addEventListener("click", () => {
-        this.sound.stop_the_music();
         this.selected_melody = descriptor.id;
         this.sound.play_score(this.selected_melody);
-        this.sound.schedule_cues(
-          TEST_MELODY_EVENTS,
-          (note) => this.piano.trigger(note.pitch),
-          (note) => this.piano.release(note.pitch)
-        );
       });
       return button;
     });
@@ -283,6 +285,7 @@ export const sketch = (p) => {
       WIDTH,
       HEIGHT,
       undefined,
+      // @ts-ignore
       document.getElementById("sketch-canvas")
     ).elt;
 
