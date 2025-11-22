@@ -204,6 +204,7 @@ class SoundScene {
       const button = new TouchButton(rectangle);
       button.events.addEventListener("click", () => {
         this.selected_melody = descriptor.id;
+        this.piano.reset();
         this.sound.play_score(this.selected_melody);
       });
       return button;

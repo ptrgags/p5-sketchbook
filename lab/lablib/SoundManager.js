@@ -238,13 +238,18 @@ export class SoundManager {
           start_time,
           end_time,
         };
-        draw.schedule(() => {
-          const note_on = new CustomEvent("note-on", { detail });
-          this.events.dispatchEvent(note_on);
+
+        transport.schedule((time) => {
+          draw.schedule(() => {
+            const note_on = new CustomEvent("note-on", { detail });
+            this.events.dispatchEvent(note_on);
+          }, time);
         }, to_tone_time(start_time));
-        draw.schedule(() => {
-          const note_off = new CustomEvent("note-off", { detail });
-          this.events.dispatchEvent(note_off);
+        transport.schedule((time) => {
+          draw.schedule(() => {
+            const note_off = new CustomEvent("note-off", { detail });
+            this.events.dispatchEvent(note_off);
+          }, time);
         }, to_tone_time(end_time));
       }
     }
