@@ -1,6 +1,8 @@
 import { Score } from "./music/Score.js";
+import { to_events } from "./music/Timeline.js";
 import { Rational } from "./Rational.js";
 import { compile_score } from "./tone_helpers/compile_music.js";
+import { to_tone_time } from "./tone_helpers/measure_notation.js";
 import { schedule_clips } from "./tone_helpers/schedule_music.js";
 
 /**
@@ -35,7 +37,15 @@ export class SoundManager {
     this.patterns = {};
 
     this.scores = {};
+    this.score_note_events = {};
     this.sfx = {};
+
+    /**
+     * Event target for listening to events
+     * @readonly
+     * @type {EventTarget}
+     */
+    this.events = new EventTarget();
   }
 
   async init() {
@@ -170,6 +180,16 @@ export class SoundManager {
   register_score(score_id, score) {
     const compiled = compile_score(this.tone, this.synths, score);
     this.scores[score_id] = compiled;
+
+    const score_events = [];
+    for (const [i, [part_id, music]] of score.parts.entries()) {
+      score_events.push({
+        instrument_index: i,
+        instrument_id: part_id,
+        events: to_events(Rational.ZERO, music),
+      });
+    }
+    this.score_note_events[score_id] = score_events;
   }
 
   /**
@@ -194,14 +214,46 @@ export class SoundManager {
       throw new Error(`can't play unregistered score ${score_id}`);
     }
 
+    // Clear the timeline so we can continue
     this.stop_the_music();
+
+    const transport = this.tone.getTransport();
+    const draw = this.tone.getDraw();
 
     const schedule = schedule_clips(Rational.ZERO, score);
     for (const [clip, start_time, end_time] of schedule) {
       clip.material.start(start_time).stop(end_time);
     }
 
-    const transport = this.tone.getTransport();
+    // Schedule note on/off events for animations
+    // TODO: this should be opt-in, not automatic.
+    const note_events = this.score_note_events[score_id];
+    for (const part of note_events) {
+      const { instrument_index, instrument_id, events } = part;
+      for (const [note, start_time, end_time] of events) {
+        const detail = {
+          instrument_index,
+          instrument_id,
+          note,
+          start_time,
+          end_time,
+        };
+
+        transport.schedule((time) => {
+          draw.schedule(() => {
+            const note_on = new CustomEvent("note-on", { detail });
+            this.events.dispatchEvent(note_on);
+          }, time);
+        }, to_tone_time(start_time));
+        transport.schedule((time) => {
+          draw.schedule(() => {
+            const note_off = new CustomEvent("note-off", { detail });
+            this.events.dispatchEvent(note_off);
+          }, time);
+        }, to_tone_time(end_time));
+      }
+    }
+
     transport.position = 0;
     transport.start("+0.1", "0:0");
     this.transport_playing = true;
@@ -230,6 +282,26 @@ export class SoundManager {
       const transport = this.tone.getTransport();
       transport.start(this.tone.now());
       this.transport_playing = true;
+    }
+  }
+
+  /**
+   * Prototype of animations based on note events.
+   * @template T
+   * @param {[T, Rational, Rational][]} events
+   * @param {function(T): void} on_start function to call at the start of a note.
+   * @param {function(T): void} on_start function to call at the end of each note.
+   */
+  schedule_cues(events, on_start, on_end) {
+    const transport = this.tone.getTransport();
+    const tone_draw = this.tone.getDraw();
+    for (const [data, start_time, end_time] of events) {
+      transport.schedule((time) => {
+        tone_draw.schedule(() => on_start(data), time);
+      }, to_tone_time(start_time));
+      transport.schedule((time) => {
+        tone_draw.schedule(() => on_end(data), time);
+      }, to_tone_time(end_time));
     }
   }
 }

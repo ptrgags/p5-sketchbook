@@ -14,10 +14,14 @@ import { Transform } from "../../sketchlib/rendering/Transform.js";
 import { Style } from "../../sketchlib/Style.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { MouseInput } from "../lablib/MouseInput.js";
+import { C4, C5, E4 } from "../lablib/music/pitches.js";
 import { render_score } from "../lablib/music/render_score.js";
+import { Harmony, Note } from "../lablib/music/Score.js";
+import { to_events } from "../lablib/music/Timeline.js";
 import { MuteButton } from "../lablib/MuteButton.js";
 import { Oklch } from "../lablib/Oklch.js";
 import { PlayButtonScene } from "../lablib/PlayButtonScene.js";
+import { Rational } from "../lablib/Rational.js";
 import { Rectangle } from "../lablib/Rectangle.js";
 import { SoundManager } from "../lablib/SoundManager.js";
 import { TouchButton } from "../lablib/TouchButton.js";
@@ -27,6 +31,7 @@ import {
   phase_scale,
   symmetry_melody,
 } from "./example_scores.js";
+import { Piano } from "./Piano.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -161,6 +166,12 @@ class SoundScene {
     this.sound = sound;
     this.mute_button = new MuteButton();
     this.events = new EventTarget();
+    this.piano = new Piano(
+      new Rectangle(Point.point(0, 300), Point.direction(500, 300 / 3)),
+      3,
+      3
+    );
+
     this.mute_button.events.addEventListener(
       "change",
       (/** @type {CustomEvent}*/ e) => {
@@ -174,12 +185,26 @@ class SoundScene {
      */
     this.selected_melody = undefined;
 
+    this.sound.events.addEventListener(
+      "note-on",
+      (/** @type {CustomEvent} */ e) => {
+        this.piano.trigger(e.detail.note.pitch);
+      }
+    );
+    this.sound.events.addEventListener(
+      "note-off",
+      (/** @type {CustomEvent} */ e) => {
+        this.piano.release(e.detail.note.pitch);
+      }
+    );
+
     this.melody_buttons = melodies.map_array((index, descriptor) => {
       const corner = index.to_world(BUTTON_OFFSET, BUTTON_STRIDE);
       const rectangle = new Rectangle(corner, MELODY_BUTTON_DIMENSIONS);
       const button = new TouchButton(rectangle);
       button.events.addEventListener("click", () => {
         this.selected_melody = descriptor.id;
+        this.piano.reset();
         this.sound.play_score(this.selected_melody);
       });
       return button;
@@ -191,7 +216,9 @@ class SoundScene {
 
     const melody_buttons = this.melody_buttons.map((x) => x.debug_render());
 
-    const primitives = [mute, ...melody_buttons, BUTTON_LABELS];
+    const piano = this.piano.render();
+
+    const primitives = [mute, ...melody_buttons, BUTTON_LABELS, piano];
 
     if (this.selected_melody !== undefined) {
       const current_time = SOUND.transport_time;
@@ -259,6 +286,7 @@ export const sketch = (p) => {
       WIDTH,
       HEIGHT,
       undefined,
+      // @ts-ignore
       document.getElementById("sketch-canvas")
     ).elt;
 

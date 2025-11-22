@@ -5,12 +5,10 @@ import {
   B,
   B4,
   C,
-  C2,
   C3,
   C4,
   D,
   E,
-  E3,
   E4,
   F,
   G,
@@ -53,6 +51,11 @@ const SCALE3 = scale_to_pitch(SCALE, 3);
 const SCALE4 = scale_to_pitch(SCALE, 4);
 const SCALE5 = scale_to_pitch(SCALE, 5);
 
+/**
+ * Make a layered melody in 3 voices. This exercises melodies and cycles
+ * in parallel
+ * @returns {Score<number>}
+ */
 export function layered_melody() {
   const pedal = parse_melody([C3, N4], [REST, N4]);
 
