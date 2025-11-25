@@ -38,6 +38,7 @@ export class SoundManager {
     this.synths = {};
     this.patterns = {};
 
+    this.current_score = undefined;
     this.scores = {};
     this.score_note_events = {};
     /**
@@ -180,13 +181,12 @@ export class SoundManager {
   }
 
   /**
-   * Get the current value of a parameter
-   * @param {string} score_id The ID of the score to examine
+   * Get the current value of a parameter from the currently playing score
    * @param {string} param_id The ID of the parameter in the score
    * @returns {number | undefined} The current value of the parameter, or undefined if no value is set
    */
-  get_param(score_id, param_id) {
-    const tween_list = this.score_tweens[score_id]?.[param_id];
+  get_param(param_id) {
+    const tween_list = this.score_tweens[this?.current_score]?.[param_id];
     if (tween_list === undefined || tween_list.length === 0) {
       return undefined;
     }
@@ -197,8 +197,8 @@ export class SoundManager {
     let tween;
     if (time < tween_list[0].start_time) {
       tween = tween_list[0];
-    } else if (time >= tween_list[tween_list.length].end_time) {
-      tween = tween_list[tween_list.length];
+    } else if (time >= tween_list[tween_list.length - 1].end_time) {
+      tween = tween_list[tween_list.length - 1];
     } else {
       tween = tween_list.find(
         (tween) => time >= tween.start_time && time < tween.end_time
@@ -325,6 +325,7 @@ export class SoundManager {
 
     transport.position = 0;
     transport.start("+0.1", "0:0");
+    this.current_score = score_id;
     this.transport_playing = true;
   }
 

@@ -31,6 +31,7 @@ import {
 import { Gap } from "../lablib/music/Timeline.js";
 import { transpose_scale_degree } from "../lablib/music/transpose.js";
 import { Rational } from "../lablib/Rational.js";
+import { SpiralBurst } from "./SpiralBurst.js";
 
 /**
  * Convert a scale to a pitch, using a fixed octave
@@ -121,6 +122,7 @@ export function layered_melody() {
       ["square", square_part],
       ["poly", poly_part],
     ],
+    params: SpiralBurst.spiral_burst_params(sine_part.duration),
   });
 }
 
@@ -142,7 +144,10 @@ export function phase_scale() {
   );
 
   const phase_part_midi = map_pitch(SCALE3, phase_part_scale);
-  return new Score({ parts: [["poly", phase_part_midi]] });
+  return new Score({
+    parts: [["poly", phase_part_midi]],
+    params: SpiralBurst.spiral_burst_params(phase_part_scale.duration),
+  });
 }
 
 const MAJOR_SCALE_PITCHES = [C, D, E, F, G, A, B];
@@ -192,7 +197,10 @@ export function symmetry_melody() {
 
   const part_midi = map_pitch(MAJOR_SCALE, part_scale);
 
-  return new Score({ parts: [["supersaw", part_midi]] });
+  return new Score({
+    parts: [["supersaw", part_midi]],
+    params: SpiralBurst.spiral_burst_params(part_midi.duration),
+  });
 }
 
 /**
@@ -273,5 +281,6 @@ export function binary_chords() {
       ["supersaw", full_progression],
       ["square", rhythm_loop],
     ],
+    params: SpiralBurst.spiral_burst_params(full_progression.duration),
   });
 }

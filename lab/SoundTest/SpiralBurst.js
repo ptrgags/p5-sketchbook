@@ -1,4 +1,5 @@
 import { Point } from "../../pga2d/objects.js";
+import { WIDTH } from "../../sketchlib/dimensions.js";
 import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
 import { PointPrimitive } from "../../sketchlib/rendering/primitives.js";
 import { group } from "../../sketchlib/rendering/shorthand.js";
@@ -8,16 +9,16 @@ import { Rational } from "../lablib/Rational.js";
 import { SoundManager } from "../lablib/SoundManager.js";
 
 const N = 10;
-const CENTER = Point.point(200, 200);
-const MAX_RADIUS = 200;
+const CENTER = Point.point(WIDTH / 2, 250);
+const MAX_RADIUS = 50;
 
 export class SpiralBurst {
   constructor() {
     this.phases = new Array(N);
     this.radii = new Array(N);
     for (let i = 0; i < N; i++) {
-      this.phases[i] = Math.random() * 2 * Math.PI;
-      this.radii[i] = Math.random() * MAX_RADIUS;
+      this.phases[i] = (2 * Math.PI * i) / N;
+      this.radii[i] = MAX_RADIUS;
     }
   }
 
@@ -51,20 +52,20 @@ export class SpiralBurst {
    * @return {[string, import("../lablib/music/Timeline.js").Timeline<ParamCurve>][]} Parameter entries to include in a score
    */
   static spiral_burst_params(duration) {
-    const spiral_duration = new Rational(7, 8);
+    const spiral_duration = new Rational(15, 16);
     const burst_duration = Rational.ONE.sub(spiral_duration);
 
     const radius = Sequential.from_loop(
       new Sequential(
-        new ParamCurve(1, 0, spiral_duration),
-        new ParamCurve(0, 1, burst_duration)
+        new ParamCurve(0, 1, burst_duration),
+        new ParamCurve(1, 0, spiral_duration)
       ),
       duration
     );
     const phase = Sequential.from_loop(
       new Sequential(
-        new ParamCurve(0, 1, spiral_duration),
-        new ParamCurve(0, 0, burst_duration)
+        new ParamCurve(0, 0, burst_duration),
+        new ParamCurve(0, 1, spiral_duration)
       ),
       duration
     );
