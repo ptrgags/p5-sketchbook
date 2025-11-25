@@ -2,9 +2,12 @@ import { Point } from "../../pga2d/objects.js";
 import { WIDTH } from "../../sketchlib/dimensions.js";
 import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
 import { PointPrimitive } from "../../sketchlib/rendering/primitives.js";
-import { group } from "../../sketchlib/rendering/shorthand.js";
+import { group, style } from "../../sketchlib/rendering/shorthand.js";
+import { Style } from "../../sketchlib/Style.js";
+import { N1, N4 } from "../lablib/music/durations.js";
 import { ParamCurve } from "../lablib/music/ParamCurve.js";
 import { Sequential } from "../lablib/music/Timeline.js";
+import { Oklch } from "../lablib/Oklch.js";
 import { Rational } from "../lablib/Rational.js";
 import { SoundManager } from "../lablib/SoundManager.js";
 
@@ -28,18 +31,28 @@ export class SpiralBurst {
    * @return {GroupPrimitive} the primitives to render
    */
   render(sound) {
-    const radius_scale = sound.get_param("radius");
-    const phase_shift = sound.get_param("phase");
+    const radius_scale = sound.get_param("radius") ?? 0.0;
+    const phase_shift = sound.get_param("phase") ?? 0;
+    const lightness = sound.get_param("lightness") ?? 0.7;
+    const chroma = sound.get_param("chroma") ?? 0.1;
+    const hue = sound.get_param("hue") ?? 130;
+
+    // TODO: Have the color be slightly different per point
+    const color = new Oklch(lightness, chroma, hue);
+    const point_style = new Style({
+      fill: color.to_srgb(),
+    });
 
     /**
-     * @type {PointPrimitive[]}
+     * @type {GroupPrimitive[]}
      */
     const points = new Array(N);
     for (let i = 0; i < N; i++) {
       const angle = this.phases[i] + phase_shift * Math.PI;
       const radius = this.radii[i] * radius_scale;
       const offset = Point.dir_from_angle(angle).scale(radius);
-      points[i] = new PointPrimitive(CENTER.add(offset));
+      const point = new PointPrimitive(CENTER.add(offset));
+      points[i] = style(point, point_style);
     }
 
     return group(...points);
@@ -69,9 +82,39 @@ export class SpiralBurst {
       ),
       duration
     );
+
+    // Color parameters in Oklch color space
+
+    // At the start of the burst, the lightness and chroma jump up,
+    // then ramp down over the course of a measure
+    const lightness = Sequential.from_loop(
+      new ParamCurve(0.7, 0.1, N1),
+      duration
+    );
+    const chroma = Sequential.from_loop(
+      new ParamCurve(0.3, 0.05, N1),
+      duration
+    );
+
+    // The hue changes every quarter note
+    const start_hue = 80;
+    const hue_step = 60;
+    const hue = Sequential.from_loop(
+      new Sequential(
+        new ParamCurve(start_hue + 0 * hue_step, start_hue + 0 * hue_step, N4),
+        new ParamCurve(start_hue + 1 * hue_step, start_hue + 1 * hue_step, N4),
+        new ParamCurve(start_hue + 2 * hue_step, start_hue + 2 * hue_step, N4),
+        new ParamCurve(start_hue + 3 * hue_step, start_hue + 3 * hue_step, N4)
+      ),
+      duration
+    );
+
     return [
       ["radius", radius],
       ["phase", phase],
+      ["lightness", lightness],
+      ["hue", hue],
+      ["chroma", chroma],
     ];
   }
 }
