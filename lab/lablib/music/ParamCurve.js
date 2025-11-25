@@ -1,6 +1,6 @@
 import { Rational } from "../Rational.js";
 
-export class ParamInterval {
+export class ParamCurve {
   /**
    * Constructor
    * @param {number} start_value Initial value

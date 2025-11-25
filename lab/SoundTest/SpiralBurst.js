@@ -2,7 +2,7 @@ import { Point } from "../../pga2d/objects.js";
 import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
 import { PointPrimitive } from "../../sketchlib/rendering/primitives.js";
 import { group } from "../../sketchlib/rendering/shorthand.js";
-import { ParamInterval } from "../lablib/music/ParamInterval.js";
+import { ParamCurve } from "../lablib/music/ParamCurve.js";
 import { Sequential } from "../lablib/music/Timeline.js";
 import { Rational } from "../lablib/Rational.js";
 import { SoundManager } from "../lablib/SoundManager.js";
@@ -48,7 +48,7 @@ export class SpiralBurst {
    * Generate the parameters for a spiral burst, to be used with a score.
    * The animation will loop every measure of 4/4 time.
    * @param {Rational} duration Total duration of the animation
-   * @return {[string, import("../lablib/music/Timeline.js").Timeline<ParamInterval>][]} Parameter entries to include in a score
+   * @return {[string, import("../lablib/music/Timeline.js").Timeline<ParamCurve>][]} Parameter entries to include in a score
    */
   static spiral_burst_params(duration) {
     const spiral_duration = new Rational(7, 8);
@@ -56,15 +56,15 @@ export class SpiralBurst {
 
     const radius = Sequential.from_loop(
       new Sequential(
-        new ParamInterval(1, 0, spiral_duration),
-        new ParamInterval(0, 1, burst_duration)
+        new ParamCurve(1, 0, spiral_duration),
+        new ParamCurve(0, 1, burst_duration)
       ),
       duration
     );
     const phase = Sequential.from_loop(
       new Sequential(
-        new ParamInterval(0, 1, spiral_duration),
-        new ParamInterval(0, 0, burst_duration)
+        new ParamCurve(0, 1, spiral_duration),
+        new ParamCurve(0, 0, burst_duration)
       ),
       duration
     );
