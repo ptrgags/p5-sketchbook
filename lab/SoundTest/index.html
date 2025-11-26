@@ -24,64 +24,85 @@
         <canvas id="sketch-canvas" width="500" height="700"></canvas>
       </div>
       <div class="description">
-        <p>Click the buttons to select between the different melodies</p>
-        <p>Updates:</p>
-        <dl>
-          <dt>2025-05-28</dt>
-          <dd>
-            I added a visualization of the musical timeline to give a rough idea
-            of the structure of the music.
-          </dd>
-          <dt>2025-05-14</dt>
-          <dd>
-            I added a third melody that takes a short motif and transforms it
-            into a larger musical work using transposition and retrograde.
-          </dd>
-          <dt>2025-05-13</dt>
-          <dd>
-            I started implementing algebraic music types based on
-            <cite>The Haskell School of Music</cite> by Paul Hudak and Donya
-            Quick, <cite>A Geometry of Music</cite> bu Dmitri Tymoczko, and some
-            concepts from
-            <a href="https://tidalcycles.org/docs/reference/cycles"
-              >Tidal Cycles</a
-            >. See the
-            <a
-              href="https://github.com/ptrgags/p5-sketchbook/blob/main/lab/lablib/music/README.md"
-              >Music README</a
-            >
-            for more details.
-          </dd>
-        </dl>
-        <p>Notes:</p>
-        <ul>
-          <li>
-            This is a sandbox for trying out Tone.js. This way I can add sound
-            effects, synthesizers, and music to my sketches.
-          </li>
-          <li>
-            There's plenty more Tone.js can do (sampled audio, connecting audio
-            nodes to make custom synthesizers, provide timing information so I
-            could e.g. sync a visualization). This sketch will serve as a
-            sandbox for experiments.
-          </li>
-          <li>
-            For drawing loops in the timeline, to do so at a fine granularity
-            would mean rendering the inner music and then copy/pasting it a
-            number of times. However, the tricky bit is the last repeat that in
-            some cases will require cropping the content to a shorter width.
-          </li>
-          <li>
-            For drawing cycles in the timeline, the tricky bit is we want to
-            draw the nested material, but the widths have to be rescaled based
-            on the cycle division.
-          </li>
-          <li>
-            Some more game engine concepts like "scenes/rooms" and "objects"
-            would be helpful to add to this repo as I add more interactive
-            elements to my code.
-          </li>
-        </ul>
+        <p>
+          Press play, then click the buttons to select between the different
+          melodies.
+        </p>
+        <p>
+          This lab sketch is a test area for adding music to my visualizations.
+          It's a sort of jukebox and visualizer to try out musical ideas.
+        </p>
+        <p>
+          The intent is to make a system that lets me write music with code. The
+          musical scores can then be played back with Tone.js. A recent addition
+          is the ability to store animation parameters and cues with the score.
+          This way, I can make animations that are always in sync with the beat.
+        </p>
+        <p>
+          See the
+          <a
+            href="https://github.com/ptrgags/p5-sketchbook/blob/main/lab/lablib/music/README.md"
+            >Music README</a
+          >
+          for more details on the musical algebra representation I'm using as
+          well as the books/articles its inspired by.
+        </p>
+        <details>
+          <summary>Changelog</summary>
+          <dl>
+            <dt>2025-11-26</dt>
+            <dd>
+              <p>
+                I added a way to describe parameters that change in time with
+                the music. This is something along the lines of automation
+                curves in a DAW, but expressed as a Timeline (see the
+                <a
+                  href="https://github.com/ptrgags/p5-sketchbook/blob/main/lab/lablib/music/README.md"
+                  >Music README</a
+                >). To try it out, I added the "spiral burst" animation. This
+                acts as a visual metronome - bursting on the downbeat, and every
+                beat after it the colors change.
+              </p>
+              <p>
+                I also reworked the musical timeline visualization to look more
+                like how you would expect in a DAW. This makes it more readable.
+              </p>
+            </dd>
+            <dt>2025-11-22</dt>
+            <dd>
+              I'm working on adding ways to have animations synced with the
+              background music. As a first experiment, I have the music system
+              triggering events every time a note starts/ends. As a first test,
+              I made the visual piano keyboard which lights up as notes are
+              played.
+            </dd>
+            <dt>2025-05-28</dt>
+            <dd>
+              I added a visualization of the musical timeline to give a rough
+              idea of the structure of the music.
+            </dd>
+            <dt>2025-05-14</dt>
+            <dd>
+              I added a third melody that takes a short motif and transforms it
+              into a larger musical work using transposition and retrograde.
+            </dd>
+            <dt>2025-05-13</dt>
+            <dd>
+              I started implementing algebraic music types based on
+              <cite>The Haskell School of Music</cite> by Paul Hudak and Donya
+              Quick, <cite>A Geometry of Music</cite> bu Dmitri Tymoczko, and
+              some concepts from
+              <a href="https://tidalcycles.org/docs/reference/cycles"
+                >Tidal Cycles</a
+              >. See the
+              <a
+                href="https://github.com/ptrgags/p5-sketchbook/blob/main/lab/lablib/music/README.md"
+                >Music README</a
+              >
+              for more details.
+            </dd>
+          </dl>
+        </details>
       </div>
     </div>
   </body>
