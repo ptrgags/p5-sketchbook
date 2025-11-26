@@ -85,6 +85,16 @@ export function old_render_timeline(offset, timeline, measure_dimensions) {
   return render_block(offset, timeline, measure_dimensions);
 }
 
+/**
+ * Render notes in a rectangle starting at offset and measure_dimensions.y tall.
+ * Its width is determined by the duration of the music. The range of pitches
+ * is automatically scaled so only pitch_range is drawn.
+ * @param {Point} offset
+ * @param {import("./Score.js").Music<number>} music Music as a timeline of MIDI notes
+ * @param {Point} measure_dimensions a Point.direction representing the size of 1 measure in pixels
+ * @param {[number, number]} pitch_range (min_pitch, max_pitch) as MIDI notes for determining note placement
+ * @returns {import("../../../sketchlib/rendering/GroupPrimitive.js").Primitive} A primitive containing all the notes (unstyled)
+ */
 function render_notes(offset, music, measure_dimensions, pitch_range) {
   if (music instanceof Gap) {
     return undefined;
@@ -92,7 +102,7 @@ function render_notes(offset, music, measure_dimensions, pitch_range) {
 
   if (music instanceof Note) {
     const [min_pitch, max_pitch] = pitch_range;
-    const pitch_count = max_pitch - min_pitch;
+    const pitch_count = max_pitch - min_pitch + 1;
     const note_height = measure_dimensions.y / pitch_count;
     const pitch_index = music.pitch - min_pitch;
 
@@ -207,7 +217,7 @@ function get_pitch_range(music) {
   });
 }
 
-// TODO: this should be a darker version of each instrument's color
+// For the background colors I'm using, solid black fill looks fine
 const NOTE_STYLE = new Style({
   fill: Color.BLACK,
 });
