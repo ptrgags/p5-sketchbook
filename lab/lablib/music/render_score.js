@@ -21,7 +21,7 @@ const MEASURE_LINE_STYLE = new Style({
 
 /**
  * Get the minimum and maximum MIDI notes
- * @param {import("./Score.js").Music<number>} music The music
+ * @param {import("./Score.js").Music<number>} music The musical timeline
  * @return {[number, number] | undefined} [min, max] pitch, or undefined if the music is silent
  */
 function get_pitch_range(music) {
@@ -53,7 +53,7 @@ function get_pitch_range(music) {
  * Render notes in a rectangle starting at offset and measure_dimensions.y tall.
  * Its width is determined by the duration of the music. The range of pitches
  * is automatically scaled so only pitch_range is drawn.
- * @param {Point} offset
+ * @param {Point} offset Top left corner of the rectangle where the notes will be overlayed as a Point.point
  * @param {import("./Score.js").Music<number>} music Music as a timeline of MIDI notes
  * @param {Point} measure_dimensions a Point.direction representing the size of 1 measure in pixels
  * @param {[number, number]} pitch_range (min_pitch, max_pitch) as MIDI notes for determining note placement
@@ -114,11 +114,11 @@ function render_notes(offset, music, measure_dimensions, pitch_range) {
 
 /**
  * Render a single Music timeline
- * @param {Point} offset Offset of the top left corner where the timeline should appear
+ * @param {Point} offset Offset of the top left corner where the timeline should appear as a Point.point
  * @param {import("./Score.js").Music<number>} music
  * @param {Point} measure_dimensions Dimensions of a rectangle representing one measure of music
  * @param {Style} background_style Style for the background rectangle
- * @param {Style} note_style Style for the note rectangles
+ * @param {Style} note_style Style for the smaller note rectangles
  * @returns {GroupPrimitive} A group primmitive ready for rendering
  */
 export function render_music(
@@ -128,8 +128,8 @@ export function render_music(
   background_style,
   note_style
 ) {
+  // Background rectangle ----------------------
   const duration = music.duration;
-
   const width_measures = duration.real;
   const dimensions = Point.direction(
     width_measures * measure_dimensions.x,
@@ -140,25 +140,27 @@ export function render_music(
     background_style
   );
 
+  // Vertical lines to mark the start of each measure -------------
   const whole_measures = duration.quotient;
   const measure_lines = new Array(whole_measures);
   for (let i = 0; i < whole_measures; i++) {
     const x = i * measure_dimensions.x;
     measure_lines[i] = new LinePrimitive(
-      Point.point(offset.x + x, offset.y),
-      Point.point(offset.x + x, offset.y + measure_dimensions.y)
+      offset.add(Point.DIR_X.scale(x)),
+      offset.add(Point.direction(x, measure_dimensions.y))
     );
   }
   const styled_lines = style(measure_lines, MEASURE_LINE_STYLE);
 
   const [min_pitch, max_pitch] = get_pitch_range(music) ?? [C4, C5];
-  // Expand the range by a couple of semitones so notes aren't too close to the
-  // edge
   /**
+   * Expand the range by a couple of semitones so notes aren't too close
+   * to the top/bottom edges which can look confusing
    * @type {[number, number]}
    */
   const pitch_range = [min_pitch - 2, max_pitch + 2];
 
+  // Many small rectangles for the notes ----------------------
   const notes = style(
     render_notes(offset, music, measure_dimensions, pitch_range),
     note_style
@@ -169,10 +171,10 @@ export function render_music(
 
 /**
  * Render a score as rectangles arranged in rows like in a DAW
- * @param {Point} offset Top left corner of the score
+ * @param {Point} offset Top left corner of the score as a Point.point
  * @param {Score<number>} score The score to draw, with values as MIDI notes
- * @param {Point} measure_dimensions (pixels_per_measure, pixels_per_voice) the dimensions of a block representing one measure and one voice
- * @param {Style[]} styles Styles for rendering the different parts of the score.
+ * @param {Point} measure_dimensions (pixels_per_measure, pixels_per_voice) the dimensions of a block representing one measure and one voice as a Point.direction
+ * @param {Style[]} styles Styles for the background rectangles for each part of the score.
  * @returns {GroupPrimitive} The visual representation of the score
  */
 export function render_score(offset, score, measure_dimensions, styles) {
