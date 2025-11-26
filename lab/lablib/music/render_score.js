@@ -188,13 +188,19 @@ function get_pitch_range(music) {
     return [music.pitch, music.pitch];
   }
 
-  // Melody and Harmony are just a simple
-  return music.children
+  // For Melody and Harmony, examine the pitches across all notes and
+  // get the overall min/max
+  const child_ranges = music.children
     .map((x) => get_pitch_range(x))
-    .filter((x) => x !== undefined)
-    .reduce(([acc_min, acc_max], [min_pitch, max_pitch]) => {
-      return [Math.min(acc_min, min_pitch), Math.max(acc_max, max_pitch)];
-    });
+    .filter((x) => x !== undefined);
+
+  if (child_ranges.length === 0) {
+    return undefined;
+  }
+
+  return child_ranges.reduce(([acc_min, acc_max], [min_pitch, max_pitch]) => {
+    return [Math.min(acc_min, min_pitch), Math.max(acc_max, max_pitch)];
+  });
 }
 
 // TODO: this should be a darker version of each instrument's color
