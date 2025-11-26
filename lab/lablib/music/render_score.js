@@ -7,6 +7,7 @@ import { count_voices } from "./count_voices.js";
 import { C4, C5 } from "./pitches.js";
 import { Harmony, Melody, Note, Rest, Score } from "./Score.js";
 import { Gap, Sequential } from "./Timeline.js";
+import { Color } from "../../../sketchlib/Color.js";
 
 /**
  * Render a simple timeline as a single block. The duration determines the width,
@@ -48,7 +49,7 @@ export function old_render_timeline(offset, timeline, measure_dimensions) {
     let child_offset = offset;
     const child_blocks = [];
     for (const child of timeline.children) {
-      const child_block = render_timeline(
+      const child_block = old_render_timeline(
         child_offset,
         child,
         measure_dimensions
@@ -66,7 +67,7 @@ export function old_render_timeline(offset, timeline, measure_dimensions) {
     let child_offset = offset;
     const child_blocks = [];
     for (const child of timeline.children) {
-      const child_block = render_timeline(
+      const child_block = old_render_timeline(
         child_offset,
         child,
         measure_dimensions
@@ -84,17 +85,92 @@ export function old_render_timeline(offset, timeline, measure_dimensions) {
   return render_block(offset, timeline, measure_dimensions);
 }
 
-export function render_timeline(offset, timeline, measure_dimensions) {
-  //const [min_pitch, max_pitch] = get_pitch_range(timeline) ?? [C4, C5];
-  //const pitch_count = max_pitch - min_pitch + 1;
+function render_notes(offset, music, measure_dimensions, pitch_range) {
+  if (music instanceof Gap) {
+    return undefined;
+  }
 
-  const width_measures = timeline.duration.real;
+  if (music instanceof Note) {
+    const [min_pitch, max_pitch] = pitch_range;
+    const pitch_count = max_pitch - min_pitch;
+    const note_height = measure_dimensions.y / pitch_count;
+    const pitch_index = music.pitch - min_pitch;
+
+    const note_offset = Point.direction(
+      0,
+      measure_dimensions.y - pitch_index * note_height
+    );
+    const dimensions = Point.direction(
+      music.duration.real * measure_dimensions.x,
+      note_height
+    );
+    return new RectPrimitive(offset.add(note_offset), dimensions);
+  }
+
+  if (music instanceof Melody) {
+    let child_offset = offset;
+    const all_notes = [];
+    for (const child of music.children) {
+      const child_notes = render_notes(
+        child_offset,
+        child,
+        measure_dimensions,
+        pitch_range
+      );
+      all_notes.push(child_notes);
+
+      const child_width = child.duration.real * measure_dimensions.x;
+      child_offset = child_offset.add(Point.DIR_X.scale(child_width));
+    }
+    return group(...all_notes.filter((x) => x !== undefined));
+  }
+
+  if (music instanceof Harmony) {
+    // Gather up the notes from all the children and overlay them. This assumes
+    // that ptich_range was computed across all of the parallel lines
+    return group(
+      ...music.children
+        .map((x) => {
+          return render_notes(offset, x, measure_dimensions, pitch_range);
+        })
+        .filter((x) => x !== undefined)
+    );
+  }
+}
+
+/**
+ * Render a single Music timeline
+ * @param {Point} offset Offset of the top left corner where the timeline should appear
+ * @param {import("./Score.js").Music<number>} music
+ * @param {Point} measure_dimensions Dimensions of a rectangle representing one measure of music
+ * @param {Style} background_style Style for the background rectangle
+ * @param {Style} note_style Style for the note rectangles
+ * @returns {GroupPrimitive} A group primmitive ready for rendering
+ */
+export function render_music(
+  offset,
+  music,
+  measure_dimensions,
+  background_style,
+  note_style
+) {
+  const width_measures = music.duration.real;
   const dimensions = Point.direction(
     width_measures * measure_dimensions.x,
     measure_dimensions.y
   );
-  const background = new RectPrimitive(offset, dimensions);
-  return background;
+  const background = style(
+    new RectPrimitive(offset, dimensions),
+    background_style
+  );
+
+  const pitch_range = get_pitch_range(music) ?? [C4, C5];
+  const notes = style(
+    render_notes(offset, music, measure_dimensions, pitch_range),
+    note_style
+  );
+
+  return group(background, notes);
 }
 
 /**
@@ -121,6 +197,11 @@ function get_pitch_range(music) {
     });
 }
 
+// TODO: this should be a darker version of each instrument's color
+const NOTE_STYLE = new Style({
+  fill: Color.BLACK,
+});
+
 /**
  * Render a score as rectangles arranged in rows like in a DAW
  * @param {Point} offset Top left corner of the score
@@ -135,10 +216,12 @@ export function render_score(offset, score, measure_dimensions, styles) {
     const [, part] = entry;
     const child_offset = Point.direction(0, measure_dimensions.y).scale(i);
 
-    const rendered = render_timeline(
+    const rendered = render_music(
       offset.add(child_offset),
       part,
-      measure_dimensions
+      measure_dimensions,
+      styles[i],
+      NOTE_STYLE
     );
     const part_group = style(rendered, styles[i]);
     parts.push(part_group);
