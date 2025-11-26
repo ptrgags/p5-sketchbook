@@ -6,87 +6,9 @@ import {
 } from "../../../sketchlib/rendering/primitives.js";
 import { group, style } from "../../../sketchlib/rendering/shorthand.js";
 import { Style } from "../../../sketchlib/Style.js";
-import { count_voices } from "./count_voices.js";
 import { C4, C5 } from "./pitches.js";
 import { Harmony, Melody, Note, Rest, Score } from "./Score.js";
-import { Gap, Sequential } from "./Timeline.js";
 import { Color } from "../../../sketchlib/Color.js";
-
-/**
- * Render a simple timeline as a single block. The duration determines the width,
- * the number of voices determines the height.
- * @template {import("./Timeline.js").TimeInterval} T
- * @param {Point} offset The top left corner where the timeline should be rendered.
- * @param {import("./Timeline.js").Timeline<T>} timeline The timeline of events
- * @param {Point} measure_dimensions Dimensions of a 1 measure x 1 voice block in pixels as a Point.direction
- * @returns {RectPrimitive}
- */
-function render_block(offset, timeline, measure_dimensions) {
-  const width = timeline.duration.real;
-  const voices = count_voices(timeline);
-
-  const dimensions = Point.direction(
-    width * measure_dimensions.x,
-    voices * measure_dimensions.y
-  );
-  return new RectPrimitive(offset, dimensions);
-}
-
-/**
- * Render a single timeline as a strip of rectangles. This does not apply styling
- * @template {import("./Timeline.js").TimeInterval} T
- * @param {Point} offset The top left corner where the timeline should be rendered.
- * @param {import("./Timeline.js").Timeline<T>} timeline The timeline of events
- * @param {Point} measure_dimensions Dimensions of a 1 measure x 1 voice block in pixels as a Point.direction
- * @return {import("../../../sketchlib/rendering/GroupPrimitive.js").Primitive | undefined} A primitive to render, or undefined if there was no content to render.
- */
-export function old_render_timeline(offset, timeline, measure_dimensions) {
-  if (timeline instanceof Gap) {
-    // no musical content to render
-    return undefined;
-  }
-
-  if (timeline instanceof Sequential) {
-    // render blocks for all the children, with offsets increasing
-    // horizontally
-    let child_offset = offset;
-    const child_blocks = [];
-    for (const child of timeline.children) {
-      const child_block = old_render_timeline(
-        child_offset,
-        child,
-        measure_dimensions
-      );
-      child_blocks.push(child_block);
-
-      const child_width = child.duration.real * measure_dimensions.x;
-      child_offset = child_offset.add(Point.direction(child_width, 0));
-    }
-    return group(...child_blocks.filter((x) => x !== undefined));
-  }
-
-  if (timeline instanceof Harmony) {
-    // render blocks for all the children, with offsets increasing vertically
-    let child_offset = offset;
-    const child_blocks = [];
-    for (const child of timeline.children) {
-      const child_block = old_render_timeline(
-        child_offset,
-        child,
-        measure_dimensions
-      );
-      child_blocks.push(child_block);
-
-      const child_height = count_voices(child) * measure_dimensions.y;
-      child_offset = child_offset.add(Point.direction(0, child_height));
-    }
-    return group(...child_blocks.filter((x) => x !== undefined));
-  }
-
-  // For now cycles, loops and individual intervals are rendered as a single
-  // block
-  return render_block(offset, timeline, measure_dimensions);
-}
 
 /**
  * Render notes in a rectangle starting at offset and measure_dimensions.y tall.
@@ -99,7 +21,7 @@ export function old_render_timeline(offset, timeline, measure_dimensions) {
  * @returns {import("../../../sketchlib/rendering/GroupPrimitive.js").Primitive} A primitive containing all the notes (unstyled)
  */
 function render_notes(offset, music, measure_dimensions, pitch_range) {
-  if (music instanceof Gap) {
+  if (music instanceof Rest) {
     return undefined;
   }
 
