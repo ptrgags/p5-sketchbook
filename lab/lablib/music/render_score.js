@@ -10,6 +10,45 @@ import { C4, C5 } from "./pitches.js";
 import { Harmony, Melody, Note, Rest, Score } from "./Score.js";
 import { Color } from "../../../sketchlib/Color.js";
 
+// For the background colors I'm using, solid black fill looks fine
+const NOTE_STYLE = new Style({
+  fill: Color.BLACK,
+});
+
+const MEASURE_LINE_STYLE = new Style({
+  stroke: Color.from_hex_code("#777777"),
+});
+
+/**
+ * Get the minimum and maximum MIDI notes
+ * @param {import("./Score.js").Music<number>} music The music
+ * @return {[number, number] | undefined} [min, max] pitch, or undefined if the music is silent
+ */
+function get_pitch_range(music) {
+  if (music instanceof Rest) {
+    // No pitch information
+    return undefined;
+  }
+
+  if (music instanceof Note) {
+    return [music.pitch, music.pitch];
+  }
+
+  // For Melody and Harmony, examine the pitches across all notes and
+  // get the overall min/max
+  const child_ranges = music.children
+    .map((x) => get_pitch_range(x))
+    .filter((x) => x !== undefined);
+
+  if (child_ranges.length === 0) {
+    return undefined;
+  }
+
+  return child_ranges.reduce(([acc_min, acc_max], [min_pitch, max_pitch]) => {
+    return [Math.min(acc_min, min_pitch), Math.max(acc_max, max_pitch)];
+  });
+}
+
 /**
  * Render notes in a rectangle starting at offset and measure_dimensions.y tall.
  * Its width is determined by the duration of the music. The range of pitches
@@ -73,10 +112,6 @@ function render_notes(offset, music, measure_dimensions, pitch_range) {
   }
 }
 
-const MEASURE_LINE_STYLE = new Style({
-  stroke: Color.from_hex_code("#777777"),
-});
-
 /**
  * Render a single Music timeline
  * @param {Point} offset Offset of the top left corner where the timeline should appear
@@ -131,41 +166,6 @@ export function render_music(
 
   return group(background, styled_lines, notes);
 }
-
-/**
- * Get the minimum and maximum MIDI notes
- * @param {import("./Score.js").Music<number>} music The music
- * @return {[number, number] | undefined} [min, max] pitch, or undefined if the music is silent
- */
-function get_pitch_range(music) {
-  if (music instanceof Rest) {
-    // No pitch information
-    return undefined;
-  }
-
-  if (music instanceof Note) {
-    return [music.pitch, music.pitch];
-  }
-
-  // For Melody and Harmony, examine the pitches across all notes and
-  // get the overall min/max
-  const child_ranges = music.children
-    .map((x) => get_pitch_range(x))
-    .filter((x) => x !== undefined);
-
-  if (child_ranges.length === 0) {
-    return undefined;
-  }
-
-  return child_ranges.reduce(([acc_min, acc_max], [min_pitch, max_pitch]) => {
-    return [Math.min(acc_min, min_pitch), Math.max(acc_max, max_pitch)];
-  });
-}
-
-// For the background colors I'm using, solid black fill looks fine
-const NOTE_STYLE = new Style({
-  fill: Color.BLACK,
-});
 
 /**
  * Render a score as rectangles arranged in rows like in a DAW
