@@ -166,7 +166,7 @@ class SoundScene {
     this.piano = new Piano(
       new Rectangle(Point.point(0, 300), Point.direction(500, 300 / 3)),
       3,
-      3
+      4
     );
     this.spiral_burst = new SpiralBurst();
 

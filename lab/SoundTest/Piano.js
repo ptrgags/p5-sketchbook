@@ -199,7 +199,7 @@ export class Piano {
       octave < this.octave_start ||
       octave >= this.octave_start + this.num_octaves
     ) {
-      console.warn("Triggering out-of-range note");
+      console.warn("Triggering out-of-range note", octave);
       return;
     }
 
@@ -221,7 +221,7 @@ export class Piano {
       octave < this.octave_start ||
       octave >= this.octave_start + this.num_octaves
     ) {
-      console.warn("Releasing out-of-range note");
+      console.warn("Releasing out-of-range note", midi_note);
       return;
     }
 
@@ -229,8 +229,10 @@ export class Piano {
     this.key_presses[midi_note]--;
 
     if (this.key_presses[midi_note] < 0) {
-      throw new Error(`more releases than triggers for note ${midi_note}!`);
-    } else if (this.key_presses[midi_note] === 0) {
+      console.warn("more releases than triggers for note", midi_note);
+    }
+
+    if (this.key_presses[midi_note] <= 0) {
       // Only release the note if duplicates have been resolved
       const pitch = MidiPitch.get_pitch_class(midi_note);
       this.octave_pianos[octave - this.octave_start].set_key(pitch, false);
