@@ -1,5 +1,5 @@
 import { Point } from "../../pga2d/objects.js";
-import { WIDTH } from "../../sketchlib/dimensions.js";
+import { HEIGHT, WIDTH } from "../../sketchlib/dimensions.js";
 import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
 import { PointPrimitive } from "../../sketchlib/rendering/primitives.js";
 import { group, style } from "../../sketchlib/rendering/shorthand.js";
@@ -12,7 +12,7 @@ import { Rational } from "../lablib/Rational.js";
 import { SoundManager } from "../lablib/SoundManager.js";
 
 const N = 10;
-const CENTER = Point.point(WIDTH / 2, 250);
+const CENTER = Point.point(WIDTH / 2, (3 * HEIGHT) / 4);
 const MAX_RADIUS = 50;
 
 export class SpiralBurst {
