@@ -98,7 +98,7 @@ function render_notes(offset, music, measure_dimensions, pitch_range) {
 
     const note_offset = Point.direction(
       0,
-      measure_dimensions.y - pitch_index * note_height
+      measure_dimensions.y - (pitch_index + 1) * note_height
     );
     const dimensions = Point.direction(
       music.duration.real * measure_dimensions.x,
@@ -164,7 +164,11 @@ export function render_music(
     background_style
   );
 
-  const pitch_range = get_pitch_range(music) ?? [C4, C5];
+  const [min_pitch, max_pitch] = get_pitch_range(music) ?? [C4, C5];
+  // Expand the range by a couple of semitones so notes aren't too close to the
+  // edge
+  const pitch_range = [min_pitch - 2, max_pitch + 2];
+
   const notes = style(
     render_notes(offset, music, measure_dimensions, pitch_range),
     note_style
