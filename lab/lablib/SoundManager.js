@@ -191,7 +191,6 @@ export class SoundManager {
       return undefined;
     }
 
-    // TODO: This would be a good case for binary search
     const time = this.transport_time;
 
     let tween;
@@ -295,7 +294,6 @@ export class SoundManager {
     }
 
     // Schedule note on/off events for animations
-    // TODO: this should be opt-in, not automatic.
     const note_events = this.score_note_events[score_id];
     for (const part of note_events) {
       const { instrument_index, instrument_id, events } = part;

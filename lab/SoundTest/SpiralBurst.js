@@ -37,7 +37,6 @@ export class SpiralBurst {
     const chroma = sound.get_param("chroma") ?? 0.1;
     const hue = sound.get_param("hue") ?? 130;
 
-    // TODO: Have the color be slightly different per point
     const color = new Oklch(lightness, chroma, hue);
     const point_style = new Style({
       fill: color.to_srgb(),
