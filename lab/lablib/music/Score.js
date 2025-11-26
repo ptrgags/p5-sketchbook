@@ -1,4 +1,5 @@
 import { Rational } from "../Rational.js";
+import { ParamCurve } from "./ParamCurve.js";
 import { REST } from "./pitches.js";
 import { Gap, Parallel, Sequential, timeline_map } from "./Timeline.js";
 
@@ -114,6 +115,14 @@ export function map_pitch(pitch_func, music) {
 
 /**
  * @typedef {string} Instrument
+ * @typedef {string} ParamID
+ */
+
+/**
+ * @template P
+ * @typedef {Object} ScoreOptions
+ * @property {[Instrument, Music<P>][]} parts The musical parts
+ * @property {[ParamID, import("./Timeline.js").Timeline<ParamCurve>][]} [params] Parameter curves for animation in sync with the music. The number is a default value
  */
 
 /**
@@ -123,9 +132,18 @@ export function map_pitch(pitch_func, music) {
 export class Score {
   /**
    * Constructor
-   * @param  {...[Instrument, Music<P>]} parts
+   * @param {ScoreOptions<P>} options
    */
-  constructor(...parts) {
-    this.parts = parts;
+  constructor(options) {
+    /**
+     * Music parts stored in score order
+     * @type {[Instrument, Music<P>][]}
+     */
+    this.parts = options.parts;
+    /**
+     * Parameter curves stored in score order
+     * @type {[ParamID, import("./Timeline.js").Timeline<ParamCurve>][]}
+     */
+    this.params = options.params ?? [];
   }
 }

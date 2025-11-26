@@ -1,5 +1,10 @@
 export class Random {
-  // random int in [min, max)
+  /**
+   * Random integer in [min, max)
+   * @param {number} min Minimum value (inclusive)
+   * @param {number} max Maximum value (exclusive)
+   * @returns {number} Random integer in [min, max)
+   */
   static rand_int(min, max) {
     return Math.floor(Math.random() * (max - min) + min);
   }

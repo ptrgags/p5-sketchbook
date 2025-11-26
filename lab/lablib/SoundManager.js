@@ -1,3 +1,5 @@
+import { Tween } from "../../sketchlib/Tween.js";
+import { ParamCurve } from "./music/ParamCurve.js";
 import { Score } from "./music/Score.js";
 import { to_events } from "./music/Timeline.js";
 import { Rational } from "./Rational.js";
@@ -11,7 +13,7 @@ import { schedule_clips } from "./tone_helpers/schedule_music.js";
  * @typedef {{
  *  bpm?: number,
  *  scores?: ScoreDeclarations,
- *  sfx?: ScoreDeclarations
+ *  sfx?: ScoreDeclarations,
  * }} SoundManifest
  */
 
@@ -36,8 +38,15 @@ export class SoundManager {
     this.synths = {};
     this.patterns = {};
 
+    this.current_score = undefined;
     this.scores = {};
     this.score_note_events = {};
+    /**
+     * Compiled tweens stored by (score_id, param_id)
+     * @private
+     * @type {{[score_id: string]: {[param_id: string]: Tween<number>[]}}}
+     */
+    this.score_tweens = {};
     this.sfx = {};
 
     /**
@@ -172,6 +181,50 @@ export class SoundManager {
   }
 
   /**
+   * Get the current value of a parameter from the currently playing score
+   * @param {string} param_id The ID of the parameter in the score
+   * @returns {number | undefined} The current value of the parameter, or undefined if no value is set
+   */
+  get_param(param_id) {
+    const tween_list = this.score_tweens[this?.current_score]?.[param_id];
+    if (tween_list === undefined || tween_list.length === 0) {
+      return undefined;
+    }
+
+    const time = this.transport_time;
+
+    let tween;
+    if (time < tween_list[0].start_time) {
+      tween = tween_list[0];
+    } else if (time >= tween_list[tween_list.length - 1].end_time) {
+      tween = tween_list[tween_list.length - 1];
+    } else {
+      tween = tween_list.find(
+        (tween) => time >= tween.start_time && time < tween.end_time
+      );
+    }
+
+    return tween.get_value(time);
+  }
+
+  /**
+   * Convert a timeline of ParamCurve to an array of Tween, assuming a start time of 0
+   * @param {import("./music/Timeline.js").Timeline<ParamCurve>} timeline the timeline to convert
+   * @return {Tween[]} The corresponding tweens,
+   */
+  compile_tweens(timeline) {
+    const events = to_events(Rational.ZERO, timeline);
+    return events.map(([curve, start_time]) => {
+      return Tween.scalar(
+        curve.start_value,
+        curve.end_value,
+        start_time.real,
+        curve.duration.real
+      );
+    });
+  }
+
+  /**
    * Compile and save a score
    * @param {string} score_id The score ID to use. This must be the same as
    * the ID used for play_score() later.
@@ -190,6 +243,17 @@ export class SoundManager {
       });
     }
     this.score_note_events[score_id] = score_events;
+
+    if (score.params) {
+      /**
+       * @type {{[param_id: string]: Tween<number>[]}}
+       */
+      const score_params = {};
+      for (const [param_id, timeline] of score.params) {
+        score_params[param_id] = this.compile_tweens(timeline);
+      }
+      this.score_tweens[score_id] = score_params;
+    }
   }
 
   /**
@@ -208,6 +272,10 @@ export class SoundManager {
     transport.cancel();
   }
 
+  /**
+   * Stop the music and play a score.
+   * @param {string} score_id ID of a score registered when initializing the sound system.
+   */
   play_score(score_id) {
     const score = this.scores[score_id];
     if (score === undefined) {
@@ -226,7 +294,6 @@ export class SoundManager {
     }
 
     // Schedule note on/off events for animations
-    // TODO: this should be opt-in, not automatic.
     const note_events = this.score_note_events[score_id];
     for (const part of note_events) {
       const { instrument_index, instrument_id, events } = part;
@@ -256,6 +323,7 @@ export class SoundManager {
 
     transport.position = 0;
     transport.start("+0.1", "0:0");
+    this.current_score = score_id;
     this.transport_playing = true;
   }
 
@@ -290,7 +358,7 @@ export class SoundManager {
    * @template T
    * @param {[T, Rational, Rational][]} events
    * @param {function(T): void} on_start function to call at the start of a note.
-   * @param {function(T): void} on_start function to call at the end of each note.
+   * @param {function(T): void} on_end function to call at the end of each note.
    */
   schedule_cues(events, on_start, on_end) {
     const transport = this.tone.getTransport();
