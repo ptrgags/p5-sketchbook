@@ -1,6 +1,9 @@
 import { Point } from "../../../pga2d/objects.js";
 import { GroupPrimitive } from "../../../sketchlib/rendering/GroupPrimitive.js";
-import { RectPrimitive } from "../../../sketchlib/rendering/primitives.js";
+import {
+  LinePrimitive,
+  RectPrimitive,
+} from "../../../sketchlib/rendering/primitives.js";
 import { group, style } from "../../../sketchlib/rendering/shorthand.js";
 import { Style } from "../../../sketchlib/Style.js";
 import { count_voices } from "./count_voices.js";
@@ -148,6 +151,10 @@ function render_notes(offset, music, measure_dimensions, pitch_range) {
   }
 }
 
+const MEASURE_LINE_STYLE = new Style({
+  stroke: Color.from_hex_code("#777777"),
+});
+
 /**
  * Render a single Music timeline
  * @param {Point} offset Offset of the top left corner where the timeline should appear
@@ -164,7 +171,9 @@ export function render_music(
   background_style,
   note_style
 ) {
-  const width_measures = music.duration.real;
+  const duration = music.duration;
+
+  const width_measures = duration.real;
   const dimensions = Point.direction(
     width_measures * measure_dimensions.x,
     measure_dimensions.y
@@ -174,9 +183,23 @@ export function render_music(
     background_style
   );
 
+  const whole_measures = duration.quotient;
+  const measure_lines = new Array(whole_measures);
+  for (let i = 0; i < whole_measures; i++) {
+    const x = i * measure_dimensions.x;
+    measure_lines[i] = new LinePrimitive(
+      Point.point(offset.x + x, offset.y),
+      Point.point(offset.x + x, offset.y + measure_dimensions.y)
+    );
+  }
+  const styled_lines = style(measure_lines, MEASURE_LINE_STYLE);
+
   const [min_pitch, max_pitch] = get_pitch_range(music) ?? [C4, C5];
   // Expand the range by a couple of semitones so notes aren't too close to the
   // edge
+  /**
+   * @type {[number, number]}
+   */
   const pitch_range = [min_pitch - 2, max_pitch + 2];
 
   const notes = style(
@@ -184,7 +207,7 @@ export function render_music(
     note_style
   );
 
-  return group(background, notes);
+  return group(background, styled_lines, notes);
 }
 
 /**
