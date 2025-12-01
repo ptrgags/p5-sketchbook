@@ -1,4 +1,5 @@
 import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
+import { LSystem } from "../../sketchlib/LSystem.js";
 import { draw_primitive } from "../../sketchlib/p5_helpers/draw_primitive.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { MouseInput } from "../lablib/MouseInput.js";
@@ -14,6 +15,30 @@ const SOUND_MANIFEST = {};
 
 //@ts-ignore
 const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
+
+const TREE_LSYSTEM = new LSystem("Fa", {
+  a: "[+Fa]-Fa",
+});
+
+function count_symbols(str) {
+  /**
+   * @type {Map<string, number>}
+   */
+  const counts = new Map();
+  for (const c of str) {
+    const current_count = counts.get(c) ?? 0;
+    counts.set(c, current_count + 1);
+  }
+
+  return counts;
+}
+
+const strings = TREE_LSYSTEM.iterate(8);
+for (const str of strings) {
+  const counts = count_symbols(str);
+  const ignore_a_len = str.length - counts.get("a");
+  console.log(ignore_a_len, counts, str);
+}
 
 class SoundScene {
   /**
