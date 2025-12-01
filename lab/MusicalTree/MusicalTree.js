@@ -1,10 +1,15 @@
 import { Point } from "../../pga2d/objects.js";
+import { Color } from "../../sketchlib/Color.js";
 import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
 import { LSystem } from "../../sketchlib/LSystem.js";
 import { draw_primitive } from "../../sketchlib/p5_helpers/draw_primitive.js";
+import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
+import { LinePrimitive } from "../../sketchlib/rendering/primitives.js";
+import { group, style } from "../../sketchlib/rendering/shorthand.js";
+import { Style } from "../../sketchlib/Style.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { MouseInput } from "../lablib/MouseInput.js";
-import { N32 } from "../lablib/music/durations.js";
+import { N16, N32 } from "../lablib/music/durations.js";
 import { B4, C4, E4, E6, F6, G6 } from "../lablib/music/pitches.js";
 import { Melody, Note, Rest, Score } from "../lablib/music/Score.js";
 import { MuteButton } from "../lablib/MuteButton.js";
@@ -36,32 +41,67 @@ for (const str of TREE_STRS) {
   console.log(ignore_a_len, counts, str);
 }
 
-/*
-function render_tree(tree_str, max_depth) {
-  const DELTA_ANGLE = Math.PI / 3;
-  let position = Point.point(WIDTH / 2, (3 * HEIGHT) / 2);
+/**
+ *
+ * @param {string} tree_str
+ * @returns {GroupPrimitive}
+ */
+function render_tree(tree_str) {
+  const DELTA_ANGLE = Math.PI / 4;
+  const MAX_LENGTH = 100;
+  const LENGTH_SCALE = 0.7;
+  let position = Point.point(WIDTH / 2, HEIGHT / 4);
   let orientation = 0;
+  /**
+   * @type {[Point, number][]}
+   */
   const stack = [];
   let depth = 0;
 
+  const primitives = [];
+
   for (const c of tree_str) {
     if (c === "F") {
+      const forward_angle = Math.PI / 2 + orientation * DELTA_ANGLE;
+      const forward = Point.dir_from_angle(forward_angle);
+      const length = MAX_LENGTH * LENGTH_SCALE ** depth;
+      const start = position;
+      const end = position.add(forward.scale(length));
+      primitives.push(new LinePrimitive(start, end));
+      position = end;
     } else if (c === "[") {
       depth++;
-      this.stack.push([position, orientation]);
+      stack.push([position, orientation]);
     } else if (c === "]") {
-      [position, orientation] = this.stack.pop();
+      depth--;
+      [position, orientation] = stack.pop();
+    } else if (c === "+") {
+      orientation++;
+    } else if (c === "-") {
+      orientation--;
     }
   }
-}*/
 
+  return group(...primitives);
+}
+const STYLE_TREE = new Style({
+  stroke: Color.YELLOW,
+});
+const TREE_PRIMITIVE = style(render_tree(TREE_STRS[3]), STYLE_TREE);
+
+/**
+ *
+ * @param {string} tree_str
+ * @param {number} max_depth
+ * @returns {Score<number>}
+ */
 function make_score(tree_str, max_depth) {
   const draw_notes = [];
   const stack_notes = [];
   const turn_notes = [];
 
   // Duration of the shortest note
-  const DUR = N32;
+  const DUR = N16;
   // For stack push/pops, it'll be hi-lo for push, lo-hi for pop
   const STACK_HI = new Note(B4, DUR);
   const STACK_LO = new Note(E4, DUR);
@@ -75,7 +115,7 @@ function make_score(tree_str, max_depth) {
     if (c === "F") {
       const note_length = max_depth - depth + 1;
       const dur = DUR.mul(new Rational(note_length));
-      draw_notes.push(new Note(C4, dur));
+      draw_notes.push(new Note(C4 + depth, dur));
       stack_notes.push(new Rest(dur));
       turn_notes.push(new Rest(dur));
     } else if (c === "[") {
@@ -98,8 +138,6 @@ function make_score(tree_str, max_depth) {
       draw_notes.push(new Rest(DUR));
       stack_notes.push(new Rest(DUR));
       turn_notes.push(TURN_RIGHT);
-    } else {
-      continue;
     }
   }
 
@@ -114,11 +152,13 @@ function make_score(tree_str, max_depth) {
 
 const MOUSE = new CanvasMouseHandler();
 
+const SCORE = make_score(TREE_STRS[3], 3);
+
 // Add scores here
 /**@type {import("../lablib/SoundManager.js").SoundManifest} */
 const SOUND_MANIFEST = {
   scores: {
-    tree: make_score(TREE_STRS[3], 3),
+    tree: SCORE,
   },
 };
 
@@ -135,6 +175,8 @@ class SoundScene {
     this.mute_button = new MuteButton();
     this.events = new EventTarget();
 
+    this.sound.play_score("tree");
+
     // Schedule sound callbacks here
     // this.sound.events.addEventListener('event', (e) => ...);
   }
@@ -146,8 +188,8 @@ class SoundScene {
   }
 
   render() {
-    // Render stuff here
-    return this.mute_button.render();
+    const mute = this.mute_button.render();
+    return group(TREE_PRIMITIVE, mute);
   }
 
   /**
