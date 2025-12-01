@@ -4,7 +4,7 @@ import { fix_mouse_coords } from "../sketchlib/fix_mouse_coords.js";
 import { draw_primitive } from "../sketchlib/p5_helpers/draw_primitive.js";
 import { Point } from "../pga2d/objects.js";
 import { prevent_mobile_scroll } from "../sketchlib/prevent_mobile_scroll.js";
-import { LSystem } from "./LSystem.js";
+import { LSystem } from "../sketchlib/LSystem.js";
 import { sec_to_frames, Tween } from "../sketchlib/Tween.js";
 import { AnimationChain, Joint } from "../sketchlib/AnimationChain.js";
 import {
@@ -13,7 +13,6 @@ import {
 } from "../sketchlib/rendering/primitives.js";
 import { Style } from "../sketchlib/Style.js";
 import { Color } from "../sketchlib/Color.js";
-import { GroupPrimitive } from "../sketchlib/rendering/GroupPrimitive.js";
 import { group, style } from "../sketchlib/rendering/shorthand.js";
 
 const INITIAL_POSITION = Point.point(WIDTH / 2, HEIGHT - 50);
