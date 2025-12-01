@@ -128,7 +128,7 @@ function make_score(tree_str, max_depth) {
       depth--;
       const dur = DUR.mul(new Rational(2));
       draw_notes.push(new Rest(dur));
-      stack_notes.push(new Melody(new Note(E4, dur), new Note(B4, dur)));
+      stack_notes.push(new Melody(STACK_LO, STACK_HI));
       turn_notes.push(new Rest(dur));
     } else if (c === "+") {
       draw_notes.push(new Rest(DUR));
