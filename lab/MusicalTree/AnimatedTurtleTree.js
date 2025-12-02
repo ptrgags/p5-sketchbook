@@ -45,11 +45,12 @@ export class TurtleGraphics {
   }
 
   /**
+   * Get the forward direction in p5's y-down coordinate system
    * @type {Point} A Point.direction representing the current forward direction as a unit direction
    */
   get dir_forward() {
     // Angles are measured from vertical, not horizontal
-    const ANGLE_ZERO = Math.PI / 2;
+    const ANGLE_ZERO = -Math.PI / 2;
     return Point.dir_from_angle(
       ANGLE_ZERO + this.delta_angle * this.orientation
     );
@@ -95,7 +96,7 @@ export class TurtleGraphics {
 }
 
 const DELTA_ANGLE = Math.PI / 5;
-const START_POINT = Point.point(WIDTH / 2, HEIGHT / 4);
+const START_POINT = Point.point(WIDTH / 2, (3 * HEIGHT) / 4);
 const MAX_LENGTH = 100;
 const LENGTH_SCALE = 0.7;
 
@@ -504,13 +505,13 @@ const STYLE_TURTLE = new Style({
  */
 function render_turtle(position, orientation) {
   const dir_front = Point.dir_from_angle(
-    Math.PI / 2 + orientation * DELTA_ANGLE
+    -Math.PI / 2 + orientation * DELTA_ANGLE
   );
   const dir_back_left = Point.dir_from_angle(
-    Math.PI / 2 + orientation * DELTA_ANGLE + (5 * Math.PI) / 6
+    -Math.PI / 2 + orientation * DELTA_ANGLE + (5 * Math.PI) / 6
   );
   const dir_back_right = Point.dir_from_angle(
-    Math.PI / 2 + orientation * DELTA_ANGLE - (5 * Math.PI) / 6
+    -Math.PI / 2 + orientation * DELTA_ANGLE - (5 * Math.PI) / 6
   );
 
   const polygon = new PolygonPrimitive([
