@@ -1,11 +1,15 @@
 import { Point } from "../../pga2d/objects.js";
 import { LSystem } from "../../sketchlib/LSystem.js";
-import { N16 } from "../lablib/music/durations.js";
+import { N16, N32 } from "../lablib/music/durations.js";
 import { map_pitch, Melody, Note, Rest, Score } from "../lablib/music/Score.js";
 import { Rational } from "../lablib/Rational.js";
 import { DOUBLE_HARMONIC, make_scale } from "../lablib/music/scales.js";
 import { HEIGHT, WIDTH } from "../../sketchlib/dimensions.js";
-import { LinePrimitive } from "../../sketchlib/rendering/primitives.js";
+import {
+  LinePrimitive,
+  PointPrimitive,
+  PolygonPrimitive,
+} from "../../sketchlib/rendering/primitives.js";
 import { group, style } from "../../sketchlib/rendering/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Color } from "../../sketchlib/Color.js";
@@ -82,7 +86,7 @@ export class TurtleGraphics {
   }
 }
 
-const DELTA_ANGLE = Math.PI / 4;
+const DELTA_ANGLE = Math.PI / 5;
 const START_POINT = Point.point(WIDTH / 2, HEIGHT / 4);
 const MAX_LENGTH = 100;
 const LENGTH_SCALE = 0.7;
@@ -135,7 +139,7 @@ class TreePrimitiveBuilder {
 const SCALE = make_scale(DOUBLE_HARMONIC);
 
 // Duration of the shortest note in the score
-const DUR_SHORT = N16;
+const DUR_SHORT = N32;
 
 // For stack commands, it's hi-lo for push lo-hi for pop
 const NOTE_STACK_HI = new Note(-2, DUR_SHORT);
@@ -252,6 +256,8 @@ class TreeAnimationBuilder {
     this.orientation = 0;
     this.orientation_curve = [];
 
+    this.stack = [];
+
     this.depth_curve = [];
   }
 
@@ -288,6 +294,8 @@ class TreeAnimationBuilder {
     this.line_count_curve.push(GAP_STACK);
     this.orientation_curve.push(GAP_STACK);
     this.depth_curve.push(increase);
+
+    this.stack.push(this.orientation);
   }
 
   /**
@@ -297,8 +305,16 @@ class TreeAnimationBuilder {
   pop(old_depth) {
     const decrease = new ParamCurve(old_depth, old_depth - 1, DUR_STACK);
 
+    const old_orientation = this.orientation;
+    this.orientation = this.stack.pop();
+    const adjust_angle = new ParamCurve(
+      old_orientation,
+      this.orientation,
+      DUR_STACK
+    );
+
     this.line_count_curve.push(GAP_STACK);
-    this.orientation_curve.push(GAP_STACK);
+    this.orientation_curve.push(adjust_angle);
     this.depth_curve.push(decrease);
   }
 
@@ -421,15 +437,43 @@ export class AnimatedTurtleTree {
     const whole_lines = Math.floor(line_count);
     const fract_lines = line_count % 1.0;
 
+    const orientation = sound.get_param("orientation");
+
     const visible_lines = this.lines.slice(0, whole_lines);
 
     const partial_line = this.lines[whole_lines];
     if (partial_line) {
       const endpoint = Point.lerp(partial_line.a, partial_line.b, fract_lines);
       const interpolated = new LinePrimitive(partial_line.a, endpoint);
-      return style([...visible_lines, interpolated], STYLE_TREE);
+      const turtle = render_turtle(endpoint, orientation);
+      return style([...visible_lines, turtle, interpolated], STYLE_TREE);
     }
 
     return style(visible_lines, STYLE_TREE);
   }
+}
+
+const RADIUS_TURTLE = 10;
+
+/**
+ * Draw a turtle as an isoceles triangle for now.
+ * @param {Point} position Point.point for the turtle position
+ * @param {number} orientation orientation of the turtle
+ */
+function render_turtle(position, orientation) {
+  const dir_front = Point.dir_from_angle(
+    Math.PI / 2 - orientation * DELTA_ANGLE
+  );
+  const dir_back_left = Point.dir_from_angle(
+    Math.PI / 2 - orientation * DELTA_ANGLE + (5 * Math.PI) / 6
+  );
+  const dir_back_right = Point.dir_from_angle(
+    Math.PI / 2 - orientation * DELTA_ANGLE - (5 * Math.PI) / 6
+  );
+
+  return new PolygonPrimitive([
+    position.add(dir_front.scale(RADIUS_TURTLE)),
+    position.add(dir_back_left.scale(RADIUS_TURTLE)),
+    position.add(dir_back_right.scale(RADIUS_TURTLE)),
+  ]);
 }

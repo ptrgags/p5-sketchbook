@@ -9,7 +9,7 @@ import { AnimatedTurtleTree } from "./AnimatedTurtleTree.js";
 
 const MOUSE = new CanvasMouseHandler();
 
-const ANIMATION = new AnimatedTurtleTree(3);
+const ANIMATION = new AnimatedTurtleTree(7);
 
 // Add scores here
 /**@type {import("../lablib/SoundManager.js").SoundManifest} */
