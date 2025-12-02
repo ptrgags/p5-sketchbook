@@ -423,6 +423,13 @@ export class AnimatedTurtleTree {
 
     const visible_lines = this.lines.slice(0, whole_lines);
 
+    const partial_line = this.lines[whole_lines];
+    if (partial_line) {
+      const endpoint = Point.lerp(partial_line.a, partial_line.b, fract_lines);
+      const interpolated = new LinePrimitive(partial_line.a, endpoint);
+      return style([...visible_lines, interpolated], STYLE_TREE);
+    }
+
     return style(visible_lines, STYLE_TREE);
   }
 }
