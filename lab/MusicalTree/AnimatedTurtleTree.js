@@ -19,6 +19,7 @@ import { ParamCurve } from "../lablib/music/ParamCurve.js";
 import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
 import { SoundManager } from "../lablib/SoundManager.js";
 import { is_nearly } from "../../sketchlib/is_nearly.js";
+import { lerp } from "../../sketchlib/lerp.js";
 
 const TREE_LSYSTEM = new LSystem("Fa", {
   a: "[+Fa][-Fa]",
@@ -95,8 +96,18 @@ const LENGTH_SCALE = 0.7;
 
 class TreePrimitiveBuilder {
   constructor() {
-    this.primitives = [];
+    this.lines = [];
     this.turtle = new TurtleGraphics(START_POINT, 0, DELTA_ANGLE);
+    /**
+     * Keep a log of the states after every command for more accurate
+     * turtle rendering on stack pops
+     * @type {[Point, number][]}
+     */
+    this.states = [[START_POINT, 0]];
+  }
+
+  save_state() {
+    this.states.push([this.turtle.position, this.turtle.orientation]);
   }
 
   /**
@@ -112,27 +123,32 @@ class TreePrimitiveBuilder {
 
     const end = this.turtle.position;
 
-    this.primitives.push(new LinePrimitive(start, end));
+    this.lines.push(new LinePrimitive(start, end));
+    this.save_state();
   }
 
   push() {
     this.turtle.push();
+    this.save_state();
   }
 
   pop() {
     this.turtle.pop();
+    this.save_state();
   }
 
   left() {
     this.turtle.turn(-1);
+    this.save_state();
   }
 
   right() {
     this.turtle.turn(1);
+    this.save_state();
   }
 
   build() {
-    return this.primitives;
+    return [this.lines, this.states];
   }
 }
 
@@ -255,12 +271,24 @@ class TreeAnimationBuilder {
     this.line_count_curve = [];
     this.line_count = 0;
 
-    this.orientation = 0;
-    this.orientation_curve = [];
-
-    this.stack = [];
+    this.state_index = 0;
+    this.state_curve = [];
 
     this.depth_curve = [];
+  }
+
+  /**
+   * Advance to the next state in the list, incrementing the counter
+   * @param {Rational} duration The duration for this command
+   */
+  increment_state(duration) {
+    const increase = new ParamCurve(
+      this.state_index,
+      this.state_index + 1,
+      duration
+    );
+    this.state_curve.push(increase);
+    this.state_index++;
   }
 
   /**
@@ -282,7 +310,7 @@ class TreeAnimationBuilder {
     const gap = new Gap(duration);
 
     this.line_count_curve.push(increase);
-    this.orientation_curve.push(gap);
+    this.increment_state(duration);
     this.depth_curve.push(gap);
   }
 
@@ -294,10 +322,8 @@ class TreeAnimationBuilder {
     const increase = new ParamCurve(old_depth, old_depth + 1, DUR_STACK);
 
     this.line_count_curve.push(GAP_STACK);
-    this.orientation_curve.push(GAP_STACK);
+    this.increment_state(DUR_STACK);
     this.depth_curve.push(increase);
-
-    this.stack.push(this.orientation);
   }
 
   /**
@@ -307,42 +333,20 @@ class TreeAnimationBuilder {
   pop(old_depth) {
     const decrease = new ParamCurve(old_depth, old_depth - 1, DUR_STACK);
 
-    const old_orientation = this.orientation;
-    this.orientation = this.stack.pop();
-    const adjust_angle = new ParamCurve(
-      old_orientation,
-      this.orientation,
-      DUR_STACK
-    );
-
     this.line_count_curve.push(GAP_STACK);
-    this.orientation_curve.push(adjust_angle);
+    this.increment_state(DUR_STACK);
     this.depth_curve.push(decrease);
   }
 
   left() {
-    const increase = new ParamCurve(
-      this.orientation,
-      this.orientation + 1,
-      DUR_SHORT
-    );
-    this.orientation++;
-
     this.line_count_curve.push(GAP_TURN);
-    this.orientation_curve.push(increase);
+    this.increment_state(DUR_SHORT);
     this.depth_curve.push(GAP_TURN);
   }
 
   right() {
-    const decrease = new ParamCurve(
-      this.orientation,
-      this.orientation - 1,
-      DUR_SHORT
-    );
-    this.orientation--;
-
     this.line_count_curve.push(GAP_TURN);
-    this.orientation_curve.push(decrease);
+    this.increment_state(DUR_SHORT);
     this.depth_curve.push(GAP_TURN);
   }
 
@@ -352,12 +356,12 @@ class TreeAnimationBuilder {
    */
   build() {
     const line_part = new Sequential(...this.line_count_curve);
-    const orientation_part = new Sequential(...this.orientation_curve);
+    const state_part = new Sequential(...this.state_curve);
     const depth_part = new Sequential(...this.depth_curve);
 
     return [
       ["line_count", line_part],
-      ["orientation", orientation_part],
+      ["state", state_part],
       ["depth", depth_part],
     ];
   }
@@ -386,6 +390,10 @@ export class AnimatedTurtleTree {
      * @type {LinePrimitive[]}
      */
     this.lines = [];
+    /**
+     * @type {[Point, number][]}
+     */
+    this.states = [];
 
     this.init_animation();
   }
@@ -426,7 +434,7 @@ export class AnimatedTurtleTree {
       parts: music_builder.build(),
       params: animation_builder.build(),
     });
-    this.lines = primitive_builder.build();
+    [this.lines, this.states] = primitive_builder.build();
   }
 
   /**
@@ -436,26 +444,45 @@ export class AnimatedTurtleTree {
    */
   render(sound) {
     const line_count = sound.get_param("line_count");
-    const whole_lines = Math.floor(line_count);
-    const fract_lines = line_count % 1.0;
+    const [whole_lines, fract_lines] = whole_fract(line_count);
 
-    const orientation = sound.get_param("orientation");
-    const depth = sound.get_param("depth");
-
+    // Render all of the lines we've already seen, and possibly one
+    // partial one in the middle of a partial line
     const visible_lines = this.lines.slice(0, whole_lines);
-
-    const partial_line = this.lines[whole_lines];
-    if (partial_line) {
+    let tree;
+    if (!is_nearly(fract_lines, 0.0)) {
+      const partial_line = this.lines[whole_lines];
       const endpoint = Point.lerp(partial_line.a, partial_line.b, fract_lines);
       const interpolated = new LinePrimitive(partial_line.a, endpoint);
-      const tree = style([...visible_lines, interpolated], STYLE_TREE);
-      const turtle = render_turtle(endpoint, orientation);
-      const stack = render_stack(endpoint, depth);
-      return group(tree, turtle, stack);
+      tree = style([...visible_lines, interpolated], STYLE_TREE);
+    } else {
+      tree = style(visible_lines, STYLE_TREE);
     }
 
-    return style(visible_lines, STYLE_TREE);
+    const state_param = sound.get_param("state");
+    const [state_index, state_t] = whole_fract(state_param);
+
+    let position;
+    let orientation;
+    if (is_nearly(state_t, 0.0)) {
+      [position, orientation] = this.states[state_index];
+    } else {
+      const [prev_position, prev_orientation] = this.states[state_index];
+      const [next_position, next_orientation] = this.states[state_index + 1];
+      position = Point.lerp(prev_position, next_position, state_t);
+      orientation = lerp(prev_orientation, next_orientation, state_t);
+    }
+
+    const depth = sound.get_param("depth");
+
+    const turtle = render_turtle(position, orientation);
+    const stack = render_stack(position, depth);
+    return group(tree, turtle, stack);
   }
+}
+
+function whole_fract(x) {
+  return [Math.floor(x), x % 1.0];
 }
 
 const RADIUS_TURTLE = 10;
@@ -472,13 +499,13 @@ const STYLE_TURTLE = new Style({
  */
 function render_turtle(position, orientation) {
   const dir_front = Point.dir_from_angle(
-    Math.PI / 2 - orientation * DELTA_ANGLE
+    Math.PI / 2 + orientation * DELTA_ANGLE
   );
   const dir_back_left = Point.dir_from_angle(
-    Math.PI / 2 - orientation * DELTA_ANGLE + (5 * Math.PI) / 6
+    Math.PI / 2 + orientation * DELTA_ANGLE + (5 * Math.PI) / 6
   );
   const dir_back_right = Point.dir_from_angle(
-    Math.PI / 2 - orientation * DELTA_ANGLE - (5 * Math.PI) / 6
+    Math.PI / 2 + orientation * DELTA_ANGLE - (5 * Math.PI) / 6
   );
 
   const polygon = new PolygonPrimitive([
