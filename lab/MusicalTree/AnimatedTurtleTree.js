@@ -168,7 +168,8 @@ const DUR_SHORT = N16;
 // For stack commands, it's hi-lo for push lo-hi for pop
 const NOTE_STACK_HI = new Note(7, DUR_SHORT);
 const NOTE_STACK_LO = new Note(6, DUR_SHORT);
-const DUR_STACK = DUR_SHORT.mul(new Rational(2));
+const PAUSE_STACK = new Rest(DUR_SHORT);
+const DUR_STACK = DUR_SHORT.mul(new Rational(3));
 const REST_STACK = new Rest(DUR_STACK);
 
 // For turn commands, just a single short note. Left turn (increment angle)
@@ -215,7 +216,7 @@ class TreeMusicBuilder {
    */
   push() {
     this.draw_notes.push(REST_STACK);
-    this.stack_notes.push(NOTE_STACK_HI, NOTE_STACK_LO);
+    this.stack_notes.push(NOTE_STACK_HI, NOTE_STACK_LO, PAUSE_STACK);
     this.turn_notes.push(REST_STACK);
   }
 
@@ -224,7 +225,7 @@ class TreeMusicBuilder {
    */
   pop() {
     this.draw_notes.push(REST_STACK);
-    this.stack_notes.push(NOTE_STACK_LO, NOTE_STACK_HI);
+    this.stack_notes.push(NOTE_STACK_LO, NOTE_STACK_HI, PAUSE_STACK);
     this.turn_notes.push(REST_STACK);
   }
 
@@ -264,7 +265,7 @@ class TreeMusicBuilder {
   }
 }
 
-const GAP_STACK = new Gap(DUR_SHORT.mul(new Rational(2)));
+const GAP_STACK = new Gap(DUR_SHORT.mul(new Rational(3)));
 const GAP_TURN = new Gap(DUR_SHORT);
 
 class TreeAnimationBuilder {
