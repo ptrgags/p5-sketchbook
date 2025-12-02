@@ -16,6 +16,7 @@ import { MuteButton } from "../lablib/MuteButton.js";
 import { PlayButtonScene } from "../lablib/PlayButtonScene.js";
 import { Rational } from "../lablib/Rational.js";
 import { SoundManager } from "../lablib/SoundManager.js";
+import { AnimatedTurtleTree } from "./AnimatedTurtleTree.js";
 
 const TREE_LSYSTEM = new LSystem("Fa", {
   a: "[+Fa][-Fa]",
@@ -154,11 +155,14 @@ const MOUSE = new CanvasMouseHandler();
 
 const SCORE = make_score(TREE_STRS[3], 3);
 
+const ANIMATION = new AnimatedTurtleTree(3);
+ANIMATION.init_animation();
+
 // Add scores here
 /**@type {import("../lablib/SoundManager.js").SoundManifest} */
 const SOUND_MANIFEST = {
   scores: {
-    tree: SCORE,
+    tree: ANIMATION.score,
   },
 };
 

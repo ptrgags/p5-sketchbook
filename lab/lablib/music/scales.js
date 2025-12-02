@@ -1,5 +1,5 @@
-import { mod } from "../../../sketchlib/mod";
-import { A, AS, B, C, C4, CS, D, DS, E, F, G, GS } from "./pitches";
+import { mod } from "../../../sketchlib/mod.js";
+import { A, AS, B, C, C4, CS, D, DS, E, F, G, GS } from "./pitches.js";
 
 export const MAJOR = [C, D, E, F, G, A, B];
 export const NATURAL_MINOR = [C, D, DS, F, G, GS, AS];
