@@ -11,6 +11,8 @@ import { Style } from "../../sketchlib/Style.js";
 import { Color } from "../../sketchlib/Color.js";
 import { Gap, Sequential } from "../lablib/music/Timeline.js";
 import { ParamCurve } from "../lablib/music/ParamCurve.js";
+import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
+import { SoundManager } from "../lablib/SoundManager.js";
 
 const TREE_LSYSTEM = new LSystem("Fa", {
   a: "[+Fa][-Fa]",
@@ -253,6 +255,11 @@ class TreeAnimationBuilder {
     this.depth_curve = [];
   }
 
+  /**
+   * When we step forward, increment the line count to help with
+   * progressively rendering
+   * @param {number} depth Current depth in the tree
+   */
   forward(depth) {
     // same calculation as in the music builder
     const duration = DUR_SHORT.mul(new Rational(this.max_depth - depth + 1));
@@ -375,7 +382,7 @@ export class AnimatedTurtleTree {
       if (c === "F") {
         music_builder.forward(depth);
         primitive_builder.forward(depth);
-        animation_builder.forward();
+        animation_builder.forward(depth);
       } else if (c === "[") {
         music_builder.push();
         primitive_builder.push();
@@ -404,7 +411,18 @@ export class AnimatedTurtleTree {
     this.lines = primitive_builder.build();
   }
 
-  render() {
-    return style(this.lines, STYLE_TREE);
+  /**
+   * Render the tree animation
+   * @param {SoundManager} sound The sound system
+   * @returns {GroupPrimitive}
+   */
+  render(sound) {
+    const line_count = sound.get_param("line_count");
+    const whole_lines = Math.floor(line_count);
+    const fract_lines = line_count % 1.0;
+
+    const visible_lines = this.lines.slice(0, whole_lines);
+
+    return style(visible_lines, STYLE_TREE);
   }
 }

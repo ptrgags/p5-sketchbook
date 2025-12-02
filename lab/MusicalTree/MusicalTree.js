@@ -45,7 +45,7 @@ class SoundScene {
   }
 
   render() {
-    return ANIMATION.render();
+    return ANIMATION.render(this.sound);
   }
 
   /**
