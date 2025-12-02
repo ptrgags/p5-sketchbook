@@ -4,6 +4,11 @@ import { N16 } from "../lablib/music/durations.js";
 import { map_pitch, Melody, Note, Rest, Score } from "../lablib/music/Score.js";
 import { Rational } from "../lablib/Rational.js";
 import { DOUBLE_HARMONIC, make_scale } from "../lablib/music/scales.js";
+import { HEIGHT, WIDTH } from "../../sketchlib/dimensions.js";
+import { LinePrimitive } from "../../sketchlib/rendering/primitives.js";
+import { group, style } from "../../sketchlib/rendering/shorthand.js";
+import { Style } from "../../sketchlib/Style.js";
+import { Color } from "../../sketchlib/Color.js";
 
 const TREE_LSYSTEM = new LSystem("Fa", {
   a: "[+Fa][-Fa]",
@@ -73,9 +78,51 @@ export class TurtleGraphics {
   }
 }
 
+const DELTA_ANGLE = Math.PI / 4;
+const START_POINT = Point.point(WIDTH / 2, HEIGHT / 4);
+const MAX_LENGTH = 100;
+const LENGTH_SCALE = 0.7;
+
 class TreePrimitiveBuilder {
   constructor() {
     this.primitives = [];
+    this.turtle = new TurtleGraphics(START_POINT, 0, DELTA_ANGLE);
+  }
+
+  /**
+   * On a forward command, add a line to the tree. The length gets
+   * shorter as we move from the trunk to the leaves
+   * @param {number} depth Current depth in the tree
+   */
+  forward(depth) {
+    const start = this.turtle.position;
+
+    const length = MAX_LENGTH * LENGTH_SCALE ** depth;
+    this.turtle.forward(length);
+
+    const end = this.turtle.position;
+
+    this.primitives.push(new LinePrimitive(start, end));
+  }
+
+  push() {
+    this.turtle.push();
+  }
+
+  pop() {
+    this.turtle.pop();
+  }
+
+  left() {
+    this.turtle.turn(-1);
+  }
+
+  right() {
+    this.turtle.turn(1);
+  }
+
+  build() {
+    return this.primitives;
   }
 }
 
@@ -196,6 +243,10 @@ class TreeAnimationBuilder {
   }
 }
 
+const STYLE_TREE = new Style({
+  stroke: Color.YELLOW,
+});
+
 export class AnimatedTurtleTree {
   /**
    * Constructor
@@ -205,34 +256,53 @@ export class AnimatedTurtleTree {
     this.max_depth = max_depth;
     this.tree_commands = TREE_LSYSTEM.iterate(max_depth)[max_depth];
 
+    // These will be populated in init_animation() via traversing the
+    // list of commands
     /**
      * @type {Score<number> | undefined}
      */
     this.score = undefined;
+    /**
+     * @type {LinePrimitive[]}
+     */
+    this.lines = [];
+
+    this.init_animation();
   }
 
   init_animation() {
     const music_builder = new TreeMusicBuilder(this.max_depth);
+    const primitive_builder = new TreePrimitiveBuilder();
 
     let depth = 0;
     for (const c of this.tree_commands) {
       if (c === "F") {
         music_builder.forward(depth);
+        primitive_builder.forward(depth);
       } else if (c === "[") {
         music_builder.push();
+        primitive_builder.push();
         depth++;
       } else if (c === "]") {
         music_builder.pop();
+        primitive_builder.pop();
         depth--;
       } else if (c === "+") {
         music_builder.left();
+        primitive_builder.left();
       } else if (c === "-") {
         music_builder.right();
+        primitive_builder.right();
       }
     }
 
     this.score = new Score({
       parts: music_builder.build(),
     });
+    this.lines = primitive_builder.build();
+  }
+
+  render() {
+    return style(this.lines, STYLE_TREE);
   }
 }
