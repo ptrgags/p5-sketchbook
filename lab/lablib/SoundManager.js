@@ -193,17 +193,18 @@ export class SoundManager {
 
     const time = this.transport_time;
 
-    let tween;
-    if (time < tween_list[0].start_time) {
-      tween = tween_list[0];
-    } else if (time >= tween_list[tween_list.length - 1].end_time) {
-      tween = tween_list[tween_list.length - 1];
-    } else {
-      tween = tween_list.find(
-        (tween) => time >= tween.start_time && time < tween.end_time
-      );
+    // Find the last tween that's before or during the current time.
+    let tween = tween_list[0];
+    for (const candidate of tween_list) {
+      if (candidate.start_time > time) {
+        break;
+      }
+
+      tween = candidate;
     }
 
+    // Get the current value. This uses the fact that the tween holds its
+    // value constant if you use an out of range time
     return tween.get_value(time);
   }
 
