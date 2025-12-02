@@ -6,6 +6,7 @@ export const NATURAL_MINOR = [C, D, DS, F, G, GS, AS];
 export const HARMONIC_MINOR = [C, D, DS, F, G, GS, B];
 
 export const MAJOR_PENTATONIC = [C, D, E, G, A];
+export const MINOR_PENTATONIC = [C, DS, F, G, AS];
 
 export const DOUBLE_HARMONIC = [C, CS, DS, F, G, GS, AS];
 

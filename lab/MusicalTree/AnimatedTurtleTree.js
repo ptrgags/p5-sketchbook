@@ -3,7 +3,12 @@ import { LSystem } from "../../sketchlib/LSystem.js";
 import { N16, N32 } from "../lablib/music/durations.js";
 import { map_pitch, Melody, Note, Rest, Score } from "../lablib/music/Score.js";
 import { Rational } from "../lablib/Rational.js";
-import { DOUBLE_HARMONIC, make_scale } from "../lablib/music/scales.js";
+import {
+  DOUBLE_HARMONIC,
+  MAJOR_PENTATONIC,
+  make_scale,
+  MINOR_PENTATONIC,
+} from "../lablib/music/scales.js";
 import { HEIGHT, WIDTH } from "../../sketchlib/dimensions.js";
 import {
   LinePrimitive,
@@ -154,7 +159,7 @@ class TreePrimitiveBuilder {
 
 // all notes are in scale degrees relative to middle C, this
 // scale will be used to transpose everything at the end
-const SCALE = make_scale(DOUBLE_HARMONIC);
+const SCALE = make_scale(MAJOR_PENTATONIC);
 
 // Duration of the shortest note in the score
 const DUR_SHORT = N16;
