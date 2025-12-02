@@ -141,7 +141,7 @@ class TreePrimitiveBuilder {
 const SCALE = make_scale(DOUBLE_HARMONIC);
 
 // Duration of the shortest note in the score
-const DUR_SHORT = N32;
+const DUR_SHORT = N16;
 
 // For stack commands, it's hi-lo for push lo-hi for pop
 const NOTE_STACK_HI = new Note(7, DUR_SHORT);
