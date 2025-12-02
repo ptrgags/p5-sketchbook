@@ -9,6 +9,8 @@ import { LinePrimitive } from "../../sketchlib/rendering/primitives.js";
 import { group, style } from "../../sketchlib/rendering/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Color } from "../../sketchlib/Color.js";
+import { Gap, Sequential } from "../lablib/music/Timeline.js";
+import { ParamCurve } from "../lablib/music/ParamCurve.js";
 
 const TREE_LSYSTEM = new LSystem("Fa", {
   a: "[+Fa][-Fa]",
@@ -167,13 +169,15 @@ class TreeMusicBuilder {
    * @param {number} depth Current depth in the tree
    */
   forward(depth) {
-    // At the deepest level, the
+    // At the deepest level, the note is the shortest duration. Every level
+    // above that, add one short duration.
     const duration = DUR_SHORT.mul(new Rational(this.max_depth - depth + 1));
     const pitch = PITCH_FWD_START + depth;
+    const rest = new Rest(duration);
 
     this.draw_notes.push(new Note(pitch, duration));
-    this.stack_notes.push(new Rest(duration));
-    this.turn_notes.push(new Rest(duration));
+    this.stack_notes.push(rest);
+    this.turn_notes.push(rest);
   }
 
   /**
@@ -230,15 +234,106 @@ class TreeMusicBuilder {
   }
 }
 
+const GAP_STACK = new Gap(DUR_SHORT.mul(new Rational(2)));
+const GAP_TURN = new Gap(DUR_SHORT);
+
 class TreeAnimationBuilder {
-  constructor() {
-    this.static_count = [];
+  /**
+   * Constructor
+   * @param {number} max_depth Deepest depth of the tree
+   */
+  constructor(max_depth) {
+    this.max_depth = max_depth;
+    this.line_count_curve = [];
+    this.line_count = 0;
+
+    this.orientation = 0;
+    this.orientation_curve = [];
+
+    this.depth_curve = [];
   }
 
+  forward(depth) {
+    // same calculation as in the music builder
+    const duration = DUR_SHORT.mul(new Rational(this.max_depth - depth + 1));
+
+    const increase = new ParamCurve(
+      this.line_count,
+      this.line_count + 1,
+      duration
+    );
+    this.line_count++;
+
+    const gap = new Gap(duration);
+
+    this.line_count_curve.push(increase);
+    this.orientation_curve.push(gap);
+    this.depth_curve.push(gap);
+  }
+
+  /**
+   * When we push a state to the stack, increment the value gradually
+   * @param {number} old_depth The depth _before_ the push command
+   */
+  push(old_depth) {
+    const increase = new ParamCurve(old_depth, old_depth + 1, DUR_STACK);
+
+    this.line_count_curve.push(GAP_STACK);
+    this.orientation_curve.push(GAP_STACK);
+    this.depth_curve.push(increase);
+  }
+
+  /**
+   * When we pop from the stack, decrement the value gradually
+   * @param {number} old_depth The depth _before_ the pop command
+   */
+  pop(old_depth) {
+    const decrease = new ParamCurve(old_depth, old_depth - 1, DUR_STACK);
+
+    this.line_count_curve.push(GAP_STACK);
+    this.orientation_curve.push(GAP_STACK);
+    this.depth_curve.push(decrease);
+  }
+
+  left() {
+    const increase = new ParamCurve(
+      this.orientation,
+      this.orientation + 1,
+      DUR_SHORT
+    );
+    this.orientation++;
+
+    this.line_count_curve.push(GAP_TURN);
+    this.orientation_curve.push(increase);
+    this.depth_curve.push(GAP_TURN);
+  }
+
+  right() {
+    const decrease = new ParamCurve(
+      this.orientation,
+      this.orientation - 1,
+      DUR_SHORT
+    );
+    this.orientation--;
+
+    this.line_count_curve.push(GAP_TURN);
+    this.orientation_curve.push(decrease);
+    this.depth_curve.push(GAP_TURN);
+  }
+
+  /**
+   * Build the animation part of a score
+   * @returns {[string, import("../lablib/music/Timeline.js").Timeline<ParamCurve>][]}
+   */
   build() {
+    const line_part = new Sequential(...this.line_count_curve);
+    const orientation_part = new Sequential(...this.orientation_curve);
+    const depth_part = new Sequential(...this.depth_curve);
+
     return [
-      ["static_prim_count", this.static_count],
-      ["orientation", this.static_count],
+      ["line_count", line_part],
+      ["orientation", orientation_part],
+      ["depth", depth_part],
     ];
   }
 }
@@ -273,31 +368,38 @@ export class AnimatedTurtleTree {
   init_animation() {
     const music_builder = new TreeMusicBuilder(this.max_depth);
     const primitive_builder = new TreePrimitiveBuilder();
+    const animation_builder = new TreeAnimationBuilder(this.max_depth);
 
     let depth = 0;
     for (const c of this.tree_commands) {
       if (c === "F") {
         music_builder.forward(depth);
         primitive_builder.forward(depth);
+        animation_builder.forward();
       } else if (c === "[") {
         music_builder.push();
         primitive_builder.push();
+        animation_builder.push(depth);
         depth++;
       } else if (c === "]") {
         music_builder.pop();
         primitive_builder.pop();
+        animation_builder.pop(depth);
         depth--;
       } else if (c === "+") {
         music_builder.left();
         primitive_builder.left();
+        animation_builder.left();
       } else if (c === "-") {
         music_builder.right();
         primitive_builder.right();
+        animation_builder.right();
       }
     }
 
     this.score = new Score({
       parts: music_builder.build(),
+      params: animation_builder.build(),
     });
     this.lines = primitive_builder.build();
   }
