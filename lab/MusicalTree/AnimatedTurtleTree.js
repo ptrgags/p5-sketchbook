@@ -258,9 +258,9 @@ class TreeMusicBuilder {
     const turn_part = map_pitch(SCALE, new Melody(...this.turn_notes));
 
     return [
-      ["sine", draw_part],
+      ["poly", draw_part],
       ["square", stack_part],
-      ["poly", turn_part],
+      ["sine", turn_part],
     ];
   }
 }
