@@ -9,6 +9,7 @@ import {
   LinePrimitive,
   PointPrimitive,
   PolygonPrimitive,
+  RectPrimitive,
 } from "../../sketchlib/rendering/primitives.js";
 import { group, style } from "../../sketchlib/rendering/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
@@ -17,6 +18,7 @@ import { Gap, Sequential } from "../lablib/music/Timeline.js";
 import { ParamCurve } from "../lablib/music/ParamCurve.js";
 import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
 import { SoundManager } from "../lablib/SoundManager.js";
+import { is_nearly } from "../../sketchlib/is_nearly.js";
 
 const TREE_LSYSTEM = new LSystem("Fa", {
   a: "[+Fa][-Fa]",
@@ -438,6 +440,7 @@ export class AnimatedTurtleTree {
     const fract_lines = line_count % 1.0;
 
     const orientation = sound.get_param("orientation");
+    const depth = sound.get_param("depth");
 
     const visible_lines = this.lines.slice(0, whole_lines);
 
@@ -445,8 +448,10 @@ export class AnimatedTurtleTree {
     if (partial_line) {
       const endpoint = Point.lerp(partial_line.a, partial_line.b, fract_lines);
       const interpolated = new LinePrimitive(partial_line.a, endpoint);
+      const tree = style([...visible_lines, interpolated], STYLE_TREE);
       const turtle = render_turtle(endpoint, orientation);
-      return style([...visible_lines, turtle, interpolated], STYLE_TREE);
+      const stack = render_stack(endpoint, depth);
+      return group(tree, turtle, stack);
     }
 
     return style(visible_lines, STYLE_TREE);
@@ -454,6 +459,11 @@ export class AnimatedTurtleTree {
 }
 
 const RADIUS_TURTLE = 10;
+
+const STYLE_TURTLE = new Style({
+  fill: Color.GREEN,
+  stroke: Color.BLACK,
+});
 
 /**
  * Draw a turtle as an isoceles triangle for now.
@@ -471,9 +481,52 @@ function render_turtle(position, orientation) {
     Math.PI / 2 - orientation * DELTA_ANGLE - (5 * Math.PI) / 6
   );
 
-  return new PolygonPrimitive([
+  const polygon = new PolygonPrimitive([
     position.add(dir_front.scale(RADIUS_TURTLE)),
     position.add(dir_back_left.scale(RADIUS_TURTLE)),
     position.add(dir_back_right.scale(RADIUS_TURTLE)),
   ]);
+
+  return style(polygon, STYLE_TURTLE);
+}
+
+const STACK_RECT_DIMENSIONS = Point.direction(RADIUS_TURTLE / 2, RADIUS_TURTLE);
+const OFFSET_STACK_START = Point.direction(
+  RADIUS_TURTLE + 4,
+  -RADIUS_TURTLE / 2
+);
+const STACK_SPACING = 2;
+const OFFSET_STACK_STRIDE = Point.DIR_X.scale(
+  STACK_RECT_DIMENSIONS.x + STACK_SPACING
+);
+
+const STYLE_STACK = new Style({
+  fill: Color.CYAN,
+  stroke: Color.WHITE,
+});
+
+function render_stack(position, depth) {
+  const whole_depth = Math.floor(depth);
+  const fract_depth = depth % 1.0;
+
+  const rects = new Array(whole_depth);
+  const first_offset = position.add(OFFSET_STACK_START);
+  for (let i = 0; i < whole_depth; i++) {
+    rects[i] = new RectPrimitive(
+      first_offset.add(OFFSET_STACK_STRIDE.scale(i)),
+      STACK_RECT_DIMENSIONS
+    );
+  }
+
+  if (!is_nearly(fract_depth, 0.0)) {
+    const partial_rect = new RectPrimitive(
+      first_offset.add(
+        OFFSET_STACK_STRIDE.scale(whole_depth + (1 - fract_depth))
+      ),
+      STACK_RECT_DIMENSIONS
+    );
+    rects.push(partial_rect);
+  }
+
+  return style(rects, STYLE_STACK);
 }
