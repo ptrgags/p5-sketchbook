@@ -1,5 +1,6 @@
 import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
 import { draw_primitive } from "../../sketchlib/p5_helpers/draw_primitive.js";
+import { group } from "../../sketchlib/rendering/shorthand.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { MouseInput } from "../lablib/MouseInput.js";
 import { MuteButton } from "../lablib/MuteButton.js";
@@ -35,7 +36,12 @@ class SoundScene {
     this.sound.play_score("tree");
 
     // Schedule sound callbacks here
-    // this.sound.events.addEventListener('event', (e) => ...);
+    this.mute_button.events.addEventListener(
+      "change",
+      (/** @type {CustomEvent}*/ e) => {
+        this.sound.toggle_sound(e.detail.sound_on);
+      }
+    );
   }
 
   update() {
@@ -45,7 +51,9 @@ class SoundScene {
   }
 
   render() {
-    return ANIMATION.render(this.sound);
+    const mute = this.mute_button.render();
+    const animation = ANIMATION.render(this.sound);
+    return group(animation, mute);
   }
 
   /**
