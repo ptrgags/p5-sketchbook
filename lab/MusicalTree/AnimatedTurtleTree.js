@@ -144,15 +144,15 @@ const SCALE = make_scale(DOUBLE_HARMONIC);
 const DUR_SHORT = N32;
 
 // For stack commands, it's hi-lo for push lo-hi for pop
-const NOTE_STACK_HI = new Note(-2, DUR_SHORT);
-const NOTE_STACK_LO = new Note(-1, DUR_SHORT);
+const NOTE_STACK_HI = new Note(7, DUR_SHORT);
+const NOTE_STACK_LO = new Note(6, DUR_SHORT);
 const DUR_STACK = DUR_SHORT.mul(new Rational(2));
 const REST_STACK = new Rest(DUR_STACK);
 
 // For turn commands, just a single short note. Left turn (increment angle)
 // is the high note, right turn is the lower note
-const NOTE_LEFT = new Note(7, DUR_SHORT);
-const NOTE_RIGHT = new Note(6, DUR_SHORT);
+const NOTE_LEFT = new Note(-1, DUR_SHORT);
+const NOTE_RIGHT = new Note(-2, DUR_SHORT);
 const REST_TURN = new Rest(DUR_SHORT);
 
 // For forward commands, the length and duration depends on the depth
