@@ -111,27 +111,4 @@ export function parse_midi_file(midi_buffer) {
   const tracks = track_chunks.map((x) => parse_track(x));
 
   return new MIDIFile(header, tracks);
-
-  // Header
-
-  /*
-  // The first header MUST be "MThd"
-  const header_type = utf8.decode(new Uint8Array(midi_buffer, 0, 4));
-  // Length MUST be 6
-  const length = midi.getUint32(4, BIG_ENDIAN);
-  const format = midi.getUint16(8, BIG_ENDIAN);
-  const ntracks = midi.getUint16(10, BIG_ENDIAN);
-  const division = midi.getUint16(12, BIG_ENDIAN);
-  const header = {
-    header_type,
-    length,
-    format,
-    ntracks,
-    division,
-  };
-  console.log(header);
-
-  // There must be ntracks MTrk
-  const track_header = utf8.decode();
-  */
 }

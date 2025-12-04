@@ -31,8 +31,21 @@ export const MIDIMessageType = {
 };
 Object.freeze(MIDIFormat);
 
-export class MIDIMessage {
-  constructor() {}
+export class MIDINote {
+  /**
+   * Constructor
+   * @param {number} tick_delta time since previous message in ticks
+   * @param {number} channel Channel number in [0, 15]
+   * @param {MIDIMessageType} message_type
+   * @param {number} pitch MIDI note number from 0-127
+   * @param {number} velocity MIDI note velocity from 0-127
+   */
+  constructor(tick_delta, channel, message_type, pitch, velocity) {
+    this.tick_delta = tick_delta;
+    this.channel = channel;
+    (this.message_type = message_type), (this.pitch = pitch);
+    this.velocity = velocity;
+  }
 }
 
 export class MIDIMetaEvent {
@@ -44,7 +57,7 @@ export class MIDISysex {
 }
 
 /**
- * @typedef {MIDIMessage | MIDIMetaEvent | MIDISysex} MIDIEvent
+ * @typedef {MIDINote | MIDIMetaEvent | MIDISysex} MIDIEvent
  */
 
 export class MIDITrack {

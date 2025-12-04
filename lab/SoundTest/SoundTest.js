@@ -31,6 +31,7 @@ import {
 } from "./example_scores.js";
 import { Piano } from "./Piano.js";
 import { SpiralBurst } from "./SpiralBurst.js";
+import { score_to_midi } from "../lablib/midi/score_to_midi.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -171,30 +172,6 @@ function download_file(file) {
   URL.revokeObjectURL(url);
 }
 
-/**
- * Generate a simple MIDI file
- * @param {Score<number>} score Score in terms of MIDI notes
- */
-function make_midi_file(score) {
-  // See https://midimusic.github.io/tech/midispec.html
-  // numbers are _big endian_!!
-
-  // Header chunk
-  const chunk_type = "MThd";
-  const length = 6; // encode as 32-bit
-  const format = 0; // 16 bit
-  // format 0 - single multi-channel track
-  // format 1 - one or more simultaneous tracks
-  // format 2 - one or more independent single-track patterns
-  const ntracks = 1; // 16-bit always 1 for format 0, variable for others
-  const division = 96; // ticks per quarter-note
-  // note: there's a second format for SMPTE formats
-
-  return new File([new Uint8Array(16)], "score.mid", {
-    type: "audio/mid",
-  });
-}
-
 function clear_errors() {
   document.getElementById("errors").innerText = "";
 }
@@ -277,7 +254,10 @@ class SoundScene {
       }
 
       // make MIDI file here
-      const file = make_midi_file(SOUND_MANIFEST.scores[this.selected_melody]);
+      const file = score_to_midi(
+        SOUND_MANIFEST.scores[this.selected_melody],
+        this.selected_melody
+      );
       // download file here
       download_file(file);
     });
