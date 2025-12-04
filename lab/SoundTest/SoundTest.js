@@ -14,7 +14,7 @@ import { Transform } from "../../sketchlib/rendering/Transform.js";
 import { Style } from "../../sketchlib/Style.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { MouseInput } from "../lablib/MouseInput.js";
-import { parse_midi_file } from "../lablib/music/parse_midi.js";
+import { parse_midi_file } from "../lablib/midi/parse_midi.js";
 import { render_score } from "../lablib/music/render_score.js";
 import { Score } from "../lablib/music/Score.js";
 import { MuteButton } from "../lablib/MuteButton.js";

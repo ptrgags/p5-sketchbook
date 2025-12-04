@@ -1,3 +1,5 @@
+import { MIDIFile, MIDIFormat, MIDIHeader, MIDITrack } from "./MidiFile.js";
+
 // this is for the littleEndian flag in DataView.getXXXX() functions
 const BIG_ENDIAN = false;
 
@@ -11,47 +13,6 @@ const UTF8 = new TextDecoder("utf-8");
  * Raw MIDI chunk
  * @typedef {{chunk_type: string, payload: DataView}} MIDIChunk
  */
-
-export class MIDIHeader {
-  /**
-   * Constructor
-   * @param {0 | 1 | 2} format MIDI format
-   * @param {number} num_tracks Number of tracks in the file
-   * @param {number} ticks_per_quarter How many ticks per quarter note
-   */
-  constructor(format, num_tracks, ticks_per_quarter) {
-    this.format = format;
-    this.num_tracks = num_tracks;
-    this.ticks_per_quarter = ticks_per_quarter;
-  }
-}
-
-export class MIDITrack {
-  /**
-   * Constructor
-   */
-  constructor(events) {
-    this.events = events;
-  }
-}
-
-export class MIDIFile {
-  /**
-   * Constructor
-   * @param {MIDIHeader} header The file header
-   * @param {MIDITrack[]} tracks One or more tracks
-   */
-  constructor(header, tracks) {
-    this.header = header;
-    this.tracks = tracks;
-
-    if (this.header.num_tracks !== this.tracks.length) {
-      throw new Error(
-        `incorrect number of tracks, expected ${this.header.num_tracks}, got ${this.tracks.length}`
-      );
-    }
-  }
-}
 
 /**
  * Split a raw MIDI file into chunks
@@ -98,13 +59,22 @@ function parse_header(chunk) {
   const num_tracks = payload.getUint16(4, BIG_ENDIAN);
   const ticks_per_quarter = payload.getUint16(8, BIG_ENDIAN);
 
-  if (format !== 0 && format !== 1 && format !== 2) {
-    throw new Error(`Invalid MIDI format ${format}`);
+  let format_enum;
+  switch (format) {
+    case 0:
+      format_enum = MIDIFormat.SINGLE_TRACK;
+      break;
+    case 1:
+      format_enum = MIDIFormat.MULTI_PARALLEL;
+      break;
+    case 2:
+      format_enum = MIDIFormat.MULTI_SEQUENCE;
+      break;
+    default:
+      throw new Error(`Invalid MIDI format ${format}`);
   }
 
-  if (format !== 0) {
-    console.info("MIDI format", format, "detected");
-  }
+  console.info("MIDI format", format, "detected");
 
   if (((ticks_per_quarter >> 7) & 1) !== 0) {
     throw new Error(
@@ -112,7 +82,7 @@ function parse_header(chunk) {
     );
   }
 
-  return new MIDIHeader(format, num_tracks, ticks_per_quarter);
+  return new MIDIHeader(format_enum, num_tracks, ticks_per_quarter);
 }
 
 function parse_track(chunk) {
