@@ -15,6 +15,7 @@ import { Style } from "../../sketchlib/Style.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { MouseInput } from "../lablib/MouseInput.js";
 import { render_score } from "../lablib/music/render_score.js";
+import { Score } from "../lablib/music/Score.js";
 import { MuteButton } from "../lablib/MuteButton.js";
 import { Oklch } from "../lablib/Oklch.js";
 import { PlayButtonScene } from "../lablib/PlayButtonScene.js";
@@ -153,6 +154,46 @@ const CURSOR = style(
   Style.DEFAULT_STROKE
 );
 
+/**
+ * Download a generated file
+ * @param {File} file The file to downlowd
+ */
+function download_file(file) {
+  const url = URL.createObjectURL(file);
+
+  const anchor = document.createElement("a");
+  anchor.setAttribute("href", url);
+  anchor.setAttribute("download", file.name);
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * Generate a simple MIDI file
+ * @param {Score<number>} score Score in terms of MIDI notes
+ */
+function make_midi_file(score) {
+  // See https://midimusic.github.io/tech/midispec.html
+  // numbers are _big endian_!!
+
+  // Header chunk
+  const chunk_type = "MThd";
+  const length = 6; // encode as 32-bit
+  const format = 0; // 16 bit
+  // format 0 - single multi-channel track
+  // format 1 - one or more simultaneous tracks
+  // format 2 - one or more independent single-track patterns
+  const ntracks = 1; // 16-bit always 1 for format 0, variable for others
+  const division = 96; // ticks per quarter-note
+  // note: there's a second format for SMPTE formats
+
+  return new File([new Uint8Array(16)], "score.mid", {
+    type: "audio/mid",
+  });
+}
+
 class SoundScene {
   /**
    * Constructor
@@ -206,6 +247,17 @@ class SoundScene {
         this.sound.play_score(this.selected_melody);
       });
       return button;
+    });
+
+    document.getElementById("export").addEventListener("click", (e) => {
+      if (!this.selected_melody) {
+        return;
+      }
+
+      // make MIDI file here
+      const file = make_midi_file(SOUND_MANIFEST.scores[this.selected_melody]);
+      // download file here
+      download_file(file);
     });
   }
 
