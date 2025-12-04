@@ -56,8 +56,8 @@ function parse_header(chunk) {
 
   const payload = chunk.payload;
   const format = payload.getUint16(0, BIG_ENDIAN);
-  const num_tracks = payload.getUint16(4, BIG_ENDIAN);
-  const ticks_per_quarter = payload.getUint16(8, BIG_ENDIAN);
+  const num_tracks = payload.getUint16(2, BIG_ENDIAN);
+  const ticks_per_quarter = payload.getUint16(4, BIG_ENDIAN);
 
   let format_enum;
   switch (format) {
@@ -104,8 +104,6 @@ function parse_track(chunk) {
  * @param {ArrayBuffer} midi_buffer The MIDI file bytes as an ArrayBuffer
  */
 export function parse_midi_file(midi_buffer) {
-  const utf8 = new TextDecoder();
-
   const [header_chunk, ...track_chunks] = parse_midi_chunks(midi_buffer);
   const header = parse_header(header_chunk);
   const tracks = track_chunks.map((x) => parse_track(x));
