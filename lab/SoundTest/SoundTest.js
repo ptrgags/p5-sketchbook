@@ -267,7 +267,8 @@ class SoundScene {
       try {
         //@ts-ignore
         const midi_data = await import_midi_file(e.target.files);
-        parse_midi_file(midi_data);
+        const midi = parse_midi_file(midi_data);
+        console.log(midi);
       } catch (err) {
         console.error(err);
         show_error(err);
