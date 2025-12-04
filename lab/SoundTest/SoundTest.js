@@ -194,6 +194,54 @@ function make_midi_file(score) {
   });
 }
 
+function clear_errors() {
+  document.getElementById("errors").innerText = "";
+}
+
+function show_error(message) {
+  document.getElementById("errors").innerText = message;
+}
+
+/**
+ * Import a MIDI file from a file picker
+ * @param {File[]} file_list
+ * @returns {Promise<ArrayBuffer>} The buffer containing the MIDI file
+ */
+async function import_midi_file(file_list) {
+  if (file_list.length === 0) {
+    throw new Error("please chose a .mid file");
+  }
+
+  return await file_list[0].arrayBuffer();
+}
+
+// this is for the littleEndian flag in DataView.getXXXX() functions
+const BIG_ENDIAN = false;
+
+/**
+ * Parse a MIDI file
+ * @param {ArrayBuffer} midi_buffer The MIDI file bytes as an ArrayBuffer
+ */
+function parse_midi_file(midi_buffer) {
+  const midi = new DataView(midi_buffer);
+
+  // Header
+  const utf8 = new TextDecoder();
+  const header_type = utf8.decode(new Uint8Array(midi_buffer, 0, 4));
+  const length = midi.getUint32(4, BIG_ENDIAN);
+  const format = midi.getUint16(8, BIG_ENDIAN);
+  const ntracks = midi.getUint16(10, BIG_ENDIAN);
+  const division = midi.getUint16(12, BIG_ENDIAN);
+  const header = {
+    header_type,
+    length,
+    format,
+    ntracks,
+    division,
+  };
+  console.log(header);
+}
+
 class SoundScene {
   /**
    * Constructor
@@ -258,6 +306,18 @@ class SoundScene {
       const file = make_midi_file(SOUND_MANIFEST.scores[this.selected_melody]);
       // download file here
       download_file(file);
+    });
+
+    document.getElementById("import").addEventListener("input", async (e) => {
+      clear_errors();
+      try {
+        //@ts-ignore
+        const midi_data = await import_midi_file(e.target.files);
+        parse_midi_file(midi_data);
+      } catch (err) {
+        console.error(err);
+        show_error(err);
+      }
     });
   }
 

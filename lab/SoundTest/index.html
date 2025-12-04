@@ -15,6 +15,11 @@
       const p5_sketch = new p5(sketch, "sketch");
     </script>
     <link rel="stylesheet" href="../../styles/layout.css" />
+    <style>
+      .errors {
+        color: #df1365;
+      }
+    </style>
   </head>
   <body>
     <sketchbook-navbar></sketchbook-navbar>
@@ -27,6 +32,7 @@
         <label for="import">Import MIDI (.mid) file</label>
         <br />
         <input type="file" name="import" id="import" accept="audio/mid" />
+        <p class="errors" id="errors"></p>
         <br />
         <button id="export">Export Current Score</button>
       </div>
