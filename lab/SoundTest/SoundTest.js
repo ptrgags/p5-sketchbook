@@ -14,6 +14,7 @@ import { Transform } from "../../sketchlib/rendering/Transform.js";
 import { Style } from "../../sketchlib/Style.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { MouseInput } from "../lablib/MouseInput.js";
+import { parse_midi_file } from "../lablib/music/parse_midi.js";
 import { render_score } from "../lablib/music/render_score.js";
 import { Score } from "../lablib/music/Score.js";
 import { MuteButton } from "../lablib/MuteButton.js";
@@ -213,66 +214,6 @@ async function import_midi_file(file_list) {
   }
 
   return await file_list[0].arrayBuffer();
-}
-
-// this is for the littleEndian flag in DataView.getXXXX() functions
-const BIG_ENDIAN = false;
-
-// 4 bytes for the chunk type string + u32 length
-const CHUNK_HEADER_LENGTH = 8;
-
-/**
- * Parse a MIDI file
- * @param {ArrayBuffer} midi_buffer The MIDI file bytes as an ArrayBuffer
- */
-function parse_midi_file(midi_buffer) {
-  const whole_file = new DataView(midi_buffer);
-  const utf8 = new TextDecoder();
-
-  // split the file into chunks
-  const chunks = [];
-  let offset = 0;
-  while (offset < midi_buffer.byteLength) {
-    const chunk_type = utf8.decode(new Uint8Array(midi_buffer, offset, 4));
-    const chunk_length = whole_file.getUint32(offset + 4, BIG_ENDIAN);
-
-    const chunk = {
-      chunk_type,
-      payload: new DataView(
-        midi_buffer,
-        offset + CHUNK_HEADER_LENGTH,
-        chunk_length
-      ),
-    };
-    chunks.push(chunk);
-
-    offset += CHUNK_HEADER_LENGTH + chunk_length;
-  }
-
-  console.log(chunks);
-
-  // Header
-
-  /*
-  // The first header MUST be "MThd"
-  const header_type = utf8.decode(new Uint8Array(midi_buffer, 0, 4));
-  // Length MUST be 6
-  const length = midi.getUint32(4, BIG_ENDIAN);
-  const format = midi.getUint16(8, BIG_ENDIAN);
-  const ntracks = midi.getUint16(10, BIG_ENDIAN);
-  const division = midi.getUint16(12, BIG_ENDIAN);
-  const header = {
-    header_type,
-    length,
-    format,
-    ntracks,
-    division,
-  };
-  console.log(header);
-
-  // There must be ntracks MTrk
-  const track_header = utf8.decode();
-  */
 }
 
 class SoundScene {
