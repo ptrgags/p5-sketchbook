@@ -29,7 +29,7 @@ export const MIDIMessageType = {
   NOTE_OFF: 0b100,
   NOTE_ON: 0b1001,
 };
-Object.freeze(MIDIFormat);
+Object.freeze(MIDIMessageType);
 
 export class MIDINote {
   /**
@@ -48,15 +48,81 @@ export class MIDINote {
   }
 }
 
-export class MIDIMetaEvent {
-  constructor() {}
+/**
+ * @enum {number}
+ */
+export const MIDIMetaType = {
+  //MIDI_PORT: 0x21, // obsolete message type, see http://midi.teragonaudio.com/tech/midifile.htm
+  END_OF_TRACK: 0x2f,
+  SET_TEMPO: 0x51,
+  TIME_SIGNATURE: 0x58,
+  KEY_SIGNATURE: 0x59,
+};
+Object.freeze(MIDIMetaType);
+
+export class MIDIEndOfTrack {
+  /**
+   *
+   * @param {number} tick_delta
+   */
+  constructor(tick_delta) {
+    this.tick_delta = tick_delta;
+  }
 }
+
+export class MIDITimeSignature {
+  /**
+   * Constructor
+   * @param {number} tick_delta
+   * @param {number} numerator
+   * @param {number} denominator
+   * @param {number} midi_clocks
+   * @param {number} notes32
+   */
+  constructor(tick_delta, numerator, denominator, midi_clocks, notes32) {
+    (this.tick_delta = tick_delta), (this.numerator = numerator);
+    this.denominator = denominator;
+    this.midi_clocks = midi_clocks;
+    this.notes32 = notes32;
+  }
+}
+
+export class MIDIKeySignature {
+  /**
+   * Constructor
+   * @param {number} tick_delta How many ticks
+   * @param {number} sharps_flats positive numbers indicate sharps, negative for flats
+   * @param {number} major_minor 1 for minor, 0 for major
+   */
+  constructor(tick_delta, sharps_flats, major_minor) {
+    this.tick_delta = tick_delta;
+    this.sharps_flats = sharps_flats;
+    this.major_minor = major_minor;
+  }
+}
+
+export class MIDISetTempo {
+  /**
+   *
+   * @param {number} tick_delta
+   * @param {number} microseconds_per_quarter
+   */
+  constructor(tick_delta, microseconds_per_quarter) {
+    this.tick_delta = tick_delta;
+    this.microseconds_per_quarter = microseconds_per_quarter;
+  }
+}
+
+/**
+ * * @typedef {MIDIEndOfTrack | MIDITimeSignature | MIDIKeySignature} MIDIMetaEvent
+ */
 
 export class MIDISysex {
   constructor() {}
 }
 
 /**
+ 
  * @typedef {MIDINote | MIDIMetaEvent | MIDISysex} MIDIEvent
  */
 
