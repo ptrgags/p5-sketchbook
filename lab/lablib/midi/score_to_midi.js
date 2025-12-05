@@ -2,10 +2,12 @@ import { Score } from "../music/Score.js";
 import { to_events } from "../music/Timeline.js";
 import { Rational } from "../Rational.js";
 import {
+  MIDIEndOfTrack,
   MIDIFile,
   MIDIFormat,
   MIDIHeader,
   MIDIMessageType,
+  MIDIMetaType,
   MIDINote,
   MIDITrack,
 } from "./MidiFile.js";
@@ -68,6 +70,7 @@ function compute_variable_length(x) {
 
 // status + 2 data bytes
 const NOTE_EVENT_LENGTH = 3;
+const END_OF_TRACK_LENGTH = 3; // FF type length=0
 
 /**
  *
@@ -80,6 +83,8 @@ function compute_track_chunk_length(events) {
     if (event instanceof MIDINote) {
       payload_size += compute_variable_length(event.tick_delta);
       payload_size += NOTE_EVENT_LENGTH;
+    } else if (event instanceof MIDIEndOfTrack) {
+      payload_size += END_OF_TRACK_LENGTH;
     }
   }
 
@@ -129,6 +134,8 @@ function encode_variable_length(data_view, offset, value) {
   return offset + values_msbf.length;
 }
 
+const META_MESSAGE = 0xff;
+
 /**
  * Encode a track
  * @param {MIDITrack} track The track to encode
@@ -153,6 +160,15 @@ function encode_track(track) {
       data_view.setUint8(offset + 1, event.pitch);
       data_view.setUint8(offset + 2, event.velocity);
       offset += NOTE_EVENT_LENGTH;
+    }
+
+    if (event instanceof MIDIEndOfTrack) {
+      offset = encode_variable_length(data_view, offset, event.tick_delta);
+      data_view.setUint8(offset, META_MESSAGE);
+      data_view.setUint8(offset + 1, MIDIMetaType.END_OF_TRACK);
+      const payload_length = 0;
+      data_view.setUint8(offset + 2, payload_length);
+      offset += END_OF_TRACK_LENGTH;
     }
   }
 
@@ -235,6 +251,9 @@ export function score_to_midi(score, score_id) {
 
     prev_tick = absolute_tick;
   }
+
+  // the End of Track message is required
+  events.push(new MIDIEndOfTrack(0));
 
   const track = new MIDITrack(events);
   const midi = new MIDIFile(header, [track]);
