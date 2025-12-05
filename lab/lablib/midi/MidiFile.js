@@ -134,7 +134,10 @@ export class MIDISetTempo {
  */
 
 export class MIDISysex {
-  constructor() {}
+  constructor(tick_delta, data) {
+    this.tick_delta = tick_delta;
+    this.data = data;
+  }
 }
 
 /**

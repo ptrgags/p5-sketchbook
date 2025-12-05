@@ -9,6 +9,7 @@ import {
   MIDINote,
   MIDIOtherMeta,
   MIDISetTempo,
+  MIDISysex,
   MIDITimeSignature,
   MIDITrack,
 } from "./MidiFile.js";
@@ -180,8 +181,15 @@ function parse_meta_message(payload, offset, tick_delta) {
   return [message, offset + META_HEADER_LENGTH + length];
 }
 
-function parse_sysex_message(payload) {
-  throw new Error("Not yet implemented!");
+function parse_sysex_message(payload, offset, tick_delta) {
+  const [length, next_offset] = parse_variable_length(payload, offset + 1);
+
+  const data = new Uint8Array(length);
+  for (let i = 0; i < length; i++) {
+    data[i] = payload.getUint8(next_offset + i);
+  }
+
+  return [new MIDISysex(tick_delta, data), next_offset + length];
 }
 
 /**
