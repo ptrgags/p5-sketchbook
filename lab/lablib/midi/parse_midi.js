@@ -7,6 +7,7 @@ import {
   MIDIMessageType,
   MIDIMetaType,
   MIDINote,
+  MIDIOtherMeta,
   MIDISetTempo,
   MIDITimeSignature,
   MIDITrack,
@@ -124,6 +125,8 @@ const META_MESSAGE = 0xff;
 const SYSEX_MESSAGE = 0xf0;
 const SYSEX_ESCAPE = 0xf7;
 
+const META_HEADER_LENGTH = 3;
+
 /**
  * Parse a MIDI meta event
  * @param {DataView} payload The payload of the track chunk
@@ -133,47 +136,48 @@ const SYSEX_ESCAPE = 0xf7;
  */
 function parse_meta_message(payload, offset, tick_delta) {
   const meta_type = payload.getUint8(offset + 1);
-  if (meta_type == MIDIMetaType.END_OF_TRACK) {
-    return [new MIDIEndOfTrack(tick_delta), offset + 3];
-  }
+  const length = payload.getUint8(offset + 2);
 
-  if (meta_type === MIDIMetaType.TIME_SIGNATURE) {
+  let message;
+
+  if (meta_type == MIDIMetaType.END_OF_TRACK) {
+    message = new MIDIEndOfTrack(tick_delta);
+  } else if (meta_type === MIDIMetaType.TIME_SIGNATURE) {
     const numerator = payload.getUint8(offset + 3);
     const denominator = payload.getUint8(offset + 4);
     const midi_clocks = payload.getUint8(offset + 5);
     const notes32 = payload.getUint8(offset + 6);
-    return [
-      new MIDITimeSignature(
-        tick_delta,
-        numerator,
-        denominator,
-        midi_clocks,
-        notes32
-      ),
-      offset + 7,
-    ];
-  }
-
-  if (meta_type === MIDIMetaType.KEY_SIGNATURE) {
+    message = new MIDITimeSignature(
+      tick_delta,
+      numerator,
+      denominator,
+      midi_clocks,
+      notes32
+    );
+  } else if (meta_type === MIDIMetaType.KEY_SIGNATURE) {
     const sharps_flats = payload.getInt8(offset + 3);
     const major_minor = payload.getInt8(offset + 4);
-    return [
-      new MIDIKeySignature(tick_delta, sharps_flats, major_minor),
-      offset + 5,
-    ];
-  }
-
-  if (meta_type === MIDIMetaType.SET_TEMPO) {
+    message = new MIDIKeySignature(tick_delta, sharps_flats, major_minor);
+  } else if (meta_type === MIDIMetaType.SET_TEMPO) {
     const microseconds_per_quarter =
       (payload.getUint8(offset + 3) << 16) |
       (payload.getUint8(offset + 4) << 8) |
       payload.getUint8(offset + 5);
-    return [new MIDISetTempo(tick_delta, microseconds_per_quarter), offset + 5];
+    message = new MIDISetTempo(tick_delta, microseconds_per_quarter);
+  } else {
+    const data = new Uint8Array(length);
+    for (let i = 0; i < length; i++) {
+      data[i] = payload.getUint8(offset + 3 + i);
+    }
+
+    console.warn(
+      "detected unsupported MIDI meta event",
+      "0x" + meta_type.toString(16)
+    );
+    message = new MIDIOtherMeta(tick_delta, meta_type, data);
   }
 
-  throw new Error(
-    `Not implemented, MIDI meta event type 0x${meta_type.toString(16)}`
-  );
+  return [message, offset + META_HEADER_LENGTH + length];
 }
 
 function parse_sysex_message(payload) {

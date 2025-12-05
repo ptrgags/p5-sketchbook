@@ -52,13 +52,29 @@ export class MIDINote {
  * @enum {number}
  */
 export const MIDIMetaType = {
-  //MIDI_PORT: 0x21, // obsolete message type, see http://midi.teragonaudio.com/tech/midifile.htm
   END_OF_TRACK: 0x2f,
   SET_TEMPO: 0x51,
   TIME_SIGNATURE: 0x58,
   KEY_SIGNATURE: 0x59,
 };
 Object.freeze(MIDIMetaType);
+
+/**
+ * Type for all other Meta events that I don't support
+ */
+export class MIDIOtherMeta {
+  /**
+   * Constructor
+   * @param {number} tick_delta Time delta in ticks
+   * @param {number} meta_type MIDIMetaType
+   * @param {Uint8Array} payload Raw bytes of message
+   */
+  constructor(tick_delta, meta_type, payload) {
+    this.tick_delta = tick_delta;
+    this.meta_type = meta_type;
+    this.payload = payload;
+  }
+}
 
 export class MIDIEndOfTrack {
   /**
@@ -114,7 +130,7 @@ export class MIDISetTempo {
 }
 
 /**
- * * @typedef {MIDIEndOfTrack | MIDITimeSignature | MIDIKeySignature} MIDIMetaEvent
+ * * @typedef {MIDIEndOfTrack | MIDITimeSignature | MIDIKeySignature | MIDIOtherMeta} MIDIMetaEvent
  */
 
 export class MIDISysex {
