@@ -1,4 +1,11 @@
-import { MIDIFile, MIDIFormat, MIDIHeader, MIDITrack } from "./MidiFile.js";
+import {
+  MIDIFile,
+  MIDIFormat,
+  MIDIHeader,
+  MIDIMessageType,
+  MIDINote,
+  MIDITrack,
+} from "./MidiFile.js";
 
 // this is for the littleEndian flag in DataView.getXXXX() functions
 const BIG_ENDIAN = false;
@@ -85,18 +92,107 @@ function parse_header(chunk) {
   return new MIDIHeader(format_enum, num_tracks, ticks_per_quarter);
 }
 
+/**
+ * Parse one of the regular MIDI message types
+ * @param {DataView} payload The binary data for the track chunk
+ * @param {number} offset The first byte of the variable length quantity
+ * @returns {[number, number]} (value, next_offset)
+ */
+function parse_variable_length(payload, offset) {
+  let index = offset;
+  let more_bytes = true;
+  let value = 0;
+  while (more_bytes) {
+    const byte = payload.getUint8(index);
+    // the low 7 bits are tacked on to the value (MSBF)
+    value = (value << 7) | (byte & 0x7f);
+
+    // the top bit of the byte indicates that there's more bytes to come.
+    more_bytes = byte >> 7 === 1;
+    index++;
+  }
+
+  return [value, index];
+}
+
+const META_MESSAGE = 0xff;
+const SYSEX_MESSAGE = 0xf0;
+const SYSEX_ESCAPE = 0xf7;
+
+function parse_meta_message(payload) {
+  throw new Error("Not yet implemented!");
+}
+
+function parse_sysex_message(payload) {
+  throw new Error("Not yet implemented!");
+}
+
+/**
+ * Parse a MIDI message
+ * @param {DataView} payload the binary data of the track payload
+ * @param {number} offset the start offset for the body of this message (after the tick delta)
+ * @param {number} tick_delta tick delta for this message
+ * @returns {[import("./MidiFile.js").MIDIEvent, number]} (message, next_offset)
+ */
+function parse_midi_message(payload, offset, tick_delta) {
+  const status = payload.getUint8(offset);
+  const message_type = status >> 4;
+  const channel = status & 0xf;
+
+  if (
+    message_type === MIDIMessageType.NOTE_ON ||
+    message_type === MIDIMessageType.NOTE_OFF
+  ) {
+    const pitch = payload.getUint8(offset + 1);
+    const velocity = payload.getUint8(offset + 2);
+    const note = new MIDINote(
+      tick_delta,
+      channel,
+      message_type,
+      pitch,
+      velocity
+    );
+    return [note, offset + 3];
+  }
+
+  throw new Error(`not yet implemented: message type ${message_type}`);
+}
+
+/**
+ * Parse a MIDI track
+ * @param {MIDIChunk} chunk
+ * @returns {MIDITrack} The parsed track
+ */
 function parse_track(chunk) {
   if (chunk.chunk_type !== "MTrk") {
     throw new Error(`Invalid track chunk type ${chunk.chunk_type}`);
   }
 
-  // iterate over the payload
-  // - delta-time is a variable length quanity
-  // - the event payload varies by message type
-  //   - F0 or F7 are sysex messages
-  //   - FF is a meta-event. Some are fixed-length, some are variable length
+  const events = [];
+  const payload = chunk.payload;
+  let offset = 0;
+  while (offset < payload.byteLength) {
+    const [tick_delta, next_offset] = parse_variable_length(payload, offset);
+    offset = next_offset;
 
-  return new MIDITrack([]);
+    // Take a look at the next byte to determine how to parse it
+    const peek = payload.getUint8(offset);
+    if (peek === META_MESSAGE) {
+      parse_meta_message(payload);
+    } else if (peek === SYSEX_MESSAGE || peek === SYSEX_ESCAPE) {
+      parse_sysex_message(payload);
+    } else {
+      const [message, next_offset] = parse_midi_message(
+        payload,
+        offset,
+        tick_delta
+      );
+      offset = next_offset;
+      events.push(message);
+    }
+  }
+
+  return new MIDITrack(events);
 }
 
 /**
