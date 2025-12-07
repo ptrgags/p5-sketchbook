@@ -1,16 +1,11 @@
 import {
-  MIDIEndOfTrack,
+  get_data_length,
   MIDIFile,
   MIDIFormat,
   MIDIHeader,
-  MIDIKeySignature,
-  MIDIMessageType,
-  MIDIMetaType,
-  MIDINote,
-  MIDIOtherMeta,
-  MIDISetTempo,
+  MIDIMessage,
+  MIDIMetaEvent,
   MIDISysex,
-  MIDITimeSignature,
   MIDITrack,
 } from "./MidiFile.js";
 
@@ -124,8 +119,6 @@ function parse_variable_length(payload, offset) {
 
 const META_MESSAGE = 0xff;
 const SYSEX_MESSAGE = 0xf0;
-const SYSEX_ESCAPE = 0xf7;
-
 const META_HEADER_LENGTH = 3;
 
 /**
@@ -138,56 +131,22 @@ const META_HEADER_LENGTH = 3;
 function parse_meta_message(payload, offset, tick_delta) {
   const meta_type = payload.getUint8(offset + 1);
   const length = payload.getUint8(offset + 2);
-
-  let message;
-
-  if (meta_type == MIDIMetaType.END_OF_TRACK) {
-    message = new MIDIEndOfTrack(tick_delta);
-  } else if (meta_type === MIDIMetaType.TIME_SIGNATURE) {
-    const numerator = payload.getUint8(offset + 3);
-    const denominator = payload.getUint8(offset + 4);
-    const midi_clocks = payload.getUint8(offset + 5);
-    const notes32 = payload.getUint8(offset + 6);
-    message = new MIDITimeSignature(
-      tick_delta,
-      numerator,
-      denominator,
-      midi_clocks,
-      notes32
-    );
-  } else if (meta_type === MIDIMetaType.KEY_SIGNATURE) {
-    const sharps_flats = payload.getInt8(offset + 3);
-    const major_minor = payload.getInt8(offset + 4);
-    message = new MIDIKeySignature(tick_delta, sharps_flats, major_minor);
-  } else if (meta_type === MIDIMetaType.SET_TEMPO) {
-    const microseconds_per_quarter =
-      (payload.getUint8(offset + 3) << 16) |
-      (payload.getUint8(offset + 4) << 8) |
-      payload.getUint8(offset + 5);
-    message = new MIDISetTempo(tick_delta, microseconds_per_quarter);
-  } else {
-    const data = new Uint8Array(length);
-    for (let i = 0; i < length; i++) {
-      data[i] = payload.getUint8(offset + 3 + i);
-    }
-
-    console.warn(
-      "detected unsupported MIDI meta event",
-      "0x" + meta_type.toString(16)
-    );
-    message = new MIDIOtherMeta(tick_delta, meta_type, data);
-  }
-
+  const body = new Uint8Array(
+    payload.buffer,
+    payload.byteOffset + offset + 3,
+    length
+  );
+  const message = new MIDIMetaEvent(tick_delta, meta_type, body);
   return [message, offset + META_HEADER_LENGTH + length];
 }
 
 function parse_sysex_message(payload, offset, tick_delta) {
   const [length, next_offset] = parse_variable_length(payload, offset + 1);
-
-  const data = new Uint8Array(length);
-  for (let i = 0; i < length; i++) {
-    data[i] = payload.getUint8(next_offset + i);
-  }
+  const data = new Uint8Array(
+    payload.buffer,
+    payload.byteOffset + next_offset,
+    length
+  );
 
   return [new MIDISysex(tick_delta, data), next_offset + length];
 }
@@ -197,30 +156,24 @@ function parse_sysex_message(payload, offset, tick_delta) {
  * @param {DataView} payload the binary data of the track payload
  * @param {number} offset the start offset for the body of this message (after the tick delta)
  * @param {number} tick_delta tick delta for this message
- * @returns {[import("./MidiFile.js").MIDIEvent, number]} (message, next_offset)
+ * @returns {[MIDIMessage, number]} (message, next_offset)
  */
 function parse_midi_message(payload, offset, tick_delta) {
   const status = payload.getUint8(offset);
   const message_type = status >> 4;
   const channel = status & 0xf;
 
-  if (
-    message_type === MIDIMessageType.NOTE_ON ||
-    message_type === MIDIMessageType.NOTE_OFF
-  ) {
-    const pitch = payload.getUint8(offset + 1);
-    const velocity = payload.getUint8(offset + 2);
-    const note = new MIDINote(
-      tick_delta,
-      channel,
-      message_type,
-      pitch,
-      velocity
-    );
-    return [note, offset + 3];
-  }
+  const data_length = get_data_length(message_type);
+  const data = new Uint8Array(
+    payload.buffer,
+    payload.byteOffset + offset + 1,
+    data_length
+  );
 
-  throw new Error(`not yet implemented: message type ${message_type}`);
+  return [
+    new MIDIMessage(tick_delta, message_type, channel, data),
+    offset + 1 + data_length,
+  ];
 }
 
 /**
@@ -250,7 +203,7 @@ function parse_track(chunk) {
       );
       offset = next_offset;
       events.push(message);
-    } else if (peek === SYSEX_MESSAGE || peek === SYSEX_ESCAPE) {
+    } else if (peek === SYSEX_MESSAGE) {
       parse_sysex_message(payload);
     } else {
       const [message, next_offset] = parse_midi_message(

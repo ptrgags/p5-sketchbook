@@ -2,13 +2,15 @@ import { Score } from "../music/Score.js";
 import { to_events } from "../music/Timeline.js";
 import { Rational } from "../Rational.js";
 import {
-  MIDIEndOfTrack,
+  get_data_length,
   MIDIFile,
   MIDIFormat,
   MIDIHeader,
+  MIDIMessage,
   MIDIMessageType,
+  MIDIMetaEvent,
   MIDIMetaType,
-  MIDINote,
+  MIDISysex,
   MIDITrack,
 } from "./MidiFile.js";
 
@@ -68,9 +70,9 @@ function compute_variable_length(x) {
   return bytes;
 }
 
-// status + 2 data bytes
-const NOTE_EVENT_LENGTH = 3;
-const END_OF_TRACK_LENGTH = 3; // FF type length=0
+const MESSAGE_HEADER_LENGTH = 1;
+const META_HEADER_LENGTH = 3;
+const SYSEX_HEADER_LENGTH = 2;
 
 /**
  *
@@ -80,11 +82,18 @@ const END_OF_TRACK_LENGTH = 3; // FF type length=0
 function compute_track_chunk_length(events) {
   let payload_size = 0;
   for (const event of events) {
-    if (event instanceof MIDINote) {
-      payload_size += compute_variable_length(event.tick_delta);
-      payload_size += NOTE_EVENT_LENGTH;
-    } else if (event instanceof MIDIEndOfTrack) {
-      payload_size += END_OF_TRACK_LENGTH;
+    if (event instanceof MIDIMessage) {
+      const tick_length = compute_variable_length(event.tick_delta);
+      const data_length = get_data_length(event.message_type);
+      payload_size += tick_length + MESSAGE_HEADER_LENGTH + data_length;
+    } else if (event instanceof MIDIMetaEvent) {
+      const tick_length = compute_variable_length(event.tick_delta);
+      const data_length = event.payload.length;
+      payload_size += tick_length + META_HEADER_LENGTH + data_length;
+    } else if (event instanceof MIDISysex) {
+      const tick_length = compute_variable_length(event.tick_delta);
+      const data_length = event.data.length;
+      payload_size += tick_length + SYSEX_HEADER_LENGTH + data_length;
     }
   }
 
@@ -152,23 +161,26 @@ function encode_track(track) {
 
   let offset = CHUNK_HEADER_LENGTH;
   for (const event of track.events) {
-    if (event instanceof MIDINote) {
+    if (event instanceof MIDIMessage) {
       offset = encode_variable_length(data_view, offset, event.tick_delta);
-
       const status = (event.message_type << 4) | event.channel;
       data_view.setUint8(offset, status);
-      data_view.setUint8(offset + 1, event.pitch);
-      data_view.setUint8(offset + 2, event.velocity);
-      offset += NOTE_EVENT_LENGTH;
+
+      for (let i = 0; i < event.data.length; i++) {
+        data_view.setUint8(offset + 1 + i, event.data[i]);
+      }
+      offset += event.data.length + 1;
     }
 
-    if (event instanceof MIDIEndOfTrack) {
+    if (event instanceof MIDIMetaEvent) {
       offset = encode_variable_length(data_view, offset, event.tick_delta);
       data_view.setUint8(offset, META_MESSAGE);
-      data_view.setUint8(offset + 1, MIDIMetaType.END_OF_TRACK);
-      const payload_length = 0;
-      data_view.setUint8(offset + 2, payload_length);
-      offset += END_OF_TRACK_LENGTH;
+      data_view.setUint8(offset + 1, event.meta_type);
+      data_view.setUint8(offset + 2, event.payload.length);
+      for (let i = 0; i < event.payload.length; i++) {
+        data_view.setUint8(offset + 3 + i, event.payload[i]);
+      }
+      offset += 3 + event.payload.length;
     }
   }
 
@@ -240,12 +252,11 @@ export function score_to_midi(score, score_id) {
   let prev_tick = 0;
   for (const [absolute_tick, channel, message_type, pitch] of sorted) {
     const delta = absolute_tick - prev_tick;
-    const event = new MIDINote(
+    const event = new MIDIMessage(
       delta,
-      channel,
       message_type,
-      pitch,
-      DEFAULT_VELOCITY
+      channel,
+      new Uint8Array([pitch, DEFAULT_VELOCITY])
     );
     events.push(event);
 
@@ -253,7 +264,9 @@ export function score_to_midi(score, score_id) {
   }
 
   // the End of Track message is required
-  events.push(new MIDIEndOfTrack(0));
+  events.push(
+    new MIDIMetaEvent(0, MIDIMetaType.END_OF_TRACK, new Uint8Array(0))
+  );
 
   const track = new MIDITrack(events);
   const midi = new MIDIFile(header, [track]);

@@ -26,25 +26,53 @@ export class MIDIHeader {
  * @enum {number}
  */
 export const MIDIMessageType = {
-  NOTE_OFF: 0b100,
+  NOTE_OFF: 0b1000,
   NOTE_ON: 0b1001,
+  POLY_AFTERTOUCH: 0b1010,
+  CONTROL_CHANGE: 0b1011,
+  PROGRAM_CHANGE: 0b1100,
+  CHANNEL_AFTERTOUCH: 0b1101,
+  PITCH_BEND: 0b1110,
+  CHANNEL_MODE: 0b1011,
+  SYSTEM: 0b1111,
 };
 Object.freeze(MIDIMessageType);
 
-export class MIDINote {
+/**
+ * Get the length of a MIDI message (not including meta or sysex events)
+ * @param {number} message_type The MIDI message type
+ * @returns {0 | 1 | 2} The number of data bytes for this message type.
+ */
+export function get_data_length(message_type) {
+  switch (message_type) {
+    case MIDIMessageType.NOTE_OFF:
+    case MIDIMessageType.NOTE_ON:
+    case MIDIMessageType.POLY_AFTERTOUCH:
+    case MIDIMessageType.CONTROL_CHANGE:
+    case MIDIMessageType.PITCH_BEND:
+    case MIDIMessageType.CHANNEL_MODE:
+      return 2;
+    case MIDIMessageType.PROGRAM_CHANGE:
+    case MIDIMessageType.CHANNEL_AFTERTOUCH:
+      return 1;
+    default:
+      return 0;
+  }
+}
+
+export class MIDIMessage {
   /**
    * Constructor
-   * @param {number} tick_delta time since previous message in ticks
-   * @param {number} channel Channel number in [0, 15]
-   * @param {MIDIMessageType} message_type
-   * @param {number} pitch MIDI note number from 0-127
-   * @param {number} velocity MIDI note velocity from 0-127
+   * @param {number} tick_delta time since the previous message in ticks
+   * @param {number} message_type the MIDI Message type
+   * @param {number} channel The channel number 0-15
+   * @param {Uint8Array} data 1-3 data bytes as a u8 array
    */
-  constructor(tick_delta, channel, message_type, pitch, velocity) {
+  constructor(tick_delta, message_type, channel, data) {
     this.tick_delta = tick_delta;
+    this.message_type = message_type;
     this.channel = channel;
-    (this.message_type = message_type), (this.pitch = pitch);
-    this.velocity = velocity;
+    this.data = data;
   }
 }
 
@@ -52,17 +80,27 @@ export class MIDINote {
  * @enum {number}
  */
 export const MIDIMetaType = {
+  SEQUENCE_NUMBER: 0x00,
+  TEXT: 0x01,
+  COPYRIGHT: 0x02,
+  TRACK_NAME: 0x03,
+  LYRIC: 0x05,
+  MARKER: 0x06,
+  CUE_POINT: 0x07,
+  CHANNEL_PREFIX: 0x20,
   END_OF_TRACK: 0x2f,
   SET_TEMPO: 0x51,
+  SMPTE_OFFSET: 0x54,
   TIME_SIGNATURE: 0x58,
   KEY_SIGNATURE: 0x59,
+  SEQUENCER_SPECIFIC: 0x7f,
 };
 Object.freeze(MIDIMetaType);
 
 /**
  * Type for all other Meta events that I don't support
  */
-export class MIDIOtherMeta {
+export class MIDIMetaEvent {
   /**
    * Constructor
    * @param {number} tick_delta Time delta in ticks
@@ -76,64 +114,12 @@ export class MIDIOtherMeta {
   }
 }
 
-export class MIDIEndOfTrack {
-  /**
-   *
-   * @param {number} tick_delta
-   */
-  constructor(tick_delta) {
-    this.tick_delta = tick_delta;
-  }
-}
-
-export class MIDITimeSignature {
-  /**
-   * Constructor
-   * @param {number} tick_delta
-   * @param {number} numerator
-   * @param {number} denominator
-   * @param {number} midi_clocks
-   * @param {number} notes32
-   */
-  constructor(tick_delta, numerator, denominator, midi_clocks, notes32) {
-    (this.tick_delta = tick_delta), (this.numerator = numerator);
-    this.denominator = denominator;
-    this.midi_clocks = midi_clocks;
-    this.notes32 = notes32;
-  }
-}
-
-export class MIDIKeySignature {
-  /**
-   * Constructor
-   * @param {number} tick_delta How many ticks
-   * @param {number} sharps_flats positive numbers indicate sharps, negative for flats
-   * @param {number} major_minor 1 for minor, 0 for major
-   */
-  constructor(tick_delta, sharps_flats, major_minor) {
-    this.tick_delta = tick_delta;
-    this.sharps_flats = sharps_flats;
-    this.major_minor = major_minor;
-  }
-}
-
-export class MIDISetTempo {
-  /**
-   *
-   * @param {number} tick_delta
-   * @param {number} microseconds_per_quarter
-   */
-  constructor(tick_delta, microseconds_per_quarter) {
-    this.tick_delta = tick_delta;
-    this.microseconds_per_quarter = microseconds_per_quarter;
-  }
-}
-
-/**
- * * @typedef {MIDIEndOfTrack | MIDITimeSignature | MIDIKeySignature | MIDIOtherMeta} MIDIMetaEvent
- */
-
 export class MIDISysex {
+  /**
+   * Constructor
+   * @param {number} tick_delta Time delta in ticks
+   * @param {Uint8Array} data Payload of the sysex message
+   */
   constructor(tick_delta, data) {
     this.tick_delta = tick_delta;
     this.data = data;
@@ -142,7 +128,7 @@ export class MIDISysex {
 
 /**
  
- * @typedef {MIDINote | MIDIMetaEvent | MIDISysex} MIDIEvent
+ * @typedef {MIDIMessage | MIDIMetaEvent | MIDISysex} MIDIEvent
  */
 
 export class MIDITrack {
