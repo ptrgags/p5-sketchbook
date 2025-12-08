@@ -32,6 +32,7 @@ import {
 import { Piano } from "./Piano.js";
 import { SpiralBurst } from "./SpiralBurst.js";
 import { score_to_midi } from "../lablib/midi/score_to_midi.js";
+import { midi_to_score } from "../lablib/midi/midi_to_score.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -268,7 +269,7 @@ class SoundScene {
         //@ts-ignore
         const midi_data = await import_midi_file(e.target.files);
         const midi = parse_midi_file(midi_data);
-        console.log(midi);
+        const score = midi_to_score(midi);
       } catch (err) {
         console.error(err);
         show_error(err);
