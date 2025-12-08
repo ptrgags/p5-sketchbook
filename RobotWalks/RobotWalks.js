@@ -18,10 +18,10 @@ const TOUCH_RIGHT = new TouchButton(
 );
 
 export const sketch = (p) => {
-  let robot = new ArcRobot();
+  let robot = new ArcRobot(5);
 
   function reset() {
-    robot = new ArcRobot();
+    robot = new ArcRobot(5);
   }
 
   p.setup = () => {
