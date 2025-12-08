@@ -127,7 +127,6 @@ export class MIDISysex {
 }
 
 /**
- 
  * @typedef {MIDIMessage | MIDIMetaEvent | MIDISysex} MIDIEvent
  */
 

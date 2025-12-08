@@ -97,32 +97,41 @@ function parse_header(chunk) {
 
 const META_MESSAGE = 0xff;
 const SYSEX_MESSAGE = 0xf0;
-const META_HEADER_LENGTH = 3;
 
 /**
  * Parse a MIDI meta event
- * @param {DataView} payload The payload of the track chunk
- * @param {number} offset The offset for the start of the message (in this case, the FF byte)
+ * @param {DataView} track_payload The payload of the track chunk
+ * @param {number} data_offset The offset of the byte after the FF status byte (in this case, the meta event type)
  * @param {number} tick_delta The time of the message
  * @returns {[import("./MidiFile.js").MIDIMetaEvent, number]} (message, next_offset)
  */
-function parse_meta_message(payload, offset, tick_delta) {
-  const meta_type = payload.getUint8(offset + 1);
-  const length = payload.getUint8(offset + 2);
+function parse_meta_message(track_payload, data_offset, tick_delta) {
+  const meta_type = track_payload.getUint8(data_offset);
+  const length = track_payload.getUint8(data_offset + 1);
   const body = new Uint8Array(
-    payload.buffer,
-    payload.byteOffset + offset + 3,
+    track_payload.buffer,
+    track_payload.byteOffset + data_offset + 2,
     length
   );
   const message = new MIDIMetaEvent(tick_delta, meta_type, body);
-  return [message, offset + META_HEADER_LENGTH + length];
+  return [message, data_offset + 2 + length];
 }
 
-function parse_sysex_message(payload, offset, tick_delta) {
-  const [length, next_offset] = decode_variable_length(payload, offset + 1);
+/**
+ * Parse a MIDI Sysex message (status byte 0xF0)
+ * @param {DataView} track_payload The binary data of the track payload
+ * @param {number} data_offset Index of the first data byte, which in this case is the length field.
+ * @param {*} tick_delta The tick delta for the message
+ * @returns {[MIDISysex, number]} (message, next_offset)
+ */
+function parse_sysex_message(track_payload, data_offset, tick_delta) {
+  const [length, next_offset] = decode_variable_length(
+    track_payload,
+    data_offset
+  );
   const data = new Uint8Array(
-    payload.buffer,
-    payload.byteOffset + next_offset,
+    track_payload.buffer,
+    track_payload.byteOffset + next_offset,
     length
   );
 
@@ -131,27 +140,56 @@ function parse_sysex_message(payload, offset, tick_delta) {
 
 /**
  * Parse a MIDI message
- * @param {DataView} payload the binary data of the track payload
- * @param {number} offset the start offset for the body of this message (after the tick delta)
+ * @param {number} status_byte The status byte of the message
+ * @param {DataView} track_payload the binary data of the track payload
+ * @param {number} data_offset The first data byte (i.e. the byte after the status byte). For message types with no data fields, this is the byte after the status byte.
  * @param {number} tick_delta tick delta for this message
  * @returns {[MIDIMessage, number]} (message, next_offset)
  */
-function parse_midi_message(payload, offset, tick_delta) {
-  const status = payload.getUint8(offset);
-  const message_type = status >> 4;
-  const channel = status & 0xf;
+function parse_midi_message(
+  status_byte,
+  track_payload,
+  data_offset,
+  tick_delta
+) {
+  const message_type = status_byte >> 4;
+  const channel = status_byte & 0xf;
 
   const data_length = get_data_length(message_type);
   const data = new Uint8Array(
-    payload.buffer,
-    payload.byteOffset + offset + 1,
+    track_payload.buffer,
+    track_payload.byteOffset + data_offset,
     data_length
   );
 
   return [
     new MIDIMessage(tick_delta, message_type, channel, data),
-    offset + 1 + data_length,
+    data_offset + data_length,
   ];
+}
+
+/**
+ * Parse a single MIDI message (minus time delta) from a track chunk. The
+ * status byte is handled in parse_track due to managing running status
+ * @param {number} status_byte Status byte parsed in parse_message
+ * @param {DataView} track_payload Payload of the MIDI track chunk
+ * @param {number} data_offset Offset of the first data byte. For messages that don't include data, this is the byte after the status byte.
+ * @param {number} tick_delta The tick delta parsed in parse_track
+ * @returns {[import("./MidiFile.js").MIDIEvent, number]} (message, after_offset). The parsed message along with the offset of the byte after the end of the message
+ */
+function parse_message(status_byte, track_payload, data_offset, tick_delta) {
+  if (status_byte === META_MESSAGE) {
+    return parse_meta_message(track_payload, data_offset, tick_delta);
+  } else if (status_byte === SYSEX_MESSAGE) {
+    return parse_sysex_message(track_payload, data_offset, tick_delta);
+  }
+
+  return parse_midi_message(
+    status_byte,
+    track_payload,
+    data_offset,
+    tick_delta
+  );
 }
 
 /**
@@ -167,31 +205,42 @@ function parse_track(chunk) {
   const events = [];
   const payload = chunk.payload;
   let offset = 0;
+  let running_status = undefined;
   while (offset < payload.byteLength) {
     const [tick_delta, next_offset] = decode_variable_length(payload, offset);
     offset = next_offset;
 
     // Take a look at the next byte to determine how to parse it
-    const peek = payload.getUint8(offset);
-    if (peek === META_MESSAGE) {
-      const [message, next_offset] = parse_meta_message(
-        payload,
-        offset,
-        tick_delta
+    const status_byte = payload.getUint8(offset);
+
+    // All the status bytes have the highest bit sets. Data bytes
+    // are always 7-bit so the highest bit is 0
+    const is_status_byte = status_byte >> 7 == 1;
+
+    if (!is_status_byte && running_status === undefined) {
+      throw new Error(
+        "Invalid MIDI message: first message does not have a status byte"
       );
-      offset = next_offset;
-      events.push(message);
-    } else if (peek === SYSEX_MESSAGE) {
-      parse_sysex_message(payload);
-    } else {
-      const [message, next_offset] = parse_midi_message(
-        payload,
-        offset,
-        tick_delta
-      );
-      offset = next_offset;
-      events.push(message);
     }
+
+    if (is_status_byte) {
+      // Explicit status byte, so update the running status
+      running_status = status_byte;
+      // Increment the offset so we're pointing to the first data byte
+      offset++;
+    } else {
+      // running status, the status byte is the same as the previous
+      // status byte in the file. nothing to be done
+    }
+
+    const [message, after_offset] = parse_message(
+      running_status,
+      payload,
+      offset,
+      tick_delta
+    );
+    offset = after_offset;
+    events.push(message);
   }
 
   return new MIDITrack(events);
