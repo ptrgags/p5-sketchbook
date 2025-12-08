@@ -22,10 +22,37 @@ const ORIENTATION_LINE_LENGTH = 25;
 
 const START_POINT = Point.ORIGIN.add(SCREEN_CENTER);
 
-const RED_LINES = new Style({
-  stroke: Color.RED,
-  width: 2,
-});
+/**
+ * Given an array, make a reverse lookup table
+ * @template T
+ * @param {Array<T>} arr The original array
+ * @returns {Object.<T, number>}
+ */
+function inverse_array(arr) {
+  /**
+   * @type {Object.<T, number>}
+   */
+  const result = {};
+  for (const [i, x] of arr.entries()) {
+    result[x] = i;
+  }
+  return result;
+}
+
+// I'm allowing onlythe following values for their visual interest
+export const N_VALUES = [3, 4, 5, 6, 8, 12];
+export const N_VALUES_INV = inverse_array(N_VALUES);
+
+const COLORS = [
+  Color.RED,
+  Color.BLUE,
+  Color.CYAN,
+  Color.MAGENTA,
+  Color.YELLOW,
+  Color.GREEN,
+];
+
+const N_STYLES = COLORS.map((x) => new Style({ stroke: x, width: 2 }));
 const GREY_LINES = new Style({
   stroke: Color.from_hex_code("#777777"),
   width: 2,
@@ -63,6 +90,7 @@ export class ArcRobot {
   constructor(n) {
     this.n = n;
     this.turn_angle = (2.0 * Math.PI) / n;
+    this.line_style = N_STYLES[N_VALUES_INV[n]];
 
     /**
      * @type {RobotAnimationState}
@@ -84,7 +112,7 @@ export class ArcRobot {
      * Styled version of the history primitive
      * @type {GroupPrimitive}
      */
-    this.history_primitive = style(this.history, RED_LINES);
+    this.history_primitive = style(this.history, this.line_style);
 
     /**
      * List of line segments the robot has already traversed, in pixels
@@ -243,7 +271,7 @@ export class ArcRobot {
 
     if (this.current_arc) {
       const arc_bg = style(this.current_arc.arc_primitive, GREY_LINES);
-      const arc_fg = style(this.current_arc.render(frame), RED_LINES);
+      const arc_fg = style(this.current_arc.render(frame), this.line_style);
 
       return group(
         this.history_primitive,

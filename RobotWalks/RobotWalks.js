@@ -1,7 +1,7 @@
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { draw_primitive } from "../sketchlib/p5_helpers/draw_primitive.js";
 import { DirectionalPad } from "../lab/lablib/DirectionalPad.js";
-import { ArcRobot } from "./ArcRobot.js";
+import { ArcRobot, N_VALUES } from "./ArcRobot.js";
 import { TouchButton } from "../lab/lablib/TouchButton.js";
 import { Rectangle } from "../lab/lablib/Rectangle.js";
 import { Point } from "../pga2d/objects.js";
@@ -18,10 +18,11 @@ const TOUCH_RIGHT = new TouchButton(
 );
 
 export const sketch = (p) => {
-  let robot = new ArcRobot(5);
+  let n = 5;
+  let robot = new ArcRobot(n);
 
   function reset() {
-    robot = new ArcRobot(5);
+    robot = new ArcRobot(n);
   }
 
   p.setup = () => {
@@ -50,6 +51,13 @@ export const sketch = (p) => {
     });
 
     document.getElementById("reset").addEventListener("click", reset);
+
+    for (const x of N_VALUES) {
+      document.getElementById(`n${x}`).addEventListener("click", () => {
+        n = x;
+        reset();
+      });
+    }
   };
 
   p.draw = () => {
