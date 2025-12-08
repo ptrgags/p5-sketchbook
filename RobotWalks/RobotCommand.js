@@ -66,6 +66,28 @@ export class RobotCommand {
   }
 
   /**
+   * Rewrite this command for a different n value
+   * @param {number} m The new robot will be an m-robot
+   * @returns {RobotCommand}
+   */
+  rewrite(m) {
+    const l = RobotCommand.left_turn(m);
+    const r = RobotCommand.right_turn(m);
+
+    let command = RobotCommand.identity(m);
+    for (let i = 0; i < this.label.length; i++) {
+      const c = this.label.charAt(this.label.length - 1 - i);
+      if (c === "L") {
+        command = RobotCommand.compose(l, command);
+      } else {
+        command = RobotCommand.compose(r, command);
+      }
+    }
+
+    return command;
+  }
+
+  /**
    * Compose two robot commands. The one on the left is the newer one
    * (like function composition)
    *
