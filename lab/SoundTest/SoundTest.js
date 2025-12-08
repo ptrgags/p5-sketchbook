@@ -33,6 +33,7 @@ import { Piano } from "./Piano.js";
 import { SpiralBurst } from "./SpiralBurst.js";
 import { score_to_midi } from "../lablib/midi/score_to_midi.js";
 import { midi_to_score } from "../lablib/midi/midi_to_score.js";
+import { encode_midi } from "../lablib/midi/encode_midi.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -255,10 +256,13 @@ class SoundScene {
       }
 
       // make MIDI file here
-      const file = score_to_midi(
-        SOUND_MANIFEST.scores[this.selected_melody],
-        this.selected_melody
-      );
+      const midi = score_to_midi(SOUND_MANIFEST.scores[this.selected_melody]);
+
+      const chunks = encode_midi(midi);
+      const file = new File(chunks, `${this.selected_melody}.mid`, {
+        type: "audio/mid",
+      });
+
       // download file here
       download_file(file);
     });
