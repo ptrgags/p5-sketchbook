@@ -15,7 +15,7 @@ import { Direction } from "../pga2d/Direction.js";
 import { Point } from "../pga2d/Point.js";
 
 // How many frames to animate each 1/5 turn arc
-const MOVEMENT_DURATION = 25;
+const FULL_CIRCLE_DURATION = 120;
 const PIXELS_PER_METER = 25;
 const ORIENTATION_LINE_LENGTH = 25;
 
@@ -90,6 +90,7 @@ export class ArcRobot {
     this.n = n;
     this.turn_angle = (2.0 * Math.PI) / n;
     this.line_style = N_STYLES[N_VALUES_INV[n]];
+    this.movement_duration = FULL_CIRCLE_DURATION / n;
 
     /**
      * @type {RobotAnimationState}
@@ -215,7 +216,7 @@ export class ArcRobot {
       PIXELS_PER_METER,
       angles_screen,
       frame,
-      MOVEMENT_DURATION
+      this.movement_duration
     );
     this.animation_state = RobotAnimationState.MOVING;
     this.command_seq = full_command_seq;
