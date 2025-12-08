@@ -13,6 +13,7 @@ import {
   MIDISysex,
   MIDITrack,
 } from "./MidiFile.js";
+import { encode_variable_length } from "./variable_length.js";
 
 // Ableton's export format
 const TICKS_PER_QUARTER = 96;
@@ -98,49 +99,6 @@ function compute_track_chunk_length(events) {
   }
 
   return CHUNK_HEADER_LENGTH + payload_size;
-}
-
-/**
- * Split a value into 7-bit chunks
- * @param {number} value The value to split
- * @returns {number[]} the 7-bit values in LSBF order
- */
-function split_value_7bits(value) {
-  if (value === 0) {
-    return [0];
-  }
-
-  const values = [];
-  let current = value;
-  while (current !== 0) {
-    values.push(current & 0x7f);
-    current >>= 7;
-  }
-  return values;
-}
-
-/**
- * Write a variable-length quantity as described in the MIDI spec
- * @param {DataView} data_view The buffer to write to
- * @param {number} offset The offset of the first byte to write
- * @param {number} value value to encode
- * @returns {number} the new offset after writing the variable-length quantity
- */
-function encode_variable_length(data_view, offset, value) {
-  const values_lsbf = split_value_7bits(value);
-  const values_msbf = values_lsbf.reverse();
-
-  // For all bytes except the last one, the MIDI spec says to
-  // set the high bit (to indicate more bytes following)
-  for (let i = 0; i < values_msbf.length - 1; i++) {
-    const high_bit_set = (1 << 7) | values_msbf[i];
-    data_view.setUint8(offset + i, high_bit_set);
-  }
-  // For the last byte, the value is written verbatim
-  const last_index = values_msbf.length - 1;
-  data_view.setUint8(offset + last_index, values_msbf[last_index]);
-
-  return offset + values_msbf.length;
 }
 
 const META_MESSAGE = 0xff;

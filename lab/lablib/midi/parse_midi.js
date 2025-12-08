@@ -8,6 +8,7 @@ import {
   MIDISysex,
   MIDITrack,
 } from "./MidiFile.js";
+import { decode_variable_length } from "./variable_length.js";
 
 // this is for the littleEndian flag in DataView.getXXXX() functions
 const BIG_ENDIAN = false;
@@ -94,29 +95,6 @@ function parse_header(chunk) {
   return new MIDIHeader(format_enum, num_tracks, ticks_per_quarter);
 }
 
-/**
- * Parse one of the regular MIDI message types
- * @param {DataView} payload The binary data for the track chunk
- * @param {number} offset The first byte of the variable length quantity
- * @returns {[number, number]} (value, next_offset)
- */
-function parse_variable_length(payload, offset) {
-  let index = offset;
-  let more_bytes = true;
-  let value = 0;
-  while (more_bytes) {
-    const byte = payload.getUint8(index);
-    // the low 7 bits are tacked on to the value (MSBF)
-    value = (value << 7) | (byte & 0x7f);
-
-    // the top bit of the byte indicates that there's more bytes to come.
-    more_bytes = byte >> 7 === 1;
-    index++;
-  }
-
-  return [value, index];
-}
-
 const META_MESSAGE = 0xff;
 const SYSEX_MESSAGE = 0xf0;
 const META_HEADER_LENGTH = 3;
@@ -141,7 +119,7 @@ function parse_meta_message(payload, offset, tick_delta) {
 }
 
 function parse_sysex_message(payload, offset, tick_delta) {
-  const [length, next_offset] = parse_variable_length(payload, offset + 1);
+  const [length, next_offset] = decode_variable_length(payload, offset + 1);
   const data = new Uint8Array(
     payload.buffer,
     payload.byteOffset + next_offset,
@@ -190,7 +168,7 @@ function parse_track(chunk) {
   const payload = chunk.payload;
   let offset = 0;
   while (offset < payload.byteLength) {
-    const [tick_delta, next_offset] = parse_variable_length(payload, offset);
+    const [tick_delta, next_offset] = decode_variable_length(payload, offset);
     offset = next_offset;
 
     // Take a look at the next byte to determine how to parse it
