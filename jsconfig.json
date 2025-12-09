@@ -3,7 +3,8 @@
       "checkJs": true,
       "target": "ES2020",
       "moduleResolution": "nodenext",
-      "module": "nodenext"
+      "module": "nodenext",
+      "lib": ["esnext"]
     },
     "exclude": ["node_modules", "**/node_modules/*"]
   }
