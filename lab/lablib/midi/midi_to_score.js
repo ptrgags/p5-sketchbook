@@ -1,5 +1,5 @@
 import { N4 } from "../music/durations.js";
-import { Melody, Rest, Score } from "../music/Score.js";
+import { Harmony, Melody, Note, Rest, Score } from "../music/Score.js";
 import { Rational } from "../Rational.js";
 import { MIDIFile, MIDIMessage, MIDIMessageType } from "./MidiFile.js";
 
@@ -73,7 +73,13 @@ function notes_by_channel(abs_events) {
  * Helper class for making parts
  */
 class KeyFrame {
-  constructor() {
+  /**
+   * Constructor
+   * @param {number} time The time of this frame in MIDI ticks
+   */
+  constructor(time) {
+    this.time = time;
+
     /**
      * Notes that started at this time
      * @type {Set<number>}
@@ -135,7 +141,7 @@ function make_keyframes(abs_notes) {
   const keyframes = new Map();
   for (const [t, note] of abs_notes) {
     if (!keyframes.has(t)) {
-      keyframes.set(t, new KeyFrame());
+      keyframes.set(t, new KeyFrame(t));
     }
 
     keyframes.get(t).add_note(note);
@@ -174,35 +180,117 @@ function find_releases(keyframes, times) {
 }
 
 /**
+ * Parse a simple bit of music from consecutive frames. This will either be
+ * a rest, a single note, or a chord of notes all of the same duration
+ * @param {KeyFrame} start_frame
+ * @param {KeyFrame} end_frame
+ * @param {Rational} to_duration Scale factor for converting ticks to rational measures
+ * @return {import("../music/Score.js").Music<number>} A music value for this interval
+ */
+function make_simple_music(start_frame, end_frame, to_duration) {
+  const duration = new Rational(end_frame.time - start_frame.time).mul(
+    to_duration
+  );
+
+  const pitches = start_frame.on_set;
+
+  // I have no notes.
+  if (pitches.size == 0) {
+    return new Rest(duration);
+  }
+
+  // I have one note.
+  if (pitches.size == 1) {
+    // TODO: Eventually I want to extract the velocity from the on_notes
+    const [pitch] = [...pitches];
+    return new Note(pitch, duration);
+  }
+
+  // I have many notes.
+  const pitches_descending = [...pitches].sort().reverse();
+  return new Harmony(...pitches_descending.map((x) => new Note(x, duration)));
+}
+
+/**
+ * For notes that overlap partially, we need a different method for parsing it
+ * @param {KeyFrame[]} frames The relevant frames
+ * @param {Rational} to_duration Scale factor for converting ticks to rational measures
+ * @returns {import("../music/Score.js").Music<number>} Music data for this section of music
+ */
+function make_complex_harmony(frames, to_duration) {
+  const start_frame = frames[0];
+  const end_frame = frames[frames.length - 1];
+  const duration = new Rational(end_frame.time - start_frame.time).mul(
+    to_duration
+  );
+  // TODO: actually compute this
+  return new Rest(duration);
+}
+
+/**
+ * Extract notes from the
+ * @param {Map<number, KeyFrame>} keyframes The keyframes
+ * @param {number[]} times Keyframe times in sorted order
+ * @param {boolean[]} releases_everything result of find_releases()
+ * @returns {import("../music/Score.js").Music<number>[]} Music material for the keyframes. The initial delay is not handled
+ */
+function extract_notes(keyframes, times, releases_everything, to_duration) {
+  const music = [];
+  let run_start = 0;
+  for (let i = 1; i < releases_everything.length; i++) {
+    if (releases_everything[i]) {
+      if (i - run_start === 1) {
+        const start_frame = keyframes.get(times[i - 1]);
+        const end_frame = keyframes.get(times[i]);
+        music.push(make_simple_music(start_frame, end_frame, to_duration));
+      } else {
+        const relevant_times = times.slice(run_start, i + 1);
+        const relevant_frames = relevant_times.map((t) => keyframes.get(t));
+        music.push(make_complex_harmony(relevant_frames, to_duration));
+      }
+      run_start = i;
+    }
+  }
+  return music;
+}
+
+/**
  * Make a part from a list of MIDI note on/off events
  * @param {[number, MIDIMessage][]} abs_notes Notes with absolute time
  * @param {number} ticks_per_quarter MIDI ticks per quarter for converting to  duration
  * @return {Melody<number>} Melody in terms of MIDI note numbers
  */
 export function make_part(abs_notes, ticks_per_quarter) {
-  // convert from ticks to rational measures
-  const to_duration = new Rational(1, ticks_per_quarter).mul(N4);
+  // Preprocess the notes so we know what intervals can be parsed as simple
+  // rests/notes/chords and which ones are more complicated harmonies that
+  // are parsed by a different method.
   const keyframes = make_keyframes(abs_notes);
-
   const times = [...keyframes.keys()].sort();
   const releases_everything = find_releases(keyframes, times);
+
+  // convert from ticks to rational measures
+  const to_duration = new Rational(1, ticks_per_quarter).mul(N4);
 
   // Handle an initial delay if there is one
   const start = times[0];
   /**
    * @type {import("../music/Score.js").Music<number>[]}
    */
-  const music = [];
+  const initial_pause = [];
   if (start > 0) {
     const delay = new Rational(start).mul(to_duration);
-    music.push(new Rest(delay));
+    initial_pause.push(new Rest(delay));
   }
 
-  // For starters, just enter a rest for the whole duration of the part
-  const end = times[keyframes.size - 1];
-  const total_duration = new Rational(end - start).mul(to_duration);
-  music.push(new Rest(total_duration));
-  return new Melody(...music);
+  // Extract the main note data
+  const notes = extract_notes(
+    keyframes,
+    times,
+    releases_everything,
+    to_duration
+  );
+
+  return new Melody(...initial_pause, ...notes);
 }
 
 /**
