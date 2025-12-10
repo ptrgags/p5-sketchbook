@@ -162,6 +162,14 @@ export class SoundManager {
     this.synths.supersaw = supersaw;
     this.synths.bell = bell;
     this.synths.tick = tick;
+
+    for (let i = 0; i < 16; i++) {
+      const channel_synth = new this.tone.Synth({
+        oscillator: { type: "square" },
+      }).toDestination();
+      channel_synth.volume.value = -6;
+      this.synths[`channel${i}`] = channel_synth;
+    }
   }
 
   /**
