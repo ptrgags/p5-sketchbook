@@ -391,7 +391,7 @@ export const sketch = (p) => {
   };
 
   p.draw = () => {
-    p.background(0);
+    p.background(127);
 
     scene.update();
 

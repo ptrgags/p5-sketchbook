@@ -212,6 +212,22 @@ function make_simple_music(start_frame, end_frame, to_duration) {
 }
 
 /**
+ * Extract a Melody of notes and rests for a single pitch
+ * @param {KeyFrame[]} frames The relevant frames
+ * @param {Rational} to_duration scale factor for converting ticks to rational measures
+ * @param {number} pitch The pitch to examine
+ * @returns {Melody<number>}
+ */
+function extract_pitch_line(frames, to_duration, pitch) {
+  for (let i = 1; i < frames.length; i++) {
+    const prev = frames[i - 1];
+    const curr = frames[i];
+  }
+
+  return new Melody();
+}
+
+/**
  * For notes that overlap partially, we need a different method for parsing it
  * @param {KeyFrame[]} frames The relevant frames
  * @param {Rational} to_duration Scale factor for converting ticks to rational measures
@@ -223,7 +239,21 @@ function make_complex_harmony(frames, to_duration) {
   const duration = new Rational(end_frame.time - start_frame.time).mul(
     to_duration
   );
-  // TODO: actually compute this
+
+  // Gather all the pitches
+  let all_pitches = frames[0].on_set;
+  for (let i = 0; i < frames.length - 1; i++) {
+    all_pitches = all_pitches.union(frames[i].on_set).union(frames[i].off_set);
+  }
+  all_pitches = all_pitches.union(frames[frames.length - 1].off_set);
+  const pitches_descending = [...all_pitches].sort().reverse();
+
+  /*
+  return new Harmony(
+    pitches_descending.map((x) =>
+      extract_pitch_line(frames, to_duration, pitch)
+    )
+  );*/
   return new Rest(duration);
 }
 
