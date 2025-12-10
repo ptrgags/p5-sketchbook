@@ -127,16 +127,11 @@ function set_equals(a, b) {
 }
 
 /**
- * Make a part from a list of MIDI note on/off events
- * @param {[number, MIDIMessage][]} abs_notes Notes with absolute time
- * @param {number} ticks_per_quarter MIDI ticks per quarter for converting to  duration
- * @return {Melody<number>} Melody in terms of MIDI note numbers
+ * Gather the MIDI events by distinct time values
+ * @param {[number, MIDIMessage][]} abs_notes(time, msg) notes with absolute times
+ * @return {Map<number, KeyFrame>}
  */
-export function make_part(abs_notes, ticks_per_quarter) {
-  /**
-   * Gather up notes for each distinct time value
-   * @type {Map<number, KeyFrame>}
-   */
+function make_keyframes(abs_notes) {
   const keyframes = new Map();
   for (const [t, note] of abs_notes) {
     if (!keyframes.has(t)) {
@@ -145,16 +140,20 @@ export function make_part(abs_notes, ticks_per_quarter) {
 
     keyframes.get(t).add_note(note);
   }
-  const times = [...keyframes.keys()].sort();
 
-  // convert from ticks to rational measures
-  const to_duration = new Rational(1, ticks_per_quarter).mul(N4);
+  return keyframes;
+}
 
+/**
+ * Find the points in the stream of notes where all notes are released,
+ * this is a preprocessing step for generating note data.
+ * @param {Map<number, KeyFrame>} keyframes All the keyframes
+ * @param {number[]} times Times in sorted order. This is passed in so it can be shared between methods
+ * @returns {boolean[]}
+ */
+function find_releases(keyframes, times) {
   // Scan over the intervals between keyframes and check for points where
   // all notes are released.
-  /**
-   * @type {boolean[]}
-   */
   const releases_everything = new Array(keyframes.size).fill(false);
   releases_everything[0] = true;
   /**
@@ -171,7 +170,22 @@ export function make_part(abs_notes, ticks_per_quarter) {
     releases_everything[i] = after_interval.size === 0;
     active_set = after_interval;
   }
-  console.log(releases_everything);
+  return releases_everything;
+}
+
+/**
+ * Make a part from a list of MIDI note on/off events
+ * @param {[number, MIDIMessage][]} abs_notes Notes with absolute time
+ * @param {number} ticks_per_quarter MIDI ticks per quarter for converting to  duration
+ * @return {Melody<number>} Melody in terms of MIDI note numbers
+ */
+export function make_part(abs_notes, ticks_per_quarter) {
+  // convert from ticks to rational measures
+  const to_duration = new Rational(1, ticks_per_quarter).mul(N4);
+  const keyframes = make_keyframes(abs_notes);
+
+  const times = [...keyframes.keys()].sort();
+  const releases_everything = find_releases(keyframes, times);
 
   // Handle an initial delay if there is one
   const start = times[0];
