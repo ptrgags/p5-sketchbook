@@ -116,15 +116,6 @@ class KeyFrame {
 }
 
 /**
- * @enum number
- */
-const MelodyParseState = {
-  SILENCE: 0,
-  SINGLE_NOTE: 1,
-  MULTIPLE_NOTES: 2,
-};
-
-/**
  * Because even with ES2024 this isn't included
  * @template T
  * @param {Set<T>} a
@@ -148,55 +139,26 @@ export function make_part(abs_notes, ticks_per_quarter) {
    */
   const keyframes = new Map();
   for (const [t, note] of abs_notes) {
-    if (keyframes[t] === undefined) {
-      keyframes[t] = new KeyFrame();
+    if (!keyframes.has(t)) {
+      keyframes.set(t, new KeyFrame());
     }
 
-    keyframes[t].add_note(note);
+    keyframes.get(t).add_note(note);
   }
   const times = [...keyframes.keys()].sort();
 
   // convert from ticks to rational measures
   const to_duration = new Rational(1, ticks_per_quarter).mul(N4);
 
+  const end = times[times.length - 1];
+  const duration = new Rational(end).mul(to_duration);
+
   // scan over the times and make a melody
   /**
    * @type {import("../music/Score.js").Music<number>[]}
    */
-  const music = [];
-  let last_end_time = 0;
-  let parse_state = MelodyParseState.SILENCE;
-  /**
-   * @type {Set<number>}
-   */
-  let active_notes = new Set();
-  for (const t of keyframes.keys()) {
-    const keyframe = keyframes.get(t);
-
-    if (parse_state == MelodyParseState.SILENCE) {
-      if (t > last_end_time) {
-        const rest_duration = new Rational(t - last_end_time).mul(to_duration);
-        music.push(new Rest(rest_duration));
-        last_end_time = t;
-      }
-
-      if (keyframe.on_set.size === 1) {
-        parse_state = MelodyParseState.SINGLE_NOTE;
-        active_notes = keyframe.on_set;
-      } else if (keyframe.on_set.size > 1) {
-        parse_state = MelodyParseState.MULTIPLE_NOTES;
-        active_notes = keyframe.on_set;
-      } else {
-        throw new Error("silence + no on notes... what's going on here?");
-      }
-    } else if (parse_state == MelodyParseState.SINGLE_NOTE) {
-      if (set_equals(active_notes, keyframe.off_set)) {
-      }
-    } else if (parse_state == MelodyParseState.MULTIPLE_NOTES) {
-    }
-  }
-
-  return new Melody(music);
+  const music = [new Rest(duration)];
+  return new Melody(...music);
 }
 
 /**
@@ -221,8 +183,12 @@ export function midi_to_score(midi) {
   const parts = [];
   for (const [channel, events] of Object.entries(notes)) {
     const part = make_part(events, ticks_per_quarter);
+    /**
+     * @type {[string, import("../music/Score.js").Music<number>]}
+     */
+    const part_entry = [`channel${channel}`, part];
 
-    parts.push([`channel${channel}`, part]);
+    parts.push(part_entry);
   }
 
   return new Score({

@@ -185,14 +185,18 @@ function show_error(message) {
 /**
  * Import a MIDI file from a file picker
  * @param {File[]} file_list
- * @returns {Promise<ArrayBuffer>} The buffer containing the MIDI file
+ * @returns {Promise<[string, ArrayBuffer]>} The filename and the buffer containing the MIDI data
  */
 async function import_midi_file(file_list) {
   if (file_list.length === 0) {
     throw new Error("please chose a .mid file");
   }
 
-  return await file_list[0].arrayBuffer();
+  const file = file_list[0];
+  const fname = file.name;
+  const buffer = await file.arrayBuffer();
+
+  return [fname, buffer];
 }
 
 class SoundScene {
@@ -243,9 +247,7 @@ class SoundScene {
       const rectangle = new Rectangle(corner, MELODY_BUTTON_DIMENSIONS);
       const button = new TouchButton(rectangle);
       button.events.addEventListener("click", () => {
-        this.selected_melody = descriptor.id;
-        this.piano.reset();
-        this.sound.play_score(this.selected_melody);
+        this.change_score(descriptor.id);
       });
       return button;
     });
@@ -271,14 +273,33 @@ class SoundScene {
       clear_errors();
       try {
         //@ts-ignore
-        const midi_data = await import_midi_file(e.target.files);
+        const [fname, midi_data] = await import_midi_file(e.target.files);
         const midi = parse_midi_file(midi_data);
         const score = midi_to_score(midi);
+        const score_id = `imported_${fname.replace(/\.mid$/i, "")}`;
+        this.sound.register_score(score_id, score);
+        RENDERED_TIMELINES[score_id] = render_score(
+          Point.ORIGIN,
+          score,
+          MEASURE_DIMENSIONS,
+          PART_STYLES
+        );
+        this.change_score(score_id);
       } catch (err) {
         console.error(err);
         show_error(err);
       }
     });
+  }
+
+  /**
+   * Stop the current score and play a new one
+   * @param {string} score_id ID of the score to play
+   */
+  change_score(score_id) {
+    this.selected_melody = score_id;
+    this.piano.reset();
+    this.sound.play_score(score_id);
   }
 
   render() {
