@@ -150,14 +150,44 @@ export function make_part(abs_notes, ticks_per_quarter) {
   // convert from ticks to rational measures
   const to_duration = new Rational(1, ticks_per_quarter).mul(N4);
 
-  const end = times[times.length - 1];
-  const duration = new Rational(end).mul(to_duration);
+  // Scan over the intervals between keyframes and check for points where
+  // all notes are released.
+  /**
+   * @type {boolean[]}
+   */
+  const releases_everything = new Array(keyframes.size).fill(false);
+  releases_everything[0] = true;
+  /**
+   * @type {Set<number>}
+   */
+  let active_set = new Set();
+  for (let i = 1; i < keyframes.size; i++) {
+    const prev_frame = keyframes.get(times[i - 1]);
+    const curr_frame = keyframes.get(times[i]);
 
-  // scan over the times and make a melody
+    const on = prev_frame.on_set;
+    const off = curr_frame.off_set;
+    const after_interval = active_set.union(on).difference(off);
+    releases_everything[i] = after_interval.size === 0;
+    active_set = after_interval;
+  }
+  console.log(releases_everything);
+
+  // Handle an initial delay if there is one
+  const start = times[0];
   /**
    * @type {import("../music/Score.js").Music<number>[]}
    */
-  const music = [new Rest(duration)];
+  const music = [];
+  if (start > 0) {
+    const delay = new Rational(start).mul(to_duration);
+    music.push(new Rest(delay));
+  }
+
+  // For starters, just enter a rest for the whole duration of the part
+  const end = times[keyframes.size - 1];
+  const total_duration = new Rational(end - start).mul(to_duration);
+  music.push(new Rest(total_duration));
   return new Melody(...music);
 }
 
