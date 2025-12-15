@@ -122,6 +122,136 @@ class KeyFrame {
 }
 
 /**
+ * Ordered map of keyframes that allows different methods of querying
+ */
+class SortedKeyFrames {
+  /**
+   * Constructor
+   * @param {Map<number, KeyFrame>} keyframes The keyframes stored by time
+   */
+  constructor(keyframes) {
+    this.keyframes = keyframes;
+    /**
+     * @type {number[]}
+     */
+    this.times = [...keyframes.keys()].sort();
+  }
+
+  /**
+   * Get the total number of keyframes
+   */
+  get length() {
+    return this.times.length;
+  }
+
+  /**
+   *
+   * @param {*} index
+   * @returns
+   */
+  get_time(index) {
+    return this.times[index];
+  }
+
+  /**
+   * Find the points in the stream of notes where all notes are released,
+   * this is a preprocessing step for generating note data.
+   *
+   * @returns {boolean[]}
+   */
+  find_releases() {
+    // Scan over the intervals between keyframes and check for points where
+    // all notes are released.
+    const releases_everything = new Array(this.keyframes.size).fill(false);
+    releases_everything[0] = true;
+
+    for (const interval of this.intervals()) {
+      const i = interval.index + 1;
+      releases_everything[i] = interval.after_pitches.size === 0;
+    }
+
+    return releases_everything;
+  }
+
+  /**
+   * Extract notes from the musical timeline
+   * @param {Rational} to_duration Scale factor
+   * @returns {import("../music/Score.js").Music<number>[]} Music material
+   */
+  extract_notes(to_duration) {
+    const releases_everything = this.find_releases();
+
+    const music = [];
+    let run_start = 0;
+    for (const interval of this.intervals()) {
+      const i = interval.index + 1;
+      if (!releases_everything[i]) {
+        continue;
+      }
+
+      if (i - run_start === 1) {
+        music.push(
+          make_simple_music(
+            interval.before_frame,
+            interval.after_frame,
+            to_duration
+          )
+        );
+      } else {
+        const relevant_times = this.times.slice(run_start, i + 1);
+        const relevant_frames = relevant_times.map((t) =>
+          this.keyframes.get(t)
+        );
+
+        music.push(make_complex_harmony(relevant_frames, to_duration));
+      }
+      run_start = i;
+    }
+
+    return music;
+  }
+
+  /**
+   * Iterate over the keyframes pairwise, giving the state before
+   * and after the interval of time
+   * @returns {Generator<{
+   * index: number,
+   * duration: number,
+   * before_frame: KeyFrame,
+   * after_frame: KeyFrame,
+   * before_pitches: Set<number>,
+   * after_pitches: Set<number>
+   * }>}
+   */
+  *intervals() {
+    /**
+     * @type {Set<number>}
+     */
+    let active_set = new Set();
+    for (let i = 1; i < this.keyframes.size; i++) {
+      const before_time = this.times[i - 1];
+      const after_time = this.times[i];
+      const before_frame = this.keyframes.get(before_time);
+      const after_frame = this.keyframes.get(after_time);
+
+      const on = before_frame.on_set;
+      const off = after_frame.off_set;
+      const after_interval = active_set.union(on).difference(off);
+
+      yield {
+        index: i - 1,
+        duration: after_time - before_time,
+        before_frame,
+        after_frame,
+        before_pitches: active_set,
+        after_pitches: after_interval,
+      };
+      active_set = after_interval;
+    }
+  }
+}
+
+/**
  * Because even with ES2024 this isn't included
  * @template T
  * @param {Set<T>} a
@@ -135,7 +265,7 @@ function set_equals(a, b) {
 /**
  * Gather the MIDI events by distinct time values
  * @param {[number, MIDIMessage][]} abs_notes(time, msg) notes with absolute times
- * @return {Map<number, KeyFrame>}
+ * @return {SortedKeyFrames}
  */
 function make_keyframes(abs_notes) {
   const keyframes = new Map();
@@ -147,36 +277,7 @@ function make_keyframes(abs_notes) {
     keyframes.get(t).add_note(note);
   }
 
-  return keyframes;
-}
-
-/**
- * Find the points in the stream of notes where all notes are released,
- * this is a preprocessing step for generating note data.
- * @param {Map<number, KeyFrame>} keyframes All the keyframes
- * @param {number[]} times Times in sorted order. This is passed in so it can be shared between methods
- * @returns {boolean[]}
- */
-function find_releases(keyframes, times) {
-  // Scan over the intervals between keyframes and check for points where
-  // all notes are released.
-  const releases_everything = new Array(keyframes.size).fill(false);
-  releases_everything[0] = true;
-  /**
-   * @type {Set<number>}
-   */
-  let active_set = new Set();
-  for (let i = 1; i < keyframes.size; i++) {
-    const prev_frame = keyframes.get(times[i - 1]);
-    const curr_frame = keyframes.get(times[i]);
-
-    const on = prev_frame.on_set;
-    const off = curr_frame.off_set;
-    const after_interval = active_set.union(on).difference(off);
-    releases_everything[i] = after_interval.size === 0;
-    active_set = after_interval;
-  }
-  return releases_everything;
+  return new SortedKeyFrames(keyframes);
 }
 
 /**
@@ -258,33 +359,6 @@ function make_complex_harmony(frames, to_duration) {
 }
 
 /**
- * Extract notes from the
- * @param {Map<number, KeyFrame>} keyframes The keyframes
- * @param {number[]} times Keyframe times in sorted order
- * @param {boolean[]} releases_everything result of find_releases()
- * @returns {import("../music/Score.js").Music<number>[]} Music material for the keyframes. The initial delay is not handled
- */
-function extract_notes(keyframes, times, releases_everything, to_duration) {
-  const music = [];
-  let run_start = 0;
-  for (let i = 1; i < releases_everything.length; i++) {
-    if (releases_everything[i]) {
-      if (i - run_start === 1) {
-        const start_frame = keyframes.get(times[i - 1]);
-        const end_frame = keyframes.get(times[i]);
-        music.push(make_simple_music(start_frame, end_frame, to_duration));
-      } else {
-        const relevant_times = times.slice(run_start, i + 1);
-        const relevant_frames = relevant_times.map((t) => keyframes.get(t));
-        music.push(make_complex_harmony(relevant_frames, to_duration));
-      }
-      run_start = i;
-    }
-  }
-  return music;
-}
-
-/**
  * Make a part from a list of MIDI note on/off events
  * @param {[number, MIDIMessage][]} abs_notes Notes with absolute time
  * @param {number} ticks_per_quarter MIDI ticks per quarter for converting to  duration
@@ -295,14 +369,12 @@ export function make_part(abs_notes, ticks_per_quarter) {
   // rests/notes/chords and which ones are more complicated harmonies that
   // are parsed by a different method.
   const keyframes = make_keyframes(abs_notes);
-  const times = [...keyframes.keys()].sort();
-  const releases_everything = find_releases(keyframes, times);
 
   // convert from ticks to rational measures
   const to_duration = new Rational(1, ticks_per_quarter).mul(N4);
 
   // Handle an initial delay if there is one
-  const start = times[0];
+  const start = keyframes.get_time(0);
   /**
    * @type {import("../music/Score.js").Music<number>[]}
    */
@@ -312,15 +384,7 @@ export function make_part(abs_notes, ticks_per_quarter) {
     initial_pause.push(new Rest(delay));
   }
 
-  // Extract the main note data
-  const notes = extract_notes(
-    keyframes,
-    times,
-    releases_everything,
-    to_duration
-  );
-
-  return new Melody(...initial_pause, ...notes);
+  return new Melody(...initial_pause, ...keyframes.extract_notes(to_duration));
 }
 
 /**
