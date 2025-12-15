@@ -320,12 +320,57 @@ function make_simple_music(start_frame, end_frame, to_duration) {
  * @returns {Melody<number>}
  */
 function extract_pitch_line(frames, to_duration, pitch) {
+  const notes = [];
+
+  let is_active = frames[0].on_set.has(pitch);
+  let last_start = frames[0].time;
   for (let i = 1; i < frames.length; i++) {
-    const prev = frames[i - 1];
-    const curr = frames[i];
+    const frame = frames[i];
+    const released = frame.off_set.has(pitch);
+    const pressed = frame.on_set.has(pitch);
+
+    /*  active  pressed  released   action               active'
+     *    0       0        0         add duration          0
+     *    0       0        x         add duration          0
+     *    0       1        x         emit gap,             1
+     *    0       1        x         emit gap,             1
+     *    1       0        0         add duration          1
+     *    1       0        1         emit note             0
+     *    1       1        0         emit note             1
+     *    1       1        1         emit note             1
+     */
+
+    if (!is_active && pressed) {
+      // continue the rest
+      is_active = pressed;
+    } else if (!is_active) {
+      // emit a rest
+      const delta = frame.time - last_start;
+      last_start = frame.time;
+
+      const rest = new Rest(new Rational(delta).mul(to_duration));
+      notes.push(rest);
+
+      is_active = pressed;
+    } else if (released || pressed) {
+      // we had an active note, and it either was released, or
+      // a new note overrides it. Either way, emit the note
+      const delta = frame.time - last_start;
+      last_start = frame.time;
+
+      const note = new Note(pitch, new Rational(delta).mul(to_duration));
+      notes.push(note);
+
+      is_active = pressed;
+    } else {
+      // sustain the active note
+      is_active = true;
+    }
   }
 
-  return new Melody();
+  // TODO: handle the final note/rest
+
+  return new Melody(...notes);
 }
 
 /**
@@ -343,19 +388,17 @@ function make_complex_harmony(frames, to_duration) {
 
   // Gather all the pitches
   let all_pitches = frames[0].on_set;
-  for (let i = 0; i < frames.length - 1; i++) {
+  for (let i = 1; i < frames.length - 1; i++) {
     all_pitches = all_pitches.union(frames[i].on_set).union(frames[i].off_set);
   }
   all_pitches = all_pitches.union(frames[frames.length - 1].off_set);
-  const pitches_descending = [...all_pitches].sort().reverse();
 
-  /*
+  const pitches_descending = [...all_pitches].sort().reverse();
   return new Harmony(
-    pitches_descending.map((x) =>
+    ...pitches_descending.map((pitch) =>
       extract_pitch_line(frames, to_duration, pitch)
     )
-  );*/
-  return new Rest(duration);
+  );
 }
 
 /**
