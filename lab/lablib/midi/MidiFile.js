@@ -74,6 +74,40 @@ export class MIDIMessage {
     this.channel = channel;
     this.data = data;
   }
+
+  /**
+   * Shorthand for a note on event
+   * @param {number} tick_delta Time delta for message
+   * @param {number} channel Channel number 0-15
+   * @param {number} pitch MIDI note number
+   * @param {number} velocity MIDI velocity 0-127
+   * @returns {MIDIMessage} The note event
+   */
+  static note_on(tick_delta, channel, pitch, velocity) {
+    return new MIDIMessage(
+      tick_delta,
+      MIDIMessageType.NOTE_ON,
+      channel,
+      new Uint8Array([pitch, velocity])
+    );
+  }
+
+  /**
+   * Shorthand for a note off event
+   * @param {number} tick_delta Time delta for message
+   * @param {number} channel Channel number 0-15
+   * @param {number} pitch MIDI note number
+   * @param {number} [velocity=0] MIDI velocity 0-127
+   * @returns {MIDIMessage} The note event
+   */
+  static note_off(tick_delta, channel, pitch, velocity = 0) {
+    return new MIDIMessage(
+      tick_delta,
+      MIDIMessageType.NOTE_OFF,
+      channel,
+      new Uint8Array([pitch, velocity])
+    );
+  }
 }
 
 /**
@@ -111,6 +145,19 @@ export class MIDIMetaEvent {
     this.tick_delta = tick_delta;
     this.meta_type = meta_type;
     this.payload = payload;
+  }
+
+  /**
+   * Shorthand for making an end of track message
+   * @param {number} tick_delta
+   * @returns
+   */
+  static end_of_track(tick_delta) {
+    return new MIDIMetaEvent(
+      tick_delta,
+      MIDIMetaType.END_OF_TRACK,
+      new Uint8Array(0)
+    );
   }
 }
 
