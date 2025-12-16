@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { Gap, Sequential } from "./Timeline";
-import { N4 } from "./durations";
+import { N2, N4 } from "./durations";
 import { simplify_timeline } from "./simplify_timeline";
 
 const NO_OPTIONS = {
@@ -54,6 +54,33 @@ describe("simplify_timeline", () => {
       const result = simplify_timeline(seq, OPTIONS);
 
       expect(result).toEqual(interval);
+    });
+
+    it("with nested Sequentials returns flattened Sequential", () => {
+      const interval1 = stub_interval(1, N4);
+      const interval2 = stub_interval(2, N2);
+      const nested = new Sequential(
+        new Sequential(interval1, interval2),
+        interval2,
+        new Sequential(interval1),
+        new Sequential(interval2, interval2),
+        interval1
+      );
+
+      const result = simplify_timeline(nested, OPTIONS);
+
+      // Same thing flattened into a single array
+      const expected = new Sequential(
+        interval1,
+        interval2,
+        interval2,
+        interval1,
+        interval2,
+        interval2,
+        interval1
+      );
+
+      expect(result).toEqual(expected);
     });
   });
 });
