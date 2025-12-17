@@ -28,7 +28,12 @@ function flatten_sequential(seq) {
         flattened.push(flat_child);
       }
     } else if (child instanceof Parallel) {
-      flattened.push(flatten_parallel(child));
+      const flat_child = flatten_parallel(child);
+      if (flat_child instanceof Sequential) {
+        flattened.push(...flat_child.children);
+      } else {
+        flattened.push(flatten_parallel(child));
+      }
     } else {
       flattened.push(child);
     }
@@ -66,8 +71,13 @@ function flatten_parallel(par) {
       }
     } else if (child instanceof Sequential) {
       const flat_child = flatten_sequential(child);
-      flattened.push(flat_child);
+      if (flat_child instanceof Parallel) {
+        flattened.push(...flat_child.children);
+      } else {
+        flattened.push(flat_child);
+      }
     } else {
+      // gap or simple interval
       flattened.push(child);
     }
   }
