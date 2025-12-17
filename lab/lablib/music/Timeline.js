@@ -25,6 +25,7 @@ export class Gap {
     return this;
   }
 }
+Gap.ZERO = Object.freeze(new Gap(Rational.ZERO));
 
 /**
  * A sequence of events in time
