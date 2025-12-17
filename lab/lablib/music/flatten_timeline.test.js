@@ -122,4 +122,69 @@ describe("flatten_timeline", () => {
 
     expect(result).toEqual(expected);
   });
+
+  it("flattens complicated parallel timeline correctly", () => {
+    const interval1 = stub_interval(1, N4);
+    const interval2 = stub_interval(2, N2);
+    const nested = new Parallel(
+      new Parallel(interval1, interval2),
+      interval2,
+      new Sequential(
+        interval1,
+        interval2,
+        new Sequential(interval1, interval1)
+      ),
+      new Parallel(
+        interval1,
+        new Parallel(interval1, new Sequential(), interval2)
+      ),
+      new Parallel(interval2, interval2),
+      interval1,
+      // This case is extra tricky! the sequentials each have a single child
+      // so they unwrap completely. But this produces a Parallel... so this
+      // needs to be completed.
+      new Sequential(
+        new Sequential(
+          new Parallel(
+            new Parallel(interval2),
+            interval1,
+            new Sequential(interval1, interval1)
+          )
+        )
+      )
+    );
+
+    const result = flatten_timeline(nested);
+
+    const expected = new Parallel(
+      // parallel is unwrapped
+      interval1,
+      interval2,
+      interval2,
+      new Sequential(
+        interval1,
+        interval2,
+        // inner sequential unwrapped
+        interval1,
+        interval1
+      ),
+      // nested parallel unwrapped
+      interval1,
+      interval1,
+      Gap.ZERO,
+      interval2,
+      // another parallel unwrapped
+      interval2,
+      interval2,
+      interval1,
+      // two redundant Sequential layers unwrapped,
+      // but then the parallel becomes top level so it should
+
+      // inner parallel also unwraps
+      interval2,
+      interval1,
+      new Sequential(interval1, interval1)
+    );
+    expect(result).toEqual(expected);
+  });
 });
