@@ -20,22 +20,17 @@ function flatten_sequential(seq) {
   const flattened = [];
 
   for (const child of seq.children) {
+    let flat_child = child;
     if (child instanceof Sequential) {
-      const flat_child = flatten_sequential(child);
-      if (flat_child instanceof Sequential) {
-        flattened.push(...flat_child.children);
-      } else {
-        flattened.push(flat_child);
-      }
+      flat_child = flatten_sequential(child);
     } else if (child instanceof Parallel) {
-      const flat_child = flatten_parallel(child);
-      if (flat_child instanceof Sequential) {
-        flattened.push(...flat_child.children);
-      } else {
-        flattened.push(flatten_parallel(child));
-      }
+      flat_child = flatten_parallel(child);
+    }
+
+    if (flat_child instanceof Sequential) {
+      flattened.push(...flat_child.children);
     } else {
-      flattened.push(child);
+      flattened.push(flat_child);
     }
   }
 
@@ -62,23 +57,18 @@ function flatten_sequential(seq) {
 function flatten_parallel(par) {
   const flattened = [];
   for (const child of par.children) {
+    let flat_child = child;
+
     if (child instanceof Parallel) {
-      const flat_child = flatten_parallel(child);
-      if (flat_child instanceof Parallel) {
-        flattened.push(...flat_child.children);
-      } else {
-        flattened.push(flat_child);
-      }
+      flat_child = flatten_parallel(child);
     } else if (child instanceof Sequential) {
-      const flat_child = flatten_sequential(child);
-      if (flat_child instanceof Parallel) {
-        flattened.push(...flat_child.children);
-      } else {
-        flattened.push(flat_child);
-      }
+      flat_child = flatten_sequential(child);
+    }
+
+    if (flat_child instanceof Parallel) {
+      flattened.push(...flat_child.children);
     } else {
-      // gap or simple interval
-      flattened.push(child);
+      flattened.push(flat_child);
     }
   }
 
