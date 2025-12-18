@@ -13,6 +13,8 @@ import { TextStyle } from "../../sketchlib/rendering/TextStyle.js";
 import { Transform } from "../../sketchlib/rendering/Transform.js";
 import { Style } from "../../sketchlib/Style.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
+import { encode_midi } from "../lablib/midi/encode_midi.js";
+import { score_to_midi } from "../lablib/midi/score_to_midi.js";
 import { MouseInput } from "../lablib/MouseInput.js";
 import { render_score } from "../lablib/music/render_score.js";
 import { MuteButton } from "../lablib/MuteButton.js";
@@ -153,6 +155,22 @@ const CURSOR = style(
   Style.DEFAULT_STROKE
 );
 
+/**
+ * Download a generated file
+ * @param {File} file The file to downlowd
+ */
+function download_file(file) {
+  const url = URL.createObjectURL(file);
+
+  const anchor = document.createElement("a");
+  anchor.setAttribute("href", url);
+  anchor.setAttribute("download", file.name);
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+}
+
 class SoundScene {
   /**
    * Constructor
@@ -207,6 +225,29 @@ class SoundScene {
       });
       return button;
     });
+
+    const export_button = document.getElementById("export");
+    if (export_button instanceof HTMLButtonElement) {
+      export_button.disabled = false;
+      export_button.addEventListener("click", () => this.export_selected());
+    }
+  }
+
+  export_selected() {
+    if (!this.selected_melody) {
+      return;
+    }
+
+    // make MIDI file here
+    const midi = score_to_midi(SOUND_MANIFEST.scores[this.selected_melody]);
+
+    const chunks = encode_midi(midi);
+    const file = new File(chunks, `${this.selected_melody}.mid`, {
+      type: "audio/mid",
+    });
+
+    // download file here
+    download_file(file);
   }
 
   render() {
