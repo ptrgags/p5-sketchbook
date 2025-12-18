@@ -27,7 +27,10 @@ function flatten_sequential(seq) {
       flat_child = flatten_parallel(child);
     }
 
-    if (flat_child instanceof Sequential) {
+    if (flat_child instanceof Gap && flat_child.is_empty) {
+      // filter out zero gaps
+      continue;
+    } else if (flat_child instanceof Sequential) {
       flattened.push(...flat_child.children);
     } else {
       flattened.push(flat_child);
@@ -65,7 +68,10 @@ function flatten_parallel(par) {
       flat_child = flatten_sequential(child);
     }
 
-    if (flat_child instanceof Parallel) {
+    if (flat_child instanceof Gap && flat_child.is_empty) {
+      // Filter out zero gaps
+      continue;
+    } else if (flat_child instanceof Parallel) {
       flattened.push(...flat_child.children);
     } else {
       flattened.push(flat_child);

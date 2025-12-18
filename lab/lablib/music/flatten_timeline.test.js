@@ -52,6 +52,30 @@ describe("flatten_timeline", () => {
     expect(result).toBe(interval);
   });
 
+  it("with Sequential containing only zero gaps returns zero gap", () => {
+    const seq = new Sequential(Gap.ZERO, Gap.ZERO);
+
+    const result = flatten_timeline(seq);
+
+    expect(result).toBe(Gap.ZERO);
+  });
+
+  it("with Sequential with zero gaps filters out gaps", () => {
+    const interval = stub_interval(1, N4);
+    const seq = new Sequential(
+      interval,
+      Gap.ZERO,
+      interval,
+      interval,
+      Gap.ZERO
+    );
+
+    const result = flatten_timeline(seq);
+
+    const expected = new Sequential(interval, interval, interval);
+    expect(result).toStrictEqual(expected);
+  });
+
   it("with nested Sequentials returns flattened Sequential", () => {
     const interval1 = stub_interval(1, N4);
     const interval2 = stub_interval(2, N2);
@@ -120,6 +144,24 @@ describe("flatten_timeline", () => {
       interval1
     );
 
+    expect(result).toStrictEqual(expected);
+  });
+
+  it("with Parallel containing only zero gaps returns zero gap", () => {
+    const seq = new Parallel(Gap.ZERO, Gap.ZERO);
+
+    const result = flatten_timeline(seq);
+
+    expect(result).toBe(Gap.ZERO);
+  });
+
+  it("with Parallel with zero gaps filters out gaps", () => {
+    const interval = stub_interval(1, N4);
+    const seq = new Parallel(interval, Gap.ZERO, interval, interval, Gap.ZERO);
+
+    const result = flatten_timeline(seq);
+
+    const expected = new Parallel(interval, interval, interval);
     expect(result).toStrictEqual(expected);
   });
 
@@ -205,5 +247,20 @@ describe("flatten_timeline", () => {
       interval1
     );
     expect(result).toStrictEqual(expected);
+  });
+
+  it("flattens complex empty timeline to zero gap", () => {
+    const whole_lot_of_nothing = new Sequential(
+      new Sequential(),
+      new Parallel(new Sequential(), new Sequential(Gap.ZERO)),
+      Gap.ZERO,
+      new Sequential(new Sequential()),
+      new Parallel(new Sequential(), Gap.ZERO),
+      Gap.ZERO
+    );
+
+    const result = flatten_timeline(whole_lot_of_nothing);
+
+    expect(result).toBe(Gap.ZERO);
   });
 });

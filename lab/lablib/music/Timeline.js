@@ -24,6 +24,14 @@ export class Gap {
   map() {
     return this;
   }
+
+  /**
+   * Return true if the duration is 0
+   * @return {boolean}
+   */
+  get is_empty() {
+    return this.duration.equals(Rational.ZERO);
+  }
 }
 Gap.ZERO = Object.freeze(new Gap(Rational.ZERO));
 
