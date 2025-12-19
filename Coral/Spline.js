@@ -1,4 +1,4 @@
-import { BezierPrimitive } from "../sketchlib/primitives/BezierPrimitive";
+import { BezierPrimitive } from "../sketchlib/primitives/BezierPrimitive.js";
 
 export class Spline {
   constructor(control_points) {

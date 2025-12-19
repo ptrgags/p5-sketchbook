@@ -1,6 +1,6 @@
 import { Point } from "../../pga2d/objects.js";
 import { HEIGHT } from "../../sketchlib/dimensions.js";
-import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
+import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { DirectionInput } from "./DirectionInput.js";
 import { KeyboardDPad } from "./KeyboardDPad.js";
 import { MouseInput } from "./MouseInput.js";
