@@ -1,4 +1,5 @@
 import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
+import { group } from "../../sketchlib/primitives/shorthand.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { MouseInput } from "../lablib/MouseInput.js";
 import { MuteButton } from "../lablib/MuteButton.js";
