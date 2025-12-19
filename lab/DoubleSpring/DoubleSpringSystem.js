@@ -1,15 +1,13 @@
 import { Point } from "../../pga2d/objects.js";
-import {
-  LinePrimitive,
-  RectPrimitive,
-} from "../../sketchlib/rendering/primitives.js";
 import { RungeKuttaIntegrator } from "../lablib/RungeKuttaIntegrator.js";
 import { Style } from "../../sketchlib/Style.js";
 import { RingBuffer } from "../lablib/RingBuffer.js";
 import { GeneralizedCoordinates } from "../lablib/VectorSpace.js";
 import { Oklch } from "../lablib/Oklch.js";
-import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
-import { group, style } from "../../sketchlib/rendering/shorthand.js";
+import { group, style } from "../../sketchlib/primitives/shorthand.js";
+import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
+import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
+import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 
 const PIXELS_PER_METER = 100;
 const X_METERS = Point.DIR_X.scale(PIXELS_PER_METER);

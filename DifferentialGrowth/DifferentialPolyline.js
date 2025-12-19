@@ -1,16 +1,13 @@
 import { Point } from "../pga2d/objects.js";
-import {
-  BeziergonPrimitive,
-  PolygonPrimitive,
-} from "../sketchlib/rendering/primitives.js";
 import { Random } from "../sketchlib/random.js";
 import { Vector2 } from "./Vector2.js";
 import { DifferentialNode, NEARBY_RADIUS } from "./DifferentialNode.js";
 import { Circle } from "./circle.js";
 import { mod } from "../sketchlib/mod.js";
 import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
-import { GroupPrimitive } from "../sketchlib/rendering/GroupPrimitive.js";
-import { style } from "../sketchlib/rendering/shorthand.js";
+import { style } from "../sketchlib/primitives/shorthand.js";
+import { BeziergonPrimitive } from "../sketchlib/primitives/BeziergonPrimitive.js";
+import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
 
 const MAX_EDGE_LENGTH = 150;
 
@@ -239,7 +236,7 @@ export class DifferentialPolyline {
     const vertices = this.nodes.map((x) =>
       Point.point(x.position.x, x.position.y)
     );
-    const polygon = new PolygonPrimitive(vertices);
+    const polygon = new PolygonPrimitive(vertices, true);
     return style(polygon, line_style);
   }
 

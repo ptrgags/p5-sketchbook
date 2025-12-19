@@ -1,8 +1,6 @@
 import { Point } from "../../pga2d/objects.js";
 import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
-import { draw_primitive } from "../../sketchlib/p5_helpers/draw_primitive.js";
-import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
-import { group } from "../../sketchlib/rendering/shorthand.js";
+import { group } from "../../sketchlib/primitives/shorthand.js";
 import { Oklch } from "../lablib/Oklch.js";
 import { DoubleSpringSystem, Spring } from "./DoubleSpringSystem.js";
 
@@ -90,7 +88,7 @@ export const sketch = (p) => {
 
     const scene = group(...animations, phase_axes, ...phase_animations);
 
-    draw_primitive(p, scene);
+    scene.draw(p);
 
     SPRING_SYSTEMS.forEach((x) => x.step(DELTA_TIME));
   };

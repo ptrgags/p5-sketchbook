@@ -1,18 +1,15 @@
 import { Point } from "../pga2d/objects.js";
-import {
-  BeziergonPrimitive,
-  CirclePrimitive,
-  LinePrimitive,
-  PointPrimitive,
-} from "../sketchlib/rendering/primitives.js";
 import { Style } from "../sketchlib/Style.js";
 import { Color } from "../sketchlib/Color.js";
 import { Motor } from "../pga2d/versors.js";
 import { AnimationChain, Joint } from "../sketchlib/AnimationChain.js";
 import { is_nearly } from "../sketchlib/is_nearly.js";
 import { GooglyEye } from "./GooglyEye.js";
-import { GroupPrimitive } from "../sketchlib/rendering/GroupPrimitive.js";
-import { group, style } from "../sketchlib/rendering/shorthand.js";
+import { BeziergonPrimitive } from "../sketchlib/primitives/BeziergonPrimitive.js";
+import { CirclePrimitive } from "../sketchlib/primitives/CirclePrimitive.js";
+import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
+import { PointPrimitive } from "../sketchlib/primitives/PointPrimitive.js";
+import { group, style } from "../sketchlib/primitives/shorthand.js";
 
 const WORM_SEGMENTS = 60;
 const WORM_SEGMENT_SEPARATION = 30;

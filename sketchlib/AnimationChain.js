@@ -1,9 +1,9 @@
 import { Point } from "../pga2d/objects.js";
 import { Motor } from "../pga2d/versors.js";
 import { Color } from "./Color.js";
-import { GroupPrimitive } from "./rendering/GroupPrimitive.js";
-import { LinePrimitive, PointPrimitive } from "./rendering/primitives.js";
-import { group, style } from "./rendering/shorthand.js";
+import { LinePrimitive } from "./primitives/LinePrimitive.js";
+import { PointPrimitive } from "./primitives/PointPrimitive.js";
+import { group, style } from "./primitives/shorthand.js";
 import { Style } from "./Style.js";
 
 const SPINE_STYLE = Style.DEFAULT_STROKE;

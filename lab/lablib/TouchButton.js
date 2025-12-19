@@ -1,7 +1,7 @@
 import { Point } from "../../pga2d/objects.js";
 import { Color } from "../../sketchlib/Color.js";
-import { RectPrimitive } from "../../sketchlib/rendering/primitives.js";
-import { style } from "../../sketchlib/rendering/shorthand.js";
+import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
+import { style } from "../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Rectangle } from "./Rectangle.js";
 
@@ -64,7 +64,7 @@ export class TouchButton {
    * Transition to a new button state, triggering events when the pressed
    * state changes
    * @private
-   * @param {ButtonState} new_state 
+   * @param {ButtonState} new_state
    */
   transition(new_state) {
     if (this.is_pressed && new_state !== ButtonState.PRESSED) {
@@ -82,7 +82,7 @@ export class TouchButton {
    */
   mouse_pressed(mouse_coords) {
     if (!this.rect.contains(mouse_coords)) {
-      this.transition(ButtonState.IDLE)
+      this.transition(ButtonState.IDLE);
       return;
     }
 
@@ -95,7 +95,7 @@ export class TouchButton {
    */
   mouse_released(mouse_coords) {
     if (!this.rect.contains(mouse_coords)) {
-      this.transition(ButtonState.IDLE)
+      this.transition(ButtonState.IDLE);
       return;
     }
 
@@ -112,12 +112,12 @@ export class TouchButton {
    */
   mouse_moved(mouse_coords) {
     if (!this.rect.contains(mouse_coords)) {
-      this.transition(ButtonState.IDLE)
+      this.transition(ButtonState.IDLE);
       return;
     }
 
     if (this.state !== ButtonState.PRESSED) {
-      this.transition(ButtonState.HOVER)
+      this.transition(ButtonState.HOVER);
     }
   }
 
@@ -127,10 +127,10 @@ export class TouchButton {
    */
   mouse_dragged(mouse_coords) {
     if (!this.rect.contains(mouse_coords)) {
-      this.transition(ButtonState.IDLE)
+      this.transition(ButtonState.IDLE);
       return;
     }
 
-    this.transition(ButtonState.PRESSED)
+    this.transition(ButtonState.PRESSED);
   }
 }

@@ -1,9 +1,7 @@
 import { Point } from "../pga2d/objects.js";
 import { ArcAngles } from "../sketchlib/ArcAngles.js";
-import {
-  ArcPrimitive,
-  LinePrimitive,
-} from "../sketchlib/rendering/primitives.js";
+import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
+import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
 import { Tween } from "../sketchlib/Tween.js";
 
 /**

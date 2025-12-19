@@ -2,15 +2,12 @@ import { Point } from "../../pga2d/objects.js";
 import { Color } from "../../sketchlib/Color.js";
 import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
 import { Grid, Index2D } from "../../sketchlib/Grid.js";
-import { draw_primitive } from "../../sketchlib/p5_helpers/draw_primitive.js";
-import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
-import {
-  LinePrimitive,
-  TextPrimitive,
-} from "../../sketchlib/rendering/primitives.js";
-import { group, style, xform } from "../../sketchlib/rendering/shorthand.js";
-import { TextStyle } from "../../sketchlib/rendering/TextStyle.js";
-import { Transform } from "../../sketchlib/rendering/Transform.js";
+import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
+import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
+import { xform, group, style } from "../../sketchlib/primitives/shorthand.js";
+import { TextPrimitive } from "../../sketchlib/primitives/TextPrimitive.js";
+import { TextStyle } from "../../sketchlib/primitives/TextStyle.js";
+import { Transform } from "../../sketchlib/primitives/Transform.js";
 import { Style } from "../../sketchlib/Style.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { MouseInput } from "../lablib/MouseInput.js";
@@ -303,7 +300,7 @@ export const sketch = (p) => {
     scene.update();
 
     const scene_primitive = scene.render();
-    draw_primitive(p, scene_primitive);
+    scene_primitive.draw(p);
   };
 
   MOUSE.mouse_pressed(p, (input) => {

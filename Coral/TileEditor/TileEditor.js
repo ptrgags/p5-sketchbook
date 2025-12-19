@@ -11,12 +11,6 @@ import {
   render_tile_walls,
 } from "../rendering.js";
 import {
-  CirclePrimitive,
-  LinePrimitive,
-  PointPrimitive,
-} from "../../sketchlib/rendering/primitives.js";
-import { draw_primitive } from "../../sketchlib/p5_helpers/draw_primitive.js";
-import {
   GRID_STYLE,
   WALL_STYLE,
   CONNECTION_STYLE,
@@ -24,8 +18,10 @@ import {
 } from "../styles.js";
 import { Color } from "../../sketchlib/Color.js";
 import { Direction } from "../../sketchlib/Direction.js";
-import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
-import { group, style } from "../../sketchlib/rendering/shorthand.js";
+import { group, style } from "../../sketchlib/primitives/shorthand.js";
+import { CirclePrimitive } from "../../sketchlib/primitives/CirclePrimitive.js";
+import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
+import { PointPrimitive } from "../../sketchlib/primitives/PointPrimitive.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -176,16 +172,16 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    draw_primitive(p, STATIC_GEOMETRY);
+    STATIC_GEOMETRY.draw(p);
 
     // Draw the Bezier spline
-    draw_primitive(p, splines);
+    splines.draw(p);
 
     if (highlight) {
-      draw_primitive(p, highlight);
+      highlight.draw(p);
     }
 
-    draw_primitive(p, control_points);
+    control_points.draw(p);
   };
 
   p.mousePressed = () => {
