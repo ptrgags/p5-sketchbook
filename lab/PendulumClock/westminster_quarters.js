@@ -36,16 +36,16 @@ function make_hour_score(hour) {
   // Every hour the hour bell rings n times, for a half note each.
   const hour_chimes = Melody.from_repeat(HOUR_BELL, hour);
   const hour_part = new Melody(FOURTH_QUARTER, hour_chimes);
-  return new Score(["bell", hour_part]);
+  return new Score({ parts: [["bell", hour_part]] });
 }
 
 /**
  * @type {{[key: string]: Score}}
  */
 export const WESTMINSTER_QUARTERS_SCORES = {
-  quarter1: new Score(["bell", FIRST_QUARTER]),
-  quarter2: new Score(["bell", SECOND_QUARTER]),
-  quarter3: new Score(["bell", THIRD_QUARTER]),
+  quarter1: new Score({ parts: [["bell", FIRST_QUARTER]] }),
+  quarter2: new Score({ parts: [["bell", SECOND_QUARTER]] }),
+  quarter3: new Score({ parts: [["bell", THIRD_QUARTER]] }),
   hour1: make_hour_score(1),
   hour2: make_hour_score(2),
   hour3: make_hour_score(3),
