@@ -9,13 +9,16 @@ import { CanvasMouseHandler } from "../lab/lablib/CanvasMouseHandler.js";
 
 const MOUSE = new CanvasMouseHandler();
 const DPAD = new DirectionalPad();
-const HALF_SCREEN = Point.direction(WIDTH / 2, HEIGHT);
+const THIRD_SCREEN = Point.direction(WIDTH / 3, HEIGHT);
 
 // Virtual touch buttons for left and right keys on mobile.
-const TOUCH_LEFT = new TouchButton(new Rectangle(Point.ORIGIN, HALF_SCREEN));
+const TOUCH_LEFT = new TouchButton(new Rectangle(Point.ORIGIN, THIRD_SCREEN));
 const TOUCH_RIGHT = new TouchButton(
-  new Rectangle(Point.point(WIDTH / 2, 0), HALF_SCREEN)
+  new Rectangle(Point.point(2 * WIDTH / 3, 0), THIRD_SCREEN)
 );
+const TOUCH_DOWN = new TouchButton(
+  new Rectangle(Point.point(WIDTH / 3, 3 * HEIGHT / 4), Point.direction(WIDTH / 3, HEIGHT / 4))
+)
 
 export const sketch = (p) => {
   let n = 5;
@@ -49,6 +52,12 @@ export const sketch = (p) => {
     TOUCH_RIGHT.events.addEventListener("released", () => {
       DPAD.key_released("ArrowRight");
     });
+    TOUCH_DOWN.events.addEventListener("pressed", () => {
+      DPAD.key_pressed("ArrowDown");
+    })
+    TOUCH_DOWN.events.addEventListener("released", () => {
+      DPAD.key_pressed("ArrowDown")
+    })
 
     document.getElementById("reset").addEventListener("click", reset);
 
@@ -66,6 +75,10 @@ export const sketch = (p) => {
     robot.update(p.frameCount, DPAD.direction.digital);
     const robot_walk = robot.render(p.frameCount);
     draw_primitive(p, robot_walk);
+
+    draw_primitive(p, TOUCH_LEFT.debug_render());
+    draw_primitive(p, TOUCH_RIGHT.debug_render());
+    draw_primitive(p, TOUCH_DOWN.debug_render());
   };
 
   p.keyPressed = (/** @type {KeyboardEvent} */ e) => {
@@ -81,20 +94,24 @@ export const sketch = (p) => {
   MOUSE.mouse_pressed(p, (input) => {
     TOUCH_LEFT.mouse_pressed(input.mouse_coords);
     TOUCH_RIGHT.mouse_pressed(input.mouse_coords);
+    TOUCH_DOWN.mouse_pressed(input.mouse_coords);
   });
 
   MOUSE.mouse_moved(p, (input) => {
     TOUCH_LEFT.mouse_moved(input.mouse_coords);
     TOUCH_RIGHT.mouse_moved(input.mouse_coords);
+    TOUCH_DOWN.mouse_moved(input.mouse_coords);
   });
 
   MOUSE.mouse_released(p, (input) => {
     TOUCH_LEFT.mouse_released(input.mouse_coords);
     TOUCH_RIGHT.mouse_released(input.mouse_coords);
+    TOUCH_DOWN.mouse_released(input.mouse_coords);
   });
 
   MOUSE.mouse_dragged(p, (input) => {
     TOUCH_LEFT.mouse_dragged(input.mouse_coords);
     TOUCH_RIGHT.mouse_dragged(input.mouse_coords);
+    TOUCH_DOWN.mouse_released(input.mouse_coords);
   });
 };
