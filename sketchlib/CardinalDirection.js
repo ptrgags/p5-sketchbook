@@ -1,4 +1,4 @@
-import { Point } from "../pga2d/objects.js";
+import { Direction } from "../pga2d/Direction.js";
 
 /**
  * One of the 4 cardinal directions. They're ordered from the right in CCW
@@ -16,58 +16,39 @@ export const CardinalDirection = {
 
 /**
  * Get the opposite direction
- * @param {Direction} direction The direction
- * @returns {Direction} The opposite direction
+ * @param {CardinalDirection} direction The direction
+ * @returns {CardinalDirection} The opposite direction
  */
 export function opposite(direction) {
   switch (direction) {
-    case Direction.LEFT:
-      return Direction.RIGHT;
-    case Direction.RIGHT:
-      return Direction.LEFT;
-    case Direction.UP:
-      return Direction.DOWN;
-    case Direction.DOWN:
-      return Direction.UP;
+    case CardinalDirection.LEFT:
+      return CardinalDirection.RIGHT;
+    case CardinalDirection.RIGHT:
+      return CardinalDirection.LEFT;
+    case CardinalDirection.UP:
+      return CardinalDirection.DOWN;
+    case CardinalDirection.DOWN:
+      return CardinalDirection.UP;
   }
 }
 
 /**
  * Return a (y-up) PGA direction. This is helpful when working with math
- * @param {Direction | undefined} direction The direction constant
- * @returns {Point} A PGA direction object corresponding to the same direction
+ * If you need y-down, use to_direction().flip_y()
+ * @param {CardinalDirection | undefined} direction The direction constant
+ * @returns {Direction} A PGA direction object corresponding to the same direction
  */
-export function to_y_up(direction) {
+export function to_direction(direction) {
   switch (direction) {
-    case Direction.LEFT:
-      return Point.DIR_X.neg();
-    case Direction.RIGHT:
-      return Point.DIR_X;
-    case Direction.UP:
-      return Point.DIR_Y;
-    case Direction.DOWN:
-      return Point.DIR_Y.neg();
+    case CardinalDirection.LEFT:
+      return Direction.DIR_X.neg();
+    case CardinalDirection.RIGHT:
+      return Direction.DIR_X;
+    case CardinalDirection.UP:
+      return Direction.DIR_Y;
+    case CardinalDirection.DOWN:
+      return Direction.DIR_Y.neg();
   }
 
-  return Point.ZERO;
-}
-
-/**
- * Return a (y-down) PGA direction. This is helpful when working in pixel
- * coordinates
- * @param {Direction | undefined} direction the direction constant
- * @returns {Point} a PGA direction corresponding to the direction
- */
-export function to_y_down(direction) {
-  switch (direction) {
-    case Direction.LEFT:
-      return Point.DIR_X.neg();
-    case Direction.RIGHT:
-      return Point.DIR_X;
-    case Direction.UP:
-      return Point.DIR_Y.neg();
-    case Direction.DOWN:
-      return Point.DIR_Y;
-  }
-  return Point.ZERO;
+  return Direction.ZERO;
 }

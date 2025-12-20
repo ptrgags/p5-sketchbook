@@ -1,19 +1,18 @@
 import { describe, it, expect } from "vitest";
 import {
-  Direction,
+  CardinalDirection,
   opposite,
-  to_y_up,
-  to_y_down,
+  to_direction,
 } from "./CardinalDirection.js";
-import { Point } from "../pga2d/objects.js";
 import { PGA_MATCHERS } from "../pga2d/pga_matchers.js";
+import { Direction } from "../pga2d/Direction.js";
 
 expect.extend(PGA_MATCHERS);
 
-describe("Direction", () => {
+describe("CardinalDirection", () => {
   it("LEFT and RIGHT are opposites", () => {
-    const left = Direction.LEFT;
-    const right = Direction.RIGHT;
+    const left = CardinalDirection.LEFT;
+    const right = CardinalDirection.RIGHT;
 
     const left_opp = opposite(left);
     const right_opp = opposite(right);
@@ -23,8 +22,8 @@ describe("Direction", () => {
   });
 
   it("UP and DOWN are opposites", () => {
-    const up = Direction.UP;
-    const down = Direction.DOWN;
+    const up = CardinalDirection.UP;
+    const down = CardinalDirection.DOWN;
 
     const up_opp = opposite(up);
     const down_opp = opposite(down);
@@ -33,67 +32,35 @@ describe("Direction", () => {
     expect(down_opp).toBe(up);
   });
 
-  describe("to_y_up", () => {
+  describe("to_direction", () => {
     it("RIGHT corresponds to +x", () => {
-      const result = to_y_up(Direction.RIGHT);
+      const result = to_direction(CardinalDirection.RIGHT);
 
-      expect(result).toBePoint(Point.DIR_X);
+      expect(result).toBePoint(Direction.DIR_X);
     });
 
     it("LEFT corresponds to -x", () => {
-      const result = to_y_up(Direction.LEFT);
+      const result = to_direction(CardinalDirection.LEFT);
 
-      expect(result).toBePoint(Point.DIR_X.scale(-1));
+      expect(result).toBePoint(Direction.DIR_X.scale(-1));
     });
 
     it("UP corresponds to +y", () => {
-      const result = to_y_up(Direction.UP);
+      const result = to_direction(CardinalDirection.UP);
 
-      expect(result).toBePoint(Point.DIR_Y);
+      expect(result).toBePoint(Direction.DIR_Y);
     });
 
     it("DOWN corresponds to -y", () => {
-      const result = to_y_up(Direction.DOWN);
+      const result = to_direction(CardinalDirection.DOWN);
 
-      expect(result).toBePoint(Point.DIR_Y.scale(-1));
+      expect(result).toBePoint(Direction.DIR_Y.scale(-1));
     });
 
     it("with undefined returns ZERO", () => {
-      const result = to_y_up(undefined);
+      const result = to_direction(undefined);
 
-      expect(result).toBePoint(Point.ZERO);
-    });
-  });
-
-  describe("to_y_down", () => {
-    it("RIGHT corresponds to +x", () => {
-      const result = to_y_down(Direction.RIGHT);
-
-      expect(result).toBePoint(Point.DIR_X);
-    });
-
-    it("LEFT corresponds to -x", () => {
-      const result = to_y_down(Direction.LEFT);
-
-      expect(result).toBePoint(Point.DIR_X.scale(-1));
-    });
-
-    it("UP corresponds to -y", () => {
-      const result = to_y_down(Direction.UP);
-
-      expect(result).toBePoint(Point.DIR_Y.neg());
-    });
-
-    it("DOWN corresponds to +y", () => {
-      const result = to_y_down(Direction.DOWN);
-
-      expect(result).toBePoint(Point.DIR_Y);
-    });
-
-    it("with undefined returns ZERO", () => {
-      const result = to_y_down(undefined);
-
-      expect(result).toBePoint(Point.ZERO);
+      expect(result).toBePoint(Direction.ZERO);
     });
   });
 });
