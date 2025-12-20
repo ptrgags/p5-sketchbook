@@ -46,7 +46,15 @@ export const sketch = (p) => {
   let robot = new ArcRobot(n);
 
   function reset() {
+    // We need to make the robot unwind here
     robot = new ArcRobot(n);
+  }
+
+  function switch_robot(m) {
+    // we need to tell the current robot to unwind quickly, then
+    // when that finishes, it should
+    n = m;
+    robot = new ArcRobot(m);
   }
 
   p.setup = () => {
@@ -82,10 +90,9 @@ export const sketch = (p) => {
 
     document.getElementById("reset").addEventListener("click", reset);
 
-    for (const x of N_VALUES) {
-      document.getElementById(`n${x}`).addEventListener("click", () => {
-        n = x;
-        reset();
+    for (const m of N_VALUES) {
+      document.getElementById(`n${m}`).addEventListener("click", () => {
+        switch_robot(m);
       });
     }
   };
