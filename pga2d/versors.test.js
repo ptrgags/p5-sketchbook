@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { Line, Point } from "./objects";
 import { Motor, Flector } from "./versors";
 import { PGA_MATCHERS } from "./pga_matchers";
+import { Point } from "./Point";
+import { Line } from "./Line";
 
 expect.extend(PGA_MATCHERS);
 

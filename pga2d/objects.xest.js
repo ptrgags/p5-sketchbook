@@ -1,5 +1,4 @@
 import { describe, it, expect } from "vitest";
-import { Point, Line } from "./objects";
 import { PGA_MATCHERS } from "./pga_matchers";
 import { PI } from "../sketchlib/math_consts";
 

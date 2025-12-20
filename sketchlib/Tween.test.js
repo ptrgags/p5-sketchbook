@@ -137,7 +137,7 @@ describe("Tween", () => {
       const result = tween.get_value(6);
 
       const expected = new Point(0.5, 0.5);
-      expect(result).toBePoint(expected);
+      expect(result).toBeDirection(expected);
     });
 
     it("Tween.elapsed_timer interpolates times", () => {

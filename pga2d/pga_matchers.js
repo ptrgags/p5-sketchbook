@@ -71,7 +71,7 @@ function format_point_diff(received, expected) {
 
 function format_dir_diff(received, expected) {
   if (!(received instanceof Direction)) {
-    return `recieved is not a Point object: ${received}`;
+    return `recieved is not a Direction object: ${received}`;
   }
 
   const diffs = [];
