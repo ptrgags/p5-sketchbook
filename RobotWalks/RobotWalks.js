@@ -44,16 +44,19 @@ const ANIMATED_PATH_EX = new AnimatedPath(
 export const sketch = (p) => {
   let robot = new ArcRobot(5);
 
-  function reset() {
-    robot.reset();
-  }
-
+  /**
+   * Switch to a different robot. This will animate unwinding the current
+   * path and winding the same path from the new robot's perspective
+   * @param {number} n The n value for the next n-robot
+   */
   function switch_robot(n) {
-    // we need to tell the current robot to unwind quickly, then
-    // when that finishes, it should
+    const commands = robot.command_list;
+    // Reset the robot, and when that's done, swap it for a new robot
     robot.events.addEventListener("reset", () => {
-      robot = new ArcRobot(n);
+      robot = new ArcRobot(n, commands);
     });
+
+    robot.reset(p.frameCount);
   }
 
   p.setup = () => {
@@ -87,7 +90,9 @@ export const sketch = (p) => {
       DPAD.key_pressed("ArrowDown");
     });
 
-    document.getElementById("reset").addEventListener("click", reset);
+    document.getElementById("reset").addEventListener("click", () => {
+      robot.reset(p.frameCount);
+    });
 
     for (const m of N_VALUES) {
       document.getElementById(`n${m}`).addEventListener("click", () => {

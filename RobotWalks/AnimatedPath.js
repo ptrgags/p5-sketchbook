@@ -50,7 +50,16 @@ export class AnimatedPath {
   }
 
   /**
-   *
+   * Check if the animation is finished
+   * @param {number} frame Current frame number
+   * @returns {boolean} True if the animation is finished
+   */
+  is_done(frame) {
+    return this.tween.is_done(frame);
+  }
+
+  /**
+   * Render the current state of the path
    * @param {number} time
    */
   render(time) {
