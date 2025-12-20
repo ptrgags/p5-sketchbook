@@ -297,13 +297,44 @@ export class ArcRobot {
   }
 
   update_animate(frame, dpad_direction) {
-    // make sure the current path exists
-    // if the current path is done animating,
+    if (!this.current_path.is_done(frame)) {
+      return;
+    }
+
+    if (dpad_direction === Direction.DOWN) {
+      this.start_undo(frame);
+      this.animation_state = RobotAnimationState.MOVING;
+      return;
+    } else if (
+      dpad_direction === Direction.LEFT ||
+      dpad_direction === Direction.RIGHT
+    ) {
+      this.start_step(frame, dpad_direction);
+      this.animation_state = RobotAnimationState.MOVING;
+      return;
+    } else {
+      this.animation_state = RobotAnimationState.IDLE;
+    }
   }
 
   update_reset(frame, dpad_direction) {
     if (!this.current_path.is_done(frame)) {
       return;
+    }
+
+    if (dpad_direction === Direction.DOWN) {
+      this.start_undo(frame);
+      this.animation_state = RobotAnimationState.MOVING;
+      return;
+    } else if (
+      dpad_direction === Direction.LEFT ||
+      dpad_direction === Direction.RIGHT
+    ) {
+      this.start_step(frame, dpad_direction);
+      this.animation_state = RobotAnimationState.MOVING;
+      return;
+    } else {
+      this.animation_state = RobotAnimationState.IDLE;
     }
 
     this.events.dispatchEvent(new CustomEvent("reset"));

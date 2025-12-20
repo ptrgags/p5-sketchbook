@@ -28,7 +28,7 @@ export class PartialPrimitive extends Primitive {
 export class AnimatedPath {
   /**
    * Constructor
-   * @param {PartialPrimitive[]} segments
+   * @param {PartialPrimitive[]} segments The segments
    * @param {number} start_t Start time (usually a frame number)
    * @param {number} duration Duration in the same units as start_t
    * @param {boolean} reverse If true, the path animates backwards
