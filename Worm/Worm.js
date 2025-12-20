@@ -1,8 +1,8 @@
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { fix_mouse_coords } from "../sketchlib/fix_mouse_coords.js";
-import { Point } from "../pga2d/objects.js";
 import { AnimatedWorm } from "./AnimatedWorm.js";
 import { prevent_mobile_scroll } from "../sketchlib/prevent_mobile_scroll.js";
+import { Point } from "../pga2d/Point.js";
 
 const INITIAL_POSITION = new Point(WIDTH / 2, HEIGHT - 50);
 

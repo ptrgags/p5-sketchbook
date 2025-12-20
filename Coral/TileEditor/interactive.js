@@ -107,7 +107,7 @@ export class InteractiveTangent {
         ? // Since directions are represented as ideal points (bivectors)
           // not vectors, you get a negative sign which is unwanted here. Hence
           // the .neg()
-          this.flip_forward.transform_point(original_tangent).neg()
+          this.flip_forward.transform_dir(original_tangent).neg()
         : original_tangent;
 
     this.control_point.tangent = corrected_tangent.limit_length(

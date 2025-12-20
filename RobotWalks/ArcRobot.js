@@ -1,8 +1,7 @@
-import { Point } from "../pga2d/objects.js";
 import { ArcAngles } from "../sketchlib/ArcAngles.js";
 import { Color } from "../sketchlib/Color.js";
 import { SCREEN_CENTER } from "../sketchlib/dimensions.js";
-import { Direction } from "../sketchlib/CardinalDirection.js";
+import { CardinalDirection } from "../sketchlib/CardinalDirection.js";
 import { Style } from "../sketchlib/Style.js";
 import { Oklch } from "../lab/lablib/Oklch.js";
 import { AnimatedArc } from "./AnimatedArc.js";
@@ -12,6 +11,8 @@ import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
 import { PointPrimitive } from "../sketchlib/primitives/PointPrimitive.js";
+import { Direction } from "../pga2d/Direction.js";
+import { Point } from "../pga2d/Point.js";
 
 // How many frames to animate each 1/5 turn arc
 const MOVEMENT_DURATION = 25;
@@ -98,6 +99,11 @@ export class ArcRobot {
     this.current_arc = undefined;
   }
 
+  /**
+   *
+   * @param {number} frame
+   * @returns {Point}
+   */
   current_position(frame) {
     if (this.animation_state === RobotAnimationState.IDLE) {
       const offset = this.command_seq.offset.scale(PIXELS_PER_METER);
@@ -107,6 +113,11 @@ export class ArcRobot {
     return this.current_arc.current_position(frame);
   }
 
+  /**
+   *
+   * @param {number} frame
+   * @returns {Direction}
+   */
   forward_dir(frame) {
     if (this.animation_state === RobotAnimationState.IDLE) {
       const orientation = this.command_seq.orientation;
@@ -118,6 +129,11 @@ export class ArcRobot {
     return this.current_arc.forward_dir(frame);
   }
 
+  /**
+   *
+   * @param {number} frame
+   * @param {CardinalDirection} dpad_direction
+   */
   start_moving(frame, dpad_direction) {
     // The D-pad key determines whether the arc curves to the left or right.
     let command;
@@ -128,7 +144,7 @@ export class ArcRobot {
     // the arc radius as 1 meter. So the right direction is _exactly_ the
     // corresponding root of unity. And left is just its negation.
     let to_center_model = ROOTS_OF_UNITY[this.command_seq.orientation];
-    if (dpad_direction === Direction.LEFT) {
+    if (dpad_direction === CardinalDirection.LEFT) {
       command = RobotCommand.LEFT_TURN;
       to_center_model = to_center_model.neg();
     } else {
@@ -145,7 +161,7 @@ export class ArcRobot {
     const start_orientation = this.command_seq.orientation;
 
     let angles_model;
-    if (dpad_direction === Direction.LEFT) {
+    if (dpad_direction === CardinalDirection.LEFT) {
       const start_angle = start_orientation * FIFTH_TURN;
       angles_model = new ArcAngles(start_angle, start_angle + FIFTH_TURN);
     } else {
@@ -172,10 +188,15 @@ export class ArcRobot {
     this.command_seq = full_command_seq;
   }
 
+  /**
+   *
+   * @param {number} frame
+   * @param {CardinalDirection} dpad_direction
+   */
   update_idle(frame, dpad_direction) {
     if (
-      dpad_direction !== Direction.LEFT &&
-      dpad_direction !== Direction.RIGHT
+      dpad_direction !== CardinalDirection.LEFT &&
+      dpad_direction !== CardinalDirection.RIGHT
     ) {
       return;
     }
@@ -183,6 +204,11 @@ export class ArcRobot {
     this.start_moving(frame, dpad_direction);
   }
 
+  /**
+   *
+   * @param {Number} frame
+   * @param {CardinalDirection} dpad_direction
+   */
   update_animate(frame, dpad_direction) {
     if (this.current_arc === undefined) {
       throw new Error("Current Arc not set!");
@@ -194,8 +220,8 @@ export class ArcRobot {
       this.polyline_history.push(line_primitive);
 
       if (
-        dpad_direction === Direction.LEFT ||
-        dpad_direction === Direction.RIGHT
+        dpad_direction === CardinalDirection.LEFT ||
+        dpad_direction === CardinalDirection.RIGHT
       ) {
         this.start_moving(frame, dpad_direction);
       }
@@ -217,6 +243,11 @@ export class ArcRobot {
     }
   }
 
+  /**
+   *
+   * @param {number} frame
+   * @returns {GroupPrimitive}
+   */
   render(frame) {
     const pos = this.current_position(frame);
     const step_forward = pos.add(

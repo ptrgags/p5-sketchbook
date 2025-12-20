@@ -1,4 +1,5 @@
-import { Point } from "../pga2d/objects.js";
+import { Direction } from "../pga2d/Direction.js";
+import { Point } from "../pga2d/Point.js";
 import { ArcAngles } from "../sketchlib/ArcAngles.js";
 import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
 import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
@@ -72,7 +73,7 @@ export class AnimatedArc {
   /**
    * Get the local "forward" direction in model space at this frame
    * @param {number} frame The current frame number
-   * @returns {Point} The forward direction as a Direction
+   * @returns {Direction} The forward direction as a Direction
    */
   forward_dir(frame) {
     // The tangent to the curve will always be a quarter turn away from

@@ -1,6 +1,5 @@
-import { Point } from "../../pga2d/objects.js";
 import { HEIGHT, WIDTH } from "../../sketchlib/dimensions.js";
-import { Direction } from "../../sketchlib/CardinalDirection.js";
+import { CardinalDirection } from "../../sketchlib/CardinalDirection.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { DirectionalPad, DirectionInput } from "../lablib/DirectionalPad.js";
 import { blit_sprite, blit_tilemap, P5Sprite, P5Tilemap } from "./blit.js";
@@ -10,6 +9,8 @@ import { Player } from "./Player.js";
 import { preload_p5_resources } from "./preload.js";
 import { Tilemap } from "./Tilemap.js";
 import { Viewport } from "./Viewport.js";
+import { Direction } from "../../pga2d/Direction.js";
+import { Point } from "../../pga2d/Point.js";
 
 const TILE_SIZE = 16;
 const TILE_SCALE = 2;
@@ -92,7 +93,7 @@ export const sketch = (p) => {
 
     current_sprite = new P5Sprite(
       p5_resources.images.character,
-      resources.sprites.walk[Direction.LEFT]
+      resources.sprites.walk[CardinalDirection.LEFT]
     );
     tilemap = new P5Tilemap(
       p5_resources.images.tileset,

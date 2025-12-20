@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { DirectionInput } from "./DirectionInput.js";
-import { Direction } from "../../sketchlib/CardinalDirection.js";
-import { Point } from "../../pga2d/objects.js";
+import { CardinalDirection } from "../../sketchlib/CardinalDirection.js";
+import { Direction } from "../../pga2d/Direction.js";
 
 describe("DirectionInput", () => {
   describe("first_nonzero", () => {
@@ -16,7 +16,7 @@ describe("DirectionInput", () => {
     it("NO_INPUT is the identity", () => {
       const identity = DirectionInput.NO_INPUT;
       const right_pressed = new DirectionInput(
-        Direction.RIGHT,
+        CardinalDirection.RIGHT,
         Direction.DIR_X
       );
 
@@ -29,19 +29,25 @@ describe("DirectionInput", () => {
 
     it("With two inputs returns the first one", () => {
       const right_pressed = new DirectionInput(
-        Direction.RIGHT,
+        CardinalDirection.RIGHT,
         Direction.DIR_X
       );
-      const down_pressed = new DirectionInput(Direction.DOWN, Direction.DIR_Y);
+      const down_pressed = new DirectionInput(
+        CardinalDirection.DOWN,
+        Direction.DIR_Y
+      );
 
       const result = DirectionInput.first_nonzero(right_pressed, down_pressed);
       expect(result).toBe(right_pressed);
     });
 
     it("is associative", () => {
-      const a = new DirectionInput(Direction.RIGHT, Direction.DIR_X);
-      const b = new DirectionInput(Direction.DOWN, Direction.DIR_Y);
-      const c = new DirectionInput(Direction.LEFT, Direction.DIR_X.neg());
+      const a = new DirectionInput(CardinalDirection.RIGHT, Direction.DIR_X);
+      const b = new DirectionInput(CardinalDirection.DOWN, Direction.DIR_Y);
+      const c = new DirectionInput(
+        CardinalDirection.LEFT,
+        Direction.DIR_X.neg()
+      );
 
       const ab_c = DirectionInput.first_nonzero(
         DirectionInput.first_nonzero(a, b),

@@ -1,4 +1,5 @@
-import { Point } from "../../pga2d/objects.js";
+import { Direction } from "../../pga2d/Direction.js";
+import { Point } from "../../pga2d/Point.js";
 import { HEIGHT, WIDTH } from "../../sketchlib/dimensions.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { PointPrimitive } from "../../sketchlib/primitives/PointPrimitive.js";

@@ -1,4 +1,3 @@
-import { Point } from "../../pga2d/objects.js";
 import { LSystem } from "../../sketchlib/LSystem.js";
 import { N16 } from "../lablib/music/durations.js";
 import { map_pitch, Melody, Note, Rest, Score } from "../lablib/music/Score.js";
@@ -17,6 +16,8 @@ import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
 import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
 import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
+import { Point } from "../../pga2d/Point.js";
+import { Direction } from "../../pga2d/Direction.js";
 
 const TREE_LSYSTEM = new LSystem("Fa", {
   a: "[+Fa][-Fa]",
@@ -38,7 +39,7 @@ export class TurtleGraphics {
 
   /**
    * Get the forward direction in p5's y-down coordinate system
-   * @type {Point} A Direction representing the current forward direction as a unit direction
+   * @type {Direction} A Direction representing the current forward direction as a unit direction
    */
   get dir_forward() {
     // Angles are measured from vertical, not horizontal

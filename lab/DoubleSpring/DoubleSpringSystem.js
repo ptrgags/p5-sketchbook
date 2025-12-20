@@ -1,4 +1,3 @@
-import { Point } from "../../pga2d/objects.js";
 import { RungeKuttaIntegrator } from "../lablib/RungeKuttaIntegrator.js";
 import { Style } from "../../sketchlib/Style.js";
 import { RingBuffer } from "../lablib/RingBuffer.js";
@@ -8,6 +7,8 @@ import { group, style } from "../../sketchlib/primitives/shorthand.js";
 import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
 import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
+import { Direction } from "../../pga2d/Direction.js";
+import { Point } from "../../pga2d/Point.js";
 
 const PIXELS_PER_METER = 100;
 const X_METERS = Direction.DIR_X.scale(PIXELS_PER_METER);
@@ -161,8 +162,8 @@ export class DoubleSpringSystem {
     const v_dir = Direction.DIR_Y.scale(-v_scale);
 
     const primitives = [
-      new LinePrimitive(origin.sub(x_dir), origin.add(x_dir)),
-      new LinePrimitive(origin.sub(v_dir), origin.add(v_dir)),
+      new LinePrimitive(origin.add(x_dir.neg()), origin.add(x_dir)),
+      new LinePrimitive(origin.add(v_dir.neg()), origin.add(v_dir)),
     ];
 
     return style(primitives, STYLE_AXIS);

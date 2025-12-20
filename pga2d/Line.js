@@ -1,3 +1,7 @@
+import { is_nearly } from "../sketchlib/is_nearly.js";
+import { Odd } from "./multivectors.js";
+import { Point } from "./Point.js";
+
 export class Line {
   /**
    * @param {number} nx The x-component of the normal

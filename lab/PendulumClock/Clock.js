@@ -1,4 +1,5 @@
-import { Point } from "../../pga2d/objects.js";
+import { Direction } from "../../pga2d/Direction.js";
+import { Point } from "../../pga2d/Point.js";
 import { Color } from "../../sketchlib/Color.js";
 import { HEIGHT, WIDTH } from "../../sketchlib/dimensions.js";
 import { PI, TAU } from "../../sketchlib/math_consts.js";

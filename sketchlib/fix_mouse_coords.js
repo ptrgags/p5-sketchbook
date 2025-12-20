@@ -1,4 +1,4 @@
-import { Point } from "../pga2d/objects.js";
+import { Point } from "../pga2d/Point.js";
 
 /**
  * In my CSS I use object-fit: contain to scale the canvases while

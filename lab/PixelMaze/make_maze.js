@@ -1,5 +1,5 @@
 import { Grid, Index2D } from "../../sketchlib/Grid.js";
-import { Direction } from "../../sketchlib/CardinalDirection.js";
+import { CardinalDirection } from "../../sketchlib/CardinalDirection.js";
 import { generate_maze, MazeCell } from "../../sketchlib/RandomDFSMaze.js";
 
 /**
@@ -39,7 +39,7 @@ function add_floors_and_walls(maze, indices) {
 
     // If we're connected on the right, draw a corridor. 3 floor tiles, and
     // 6 wall tiles above it
-    if (cell.is_connected(Direction.RIGHT)) {
+    if (cell.is_connected(CardinalDirection.RIGHT)) {
       // Middle of the 3 tiles, hence + 1
       const dst_row = row_offset + 1;
       for (let i = 0; i < TILES_PER_CELL; i++) {
@@ -64,7 +64,7 @@ function add_floors_and_walls(maze, indices) {
 
     // The vertical corridors are similar, except the walls are placed a bit
     // differently
-    if (cell.is_connected(Direction.DOWN)) {
+    if (cell.is_connected(CardinalDirection.DOWN)) {
       const dst_col = col_offset + 1;
       for (let i = 0; i < TILES_PER_CELL; i++) {
         const dst_row = row_offset + TILES_PER_CELL + i;
@@ -85,7 +85,7 @@ function add_floors_and_walls(maze, indices) {
     // For cells below us, we still need a wall above the room even if there
     // was no connection. Each wall is 2 tiles high, so we write a 2x3 rectangle
     // of cells
-    if (cell_y + 1 < maze.rows && !cell.is_connected(Direction.DOWN)) {
+    if (cell_y + 1 < maze.rows && !cell.is_connected(CardinalDirection.DOWN)) {
       for (let i = 1; i < TILES_PER_CELL; i++) {
         const dst_row = row_offset + TILES_PER_CELL + i;
         for (let j = 0; j < TILES_PER_CELL; j++) {

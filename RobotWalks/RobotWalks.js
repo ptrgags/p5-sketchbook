@@ -3,8 +3,9 @@ import { DirectionalPad } from "../lab/lablib/DirectionalPad.js";
 import { ArcRobot } from "./ArcRobot.js";
 import { TouchButton } from "../lab/lablib/TouchButton.js";
 import { Rectangle } from "../lab/lablib/Rectangle.js";
-import { Point } from "../pga2d/objects.js";
 import { CanvasMouseHandler } from "../lab/lablib/CanvasMouseHandler.js";
+import { Direction } from "../pga2d/Direction.js";
+import { Point } from "../pga2d/Point.js";
 
 const MOUSE = new CanvasMouseHandler();
 const DPAD = new DirectionalPad();

@@ -1,4 +1,5 @@
-import { Point } from "../../pga2d/objects.js";
+import { Direction } from "../../pga2d/Direction.js";
+import { Point } from "../../pga2d/Point.js";
 import { Color } from "../../sketchlib/Color.js";
 import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
 import { Grid, Index2D } from "../../sketchlib/Grid.js";
@@ -126,7 +127,7 @@ const [BUTTON_OFFSET, BUTTON_STRIDE] = MELODY_BUTTONS.compute_layout(
 function make_button_labels(buttons) {
   const primitives = buttons.map_array((index, descriptor) => {
     const point = index.to_world(
-      BUTTON_OFFSET.add(MELODY_BUTTON_CENTER_OFFSET),
+      BUTTON_OFFSET.add(MELODY_BUTTON_CENTER_OFFSET).to_point(),
       BUTTON_STRIDE
     );
     return new TextPrimitive(descriptor.label, point);
@@ -194,7 +195,7 @@ class SoundScene {
     );
 
     this.melody_buttons = melodies.map_array((index, descriptor) => {
-      const corner = index.to_world(BUTTON_OFFSET, BUTTON_STRIDE);
+      const corner = index.to_world(BUTTON_OFFSET.to_point(), BUTTON_STRIDE);
       const rectangle = new Rectangle(corner, MELODY_BUTTON_DIMENSIONS);
       const button = new TouchButton(rectangle);
       button.events.addEventListener("click", () => {

@@ -1,4 +1,5 @@
 import { is_nearly } from "../sketchlib/is_nearly.js";
+import { Line } from "./Line.js";
 import { Even } from "./multivectors.js";
 import { Point } from "./Point.js";
 
@@ -37,10 +38,16 @@ export class Direction {
   /**
    * Construct from a bivector
    * @param {Even} bivec The bivector that represents this point.
+   * @return {Direction}
    */
   static from_bivec(bivec) {
     const { xy, xo, yo } = bivec;
-    return new Point(xy, xo, yo);
+    if (!is_nearly(xy, 0)) {
+      throw new Error("Trying to create Direction from a point!");
+    }
+    const x = yo;
+    const y = -xo;
+    return new Direction(x, y);
   }
 
   to_point() {
@@ -114,24 +121,27 @@ export class Direction {
   }
 
   /**
-   * Add another point. For directions, this works like vector addition. For points, this actually computes the midpoint due to homogeneity
-   * @param {Point} other
-   * @returns {Point} The sum of the two points
+   * Add another direction. This works like vector addition
+   * @param {Direction} other
+   * @returns {Direction} The sum of the two points
    */
   add(other) {
-    const bivec = this.bivec.add(other.bivec);
-    return Point.from_bivec(bivec);
+    const { xo, yo } = this.bivec.add(other.bivec);
+    const x = yo;
+    const y = -xo;
+    return new Direction(x, y);
   }
 
   /**
-   * Subtract two generalized points. This can produce a direction or
-   * a new point depending on whether the inputs are points/directions
-   * @param {Point} other The other point
-   * @returns {Point} The result of the subtraction
+   * Subtract two directions, this produces a new Direction
+   * @param {Direction} other The other point
+   * @returns {Direction} The result of the subtraction
    */
   sub(other) {
-    const { xy, xo, yo } = this.bivec.sub(other.bivec);
-    return new Point(xy, xo, yo);
+    const { xo, yo } = this.bivec.sub(other.bivec);
+    const x = yo;
+    const y = -xo;
+    return new Direction(x, y);
   }
 
   /**
@@ -145,16 +155,13 @@ export class Direction {
   }
 
   /**
-   * Compute the squared distance between this point and another one
-   * @param {Point} point another point
-   * @returns {number}
+   * Make a new Direction in the same direction as this one but with
+   * a different magnitude
+   * @param {number} length Desired length
+   * @returns {Direction}
    */
-  dist_sqr(point) {
-    return this.sub(point).ideal_norm_sqr();
-  }
-
   set_length(length) {
-    const curr_length = this.ideal_norm();
+    const curr_length = this.mag();
     if (curr_length === 0) {
       throw new Error("Trying to set length of null vector");
     }
@@ -166,10 +173,10 @@ export class Direction {
   /**
    * Limit the length of a direction
    * @param {number} max_length
-   * @returns {Point} The same direction with updated magnitude
+   * @returns {Direction} The same direction with updated magnitude
    */
   limit_length(max_length) {
-    const curr_length = this.ideal_norm();
+    const curr_length = this.mag();
     if (curr_length === 0) {
       return this;
     }
@@ -232,13 +239,13 @@ export class Direction {
 
   /**
    * Linearly interpolate between two directions
-   * @param {Point} a The first point
-   * @param {Point} b The second point
+   * @param {Direction} a The first point
+   * @param {Direction} b The second point
    * @param {number} t The interpolation factor
    */
   static lerp(a, b, t) {
     const bivector = Even.lerp(a.bivec, b.bivec, t);
-    return Point.from_bivec(bivector);
+    return Direction.from_bivec(bivector);
   }
 
   /**
@@ -246,7 +253,7 @@ export class Direction {
    * the unit circle exp(2 * pi * i * k / N), except expressed as
    * direction objects, not complex numbers.
    * @param {number} n A positive integer number of roots to generate
-   * @return {Point[]} An array of the N roots
+   * @return {Direction[]} An array of the N roots
    */
   static roots_of_unity(n) {
     if (n < 1) {

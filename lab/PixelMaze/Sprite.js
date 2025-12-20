@@ -1,4 +1,4 @@
-import { Point } from "../../pga2d/objects.js";
+import { Direction } from "../../pga2d/Direction.js";
 import { mod } from "../../sketchlib/mod.js";
 import { ImageFrames } from "./ImageFrames.js";
 
@@ -12,7 +12,7 @@ export class Sprite {
    * @param {ImageFrames} spritesheet The layout of the sprite sheet
    * @param {number} start_frame The frame ID of the first frame in the animation
    * @param {number} frame_count How many frames in the animation (must be positive)
-   * @param {Point} origin Origin of the sprite as a direction in pixels
+   * @param {Direction} origin Origin of the sprite as a direction in pixels
    */
   constructor(spritesheet, start_frame, frame_count, origin) {
     if (frame_count < 1) {
@@ -58,7 +58,7 @@ export class Sprite {
    * @param {ImageFrames} image_frames The image frames to use
    * @param {number} row The row number
    * @param {number} frame_count The number of frames in the animation
-   * @param {Point} origin
+   * @param {Direction} origin
    * @returns {Sprite} A sprite animation from these frames
    */
   static from_row(image_frames, row, frame_count, origin) {
@@ -75,7 +75,7 @@ export class Sprite {
    * @param {ImageFrames} image_frames The image frames
    * @param {number} start_row The row number of the first image strip
    * @param {number} frame_count The number of frames in the animation for one direction
-   * @param {Point} origin The origin
+   * @param {Direction} origin The origin
    * @returns {Sprite[]} An array of 4 sprites that can be indexed by a GridDirection
    */
   static make_direction_sprites(image_frames, start_row, frame_count, origin) {

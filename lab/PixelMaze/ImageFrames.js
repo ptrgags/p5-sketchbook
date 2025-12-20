@@ -1,4 +1,4 @@
-import { Point } from "../../pga2d/objects.js";
+import { Direction } from "../../pga2d/Direction.js";
 
 /**
  * Class for managing frames of a spritesheet or tile
@@ -8,8 +8,8 @@ import { Point } from "../../pga2d/objects.js";
 export class ImageFrames {
   /**
    * Constructor
-   * @param {Point} image_dimensions Image dimensions as a direction in pixels
-   * @param {Point} frame_size Size of a single frame in pixels
+   * @param {Direction} image_dimensions Image dimensions as a direction in pixels
+   * @param {Direction} frame_size Size of a single frame in pixels
    */
   constructor(image_dimensions, frame_size) {
     const { x: w, y: h } = image_dimensions;
@@ -30,7 +30,7 @@ export class ImageFrames {
   /**
    * Get the top left corner of a single frame
    * @param {number} frame_id Integer frame ID in [0, this.frame_count)
-   * @returns {Point} The offset of the frame (as a Direction) in pixels
+   * @returns {Direction} The offset of the frame (as a Direction) in pixels
    */
   get_frame_offset(frame_id) {
     const width = this.grid_dimensions.x;

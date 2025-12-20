@@ -1,4 +1,5 @@
-import { Point } from "../../pga2d/objects.js";
+import { Direction } from "../../pga2d/Direction.js";
+import { Point } from "../../pga2d/Point.js";
 import { Sprite } from "./Sprite.js";
 
 /**
@@ -32,7 +33,7 @@ export class Viewport {
   /**
    * Constructor
    * @param {Point} position Position of the top left corner of the viewport in pixels of the map (not the screen!)
-   * @param {Point} screen_dimensions Screen dimensions. This will determine the side of the viewport
+   * @param {Direction} screen_dimensions Screen dimensions. This will determine the side of the viewport
    * @param {Point} margin Margin around a sprite for use with track_sprite()
    * @param {number} upscale_factor Pixel art upscale factor (integer)
    */
@@ -50,7 +51,7 @@ export class Viewport {
    */
   track_sprite(sprite_position, sprite) {
     // corners of the sprite in map pixels
-    const sprite_top_left = sprite_position.sub(sprite.origin);
+    const sprite_top_left = sprite_position.add(sprite.origin.neg());
     const sprite_bottom_right = sprite_top_left.add(sprite.frame_size);
 
     // Constrain the viewport so there's at least the margin in all direction.

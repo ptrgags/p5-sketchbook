@@ -1,4 +1,4 @@
-import { Direction } from "../sketchlib/CardinalDirection.js";
+import { CardinalDirection } from "../sketchlib/CardinalDirection.js";
 import { Grid, griderator, Index2D } from "../sketchlib/Grid.js";
 import { CoralTile, Quadrant } from "./CoralTile.js";
 import { Spline } from "./Spline.js";
@@ -38,10 +38,10 @@ function get_tile_index(quadrant_index) {
 //      name of direction func to call if disconnected
 // ]
 const NEXT_INDEX_LUT = {
-  [Quadrant.SOUTHEAST]: [Direction.RIGHT, "right", "up"],
-  [Quadrant.NORTHEAST]: [Direction.UP, "up", "left"],
-  [Quadrant.NORTHWEST]: [Direction.LEFT, "left", "down"],
-  [Quadrant.SOUTHWEST]: [Direction.DOWN, "down", "right"],
+  [Quadrant.SOUTHEAST]: [CardinalDirection.RIGHT, "right", "up"],
+  [Quadrant.NORTHEAST]: [CardinalDirection.UP, "up", "left"],
+  [Quadrant.NORTHWEST]: [CardinalDirection.LEFT, "left", "down"],
+  [Quadrant.SOUTHWEST]: [CardinalDirection.DOWN, "down", "right"],
 };
 
 function get_next_index(tile, quadrant_index, quadrant) {

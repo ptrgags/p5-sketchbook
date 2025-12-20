@@ -1,3 +1,4 @@
+import { Point } from "../pga2d/Point.js";
 import { Motor } from "../pga2d/versors.js";
 import { Color } from "./Color.js";
 import { LinePrimitive } from "./primitives/LinePrimitive.js";
@@ -91,7 +92,7 @@ export class Joint {
     const unbent_angle = is_ccw ? -min_bend_angle : min_bend_angle;
     const forward = a.sub(b).normalize();
     const rotation = Motor.rotation(Point.ORIGIN, unbent_angle);
-    const offset = rotation.transform_point(forward).scale(follow_distance);
+    const offset = rotation.transform_dir(forward).scale(follow_distance);
     return b.add(offset);
   }
 }

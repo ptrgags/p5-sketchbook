@@ -1,4 +1,4 @@
-import { Point } from "../../pga2d/objects.js";
+import { Direction } from "../../pga2d/Direction.js";
 
 /**
  * A transformation that can be converted to p5 commands. Right now
@@ -7,7 +7,7 @@ import { Point } from "../../pga2d/objects.js";
 export class Transform {
   /**
    * Constructor
-   * @param {Point} translation The translation amount
+   * @param {Direction} translation The translation amount
    */
   constructor(translation) {
     this.translation = translation;
