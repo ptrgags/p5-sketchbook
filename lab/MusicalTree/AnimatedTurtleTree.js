@@ -1,30 +1,22 @@
 import { Point } from "../../pga2d/objects.js";
 import { LSystem } from "../../sketchlib/LSystem.js";
-import { N16, N32 } from "../lablib/music/durations.js";
+import { N16 } from "../lablib/music/durations.js";
 import { map_pitch, Melody, Note, Rest, Score } from "../lablib/music/Score.js";
 import { Rational } from "../lablib/Rational.js";
-import {
-  DOUBLE_HARMONIC,
-  MAJOR_PENTATONIC,
-  make_scale,
-  MINOR_PENTATONIC,
-} from "../lablib/music/scales.js";
+import { MAJOR_PENTATONIC, make_scale } from "../lablib/music/scales.js";
 import { HEIGHT, WIDTH } from "../../sketchlib/dimensions.js";
-import {
-  LinePrimitive,
-  PointPrimitive,
-  PolygonPrimitive,
-  RectPrimitive,
-} from "../../sketchlib/rendering/primitives.js";
-import { group, style } from "../../sketchlib/rendering/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Color } from "../../sketchlib/Color.js";
 import { Gap, Sequential } from "../lablib/music/Timeline.js";
 import { ParamCurve } from "../lablib/music/ParamCurve.js";
-import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
 import { SoundManager } from "../lablib/SoundManager.js";
 import { is_nearly } from "../../sketchlib/is_nearly.js";
 import { lerp } from "../../sketchlib/lerp.js";
+import { group, style } from "../../sketchlib/primitives/shorthand.js";
+import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
+import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
+import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
+import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
 
 const TREE_LSYSTEM = new LSystem("Fa", {
   a: "[+Fa][-Fa]",
@@ -515,11 +507,14 @@ function render_turtle(position, orientation) {
     -Math.PI / 2 + orientation * DELTA_ANGLE - (5 * Math.PI) / 6
   );
 
-  const polygon = new PolygonPrimitive([
-    position.add(dir_front.scale(RADIUS_TURTLE)),
-    position.add(dir_back_left.scale(RADIUS_TURTLE)),
-    position.add(dir_back_right.scale(RADIUS_TURTLE)),
-  ]);
+  const polygon = new PolygonPrimitive(
+    [
+      position.add(dir_front.scale(RADIUS_TURTLE)),
+      position.add(dir_back_left.scale(RADIUS_TURTLE)),
+      position.add(dir_back_right.scale(RADIUS_TURTLE)),
+    ],
+    true
+  );
 
   return style(polygon, STYLE_TURTLE);
 }

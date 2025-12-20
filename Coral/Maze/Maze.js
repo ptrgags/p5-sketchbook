@@ -1,4 +1,3 @@
-import { draw_primitive } from "../../sketchlib/p5_helpers/draw_primitive.js";
 import { generate_maze } from "../../sketchlib/RandomDFSMaze.js";
 import { CoralTile } from "../CoralTile.js";
 import { Rect } from "../Rect.js";
@@ -15,8 +14,7 @@ import {
   SPLINE_STYLE,
 } from "../styles.js";
 import { Grid } from "../../sketchlib/Grid.js";
-import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
-import { group, style } from "../../sketchlib/rendering/shorthand.js";
+import { group, style } from "../../sketchlib/primitives/shorthand.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -168,7 +166,7 @@ export const sketch = (p) => {
 
   p.draw = () => {
     p.background(0);
-    draw_primitive(p, QUAD_GROUP);
-    draw_primitive(p, dynamic_primitives);
+    QUAD_GROUP.draw(p);
+    dynamic_primitives.draw(p);
   };
 };

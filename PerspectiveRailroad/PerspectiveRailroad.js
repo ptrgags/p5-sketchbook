@@ -1,13 +1,9 @@
 import { Line, Point } from "../pga2d/objects.js";
-import {
-  PolygonPrimitive,
-  RectPrimitive,
-} from "../sketchlib/rendering/primitives.js";
 import { Style } from "../sketchlib/Style.js";
-import { draw_primitive } from "../sketchlib/p5_helpers/draw_primitive.js";
 import { Color } from "../sketchlib/Color.js";
-import { GroupPrimitive } from "../sketchlib/rendering/GroupPrimitive.js";
-import { group, style } from "../sketchlib/rendering/shorthand.js";
+import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
+import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
+import { group, style } from "../sketchlib/primitives/shorthand.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -27,6 +23,8 @@ const GROUND_STYLE = DEFAULT_STYLE.with_fill(new Color(135, 201, 162));
 const SKY_STYLE = new Style({ fill: new Color(30, 173, 235) });
 const RAIL_STYLE = DEFAULT_STYLE.with_fill(new Color(71, 70, 69));
 const TIE_STYLE = DEFAULT_STYLE.with_fill(new Color(99, 59, 26));
+
+const CLOSED = true;
 
 function compute_rails() {
   const A_top_left = A.add(Point.DIR_Y.scale(-RAIL_HEIGHT));
@@ -51,26 +49,22 @@ function compute_rails() {
 
   // The rails are perspective cuboids, but on the screen they look like
   // elongated triangles
-  const left_rail_top = new PolygonPrimitive([
-    isx_A_top_left,
-    isx_A_top_right,
-    VP_RAILS,
-  ]);
-  const left_rail_side = new PolygonPrimitive([
-    isx_A_top_right,
-    isx_A_bottom_right,
-    VP_RAILS,
-  ]);
-  const right_rail_side = new PolygonPrimitive([
-    isx_B_bottom_left,
-    isx_B_top_left,
-    VP_RAILS,
-  ]);
-  const right_rail_top = new PolygonPrimitive([
-    isx_B_top_left,
-    isx_B_top_right,
-    VP_RAILS,
-  ]);
+  const left_rail_top = new PolygonPrimitive(
+    [isx_A_top_left, isx_A_top_right, VP_RAILS],
+    CLOSED
+  );
+  const left_rail_side = new PolygonPrimitive(
+    [isx_A_top_right, isx_A_bottom_right, VP_RAILS],
+    CLOSED
+  );
+  const right_rail_side = new PolygonPrimitive(
+    [isx_B_bottom_left, isx_B_top_left, VP_RAILS],
+    CLOSED
+  );
+  const right_rail_top = new PolygonPrimitive(
+    [isx_B_top_left, isx_B_top_right, VP_RAILS],
+    CLOSED
+  );
 
   return [left_rail_top, left_rail_side, right_rail_top, right_rail_side];
 }
@@ -156,7 +150,9 @@ function railroad_ties(tie_bottoms, tie_thickness) {
     const top_left = tie_top.meet(guide_left);
     const top_right = tie_top.meet(guide_right);
 
-    ties.push(new PolygonPrimitive([quad_a, quad_b, top_right, top_left]));
+    ties.push(
+      new PolygonPrimitive([quad_a, quad_b, top_right, top_left], CLOSED)
+    );
   }
 
   return ties;
@@ -210,7 +206,7 @@ class AnimatedTie {
     const bottom_right = Point.lerp(a, b, t);
     const top_right = Point.lerp(d, c, t);
 
-    return new PolygonPrimitive([a, bottom_right, top_right, d]);
+    return new PolygonPrimitive([a, bottom_right, top_right, d], CLOSED);
   }
 }
 
@@ -279,7 +275,7 @@ class AnimatedRails {
 
       const top_left = Point.lerp(a, vp, t);
       const top_right = Point.lerp(b, vp, t);
-      return new PolygonPrimitive([a, b, top_right, top_left]);
+      return new PolygonPrimitive([a, b, top_right, top_left], CLOSED);
     });
   }
 }
@@ -299,7 +295,7 @@ export const sketch = (p) => {
   p.setup = () => {
     p.createCanvas(WIDTH, HEIGHT);
 
-    draw_primitive(p, BACKGROUND);
+    BACKGROUND.draw(p);
   };
 
   p.draw = () => {
@@ -317,8 +313,8 @@ export const sketch = (p) => {
 
     const dynamic_geom = group(ties, rails);
 
-    draw_primitive(p, BACKGROUND);
-    draw_primitive(p, dynamic_geom);
+    BACKGROUND.draw(p);
+    dynamic_geom.draw(p);
 
     if (
       ANIMATED_RAILS.is_finished(p.frameCount) &&

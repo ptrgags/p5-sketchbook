@@ -1,8 +1,6 @@
 import { Point } from "../../pga2d/objects.js";
 import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
-import { draw_primitive } from "../../sketchlib/p5_helpers/draw_primitive.js";
-import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
-import { group } from "../../sketchlib/rendering/shorthand.js";
+import { group } from "../../sketchlib/primitives/shorthand.js";
 import { DoublePendulumSystem, Pendulum } from "./DoublePendulumSystem.js";
 
 const BOB_MASS = 1.0;
@@ -63,7 +61,7 @@ export const sketch = (p) => {
       phase2
     );
 
-    draw_primitive(p, scene);
+    scene.draw(p);
 
     SYSTEM.step(DELTA_TIME);
   };

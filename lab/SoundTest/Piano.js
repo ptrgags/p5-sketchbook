@@ -1,7 +1,7 @@
 import { Point } from "../../pga2d/objects.js";
 import { Color } from "../../sketchlib/Color.js";
-import { RectPrimitive } from "../../sketchlib/rendering/primitives.js";
-import { group, style } from "../../sketchlib/rendering/shorthand.js";
+import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
+import { group, style } from "../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { MidiPitch } from "../lablib/music/pitch_conversions.js";
 import { Rectangle } from "../lablib/Rectangle.js";

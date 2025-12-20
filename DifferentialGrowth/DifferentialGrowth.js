@@ -2,7 +2,6 @@ import { Rectangle } from "./rectangle.js";
 import { Quadtree } from "./quadtree.js";
 import { DifferentialPolyline } from "./DifferentialPolyline.js";
 import { Style } from "../sketchlib/Style.js";
-import { draw_primitive } from "../sketchlib/p5_helpers/draw_primitive.js";
 import { Vector2 } from "./Vector2.js";
 import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
 import { Color } from "../sketchlib/Color.js";
@@ -96,14 +95,14 @@ export const sketch = (p) => {
       const poly2 = POLYLINE2.make_polyline(
         STYLE_POLYLINE2.with_stroke(Color.WHITE)
       );
-      draw_primitive(p, poly1);
-      draw_primitive(p, poly2);
+      poly1.draw(p);
+      poly2.draw(p);
     }
 
     const spline1 = POLYLINE.make_curve(STYLE_POLYLINE1);
     const spline2 = POLYLINE2.make_curve(STYLE_POLYLINE2);
-    draw_primitive(p, spline1);
-    draw_primitive(p, spline2);
+    spline1.draw(p);
+    spline2.draw(p);
 
     for (let i = 0; i < UPDATES_PER_FRAME; i++) {
       update();

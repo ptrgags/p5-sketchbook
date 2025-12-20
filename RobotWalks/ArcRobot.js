@@ -3,17 +3,15 @@ import { ArcAngles } from "../sketchlib/ArcAngles.js";
 import { Color } from "../sketchlib/Color.js";
 import { SCREEN_CENTER } from "../sketchlib/dimensions.js";
 import { Direction } from "../sketchlib/Direction.js";
-import { GroupPrimitive } from "../sketchlib/rendering/GroupPrimitive.js";
-import {
-  ArcPrimitive,
-  LinePrimitive,
-  PointPrimitive,
-} from "../sketchlib/rendering/primitives.js";
-import { group, style } from "../sketchlib/rendering/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 import { Oklch } from "../lab/lablib/Oklch.js";
 import { AnimatedArc } from "./AnimatedArc.js";
 import { RobotCommand, ROOTS_OF_UNITY } from "./RobotCommand.js";
+import { group, style } from "../sketchlib/primitives/shorthand.js";
+import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
+import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
+import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
+import { PointPrimitive } from "../sketchlib/primitives/PointPrimitive.js";
 
 // How many frames to animate each 1/5 turn arc
 const FULL_CIRCLE_DURATION = 120;

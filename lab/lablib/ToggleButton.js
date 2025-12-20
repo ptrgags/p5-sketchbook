@@ -1,7 +1,5 @@
 import { Point } from "../../pga2d/objects.js";
 import { Color } from "../../sketchlib/Color.js";
-import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
-import { RectPrimitive } from "../../sketchlib/rendering/primitives.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Rectangle } from "./Rectangle.js";
 import { ButtonState, TouchButton } from "./TouchButton.js";

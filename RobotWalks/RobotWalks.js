@@ -1,5 +1,4 @@
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
-import { draw_primitive } from "../sketchlib/p5_helpers/draw_primitive.js";
 import { DirectionalPad } from "../lab/lablib/DirectionalPad.js";
 import { ArcRobot, N_VALUES } from "./ArcRobot.js";
 import { TouchButton } from "../lab/lablib/TouchButton.js";
@@ -11,7 +10,7 @@ const MOUSE = new CanvasMouseHandler();
 const DPAD = new DirectionalPad();
 const THIRD_SCREEN = Point.direction(WIDTH / 3, HEIGHT);
 
-// Virtual touch buttons for left and right keys on mobile.
+// Virtual touch buttons for directional buttons on mobile.
 const TOUCH_LEFT = new TouchButton(new Rectangle(Point.ORIGIN, THIRD_SCREEN));
 const TOUCH_RIGHT = new TouchButton(
   new Rectangle(Point.point(2 * WIDTH / 3, 0), THIRD_SCREEN)
@@ -74,11 +73,11 @@ export const sketch = (p) => {
 
     robot.update(p.frameCount, DPAD.direction.digital);
     const robot_walk = robot.render(p.frameCount);
-    draw_primitive(p, robot_walk);
+    robot_walk.draw(p);
 
-    draw_primitive(p, TOUCH_LEFT.debug_render());
-    draw_primitive(p, TOUCH_RIGHT.debug_render());
-    draw_primitive(p, TOUCH_DOWN.debug_render());
+    TOUCH_LEFT.debug_render().draw(p);
+    TOUCH_RIGHT.debug_render().draw(p);
+    TOUCH_DOWN.debug_render().draw(p);
   };
 
   p.keyPressed = (/** @type {KeyboardEvent} */ e) => {

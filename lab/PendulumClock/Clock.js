@@ -2,13 +2,10 @@ import { Point } from "../../pga2d/objects.js";
 import { Color } from "../../sketchlib/Color.js";
 import { HEIGHT, WIDTH } from "../../sketchlib/dimensions.js";
 import { PI, TAU } from "../../sketchlib/math_consts.js";
-import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
-import {
-  CirclePrimitive,
-  LinePrimitive,
-  VectorPrimitive,
-} from "../../sketchlib/rendering/primitives.js";
-import { group, style } from "../../sketchlib/rendering/shorthand.js";
+import { CirclePrimitive } from "../../sketchlib/primitives/CirclePrimitive.js";
+import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
+import { group, style } from "../../sketchlib/primitives/shorthand.js";
+import { VectorPrimitive } from "../../sketchlib/primitives/VectorPrimitive.js";
 import { Style } from "../../sketchlib/Style.js";
 import { ClockTime } from "./ClockTime.js";
 

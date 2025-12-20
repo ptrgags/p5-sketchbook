@@ -1,10 +1,7 @@
 import { Style } from "../Style.js";
 import { GroupPrimitive } from "./GroupPrimitive.js";
+import { Primitive } from "./Primitive.js";
 import { Transform } from "./Transform.js";
-
-/**
- * @typedef {import("./primitives").SimplePrimitive | GroupPrimitive} Primitive
- */
 
 /**
  * Shorthand for creating a GroupPrimitive that just groups primitives with

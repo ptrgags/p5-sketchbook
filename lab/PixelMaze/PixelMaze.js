@@ -1,7 +1,6 @@
 import { Point } from "../../pga2d/objects.js";
 import { HEIGHT, WIDTH } from "../../sketchlib/dimensions.js";
 import { Direction } from "../../sketchlib/Direction.js";
-import { draw_primitive } from "../../sketchlib/p5_helpers/draw_primitive.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { DirectionalPad, DirectionInput } from "../lablib/DirectionalPad.js";
 import { blit_sprite, blit_tilemap, P5Sprite, P5Tilemap } from "./blit.js";
@@ -135,7 +134,7 @@ export const sketch = (p) => {
 
     p.pop();
 
-    draw_primitive(p, DPAD.render());
+    DPAD.render().draw(p);
   };
 
   p.keyPressed = (/** @type {KeyboardEvent} */ e) => {
