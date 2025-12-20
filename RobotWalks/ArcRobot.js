@@ -30,6 +30,18 @@ export const COLORS = Oklch.gradient(
 );
 
 /**
+ * @enum {number}
+ */
+const RobotAnimationState = {
+  // Idle, waiting for commands
+  IDLE: 0,
+  // Currently animating a single arc path or undo
+  MOVING: 1,
+  // Unwinding back to the original state
+  RESETTING: 2,
+};
+
+/**
  * Robot based on Project Euler #208, see https://projecteuler.net/problem=208
  */
 export class ArcRobot {
@@ -39,6 +51,18 @@ export class ArcRobot {
    */
   constructor(n) {
     this.n = n;
+
+    /**
+     * @type {RobotAnimationState}
+     */
+    this.animation_state = RobotAnimationState.IDLE;
+
+    /**
+     * Event target with the following events
+     * - reset - when the robot finishes the resetting animation and returns to the IDLE state.
+     * @type {EventTarget}
+     */
+    this.events = new EventTarget();
   }
 
   /**
@@ -57,4 +81,6 @@ export class ArcRobot {
   render(frame) {
     return group();
   }
+
+  reset() {}
 }

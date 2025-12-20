@@ -42,19 +42,18 @@ const ANIMATED_PATH_EX = new AnimatedPath(
 );
 
 export const sketch = (p) => {
-  let n = 5;
-  let robot = new ArcRobot(n);
+  let robot = new ArcRobot(5);
 
   function reset() {
-    // We need to make the robot unwind here
-    robot = new ArcRobot(n);
+    robot.reset();
   }
 
-  function switch_robot(m) {
+  function switch_robot(n) {
     // we need to tell the current robot to unwind quickly, then
     // when that finishes, it should
-    n = m;
-    robot = new ArcRobot(m);
+    robot.events.addEventListener("reset", () => {
+      robot = new ArcRobot(n);
+    });
   }
 
   p.setup = () => {
