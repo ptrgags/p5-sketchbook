@@ -2,7 +2,7 @@ import { Point } from "../pga2d/objects.js";
 import { ArcAngles } from "../sketchlib/ArcAngles.js";
 import { Color } from "../sketchlib/Color.js";
 import { SCREEN_CENTER } from "../sketchlib/dimensions.js";
-import { Direction } from "../sketchlib/Direction.js";
+import { Direction } from "../sketchlib/CardinalDirection.js";
 import { Style } from "../sketchlib/Style.js";
 import { Oklch } from "../lab/lablib/Oklch.js";
 import { AnimatedArc } from "./AnimatedArc.js";

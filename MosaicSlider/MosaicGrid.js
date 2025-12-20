@@ -16,7 +16,7 @@ const SQUARE_SIZE = 30;
 const MARGIN_X = (WIDTH - COLS * SQUARE_SIZE) / 2;
 const MARGIN_Y = (HEIGHT - ROWS * SQUARE_SIZE) / 2;
 const STRIDE = Point.direction(SQUARE_SIZE, SQUARE_SIZE);
-const CORNER = Point.point(MARGIN_X, MARGIN_Y);
+const CORNER = new Point(MARGIN_X, MARGIN_Y);
 const SWAP_DURATION = sec_to_frames(1 / 16);
 const PIXEL_STYLE = new Style({ stroke: Color.BLACK, width: 2 });
 
@@ -97,7 +97,7 @@ export class MosaicGrid {
 
     // Look at the vector between the cell's center and the mouse.
     // Pick the closest cardinal direction and move one cell in that direction.
-    const src_center = Point.point(
+    const src_center = new Point(
       MARGIN_X + (j + 0.5) * SQUARE_SIZE,
       MARGIN_Y + (i + 0.5) * SQUARE_SIZE
     );

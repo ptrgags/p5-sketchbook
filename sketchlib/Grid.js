@@ -1,6 +1,6 @@
 import { Rectangle } from "../lab/lablib/Rectangle.js";
 import { Point } from "../pga2d/objects.js";
-import { Direction } from "./Direction.js";
+import { Direction } from "./CardinalDirection.js";
 
 /**
  * Iterate over a 2D range of values, performing an action at each step.
@@ -116,7 +116,7 @@ export class Index2D {
 
   /**
    * Convert an index (assumed to be row-major) to a point in the world
-   * @param {Point} offset The offset in units of the world as a Point.point
+   * @param {Point} offset The offset in units of the world as a Point
    * @param {Point} stride A Point.direction for the stride
    * @returns {Point} A point in the world
    */

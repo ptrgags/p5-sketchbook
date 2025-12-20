@@ -1,5 +1,5 @@
 import { Grid, Index2D } from "../../sketchlib/Grid.js";
-import { Direction } from "../../sketchlib/Direction.js";
+import { Direction } from "../../sketchlib/CardinalDirection.js";
 import { generate_maze, MazeCell } from "../../sketchlib/RandomDFSMaze.js";
 
 /**

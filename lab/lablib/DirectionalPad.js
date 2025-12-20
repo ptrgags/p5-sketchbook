@@ -9,7 +9,7 @@ import { TouchDPad } from "./TouchDPad.js";
 
 const DPAD_DIMENSIONS = Point.direction(200, 200);
 const MARGIN = 10;
-const DPAD_ORIGIN = Point.point(MARGIN, HEIGHT - DPAD_DIMENSIONS.y - MARGIN);
+const DPAD_ORIGIN = new Point(MARGIN, HEIGHT - DPAD_DIMENSIONS.y - MARGIN);
 const DEAD_ZONE_RADIUS = 0.01;
 
 export class DirectionalPad {

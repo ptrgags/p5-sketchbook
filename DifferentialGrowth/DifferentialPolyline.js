@@ -224,8 +224,8 @@ export class DifferentialPolyline {
   }
 
   make_curve(line_style) {
-    const positions = this.nodes.map((node) =>
-      Point.point(node.position.x, node.position.y)
+    const positions = this.nodes.map(
+      (node) => new Point(node.position.x, node.position.y)
     );
 
     const beziergon = BeziergonPrimitive.interpolate_points(positions);
@@ -233,8 +233,8 @@ export class DifferentialPolyline {
   }
 
   make_polyline(line_style) {
-    const vertices = this.nodes.map((x) =>
-      Point.point(x.position.x, x.position.y)
+    const vertices = this.nodes.map(
+      (x) => new Point(x.position.x, x.position.y)
     );
     const polygon = new PolygonPrimitive(vertices, true);
     return style(polygon, line_style);

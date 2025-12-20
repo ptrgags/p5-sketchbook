@@ -1,5 +1,5 @@
 import { Point } from "../../pga2d/objects.js";
-import { Direction, to_y_down } from "../../sketchlib/Direction.js";
+import { Direction, to_y_down } from "../../sketchlib/CardinalDirection.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
 import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";

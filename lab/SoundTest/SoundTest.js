@@ -108,7 +108,7 @@ const TEXT_COLOR = new Style({
 });
 
 const GRID_BOUNDARY = new Rectangle(
-  Point.point(0, HEIGHT / 2),
+  new Point(0, HEIGHT / 2),
   Point.direction(WIDTH, HEIGHT / 2)
 );
 const GRID_MARGIN = Point.direction(75, 80);
@@ -144,8 +144,8 @@ const TIMELINE_TOP = HEIGHT / 8;
 
 const CURSOR = style(
   new LinePrimitive(
-    Point.point(WIDTH / 2, TIMELINE_TOP),
-    Point.point(WIDTH / 2, TIMELINE_TOP + HEIGHT / 4)
+    new Point(WIDTH / 2, TIMELINE_TOP),
+    new Point(WIDTH / 2, TIMELINE_TOP + HEIGHT / 4)
   ),
   Style.DEFAULT_STROKE
 );
@@ -161,7 +161,7 @@ class SoundScene {
     this.mute_button = new MuteButton();
     this.events = new EventTarget();
     this.piano = new Piano(
-      new Rectangle(Point.point(0, 300), Point.direction(500, 300 / 3)),
+      new Rectangle(new Point(0, 300), Point.direction(500, 300 / 3)),
       3,
       4
     );

@@ -1,4 +1,4 @@
-import { Direction } from "../sketchlib/Direction.js";
+import { Direction } from "../sketchlib/CardinalDirection.js";
 import { Grid, griderator, Index2D } from "../sketchlib/Grid.js";
 import { CoralTile, Quadrant } from "./CoralTile.js";
 import { Spline } from "./Spline.js";

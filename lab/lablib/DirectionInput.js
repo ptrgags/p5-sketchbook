@@ -1,5 +1,5 @@
 import { Point } from "../../pga2d/objects.js";
-import { Direction } from "../../sketchlib/Direction.js";
+import { Direction } from "../../sketchlib/CardinalDirection.js";
 
 export class DirectionInput {
   /**

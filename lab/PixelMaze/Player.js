@@ -1,5 +1,5 @@
 import { sec_to_frames, Tween } from "../../sketchlib/Tween.js";
-import { Direction, to_y_down } from "../../sketchlib/Direction.js";
+import { Direction, to_y_down } from "../../sketchlib/CardinalDirection.js";
 import { Index2D } from "../../sketchlib/Grid.js";
 import { Tiles } from "./make_maze.js";
 import { Tilemap } from "./Tilemap.js";

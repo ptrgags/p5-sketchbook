@@ -2,7 +2,7 @@ import { ControlPoint } from "./ControlPoint.js";
 import { Point } from "../pga2d/objects.js";
 import { Rect } from "./Rect.js";
 import { FlagSet } from "../sketchlib/FlagSet.js";
-import { Direction } from "../sketchlib/Direction.js";
+import { Direction } from "../sketchlib/CardinalDirection.js";
 
 const DIR_LEFT = Point.DIR_X.neg();
 const DIR_RIGHT = Point.DIR_X;
@@ -40,17 +40,17 @@ export class CoralTile {
       this.control_points = control_points;
     } else {
       const se_position = connects_down
-        ? Point.point(0.75, 0)
-        : Point.point(0.5, 0.25);
+        ? new Point(0.75, 0)
+        : new Point(0.5, 0.25);
       const ne_position = connects_right
-        ? Point.point(1, 0.75)
-        : Point.point(0.75, 0.5);
+        ? new Point(1, 0.75)
+        : new Point(0.75, 0.5);
       const nw_position = connects_up
-        ? Point.point(0.25, 1)
-        : Point.point(0.5, 0.75);
+        ? new Point(0.25, 1)
+        : new Point(0.5, 0.75);
       const sw_position = connects_left
-        ? Point.point(0, 0.25)
-        : Point.point(0.25, 0.5);
+        ? new Point(0, 0.25)
+        : new Point(0.25, 0.5);
       const se = new ControlPoint(se_position, se_dir.scale(0.1));
       const ne = new ControlPoint(ne_position, ne_dir.scale(0.1));
       const nw = new ControlPoint(nw_position, nw_dir.scale(0.1));

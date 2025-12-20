@@ -1,7 +1,7 @@
 import { Point } from "../pga2d/objects.js";
 import { Rect } from "./Rect.js";
 import { CoralTile } from "./CoralTile.js";
-import { Direction } from "../sketchlib/Direction.js";
+import { Direction } from "../sketchlib/CardinalDirection.js";
 import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 
@@ -18,16 +18,16 @@ export function render_quad(rect) {
     // Boundary
     new RectPrimitive(rect.position, rect.dimensions),
     // Crossbars
-    new LinePrimitive(Point.point(x, y + h / 2), Point.point(x + w, y + h / 2)),
-    new LinePrimitive(Point.point(x + w / 2, y), Point.point(x + w / 2, y + h)),
+    new LinePrimitive(new Point(x, y + h / 2), new Point(x + w, y + h / 2)),
+    new LinePrimitive(new Point(x + w / 2, y), new Point(x + w / 2, y + h)),
   ];
 }
 
 const CONNECT_POINTS = [
-  Point.point(1.0, 0.5),
-  Point.point(0.5, 1.0),
-  Point.point(0.0, 0.5),
-  Point.point(0.5, 0.0),
+  new Point(1.0, 0.5),
+  new Point(0.5, 1.0),
+  new Point(0.0, 0.5),
+  new Point(0.5, 0.0),
 ];
 
 /**
@@ -40,7 +40,7 @@ const CONNECT_POINTS = [
 export function render_tile_connections(tile) {
   const quad = tile.quad;
   const flags = tile.connection_flags;
-  const center = quad.uv_to_world(Point.point(0.5, 0.5));
+  const center = quad.uv_to_world(new Point(0.5, 0.5));
   const primitives = [];
   for (let i = 0; i < Direction.COUNT; i++) {
     if (!flags.has_flag(i)) {
@@ -56,10 +56,10 @@ export function render_tile_connections(tile) {
 }
 
 const WALLS = [
-  [Point.point(1, 0), Point.point(1, 1)],
-  [Point.point(1, 1), Point.point(0, 1)],
-  [Point.point(0, 1), Point.point(0, 0)],
-  [Point.point(0, 0), Point.point(1, 0)],
+  [new Point(1, 0), new Point(1, 1)],
+  [new Point(1, 1), new Point(0, 1)],
+  [new Point(0, 1), new Point(0, 0)],
+  [new Point(0, 0), new Point(1, 0)],
 ];
 
 /**

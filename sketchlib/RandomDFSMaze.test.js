@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { generate_maze } from "./RandomDFSMaze";
-import { Direction } from "./Direction";
+import { Direction } from "./CardinalDirection";
 import { griderator, Index2D } from "./Grid";
 
 describe("generate_maze", () => {

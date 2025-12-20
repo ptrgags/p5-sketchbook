@@ -25,7 +25,7 @@ function median(a, b, c) {
 function median_point(a, b, c) {
   const med_x = median(a.x, b.x, c.x);
   const med_y = median(a.y, b.y, c.y);
-  return Point.point(med_x, med_y);
+  return new Point(med_x, med_y);
 }
 
 export class Viewport {
@@ -76,7 +76,7 @@ export class Viewport {
    */
   map_to_viewport(point) {
     const { x, y } = point.sub(this.position);
-    return Point.point(Math.round(x), Math.round(y));
+    return new Point(Math.round(x), Math.round(y));
   }
 
   /**
@@ -87,6 +87,6 @@ export class Viewport {
    */
   map_to_screen(point) {
     const { x, y } = point.sub(this.position).scale(this.upscale_factor);
-    return Point.point(Math.round(x), Math.round(y));
+    return new Point(Math.round(x), Math.round(y));
   }
 }

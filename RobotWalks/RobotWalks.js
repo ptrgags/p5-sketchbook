@@ -13,7 +13,7 @@ const HALF_SCREEN = Point.direction(WIDTH / 2, HEIGHT);
 // Virtual touch buttons for left and right keys on mobile.
 const TOUCH_LEFT = new TouchButton(new Rectangle(Point.ORIGIN, HALF_SCREEN));
 const TOUCH_RIGHT = new TouchButton(
-  new Rectangle(Point.point(WIDTH / 2, 0), HALF_SCREEN)
+  new Rectangle(new Point(WIDTH / 2, 0), HALF_SCREEN)
 );
 
 export const sketch = (p) => {

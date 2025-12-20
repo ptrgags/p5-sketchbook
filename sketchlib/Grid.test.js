@@ -1,6 +1,6 @@
 import { describe, it, expect, test } from "vitest";
 import { Grid, griderator, Index2D } from "./Grid";
-import { Direction } from "./Direction";
+import { Direction } from "./CardinalDirection";
 import { Rectangle } from "../lab/lablib/Rectangle";
 import { Point } from "../pga2d/objects";
 import { PGA_MATCHERS } from "../pga2d/pga_matchers";
@@ -122,7 +122,7 @@ describe("Index2D", () => {
 
     it("computes correct position with offset", () => {
       const index = new Index2D(1, 3);
-      const offset = Point.point(4, 4);
+      const offset = new Point(4, 4);
       const stride = Point.direction(2, 4);
 
       const result = index.to_world(offset, stride);
@@ -441,7 +441,7 @@ describe("Grid", () => {
 
       const [offset, stride] = grid.compute_layout(boundary, item_size, margin);
 
-      const expected_offset = Point.point(2, 4);
+      const expected_offset = new Point(2, 4);
       const expected_stride = Point.direction(2, 2);
       expect(offset).toBePoint(expected_offset);
       expect(stride).toBePoint(expected_stride);
@@ -469,7 +469,7 @@ describe("Grid", () => {
 
       const [offset, stride] = grid.compute_layout(boundary, item_size, margin);
 
-      const expected_offset = Point.point(4, 1);
+      const expected_offset = new Point(4, 1);
       const expected_stride = Point.direction(3, 2);
       expect(offset).toBePoint(expected_offset);
       expect(stride).toBePoint(expected_stride);

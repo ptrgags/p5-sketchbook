@@ -34,6 +34,6 @@ export class ControlPoint {
 
     const [x, y] = position;
     const [dx, dy] = tangent;
-    return new ControlPoint(Point.point(x, y), Point.direction(dx, dy));
+    return new ControlPoint(new Point(x, y), Point.direction(dx, dy));
   }
 }

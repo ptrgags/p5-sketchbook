@@ -4,7 +4,7 @@ import { Point } from "../pga2d/objects.js";
 import { AnimatedWorm } from "./AnimatedWorm.js";
 import { prevent_mobile_scroll } from "../sketchlib/prevent_mobile_scroll.js";
 
-const INITIAL_POSITION = Point.point(WIDTH / 2, HEIGHT - 50);
+const INITIAL_POSITION = new Point(WIDTH / 2, HEIGHT - 50);
 
 const WORM = new AnimatedWorm(INITIAL_POSITION);
 

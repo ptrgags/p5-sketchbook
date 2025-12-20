@@ -67,7 +67,7 @@ export const sketch = (p) => {
     p.background(0);
 
     const spring_animations = SPRING_SYSTEMS.map((system, i) => {
-      const origin = Point.point(10, 100 * i + 100);
+      const origin = new Point(10, 100 * i + 100);
       return system.render(origin);
     });
 
@@ -75,7 +75,7 @@ export const sketch = (p) => {
 
     const X_SCALE = 300;
     const V_SCALE = 30;
-    const phase_origin = Point.point(WIDTH / 2, (7 * HEIGHT) / 8);
+    const phase_origin = new Point(WIDTH / 2, (7 * HEIGHT) / 8);
     const phase_axes = SPRING_SYSTEMS[0].render_phase_axes(
       phase_origin,
       X_SCALE,

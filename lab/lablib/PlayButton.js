@@ -10,15 +10,9 @@ import { TouchButton } from "./TouchButton.js";
 const TRIANGLE_WIDTH = 200;
 const PLAY_TRIANGLE = new PolygonPrimitive(
   [
-    Point.point(
-      WIDTH / 2 - TRIANGLE_WIDTH / 2,
-      HEIGHT / 2 - TRIANGLE_WIDTH / 2
-    ),
-    Point.point(
-      WIDTH / 2 - TRIANGLE_WIDTH / 2,
-      HEIGHT / 2 + TRIANGLE_WIDTH / 2
-    ),
-    Point.point(WIDTH / 2 + TRIANGLE_WIDTH / 2, HEIGHT / 2),
+    new Point(WIDTH / 2 - TRIANGLE_WIDTH / 2, HEIGHT / 2 - TRIANGLE_WIDTH / 2),
+    new Point(WIDTH / 2 - TRIANGLE_WIDTH / 2, HEIGHT / 2 + TRIANGLE_WIDTH / 2),
+    new Point(WIDTH / 2 + TRIANGLE_WIDTH / 2, HEIGHT / 2),
   ],
   true
 );

@@ -88,7 +88,7 @@ export class TurtleGraphics {
 }
 
 const DELTA_ANGLE = Math.PI / 5;
-const START_POINT = Point.point(WIDTH / 2, (3 * HEIGHT) / 4);
+const START_POINT = new Point(WIDTH / 2, (3 * HEIGHT) / 4);
 const MAX_LENGTH = 100;
 const LENGTH_SCALE = 0.7;
 
@@ -493,7 +493,7 @@ const STYLE_TURTLE = new Style({
 
 /**
  * Draw a turtle as an isoceles triangle for now.
- * @param {Point} position Point.point for the turtle position
+ * @param {Point} position Point for the turtle position
  * @param {number} orientation orientation of the turtle
  */
 function render_turtle(position, orientation) {

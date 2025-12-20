@@ -9,9 +9,9 @@ const WIDTH = 500;
 const HEIGHT = 700;
 
 // vanishing point of the rails
-const VP_RAILS = Point.point(WIDTH / 2, HEIGHT / 4);
-const A = Point.point(WIDTH / 4, HEIGHT);
-const B = Point.point((3 * WIDTH) / 4, HEIGHT);
+const VP_RAILS = new Point(WIDTH / 2, HEIGHT / 4);
+const A = new Point(WIDTH / 4, HEIGHT);
+const B = new Point((3 * WIDTH) / 4, HEIGHT);
 
 const BOTTOM_SIDE = new Line(0, 1, HEIGHT);
 
@@ -160,13 +160,13 @@ function railroad_ties(tie_bottoms, tie_thickness) {
 
 function make_background() {
   const sky_prim = new RectPrimitive(
-    Point.point(0, 0),
+    new Point(0, 0),
     Point.direction(WIDTH, VP_RAILS.y)
   );
   const sky = style(sky_prim, SKY_STYLE);
 
   const ground_prim = new RectPrimitive(
-    Point.point(0, VP_RAILS.y),
+    new Point(0, VP_RAILS.y),
     Point.direction(WIDTH, HEIGHT - VP_RAILS.y)
   );
   const ground = style(ground_prim, GROUND_STYLE);
@@ -214,8 +214,8 @@ const RAILS_START_FRAME = 20;
 const RAILS_DURATION = 200;
 const TIE_DURATION = 30;
 function make_ties() {
-  const tie_bottom_left = Point.point(50, HEIGHT);
-  const tie_bottom_right = Point.point(475, HEIGHT);
+  const tie_bottom_left = new Point(50, HEIGHT);
+  const tie_bottom_right = new Point(475, HEIGHT);
 
   const TIE_SPACING = 100;
   const tie_bottoms = even_spaced_rectangles(

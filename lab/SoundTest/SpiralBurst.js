@@ -12,7 +12,7 @@ import { Rational } from "../lablib/Rational.js";
 import { SoundManager } from "../lablib/SoundManager.js";
 
 const N = 10;
-const CENTER = Point.point(WIDTH / 2, (3 * HEIGHT) / 4);
+const CENTER = new Point(WIDTH / 2, (3 * HEIGHT) / 4);
 const MAX_RADIUS = 50;
 
 export class SpiralBurst {

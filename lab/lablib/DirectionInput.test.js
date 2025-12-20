@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { DirectionInput } from "./DirectionInput.js";
-import { Direction } from "../../sketchlib/Direction.js";
+import { Direction } from "../../sketchlib/CardinalDirection.js";
 import { Point } from "../../pga2d/objects.js";
 
 describe("DirectionInput", () => {

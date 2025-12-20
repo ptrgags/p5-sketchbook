@@ -2,7 +2,7 @@ import { Grid, Index2D } from "./Grid.js";
 import { Random } from "./random.js";
 import { DFS } from "./DFS.js";
 import { FlagSet } from "./FlagSet.js";
-import { Direction, opposite } from "./Direction.js";
+import { Direction, opposite } from "./CardinalDirection.js";
 import { GridDFSTraversal } from "./GridDFSTraversal.js";
 
 export class MazeCell {

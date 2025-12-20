@@ -11,7 +11,7 @@ import { ToggleButton, ToggleState } from "./ToggleButton.js";
 const SOUND_ON = ToggleState.STATE_A;
 const SOUND_OFF = ToggleState.STATE_B;
 const SOUND_TOGGLE_SIZE = 50;
-const SOUND_TOGGLE_CORNER = Point.point(WIDTH - SOUND_TOGGLE_SIZE, 0);
+const SOUND_TOGGLE_CORNER = new Point(WIDTH - SOUND_TOGGLE_SIZE, 0);
 
 const SPEAKER_CONE = new PolygonPrimitive(
   [

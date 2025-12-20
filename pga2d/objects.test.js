@@ -21,7 +21,7 @@ function expect_point_array(result, expected) {
 describe("Point", () => {
   describe("euclidean", () => {
     it("converts to direction", () => {
-      const a = Point.point(2, -5);
+      const a = new Point(2, -5);
 
       const result = a.to_direction();
 
@@ -30,35 +30,35 @@ describe("Point", () => {
     });
 
     it("gets the underlying x and y components", () => {
-      const a = Point.point(2, -5);
+      const a = new Point(2, -5);
 
       expect(a.x).toBe(2);
       expect(a.y).toBe(-5);
     });
 
     it("adding two points returns the midpoint", () => {
-      const a = Point.point(1, 2);
-      const b = Point.point(3, 4);
+      const a = new Point(1, 2);
+      const b = new Point(3, 4);
 
       const result = a.add(b);
 
-      const expected = Point.point(2, 3);
+      const expected = new Point(2, 3);
       expect(result).toEqual(expected);
     });
 
     it("adding a direction returns the correct point", () => {
-      const a = Point.point(1, 2);
+      const a = new Point(1, 2);
       const dir = Point.direction(3, 4);
 
       const result = a.add(dir);
 
-      const expected = Point.point(4, 6);
+      const expected = new Point(4, 6);
       expect(result).toBePoint(expected);
     });
 
     it("subtracting points produces the correct direction", () => {
-      const a = Point.point(1, 4);
-      const b = Point.point(3, 2);
+      const a = new Point(1, 4);
+      const b = new Point(3, 2);
 
       const result = a.sub(b);
 
@@ -67,8 +67,8 @@ describe("Point", () => {
     });
 
     it("joining two points gives the line through them", () => {
-      const a = Point.point(0, 1);
-      const b = Point.point(1, 0);
+      const a = new Point(0, 1);
+      const b = new Point(1, 0);
 
       const result = a.join(b);
 
@@ -77,8 +77,8 @@ describe("Point", () => {
     });
 
     it("swapping join arguments reverses the line's orientation", () => {
-      const a = Point.point(0, 1);
-      const b = Point.point(1, 0);
+      const a = new Point(0, 1);
+      const b = new Point(1, 0);
 
       const result_forward = a.join(b);
       const result_backward = b.join(a);
@@ -90,19 +90,19 @@ describe("Point", () => {
     });
 
     it("lerp interpolates two points", () => {
-      const a = Point.point(1, 2);
-      const b = Point.point(-2, -8);
+      const a = new Point(1, 2);
+      const b = new Point(-2, -8);
 
       const result = Point.lerp(a, b, 0.25);
 
       // 3/4 * 1 + 1/4 * -2 = 1/4(3 -2) = 1/4
       // 3/4 * 2 + 1/4 * -8 = 1/4(6 - 8) = -2/4 = -1/2
-      const expected = Point.point(0.25, -0.5);
+      const expected = new Point(0.25, -0.5);
       expect(result).toEqual(expected);
     });
 
     it("toString formats as point", () => {
-      const a = Point.point(0.00012345, 2.98763);
+      const a = new Point(0.00012345, 2.98763);
 
       const result = a.toString();
 
@@ -117,7 +117,7 @@ describe("Point", () => {
 
       const result = a.to_point();
 
-      const expected = Point.point(2, -5);
+      const expected = new Point(2, -5);
       expect(result).toBePoint(expected);
     });
 
@@ -243,13 +243,13 @@ describe("Point", () => {
     });
 
     it("flip_y flips y coordinate of points", () => {
-      const point = Point.point(3, 4);
+      const point = new Point(3, 4);
 
       const result = point.flip_y();
 
-      const expected = Point.point(3, -4);
+      const expected = new Point(3, -4);
       expect(result).toBePoint(expected);
-    })
+    });
 
     it("flip_y flips y coordinate of directions", () => {
       const dir = Point.direction(3, -4);
@@ -258,7 +258,7 @@ describe("Point", () => {
 
       const expected = Point.direction(3, 4);
       expect(result).toBePoint(expected);
-    })
+    });
 
     it("dot of two directions computes the dot product of components", () => {
       const a = Point.direction(1, 2);
@@ -389,7 +389,7 @@ describe("Line", () => {
 
     const result = a.meet(b);
 
-    const expected = Point.point(1.5, -0.5);
+    const expected = new Point(1.5, -0.5);
     expect(result).toBePoint(expected);
   });
 

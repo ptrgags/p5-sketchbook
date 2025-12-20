@@ -12,7 +12,7 @@ import { Point } from "../pga2d/objects.js";
 export function fix_mouse_coords(canvas, mouse_x, mouse_y) {
   // The canvas hasn't been added to the page yet! gracefully return (0, 0)
   if (!canvas) {
-    return Point.point(0, 0);
+    return new Point(0, 0);
   }
 
   // This is what p5.js uses for its pixel ratio. I needed to use this
@@ -49,5 +49,5 @@ export function fix_mouse_coords(canvas, mouse_x, mouse_y) {
 
   const x = ((mouse_x - margin_left) * canvas_width) / effective_width;
   const y = ((mouse_y - margin_top) * canvas_height) / effective_height;
-  return Point.point(x, y);
+  return new Point(x, y);
 }

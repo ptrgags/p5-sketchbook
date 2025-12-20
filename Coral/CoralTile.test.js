@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { Rect } from "./Rect.js";
 import { CoralTile } from "./CoralTile.js";
-import { Direction } from "../sketchlib/Direction.js";
+import { Direction } from "../sketchlib/CardinalDirection.js";
 import { FlagSet } from "../sketchlib/FlagSet.js";
 import { ControlPoint } from "./ControlPoint.js";
 import { Point } from "../pga2d/objects.js";
@@ -65,10 +65,10 @@ describe("CoralTile", () => {
     const result = CoralTile.parse_json(json_tile, QUAD);
 
     const expected_control_points = [
-      new ControlPoint(Point.point(0.6, 0), Point.direction(0.2, 0.2)),
-      new ControlPoint(Point.point(1, 0.6), Point.direction(-0.2, 0.2)),
-      new ControlPoint(Point.point(0.4, 1), Point.direction(-0.2, -0.2)),
-      new ControlPoint(Point.point(0, 0.4), Point.direction(0.2, -0.2)),
+      new ControlPoint(new Point(0.6, 0), Point.direction(0.2, 0.2)),
+      new ControlPoint(new Point(1, 0.6), Point.direction(-0.2, 0.2)),
+      new ControlPoint(new Point(0.4, 1), Point.direction(-0.2, -0.2)),
+      new ControlPoint(new Point(0, 0.4), Point.direction(0.2, -0.2)),
     ];
 
     expect(result.quad).toBe(QUAD);

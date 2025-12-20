@@ -1,4 +1,3 @@
-import { Point } from "../pga2d/objects.js";
 import { Motor } from "../pga2d/versors.js";
 import { Color } from "./Color.js";
 import { LinePrimitive } from "./primitives/LinePrimitive.js";

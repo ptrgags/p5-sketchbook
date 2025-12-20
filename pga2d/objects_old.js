@@ -13,7 +13,7 @@ import { is_nearly } from "../sketchlib/is_nearly.js";
  */
 export class Point {
   /**
-   * Constructor. This is mainly for internal use, see Point.point and
+   * Constructor. This is mainly for internal use, see Point and
    * Point.direction instead
    * @param {number} xy The xy component (0 for directions, nonzero for points)
    * @param {number} xo The xo component (the *flipped* vertical direction)

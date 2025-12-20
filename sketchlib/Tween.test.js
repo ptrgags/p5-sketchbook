@@ -122,11 +122,11 @@ describe("Tween", () => {
     });
 
     it("Tween.point interpolates points", () => {
-      const tween = Tween.point(Point.point(0, 1), Point.point(1, 0), 4, 4);
+      const tween = Tween.point(new Point(0, 1), new Point(1, 0), 4, 4);
 
       const result = tween.get_value(6);
 
-      const expected = Point.point(0.5, 0.5);
+      const expected = new Point(0.5, 0.5);
       expect(result).toBePoint(expected);
     });
 

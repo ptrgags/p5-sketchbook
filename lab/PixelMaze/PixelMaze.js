@@ -1,6 +1,6 @@
 import { Point } from "../../pga2d/objects.js";
 import { HEIGHT, WIDTH } from "../../sketchlib/dimensions.js";
-import { Direction } from "../../sketchlib/Direction.js";
+import { Direction } from "../../sketchlib/CardinalDirection.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { DirectionalPad, DirectionInput } from "../lablib/DirectionalPad.js";
 import { blit_sprite, blit_tilemap, P5Sprite, P5Tilemap } from "./blit.js";

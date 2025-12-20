@@ -11,7 +11,7 @@ import { ClockTime } from "./ClockTime.js";
 
 const OUTER_RADIUS = 100;
 const INNER_RADIUS = 70;
-const CLOCK_CENTER = Point.point(WIDTH / 2, HEIGHT / 4);
+const CLOCK_CENTER = new Point(WIDTH / 2, HEIGHT / 4);
 const CLOCK_CIRCLE = new CirclePrimitive(CLOCK_CENTER, OUTER_RADIUS);
 
 const DIRS_12 = new Array(12).fill(0).map((_, i) => {

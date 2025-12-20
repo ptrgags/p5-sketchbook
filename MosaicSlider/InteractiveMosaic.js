@@ -32,7 +32,7 @@ export class InteractiveMosaic {
     this.frame = 0;
 
     this.swap_pair = undefined;
-    this.mouse = Point.point(0, 0);
+    this.mouse = new Point(0, 0);
     this.mouse_down = false;
   }
 
