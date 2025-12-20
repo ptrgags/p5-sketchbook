@@ -68,13 +68,13 @@ export class AnimatedWorm {
     this.look_direction = new Direction(0, 1);
     this.googly = [
       new GooglyEye(
-        first_point.add(Point.DIR_X.scale(-WORM_EYE_SEPARATION)),
+        first_point.add(Direction.DIR_X.scale(-WORM_EYE_SEPARATION)),
         this.look_direction,
         WORM_EYE_RADIUS,
         WORM_PUPIL_RADIUS
       ),
       new GooglyEye(
-        first_point.add(Point.DIR_X.scale(WORM_EYE_SEPARATION)),
+        first_point.add(Direction.DIR_X.scale(WORM_EYE_SEPARATION)),
         this.look_direction,
         WORM_EYE_RADIUS,
         WORM_PUPIL_RADIUS

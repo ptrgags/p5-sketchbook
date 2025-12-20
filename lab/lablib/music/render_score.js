@@ -93,7 +93,7 @@ function render_notes(offset, music, measure_dimensions, pitch_range) {
       all_notes.push(child_notes);
 
       const child_width = child.duration.real * measure_dimensions.x;
-      child_offset = child_offset.add(Point.DIR_X.scale(child_width));
+      child_offset = child_offset.add(Direction.DIR_X.scale(child_width));
     }
     return group(...all_notes.filter((x) => x !== undefined));
   }
@@ -145,7 +145,7 @@ export function render_music(
   for (let i = 0; i < whole_measures; i++) {
     const x = i * measure_dimensions.x;
     measure_lines[i] = new LinePrimitive(
-      offset.add(Point.DIR_X.scale(x)),
+      offset.add(Direction.DIR_X.scale(x)),
       offset.add(new Direction(x, measure_dimensions.y))
     );
   }

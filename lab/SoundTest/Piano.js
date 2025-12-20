@@ -21,7 +21,7 @@ function make_white_keys(bounding_rect) {
   const result = new Array(7);
 
   for (let i = 0; i < NUM_WHITE_KEYS; i++) {
-    const offset = Point.DIR_X.scale(i * key_dimensions.x);
+    const offset = Direction.DIR_X.scale(i * key_dimensions.x);
     result[i] = new RectPrimitive(
       bounding_rect.position.add(offset),
       key_dimensions
@@ -44,7 +44,7 @@ function make_black_keys(bounding_rect) {
   const key_offsets = [3, 7, 15, 19, 23];
 
   return key_offsets.map((i) => {
-    const offset = Point.DIR_X.scale((i * width) / 28);
+    const offset = Direction.DIR_X.scale((i * width) / 28);
     return new RectPrimitive(
       bounding_rect.position.add(offset),
       key_dimensions
@@ -178,7 +178,7 @@ export class Piano {
     this.octave_pianos = new Array(this.num_octaves);
     for (let i = 0; i < num_octaves; i++) {
       const offset = bounding_rect.position.add(
-        Point.DIR_X.scale(i * octave_width)
+        Direction.DIR_X.scale(i * octave_width)
       );
       this.octave_pianos[i] = new SingleOctavePiano(
         new Rectangle(offset, octave_dimensions)

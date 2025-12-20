@@ -43,7 +43,7 @@ export class TurtleGraphics {
   get dir_forward() {
     // Angles are measured from vertical, not horizontal
     const ANGLE_ZERO = -Math.PI / 2;
-    return Point.dir_from_angle(
+    return Direction.from_angle(
       ANGLE_ZERO + this.delta_angle * this.orientation
     );
   }
@@ -497,13 +497,13 @@ const STYLE_TURTLE = new Style({
  * @param {number} orientation orientation of the turtle
  */
 function render_turtle(position, orientation) {
-  const dir_front = Point.dir_from_angle(
+  const dir_front = Direction.from_angle(
     -Math.PI / 2 + orientation * DELTA_ANGLE
   );
-  const dir_back_left = Point.dir_from_angle(
+  const dir_back_left = Direction.from_angle(
     -Math.PI / 2 + orientation * DELTA_ANGLE + (5 * Math.PI) / 6
   );
-  const dir_back_right = Point.dir_from_angle(
+  const dir_back_right = Direction.from_angle(
     -Math.PI / 2 + orientation * DELTA_ANGLE - (5 * Math.PI) / 6
   );
 
@@ -522,7 +522,7 @@ function render_turtle(position, orientation) {
 const STACK_RECT_DIMENSIONS = new Direction(RADIUS_TURTLE / 2, RADIUS_TURTLE);
 const OFFSET_STACK_START = new Direction(RADIUS_TURTLE + 4, -RADIUS_TURTLE / 2);
 const STACK_SPACING = 2;
-const OFFSET_STACK_STRIDE = Point.DIR_X.scale(
+const OFFSET_STACK_STRIDE = Direction.DIR_X.scale(
   STACK_RECT_DIMENSIONS.x + STACK_SPACING
 );
 

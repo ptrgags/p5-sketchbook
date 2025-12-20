@@ -1,4 +1,4 @@
-import { Point } from "../../pga2d/objects.js";
+import { Point } from "../../pga2d/Point.js";
 import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
 import { group } from "../../sketchlib/primitives/shorthand.js";
 import { DoublePendulumSystem, Pendulum } from "./DoublePendulumSystem.js";

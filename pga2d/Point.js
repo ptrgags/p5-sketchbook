@@ -145,12 +145,11 @@ export class Point {
    * @returns {number}
    */
   dist_sqr(point) {
-    return this.sub(point).ideal_norm_sqr();
+    return this.sub(point).mag_sqr();
   }
 
   /**
    * Return a point of the same type
-   * @param {Point} point The original point
    * @returns {Point} The result of flipping the y-coordinate
    */
   flip_y() {

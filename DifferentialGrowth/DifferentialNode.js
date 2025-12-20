@@ -9,6 +9,10 @@ export const NEARBY_RADIUS = 20;
 const TEMP_DELTA_VELOCITY = new Vector2(0, 0);
 const TEMP_DELTA_POSITION = new Vector2(0, 0);
 export class DifferentialNode {
+  /**
+   *
+   * @param {Vector2} position
+   */
   constructor(position) {
     this.position = position;
     this.velocity = new Vector2(0, 0);

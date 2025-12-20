@@ -49,7 +49,7 @@ export class SpiralBurst {
     for (let i = 0; i < N; i++) {
       const angle = this.phases[i] + phase_shift * Math.PI;
       const radius = this.radii[i] * radius_scale;
-      const offset = Point.dir_from_angle(angle).scale(radius);
+      const offset = Direction.from_angle(angle).scale(radius);
       const point = new PointPrimitive(CENTER.add(offset));
       points[i] = style(point, point_style);
     }

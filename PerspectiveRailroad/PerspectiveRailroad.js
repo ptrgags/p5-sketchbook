@@ -1,9 +1,11 @@
-import { Line, Point } from "../pga2d/objects.js";
 import { Style } from "../sketchlib/Style.js";
 import { Color } from "../sketchlib/Color.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
+import { Point } from "../pga2d/Point.js";
+import { Line } from "../pga2d/Line.js";
+import { Direction } from "../pga2d/Direction.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -27,9 +29,9 @@ const TIE_STYLE = DEFAULT_STYLE.with_fill(new Color(99, 59, 26));
 const CLOSED = true;
 
 function compute_rails() {
-  const A_top_left = A.add(Point.DIR_Y.scale(-RAIL_HEIGHT));
-  const A_top_right = A_top_left.add(Point.DIR_X.scale(RAIL_WIDTH));
-  const A_bottom_right = A.add(Point.DIR_X.scale(RAIL_WIDTH));
+  const A_top_left = A.add(Direction.DIR_Y.scale(-RAIL_HEIGHT));
+  const A_top_right = A_top_left.add(Direction.DIR_X.scale(RAIL_WIDTH));
+  const A_bottom_right = A.add(Direction.DIR_X.scale(RAIL_WIDTH));
   const A_rail_top_left = A_top_left.join(VP_RAILS);
   const A_rail_top_right = A_top_right.join(VP_RAILS);
   const A_rail_bottom_right = A_bottom_right.join(VP_RAILS);
@@ -38,8 +40,8 @@ function compute_rails() {
   const isx_A_bottom_right = A_rail_bottom_right.meet(BOTTOM_SIDE);
 
   const B_bottom_left = B;
-  const B_top_left = B.add(Point.DIR_Y.scale(-RAIL_HEIGHT));
-  const B_top_right = B_top_left.add(Point.DIR_X.scale(RAIL_WIDTH));
+  const B_top_left = B.add(Direction.DIR_Y.scale(-RAIL_HEIGHT));
+  const B_top_right = B_top_left.add(Direction.DIR_X.scale(RAIL_WIDTH));
   const B_rail_bottom_left = B_bottom_left.join(VP_RAILS);
   const B_rail_top_left = B_top_left.join(VP_RAILS);
   const B_rail_top_right = B_top_right.join(VP_RAILS);
@@ -85,8 +87,8 @@ function even_spaced_rectangles(point_a, point_b, vp, vertical_spacing) {
   // the second line is the given number of pixels above it.
   const first_line = point_a.join(point_b);
   const second_line = point_a
-    .add(Point.DIR_Y.scale(-vertical_spacing))
-    .join(Point.DIR_X);
+    .add(Direction.DIR_Y.scale(-vertical_spacing))
+    .join(Direction.DIR_X);
 
   // Left and right guidelines that lead to the vanishing point
   const guide_left = point_a.join(vp);
@@ -111,7 +113,7 @@ function even_spaced_rectangles(point_a, point_b, vp, vertical_spacing) {
     const center = current_line.meet(center_line);
     const line_to_next = prev_left.join(center);
     const next_right = line_to_next.meet(guide_right);
-    const next_line = next_right.join(Point.DIR_X);
+    const next_line = next_right.join(Direction.DIR_X);
     const next_left = next_line.meet(guide_left);
 
     horizontal_lines.push(next_line);
@@ -146,7 +148,7 @@ function railroad_ties(tie_bottoms, tie_thickness) {
 
     const diag = quad_a.join(quad_c);
     const isx = diag.meet(ref_line);
-    const tie_top = isx.join(Point.DIR_X);
+    const tie_top = isx.join(Direction.DIR_X);
     const top_left = tie_top.meet(guide_left);
     const top_right = tie_top.meet(guide_right);
 

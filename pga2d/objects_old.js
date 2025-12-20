@@ -14,7 +14,7 @@ import { is_nearly } from "../sketchlib/is_nearly.js";
 export class Point {
   /**
    * Constructor. This is mainly for internal use, see Point.point and
-   * Direction instead
+   * Point.direction instead
    * @param {number} xy The xy component (0 for directions, nonzero for points)
    * @param {number} xo The xo component (the *flipped* vertical direction)
    * @param {number} yo The yo component (the horizontal direction)
@@ -60,7 +60,7 @@ export class Point {
    * @returns {Point} A direction with the coordinates (cos(theta), sin(theta))
    */
   static dir_from_angle(theta) {
-    return Direction(Math.cos(theta), Math.sin(theta));
+    return Point.direction(Math.cos(theta), Math.sin(theta));
   }
 
   /**

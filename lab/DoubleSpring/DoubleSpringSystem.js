@@ -10,8 +10,8 @@ import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 
 const PIXELS_PER_METER = 100;
-const X_METERS = Point.DIR_X.scale(PIXELS_PER_METER);
-const Y_METERS = Point.DIR_Y.scale(-PIXELS_PER_METER);
+const X_METERS = Direction.DIR_X.scale(PIXELS_PER_METER);
+const Y_METERS = Direction.DIR_Y.scale(-PIXELS_PER_METER);
 const NUM_COILS = 10;
 
 const STYLE_AXIS = Style.DEFAULT_STROKE;
@@ -53,7 +53,7 @@ function render_horizontal_spring(position, dimensions, num_coils, line_style) {
   const { x: w, y: h } = dimensions;
 
   const delta_x = new Direction(w / num_coils, 0);
-  const delta_y = Point.DIR_Y.scale(h);
+  const delta_y = Direction.DIR_Y.scale(h);
   const wires = [];
 
   for (let i = 0; i < num_coils; i++) {
@@ -122,8 +122,8 @@ export class DoubleSpringSystem {
    * @returns {[GroupPrimitive, GroupPrimitive]} The two phase plots
    */
   render_phase(origin, x_scale, v_scale) {
-    const x_dir = Point.DIR_X.scale(x_scale);
-    const v_dir = Point.DIR_Y.scale(-v_scale);
+    const x_dir = Direction.DIR_X.scale(x_scale);
+    const v_dir = Direction.DIR_Y.scale(-v_scale);
 
     const states = [...this.history];
     const points1 = states.map(([x1, v1, ,]) =>
@@ -157,8 +157,8 @@ export class DoubleSpringSystem {
    * @returns {GroupPrimitive}
    */
   render_phase_axes(origin, x_scale, v_scale) {
-    const x_dir = Point.DIR_X.scale(x_scale);
-    const v_dir = Point.DIR_Y.scale(-v_scale);
+    const x_dir = Direction.DIR_X.scale(x_scale);
+    const v_dir = Direction.DIR_Y.scale(-v_scale);
 
     const primitives = [
       new LinePrimitive(origin.sub(x_dir), origin.add(x_dir)),

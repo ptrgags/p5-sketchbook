@@ -209,7 +209,7 @@ export class Direction {
   /**
    * Compute the dot product of the x and y components of the points.
    * Technically this is the dot product of the duals
-   * @param {Point} other The other point
+   * @param {Direction} other The other direction
    * @returns {number} The dot product.
    */
   dot(other) {

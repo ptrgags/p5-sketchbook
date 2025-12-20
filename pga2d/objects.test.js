@@ -124,7 +124,7 @@ describe("Point", () => {
     it("dir_from_angle computes cosine and sine", () => {
       const angle = (2 * PI) / 3;
 
-      const result = Point.dir_from_angle(angle);
+      const result = Direction.from_angle(angle);
 
       const expected = new Direction(-0.5, Math.sqrt(3) / 2);
       expect(result).toBePoint(expected);

@@ -1,17 +1,29 @@
-import { Point } from "../pga2d/objects.js";
+import { Direction } from "../pga2d/Direction.js";
+import { Point } from "../pga2d/Point.js";
 
 export class ControlPoint {
+  /**
+   * Constructor
+   * @param {Point} position
+   * @param {Direction} tangent
+   */
   constructor(position, tangent) {
     this.position = position;
     this.tangent = tangent;
   }
 
+  /**
+   * @type {Point}
+   */
   get forward_point() {
     return this.position.add(this.tangent);
   }
 
+  /**
+   * @type {Point}
+   */
   get backward_point() {
-    return this.position.sub(this.tangent);
+    return this.position.add(this.tangent.neg());
   }
 
   to_json() {
@@ -21,6 +33,11 @@ export class ControlPoint {
     };
   }
 
+  /**
+   * Parse a control point from JSON
+   * @param {object} json A JSON object
+   * @returns {ControlPoint} The parsed ControlPoint
+   */
   static parse_json(json) {
     const { position, tangent } = json;
 

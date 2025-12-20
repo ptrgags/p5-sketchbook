@@ -1,9 +1,9 @@
-import { Point } from "../pga2d/objects.js";
 import { Rect } from "./Rect.js";
 import { CoralTile } from "./CoralTile.js";
-import { Direction } from "../sketchlib/CardinalDirection.js";
+import { CardinalDirection } from "../sketchlib/CardinalDirection.js";
 import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
+import { Point } from "../pga2d/Point.js";
 
 /**
  * Render the boundaries and cross-bars of a quad to uncolored geometry
@@ -42,7 +42,7 @@ export function render_tile_connections(tile) {
   const flags = tile.connection_flags;
   const center = quad.uv_to_world(new Point(0.5, 0.5));
   const primitives = [];
-  for (let i = 0; i < Direction.COUNT; i++) {
+  for (let i = 0; i < CardinalDirection.COUNT; i++) {
     if (!flags.has_flag(i)) {
       continue;
     }
@@ -72,7 +72,7 @@ export function render_tile_walls(tile) {
   const quad = tile.quad;
   const flags = tile.connection_flags;
   const primitives = [];
-  for (let i = 0; i < Direction.COUNT; i++) {
+  for (let i = 0; i < CardinalDirection.COUNT; i++) {
     if (flags.has_flag(i)) {
       continue;
     }

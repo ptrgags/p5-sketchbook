@@ -112,7 +112,7 @@ export class ArcRobot {
       const orientation = this.command_seq.orientation;
       // Orientation is measured from north, so add a quarter turn
       const angle = orientation * FIFTH_TURN + Math.PI / 2;
-      return Point.dir_from_angle(angle).flip_y();
+      return Direction.from_angle(angle).flip_y();
     }
 
     return this.current_arc.forward_dir(frame);
