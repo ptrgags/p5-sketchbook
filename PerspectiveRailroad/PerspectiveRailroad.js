@@ -161,13 +161,13 @@ function railroad_ties(tie_bottoms, tie_thickness) {
 function make_background() {
   const sky_prim = new RectPrimitive(
     new Point(0, 0),
-    Point.direction(WIDTH, VP_RAILS.y)
+    new Direction(WIDTH, VP_RAILS.y)
   );
   const sky = style(sky_prim, SKY_STYLE);
 
   const ground_prim = new RectPrimitive(
     new Point(0, VP_RAILS.y),
-    Point.direction(WIDTH, HEIGHT - VP_RAILS.y)
+    new Direction(WIDTH, HEIGHT - VP_RAILS.y)
   );
   const ground = style(ground_prim, GROUND_STYLE);
 

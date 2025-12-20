@@ -8,7 +8,7 @@ export class RectPrimitive {
   /**
    * Constructor
    * @param {Point} position The top left corner of the rectangle as a Point
-   * @param {Direction} dimensions The dimensions of the rectangle as a Point.direction
+   * @param {Direction} dimensions The dimensions of the rectangle as a Direction
    */
   constructor(position, dimensions) {
     this.position = position;

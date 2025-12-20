@@ -5,7 +5,7 @@ import { clamp } from "../sketchlib/clamp.js";
 export class Rect {
   constructor(x, y, width, height) {
     this.position = new Point(x, y);
-    this.dimensions = Point.direction(width, height);
+    this.dimensions = new Direction(width, height);
   }
 
   get far_corner() {

@@ -8,10 +8,10 @@ import { ImageFrames } from "./ImageFrames";
 expect.extend(PGA_MATCHERS);
 
 // More padding on the left/right than top/bottom
-const MARGIN = Point.direction(16, 8);
+const MARGIN = new Direction(16, 8);
 
 // Size of a Gameboy Advance screen for nostalgia reasons.
-const DIMENSIONS = Point.direction(240, 160);
+const DIMENSIONS = new Direction(240, 160);
 
 /**
  * @param {Point} position
@@ -22,9 +22,9 @@ function make_viewport(position, upscale_factor) {
   return new Viewport(position, DIMENSIONS, MARGIN, upscale_factor);
 }
 
-const DIMS = Point.direction(16, 32);
+const DIMS = new Direction(16, 32);
 const IMAGE_FRAMES = new ImageFrames(DIMS, DIMS);
-const ORIGIN = Point.direction(0, 16);
+const ORIGIN = new Direction(0, 16);
 function make_character_sprite() {
   return new Sprite(IMAGE_FRAMES, 0, 1, ORIGIN);
 }

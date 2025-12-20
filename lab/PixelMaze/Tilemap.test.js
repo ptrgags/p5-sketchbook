@@ -5,7 +5,7 @@ import { Grid, Index2D } from "../../sketchlib/Grid";
 import { Tilemap } from "./Tilemap.js";
 
 function make_tileset() {
-  return new ImageFrames(Point.direction(64, 64), Point.direction(16, 16));
+  return new ImageFrames(new Direction(64, 64), new Direction(16, 16));
 }
 
 describe("Tilemap", () => {

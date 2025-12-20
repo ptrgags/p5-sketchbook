@@ -18,7 +18,7 @@ const MAZE_ROWS = 20;
 const MAZE_COLS = 20;
 const INDICES = make_maze(MAZE_ROWS, MAZE_COLS);
 
-const ORIGIN_CHARACTER = Point.direction(0, TILE_SIZE);
+const ORIGIN_CHARACTER = new Direction(0, TILE_SIZE);
 const RESOURCE_MANIFEST = {
   images: {
     tileset: "./sprites/placeholder-tileset.png",
@@ -27,11 +27,11 @@ const RESOURCE_MANIFEST = {
   image_frames: {
     tileset_basic: {
       image: "tileset",
-      frame_size: Point.direction(TILE_SIZE, TILE_SIZE),
+      frame_size: new Direction(TILE_SIZE, TILE_SIZE),
     },
     character: {
       image: "character",
-      frame_size: Point.direction(TILE_SIZE, 2 * TILE_SIZE),
+      frame_size: new Direction(TILE_SIZE, 2 * TILE_SIZE),
     },
   },
   sprites: {
@@ -55,10 +55,10 @@ const RESOURCE_MANIFEST = {
 const MOUSE = new CanvasMouseHandler();
 const DPAD = new DirectionalPad();
 
-const VIEWPORT_MARGIN = Point.direction(3, 3).scale(TILE_SIZE);
+const VIEWPORT_MARGIN = new Direction(3, 3).scale(TILE_SIZE);
 const VIEWPORT = new Viewport(
   Point.ORIGIN,
-  Point.direction(WIDTH, HEIGHT),
+  new Direction(WIDTH, HEIGHT),
   VIEWPORT_MARGIN,
   TILE_SCALE
 );
@@ -102,7 +102,7 @@ export const sketch = (p) => {
     player = new Player(
       resources.sprites.walk,
       resources.sprites.idle,
-      Point.direction(4, 10).scale(TILE_SIZE).to_point()
+      new Direction(4, 10).scale(TILE_SIZE).to_point()
     );
 
     p.noSmooth();

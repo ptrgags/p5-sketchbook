@@ -52,7 +52,7 @@ const PART_STYLES = Oklch.gradient(
 );
 
 const RENDERED_TIMELINES = {};
-const MEASURE_DIMENSIONS = Point.direction(25, 50);
+const MEASURE_DIMENSIONS = new Direction(25, 50);
 
 for (const [key, score] of Object.entries(SOUND_MANIFEST.scores)) {
   RENDERED_TIMELINES[key] = render_score(
@@ -97,7 +97,7 @@ MELODY_BUTTONS.set(
 );
 
 const MELODY_BUTTON_SIZE = 150;
-const MELODY_BUTTON_DIMENSIONS = Point.direction(
+const MELODY_BUTTON_DIMENSIONS = new Direction(
   MELODY_BUTTON_SIZE,
   MELODY_BUTTON_SIZE / 2
 );
@@ -109,9 +109,9 @@ const TEXT_COLOR = new Style({
 
 const GRID_BOUNDARY = new Rectangle(
   new Point(0, HEIGHT / 2),
-  Point.direction(WIDTH, HEIGHT / 2)
+  new Direction(WIDTH, HEIGHT / 2)
 );
-const GRID_MARGIN = Point.direction(75, 80);
+const GRID_MARGIN = new Direction(75, 80);
 const [BUTTON_OFFSET, BUTTON_STRIDE] = MELODY_BUTTONS.compute_layout(
   GRID_BOUNDARY,
   MELODY_BUTTON_DIMENSIONS,
@@ -161,7 +161,7 @@ class SoundScene {
     this.mute_button = new MuteButton();
     this.events = new EventTarget();
     this.piano = new Piano(
-      new Rectangle(new Point(0, 300), Point.direction(500, 300 / 3)),
+      new Rectangle(new Point(0, 300), new Direction(500, 300 / 3)),
       3,
       4
     );
@@ -221,7 +221,7 @@ class SoundScene {
       const current_time = SOUND.transport_time;
       const x = current_time * MEASURE_DIMENSIONS.x;
       const transform = new Transform(
-        Point.direction(WIDTH / 2 - x, TIMELINE_TOP)
+        new Direction(WIDTH / 2 - x, TIMELINE_TOP)
       );
       const timeline = RENDERED_TIMELINES[this.selected_melody];
       const shifted = xform(timeline, transform);

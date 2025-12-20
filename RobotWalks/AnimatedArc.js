@@ -72,7 +72,7 @@ export class AnimatedArc {
   /**
    * Get the local "forward" direction in model space at this frame
    * @param {number} frame The current frame number
-   * @returns {Point} The forward direction as a Point.direction
+   * @returns {Point} The forward direction as a Direction
    */
   forward_dir(frame) {
     // The tangent to the curve will always be a quarter turn away from

@@ -91,7 +91,7 @@ export function blit_tilemap(p, p5_tilemap, origin) {
   const tile_size = tileset.frame_size.x;
   indices.for_each((index, tile_id) => {
     const { i, j } = index;
-    const offset = Point.direction(j, i).scale(tile_size);
+    const offset = new Direction(j, i).scale(tile_size);
     const position = origin.add(offset);
     blit_frame(p, p5_tilemap.p5_image, tileset, tile_id, position);
   });

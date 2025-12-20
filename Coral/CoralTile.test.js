@@ -65,10 +65,10 @@ describe("CoralTile", () => {
     const result = CoralTile.parse_json(json_tile, QUAD);
 
     const expected_control_points = [
-      new ControlPoint(new Point(0.6, 0), Point.direction(0.2, 0.2)),
-      new ControlPoint(new Point(1, 0.6), Point.direction(-0.2, 0.2)),
-      new ControlPoint(new Point(0.4, 1), Point.direction(-0.2, -0.2)),
-      new ControlPoint(new Point(0, 0.4), Point.direction(0.2, -0.2)),
+      new ControlPoint(new Point(0.6, 0), new Direction(0.2, 0.2)),
+      new ControlPoint(new Point(1, 0.6), new Direction(-0.2, 0.2)),
+      new ControlPoint(new Point(0.4, 1), new Direction(-0.2, -0.2)),
+      new ControlPoint(new Point(0, 0.4), new Direction(0.2, -0.2)),
     ];
 
     expect(result.quad).toBe(QUAD);

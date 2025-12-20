@@ -46,5 +46,5 @@ export class Rectangle {
  */
 export const SCREEN_RECT = new Rectangle(
   Point.ORIGIN,
-  Point.direction(WIDTH, HEIGHT)
+  new Direction(WIDTH, HEIGHT)
 );

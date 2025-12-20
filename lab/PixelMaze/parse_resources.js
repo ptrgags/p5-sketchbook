@@ -6,7 +6,7 @@ function parse_image_frames(p5_images, manifest, image_frames) {
   for (const [id, tileset_info] of Object.entries(manifest)) {
     const { image, frame_size } = tileset_info;
     const p5_image = p5_images[image];
-    const dimensions = Point.direction(p5_image.width, p5_image.height);
+    const dimensions = new Direction(p5_image.width, p5_image.height);
 
     const tileset = new ImageFrames(dimensions, frame_size);
     image_frames[id] = tileset;

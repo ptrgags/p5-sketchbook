@@ -15,7 +15,7 @@ const COLS = 16;
 const SQUARE_SIZE = 30;
 const MARGIN_X = (WIDTH - COLS * SQUARE_SIZE) / 2;
 const MARGIN_Y = (HEIGHT - ROWS * SQUARE_SIZE) / 2;
-const STRIDE = Point.direction(SQUARE_SIZE, SQUARE_SIZE);
+const STRIDE = new Direction(SQUARE_SIZE, SQUARE_SIZE);
 const CORNER = new Point(MARGIN_X, MARGIN_Y);
 const SWAP_DURATION = sec_to_frames(1 / 16);
 const PIXEL_STYLE = new Style({ stroke: Color.BLACK, width: 2 });
@@ -141,7 +141,7 @@ export class MosaicGrid {
       }
 
       const { i, j } = index;
-      const offset = Point.direction(j * SQUARE_SIZE, i * SQUARE_SIZE);
+      const offset = new Direction(j * SQUARE_SIZE, i * SQUARE_SIZE);
       const position = CORNER.add(offset);
       const rect = new RectPrimitive(position, STRIDE);
       by_colors[color_index].push(rect);
@@ -164,11 +164,11 @@ export class MosaicGrid {
     const { i: src_i, j: src_j } = src_index;
     const { i: dst_i, j: dst_j } = dst_index;
     const position_a = CORNER.add(
-      Point.direction(src_j * SQUARE_SIZE, src_i * SQUARE_SIZE)
+      new Direction(src_j * SQUARE_SIZE, src_i * SQUARE_SIZE)
     );
     const style_a = this.get_style(src_index);
     const position_b = CORNER.add(
-      Point.direction(dst_j * SQUARE_SIZE, dst_i * SQUARE_SIZE)
+      new Direction(dst_j * SQUARE_SIZE, dst_i * SQUARE_SIZE)
     );
     const style_b = this.get_style(dst_index);
     return new PixelSwapPair(

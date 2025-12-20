@@ -38,7 +38,7 @@ export class TurtleGraphics {
 
   /**
    * Get the forward direction in p5's y-down coordinate system
-   * @type {Point} A Point.direction representing the current forward direction as a unit direction
+   * @type {Point} A Direction representing the current forward direction as a unit direction
    */
   get dir_forward() {
     // Angles are measured from vertical, not horizontal
@@ -519,11 +519,8 @@ function render_turtle(position, orientation) {
   return style(polygon, STYLE_TURTLE);
 }
 
-const STACK_RECT_DIMENSIONS = Point.direction(RADIUS_TURTLE / 2, RADIUS_TURTLE);
-const OFFSET_STACK_START = Point.direction(
-  RADIUS_TURTLE + 4,
-  -RADIUS_TURTLE / 2
-);
+const STACK_RECT_DIMENSIONS = new Direction(RADIUS_TURTLE / 2, RADIUS_TURTLE);
+const OFFSET_STACK_START = new Direction(RADIUS_TURTLE + 4, -RADIUS_TURTLE / 2);
 const STACK_SPACING = 2;
 const OFFSET_STACK_STRIDE = Point.DIR_X.scale(
   STACK_RECT_DIMENSIONS.x + STACK_SPACING

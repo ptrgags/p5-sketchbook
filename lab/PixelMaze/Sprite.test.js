@@ -4,8 +4,8 @@ import { ImageFrames } from "./ImageFrames.js";
 import { Sprite } from "./Sprite.js";
 
 function make_image_frames() {
-  const image_dimensions = Point.direction(64, 256);
-  const frame_size = Point.direction(16, 32);
+  const image_dimensions = new Direction(64, 256);
+  const frame_size = new Direction(16, 32);
   return new ImageFrames(image_dimensions, frame_size);
 }
 

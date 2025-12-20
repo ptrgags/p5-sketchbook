@@ -41,7 +41,7 @@ export class TouchDPad {
     // Compute the coordinates from the center
     const { x, y } = point.sub(this.rect.center);
     const { x: x_scale, y: y_scale } = this.rect.dimensions.scale(0.5);
-    const analog_value = Point.direction(x / x_scale, y / y_scale);
+    const analog_value = new Direction(x / x_scale, y / y_scale);
 
     // Allow a deadzone in the middle of the DPAD
     if (analog_value.ideal_norm_sqr() < this.dead_zone_radius_sqr) {
@@ -110,8 +110,8 @@ export class TouchDPad {
     const top_left = this.rect.position;
     const bottom_right = this.rect.position.add(this.rect.dimensions);
 
-    const across = Point.direction(this.rect.dimensions.x, 0);
-    const down = Point.direction(0, this.rect.dimensions.y);
+    const across = new Direction(this.rect.dimensions.x, 0);
+    const down = new Direction(0, this.rect.dimensions.y);
     const top_right = top_left.add(across);
     const bottom_left = top_left.add(down);
 
@@ -189,14 +189,14 @@ export class TouchDPad {
     const half_dimensions = this.rect.dimensions.scale(0.5);
 
     const analog_direction = this.direction.analog;
-    const analog_offset = Point.direction(
+    const analog_offset = new Direction(
       analog_direction.x * half_dimensions.x,
       analog_direction.y * half_dimensions.y
     );
     const analog_arrow = new VectorPrimitive(center, center.add(analog_offset));
 
     const digital_direction = to_y_down(this.direction.digital);
-    const digital_offset = Point.direction(
+    const digital_offset = new Direction(
       digital_direction.x * half_dimensions.x,
       digital_direction.y * half_dimensions.y
     );

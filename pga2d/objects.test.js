@@ -25,7 +25,7 @@ describe("Point", () => {
 
       const result = a.to_direction();
 
-      const expected = Point.direction(2, -5);
+      const expected = new Direction(2, -5);
       expect(result).toBePoint(expected);
     });
 
@@ -48,7 +48,7 @@ describe("Point", () => {
 
     it("adding a direction returns the correct point", () => {
       const a = new Point(1, 2);
-      const dir = Point.direction(3, 4);
+      const dir = new Direction(3, 4);
 
       const result = a.add(dir);
 
@@ -62,7 +62,7 @@ describe("Point", () => {
 
       const result = a.sub(b);
 
-      const expected = Point.direction(-2, 2);
+      const expected = new Direction(-2, 2);
       expect(result).toBePoint(expected);
     });
 
@@ -113,7 +113,7 @@ describe("Point", () => {
 
   describe("direction", () => {
     it("converts to point", () => {
-      const a = Point.direction(2, -5);
+      const a = new Direction(2, -5);
 
       const result = a.to_point();
 
@@ -126,19 +126,19 @@ describe("Point", () => {
 
       const result = Point.dir_from_angle(angle);
 
-      const expected = Point.direction(-0.5, Math.sqrt(3) / 2);
+      const expected = new Direction(-0.5, Math.sqrt(3) / 2);
       expect(result).toBePoint(expected);
     });
 
     it("gets the underlying x and y components", () => {
-      const a = Point.direction(-3, 5);
+      const a = new Direction(-3, 5);
 
       expect(a.x).toBe(-3);
       expect(a.y).toBe(5);
     });
 
     it("dual returns the orthogonal line", () => {
-      const a = Point.direction(2, 1);
+      const a = new Direction(2, 1);
 
       const result = a.dual();
 
@@ -147,16 +147,16 @@ describe("Point", () => {
     });
 
     it("neg negates the components", () => {
-      const a = Point.direction(1, -3);
+      const a = new Direction(1, -3);
 
       const result = a.neg();
 
-      const expected = Point.direction(-1, 3);
+      const expected = new Direction(-1, 3);
       expect(result).toBePoint(expected);
     });
 
     it("ideal norm returns the magnitude of x and y components", () => {
-      const a = Point.direction(3, 4);
+      const a = new Direction(3, 4);
 
       const result = a.ideal_norm_sqr();
 
@@ -165,7 +165,7 @@ describe("Point", () => {
     });
 
     it("ideal magnitude returns the magnitude of x and y components", () => {
-      const a = Point.direction(3, 4);
+      const a = new Direction(3, 4);
 
       const result = a.ideal_norm();
 
@@ -174,7 +174,7 @@ describe("Point", () => {
     });
 
     it("limit_length with short direction does not change vector", () => {
-      const a = Point.direction(1, 2);
+      const a = new Direction(1, 2);
       const max_length = 100;
 
       const result = a.limit_length(max_length);
@@ -183,7 +183,7 @@ describe("Point", () => {
     });
 
     it("limit_length with long direction snaps to max length", () => {
-      const a = Point.direction(300, 400);
+      const a = new Direction(300, 400);
       const max_length = 100;
 
       const result = a.limit_length(max_length);
@@ -192,7 +192,7 @@ describe("Point", () => {
       // the new magnitude is 100, which is 1/5 exactly.
       // 300 / 5  = 60
       // 400 / 5  = 80
-      const expected = Point.direction(60, 80);
+      const expected = new Direction(60, 80);
       expect(result).toEqual(expected);
     });
 
@@ -206,7 +206,7 @@ describe("Point", () => {
     });
 
     it("set_length with short direction snaps to length", () => {
-      const a = Point.direction(3, 4);
+      const a = new Direction(3, 4);
       const length = 100;
 
       const result = a.set_length(length);
@@ -215,12 +215,12 @@ describe("Point", () => {
       // the new magnitude is 100, which is 1/5 exactly.
       // 300 / 5  = 60
       // 400 / 5  = 80
-      const expected = Point.direction(60, 80);
+      const expected = new Direction(60, 80);
       expect(result).toBePoint(expected);
     });
 
     it("set_length with long direction snaps to max length", () => {
-      const a = Point.direction(300, 400);
+      const a = new Direction(300, 400);
       const max_length = 100;
 
       const result = a.set_length(max_length);
@@ -229,16 +229,16 @@ describe("Point", () => {
       // the new magnitude is 100, which is 1/5 exactly.
       // 300 / 5  = 60
       // 400 / 5  = 80
-      const expected = Point.direction(60, 80);
+      const expected = new Direction(60, 80);
       expect(result).toBePoint(expected);
     });
 
     it("scale performs scalar multiplication", () => {
-      const dir = Point.direction(4, -3);
+      const dir = new Direction(4, -3);
 
       const result = dir.scale(2);
 
-      const expected = Point.direction(8, -6);
+      const expected = new Direction(8, -6);
       expect(result).toBePoint(expected);
     });
 
@@ -252,17 +252,17 @@ describe("Point", () => {
     });
 
     it("flip_y flips y coordinate of directions", () => {
-      const dir = Point.direction(3, -4);
+      const dir = new Direction(3, -4);
 
       const result = dir.flip_y();
 
-      const expected = Point.direction(3, 4);
+      const expected = new Direction(3, 4);
       expect(result).toBePoint(expected);
     });
 
     it("dot of two directions computes the dot product of components", () => {
-      const a = Point.direction(1, 2);
-      const b = Point.direction(3, 4);
+      const a = new Direction(1, 2);
+      const b = new Direction(3, 4);
 
       const result = a.dot(b);
 
@@ -273,14 +273,14 @@ describe("Point", () => {
   });
 
   it("lerp interpolates two directions", () => {
-    const a = Point.direction(1, 2);
-    const b = Point.direction(-2, -8);
+    const a = new Direction(1, 2);
+    const b = new Direction(-2, -8);
 
     const result = Point.lerp(a, b, 0.25);
 
     // 3/4 * 1 + 1/4 * -2 = 1/4(3 -2) = 1/4
     // 3/4 * 2 + 1/4 * -8 = 1/4(6 - 8) = -2/4 = -1/2
-    const expected = Point.direction(0.25, -0.5);
+    const expected = new Direction(0.25, -0.5);
     expect(result).toBePoint(expected);
   });
 
@@ -324,8 +324,8 @@ describe("Point", () => {
 
       // cos(45 deg) = sin(45 deg) = sqrt(2)/2 = sqrt(1/2)
       const xy45 = Math.SQRT1_2;
-      const ne = Point.direction(xy45, xy45);
-      const nw = Point.direction(-xy45, xy45);
+      const ne = new Direction(xy45, xy45);
+      const nw = Direction(-xy45, xy45);
       const expected = [
         Point.DIR_X,
         ne,

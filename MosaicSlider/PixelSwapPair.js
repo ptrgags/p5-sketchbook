@@ -41,7 +41,7 @@ export class PixelSwapPair {
       start_frame,
       duration_frames
     );
-    this.pixel_dimensions = Point.direction(pixel_width, pixel_width);
+    this.pixel_dimensions = new Direction(pixel_width, pixel_width);
   }
 
   /**

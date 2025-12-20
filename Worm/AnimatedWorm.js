@@ -43,7 +43,7 @@ export class AnimatedWorm {
    */
   constructor(initial_position) {
     const first_point = initial_position;
-    const down = Point.direction(0, WORM_SEGMENT_SEPARATION);
+    const down = new Direction(0, WORM_SEGMENT_SEPARATION);
 
     const joints = new Array(WORM_SEGMENTS);
     for (let i = 0; i < WORM_SEGMENTS; i++) {
@@ -65,7 +65,7 @@ export class AnimatedWorm {
 
     this.chain = new AnimationChain(joints, WORM_MIN_BEND_ANGLE);
 
-    this.look_direction = Point.direction(0, 1);
+    this.look_direction = new Direction(0, 1);
     this.googly = [
       new GooglyEye(
         first_point.add(Point.DIR_X.scale(-WORM_EYE_SEPARATION)),

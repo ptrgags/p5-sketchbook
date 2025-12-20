@@ -52,7 +52,7 @@ export class Spring {
 function render_horizontal_spring(position, dimensions, num_coils, line_style) {
   const { x: w, y: h } = dimensions;
 
-  const delta_x = Point.direction(w / num_coils, 0);
+  const delta_x = new Direction(w / num_coils, 0);
   const delta_y = Point.DIR_Y.scale(h);
   const wires = [];
 
@@ -185,7 +185,7 @@ export class DoubleSpringSystem {
     const bob1_position = bob_height.add(X_METERS.scale(l1 + x1));
     const bob1 = new RectPrimitive(
       bob1_position,
-      Point.direction(w1, w1).scale(PIXELS_PER_METER)
+      new Direction(w1, w1).scale(PIXELS_PER_METER)
     );
 
     const left_spring = render_horizontal_spring(
@@ -199,7 +199,7 @@ export class DoubleSpringSystem {
     const bob2_position = bob_height.add(X_METERS.scale(rest_length2 + x2));
     const bob2 = new RectPrimitive(
       bob2_position,
-      Point.direction(w2, w2).scale(PIXELS_PER_METER)
+      new Direction(w2, w2).scale(PIXELS_PER_METER)
     );
 
     const right_spring = render_horizontal_spring(

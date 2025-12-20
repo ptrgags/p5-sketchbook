@@ -8,7 +8,7 @@ import { CanvasMouseHandler } from "../lab/lablib/CanvasMouseHandler.js";
 
 const MOUSE = new CanvasMouseHandler();
 const DPAD = new DirectionalPad();
-const HALF_SCREEN = Point.direction(WIDTH / 2, HEIGHT);
+const HALF_SCREEN = new Direction(WIDTH / 2, HEIGHT);
 
 // Virtual touch buttons for left and right keys on mobile.
 const TOUCH_LEFT = new TouchButton(new Rectangle(Point.ORIGIN, HALF_SCREEN));

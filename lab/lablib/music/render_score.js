@@ -54,7 +54,7 @@ function get_pitch_range(music) {
  * is automatically scaled so only pitch_range is drawn.
  * @param {Point} offset Top left corner of the rectangle where the notes will be overlayed as a Point
  * @param {import("./Score.js").Music<number>} music Music as a timeline of MIDI notes
- * @param {Point} measure_dimensions a Point.direction representing the size of 1 measure in pixels
+ * @param {Point} measure_dimensions a Direction representing the size of 1 measure in pixels
  * @param {[number, number]} pitch_range (min_pitch, max_pitch) as MIDI notes for determining note placement
  * @returns {Primitive} A primitive containing all the notes (unstyled)
  */
@@ -69,11 +69,11 @@ function render_notes(offset, music, measure_dimensions, pitch_range) {
     const note_height = measure_dimensions.y / pitch_count;
     const pitch_index = music.pitch - min_pitch;
 
-    const note_offset = Point.direction(
+    const note_offset = new Direction(
       0,
       measure_dimensions.y - (pitch_index + 1) * note_height
     );
-    const dimensions = Point.direction(
+    const dimensions = new Direction(
       music.duration.real * measure_dimensions.x,
       note_height
     );
@@ -130,7 +130,7 @@ export function render_music(
   // Background rectangle ----------------------
   const duration = music.duration;
   const width_measures = duration.real;
-  const dimensions = Point.direction(
+  const dimensions = new Direction(
     width_measures * measure_dimensions.x,
     measure_dimensions.y
   );
@@ -146,7 +146,7 @@ export function render_music(
     const x = i * measure_dimensions.x;
     measure_lines[i] = new LinePrimitive(
       offset.add(Point.DIR_X.scale(x)),
-      offset.add(Point.direction(x, measure_dimensions.y))
+      offset.add(new Direction(x, measure_dimensions.y))
     );
   }
   const styled_lines = style(measure_lines, MEASURE_LINE_STYLE);
@@ -172,7 +172,7 @@ export function render_music(
  * Render a score as rectangles arranged in rows like in a DAW
  * @param {Point} offset Top left corner of the score as a Point
  * @param {Score<number>} score The score to draw, with values as MIDI notes
- * @param {Point} measure_dimensions (pixels_per_measure, pixels_per_voice) the dimensions of a block representing one measure and one voice as a Point.direction
+ * @param {Point} measure_dimensions (pixels_per_measure, pixels_per_voice) the dimensions of a block representing one measure and one voice as a Direction
  * @param {Style[]} styles Styles for the background rectangles for each part of the score.
  * @returns {GroupPrimitive} The visual representation of the score
  */
@@ -180,7 +180,7 @@ export function render_score(offset, score, measure_dimensions, styles) {
   const parts = [];
   for (const [i, entry] of score.parts.entries()) {
     const [, part] = entry;
-    const child_offset = Point.direction(0, measure_dimensions.y).scale(i);
+    const child_offset = new Direction(0, measure_dimensions.y).scale(i);
 
     const rendered = render_music(
       offset.add(child_offset),

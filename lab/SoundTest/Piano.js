@@ -16,7 +16,7 @@ const NUM_WHITE_KEYS = 7;
  */
 function make_white_keys(bounding_rect) {
   const { x: width, y: height } = bounding_rect.dimensions;
-  const key_dimensions = Point.direction(width / 7, height);
+  const key_dimensions = new Direction(width / 7, height);
 
   const result = new Array(7);
 
@@ -37,7 +37,7 @@ function make_white_keys(bounding_rect) {
  */
 function make_black_keys(bounding_rect) {
   const { x: width, y: height } = bounding_rect.dimensions;
-  const key_dimensions = Point.direction(width / 14, (9 * height) / 16);
+  const key_dimensions = new Direction(width / 14, (9 * height) / 16);
 
   // key offsets in multiples of half the black key width, i.e. 1/28 of
   // the width of the keyboard
@@ -172,7 +172,7 @@ export class Piano {
 
     const { x: width, y: height } = bounding_rect.dimensions;
     const octave_width = width / num_octaves;
-    const octave_dimensions = Point.direction(octave_width, height);
+    const octave_dimensions = new Direction(octave_width, height);
 
     // Create a number of single-octave pianos
     this.octave_pianos = new Array(this.num_octaves);

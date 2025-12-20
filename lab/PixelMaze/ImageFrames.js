@@ -23,19 +23,19 @@ export class ImageFrames {
 
     this.image_dimensions = image_dimensions;
     this.frame_size = frame_size;
-    this.grid_dimensions = Point.direction(w / frame_w, h / frame_h);
+    this.grid_dimensions = new Direction(w / frame_w, h / frame_h);
     this.frame_count = this.grid_dimensions.x * this.grid_dimensions.y;
   }
 
   /**
    * Get the top left corner of a single frame
    * @param {number} frame_id Integer frame ID in [0, this.frame_count)
-   * @returns {Point} The offset of the frame (as a Point.direction) in pixels
+   * @returns {Point} The offset of the frame (as a Direction) in pixels
    */
   get_frame_offset(frame_id) {
     const width = this.grid_dimensions.x;
     const x = frame_id % width;
     const y = Math.floor(frame_id / width);
-    return Point.direction(x * this.frame_size.x, y * this.frame_size.y);
+    return new Direction(x * this.frame_size.x, y * this.frame_size.y);
   }
 }

@@ -97,7 +97,7 @@ describe("Flector", () => {
     });
 
     it("reflects direction in a line", () => {
-      const direction = Point.direction(1, 2);
+      const direction = new Direction(1, 2);
       const line = new Line(1, -1, 0);
       const reflection = Flector.reflection(line);
 
@@ -106,7 +106,7 @@ describe("Flector", () => {
       // Note: bivectors are inverted in the mirror. Since this is
       // an ideal direction, the minus sign doesn't get normalized hence
       // the negative coefficients here
-      const expected = Point.direction(-2, -1);
+      const expected = new Direction(-2, -1);
       expect(result).toBePoint(expected);
     });
   });

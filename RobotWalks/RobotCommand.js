@@ -25,7 +25,7 @@ export class RobotCommand {
   }
 
   /**
-   * Get a Point.direction representing the offset from the start. Units
+   * Get a Direction representing the offset from the start. Units
    * are in model space, i.e. meters, y-up
    * @type {Point}
    */

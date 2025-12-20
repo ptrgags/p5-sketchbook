@@ -117,14 +117,14 @@ export class Index2D {
   /**
    * Convert an index (assumed to be row-major) to a point in the world
    * @param {Point} offset The offset in units of the world as a Point
-   * @param {Point} stride A Point.direction for the stride
+   * @param {Point} stride A Direction for the stride
    * @returns {Point} A point in the world
    */
   to_world(offset, stride) {
     const { i, j } = this;
     const { x, y } = offset;
     const { x: dx, y: dy } = stride;
-    return Point.direction(x + j * dx, y + i * dy);
+    return new Direction(x + j * dx, y + i * dy);
   }
 }
 
@@ -322,21 +322,21 @@ export class Grid {
    * Evenly space items of item_size within the bounding rectangle according
    * to the number of rows/columns in this grid.
    * @param {Rectangle} boundary The bounding rectangle
-   * @param {Point} item_size The size of each item as a Point.direction
+   * @param {Point} item_size The size of each item as a Direction
    * @param {Point} margin How much space to leave around the x or y direction (note that this will be doubled). Any remaining space will be used as padding
    * @return {[Point, Point]} [offset, stride] The computed offset and stride
    */
   compute_layout(boundary, item_size, margin) {
     // If we arranged the items as tightly as possible, how big would this
     // rectangle be?
-    const total_item_space = Point.direction(
+    const total_item_space = new Direction(
       item_size.x * this.cols,
       item_size.y * this.rows
     );
     const remaining_space = boundary.dimensions.sub(total_item_space);
     const padding = remaining_space.sub(margin.scale(2));
 
-    const padding_size = Point.direction(
+    const padding_size = new Direction(
       padding.x / (this.cols - 1),
       padding.y / (this.rows - 1)
     );
