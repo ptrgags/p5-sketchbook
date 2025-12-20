@@ -1,11 +1,9 @@
 import { Point } from "../pga2d/objects.js";
-import {
-  LinePrimitive,
-  RectPrimitive,
-} from "../sketchlib/rendering/primitives.js";
 import { Rect } from "./Rect.js";
 import { CoralTile } from "./CoralTile.js";
 import { Direction } from "../sketchlib/Direction.js";
+import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
+import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 
 /**
  * Render the boundaries and cross-bars of a quad to uncolored geometry

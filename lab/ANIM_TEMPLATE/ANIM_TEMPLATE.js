@@ -1,5 +1,4 @@
 import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
-import { draw_primitive } from "../../sketchlib/p5_helpers/draw_primitive.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { MouseInput } from "../lablib/MouseInput.js";
 import { MuteButton } from "../lablib/MuteButton.js";
@@ -102,7 +101,7 @@ export const sketch = (p) => {
     scene.update();
 
     const scene_primitive = scene.render();
-    draw_primitive(p, scene_primitive);
+    scene_primitive.draw(p);
   };
 
   MOUSE.mouse_pressed(p, (input) => {

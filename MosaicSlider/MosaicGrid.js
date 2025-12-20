@@ -1,14 +1,14 @@
 import { Point } from "../pga2d/objects.js";
 import { Grid, Index2D } from "../sketchlib/Grid.js";
 import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
-import { RectPrimitive } from "../sketchlib/rendering/primitives.js";
 import { Style } from "../sketchlib/Style.js";
 import { PixelSwapPair } from "./PixelSwapPair.js";
 import { in_bounds } from "../sketchlib/in_bounds.js";
 import { sec_to_frames } from "../sketchlib/Tween.js";
 import { Color } from "../sketchlib/Color.js";
-import { GroupPrimitive } from "../sketchlib/rendering/GroupPrimitive.js";
-import { group, style } from "../sketchlib/rendering/shorthand.js";
+import { group, style } from "../sketchlib/primitives/shorthand.js";
+import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
+import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 
 const ROWS = 16;
 const COLS = 16;

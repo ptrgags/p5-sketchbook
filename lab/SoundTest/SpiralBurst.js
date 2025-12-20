@@ -1,8 +1,8 @@
 import { Point } from "../../pga2d/objects.js";
 import { HEIGHT, WIDTH } from "../../sketchlib/dimensions.js";
-import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
-import { PointPrimitive } from "../../sketchlib/rendering/primitives.js";
-import { group, style } from "../../sketchlib/rendering/shorthand.js";
+import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
+import { PointPrimitive } from "../../sketchlib/primitives/PointPrimitive.js";
+import { group, style } from "../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { N1, N4 } from "../lablib/music/durations.js";
 import { ParamCurve } from "../lablib/music/ParamCurve.js";

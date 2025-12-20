@@ -1,6 +1,5 @@
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { Color } from "../sketchlib/Color.js";
-import { draw_primitive } from "../sketchlib/p5_helpers/draw_primitive.js";
 import { fix_mouse_coords } from "../sketchlib/fix_mouse_coords.js";
 import { InteractiveMosaic } from "./InteractiveMosaic.js";
 import { prevent_mobile_scroll } from "../sketchlib/prevent_mobile_scroll.js";
@@ -62,9 +61,8 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    draw_primitive(p, mosaic.render(p.frameCount));
-
     mosaic.update(p.frameCount);
+    mosaic.render(p.frameCount).draw(p);
   };
 
   p.mousePressed = () => {

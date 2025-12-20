@@ -1,12 +1,9 @@
 import { Point } from "../../pga2d/objects.js";
 import { Color } from "../../sketchlib/Color.js";
 import { WIDTH } from "../../sketchlib/dimensions.js";
-import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
-import {
-  LinePrimitive,
-  PolygonPrimitive,
-} from "../../sketchlib/rendering/primitives.js";
-import { group, style } from "../../sketchlib/rendering/shorthand.js";
+import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
+import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
+import { group, style } from "../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Rectangle } from "./Rectangle.js";
 import { ToggleButton, ToggleState } from "./ToggleButton.js";
@@ -16,39 +13,45 @@ const SOUND_OFF = ToggleState.STATE_B;
 const SOUND_TOGGLE_SIZE = 50;
 const SOUND_TOGGLE_CORNER = Point.point(WIDTH - SOUND_TOGGLE_SIZE, 0);
 
-const SPEAKER_CONE = new PolygonPrimitive([
-  SOUND_TOGGLE_CORNER.add(Point.direction(8, 4)),
-  SOUND_TOGGLE_CORNER.add(Point.direction(8, SOUND_TOGGLE_SIZE - 4)),
-  SOUND_TOGGLE_CORNER.add(
-    Point.direction(
-      SOUND_TOGGLE_SIZE / 2,
-      SOUND_TOGGLE_SIZE - SOUND_TOGGLE_SIZE / 3
-    )
-  ),
-  SOUND_TOGGLE_CORNER.add(
-    Point.direction(SOUND_TOGGLE_SIZE / 2, SOUND_TOGGLE_SIZE / 3)
-  ),
-]);
-const SPEAKER_BASE = new PolygonPrimitive([
-  SOUND_TOGGLE_CORNER.add(
-    Point.direction(SOUND_TOGGLE_SIZE / 2, SOUND_TOGGLE_SIZE / 3)
-  ),
-  SOUND_TOGGLE_CORNER.add(
-    Point.direction(
-      SOUND_TOGGLE_SIZE / 2,
-      SOUND_TOGGLE_SIZE - SOUND_TOGGLE_SIZE / 3
-    )
-  ),
-  SOUND_TOGGLE_CORNER.add(
-    Point.direction(
-      SOUND_TOGGLE_SIZE / 2 + 10,
-      SOUND_TOGGLE_SIZE - SOUND_TOGGLE_SIZE / 3
-    )
-  ),
-  SOUND_TOGGLE_CORNER.add(
-    Point.direction(SOUND_TOGGLE_SIZE / 2 + 10, SOUND_TOGGLE_SIZE / 3)
-  ),
-]);
+const SPEAKER_CONE = new PolygonPrimitive(
+  [
+    SOUND_TOGGLE_CORNER.add(Point.direction(8, 4)),
+    SOUND_TOGGLE_CORNER.add(Point.direction(8, SOUND_TOGGLE_SIZE - 4)),
+    SOUND_TOGGLE_CORNER.add(
+      Point.direction(
+        SOUND_TOGGLE_SIZE / 2,
+        SOUND_TOGGLE_SIZE - SOUND_TOGGLE_SIZE / 3
+      )
+    ),
+    SOUND_TOGGLE_CORNER.add(
+      Point.direction(SOUND_TOGGLE_SIZE / 2, SOUND_TOGGLE_SIZE / 3)
+    ),
+  ],
+  true
+);
+const SPEAKER_BASE = new PolygonPrimitive(
+  [
+    SOUND_TOGGLE_CORNER.add(
+      Point.direction(SOUND_TOGGLE_SIZE / 2, SOUND_TOGGLE_SIZE / 3)
+    ),
+    SOUND_TOGGLE_CORNER.add(
+      Point.direction(
+        SOUND_TOGGLE_SIZE / 2,
+        SOUND_TOGGLE_SIZE - SOUND_TOGGLE_SIZE / 3
+      )
+    ),
+    SOUND_TOGGLE_CORNER.add(
+      Point.direction(
+        SOUND_TOGGLE_SIZE / 2 + 10,
+        SOUND_TOGGLE_SIZE - SOUND_TOGGLE_SIZE / 3
+      )
+    ),
+    SOUND_TOGGLE_CORNER.add(
+      Point.direction(SOUND_TOGGLE_SIZE / 2 + 10, SOUND_TOGGLE_SIZE / 3)
+    ),
+  ],
+  true
+);
 
 const SPEAKER = style(
   [SPEAKER_BASE, SPEAKER_CONE],

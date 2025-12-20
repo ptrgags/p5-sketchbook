@@ -1,7 +1,5 @@
 import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
-import { draw_primitive } from "../../sketchlib/p5_helpers/draw_primitive.js";
-import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
-import { group } from "../../sketchlib/rendering/shorthand.js";
+import { group } from "../../sketchlib/primitives/shorthand.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { N16, N32, N8 } from "../lablib/music/durations.js";
 import { A3, C4, D4, E4, G4 } from "../lablib/music/pitches.js";
@@ -19,10 +17,14 @@ import {
 
 const MOUSE = new CanvasMouseHandler();
 
-const TICK_TOCK = new Score([
-  "tick",
-  new Melody(new Note(A3, N8), new Note(C4, N16), new Note(C4, N16)),
-]);
+const TICK_TOCK = new Score({
+  parts: [
+    [
+      "tick",
+      new Melody(new Note(A3, N8), new Note(C4, N16), new Note(C4, N16)),
+    ],
+  ],
+});
 
 /** @type {import("../lablib/SoundManager.js").SoundManifest} */
 const SOUND_MANIFEST = {
@@ -139,7 +141,7 @@ export const sketch = (p) => {
 
     const scene_primitive = scene.render();
 
-    draw_primitive(p, scene_primitive);
+    scene_primitive.draw(p);
   };
 
   MOUSE.mouse_pressed(p, (input) => {

@@ -1,12 +1,10 @@
 import { Point } from "../../pga2d/objects.js";
 import { Direction, to_y_down } from "../../sketchlib/Direction.js";
-import { GroupPrimitive } from "../../sketchlib/rendering/GroupPrimitive.js";
-import {
-  PolygonPrimitive,
-  RectPrimitive,
-  VectorPrimitive,
-} from "../../sketchlib/rendering/primitives.js";
-import { group, style } from "../../sketchlib/rendering/shorthand.js";
+import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
+import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
+import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
+import { group, style } from "../../sketchlib/primitives/shorthand.js";
+import { VectorPrimitive } from "../../sketchlib/primitives/VectorPrimitive.js";
 import { Style } from "../../sketchlib/Style.js";
 import { DirectionInput } from "./DirectionInput.js";
 import { MouseInCanvas, MouseInput } from "./MouseInput.js";
@@ -131,37 +129,25 @@ export class TouchDPad {
     const edge_dl = Point.lerp(bottom_left, bottom_right, 0.25);
     const edge_dr = Point.lerp(bottom_left, bottom_right, 0.75);
 
-    const right_button = new PolygonPrimitive([
-      center,
-      mid_dr,
-      edge_rd,
-      edge_ru,
-      mid_ur,
-    ]);
+    const right_button = new PolygonPrimitive(
+      [center, mid_dr, edge_rd, edge_ru, mid_ur],
+      true
+    );
 
-    const up_button = new PolygonPrimitive([
-      center,
-      mid_ur,
-      edge_ur,
-      edge_ul,
-      mid_ul,
-    ]);
+    const up_button = new PolygonPrimitive(
+      [center, mid_ur, edge_ur, edge_ul, mid_ul],
+      true
+    );
 
-    const left_button = new PolygonPrimitive([
-      center,
-      mid_ul,
-      edge_lu,
-      edge_ld,
-      mid_dl,
-    ]);
+    const left_button = new PolygonPrimitive(
+      [center, mid_ul, edge_lu, edge_ld, mid_dl],
+      true
+    );
 
-    const down_button = new PolygonPrimitive([
-      center,
-      mid_dl,
-      edge_dl,
-      edge_dr,
-      mid_dr,
-    ]);
+    const down_button = new PolygonPrimitive(
+      [center, mid_dl, edge_dl, edge_dr, mid_dr],
+      true
+    );
     return [right_button, up_button, left_button, down_button];
   }
 
