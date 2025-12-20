@@ -372,10 +372,10 @@ export class ArcRobot {
    * @returns {GroupPrimitive} The primitive to render
    */
   render(frame) {
-    const trajectory = style(this.current_path.trajectory, GREY_LINES);
+    //const trajectory = style(this.current_path.trajectory, GREY_LINES);
     const motion = style(this.current_path.render(frame), this.line_style);
 
-    return group(this.past_path, trajectory, motion);
+    return group(this.past_path, motion);
   }
 
   reset(frame) {
@@ -385,9 +385,9 @@ export class ArcRobot {
       all_arcs,
       frame,
       DURATION_UNWIND_PATH,
-      // wind forwards
-      false
+      true
     );
+    this.history = [];
     this.animation_state === RobotAnimationState.RESETTING;
   }
 }
