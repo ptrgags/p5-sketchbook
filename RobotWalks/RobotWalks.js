@@ -1,10 +1,13 @@
-import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
+import { WIDTH, HEIGHT, SCREEN_CENTER } from "../sketchlib/dimensions.js";
 import { DirectionalPad } from "../lab/lablib/DirectionalPad.js";
 import { ArcRobot, N_VALUES } from "./ArcRobot.js";
 import { TouchButton } from "../lab/lablib/TouchButton.js";
 import { Rectangle } from "../lab/lablib/Rectangle.js";
 import { Point } from "../pga2d/objects.js";
 import { CanvasMouseHandler } from "../lab/lablib/CanvasMouseHandler.js";
+import { AnimatedPath } from "./AnimatedPath.js";
+import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
+import { ArcAngles } from "../sketchlib/ArcAngles.js";
 
 const MOUSE = new CanvasMouseHandler();
 const DPAD = new DirectionalPad();
@@ -13,11 +16,30 @@ const THIRD_SCREEN = Point.direction(WIDTH / 3, HEIGHT);
 // Virtual touch buttons for directional buttons on mobile.
 const TOUCH_LEFT = new TouchButton(new Rectangle(Point.ORIGIN, THIRD_SCREEN));
 const TOUCH_RIGHT = new TouchButton(
-  new Rectangle(Point.point(2 * WIDTH / 3, 0), THIRD_SCREEN)
+  new Rectangle(Point.point((2 * WIDTH) / 3, 0), THIRD_SCREEN)
 );
 const TOUCH_DOWN = new TouchButton(
-  new Rectangle(Point.point(WIDTH / 3, 3 * HEIGHT / 4), Point.direction(WIDTH / 3, HEIGHT / 4))
-)
+  new Rectangle(
+    Point.point(WIDTH / 3, (3 * HEIGHT) / 4),
+    Point.direction(WIDTH / 3, HEIGHT / 4)
+  )
+);
+
+// TEMP CODE
+const RIGHT_ARC = new ArcAngles(-Math.PI / 2, Math.PI / 2);
+const LEFT_ARC = new ArcAngles((3 * Math.PI) / 2, Math.PI / 2);
+const DOWN_STRIDE = Point.DIR_Y.scale(100);
+
+const ANIMATED_PATH_EX = new AnimatedPath(
+  [
+    new ArcPrimitive(SCREEN_CENTER, 50, RIGHT_ARC),
+    new ArcPrimitive(SCREEN_CENTER.add(DOWN_STRIDE), 50, LEFT_ARC),
+    new ArcPrimitive(SCREEN_CENTER.add(DOWN_STRIDE.scale(2.0)), 50, RIGHT_ARC),
+  ],
+  0,
+  500,
+  false
+);
 
 export const sketch = (p) => {
   let n = 5;
@@ -53,10 +75,10 @@ export const sketch = (p) => {
     });
     TOUCH_DOWN.events.addEventListener("pressed", () => {
       DPAD.key_pressed("ArrowDown");
-    })
+    });
     TOUCH_DOWN.events.addEventListener("released", () => {
-      DPAD.key_pressed("ArrowDown")
-    })
+      DPAD.key_pressed("ArrowDown");
+    });
 
     document.getElementById("reset").addEventListener("click", reset);
 
@@ -78,6 +100,12 @@ export const sketch = (p) => {
     TOUCH_LEFT.debug_render().draw(p);
     TOUCH_RIGHT.debug_render().draw(p);
     TOUCH_DOWN.debug_render().draw(p);
+
+    p.push();
+    p.noFill();
+    p.stroke(255);
+    ANIMATED_PATH_EX.render(p.frameCount).draw(p);
+    p.pop();
   };
 
   p.keyPressed = (/** @type {KeyboardEvent} */ e) => {
