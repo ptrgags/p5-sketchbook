@@ -322,11 +322,9 @@ export class ArcRobot {
       return;
     }
 
-    if (dpad_direction === Direction.DOWN) {
-      this.start_undo(frame);
-      this.animation_state = RobotAnimationState.MOVING;
-      return;
-    } else if (
+    this.events.dispatchEvent(new CustomEvent("reset"));
+
+    if (
       dpad_direction === Direction.LEFT ||
       dpad_direction === Direction.RIGHT
     ) {
@@ -336,8 +334,6 @@ export class ArcRobot {
     } else {
       this.animation_state = RobotAnimationState.IDLE;
     }
-
-    this.events.dispatchEvent(new CustomEvent("reset"));
   }
 
   /**
@@ -349,7 +345,7 @@ export class ArcRobot {
     // On the first frame, if we have initial commands, start a winding
     // animation
     if (this.initial_commands) {
-      this.start_winding(frame, this.command_list);
+      this.start_winding(frame, this.initial_commands);
       this.initial_commands = undefined;
       return;
     }
@@ -388,6 +384,6 @@ export class ArcRobot {
       true
     );
     this.history = [];
-    this.animation_state === RobotAnimationState.RESETTING;
+    this.animation_state = RobotAnimationState.RESETTING;
   }
 }
