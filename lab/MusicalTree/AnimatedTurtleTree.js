@@ -17,6 +17,7 @@ import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
 import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
 import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
+import { whole_fract } from "../../sketchlib/whole_fract.js";
 
 const TREE_LSYSTEM = new LSystem("Fa", {
   a: "[+Fa][-Fa]",
@@ -478,10 +479,6 @@ export class AnimatedTurtleTree {
     const stack = render_stack(position, depth);
     return group(tree, turtle, stack);
   }
-}
-
-function whole_fract(x) {
-  return [Math.floor(x), x % 1.0];
 }
 
 const RADIUS_TURTLE = 10;
