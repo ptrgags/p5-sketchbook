@@ -53,8 +53,8 @@ class ClipPrimitive {
     p.push();
 
     // Make the clip mask as the intersection of all the masks.
-    for (const [mask, inverted] of this.masks) {
-      p.beginClip({ inverted });
+    for (const [mask, invert] of this.masks) {
+      p.beginClip({ invert });
       mask.draw(p);
       p.endClip();
     }
@@ -66,6 +66,9 @@ class ClipPrimitive {
 }
 
 const BIG_CIRCLE = new CirclePrimitive(new Point(250, 350), 100);
+const BIG_CIRCLE_STYLE = new Style({ stroke: Color.MAGENTA, width: 8 });
+const MID_LINE = new LinePrimitive(new Point(250, 0), new Point(250, 700));
+const BIG_CIRCLE_DECO = style([BIG_CIRCLE, MID_LINE], BIG_CIRCLE_STYLE);
 
 const LEFT_HALF = new RectPrimitive(new Point(0, 0), new Direction(250, 700));
 
@@ -82,14 +85,14 @@ const RIGHT_HALF = new RectPrimitive(
   new Direction(250, 700)
 );
 
-const SMALLER_CIRCLE = new CirclePrimitive(new Point(375, 400), 200);
+const SMALLER_CIRCLE = new CirclePrimitive(new Point(375, 400), 100);
 const polka = [];
 const POLKA_STYLE = new Style({ fill: Color.CYAN });
 for (let i = 0; i < 10; i++) {
   const x = 250 + 50 * i;
   for (let j = 0; j < 10; j++) {
     const y = 345 + 50 * j;
-    polka.push(new CirclePrimitive(new Point(x, y), 45));
+    polka.push(new CirclePrimitive(new Point(x, y), 45 / 2));
   }
 }
 const POLKA = style(group(...polka), POLKA_STYLE);
@@ -123,7 +126,8 @@ const TANGLE = ClipPrimitive.simple(
         ClipPrimitive.inverted(SMALLER_CIRCLE, SINE_DUST),
         SMALLER_OUTLINE
       )
-    )
+    ),
+    BIG_CIRCLE_DECO
   )
 );
 
@@ -135,6 +139,9 @@ export const sketch = (p) => {
       undefined,
       document.getElementById("sketch-canvas")
     );
+
+    p.background(0);
+    TANGLE.draw(p);
   };
 
   p.draw_old = () => {
@@ -311,8 +318,5 @@ export const sketch = (p) => {
     // end big circle
   };
 
-  p.draw = () => {
-    p.background(0);
-    TANGLE.draw(p);
-  };
+  p.draw = () => {};
 };
