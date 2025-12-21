@@ -1,4 +1,131 @@
+import { Direction } from "../../pga2d/Direction.js";
+import { Point } from "../../pga2d/Point.js";
+import { Color } from "../../sketchlib/Color.js";
 import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
+import { CirclePrimitive } from "../../sketchlib/primitives/CirclePrimitive.js";
+import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
+import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
+import { PointPrimitive } from "../../sketchlib/primitives/PointPrimitive.js";
+import { Primitive } from "../../sketchlib/primitives/Primitive.js";
+import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
+import { group, style } from "../../sketchlib/primitives/shorthand.js";
+import { Style } from "../../sketchlib/Style.js";
+
+class ClipPrimitive {
+  /**
+   * Constructor
+   * @param {[Primitive, boolean][]} masks Pairs of (mask, inverted). The masks will be intersected to get the final clip mask. To union masks together, just have the mask render multiple shapes. To invert a mask, set the inverted flag for that mask.
+   * @param {Primitive} child
+   */
+  constructor(masks, child) {
+    this.masks = masks;
+    this.child = child;
+  }
+
+  /**
+   *
+   * @param {Primitive} mask
+   * @param {Primitive} child
+   * @returns
+   */
+  static simple(mask, child) {
+    return new ClipPrimitive([[mask, false]], child);
+  }
+
+  // Shorthand for a single innverted mask
+  /**
+   *
+   * @param {Primitive} mask
+   * @param {Primitive} child
+   * @returns
+   */
+  static inverted(mask, child) {
+    return new ClipPrimitive([[mask, true]], child);
+  }
+
+  /**
+   * Draw the clipped primitive
+   * @param {import("p5")} p p5 drawing context
+   */
+  draw(p) {
+    // pushing is important here - there's no way to clear stenciled
+    // pixels except through pop(). See https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/clip
+    p.push();
+
+    // Make the clip mask as the intersection of all the masks.
+    for (const [mask, inverted] of this.masks) {
+      p.beginClip({ inverted });
+      mask.draw(p);
+      p.endClip();
+    }
+
+    // Draw the child
+    this.child.draw(p);
+    p.pop();
+  }
+}
+
+const BIG_CIRCLE = new CirclePrimitive(new Point(250, 350), 100);
+
+const LEFT_HALF = new RectPrimitive(new Point(0, 0), new Direction(250, 700));
+
+const stripe_lines = [];
+const STRIPE_STYLE = new Style({ stroke: Color.RED });
+for (let i = 0; i < 50; i++) {
+  const y = 200 + i * 10;
+  stripe_lines.push(new LinePrimitive(new Point(0, y), new Point(500, y)));
+}
+const STRIPES = style(group(...stripe_lines), STRIPE_STYLE);
+
+const RIGHT_HALF = new RectPrimitive(
+  new Point(250, 0),
+  new Direction(250, 700)
+);
+
+const SMALLER_CIRCLE = new CirclePrimitive(new Point(375, 400), 200);
+const polka = [];
+const POLKA_STYLE = new Style({ fill: Color.CYAN });
+for (let i = 0; i < 10; i++) {
+  const x = 250 + 50 * i;
+  for (let j = 0; j < 10; j++) {
+    const y = 345 + 50 * j;
+    polka.push(new CirclePrimitive(new Point(x, y), 45));
+  }
+}
+const POLKA = style(group(...polka), POLKA_STYLE);
+const STYLE_SMALL_OUTLINE = new Style({
+  stroke: Color.YELLOW,
+  width: 5,
+});
+const SMALLER_OUTLINE = style(SMALLER_CIRCLE, STYLE_SMALL_OUTLINE);
+
+const sine_dots = [];
+for (let i = 0; i < 10; i++) {
+  const x_center = 250 + i * 10;
+  for (let j = 0; j < 300; j++) {
+    const offset = 5 * Math.sin(2 * Math.PI * 1 * (j / 100));
+    const y = 200 + j;
+    sine_dots.push(new PointPrimitive(new Point(x_center + offset, y)));
+  }
+}
+
+const SINE_STYLE = new Style({ fill: Color.GREEN });
+const SINE_DUST = style(group(...sine_dots), SINE_STYLE);
+
+const TANGLE = ClipPrimitive.simple(
+  BIG_CIRCLE,
+  group(
+    ClipPrimitive.simple(LEFT_HALF, STRIPES),
+    ClipPrimitive.simple(
+      RIGHT_HALF,
+      group(
+        ClipPrimitive.simple(SMALLER_CIRCLE, POLKA),
+        ClipPrimitive.inverted(SMALLER_CIRCLE, SINE_DUST),
+        SMALLER_OUTLINE
+      )
+    )
+  )
+);
 
 export const sketch = (p) => {
   p.setup = () => {
@@ -10,7 +137,7 @@ export const sketch = (p) => {
     );
   };
 
-  p.draw = () => {
+  p.draw_old = () => {
     p.background(0);
 
     // Oh yikes, I see that you can't nest begin/end clip calls: https://github.com/processing/p5.js/blob/main/src/core/p5.Renderer.js#L107
@@ -182,5 +309,10 @@ export const sketch = (p) => {
 
     p.pop();
     // end big circle
+  };
+
+  p.draw = () => {
+    p.background(0);
+    TANGLE.draw(p);
   };
 };
