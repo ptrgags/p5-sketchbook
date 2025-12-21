@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { PGA_MATCHERS } from "../pga2d/pga_matchers";
 import { RobotCommand } from "./RobotCommand";
-import { Point } from "../pga2d/objects";
+import { Direction } from "../pga2d/Direction";
 
 expect.extend(PGA_MATCHERS);
 
@@ -14,7 +14,7 @@ describe("RobotCommand", () => {
 
       const result = id.offset;
 
-      expect(result).toBePoint(Point.ZERO);
+      expect(result).toBePoint(Direction.ZERO);
     });
 
     it("LEFT_TURN has expected offset", () => {
@@ -48,7 +48,7 @@ describe("RobotCommand", () => {
 
       const result = full_turn.offset;
 
-      expect(result).toBePoint(Point.ZERO);
+      expect(result).toBePoint(Direction.ZERO);
     });
 
     it("computes offset for nontrivial path", () => {
@@ -70,7 +70,7 @@ describe("RobotCommand", () => {
         2 * Math.cos(FIFTH_TURN) - 1 - Math.cos(4 * FIFTH_TURN),
         2 * Math.sin(FIFTH_TURN) - Math.sin(4 * FIFTH_TURN)
       );
-      expect(result).toBePoint(expected);
+      expect(result).toBeDirection(expected);
     });
   });
 

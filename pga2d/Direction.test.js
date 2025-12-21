@@ -17,12 +17,12 @@ describe("Direction", () => {
   });
 
   it("dir_from_angle computes cosine and sine", () => {
-    const angle = (2 * PI) / 3;
+    const angle = (2 * Math.PI) / 3;
 
     const result = Direction.from_angle(angle);
 
     const expected = new Direction(-0.5, Math.sqrt(3) / 2);
-    expect(result).toBePoint(expected);
+    expect(result).toBeDirection(expected);
   });
 
   it("gets the underlying x and y components", () => {
@@ -47,22 +47,22 @@ describe("Direction", () => {
     const result = a.neg();
 
     const expected = new Direction(-1, 3);
-    expect(result).toBePoint(expected);
+    expect(result).toBeDirection(expected);
   });
 
-  it("ideal norm returns the magnitude of x and y components", () => {
+  it("mag_sqr returns squared magnitude", () => {
     const a = new Direction(3, 4);
 
-    const result = a.ideal_norm_sqr();
+    const result = a.mag_sqr();
 
     // 3^2 + 4^2
     expect(result).toBe(25);
   });
 
-  it("ideal magnitude returns the magnitude of x and y components", () => {
+  it("mag returns the magnitude of the direction", () => {
     const a = new Direction(3, 4);
 
-    const result = a.ideal_norm();
+    const result = a.mag();
 
     // sqrt(3^2 + 4^2) = sqrt(25) = 5
     expect(result).toBeCloseTo(5);
@@ -74,7 +74,7 @@ describe("Direction", () => {
 
     const result = a.limit_length(max_length);
 
-    expect(result).toEqual(a);
+    expect(result).toBeDirection(a);
   });
 
   it("limit_length with long direction snaps to max length", () => {
@@ -92,7 +92,7 @@ describe("Direction", () => {
   });
 
   it("set_length with zero length direction throws error", () => {
-    const a = Point.ZERO;
+    const a = Direction.ZERO;
     const length = 100;
 
     expect(() => {
@@ -111,7 +111,7 @@ describe("Direction", () => {
     // 300 / 5  = 60
     // 400 / 5  = 80
     const expected = new Direction(60, 80);
-    expect(result).toBePoint(expected);
+    expect(result).toBeDirection(expected);
   });
 
   it("set_length with long direction snaps to max length", () => {
@@ -125,7 +125,7 @@ describe("Direction", () => {
     // 300 / 5  = 60
     // 400 / 5  = 80
     const expected = new Direction(60, 80);
-    expect(result).toBePoint(expected);
+    expect(result).toBeDirection(expected);
   });
 
   it("scale performs scalar multiplication", () => {
@@ -134,16 +134,7 @@ describe("Direction", () => {
     const result = dir.scale(2);
 
     const expected = new Direction(8, -6);
-    expect(result).toBePoint(expected);
-  });
-
-  it("flip_y flips y coordinate of points", () => {
-    const point = new Point(3, 4);
-
-    const result = point.flip_y();
-
-    const expected = new Point(3, -4);
-    expect(result).toBePoint(expected);
+    expect(result).toBeDirection(expected);
   });
 
   it("flip_y flips y coordinate of directions", () => {
@@ -152,7 +143,7 @@ describe("Direction", () => {
     const result = dir.flip_y();
 
     const expected = new Direction(3, 4);
-    expect(result).toBePoint(expected);
+    expect(result).toBeDirection(expected);
   });
 
   it("dot of two directions computes the dot product of components", () => {
@@ -170,12 +161,12 @@ describe("Direction", () => {
     const a = new Direction(1, 2);
     const b = new Direction(-2, -8);
 
-    const result = Point.lerp(a, b, 0.25);
+    const result = Direction.lerp(a, b, 0.25);
 
     // 3/4 * 1 + 1/4 * -2 = 1/4(3 -2) = 1/4
     // 3/4 * 2 + 1/4 * -8 = 1/4(6 - 8) = -2/4 = -1/2
     const expected = new Direction(0.25, -0.5);
-    expect(result).toBePoint(expected);
+    expect(result).toBeDirection(expected);
   });
 
   it("toString formats as direction", () => {

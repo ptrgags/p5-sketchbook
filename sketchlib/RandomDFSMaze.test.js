@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { generate_maze } from "./RandomDFSMaze";
-import { Direction } from "./CardinalDirection";
+import { CardinalDirection } from "./CardinalDirection";
 import { griderator, Index2D } from "./Grid";
 
 describe("generate_maze", () => {
@@ -16,10 +16,10 @@ describe("generate_maze", () => {
 
     for (const cell of maze) {
       const connections = [
-        cell.is_connected(Direction.RIGHT),
-        cell.is_connected(Direction.UP),
-        cell.is_connected(Direction.LEFT),
-        cell.is_connected(Direction.DOWN),
+        cell.is_connected(CardinalDirection.RIGHT),
+        cell.is_connected(CardinalDirection.UP),
+        cell.is_connected(CardinalDirection.LEFT),
+        cell.is_connected(CardinalDirection.DOWN),
       ];
       const has_connection = connections.some((x) => x);
 
@@ -36,8 +36,8 @@ describe("generate_maze", () => {
       const right = new Index2D(i, j + 1);
 
       // Either these both will be set or just one
-      const connected_lr = maze.get(left).is_connected(Direction.RIGHT);
-      const connected_rl = maze.get(right).is_connected(Direction.LEFT);
+      const connected_lr = maze.get(left).is_connected(CardinalDirection.RIGHT);
+      const connected_rl = maze.get(right).is_connected(CardinalDirection.LEFT);
       expect(connected_lr).toBe(connected_rl);
     });
 
@@ -47,8 +47,8 @@ describe("generate_maze", () => {
       const down = new Index2D(i + 1, j);
 
       // Either these both will be set or just one
-      const connected_ud = maze.get(up).is_connected(Direction.DOWN);
-      const connected_du = maze.get(down).is_connected(Direction.UP);
+      const connected_ud = maze.get(up).is_connected(CardinalDirection.DOWN);
+      const connected_du = maze.get(down).is_connected(CardinalDirection.UP);
       expect(connected_ud).toBe(connected_du);
     });
   });
@@ -60,10 +60,10 @@ describe("generate_maze", () => {
     for (let i = 0; i < maze.rows; i++) {
       const connected_left_edge = maze
         .get(new Index2D(i, 0))
-        .is_connected(Direction.LEFT);
+        .is_connected(CardinalDirection.LEFT);
       const connected_right_edge = maze
         .get(new Index2D(i, maze.cols - 1))
-        .is_connected(Direction.RIGHT);
+        .is_connected(CardinalDirection.RIGHT);
 
       expect(connected_left_edge).toBe(false);
       expect(connected_right_edge).toBe(false);
@@ -73,10 +73,10 @@ describe("generate_maze", () => {
     for (let i = 0; i < maze.cols; i++) {
       const connected_top_edge = maze
         .get(new Index2D(0, i))
-        .is_connected(Direction.UP);
+        .is_connected(CardinalDirection.UP);
       const connected_bottom_edge = maze
         .get(new Index2D(maze.rows - 1, i))
-        .is_connected(Direction.DOWN);
+        .is_connected(CardinalDirection.DOWN);
 
       expect(connected_top_edge).toBe(false);
       expect(connected_bottom_edge).toBe(false);

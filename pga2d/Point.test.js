@@ -3,6 +3,7 @@ import { describe, it, expect } from "vitest";
 import { Direction } from "./Direction";
 import { Point } from "./Point";
 import { PGA_MATCHERS } from "./pga_matchers";
+import { Line } from "./Line";
 
 expect.extend(PGA_MATCHERS);
 
@@ -21,16 +22,6 @@ describe("Point", () => {
 
     expect(a.x).toBe(2);
     expect(a.y).toBe(-5);
-  });
-
-  it("adding two points returns the midpoint", () => {
-    const a = new Point(1, 2);
-    const b = new Point(3, 4);
-
-    const result = a.add(b);
-
-    const expected = new Point(2, 3);
-    expect(result).toEqual(expected);
   });
 
   it("adding a direction returns the correct point", () => {
@@ -85,7 +76,7 @@ describe("Point", () => {
     // 3/4 * 1 + 1/4 * -2 = 1/4(3 -2) = 1/4
     // 3/4 * 2 + 1/4 * -8 = 1/4(6 - 8) = -2/4 = -1/2
     const expected = new Point(0.25, -0.5);
-    expect(result).toEqual(expected);
+    expect(result).toBePoint(expected);
   });
 
   it("toString formats as point", () => {
@@ -95,5 +86,14 @@ describe("Point", () => {
 
     const expected = "Point(0.000123, 2.99)";
     expect(result).toBe(expected);
+  });
+
+  it("flip_y flips y coordinate of points", () => {
+    const point = new Point(3, 4);
+
+    const result = point.flip_y();
+
+    const expected = new Point(3, -4);
+    expect(result).toBePoint(expected);
   });
 });

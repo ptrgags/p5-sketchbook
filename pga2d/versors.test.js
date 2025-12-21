@@ -3,6 +3,7 @@ import { Motor, Flector } from "./versors";
 import { PGA_MATCHERS } from "./pga_matchers";
 import { Point } from "./Point";
 import { Line } from "./Line";
+import { Direction } from "./Direction";
 
 expect.extend(PGA_MATCHERS);
 
@@ -71,8 +72,8 @@ describe("Flector", () => {
 
       const result = reflection.transform_point(point);
 
-      const expected = Point.ZERO;
-      expect(result).toBePoint(expected);
+      const expected = Direction.ZERO;
+      expect(result).toBeDirection(expected);
     });
 
     it("reflecting twice leaves point unchanged", () => {

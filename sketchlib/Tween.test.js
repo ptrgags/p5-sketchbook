@@ -136,7 +136,7 @@ describe("Tween", () => {
 
       const result = tween.get_value(6);
 
-      const expected = new Point(0.5, 0.5);
+      const expected = new Direction(0.5, 0.5);
       expect(result).toBeDirection(expected);
     });
 
