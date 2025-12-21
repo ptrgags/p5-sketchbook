@@ -117,8 +117,8 @@ describe("Index2D", () => {
 
       const result = index.to_world(offset, stride);
 
-      const expected = new Direction(6, 4);
-      expect(result).toBeDirection(expected);
+      const expected = new Point(6, 4);
+      expect(result).toBePoint(expected);
     });
 
     it("computes correct position with offset", () => {
@@ -128,8 +128,8 @@ describe("Index2D", () => {
 
       const result = index.to_world(offset, stride);
 
-      const expected = new Direction(10, 8);
-      expect(result).toBeDirection(expected);
+      const expected = new Point(10, 8);
+      expect(result).toBePoint(expected);
     });
   });
 });

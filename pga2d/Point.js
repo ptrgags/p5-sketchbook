@@ -1,3 +1,4 @@
+import { is_nearly } from "../sketchlib/is_nearly.js";
 import { Direction } from "./Direction.js";
 import { Line } from "./Line.js";
 import { Even } from "./multivectors.js";
@@ -31,7 +32,13 @@ export class Point {
    */
   static from_bivec(bivec) {
     const { xy, xo, yo } = bivec;
-    return new Point(xy, xo, yo);
+    if (is_nearly(xy, 0)) {
+      throw new Error("Trying to create a Point from a direction!");
+    }
+
+    const x = yo / xy;
+    const y = -xo / xy;
+    return new Point(x, y);
   }
 
   /**
