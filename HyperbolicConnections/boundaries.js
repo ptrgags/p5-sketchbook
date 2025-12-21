@@ -157,7 +157,7 @@ export class Boundary {
 
       const angle = (i / length) * (2.0 * Math.PI);
       point.angle = angle;
-      new Point = [Math.cos(angle), Math.sin(angle)];
+      point.point = [Math.cos(angle), Math.sin(angle)];
     }
   }
 
