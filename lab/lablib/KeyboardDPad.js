@@ -1,5 +1,7 @@
-import { Point } from "../../pga2d/objects.js";
-import { Direction, to_y_down } from "../../sketchlib/Direction.js";
+import {
+  CardinalDirection,
+  to_direction,
+} from "../../sketchlib/CardinalDirection.js";
 import { DirectionInput } from "./DirectionInput.js";
 
 export const ARROW_CODES = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"];
@@ -13,22 +15,22 @@ export const WASD_CODES = ["KeyW", "KeyA", "KeyS", "KeyD"];
 /**
  * Convert a keyboard arrow key to a direction
  * @param {ArrowCode | WASDCode} key The keyboard key
- * @returns {Direction} The corresponding direction
+ * @returns {CardinalDirection} The corresponding direction
  */
 function get_direction(key) {
   switch (key) {
     case "ArrowLeft":
     case "KeyA":
-      return Direction.LEFT;
+      return CardinalDirection.LEFT;
     case "ArrowRight":
     case "KeyD":
-      return Direction.RIGHT;
+      return CardinalDirection.RIGHT;
     case "ArrowUp":
     case "KeyW":
-      return Direction.UP;
+      return CardinalDirection.UP;
     case "ArrowDown":
     case "KeyS":
-      return Direction.DOWN;
+      return CardinalDirection.DOWN;
   }
 }
 
@@ -68,7 +70,10 @@ export class KeyboardDPad {
   pressed(dpad_code) {
     const direction = get_direction(dpad_code);
     this.keys_down[direction] = true;
-    this.direction = new DirectionInput(direction, to_y_down(direction));
+    this.direction = new DirectionInput(
+      direction,
+      to_direction(direction).flip_y()
+    );
   }
 
   /**
@@ -85,7 +90,7 @@ export class KeyboardDPad {
     if (fallback_direction !== -1) {
       this.direction = new DirectionInput(
         fallback_direction,
-        to_y_down(fallback_direction)
+        to_direction(fallback_direction).flip_y()
       );
     } else {
       this.direction = DirectionInput.NO_INPUT;

@@ -1,5 +1,9 @@
-import { Point } from "../../pga2d/objects.js";
-import { Direction, to_y_down } from "../../sketchlib/Direction.js";
+import { Direction } from "../../pga2d/Direction.js";
+import { Point } from "../../pga2d/Point.js";
+import {
+  CardinalDirection,
+  to_direction,
+} from "../../sketchlib/CardinalDirection.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
 import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
@@ -41,10 +45,10 @@ export class TouchDPad {
     // Compute the coordinates from the center
     const { x, y } = point.sub(this.rect.center);
     const { x: x_scale, y: y_scale } = this.rect.dimensions.scale(0.5);
-    const analog_value = Point.direction(x / x_scale, y / y_scale);
+    const analog_value = new Direction(x / x_scale, y / y_scale);
 
     // Allow a deadzone in the middle of the DPAD
-    if (analog_value.ideal_norm_sqr() < this.dead_zone_radius_sqr) {
+    if (analog_value.mag_sqr() < this.dead_zone_radius_sqr) {
       this.direction = DirectionInput.NO_INPUT;
       return;
     }
@@ -52,13 +56,13 @@ export class TouchDPad {
     const is_horizontal = Math.abs(analog_value.x) > Math.abs(analog_value.y);
     let digital_direction;
     if (is_horizontal && analog_value.x > 0) {
-      digital_direction = Direction.RIGHT;
+      digital_direction = CardinalDirection.RIGHT;
     } else if (is_horizontal) {
-      digital_direction = Direction.LEFT;
+      digital_direction = CardinalDirection.LEFT;
     } else if (analog_value.y > 0) {
-      digital_direction = Direction.DOWN;
+      digital_direction = CardinalDirection.DOWN;
     } else {
-      digital_direction = Direction.UP;
+      digital_direction = CardinalDirection.UP;
     }
 
     this.direction = new DirectionInput(digital_direction, analog_value);
@@ -110,8 +114,8 @@ export class TouchDPad {
     const top_left = this.rect.position;
     const bottom_right = this.rect.position.add(this.rect.dimensions);
 
-    const across = Point.direction(this.rect.dimensions.x, 0);
-    const down = Point.direction(0, this.rect.dimensions.y);
+    const across = new Direction(this.rect.dimensions.x, 0);
+    const down = new Direction(0, this.rect.dimensions.y);
     const top_right = top_left.add(across);
     const bottom_left = top_left.add(down);
 
@@ -189,14 +193,14 @@ export class TouchDPad {
     const half_dimensions = this.rect.dimensions.scale(0.5);
 
     const analog_direction = this.direction.analog;
-    const analog_offset = Point.direction(
+    const analog_offset = new Direction(
       analog_direction.x * half_dimensions.x,
       analog_direction.y * half_dimensions.y
     );
     const analog_arrow = new VectorPrimitive(center, center.add(analog_offset));
 
-    const digital_direction = to_y_down(this.direction.digital);
-    const digital_offset = Point.direction(
+    const digital_direction = to_direction(this.direction.digital).flip_y();
+    const digital_offset = new Direction(
       digital_direction.x * half_dimensions.x,
       digital_direction.y * half_dimensions.y
     );

@@ -1,4 +1,5 @@
-import { Point } from "../../pga2d/objects.js";
+import { Direction } from "../../pga2d/Direction.js";
+import { Point } from "../../pga2d/Point.js";
 import { HEIGHT } from "../../sketchlib/dimensions.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { DirectionInput } from "./DirectionInput.js";
@@ -7,9 +8,9 @@ import { MouseInput } from "./MouseInput.js";
 import { Rectangle } from "./Rectangle.js";
 import { TouchDPad } from "./TouchDPad.js";
 
-const DPAD_DIMENSIONS = Point.direction(200, 200);
+const DPAD_DIMENSIONS = new Direction(200, 200);
 const MARGIN = 10;
-const DPAD_ORIGIN = Point.point(MARGIN, HEIGHT - DPAD_DIMENSIONS.y - MARGIN);
+const DPAD_ORIGIN = new Point(MARGIN, HEIGHT - DPAD_DIMENSIONS.y - MARGIN);
 const DEAD_ZONE_RADIUS = 0.01;
 
 export class DirectionalPad {

@@ -1,4 +1,3 @@
-import { Point } from "../pga2d/objects.js";
 import { Random } from "../sketchlib/random.js";
 import { Vector2 } from "./Vector2.js";
 import { DifferentialNode, NEARBY_RADIUS } from "./DifferentialNode.js";
@@ -8,10 +7,10 @@ import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
 import { style } from "../sketchlib/primitives/shorthand.js";
 import { BeziergonPrimitive } from "../sketchlib/primitives/BeziergonPrimitive.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
+import { Point } from "../pga2d/Point.js";
+import { Quadtree } from "./quadtree.js";
 
 const MAX_EDGE_LENGTH = 150;
-
-const MAX_POINTS_PER_POLYLINE = 1000;
 
 // How small of an angle below which more nodes will be added
 const PINCH_ANGLE_THRESHOLD = Math.PI / 6;
@@ -27,12 +26,16 @@ const ATTRACTION_MIN_DISTANCE = 20;
 const TEMP_DESIRED_VELOCITY = new Vector2();
 const TEMP_STEERING_FORCE = new Vector2();
 const TEMP_TOTAL_FORCE = new Vector2();
-const TEMP_ATTRACTION = new Vector2();
 const TEMP_REPULSION = new Vector2();
 const TEMP_BA = new Vector2();
 const TEMP_BC = new Vector2();
 
 export class DifferentialPolyline {
+  /**
+   *
+   * @param {Vector2[]} positions_array
+   * @param {Quadtree} quadtree
+   */
   constructor(positions_array, quadtree) {
     this.nodes = positions_array.map((v) => new DifferentialNode(v));
 
@@ -46,6 +49,9 @@ export class DifferentialPolyline {
     }
   }
 
+  /**
+   *
+   */
   split_long_edges() {
     for (let i = 0; i < this.nodes.length; i++) {
       const start = this.nodes[i];
@@ -57,6 +63,9 @@ export class DifferentialPolyline {
     }
   }
 
+  /**
+   *
+   */
   split_pinched_angles() {
     const split_points = [];
     for (let i = 0; i < this.nodes.length; i++) {
@@ -224,8 +233,8 @@ export class DifferentialPolyline {
   }
 
   make_curve(line_style) {
-    const positions = this.nodes.map((node) =>
-      Point.point(node.position.x, node.position.y)
+    const positions = this.nodes.map(
+      (node) => new Point(node.position.x, node.position.y)
     );
 
     const beziergon = BeziergonPrimitive.interpolate_points(positions);
@@ -233,8 +242,8 @@ export class DifferentialPolyline {
   }
 
   make_polyline(line_style) {
-    const vertices = this.nodes.map((x) =>
-      Point.point(x.position.x, x.position.y)
+    const vertices = this.nodes.map(
+      (x) => new Point(x.position.x, x.position.y)
     );
     const polygon = new PolygonPrimitive(vertices, true);
     return style(polygon, line_style);

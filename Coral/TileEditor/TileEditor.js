@@ -17,7 +17,7 @@ import {
   SPLINE_STYLE,
 } from "../styles.js";
 import { Color } from "../../sketchlib/Color.js";
-import { Direction } from "../../sketchlib/Direction.js";
+import { CardinalDirection } from "../../sketchlib/CardinalDirection.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
 import { CirclePrimitive } from "../../sketchlib/primitives/CirclePrimitive.js";
 import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
@@ -40,7 +40,10 @@ const CONNECTION_ORDER = [
 ];
 
 const TILES = SMALL_QUADS.map(({ i, j }, quad) => {
-  const connection_flags = new FlagSet(CONNECTION_ORDER[i][j], Direction.COUNT);
+  const connection_flags = new FlagSet(
+    CONNECTION_ORDER[i][j],
+    CardinalDirection.COUNT
+  );
   return new CoralTile(quad, connection_flags);
 });
 

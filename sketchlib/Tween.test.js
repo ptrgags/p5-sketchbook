@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { frames_to_sec, sec_to_frames, Tween } from "./Tween.js";
-import { Point } from "../pga2d/objects.js";
 import { PGA_MATCHERS } from "../pga2d/pga_matchers.js";
+import { Point } from "../pga2d/Point.js";
+import { Direction } from "../pga2d/Direction.js";
 
 function make_tween() {
   const start_value = 2;
@@ -122,12 +123,21 @@ describe("Tween", () => {
     });
 
     it("Tween.point interpolates points", () => {
-      const tween = Tween.point(Point.point(0, 1), Point.point(1, 0), 4, 4);
+      const tween = Tween.point(new Point(0, 1), new Point(1, 0), 4, 4);
 
       const result = tween.get_value(6);
 
-      const expected = Point.point(0.5, 0.5);
+      const expected = new Point(0.5, 0.5);
       expect(result).toBePoint(expected);
+    });
+
+    it("Tween.dir interpolates directions", () => {
+      const tween = Tween.dir(new Direction(0, 1), new Direction(1, 0), 4, 4);
+
+      const result = tween.get_value(6);
+
+      const expected = new Direction(0.5, 0.5);
+      expect(result).toBeDirection(expected);
     });
 
     it("Tween.elapsed_timer interpolates times", () => {

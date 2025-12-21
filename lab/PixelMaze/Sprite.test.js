@@ -1,11 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { Point } from "../../pga2d/objects.js";
 import { ImageFrames } from "./ImageFrames.js";
 import { Sprite } from "./Sprite.js";
+import { Direction } from "../../pga2d/Direction.js";
 
 function make_image_frames() {
-  const image_dimensions = Point.direction(64, 256);
-  const frame_size = Point.direction(16, 32);
+  const image_dimensions = new Direction(64, 256);
+  const frame_size = new Direction(16, 32);
   return new ImageFrames(image_dimensions, frame_size);
 }
 
@@ -13,7 +13,7 @@ describe("Sprite", () => {
   it("with no frames throws", () => {
     const image_frames = make_image_frames();
     expect(() => {
-      return new Sprite(image_frames, 3, 0, Point.ZERO);
+      return new Sprite(image_frames, 3, 0, Direction.ZERO);
     }).toThrowError("frame_count must be positive");
   });
 
@@ -22,7 +22,7 @@ describe("Sprite", () => {
     const out_of_bounds = 100;
 
     expect(() => {
-      return new Sprite(image_frames, out_of_bounds, 4, Point.ZERO);
+      return new Sprite(image_frames, out_of_bounds, 4, Direction.ZERO);
     }).toThrowError("start frame out of bounds");
   });
 
@@ -32,14 +32,19 @@ describe("Sprite", () => {
     const too_long = 5;
 
     expect(() => {
-      return new Sprite(image_frames, start_of_last_row, too_long, Point.ZERO);
+      return new Sprite(
+        image_frames,
+        start_of_last_row,
+        too_long,
+        Direction.ZERO
+      );
     }).toThrowError("animation too long");
   });
 
   describe("get_frame_id", () => {
     function make_sprite() {
       const image_frames = make_image_frames();
-      return new Sprite(image_frames, 2, 4, Point.ZERO);
+      return new Sprite(image_frames, 2, 4, Direction.ZERO);
     }
 
     it("with integer t in range computes correct frame number", () => {
@@ -56,9 +61,9 @@ describe("Sprite", () => {
   it("from_row computes correct sprite", () => {
     const image_frames = make_image_frames();
 
-    const result = Sprite.from_row(image_frames, 2, 2, Point.ZERO);
+    const result = Sprite.from_row(image_frames, 2, 2, Direction.ZERO);
 
-    const expected = new Sprite(image_frames, 8, 2, Point.ZERO);
+    const expected = new Sprite(image_frames, 8, 2, Direction.ZERO);
     expect(result).toEqual(expected);
   });
 
@@ -69,14 +74,14 @@ describe("Sprite", () => {
       image_frames,
       4,
       2,
-      Point.ZERO
+      Direction.ZERO
     );
 
     const expected = [
-      new Sprite(image_frames, 16, 2, Point.ZERO),
-      new Sprite(image_frames, 20, 2, Point.ZERO),
-      new Sprite(image_frames, 24, 2, Point.ZERO),
-      new Sprite(image_frames, 28, 2, Point.ZERO),
+      new Sprite(image_frames, 16, 2, Direction.ZERO),
+      new Sprite(image_frames, 20, 2, Direction.ZERO),
+      new Sprite(image_frames, 24, 2, Direction.ZERO),
+      new Sprite(image_frames, 28, 2, Direction.ZERO),
     ];
     expect(result).toEqual(expected);
   });

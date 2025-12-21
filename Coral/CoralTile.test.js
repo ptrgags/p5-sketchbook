@@ -1,16 +1,17 @@
 import { describe, it, expect } from "vitest";
 import { Rect } from "./Rect.js";
 import { CoralTile } from "./CoralTile.js";
-import { Direction } from "../sketchlib/Direction.js";
+import { CardinalDirection } from "../sketchlib/CardinalDirection.js";
 import { FlagSet } from "../sketchlib/FlagSet.js";
 import { ControlPoint } from "./ControlPoint.js";
-import { Point } from "../pga2d/objects.js";
+import { Point } from "../pga2d/Point.js";
+import { Direction } from "../pga2d/Direction.js";
 
 describe("CoralTile", () => {
   const QUAD = new Rect(0, 0, 200, 200);
 
   it("to_json serializes default tile", () => {
-    const flags_right_up = new FlagSet(0b0011, Direction.COUNT);
+    const flags_right_up = new FlagSet(0b0011, CardinalDirection.COUNT);
     const tile = new CoralTile(QUAD, flags_right_up);
 
     const result = tile.to_json();
@@ -65,10 +66,10 @@ describe("CoralTile", () => {
     const result = CoralTile.parse_json(json_tile, QUAD);
 
     const expected_control_points = [
-      new ControlPoint(Point.point(0.6, 0), Point.direction(0.2, 0.2)),
-      new ControlPoint(Point.point(1, 0.6), Point.direction(-0.2, 0.2)),
-      new ControlPoint(Point.point(0.4, 1), Point.direction(-0.2, -0.2)),
-      new ControlPoint(Point.point(0, 0.4), Point.direction(0.2, -0.2)),
+      new ControlPoint(new Point(0.6, 0), new Direction(0.2, 0.2)),
+      new ControlPoint(new Point(1, 0.6), new Direction(-0.2, 0.2)),
+      new ControlPoint(new Point(0.4, 1), new Direction(-0.2, -0.2)),
+      new ControlPoint(new Point(0, 0.4), new Direction(0.2, -0.2)),
     ];
 
     expect(result.quad).toBe(QUAD);

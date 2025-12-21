@@ -1,4 +1,5 @@
-import { Point } from "../../pga2d/objects.js";
+import { Direction } from "../../pga2d/Direction.js";
+import { Point } from "../../pga2d/Point.js";
 import { Sprite } from "./Sprite.js";
 
 /**
@@ -25,15 +26,15 @@ function median(a, b, c) {
 function median_point(a, b, c) {
   const med_x = median(a.x, b.x, c.x);
   const med_y = median(a.y, b.y, c.y);
-  return Point.point(med_x, med_y);
+  return new Point(med_x, med_y);
 }
 
 export class Viewport {
   /**
    * Constructor
    * @param {Point} position Position of the top left corner of the viewport in pixels of the map (not the screen!)
-   * @param {Point} screen_dimensions Screen dimensions. This will determine the side of the viewport
-   * @param {Point} margin Margin around a sprite for use with track_sprite()
+   * @param {Direction} screen_dimensions Screen dimensions. This will determine the side of the viewport
+   * @param {Direction} margin Margin around a sprite for use with track_sprite()
    * @param {number} upscale_factor Pixel art upscale factor (integer)
    */
   constructor(position, screen_dimensions, margin, upscale_factor) {
@@ -50,17 +51,17 @@ export class Viewport {
    */
   track_sprite(sprite_position, sprite) {
     // corners of the sprite in map pixels
-    const sprite_top_left = sprite_position.sub(sprite.origin);
+    const sprite_top_left = sprite_position.add(sprite.origin.neg());
     const sprite_bottom_right = sprite_top_left.add(sprite.frame_size);
 
     // Constrain the viewport so there's at least the margin in all direction.
     // In each dimension, there are three possible places the viewport, and
     // we want the one in the middle.
-    const candidate_top_left = sprite_top_left.sub(this.margin);
+    const candidate_top_left = sprite_top_left.add(this.margin.neg());
     const candidate_unchanged = this.position;
     const candidate_bottom_right = sprite_bottom_right
       .add(this.margin)
-      .sub(this.dimensions);
+      .add(this.dimensions.neg());
     this.position = median_point(
       candidate_top_left,
       candidate_unchanged,
@@ -76,7 +77,7 @@ export class Viewport {
    */
   map_to_viewport(point) {
     const { x, y } = point.sub(this.position);
-    return Point.point(Math.round(x), Math.round(y));
+    return new Point(Math.round(x), Math.round(y));
   }
 
   /**
@@ -87,6 +88,6 @@ export class Viewport {
    */
   map_to_screen(point) {
     const { x, y } = point.sub(this.position).scale(this.upscale_factor);
-    return Point.point(Math.round(x), Math.round(y));
+    return new Point(Math.round(x), Math.round(y));
   }
 }

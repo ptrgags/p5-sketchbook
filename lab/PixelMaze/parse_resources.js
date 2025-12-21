@@ -1,4 +1,4 @@
-import { Point } from "../../pga2d/objects.js";
+import { Direction } from "../../pga2d/Direction.js";
 import { ImageFrames } from "./ImageFrames.js";
 import { Sprite } from "./Sprite.js";
 
@@ -6,7 +6,7 @@ function parse_image_frames(p5_images, manifest, image_frames) {
   for (const [id, tileset_info] of Object.entries(manifest)) {
     const { image, frame_size } = tileset_info;
     const p5_image = p5_images[image];
-    const dimensions = Point.direction(p5_image.width, p5_image.height);
+    const dimensions = new Direction(p5_image.width, p5_image.height);
 
     const tileset = new ImageFrames(dimensions, frame_size);
     image_frames[id] = tileset;
@@ -17,7 +17,7 @@ function parse_sprites(manifest, image_frames, sprites) {
   for (const [id, sprite_info] of Object.entries(manifest)) {
     const { type, spritesheet, origin: maybe_origin } = sprite_info;
     const frames = image_frames[spritesheet];
-    const origin = maybe_origin ?? Point.ZERO;
+    const origin = maybe_origin ?? Direction.ZERO;
 
     if (type === "directional") {
       const { start_row, frame_count, origin } = sprite_info;

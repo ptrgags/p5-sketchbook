@@ -1,17 +1,19 @@
-import { Line, Point } from "../pga2d/objects.js";
 import { Style } from "../sketchlib/Style.js";
 import { Color } from "../sketchlib/Color.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
+import { Point } from "../pga2d/Point.js";
+import { Line } from "../pga2d/Line.js";
+import { Direction } from "../pga2d/Direction.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
 
 // vanishing point of the rails
-const VP_RAILS = Point.point(WIDTH / 2, HEIGHT / 4);
-const A = Point.point(WIDTH / 4, HEIGHT);
-const B = Point.point((3 * WIDTH) / 4, HEIGHT);
+const VP_RAILS = new Point(WIDTH / 2, HEIGHT / 4);
+const A = new Point(WIDTH / 4, HEIGHT);
+const B = new Point((3 * WIDTH) / 4, HEIGHT);
 
 const BOTTOM_SIDE = new Line(0, 1, HEIGHT);
 
@@ -26,10 +28,22 @@ const TIE_STYLE = DEFAULT_STYLE.with_fill(new Color(99, 59, 26));
 
 const CLOSED = true;
 
+/**
+ * Expect a Point type
+ * @param {Point | Direction} generalized_point
+ * @returns {Point}
+ */
+function expect_point(generalized_point) {
+  if (!(generalized_point instanceof Point)) {
+    throw new Error(`expected point, got direction: ${generalized_point}`);
+  }
+  return generalized_point;
+}
+
 function compute_rails() {
-  const A_top_left = A.add(Point.DIR_Y.scale(-RAIL_HEIGHT));
-  const A_top_right = A_top_left.add(Point.DIR_X.scale(RAIL_WIDTH));
-  const A_bottom_right = A.add(Point.DIR_X.scale(RAIL_WIDTH));
+  const A_top_left = A.add(Direction.DIR_Y.scale(-RAIL_HEIGHT));
+  const A_top_right = A_top_left.add(Direction.DIR_X.scale(RAIL_WIDTH));
+  const A_bottom_right = A.add(Direction.DIR_X.scale(RAIL_WIDTH));
   const A_rail_top_left = A_top_left.join(VP_RAILS);
   const A_rail_top_right = A_top_right.join(VP_RAILS);
   const A_rail_bottom_right = A_bottom_right.join(VP_RAILS);
@@ -38,8 +52,8 @@ function compute_rails() {
   const isx_A_bottom_right = A_rail_bottom_right.meet(BOTTOM_SIDE);
 
   const B_bottom_left = B;
-  const B_top_left = B.add(Point.DIR_Y.scale(-RAIL_HEIGHT));
-  const B_top_right = B_top_left.add(Point.DIR_X.scale(RAIL_WIDTH));
+  const B_top_left = B.add(Direction.DIR_Y.scale(-RAIL_HEIGHT));
+  const B_top_right = B_top_left.add(Direction.DIR_X.scale(RAIL_WIDTH));
   const B_rail_bottom_left = B_bottom_left.join(VP_RAILS);
   const B_rail_top_left = B_top_left.join(VP_RAILS);
   const B_rail_top_right = B_top_right.join(VP_RAILS);
@@ -50,19 +64,19 @@ function compute_rails() {
   // The rails are perspective cuboids, but on the screen they look like
   // elongated triangles
   const left_rail_top = new PolygonPrimitive(
-    [isx_A_top_left, isx_A_top_right, VP_RAILS],
+    [expect_point(isx_A_top_left), expect_point(isx_A_top_right), VP_RAILS],
     CLOSED
   );
   const left_rail_side = new PolygonPrimitive(
-    [isx_A_top_right, isx_A_bottom_right, VP_RAILS],
+    [expect_point(isx_A_top_right), expect_point(isx_A_bottom_right), VP_RAILS],
     CLOSED
   );
   const right_rail_side = new PolygonPrimitive(
-    [isx_B_bottom_left, isx_B_top_left, VP_RAILS],
+    [expect_point(isx_B_bottom_left), expect_point(isx_B_top_left), VP_RAILS],
     CLOSED
   );
   const right_rail_top = new PolygonPrimitive(
-    [isx_B_top_left, isx_B_top_right, VP_RAILS],
+    [expect_point(isx_B_top_left), expect_point(isx_B_top_right), VP_RAILS],
     CLOSED
   );
 
@@ -85,8 +99,8 @@ function even_spaced_rectangles(point_a, point_b, vp, vertical_spacing) {
   // the second line is the given number of pixels above it.
   const first_line = point_a.join(point_b);
   const second_line = point_a
-    .add(Point.DIR_Y.scale(-vertical_spacing))
-    .join(Point.DIR_X);
+    .add(Direction.DIR_Y.scale(-vertical_spacing))
+    .join(Direction.DIR_X);
 
   // Left and right guidelines that lead to the vanishing point
   const guide_left = point_a.join(vp);
@@ -111,7 +125,7 @@ function even_spaced_rectangles(point_a, point_b, vp, vertical_spacing) {
     const center = current_line.meet(center_line);
     const line_to_next = prev_left.join(center);
     const next_right = line_to_next.meet(guide_right);
-    const next_line = next_right.join(Point.DIR_X);
+    const next_line = next_right.join(Direction.DIR_X);
     const next_left = next_line.meet(guide_left);
 
     horizontal_lines.push(next_line);
@@ -146,7 +160,7 @@ function railroad_ties(tie_bottoms, tie_thickness) {
 
     const diag = quad_a.join(quad_c);
     const isx = diag.meet(ref_line);
-    const tie_top = isx.join(Point.DIR_X);
+    const tie_top = isx.join(Direction.DIR_X);
     const top_left = tie_top.meet(guide_left);
     const top_right = tie_top.meet(guide_right);
 
@@ -160,14 +174,14 @@ function railroad_ties(tie_bottoms, tie_thickness) {
 
 function make_background() {
   const sky_prim = new RectPrimitive(
-    Point.point(0, 0),
-    Point.direction(WIDTH, VP_RAILS.y)
+    new Point(0, 0),
+    new Direction(WIDTH, VP_RAILS.y)
   );
   const sky = style(sky_prim, SKY_STYLE);
 
   const ground_prim = new RectPrimitive(
-    Point.point(0, VP_RAILS.y),
-    Point.direction(WIDTH, HEIGHT - VP_RAILS.y)
+    new Point(0, VP_RAILS.y),
+    new Direction(WIDTH, HEIGHT - VP_RAILS.y)
   );
   const ground = style(ground_prim, GROUND_STYLE);
 
@@ -214,8 +228,8 @@ const RAILS_START_FRAME = 20;
 const RAILS_DURATION = 200;
 const TIE_DURATION = 30;
 function make_ties() {
-  const tie_bottom_left = Point.point(50, HEIGHT);
-  const tie_bottom_right = Point.point(475, HEIGHT);
+  const tie_bottom_left = new Point(50, HEIGHT);
+  const tie_bottom_right = new Point(475, HEIGHT);
 
   const TIE_SPACING = 100;
   const tie_bottoms = even_spaced_rectangles(

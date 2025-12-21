@@ -1,6 +1,8 @@
-import { Point } from "../pga2d/objects.js";
+import { Direction } from "../pga2d/Direction.js";
+import { Point } from "../pga2d/Point.js";
 import { Color } from "../sketchlib/Color.js";
 import { CirclePrimitive } from "../sketchlib/primitives/CirclePrimitive.js";
+import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 
@@ -8,6 +10,13 @@ const STYLE_SCLERA = new Style({ fill: Color.WHITE });
 const STYLE_PUPIL = new Style({ fill: Color.BLACK });
 
 export class GooglyEye {
+  /**
+   *
+   * @param {Point} position
+   * @param {Direction} look_direction
+   * @param {number} sclera_radius
+   * @param {number} pupil_radius
+   */
   constructor(position, look_direction, sclera_radius, pupil_radius) {
     this.position = position;
     this.look_direction = look_direction;
@@ -20,7 +29,7 @@ export class GooglyEye {
   /**
    * Update the position and look direction
    * @param {Point} position The new position of the eye
-   * @param {Point} look_direction The direction to look in. This must be normalized
+   * @param {Direction} look_direction The direction to look in. This must be normalized
    */
   update(position, look_direction) {
     this.position = position;
@@ -29,6 +38,10 @@ export class GooglyEye {
     this.geometry = this.compute_geometry();
   }
 
+  /**
+   *
+   * @returns {GroupPrimitive} Geometry for this frame
+   */
   compute_geometry() {
     // The sclera is easy, just draw a filled circle
     const sclera_circle = new CirclePrimitive(

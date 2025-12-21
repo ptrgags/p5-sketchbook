@@ -1,4 +1,3 @@
-import { Point } from "../../../pga2d/objects.js";
 import { Style } from "../../../sketchlib/Style.js";
 import { C4, C5 } from "./pitches.js";
 import { Harmony, Melody, Note, Rest, Score } from "./Score.js";
@@ -8,6 +7,8 @@ import { GroupPrimitive } from "../../../sketchlib/primitives/GroupPrimitive.js"
 import { LinePrimitive } from "../../../sketchlib/primitives/LinePrimitive.js";
 import { RectPrimitive } from "../../../sketchlib/primitives/RectPrimitive.js";
 import { group, style } from "../../../sketchlib/primitives/shorthand.js";
+import { Point } from "../../../pga2d/Point.js";
+import { Direction } from "../../../pga2d/Direction.js";
 
 // For the background colors I'm using, solid black fill looks fine
 const NOTE_STYLE = new Style({
@@ -52,9 +53,9 @@ function get_pitch_range(music) {
  * Render notes in a rectangle starting at offset and measure_dimensions.y tall.
  * Its width is determined by the duration of the music. The range of pitches
  * is automatically scaled so only pitch_range is drawn.
- * @param {Point} offset Top left corner of the rectangle where the notes will be overlayed as a Point.point
+ * @param {Point} offset Top left corner of the rectangle where the notes will be overlayed as a Point
  * @param {import("./Score.js").Music<number>} music Music as a timeline of MIDI notes
- * @param {Point} measure_dimensions a Point.direction representing the size of 1 measure in pixels
+ * @param {Direction} measure_dimensions a Direction representing the size of 1 measure in pixels
  * @param {[number, number]} pitch_range (min_pitch, max_pitch) as MIDI notes for determining note placement
  * @returns {Primitive} A primitive containing all the notes (unstyled)
  */
@@ -69,11 +70,11 @@ function render_notes(offset, music, measure_dimensions, pitch_range) {
     const note_height = measure_dimensions.y / pitch_count;
     const pitch_index = music.pitch - min_pitch;
 
-    const note_offset = Point.direction(
+    const note_offset = new Direction(
       0,
       measure_dimensions.y - (pitch_index + 1) * note_height
     );
-    const dimensions = Point.direction(
+    const dimensions = new Direction(
       music.duration.real * measure_dimensions.x,
       note_height
     );
@@ -93,7 +94,7 @@ function render_notes(offset, music, measure_dimensions, pitch_range) {
       all_notes.push(child_notes);
 
       const child_width = child.duration.real * measure_dimensions.x;
-      child_offset = child_offset.add(Point.DIR_X.scale(child_width));
+      child_offset = child_offset.add(Direction.DIR_X.scale(child_width));
     }
     return group(...all_notes.filter((x) => x !== undefined));
   }
@@ -113,9 +114,9 @@ function render_notes(offset, music, measure_dimensions, pitch_range) {
 
 /**
  * Render a single Music timeline
- * @param {Point} offset Offset of the top left corner where the timeline should appear as a Point.point
+ * @param {Point} offset Offset of the top left corner where the timeline should appear as a Point
  * @param {import("./Score.js").Music<number>} music
- * @param {Point} measure_dimensions Dimensions of a rectangle representing one measure of music
+ * @param {Direction} measure_dimensions Dimensions of a rectangle representing one measure of music
  * @param {Style} background_style Style for the background rectangle
  * @param {Style} note_style Style for the smaller note rectangles
  * @returns {GroupPrimitive} A group primmitive ready for rendering
@@ -130,7 +131,7 @@ export function render_music(
   // Background rectangle ----------------------
   const duration = music.duration;
   const width_measures = duration.real;
-  const dimensions = Point.direction(
+  const dimensions = new Direction(
     width_measures * measure_dimensions.x,
     measure_dimensions.y
   );
@@ -145,8 +146,8 @@ export function render_music(
   for (let i = 0; i < whole_measures; i++) {
     const x = i * measure_dimensions.x;
     measure_lines[i] = new LinePrimitive(
-      offset.add(Point.DIR_X.scale(x)),
-      offset.add(Point.direction(x, measure_dimensions.y))
+      offset.add(Direction.DIR_X.scale(x)),
+      offset.add(new Direction(x, measure_dimensions.y))
     );
   }
   const styled_lines = style(measure_lines, MEASURE_LINE_STYLE);
@@ -170,9 +171,9 @@ export function render_music(
 
 /**
  * Render a score as rectangles arranged in rows like in a DAW
- * @param {Point} offset Top left corner of the score as a Point.point
+ * @param {Point} offset Top left corner of the score as a Point
  * @param {Score<number>} score The score to draw, with values as MIDI notes
- * @param {Point} measure_dimensions (pixels_per_measure, pixels_per_voice) the dimensions of a block representing one measure and one voice as a Point.direction
+ * @param {Direction} measure_dimensions (pixels_per_measure, pixels_per_voice) the dimensions of a block representing one measure and one voice as a Direction
  * @param {Style[]} styles Styles for the background rectangles for each part of the score.
  * @returns {GroupPrimitive} The visual representation of the score
  */
@@ -180,7 +181,7 @@ export function render_score(offset, score, measure_dimensions, styles) {
   const parts = [];
   for (const [i, entry] of score.parts.entries()) {
     const [, part] = entry;
-    const child_offset = Point.direction(0, measure_dimensions.y).scale(i);
+    const child_offset = new Direction(0, measure_dimensions.y).scale(i);
 
     const rendered = render_music(
       offset.add(child_offset),

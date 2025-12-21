@@ -1,4 +1,4 @@
-import { Point } from "../pga2d/objects.js";
+import { Point } from "../pga2d/Point.js";
 import { Color } from "../sketchlib/Color.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { group } from "../sketchlib/primitives/shorthand.js";
@@ -32,7 +32,7 @@ export class InteractiveMosaic {
     this.frame = 0;
 
     this.swap_pair = undefined;
-    this.mouse = Point.point(0, 0);
+    this.mouse = new Point(0, 0);
     this.mouse_down = false;
   }
 

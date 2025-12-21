@@ -1,4 +1,5 @@
-import { Point } from "../../pga2d/objects.js";
+import { Direction } from "../../pga2d/Direction.js";
+import { Point } from "../../pga2d/Point.js";
 import { ImageFrames } from "./ImageFrames.js";
 import { Sprite } from "./Sprite.js";
 import { Tilemap } from "./Tilemap.js";
@@ -64,7 +65,7 @@ export function blit_sprite(p, p5_sprite, t, position) {
     p5_sprite.p5_image,
     p5_sprite.spritesheet,
     frame_id,
-    position.sub(origin)
+    position.add(origin.neg())
   );
 }
 
@@ -91,7 +92,7 @@ export function blit_tilemap(p, p5_tilemap, origin) {
   const tile_size = tileset.frame_size.x;
   indices.for_each((index, tile_id) => {
     const { i, j } = index;
-    const offset = Point.direction(j, i).scale(tile_size);
+    const offset = new Direction(j, i).scale(tile_size);
     const position = origin.add(offset);
     blit_frame(p, p5_tilemap.p5_image, tileset, tile_id, position);
   });

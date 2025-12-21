@@ -1,9 +1,13 @@
 import { sec_to_frames, Tween } from "../../sketchlib/Tween.js";
-import { Direction, to_y_down } from "../../sketchlib/Direction.js";
+import {
+  CardinalDirection,
+  to_direction,
+} from "../../sketchlib/CardinalDirection.js";
 import { Index2D } from "../../sketchlib/Grid.js";
 import { Tiles } from "./make_maze.js";
 import { Tilemap } from "./Tilemap.js";
 import { DirectionInput } from "../lablib/DirectionInput.js";
+import { Point } from "../../pga2d/Point.js";
 
 const TILE_SIZE = 16;
 
@@ -23,9 +27,15 @@ const DURATION_WALK = sec_to_frames(0.1);
 const DURATION_WALK_IN_PLACE = sec_to_frames(0.2);
 
 export class Player {
+  /**
+   *
+   * @param {*} walk_sprites
+   * @param {*} idle_sprites
+   * @param {Point} position
+   */
   constructor(walk_sprites, idle_sprites, position) {
     this.position = position;
-    this.direction = Direction.RIGHT;
+    this.direction = CardinalDirection.RIGHT;
     this.walk_sprites = walk_sprites;
     this.idle_sprites = idle_sprites;
 
@@ -43,7 +53,7 @@ export class Player {
 
   /**
    * Update direction
-   * @param {Direction | undefined} direction The new direction value
+   * @param {CardinalDirection} [direction] The new direction value
    */
   update_direction(direction) {
     this.input_direction = direction;
@@ -70,7 +80,7 @@ export class Player {
     }
 
     // Move to the adjacent cell
-    const offset = to_y_down(direction).scale(TILE_SIZE);
+    const offset = to_direction(direction).flip_y().scale(TILE_SIZE);
     return this.position.add(offset);
   }
 

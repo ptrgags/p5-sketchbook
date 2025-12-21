@@ -1,9 +1,10 @@
 import { describe, it, expect, test } from "vitest";
 import { Grid, griderator, Index2D } from "./Grid";
-import { Direction } from "./Direction";
+import { CardinalDirection } from "./CardinalDirection";
 import { Rectangle } from "../lab/lablib/Rectangle";
-import { Point } from "../pga2d/objects";
 import { PGA_MATCHERS } from "../pga2d/pga_matchers";
+import { Point } from "../pga2d/Point";
+import { Direction } from "../pga2d/Direction";
 
 expect.extend(PGA_MATCHERS);
 
@@ -91,10 +92,10 @@ describe("Index2D", () => {
     });
 
     test.each([
-      ["right", 1, 6, Direction.RIGHT],
-      ["up", 0, 5, Direction.UP],
-      ["left", 1, 4, Direction.LEFT],
-      ["down", 2, 5, Direction.DOWN],
+      ["right", 1, 6, CardinalDirection.RIGHT],
+      ["up", 0, 5, CardinalDirection.UP],
+      ["left", 1, 4, CardinalDirection.LEFT],
+      ["down", 2, 5, CardinalDirection.DOWN],
     ])(
       "with adjacent cell returns the correct direction: %s",
       (label, i, j, expected) => {
@@ -112,22 +113,22 @@ describe("Index2D", () => {
     it("computes correct position without offset", () => {
       const index = new Index2D(1, 3);
       const offset = Point.ORIGIN;
-      const stride = Point.direction(2, 4);
+      const stride = new Direction(2, 4);
 
       const result = index.to_world(offset, stride);
 
-      const expected = Point.direction(6, 4);
+      const expected = new Point(6, 4);
       expect(result).toBePoint(expected);
     });
 
     it("computes correct position with offset", () => {
       const index = new Index2D(1, 3);
-      const offset = Point.point(4, 4);
-      const stride = Point.direction(2, 4);
+      const offset = new Point(4, 4);
+      const stride = new Direction(2, 4);
 
       const result = index.to_world(offset, stride);
 
-      const expected = Point.direction(10, 8);
+      const expected = new Point(10, 8);
       expect(result).toBePoint(expected);
     });
   });
@@ -421,58 +422,58 @@ describe("Grid", () => {
   describe("compute_layout", () => {
     it("computes a layout without spacing or margins", () => {
       const grid = new Grid(2, 2);
-      const boundary = new Rectangle(Point.ORIGIN, Point.direction(4, 4));
-      const item_size = Point.direction(2, 2);
-      const margin = Point.ZERO;
+      const boundary = new Rectangle(Point.ORIGIN, new Direction(4, 4));
+      const item_size = new Direction(2, 2);
+      const margin = Direction.ZERO;
 
       const [offset, stride] = grid.compute_layout(boundary, item_size, margin);
 
       const expected_offset = Point.ORIGIN;
-      const expected_stride = Point.direction(2, 2);
+      const expected_stride = new Direction(2, 2);
       expect(offset).toBePoint(expected_offset);
-      expect(stride).toBePoint(expected_stride);
+      expect(stride).toBeDirection(expected_stride);
     });
 
     it("computes a layout with margins", () => {
       const grid = new Grid(2, 2);
-      const boundary = new Rectangle(Point.ORIGIN, Point.direction(8, 12));
-      const item_size = Point.direction(2, 2);
-      const margin = Point.direction(2, 4);
+      const boundary = new Rectangle(Point.ORIGIN, new Direction(8, 12));
+      const item_size = new Direction(2, 2);
+      const margin = new Direction(2, 4);
 
       const [offset, stride] = grid.compute_layout(boundary, item_size, margin);
 
-      const expected_offset = Point.point(2, 4);
-      const expected_stride = Point.direction(2, 2);
+      const expected_offset = new Point(2, 4);
+      const expected_stride = new Direction(2, 2);
       expect(offset).toBePoint(expected_offset);
-      expect(stride).toBePoint(expected_stride);
+      expect(stride).toBeDirection(expected_stride);
     });
 
     it("computes a layout with spacing", () => {
       const grid = new Grid(2, 2);
-      const boundary = new Rectangle(Point.ORIGIN, Point.direction(8, 10));
-      const item_size = Point.direction(2, 2);
-      const margin = Point.ZERO;
+      const boundary = new Rectangle(Point.ORIGIN, new Direction(8, 10));
+      const item_size = new Direction(2, 2);
+      const margin = Direction.ZERO;
 
       const [offset, stride] = grid.compute_layout(boundary, item_size, margin);
 
       const expected_offset = Point.ORIGIN;
-      const expected_stride = Point.direction(6, 8);
+      const expected_stride = new Direction(6, 8);
       expect(offset).toBePoint(expected_offset);
-      expect(stride).toBePoint(expected_stride);
+      expect(stride).toBeDirection(expected_stride);
     });
 
     it("computes a layout with spacing and margins", () => {
       const grid = new Grid(3, 3);
-      const boundary = new Rectangle(Point.ORIGIN, Point.direction(16, 8));
-      const item_size = Point.direction(2, 2);
-      const margin = Point.direction(4, 1);
+      const boundary = new Rectangle(Point.ORIGIN, new Direction(16, 8));
+      const item_size = new Direction(2, 2);
+      const margin = new Direction(4, 1);
 
       const [offset, stride] = grid.compute_layout(boundary, item_size, margin);
 
-      const expected_offset = Point.point(4, 1);
-      const expected_stride = Point.direction(3, 2);
+      const expected_offset = new Point(4, 1);
+      const expected_stride = new Direction(3, 2);
       expect(offset).toBePoint(expected_offset);
-      expect(stride).toBePoint(expected_stride);
+      expect(stride).toBeDirection(expected_stride);
     });
   });
 });

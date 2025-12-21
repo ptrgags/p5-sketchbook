@@ -1,8 +1,8 @@
-import { Point } from "../pga2d/objects.js";
+import { Direction } from "../pga2d/Direction.js";
 import { mod } from "../sketchlib/mod.js";
 
 export const N = 5;
-export const ROOTS_OF_UNITY = Point.roots_of_unity(N);
+export const ROOTS_OF_UNITY = Direction.roots_of_unity(N);
 
 // Displacement between the start and end of the arc. It will always be
 // the difference of two adjacent fifth roots of unity
@@ -25,12 +25,12 @@ export class RobotCommand {
   }
 
   /**
-   * Get a Point.direction representing the offset from the start. Units
+   * Get a Direction representing the offset from the start. Units
    * are in model space, i.e. meters, y-up
-   * @type {Point}
+   * @type {Direction}
    */
   get offset() {
-    let result = Point.ZERO;
+    let result = Direction.ZERO;
     for (let i = 0; i < N; i++) {
       const weight = this.weights[i];
       const offset = OFFSETS[i];

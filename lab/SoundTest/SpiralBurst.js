@@ -1,4 +1,5 @@
-import { Point } from "../../pga2d/objects.js";
+import { Direction } from "../../pga2d/Direction.js";
+import { Point } from "../../pga2d/Point.js";
 import { HEIGHT, WIDTH } from "../../sketchlib/dimensions.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { PointPrimitive } from "../../sketchlib/primitives/PointPrimitive.js";
@@ -12,7 +13,7 @@ import { Rational } from "../lablib/Rational.js";
 import { SoundManager } from "../lablib/SoundManager.js";
 
 const N = 10;
-const CENTER = Point.point(WIDTH / 2, (3 * HEIGHT) / 4);
+const CENTER = new Point(WIDTH / 2, (3 * HEIGHT) / 4);
 const MAX_RADIUS = 50;
 
 export class SpiralBurst {
@@ -49,7 +50,7 @@ export class SpiralBurst {
     for (let i = 0; i < N; i++) {
       const angle = this.phases[i] + phase_shift * Math.PI;
       const radius = this.radii[i] * radius_scale;
-      const offset = Point.dir_from_angle(angle).scale(radius);
+      const offset = Direction.from_angle(angle).scale(radius);
       const point = new PointPrimitive(CENTER.add(offset));
       points[i] = style(point, point_style);
     }

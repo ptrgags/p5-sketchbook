@@ -1,4 +1,3 @@
-import { Point } from "../../pga2d/objects.js";
 import { LSystem } from "../../sketchlib/LSystem.js";
 import { N16 } from "../lablib/music/durations.js";
 import { map_pitch, Melody, Note, Rest, Score } from "../lablib/music/Score.js";
@@ -17,6 +16,8 @@ import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
 import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
 import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
+import { Point } from "../../pga2d/Point.js";
+import { Direction } from "../../pga2d/Direction.js";
 
 const TREE_LSYSTEM = new LSystem("Fa", {
   a: "[+Fa][-Fa]",
@@ -38,12 +39,12 @@ export class TurtleGraphics {
 
   /**
    * Get the forward direction in p5's y-down coordinate system
-   * @type {Point} A Point.direction representing the current forward direction as a unit direction
+   * @type {Direction} A Direction representing the current forward direction as a unit direction
    */
   get dir_forward() {
     // Angles are measured from vertical, not horizontal
     const ANGLE_ZERO = -Math.PI / 2;
-    return Point.dir_from_angle(
+    return Direction.from_angle(
       ANGLE_ZERO + this.delta_angle * this.orientation
     );
   }
@@ -88,7 +89,7 @@ export class TurtleGraphics {
 }
 
 const DELTA_ANGLE = Math.PI / 5;
-const START_POINT = Point.point(WIDTH / 2, (3 * HEIGHT) / 4);
+const START_POINT = new Point(WIDTH / 2, (3 * HEIGHT) / 4);
 const MAX_LENGTH = 100;
 const LENGTH_SCALE = 0.7;
 
@@ -493,17 +494,17 @@ const STYLE_TURTLE = new Style({
 
 /**
  * Draw a turtle as an isoceles triangle for now.
- * @param {Point} position Point.point for the turtle position
+ * @param {Point} position Point for the turtle position
  * @param {number} orientation orientation of the turtle
  */
 function render_turtle(position, orientation) {
-  const dir_front = Point.dir_from_angle(
+  const dir_front = Direction.from_angle(
     -Math.PI / 2 + orientation * DELTA_ANGLE
   );
-  const dir_back_left = Point.dir_from_angle(
+  const dir_back_left = Direction.from_angle(
     -Math.PI / 2 + orientation * DELTA_ANGLE + (5 * Math.PI) / 6
   );
-  const dir_back_right = Point.dir_from_angle(
+  const dir_back_right = Direction.from_angle(
     -Math.PI / 2 + orientation * DELTA_ANGLE - (5 * Math.PI) / 6
   );
 
@@ -519,13 +520,10 @@ function render_turtle(position, orientation) {
   return style(polygon, STYLE_TURTLE);
 }
 
-const STACK_RECT_DIMENSIONS = Point.direction(RADIUS_TURTLE / 2, RADIUS_TURTLE);
-const OFFSET_STACK_START = Point.direction(
-  RADIUS_TURTLE + 4,
-  -RADIUS_TURTLE / 2
-);
+const STACK_RECT_DIMENSIONS = new Direction(RADIUS_TURTLE / 2, RADIUS_TURTLE);
+const OFFSET_STACK_START = new Direction(RADIUS_TURTLE + 4, -RADIUS_TURTLE / 2);
 const STACK_SPACING = 2;
-const OFFSET_STACK_STRIDE = Point.DIR_X.scale(
+const OFFSET_STACK_STRIDE = Direction.DIR_X.scale(
   STACK_RECT_DIMENSIONS.x + STACK_SPACING
 );
 
