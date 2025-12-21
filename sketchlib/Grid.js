@@ -325,7 +325,7 @@ export class Grid {
    * @param {Rectangle} boundary The bounding rectangle
    * @param {Direction} item_size The size of each item as a Direction
    * @param {Direction} margin How much space to leave around the x or y direction (note that this will be doubled). Any remaining space will be used as padding
-   * @return {[Direction, Direction]} [offset, stride] The computed offset and stride
+   * @return {[Point, Direction]} [offset, stride] The computed offset and stride
    */
   compute_layout(boundary, item_size, margin) {
     // If we arranged the items as tightly as possible, how big would this

@@ -113,7 +113,7 @@ const GRID_BOUNDARY = new Rectangle(
   new Direction(WIDTH, HEIGHT / 2)
 );
 const GRID_MARGIN = new Direction(75, 80);
-const [BUTTON_OFFSET, BUTTON_STRIDE] = MELODY_BUTTONS.compute_layout(
+const [FIRST_BUTTON_POSITION, BUTTON_STRIDE] = MELODY_BUTTONS.compute_layout(
   GRID_BOUNDARY,
   MELODY_BUTTON_DIMENSIONS,
   GRID_MARGIN
@@ -126,11 +126,9 @@ const [BUTTON_OFFSET, BUTTON_STRIDE] = MELODY_BUTTONS.compute_layout(
  */
 function make_button_labels(buttons) {
   const primitives = buttons.map_array((index, descriptor) => {
-    const point = index.to_world(
-      BUTTON_OFFSET.add(MELODY_BUTTON_CENTER_OFFSET).to_point(),
-      BUTTON_STRIDE
-    );
-    return new TextPrimitive(descriptor.label, point);
+    const offset = FIRST_BUTTON_POSITION.add(MELODY_BUTTON_CENTER_OFFSET);
+    const position_world = index.to_world(offset, BUTTON_STRIDE);
+    return new TextPrimitive(descriptor.label, position_world);
   });
 
   return new GroupPrimitive(primitives, {
@@ -195,7 +193,7 @@ class SoundScene {
     );
 
     this.melody_buttons = melodies.map_array((index, descriptor) => {
-      const corner = index.to_world(BUTTON_OFFSET.to_point(), BUTTON_STRIDE);
+      const corner = index.to_world(FIRST_BUTTON_POSITION, BUTTON_STRIDE);
       const rectangle = new Rectangle(corner, MELODY_BUTTON_DIMENSIONS);
       const button = new TouchButton(rectangle);
       button.events.addEventListener("click", () => {
