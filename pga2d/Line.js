@@ -1,4 +1,5 @@
 import { is_nearly } from "../sketchlib/is_nearly.js";
+import { Direction } from "./Direction.js";
 import { Odd } from "./multivectors.js";
 import { Point } from "./Point.js";
 
@@ -58,16 +59,21 @@ export class Line {
    * Find the meet of two lines. This is their point of intersection, or for parallel lines
    * an ideal point in the direction the lines point (this is 90 degrees clockwise of their normals)
    * @param {Line} other The line to intersect with
+   * @returns {Point | Direction}
    */
   meet(other) {
     const bivec = this.vec.wedge_odd(other.vec);
+    if (is_nearly(bivec.xy, 0)) {
+      return Direction.from_bivec(bivec);
+    }
+
     return Point.from_bivec(bivec);
   }
 
   /**
-   *
-   * @param {Line} other
-   * @returns {number} The dot product of the lines. This is the cosine of the line betwen them.
+   * Get the dot product of lines - the cosine of the angle between them
+   * @param {Line} other Another line
+   * @returns {number} The dot product of the lines.
    */
   dot(other) {
     return this.vec.dot(other.vec);

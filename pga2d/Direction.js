@@ -146,7 +146,7 @@ export class Direction {
 
   /**
    * Join two points into a line
-   * @param {Point} other The other point to join into a line
+   * @param {Point | Direction} other The other point to join into a line
    * @returns {Line} The line through the two points
    */
   join(other) {

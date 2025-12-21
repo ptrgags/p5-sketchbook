@@ -1,9 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { Viewport } from "./Viewport";
-import { Point } from "../../pga2d/objects";
 import { PGA_MATCHERS } from "../../pga2d/pga_matchers";
 import { Sprite } from "./Sprite";
 import { ImageFrames } from "./ImageFrames";
+import { Direction } from "../../pga2d/Direction";
+import { Point } from "../../pga2d/Point";
 
 expect.extend(PGA_MATCHERS);
 

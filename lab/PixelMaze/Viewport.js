@@ -34,7 +34,7 @@ export class Viewport {
    * Constructor
    * @param {Point} position Position of the top left corner of the viewport in pixels of the map (not the screen!)
    * @param {Direction} screen_dimensions Screen dimensions. This will determine the side of the viewport
-   * @param {Point} margin Margin around a sprite for use with track_sprite()
+   * @param {Direction} margin Margin around a sprite for use with track_sprite()
    * @param {number} upscale_factor Pixel art upscale factor (integer)
    */
   constructor(position, screen_dimensions, margin, upscale_factor) {
@@ -57,11 +57,11 @@ export class Viewport {
     // Constrain the viewport so there's at least the margin in all direction.
     // In each dimension, there are three possible places the viewport, and
     // we want the one in the middle.
-    const candidate_top_left = sprite_top_left.sub(this.margin);
+    const candidate_top_left = sprite_top_left.add(this.margin.neg());
     const candidate_unchanged = this.position;
     const candidate_bottom_right = sprite_bottom_right
       .add(this.margin)
-      .sub(this.dimensions);
+      .add(this.dimensions.neg());
     this.position = median_point(
       candidate_top_left,
       candidate_unchanged,

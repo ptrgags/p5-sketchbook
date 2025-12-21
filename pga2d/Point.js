@@ -73,45 +73,6 @@ export class Point {
   }
 
   /**
-   * Get the euclidean norm squared. This is confusingly the xy-component squared
-   * @returns {number} The squared euclidean norm
-   */
-  euclidean_norm_sqr() {
-    // the xo and yo parts square to 0, so we only have xy * yx
-    const { xy } = this.bivec;
-    return xy * xy;
-  }
-
-  /**
-   * Get the euclidean norm. This is confusingly the absolute value of the xy-component
-   * @returns {number} The euclidean norm
-   */
-  euclidean_norm() {
-    // this is equivalent to sqrt(euclidean_norm_sqr), since abs(x) = sqrt(x^2)
-    const { xy } = this.bivec;
-    return Math.abs(xy);
-  }
-
-  /**
-   * The ideal norm squared. Confusingly, this is the usual norm x^2 + y^2 in GA
-   * @returns {number} The ideal norm squared
-   */
-  ideal_norm_sqr() {
-    // this is the euclidean norm of the dual, but computed without allocating
-    // the dual line
-    const { yo: x, xo: y } = this.bivec;
-    return x * x + y * y;
-  }
-
-  /**
-   * The ideal norm, sqrt(x^2 + y^2)
-   * @returns {number} The ideal norm squared
-   */
-  ideal_norm() {
-    return Math.sqrt(this.ideal_norm_sqr());
-  }
-
-  /**
    * Add a direction to a Point, producing a new point.
    * @param {Direction} dir The direction to add
    */
@@ -137,8 +98,9 @@ export class Point {
   }
 
   /**
-   * Join two points into a line
-   * @param {Point} other The other point to join into a line
+   * Join this point to another point or direction, producing a line through
+   * both.
+   * @param {Point | Direction} other The other point or direction
    * @returns {Line} The line through the two points
    */
   join(other) {
@@ -163,6 +125,10 @@ export class Point {
     return new Point(this.x, -this.y);
   }
 
+  /**
+   *
+   * @returns {string}
+   */
   toString() {
     const x_str = this.x.toPrecision(3);
     const y_str = this.y.toPrecision(3);

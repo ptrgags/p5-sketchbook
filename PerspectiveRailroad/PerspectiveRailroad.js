@@ -28,6 +28,18 @@ const TIE_STYLE = DEFAULT_STYLE.with_fill(new Color(99, 59, 26));
 
 const CLOSED = true;
 
+/**
+ * Expect a Point type
+ * @param {Point | Direction} generalized_point
+ * @returns {Point}
+ */
+function expect_point(generalized_point) {
+  if (!(generalized_point instanceof Point)) {
+    throw new Error(`expected point, got direction: ${generalized_point}`);
+  }
+  return generalized_point;
+}
+
 function compute_rails() {
   const A_top_left = A.add(Direction.DIR_Y.scale(-RAIL_HEIGHT));
   const A_top_right = A_top_left.add(Direction.DIR_X.scale(RAIL_WIDTH));
@@ -52,19 +64,19 @@ function compute_rails() {
   // The rails are perspective cuboids, but on the screen they look like
   // elongated triangles
   const left_rail_top = new PolygonPrimitive(
-    [isx_A_top_left, isx_A_top_right, VP_RAILS],
+    [expect_point(isx_A_top_left), expect_point(isx_A_top_right), VP_RAILS],
     CLOSED
   );
   const left_rail_side = new PolygonPrimitive(
-    [isx_A_top_right, isx_A_bottom_right, VP_RAILS],
+    [expect_point(isx_A_top_right), expect_point(isx_A_bottom_right), VP_RAILS],
     CLOSED
   );
   const right_rail_side = new PolygonPrimitive(
-    [isx_B_bottom_left, isx_B_top_left, VP_RAILS],
+    [expect_point(isx_B_bottom_left), expect_point(isx_B_top_left), VP_RAILS],
     CLOSED
   );
   const right_rail_top = new PolygonPrimitive(
-    [isx_B_top_left, isx_B_top_right, VP_RAILS],
+    [expect_point(isx_B_top_left), expect_point(isx_B_top_right), VP_RAILS],
     CLOSED
   );
 

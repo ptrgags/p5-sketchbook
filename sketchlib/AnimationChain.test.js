@@ -97,7 +97,7 @@ describe("Joint", () => {
       const b = new Point(0, -1);
       const follow_dist = 1;
       const min_bend = (3 * Math.PI) / 4;
-      const c = a.scale(2);
+      const c = new Point(0, 2);
 
       const result = Joint.constraint_follow_bend(
         a,

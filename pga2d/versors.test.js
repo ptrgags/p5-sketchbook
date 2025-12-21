@@ -65,15 +65,14 @@ describe("Flector", () => {
       expect(result).toBePoint(expected);
     });
 
-    it("reflection in plane at infinity returns 0", () => {
+    it("reflection in plane at infinity throws error", () => {
       const point = new Point(3, 4);
       const line = new Line(0, 0, 1);
       const reflection = Flector.reflection(line);
 
-      const result = reflection.transform_point(point);
-
-      const expected = Direction.ZERO;
-      expect(result).toBeDirection(expected);
+      expect(() => {
+        reflection.transform_point(point);
+      }).toThrowError("Trying to create a Point from a direction!");
     });
 
     it("reflecting twice leaves point unchanged", () => {
@@ -103,13 +102,13 @@ describe("Flector", () => {
       const line = new Line(1, -1, 0);
       const reflection = Flector.reflection(line);
 
-      const result = reflection.transform_point(direction);
+      const result = reflection.transform_dir(direction);
 
       // Note: bivectors are inverted in the mirror. Since this is
       // an ideal direction, the minus sign doesn't get normalized hence
       // the negative coefficients here
       const expected = new Direction(-2, -1);
-      expect(result).toBePoint(expected);
+      expect(result).toBeDirection(expected);
     });
   });
 });
