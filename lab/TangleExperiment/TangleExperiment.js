@@ -3,67 +3,16 @@ import { Point } from "../../pga2d/Point.js";
 import { Color } from "../../sketchlib/Color.js";
 import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
 import { CirclePrimitive } from "../../sketchlib/primitives/CirclePrimitive.js";
+import { InvMask, Mask } from "../../sketchlib/primitives/ClipMask.js";
+import { ClipPrimitive } from "../../sketchlib/primitives/ClipPrimitive.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
 import { PointPrimitive } from "../../sketchlib/primitives/PointPrimitive.js";
 import { Primitive } from "../../sketchlib/primitives/Primitive.js";
 import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
+import { VectorTangle } from "../../sketchlib/primitives/VectorTangle.js";
 import { Style } from "../../sketchlib/Style.js";
-
-class ClipPrimitive {
-  /**
-   * Constructor
-   * @param {[Primitive, boolean][]} masks Pairs of (mask, inverted). The masks will be intersected to get the final clip mask. To union masks together, just have the mask render multiple shapes. To invert a mask, set the inverted flag for that mask.
-   * @param {Primitive} child
-   */
-  constructor(masks, child) {
-    this.masks = masks;
-    this.child = child;
-  }
-
-  /**
-   *
-   * @param {Primitive} mask
-   * @param {Primitive} child
-   * @returns
-   */
-  static simple(mask, child) {
-    return new ClipPrimitive([[mask, false]], child);
-  }
-
-  // Shorthand for a single innverted mask
-  /**
-   *
-   * @param {Primitive} mask
-   * @param {Primitive} child
-   * @returns
-   */
-  static inverted(mask, child) {
-    return new ClipPrimitive([[mask, true]], child);
-  }
-
-  /**
-   * Draw the clipped primitive
-   * @param {import("p5")} p p5 drawing context
-   */
-  draw(p) {
-    // pushing is important here - there's no way to clear stenciled
-    // pixels except through pop(). See https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/clip
-    p.push();
-
-    // Make the clip mask as the intersection of all the masks.
-    for (const [mask, invert] of this.masks) {
-      p.beginClip({ invert });
-      mask.draw(p);
-      p.endClip();
-    }
-
-    // Draw the child
-    this.child.draw(p);
-    p.pop();
-  }
-}
 
 const BIG_CIRCLE = new CirclePrimitive(new Point(250, 350), 100);
 const BIG_CIRCLE_STYLE = new Style({ stroke: Color.MAGENTA, width: 8 });
@@ -115,18 +64,22 @@ for (let i = 0; i < 10; i++) {
 const SINE_STYLE = new Style({ fill: Color.GREEN });
 const SINE_DUST = style(group(...sine_dots), SINE_STYLE);
 
-const TANGLE = ClipPrimitive.simple(
-  BIG_CIRCLE,
-  group(
-    ClipPrimitive.simple(LEFT_HALF, STRIPES),
-    ClipPrimitive.simple(
-      RIGHT_HALF,
-      group(
-        ClipPrimitive.simple(SMALLER_CIRCLE, POLKA),
-        ClipPrimitive.inverted(SMALLER_CIRCLE, SINE_DUST),
-        SMALLER_OUTLINE
-      )
-    ),
+const TANGLE = new ClipPrimitive(
+  new Mask(BIG_CIRCLE),
+  new VectorTangle(
+    [
+      [new Mask(LEFT_HALF), STRIPES],
+      [
+        new Mask(RIGHT_HALF),
+        new VectorTangle(
+          [
+            [new Mask(SMALLER_CIRCLE), POLKA],
+            [new InvMask(SMALLER_CIRCLE), SINE_DUST],
+          ],
+          SMALLER_OUTLINE
+        ),
+      ],
+    ],
     BIG_CIRCLE_DECO
   )
 );
