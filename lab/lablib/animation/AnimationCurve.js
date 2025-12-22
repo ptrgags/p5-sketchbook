@@ -1,8 +1,8 @@
-import { Tween } from "../../../sketchlib/Tween";
+import { Tween } from "../../../sketchlib/Tween.js";
 import { to_events } from "../music/Timeline.js";
 import { Rational } from "../Rational.js";
 import { ParamCurve } from "./ParamCurve.js";
-import { PiecewiseLinear } from "./PiecewiseLinear";
+import { PiecewiseLinear } from "./PiecewiseLinear.js";
 
 export class AnimationCurve {
   /**

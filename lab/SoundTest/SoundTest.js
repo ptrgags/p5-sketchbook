@@ -24,16 +24,26 @@ import { BasicSynth } from "../lablib/sound/instruments/BasicSynth.js";
 import { SoundSystem } from "../lablib/sound/SoundSystem.js";
 import { Transport } from "../lablib/sound/Transport.js";
 import { TouchButton } from "../lablib/TouchButton.js";
-import {
-  binary_chords,
-  layered_melody,
-  phase_scale,
-  symmetry_melody,
-} from "./example_scores.js";
 import { Piano } from "./Piano.js";
 import { SpiralBurst } from "./SpiralBurst.js";
 import { AnimationCurves } from "../lablib/animation/AnimationCurves.js";
 import { MusicalCues } from "../lablib/animation/MusicalCues.js";
+import {
+  CURVES_LAYERED_MELODY,
+  SCORE_LAYERED_MELODY,
+} from "./example_scores/layered_melody.js";
+import {
+  CURVES_PHASE_SCALE,
+  SCORE_PHASE_SCALE,
+} from "./example_scores/phase_scale.js";
+import {
+  CURVES_SYMMETRY_MELODY,
+  SCORE_SYMMETRY_MELODY,
+} from "./example_scores/symmetry_melody.js";
+import {
+  CURVES_BINARY_CHORDS,
+  SCORE_BINARY_CHORDS,
+} from "./example_scores/binary_chords.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -45,13 +55,18 @@ const SCORE_INSTRUMENTS = {
 };
 
 const SCORES = {
-  layered_melody: layered_melody(),
-  phase_scale: phase_scale(),
-  symmetry_melody: symmetry_melody(),
-  binary_progression: binary_chords(),
+  layered_melody: SCORE_LAYERED_MELODY,
+  phase_scale: SCORE_PHASE_SCALE,
+  symmetry_melody: SCORE_SYMMETRY_MELODY,
+  binary_chords: SCORE_BINARY_CHORDS,
 };
 
-const CURVE_DEFS = {};
+const CURVES = {
+  layered_melody: CURVES_LAYERED_MELODY,
+  phase_scale: CURVES_PHASE_SCALE,
+  symmetry_melody: CURVES_SYMMETRY_MELODY,
+  binary_chords: CURVES_BINARY_CHORDS,
+};
 
 const PART_STYLES = Oklch.gradient(
   new Oklch(0.7, 0.1, 0),
@@ -82,7 +97,6 @@ const SOUND = new SoundSystem(Tone);
 const TRANSPORT = new Transport(SOUND);
 const BGM = new BackgroundMusic(SOUND, SCORE_INSTRUMENTS, SCORES);
 const CUES = new MusicalCues(SOUND);
-const ANIM = new AnimationCurves(CURVE_DEFS);
 
 class MelodyButtonDescriptor {
   /**
@@ -181,13 +195,23 @@ class SoundScene {
       3,
       4
     );
-    this.spiral_burst = new SpiralBurst(ANIM);
+
+    /**
+     * @type {SpiralBurst}
+     */
+    this.spiral_burst = undefined;
 
     /**
      * ID of the score currently playing
      * @type {string}
      */
     this.selected_melody = undefined;
+
+    /**
+     * Animation curves for the currently selected score
+     * @type {AnimationCurves}
+     */
+    this.curves = undefined;
 
     CUES.cues.addEventListener("note-on", (/** @type {CustomEvent} */ e) => {
       this.piano.trigger(e.detail.note.pitch);
@@ -200,37 +224,50 @@ class SoundScene {
       const corner = index.to_world(FIRST_BUTTON_POSITION, BUTTON_STRIDE);
       const rectangle = new Rectangle(corner, MELODY_BUTTON_DIMENSIONS);
       const button = new TouchButton(rectangle);
-      button.events.addEventListener("click", () => {
-        this.selected_melody = descriptor.id;
-        this.piano.reset();
-        BGM.play_score(this.selected_melody);
-      });
+      button.events.addEventListener("click", () =>
+        this.change_score(descriptor.id)
+      );
       return button;
     });
   }
 
+  /**
+   * Select a new score using one of the buttons
+   * @param {string} score_id Selected score ID
+   */
+  change_score(score_id) {
+    this.selected_melody = score_id;
+    this.piano.reset();
+    this.spiral_burst = new SpiralBurst(CURVES[score_id]);
+    BGM.play_score(score_id);
+  }
+
   update() {
     const current_time = TRANSPORT.current_time;
-    ANIM.update(current_time);
+    if (this.selected_melody) {
+      CURVES[this.selected_melody].update(current_time);
+    }
   }
 
   render() {
     const mute = this.mute_button.render();
     const melody_buttons = this.melody_buttons.map((x) => x.debug_render());
     const piano = this.piano.render();
-    const burst = this.spiral_burst.render();
 
-    const primitives = [mute, ...melody_buttons, BUTTON_LABELS, piano, burst];
+    const primitives = [mute, ...melody_buttons, BUTTON_LABELS, piano];
 
-    if (this.selected_melody !== undefined) {
-      const x = ANIM.time * MEASURE_DIMENSIONS.x;
+    if (this.selected_melody) {
+      const burst = this.spiral_burst.render();
+
+      const time = CURVES[this.selected_melody].time;
+      const x = time * MEASURE_DIMENSIONS.x;
       const transform = new Transform(
         new Direction(WIDTH / 2 - x, TIMELINE_TOP)
       );
       const timeline = RENDERED_TIMELINES[this.selected_melody];
       const shifted = xform(timeline, transform);
 
-      return group(...primitives, shifted, CURSOR);
+      return group(...primitives, burst, shifted, CURSOR);
     }
 
     return group(...primitives);

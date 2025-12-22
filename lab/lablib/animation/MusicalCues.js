@@ -1,5 +1,5 @@
-import { Rational } from "../Rational";
-import { SoundSystem } from "../sound/SoundSystem";
+import { Rational } from "../Rational.js";
+import { SoundSystem } from "../sound/SoundSystem.js";
 
 export class MusicalCues {
   /**

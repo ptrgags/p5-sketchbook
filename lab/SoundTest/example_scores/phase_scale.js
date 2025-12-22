@@ -1,3 +1,4 @@
+import { AnimationCurves } from "../../lablib/animation/AnimationCurves.js";
 import { B, C, C3, E, F, G, GS } from "../../lablib/music/pitches.js";
 import { make_scale } from "../../lablib/music/scales.js";
 import {
@@ -34,6 +35,7 @@ const phase_part_midi = map_pitch(SCALE3, phase_part_scale);
 export const SCORE_PHASE_SCALE = new Score({
   parts: [["poly", phase_part_midi]],
 });
-export const CURVES_PHASE_SCALE = SpiralBurst.spiral_burst_curves(
-  phase_part_scale.duration
+
+export const CURVES_PHASE_SCALE = new AnimationCurves(
+  SpiralBurst.spiral_burst_curves(phase_part_scale.duration)
 );
