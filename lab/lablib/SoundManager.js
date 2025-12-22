@@ -153,51 +153,6 @@ export class SoundManager {
   }
 
   /**
-   * Get the current value of a parameter from the currently playing score
-   * @param {string} param_id The ID of the parameter in the score
-   * @returns {number | undefined} The current value of the parameter, or undefined if no value is set
-   */
-  get_param(param_id) {
-    const tween_list = this.score_tweens[this?.current_score]?.[param_id];
-    if (tween_list === undefined || tween_list.length === 0) {
-      return undefined;
-    }
-
-    const time = this.transport_time;
-
-    // Find the last tween that's before or during the current time.
-    let tween = tween_list[0];
-    for (const candidate of tween_list) {
-      if (candidate.start_time > time) {
-        break;
-      }
-
-      tween = candidate;
-    }
-
-    // Get the current value. This uses the fact that the tween holds its
-    // value constant if you use an out of range time
-    return tween.get_value(time);
-  }
-
-  /**
-   * Convert a timeline of ParamCurve to an array of Tween, assuming a start time of 0
-   * @param {import("./music/Timeline.js").Timeline<ParamCurve>} timeline the timeline to convert
-   * @return {Tween[]} The corresponding tweens,
-   */
-  compile_tweens(timeline) {
-    const events = to_events(Rational.ZERO, timeline);
-    return events.map(([curve, start_time]) => {
-      return Tween.scalar(
-        curve.start_value,
-        curve.end_value,
-        start_time.real,
-        curve.duration.real
-      );
-    });
-  }
-
-  /**
    * Compile and save a score
    * @param {string} score_id The score ID to use. This must be the same as
    * the ID used for play_score() later.
@@ -207,6 +162,7 @@ export class SoundManager {
     const compiled = compile_score(this.tone, this.synths, score);
     this.scores[score_id] = compiled;
 
+    // TODO: this should become part of converting score to note on/off events
     const score_events = [];
     for (const [i, [part_id, music]] of score.parts.entries()) {
       score_events.push({
@@ -216,17 +172,6 @@ export class SoundManager {
       });
     }
     this.score_note_events[score_id] = score_events;
-
-    if (score.params) {
-      /**
-       * @type {{[param_id: string]: Tween<number>[]}}
-       */
-      const score_params = {};
-      for (const [param_id, timeline] of score.params) {
-        score_params[param_id] = this.compile_tweens(timeline);
-      }
-      this.score_tweens[score_id] = score_params;
-    }
   }
 
   /**
@@ -323,26 +268,6 @@ export class SoundManager {
       const transport = this.tone.getTransport();
       transport.start(this.tone.now());
       this.transport_playing = true;
-    }
-  }
-
-  /**
-   * Prototype of animations based on note events.
-   * @template T
-   * @param {[T, Rational, Rational][]} events
-   * @param {function(T): void} on_start function to call at the start of a note.
-   * @param {function(T): void} on_end function to call at the end of each note.
-   */
-  schedule_cues(events, on_start, on_end) {
-    const transport = this.tone.getTransport();
-    const tone_draw = this.tone.getDraw();
-    for (const [data, start_time, end_time] of events) {
-      transport.schedule((time) => {
-        tone_draw.schedule(() => on_start(data), time);
-      }, to_tone_time(start_time));
-      transport.schedule((time) => {
-        tone_draw.schedule(() => on_end(data), time);
-      }, to_tone_time(end_time));
     }
   }
 }

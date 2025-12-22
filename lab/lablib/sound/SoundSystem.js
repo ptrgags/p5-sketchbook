@@ -1,5 +1,6 @@
 import { Rational } from "../Rational.js";
 import { to_tone_time } from "../tone_helpers/measure_notation.js";
+import { Transport } from "./Transport.js";
 
 export class SoundSystem {
   /**
@@ -10,6 +11,8 @@ export class SoundSystem {
     this.tone = tone_module;
 
     this.init_requested = false;
+
+    this.transport = new Transport(this);
   }
 
   async init() {

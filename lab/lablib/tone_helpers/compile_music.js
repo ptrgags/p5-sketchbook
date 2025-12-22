@@ -173,14 +173,14 @@ export function compile_music(tone, instrument, music) {
  * Compile a score to a set of ToneJS compatible clips ready for scheduling. This
  * bakes the instruments into the callbacks
  * @param {import("tone")} tone the Tone.js library
- * @param {{[id: string]: import("tone").Synth}} instruments The set of available instruments
+ * @param {Map<string, import("tone").Synth>} instruments The set of available instruments
  * @param {Score<number>} score The score of music
  * @returns {import("../music/Timeline.js").Timeline<ToneClip>} A timeline of music clips ready for scheduling.
  */
 export function compile_score(tone, instruments, score) {
   const clips = [];
   for (const [instrument_id, music] of score.parts) {
-    const clip = compile_music(tone, instruments[instrument_id], music);
+    const clip = compile_music(tone, instruments.get(instrument_id), music);
     clips.push(clip);
   }
 
