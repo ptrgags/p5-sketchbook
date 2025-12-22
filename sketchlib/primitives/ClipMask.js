@@ -1,5 +1,3 @@
-import { Color } from "../Color.js";
-import { Style } from "../Style.js";
 import { Primitive } from "./Primitive.js";
 
 /**
@@ -35,7 +33,9 @@ export class Mask {
   /**
    * Constructor
    * @param  {...Primitive} primitives The primitives to render. They will be
-   * implicitly UNIONed together. These cannot be ClipPrimitive or VectorTangle
+   * implicitly UNIONed together. None of the primitives or their descendants
+   * can be a ClipPrimitive or VectorTangle, or you will end up nesting
+   * beginClip/endClip blocks. This is {@link https://github.com/processing/p5.js/blob/main/src/core/p5.Renderer.js#L107 | disallowed by p5.js}
    */
   constructor(...primitives) {
     this.primitives = primitives;
@@ -78,6 +78,10 @@ export class InvMask extends Mask {
 /**
  * A collection of masks that are intersected together. This is done
  * by making a sequence of beginClip/endClip blocks.
+ *
+ * The fact that subsequent clip paths gives intersection is not at all obvious,
+ * See {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/clip |MDN docs for canvas clip() function}
+ * for where I learned this
  *
  * @implements {ClipMask}
  */
