@@ -83,8 +83,7 @@ for (const [key, score] of Object.entries(SCORES)) {
 const SOUND = new SoundSystem(Tone);
 const TRANSPORT = new Transport(SOUND);
 const BGM = new BackgroundMusic(SOUND, SCORE_INSTRUMENTS, SCORES);
-const ANIM = new AnimationSystem();
-const MUSIC_ANIMATION = new MusicalAnimation(SOUND, ANIM);
+const ANIM = new MusicalAnimation(SOUND, new AnimationSystem());
 
 class MelodyButtonDescriptor {
   /**
@@ -211,6 +210,11 @@ class SoundScene {
     });
   }
 
+  update() {
+    const current_time = TRANSPORT.current_time;
+    ANIM.update(current_time);
+  }
+
   render() {
     const mute = this.mute_button.render();
     const melody_buttons = this.melody_buttons.map((x) => x.debug_render());
@@ -220,7 +224,7 @@ class SoundScene {
     const primitives = [mute, ...melody_buttons, BUTTON_LABELS, piano, burst];
 
     if (this.selected_melody !== undefined) {
-      const x = TRANSPORT.current_time * MEASURE_DIMENSIONS.x;
+      const x = ANIM.time * MEASURE_DIMENSIONS.x;
       const transform = new Transform(
         new Direction(WIDTH / 2 - x, TIMELINE_TOP)
       );
@@ -232,8 +236,6 @@ class SoundScene {
 
     return group(...primitives);
   }
-
-  update() {}
 
   /**
    *

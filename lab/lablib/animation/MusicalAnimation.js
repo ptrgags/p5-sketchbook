@@ -1,6 +1,5 @@
 import { Rational } from "../Rational.js";
 import { SoundSystem } from "../sound/SoundSystem.js";
-import { Transport } from "../sound/Transport.js";
 import { AnimationSystem } from "./AnimationSystem.js";
 
 export class MusicalAnimation {
@@ -17,19 +16,34 @@ export class MusicalAnimation {
   }
 
   /**
-   * Get the underlying
    * @type {EventTarget}
    */
-  get events() {
-    return this.animation.events;
+  get cues() {
+    return this.animation.cues;
   }
 
   /**
-   * Update the current time based on the
-   * @param {Transport} transport
+   * @type {number}
    */
-  update(transport) {
-    this.animation.update(transport.current_time);
+  get time() {
+    return this.animation.time;
+  }
+
+  /**
+   * Get the current value of the given curve
+   * @param {string} curve_id Curve ID
+   * @return {number} The current curve value
+   */
+  get_curve_val(curve_id) {
+    return this.animation.get_curve_val(curve_id);
+  }
+
+  /**
+   * Update the current time, this will affect get_curve() for this frame
+   * @param {number} time The current transport time
+   */
+  update(time) {
+    this.animation.update(time);
   }
 
   /**

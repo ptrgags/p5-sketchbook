@@ -7,6 +7,8 @@ import { A3, C4, D4, E4, G4 } from "../lablib/music/pitches.js";
 import { Melody, Note, Rest, Score } from "../lablib/music/Score.js";
 import { MuteButton } from "../lablib/MuteButton.js";
 import { PlayButtonScene } from "../lablib/PlayButtonScene.js";
+import { BasicSynth } from "../lablib/sound/instruments/BasicSynth.js";
+import { SoundEffects } from "../lablib/sound/SoundEffects.js";
 import { SoundSystem } from "../lablib/sound/SoundSystem.js";
 import { Transport } from "../lablib/sound/Transport.js";
 import { SoundManager } from "../lablib/SoundManager.js";
@@ -37,8 +39,15 @@ const SOUND_MANIFEST = {
   },
 };
 
+const SFX_INSTRUMENTS = {
+  tick: new BasicSynth("square"),
+  bell: new BasicSynth("triangle"),
+};
+const SFX_MUSIC = [];
+
 //@ts-ignore
 const SOUND = new SoundSystem(Tone);
+const SFX = new SoundEffects(SOUND, SFX_INSTRUMENTS, SFX_MUSIC);
 
 class PendulumClockScene {
   /**
@@ -81,19 +90,19 @@ class PendulumClockScene {
       const hour12 = n === 0 ? 12 : n;
       const chime_id = `hour${hour12}`;
 
-      this.sound.play_sfx(chime_id);
+      SFX.play_sfx(chime_id);
       this.next_available_second = WESTMINSTER_SCORE_LENGTHS[chime_id];
     } else if (minutes === 15 && seconds === 0) {
-      this.sound.play_sfx("quarter1");
+      SFX.play_sfx("quarter1");
       this.next_available_second = WESTMINSTER_SCORE_LENGTHS.quarter1;
     } else if (minutes === 30 && seconds === 0) {
-      this.sound.play_sfx("quarter2");
+      SFX.play_sfx("quarter2");
       this.next_available_second = WESTMINSTER_SCORE_LENGTHS.quarter2;
     } else if (minutes === 45 && seconds === 0) {
-      this.sound.play_sfx("quarter3");
+      SFX.play_sfx("quarter3");
       this.next_available_second = WESTMINSTER_SCORE_LENGTHS.quarter3;
     } else if (seconds > Math.ceil(this.next_available_second)) {
-      this.sound.play_sfx("tick_tock");
+      SFX.play_sfx("tick_tock");
       this.next_available_second = -1;
     }
   }

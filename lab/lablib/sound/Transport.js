@@ -1,4 +1,4 @@
-import { SoundSystem } from "./SoundSystem";
+import { SoundSystem } from "./SoundSystem.js";
 
 export class Transport {
   /**

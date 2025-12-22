@@ -1,4 +1,4 @@
-import { ParamCurve } from "../music/ParamCurve";
+import { ParamCurve } from "../music/ParamCurve.js";
 
 export class AnimationSystem {
   constructor() {
