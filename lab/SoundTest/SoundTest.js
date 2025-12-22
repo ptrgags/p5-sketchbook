@@ -12,7 +12,9 @@ import { Transform } from "../../sketchlib/primitives/Transform.js";
 import { Style } from "../../sketchlib/Style.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { MouseInput } from "../lablib/MouseInput.js";
+import { parse_midi_file } from "../lablib/midi/parse_midi.js";
 import { render_score } from "../lablib/music/render_score.js";
+import { Score } from "../lablib/music/Score.js";
 import { MuteButton } from "../lablib/MuteButton.js";
 import { Oklch } from "../lablib/Oklch.js";
 import { PlayButtonScene } from "../lablib/PlayButtonScene.js";
@@ -27,6 +29,9 @@ import {
 } from "./example_scores.js";
 import { Piano } from "./Piano.js";
 import { SpiralBurst } from "./SpiralBurst.js";
+import { score_to_midi } from "../lablib/midi/score_to_midi.js";
+import { midi_to_score } from "../lablib/midi/midi_to_score.js";
+import { encode_midi } from "../lablib/midi/encode_midi.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -43,7 +48,7 @@ const SOUND_MANIFEST = {
 const PART_STYLES = Oklch.gradient(
   new Oklch(0.7, 0.1, 0),
   new Oklch(0.7, 0.1, 350),
-  5
+  16
 ).map(
   (x) =>
     new Style({
@@ -149,6 +154,47 @@ const CURSOR = style(
   Style.DEFAULT_STROKE
 );
 
+/**
+ * Download a generated file
+ * @param {File} file The file to downlowd
+ */
+function download_file(file) {
+  const url = URL.createObjectURL(file);
+
+  const anchor = document.createElement("a");
+  anchor.setAttribute("href", url);
+  anchor.setAttribute("download", file.name);
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+}
+
+function clear_errors() {
+  document.getElementById("errors").innerText = "";
+}
+
+function show_error(message) {
+  document.getElementById("errors").innerText = message;
+}
+
+/**
+ * Import a MIDI file from a file picker
+ * @param {File[]} file_list
+ * @returns {Promise<[string, ArrayBuffer]>} The filename and the buffer containing the MIDI data
+ */
+async function import_midi_file(file_list) {
+  if (file_list.length === 0) {
+    throw new Error("please chose a .mid file");
+  }
+
+  const file = file_list[0];
+  const fname = file.name;
+  const buffer = await file.arrayBuffer();
+
+  return [fname, buffer];
+}
+
 class SoundScene {
   /**
    * Constructor
@@ -197,12 +243,59 @@ class SoundScene {
       const rectangle = new Rectangle(corner, MELODY_BUTTON_DIMENSIONS);
       const button = new TouchButton(rectangle);
       button.events.addEventListener("click", () => {
-        this.selected_melody = descriptor.id;
-        this.piano.reset();
-        this.sound.play_score(this.selected_melody);
+        this.change_score(descriptor.id);
       });
       return button;
     });
+
+    document.getElementById("export").addEventListener("click", (e) => {
+      if (!this.selected_melody) {
+        return;
+      }
+
+      // make MIDI file here
+      const midi = score_to_midi(SOUND_MANIFEST.scores[this.selected_melody]);
+
+      const chunks = encode_midi(midi);
+      const file = new File(chunks, `${this.selected_melody}.mid`, {
+        type: "audio/mid",
+      });
+
+      // download file here
+      download_file(file);
+    });
+
+    document.getElementById("import").addEventListener("input", async (e) => {
+      clear_errors();
+      try {
+        //@ts-ignore
+        const [fname, midi_data] = await import_midi_file(e.target.files);
+        const midi = parse_midi_file(midi_data);
+        const score = midi_to_score(midi);
+        const score_id = `imported_${fname.replace(/\.mid$/i, "")}`;
+        this.sound.register_score(score_id, score);
+        RENDERED_TIMELINES[score_id] = render_score(
+          Point.ORIGIN,
+          score,
+          MEASURE_DIMENSIONS,
+          PART_STYLES
+        );
+        this.change_score(score_id);
+      } catch (err) {
+        console.error(err);
+        show_error(err);
+      }
+    });
+  }
+
+  /**
+   * Stop the current score and play a new one
+   * @param {string} score_id ID of the score to play
+   */
+  change_score(score_id) {
+    this.selected_melody = score_id;
+    this.piano.reset();
+    this.sound.play_score(score_id);
   }
 
   render() {
@@ -294,7 +387,7 @@ export const sketch = (p) => {
   };
 
   p.draw = () => {
-    p.background(0);
+    p.background(127);
 
     scene.update();
 

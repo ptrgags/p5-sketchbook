@@ -15,13 +15,26 @@
       const p5_sketch = new p5(sketch, "sketch");
     </script>
     <link rel="stylesheet" href="../../styles/layout.css" />
+    <style>
+      .errors {
+        color: #df1365;
+      }
+    </style>
   </head>
   <body>
     <sketchbook-navbar></sketchbook-navbar>
     <div class="container">
-      <h1>Sound Test (2025)</h1>
+      <h1>🧪Sound Test (2025)</h1>
       <div class="sketch">
         <canvas id="sketch-canvas" width="500" height="700"></canvas>
+      </div>
+      <div class="controls">
+        <label for="import">Import MIDI (.mid) file</label>
+        <br />
+        <input type="file" name="import" id="import" accept="audio/mid" />
+        <p class="errors" id="errors"></p>
+        <br />
+        <button id="export">Export Current Score</button>
       </div>
       <div class="description">
         <p>
@@ -50,6 +63,11 @@
         <details>
           <summary>Changelog</summary>
           <dl>
+            <dt>2025-12-05</dt>
+            <dd>
+              Added MIDI import/export buttons. Only the most basic MIDI
+              messages are supported.
+            </dd>
             <dt>2025-11-26</dt>
             <dd>
               <p>
