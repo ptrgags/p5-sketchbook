@@ -5,6 +5,7 @@ import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { PointPrimitive } from "../../sketchlib/primitives/PointPrimitive.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
+import { AnimationSystem } from "../lablib/animation/AnimationSystem.js";
 import { N1, N4 } from "../lablib/music/durations.js";
 import { ParamCurve } from "../lablib/music/ParamCurve.js";
 import { Sequential } from "../lablib/music/Timeline.js";
@@ -28,15 +29,15 @@ export class SpiralBurst {
 
   /**
    * Render the circles that make up the burst
-   * @param {SoundManager} sound the sound/animation system
+   * @param {AnimationSystem} anim The animation system
    * @return {GroupPrimitive} the primitives to render
    */
-  render(sound) {
-    const radius_scale = sound.get_param("radius") ?? 0.0;
-    const phase_shift = sound.get_param("phase") ?? 0;
-    const lightness = sound.get_param("lightness") ?? 0.7;
-    const chroma = sound.get_param("chroma") ?? 0.1;
-    const hue = sound.get_param("hue") ?? 130;
+  render(anim) {
+    const radius_scale = anim.get_param("radius") ?? 0.0;
+    const phase_shift = anim.get_param("phase") ?? 0;
+    const lightness = anim.get_param("lightness") ?? 0.7;
+    const chroma = anim.get_param("chroma") ?? 0.1;
+    const hue = anim.get_param("hue") ?? 130;
 
     const color = new Oklch(lightness, chroma, hue);
     const point_style = new Style({

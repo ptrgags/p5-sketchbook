@@ -7,6 +7,7 @@ import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Rectangle } from "./Rectangle.js";
+import { SoundSystem } from "./sound/SoundSystem.js";
 import { ToggleButton, ToggleState } from "./ToggleButton.js";
 
 const SOUND_ON = ToggleState.STATE_A;
@@ -72,7 +73,13 @@ const GROUP_MUTED = group(SPEAKER, SPEAKER_SLASH);
 const GROUP_UNMUTED = SPEAKER;
 
 export class MuteButton {
+  /**
+   * Constructor
+   * @param {SoundSystem} sound The sound system
+   */
   constructor(sound) {
+    this.sound = sound;
+
     this.sound_toggle = new ToggleButton(
       new Rectangle(
         SOUND_TOGGLE_CORNER,
@@ -88,9 +95,7 @@ export class MuteButton {
       (/**@type {CustomEvent}**/ e) => {
         const state = e.detail;
         const sound_on = state === SOUND_ON;
-        this.events.dispatchEvent(
-          new CustomEvent("change", { detail: { sound_on } })
-        );
+        this.sound.toggle_sound(sound_on);
       }
     );
   }

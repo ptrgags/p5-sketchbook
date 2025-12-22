@@ -1,6 +1,11 @@
 import { PlayButton } from "./PlayButton.js";
+import { SoundSystem } from "./sound/SoundSystem.js";
 
 export class PlayButtonScene {
+  /**
+   * Constructor
+   * @param {SoundSystem} sound The sound system
+   */
   constructor(sound) {
     this.sound = sound;
     this.play_button = new PlayButton();

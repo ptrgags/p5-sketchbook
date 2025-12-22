@@ -7,6 +7,8 @@ import { A3, C4, D4, E4, G4 } from "../lablib/music/pitches.js";
 import { Melody, Note, Rest, Score } from "../lablib/music/Score.js";
 import { MuteButton } from "../lablib/MuteButton.js";
 import { PlayButtonScene } from "../lablib/PlayButtonScene.js";
+import { SoundSystem } from "../lablib/sound/SoundSystem.js";
+import { Transport } from "../lablib/sound/Transport.js";
 import { SoundManager } from "../lablib/SoundManager.js";
 import { Clock } from "./Clock.js";
 import { ClockTime } from "./ClockTime.js";
@@ -36,9 +38,13 @@ const SOUND_MANIFEST = {
 };
 
 //@ts-ignore
-const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
+const SOUND = new SoundSystem(Tone);
 
 class PendulumClockScene {
+  /**
+   *
+   * @param {SoundSystem} sound
+   */
   constructor(sound) {
     this.sound = sound;
     this.clock = new Clock();
