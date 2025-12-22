@@ -8,7 +8,7 @@ import { Style } from "../../sketchlib/Style.js";
 import { AnimationSystem } from "../lablib/animation/AnimationSystem.js";
 import { MusicalAnimation } from "../lablib/animation/MusicalAnimation.js";
 import { N1, N4 } from "../lablib/music/durations.js";
-import { ParamCurve } from "../lablib/music/ParamCurve.js";
+import { ParamCurve } from "../lablib/animation/ParamCurve.js";
 import { Sequential } from "../lablib/music/Timeline.js";
 import { Oklch } from "../lablib/Oklch.js";
 import { Rational } from "../lablib/Rational.js";

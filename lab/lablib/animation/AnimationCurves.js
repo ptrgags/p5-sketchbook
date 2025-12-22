@@ -1,9 +1,21 @@
 import { ParamCurve } from "./ParamCurve.js";
 
 export class AnimationSystem {
-  constructor() {
-    this.cues = new EventTarget();
+  /**
+   * Constructor
+   * @param {{[curve_id: string]: import("../music/Timeline").Timeline<ParamCurve>}} curves
+   */
+  constructor(curves) {
     this.time = 0;
+
+    /**
+     * @type {Map<string, AnimationCurve>}
+     */
+    this.curves = new Map();
+
+    for (const [curve_id, curve] of Object.entries(curves)) {
+      this.register_curve(curve_id, curve);
+    }
   }
 
   /**
@@ -15,8 +27,8 @@ export class AnimationSystem {
   }
 
   /**
-   *
-   * @param {string} curve_id ID of the
+   * Add an animation curve
+   * @param {string} curve_id ID to refer to this curve in get_curve_val
    * @param {import("../music/Timeline").Timeline<ParamCurve>} curve
    */
   register_curve(curve_id, curve) {}
@@ -28,14 +40,5 @@ export class AnimationSystem {
    */
   get_curve_val(curve_id) {
     return undefined;
-  }
-
-  /**
-   * Trigger a cue event
-   * @param {string} cue_id ID for this cue event
-   * @param {any} detail Data to include in the cue
-   */
-  cue(cue_id, detail) {
-    this.cues.dispatchEvent(new CustomEvent(cue_id, { detail }));
   }
 }

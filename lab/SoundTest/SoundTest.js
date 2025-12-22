@@ -75,11 +75,6 @@ for (const [key, score] of Object.entries(SCORES)) {
 }
 
 //@ts-ignore
-//const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
-
-//const ANIMATION = new AnimationSystem();
-
-//@ts-ignore
 const SOUND = new SoundSystem(Tone);
 const TRANSPORT = new Transport(SOUND);
 const BGM = new BackgroundMusic(SOUND, SCORE_INSTRUMENTS, SCORES);

@@ -1,4 +1,4 @@
-class ADSR {
+export class ADSR {
   /**
    * Constructor
    * @param {number} attack Attack time in seconds
