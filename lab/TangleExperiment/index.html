@@ -22,7 +22,21 @@
       <div class="sketch">
         <canvas id="sketch-canvas" width="500" height="700"></canvas>
       </div>
-      <div class="description">DESCRIPTION GOES HERE</div>
+      <div class="description">
+        <p>
+          This sketch is a quick test of using clip paths. This will be very
+          useful for rendering tangles like I draw on paper.
+        </p>
+        <p>
+          For example of how clipping is helpful, see how the green wavy pattern
+          is drawn within a region bounded by circular arcs. This shape would be
+          difficult to describe directly. With a clip mask, it's a lot easier.
+          In this case, the mask is created by combining shapes with set
+          operations. In this case, the green region is something along the
+          lines of:
+          <code>INTERSECT(pink_circle, right_half, INVERT(yellow_circle))</code>
+        </p>
+      </div>
     </div>
   </body>
 </html>
