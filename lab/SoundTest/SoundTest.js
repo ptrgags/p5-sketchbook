@@ -17,7 +17,7 @@ import { MouseInput } from "../lablib/MouseInput.js";
 import { render_score } from "../lablib/music/render_score.js";
 import { MuteButton } from "../lablib/MuteButton.js";
 import { Oklch } from "../lablib/Oklch.js";
-import { PlayButtonScene } from "../lablib/PlayButtonScene.js";
+import { PlayButtonScene } from "../lablib/sound/PlayButtonScene.js";
 import { Rectangle } from "../lablib/Rectangle.js";
 import { BackgroundMusic } from "../lablib/sound/BackgroundMusic.js";
 import { BasicSynth } from "../lablib/sound/instruments/BasicSynth.js";

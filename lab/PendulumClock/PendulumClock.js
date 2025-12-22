@@ -6,7 +6,7 @@ import { A3, C4, D4, E4, G4 } from "../lablib/music/pitches.js";
 
 import { Melody, Note, Rest, Score } from "../lablib/music/Score.js";
 import { MuteButton } from "../lablib/MuteButton.js";
-import { PlayButtonScene } from "../lablib/PlayButtonScene.js";
+import { PlayButtonScene } from "../lablib/sound/PlayButtonScene.js";
 import { BasicSynth } from "../lablib/sound/instruments/BasicSynth.js";
 import { SoundEffects } from "../lablib/sound/SoundEffects.js";
 import { SoundSystem } from "../lablib/sound/SoundSystem.js";
@@ -57,15 +57,8 @@ class PendulumClockScene {
   constructor(sound) {
     this.sound = sound;
     this.clock = new Clock();
-    this.mute_button = new MuteButton();
+    this.mute_button = new MuteButton(SOUND);
     this.events = new EventTarget();
-
-    this.mute_button.events.addEventListener(
-      "change",
-      (/** @type {CustomEvent}*/ e) => {
-        this.sound.toggle_sound(e.detail.sound_on);
-      }
-    );
 
     this.next_available_second = -1;
 

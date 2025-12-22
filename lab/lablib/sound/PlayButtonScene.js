@@ -1,5 +1,5 @@
-import { PlayButton } from "./PlayButton.js";
-import { SoundSystem } from "./sound/SoundSystem.js";
+import { PlayButton } from "../PlayButton.js";
+import { SoundSystem } from "./SoundSystem.js";
 
 export class PlayButtonScene {
   /**
