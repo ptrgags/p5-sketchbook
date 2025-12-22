@@ -1,6 +1,7 @@
+import { AnimationCurve } from "./AnimationCurve.js";
 import { ParamCurve } from "./ParamCurve.js";
 
-export class AnimationSystem {
+export class AnimationCurves {
   /**
    * Constructor
    * @param {{[curve_id: string]: import("../music/Timeline").Timeline<ParamCurve>}} curves
@@ -31,14 +32,17 @@ export class AnimationSystem {
    * @param {string} curve_id ID to refer to this curve in get_curve_val
    * @param {import("../music/Timeline").Timeline<ParamCurve>} curve
    */
-  register_curve(curve_id, curve) {}
+  register_curve(curve_id, curve) {
+    const compiled = AnimationCurve.from_timeline(curve);
+    this.curves.set(curve_id, compiled);
+  }
 
   /**
    * Get the value of a parameter
    * @param {string} curve_id ID of the parameter curve
-   * @returns {number | undefined} The value of the parameter, or undefined if not set
+   * @returns {number | undefined} The value of the parameter, or undefined if the parameter is not present
    */
   get_curve_val(curve_id) {
-    return undefined;
+    return this.curves.get(curve_id)?.value(this.time);
   }
 }

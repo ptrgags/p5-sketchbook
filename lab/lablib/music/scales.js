@@ -1,8 +1,15 @@
 import { mod } from "../../../sketchlib/mod.js";
 import { A, AS, B, C, C4, CS, D, DS, E, F, G, GS } from "./pitches.js";
 
-export const MAJOR = [C, D, E, F, G, A, B];
-export const NATURAL_MINOR = [C, D, DS, F, G, GS, AS];
+export const IONIAN = [C, D, E, F, G, A, B];
+export const DORIAN = [D, E, F, G, A, B, C];
+export const PHRYGIAN = [E, F, G, A, B, C, D];
+export const LYDIAN = [F, G, A, B, C, D, E];
+export const MIXOLYDIAN = [G, A, B, C, D, E, F];
+export const AEOLIAN = [A, B, C, D, E, F, G];
+export const LOCRIAN = [B, C, D, E, F, G, A];
+export const MAJOR = IONIAN;
+export const NATURAL_MINOR = AEOLIAN;
 export const HARMONIC_MINOR = [C, D, DS, F, G, GS, B];
 
 export const MAJOR_PENTATONIC = [C, D, E, G, A];

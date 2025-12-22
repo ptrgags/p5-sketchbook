@@ -13,13 +13,19 @@ import { Sequential } from "../lablib/music/Timeline.js";
 import { Oklch } from "../lablib/Oklch.js";
 import { Rational } from "../lablib/Rational.js";
 import { SoundManager } from "../lablib/SoundManager.js";
+import { AnimationCurves } from "../lablib/animation/AnimationCurves.js";
 
 const N = 10;
 const CENTER = new Point(WIDTH / 2, (3 * HEIGHT) / 4);
 const MAX_RADIUS = 50;
 
 export class SpiralBurst {
-  constructor() {
+  /**
+   * Constructor
+   * @param {AnimationCurves} curves Animation curves
+   */
+  constructor(curves) {
+    this.curves = curves;
     this.phases = new Array(N);
     this.radii = new Array(N);
     for (let i = 0; i < N; i++) {
@@ -30,15 +36,14 @@ export class SpiralBurst {
 
   /**
    * Render the circles that make up the burst
-   * @param {MusicalAnimation} anim The animation system
    * @return {GroupPrimitive} the primitives to render
    */
-  render(anim) {
-    const radius_scale = anim.get_curve_val("radius") ?? 0.0;
-    const phase_shift = anim.get_curve_val("phase") ?? 0;
-    const lightness = anim.get_curve_val("lightness") ?? 0.7;
-    const chroma = anim.get_curve_val("chroma") ?? 0.1;
-    const hue = anim.get_curve_val("hue") ?? 130;
+  render() {
+    const radius_scale = this.curves.get_curve_val("radius") ?? 0.0;
+    const phase_shift = this.curves.get_curve_val("phase") ?? 0;
+    const lightness = this.curves.get_curve_val("lightness") ?? 0.7;
+    const chroma = this.curves.get_curve_val("chroma") ?? 0.1;
+    const hue = this.curves.get_curve_val("hue") ?? 130;
 
     const color = new Oklch(lightness, chroma, hue);
     const point_style = new Style({
@@ -64,9 +69,9 @@ export class SpiralBurst {
    * Generate the parameters for a spiral burst, to be used with a score.
    * The animation will loop every measure of 4/4 time.
    * @param {Rational} duration Total duration of the animation
-   * @return {[string, import("../lablib/music/Timeline.js").Timeline<ParamCurve>][]} Parameter entries to include in a score
+   * @return {{[curve_id: string]: import("../lablib/music/Timeline.js").Timeline<ParamCurve>}} Parameter entries to include in a score
    */
-  static spiral_burst_params(duration) {
+  static spiral_burst_curves(duration) {
     const spiral_duration = new Rational(15, 16);
     const burst_duration = Rational.ONE.sub(spiral_duration);
 
@@ -111,12 +116,12 @@ export class SpiralBurst {
       duration
     );
 
-    return [
-      ["radius", radius],
-      ["phase", phase],
-      ["lightness", lightness],
-      ["hue", hue],
-      ["chroma", chroma],
-    ];
+    return {
+      radius,
+      phase,
+      lightness,
+      hue,
+      chroma,
+    };
   }
 }

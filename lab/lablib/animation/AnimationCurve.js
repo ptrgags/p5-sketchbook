@@ -49,11 +49,11 @@ export class AnimationCurve {
   /**
    * Convert a timeline of parameter curves to an AnimationCurve
    * @param {import("../music/Timeline").Timeline<ParamCurve>} timeline Timeline of curves
-   * @returns
+   * @returns {AnimationCurve}
    */
   static from_timeline(timeline) {
     const events = to_events(Rational.ZERO, timeline);
-    return events.map(([curve, start_time]) => {
+    const tweens = events.map(([curve, start_time]) => {
       return Tween.scalar(
         curve.start_value,
         curve.end_value,
@@ -61,5 +61,6 @@ export class AnimationCurve {
         curve.duration.real
       );
     });
+    return new AnimationCurve(tweens);
   }
 }

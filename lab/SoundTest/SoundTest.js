@@ -23,7 +23,6 @@ import { BackgroundMusic } from "../lablib/sound/BackgroundMusic.js";
 import { BasicSynth } from "../lablib/sound/instruments/BasicSynth.js";
 import { SoundSystem } from "../lablib/sound/SoundSystem.js";
 import { Transport } from "../lablib/sound/Transport.js";
-import { SoundManager } from "../lablib/SoundManager.js";
 import { TouchButton } from "../lablib/TouchButton.js";
 import {
   binary_chords,
@@ -33,6 +32,8 @@ import {
 } from "./example_scores.js";
 import { Piano } from "./Piano.js";
 import { SpiralBurst } from "./SpiralBurst.js";
+import { AnimationCurves } from "../lablib/animation/AnimationCurves.js";
+import { MusicalCues } from "../lablib/animation/MusicalCues.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -49,6 +50,8 @@ const SCORES = {
   symmetry_melody: symmetry_melody(),
   binary_progression: binary_chords(),
 };
+
+const CURVE_DEFS = {};
 
 const PART_STYLES = Oklch.gradient(
   new Oklch(0.7, 0.1, 0),
@@ -78,7 +81,8 @@ for (const [key, score] of Object.entries(SCORES)) {
 const SOUND = new SoundSystem(Tone);
 const TRANSPORT = new Transport(SOUND);
 const BGM = new BackgroundMusic(SOUND, SCORE_INSTRUMENTS, SCORES);
-const ANIM = new MusicalAnimation(SOUND, new AnimationSystem());
+const CUES = new MusicalCues(SOUND);
+const ANIM = new AnimationCurves(CURVE_DEFS);
 
 class MelodyButtonDescriptor {
   /**
@@ -177,7 +181,7 @@ class SoundScene {
       3,
       4
     );
-    this.spiral_burst = new SpiralBurst();
+    this.spiral_burst = new SpiralBurst(ANIM);
 
     /**
      * ID of the score currently playing
@@ -185,10 +189,10 @@ class SoundScene {
      */
     this.selected_melody = undefined;
 
-    ANIM.cues.addEventListener("note-on", (/** @type {CustomEvent} */ e) => {
+    CUES.cues.addEventListener("note-on", (/** @type {CustomEvent} */ e) => {
       this.piano.trigger(e.detail.note.pitch);
     });
-    ANIM.cues.addEventListener("note-off", (/** @type {CustomEvent} */ e) => {
+    CUES.cues.addEventListener("note-off", (/** @type {CustomEvent} */ e) => {
       this.piano.release(e.detail.note.pitch);
     });
 
@@ -214,7 +218,7 @@ class SoundScene {
     const mute = this.mute_button.render();
     const melody_buttons = this.melody_buttons.map((x) => x.debug_render());
     const piano = this.piano.render();
-    const burst = this.spiral_burst.render(ANIM);
+    const burst = this.spiral_burst.render();
 
     const primitives = [mute, ...melody_buttons, BUTTON_LABELS, piano, burst];
 

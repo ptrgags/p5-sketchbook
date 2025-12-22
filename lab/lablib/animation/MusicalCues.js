@@ -1,45 +1,15 @@
-export class MusicalAnimation {
+import { Rational } from "../Rational";
+import { SoundSystem } from "../sound/SoundSystem";
+
+export class MusicalCues {
   /**
    * Constructor
    * @param {SoundSystem} sound Sound system for scheduling cues on the music timeline
-   * @param {AnimationSystem} animation Animation system that manages the events
    */
-  constructor(sound, animation) {
+  constructor(sound) {
     this.sound = sound;
-    this.animation = animation;
-
+    this.cues = new EventTarget();
     this.event_ids = [];
-  }
-
-  /**
-   * @type {EventTarget}
-   */
-  get cues() {
-    return this.animation.cues;
-  }
-
-  /**
-   * @type {number}
-   */
-  get time() {
-    return this.animation.time;
-  }
-
-  /**
-   * Get the current value of the given curve
-   * @param {string} curve_id Curve ID
-   * @return {number} The current curve value
-   */
-  get_curve_val(curve_id) {
-    return this.animation.get_curve_val(curve_id);
-  }
-
-  /**
-   * Update the current time, this will affect get_curve() for this frame
-   * @param {number} time The current transport time
-   */
-  update(time) {
-    this.animation.update(time);
   }
 
   /**
@@ -50,7 +20,7 @@ export class MusicalAnimation {
   schedule_cues(cue_id, cues) {
     for (const [start_time, data] of cues) {
       const event_id = this.sound.schedule(start_time, () => {
-        this.animation.cue(cue_id, data);
+        this.cues.dispatchEvent(new CustomEvent(cue_id, { detail: data }));
       });
       this.event_ids.push(event_id);
     }

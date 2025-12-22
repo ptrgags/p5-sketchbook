@@ -117,7 +117,6 @@ export function map_pitch(pitch_func, music) {
  * @template P
  * @typedef {Object} ScoreOptions
  * @property {[string, Music<P>][]} parts The musical parts
- * @property {[string, import("./Timeline.js").Timeline<ParamCurve>][]} [params] Parameter curves for animation in sync with the music. The number is a default value
  */
 
 /**
@@ -135,10 +134,5 @@ export class Score {
      * @type {[string, Music<P>][]}
      */
     this.parts = options.parts;
-    /**
-     * Parameter curves stored in score order
-     * @type {[string, import("./Timeline.js").Timeline<ParamCurve>][]}
-     */
-    this.params = options.params ?? [];
   }
 }
