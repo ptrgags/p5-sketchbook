@@ -1,4 +1,5 @@
 import { Tween } from "../../sketchlib/Tween.js";
+import { PluckEnvelope } from "./envelopes.js";
 import { ParamCurve } from "./music/ParamCurve.js";
 import { Score } from "./music/Score.js";
 import { to_events } from "./music/Timeline.js";
@@ -102,7 +103,9 @@ export class SoundManager {
   init_synths() {
     const sine = new this.tone.Synth({
       oscillator: {
-        type: "sine",
+        type: "fm",
+        width: 3,
+        //type: "sine",
       },
     }).toDestination();
 
@@ -122,12 +125,7 @@ export class SoundManager {
     supersaw.volume.value = -9;
 
     const bell = new this.tone.FMSynth({
-      envelope: {
-        attack: 0,
-        decay: 2.0,
-        sustain: 0.0,
-        release: 2.0,
-      },
+      envelope: new PluckEnvelope(2),
     }).toDestination();
     bell.volume.value = -3;
 
@@ -147,12 +145,7 @@ export class SoundManager {
         decay: 0,
         release: 0,
       },
-      envelope: {
-        attack: 0,
-        decay: 0.05,
-        sustain: 0.0,
-        release: 0.05,
-      },
+      envelope: new PluckEnvelope(0.05),
     }).toDestination();
     tick.volume.value = -2;
 
