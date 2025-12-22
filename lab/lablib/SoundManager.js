@@ -1,5 +1,6 @@
 import { Tween } from "../../sketchlib/Tween.js";
-import { PluckEnvelope } from "./envelopes.js";
+import { DigitalEnvelope, OrganEnvelope, PluckEnvelope } from "./envelopes.js";
+import { basic_synth, fm_synth } from "./instruments.js";
 import { ParamCurve } from "./music/ParamCurve.js";
 import { Score } from "./music/Score.js";
 import { to_events } from "./music/Timeline.js";
@@ -101,18 +102,21 @@ export class SoundManager {
   }
 
   init_synths() {
-    const sine = new this.tone.Synth({
-      oscillator: {
-        type: "fm",
-        width: 3,
-        //type: "sine",
-      },
-    }).toDestination();
+    const sine = basic_synth(
+      this.tone,
+      false,
+      "sine",
+      new OrganEnvelope(1.0)
+    ).toDestination();
+    sine.volume.value = -3;
 
-    const square = new this.tone.Synth({
-      oscillator: { type: "triangle" },
-    }).toDestination();
-    square.volume.value = -3;
+    const square = basic_synth(
+      this.tone,
+      false,
+      "square",
+      new OrganEnvelope(1.0)
+    ).toDestination();
+    square.volume.value = -9;
 
     const poly = new this.tone.PolySynth(this.tone.Synth, {
       oscillator: { type: "fmsine2" },
@@ -129,24 +133,14 @@ export class SoundManager {
     }).toDestination();
     bell.volume.value = -3;
 
-    const tick = new this.tone.FMSynth({
-      modulationIndex: 25,
-      // C:M ratio
-      harmonicity: 2,
-      oscillator: {
-        type: "sine",
-      },
-      modulation: {
-        type: "sine",
-      },
-      modulationEnvelope: {
-        attack: 0,
-        sustain: 1,
-        decay: 0,
-        release: 0,
-      },
-      envelope: new PluckEnvelope(0.05),
-    }).toDestination();
+    const tick = fm_synth(
+      this.tone,
+      false,
+      2,
+      25,
+      new PluckEnvelope(0.05),
+      new DigitalEnvelope()
+    ).toDestination();
     tick.volume.value = -2;
 
     this.synths.sine = sine;

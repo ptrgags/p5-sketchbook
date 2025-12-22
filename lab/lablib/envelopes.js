@@ -22,7 +22,16 @@ export class OrganEnvelope {
   constructor(release) {
     this.attack = 0;
     this.decay = 0;
-    this.sustain = 1.0;
+    this.sustain = 1;
     this.release = release;
+  }
+}
+
+export class DigitalEnvelope {
+  constructor() {
+    this.attack = 0;
+    this.decay = 0;
+    this.sustain = 1;
+    this.release = 0;
   }
 }
