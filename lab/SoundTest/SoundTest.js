@@ -10,34 +10,62 @@ import { TextPrimitive } from "../../sketchlib/primitives/TextPrimitive.js";
 import { TextStyle } from "../../sketchlib/primitives/TextStyle.js";
 import { Transform } from "../../sketchlib/primitives/Transform.js";
 import { Style } from "../../sketchlib/Style.js";
+import { AnimationSystem } from "../lablib/animation/AnimationSystem.js";
+import { MusicalAnimation } from "../lablib/animation/MusicalAnimation.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { MouseInput } from "../lablib/MouseInput.js";
 import { render_score } from "../lablib/music/render_score.js";
 import { MuteButton } from "../lablib/MuteButton.js";
 import { Oklch } from "../lablib/Oklch.js";
-import { PlayButtonScene } from "../lablib/PlayButtonScene.js";
+import { PlayButtonScene } from "../lablib/sound/PlayButtonScene.js";
 import { Rectangle } from "../lablib/Rectangle.js";
-import { SoundManager } from "../lablib/SoundManager.js";
+import { BackgroundMusic } from "../lablib/sound/BackgroundMusic.js";
+import { BasicSynth } from "../lablib/sound/instruments/BasicSynth.js";
+import { SoundSystem } from "../lablib/sound/SoundSystem.js";
+import { Transport } from "../lablib/sound/Transport.js";
 import { TouchButton } from "../lablib/TouchButton.js";
-import {
-  binary_chords,
-  layered_melody,
-  phase_scale,
-  symmetry_melody,
-} from "./example_scores.js";
 import { Piano } from "./Piano.js";
 import { SpiralBurst } from "./SpiralBurst.js";
+import { AnimationCurves } from "../lablib/animation/AnimationCurves.js";
+import { MusicalCues } from "../lablib/animation/MusicalCues.js";
+import {
+  CURVES_LAYERED_MELODY,
+  SCORE_LAYERED_MELODY,
+} from "./example_scores/layered_melody.js";
+import {
+  CURVES_PHASE_SCALE,
+  SCORE_PHASE_SCALE,
+} from "./example_scores/phase_scale.js";
+import {
+  CURVES_SYMMETRY_MELODY,
+  SCORE_SYMMETRY_MELODY,
+} from "./example_scores/symmetry_melody.js";
+import {
+  CURVES_BINARY_CHORDS,
+  SCORE_BINARY_CHORDS,
+} from "./example_scores/binary_chords.js";
 
 const MOUSE = new CanvasMouseHandler();
 
-/**@type {import("../lablib/SoundManager.js").SoundManifest} */
-const SOUND_MANIFEST = {
-  scores: {
-    layered_melody: layered_melody(),
-    phase_scale: phase_scale(),
-    symmetry_melody: symmetry_melody(),
-    binary_progression: binary_chords(),
-  },
+const SCORE_INSTRUMENTS = {
+  sine: new BasicSynth("sine"),
+  tri: new BasicSynth("triangle"),
+  square: new BasicSynth("square"),
+  saw: new BasicSynth("sawtooth"),
+};
+
+const SCORES = {
+  layered_melody: SCORE_LAYERED_MELODY,
+  phase_scale: SCORE_PHASE_SCALE,
+  symmetry_melody: SCORE_SYMMETRY_MELODY,
+  binary_chords: SCORE_BINARY_CHORDS,
+};
+
+const CURVES = {
+  layered_melody: CURVES_LAYERED_MELODY,
+  phase_scale: CURVES_PHASE_SCALE,
+  symmetry_melody: CURVES_SYMMETRY_MELODY,
+  binary_chords: CURVES_BINARY_CHORDS,
 };
 
 const PART_STYLES = Oklch.gradient(
@@ -55,7 +83,7 @@ const PART_STYLES = Oklch.gradient(
 const RENDERED_TIMELINES = {};
 const MEASURE_DIMENSIONS = new Direction(25, 50);
 
-for (const [key, score] of Object.entries(SOUND_MANIFEST.scores)) {
+for (const [key, score] of Object.entries(SCORES)) {
   RENDERED_TIMELINES[key] = render_score(
     Point.ORIGIN,
     score,
@@ -65,7 +93,10 @@ for (const [key, score] of Object.entries(SOUND_MANIFEST.scores)) {
 }
 
 //@ts-ignore
-const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
+const SOUND = new SoundSystem(Tone);
+const TRANSPORT = new Transport(SOUND);
+const BGM = new BackgroundMusic(SOUND, SCORE_INSTRUMENTS, SCORES);
+const CUES = new MusicalCues(SOUND);
 
 class MelodyButtonDescriptor {
   /**
@@ -152,26 +183,23 @@ const CURSOR = style(
 class SoundScene {
   /**
    * Constructor
-   * @param {SoundManager} sound Reference to the sound manager
+   * @param {SoundSystem} sound Reference to the sound system
    * @param {Grid<MelodyButtonDescriptor>} melodies The melodies to create buttons for
    */
   constructor(sound, melodies) {
     this.sound = sound;
-    this.mute_button = new MuteButton();
+    this.mute_button = new MuteButton(sound);
     this.events = new EventTarget();
     this.piano = new Piano(
       new Rectangle(new Point(0, 300), new Direction(500, 300 / 3)),
       3,
       4
     );
-    this.spiral_burst = new SpiralBurst();
 
-    this.mute_button.events.addEventListener(
-      "change",
-      (/** @type {CustomEvent}*/ e) => {
-        this.sound.toggle_sound(e.detail.sound_on);
-      }
-    );
+    /**
+     * @type {SpiralBurst}
+     */
+    this.spiral_burst = undefined;
 
     /**
      * ID of the score currently playing
@@ -179,59 +207,71 @@ class SoundScene {
      */
     this.selected_melody = undefined;
 
-    this.sound.events.addEventListener(
-      "note-on",
-      (/** @type {CustomEvent} */ e) => {
-        this.piano.trigger(e.detail.note.pitch);
-      }
-    );
-    this.sound.events.addEventListener(
-      "note-off",
-      (/** @type {CustomEvent} */ e) => {
-        this.piano.release(e.detail.note.pitch);
-      }
-    );
+    /**
+     * Animation curves for the currently selected score
+     * @type {AnimationCurves}
+     */
+    this.curves = undefined;
+
+    CUES.cues.addEventListener("note-on", (/** @type {CustomEvent} */ e) => {
+      this.piano.trigger(e.detail.note.pitch);
+    });
+    CUES.cues.addEventListener("note-off", (/** @type {CustomEvent} */ e) => {
+      this.piano.release(e.detail.note.pitch);
+    });
 
     this.melody_buttons = melodies.map_array((index, descriptor) => {
       const corner = index.to_world(FIRST_BUTTON_POSITION, BUTTON_STRIDE);
       const rectangle = new Rectangle(corner, MELODY_BUTTON_DIMENSIONS);
       const button = new TouchButton(rectangle);
-      button.events.addEventListener("click", () => {
-        this.selected_melody = descriptor.id;
-        this.piano.reset();
-        this.sound.play_score(this.selected_melody);
-      });
+      button.events.addEventListener("click", () =>
+        this.change_score(descriptor.id)
+      );
       return button;
     });
   }
 
+  /**
+   * Select a new score using one of the buttons
+   * @param {string} score_id Selected score ID
+   */
+  change_score(score_id) {
+    this.selected_melody = score_id;
+    this.piano.reset();
+    this.spiral_burst = new SpiralBurst(CURVES[score_id]);
+    BGM.play_score(score_id);
+  }
+
+  update() {
+    const current_time = TRANSPORT.current_time;
+    if (this.selected_melody) {
+      CURVES[this.selected_melody].update(current_time);
+    }
+  }
+
   render() {
     const mute = this.mute_button.render();
-
     const melody_buttons = this.melody_buttons.map((x) => x.debug_render());
-
     const piano = this.piano.render();
 
-    const burst = this.spiral_burst.render(SOUND);
+    const primitives = [mute, ...melody_buttons, BUTTON_LABELS, piano];
 
-    const primitives = [mute, ...melody_buttons, BUTTON_LABELS, piano, burst];
+    if (this.selected_melody) {
+      const burst = this.spiral_burst.render();
 
-    if (this.selected_melody !== undefined) {
-      const current_time = SOUND.transport_time;
-      const x = current_time * MEASURE_DIMENSIONS.x;
+      const time = CURVES[this.selected_melody].time;
+      const x = time * MEASURE_DIMENSIONS.x;
       const transform = new Transform(
         new Direction(WIDTH / 2 - x, TIMELINE_TOP)
       );
       const timeline = RENDERED_TIMELINES[this.selected_melody];
       const shifted = xform(timeline, transform);
 
-      return group(...primitives, shifted, CURSOR);
+      return group(...primitives, burst, shifted, CURSOR);
     }
 
     return group(...primitives);
   }
-
-  update() {}
 
   /**
    *
@@ -297,9 +337,7 @@ export const sketch = (p) => {
     p.background(0);
 
     scene.update();
-
-    const scene_primitive = scene.render();
-    scene_primitive.draw(p);
+    scene.render().draw(p);
   };
 
   MOUSE.mouse_pressed(p, (input) => {

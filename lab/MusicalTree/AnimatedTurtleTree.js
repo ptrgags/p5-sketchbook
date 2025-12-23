@@ -7,7 +7,7 @@ import { HEIGHT, WIDTH } from "../../sketchlib/dimensions.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Color } from "../../sketchlib/Color.js";
 import { Gap, Sequential } from "../lablib/music/Timeline.js";
-import { ParamCurve } from "../lablib/music/ParamCurve.js";
+import { ParamCurve } from "../lablib/animation/ParamCurve.js";
 import { SoundManager } from "../lablib/SoundManager.js";
 import { is_nearly } from "../../sketchlib/is_nearly.js";
 import { lerp } from "../../sketchlib/lerp.js";

@@ -2,7 +2,7 @@ import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { MouseInput } from "../lablib/MouseInput.js";
 import { MuteButton } from "../lablib/MuteButton.js";
-import { PlayButtonScene } from "../lablib/PlayButtonScene.js";
+import { PlayButtonScene } from "../lablib/sound/PlayButtonScene.js";
 import { SoundManager } from "../lablib/SoundManager.js";
 
 const MOUSE = new CanvasMouseHandler();

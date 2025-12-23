@@ -5,19 +5,27 @@ import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { PointPrimitive } from "../../sketchlib/primitives/PointPrimitive.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
+import { AnimationSystem } from "../lablib/animation/AnimationSystem.js";
+import { MusicalAnimation } from "../lablib/animation/MusicalAnimation.js";
 import { N1, N4 } from "../lablib/music/durations.js";
-import { ParamCurve } from "../lablib/music/ParamCurve.js";
+import { ParamCurve } from "../lablib/animation/ParamCurve.js";
 import { Sequential } from "../lablib/music/Timeline.js";
 import { Oklch } from "../lablib/Oklch.js";
 import { Rational } from "../lablib/Rational.js";
 import { SoundManager } from "../lablib/SoundManager.js";
+import { AnimationCurves } from "../lablib/animation/AnimationCurves.js";
 
 const N = 10;
 const CENTER = new Point(WIDTH / 2, (3 * HEIGHT) / 4);
 const MAX_RADIUS = 50;
 
 export class SpiralBurst {
-  constructor() {
+  /**
+   * Constructor
+   * @param {AnimationCurves} curves Animation curves
+   */
+  constructor(curves) {
+    this.curves = curves;
     this.phases = new Array(N);
     this.radii = new Array(N);
     for (let i = 0; i < N; i++) {
@@ -28,15 +36,14 @@ export class SpiralBurst {
 
   /**
    * Render the circles that make up the burst
-   * @param {SoundManager} sound the sound/animation system
    * @return {GroupPrimitive} the primitives to render
    */
-  render(sound) {
-    const radius_scale = sound.get_param("radius") ?? 0.0;
-    const phase_shift = sound.get_param("phase") ?? 0;
-    const lightness = sound.get_param("lightness") ?? 0.7;
-    const chroma = sound.get_param("chroma") ?? 0.1;
-    const hue = sound.get_param("hue") ?? 130;
+  render() {
+    const radius_scale = this.curves.get_curve_val("radius") ?? 0.0;
+    const phase_shift = this.curves.get_curve_val("phase") ?? 0;
+    const lightness = this.curves.get_curve_val("lightness") ?? 0.7;
+    const chroma = this.curves.get_curve_val("chroma") ?? 0.1;
+    const hue = this.curves.get_curve_val("hue") ?? 130;
 
     const color = new Oklch(lightness, chroma, hue);
     const point_style = new Style({
@@ -62,9 +69,9 @@ export class SpiralBurst {
    * Generate the parameters for a spiral burst, to be used with a score.
    * The animation will loop every measure of 4/4 time.
    * @param {Rational} duration Total duration of the animation
-   * @return {[string, import("../lablib/music/Timeline.js").Timeline<ParamCurve>][]} Parameter entries to include in a score
+   * @return {{[curve_id: string]: import("../lablib/music/Timeline.js").Timeline<ParamCurve>}} Parameter entries to include in a score
    */
-  static spiral_burst_params(duration) {
+  static spiral_burst_curves(duration) {
     const spiral_duration = new Rational(15, 16);
     const burst_duration = Rational.ONE.sub(spiral_duration);
 
@@ -109,12 +116,12 @@ export class SpiralBurst {
       duration
     );
 
-    return [
-      ["radius", radius],
-      ["phase", phase],
-      ["lightness", lightness],
-      ["hue", hue],
-      ["chroma", chroma],
-    ];
+    return {
+      radius,
+      phase,
+      lightness,
+      hue,
+      chroma,
+    };
   }
 }
