@@ -26,7 +26,7 @@ export const CORAL = new CoralTree(
             new Point(125, 550)
           ),
           [
-            //E
+            //E -- movable
             new CoralNode(
               CirclePrimitive.from_two_points(
                 new Point(150, 600),
@@ -37,8 +37,61 @@ export const CORAL = new CoralTree(
             new CoralNode(
               CirclePrimitive.from_two_points(
                 new Point(150, 500),
-                new Point(100, 425)
-              )
+                new Point(100, 475)
+              ),
+              [
+                // G
+                new CoralNode(
+                  new CirclePrimitive(new Point(175, 425), RADIUS_SMALL),
+                  [
+                    // H
+                    new CoralNode(
+                      new CirclePrimitive(new Point(200, 350), RADIUS_BIG)
+                    ),
+                  ]
+                ),
+                // I
+                new CoralNode(
+                  new CirclePrimitive(new Point(125, 400), RADIUS_SMALL),
+                  [
+                    // J
+                    new CoralNode(
+                      CirclePrimitive.from_two_points(
+                        new Point(125, 325),
+                        new Point(125, 350)
+                      ),
+                      [
+                        // K
+                        new CoralNode(
+                          new CirclePrimitive(new Point(125, 275), RADIUS_BIG),
+                          [
+                            // L
+                            new CoralNode(
+                              new CirclePrimitive(
+                                new Point(75, 250),
+                                RADIUS_BIG
+                              )
+                            ),
+                          ]
+                        ),
+                      ]
+                    ),
+                  ]
+                ),
+                // M
+                new CoralNode(
+                  CirclePrimitive.from_two_points(
+                    new Point(75, 400),
+                    new Point(75, 425)
+                  ),
+                  [
+                    // N
+                    new CoralNode(
+                      new CirclePrimitive(new Point(50, 350), RADIUS_BIG)
+                    ),
+                  ]
+                ),
+              ]
             ),
           ]
         ),
