@@ -1,8 +1,12 @@
+import { Direction } from "../pga2d/Direction.js";
 import { Point } from "../pga2d/Point.js";
 import { Color } from "../sketchlib/Color.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
+import { Mask } from "../sketchlib/primitives/ClipMask.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
+import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
+import { VectorTangle } from "../sketchlib/primitives/VectorTangle.js";
 import { Style } from "../sketchlib/Style.js";
 
 /**
@@ -58,6 +62,35 @@ const PANELS = style(
   PANEL_STYLE
 );
 
+const QUARTERS_DIMENSIONS = new Direction(200, 200);
+const QUARTER_HITOMEZASHI = new RectPrimitive(
+  new Point(100, 100),
+  QUARTERS_DIMENSIONS
+);
+const QUARTER_CIRCLE_FAN = new RectPrimitive(
+  new Point(300, 100),
+  QUARTERS_DIMENSIONS
+);
+const QUARTER_BRICK_WALL = new RectPrimitive(
+  new Point(300, 300),
+  QUARTERS_DIMENSIONS
+);
+const QUARTER_PEEK = new RectPrimitive(
+  new Point(100, 300),
+  QUARTERS_DIMENSIONS
+);
+
+const STYLE_QUARTERS = new Style({
+  stroke: Color.MAGENTA,
+  width: 4,
+});
+const QUARTERS = style(
+  [QUARTER_HITOMEZASHI, QUARTER_CIRCLE_FAN, QUARTER_BRICK_WALL, QUARTER_PEEK],
+  STYLE_QUARTERS
+);
+
+const TANGLE = new VectorTangle([[new Mask(PANEL_QUARTERS), QUARTERS]], PANELS);
+
 export const sketch = (p) => {
   p.setup = () => {
     p.createCanvas(
@@ -71,6 +104,6 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0, 0, 63);
 
-    PANELS.draw(p);
+    TANGLE.draw(p);
   };
 };
