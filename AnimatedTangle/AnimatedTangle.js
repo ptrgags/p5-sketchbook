@@ -142,6 +142,7 @@ const ANIMATION_LENGTH = new Rational(8);
 const CURVE_DEFS = {
   ...EYE.make_curves(ANIMATION_LENGTH),
   ...CIRCLE_FAN.make_curves(),
+  ...GEODE.make_curves(ANIMATION_LENGTH),
 };
 
 const ANIM = new AnimationCurves(CURVE_DEFS);
@@ -167,6 +168,7 @@ export const sketch = (p) => {
     ANIM.update(t_sec);
     EYE.update(ANIM);
     CIRCLE_FAN.update(ANIM);
+    GEODE.update(ANIM);
 
     BACKGROUND_STRIPES.draw(p);
     TANGLE.draw(p);
