@@ -10,7 +10,6 @@ import { Transform } from "../../sketchlib/primitives/Transform.js";
 import { Style } from "../../sketchlib/Style.js";
 
 const STYLE_MOUNTAINS = new Style({
-  stroke: Color.BLACK,
   fill: Color.from_hex_code("#555555"),
 });
 
@@ -21,7 +20,7 @@ class Landscape {
      */
     this.mountain_points = [];
 
-    const spacing = WIDTH / n;
+    const spacing = WIDTH / (n - 1);
     const center_y = 50;
 
     for (let i = 0; i < n; i++) {
@@ -32,6 +31,12 @@ class Landscape {
         new Point(i * spacing, center_y + sign * height)
       );
     }
+    // Make it loop
+    const last_point = this.mountain_points[this.mountain_points.length - 1];
+    this.mountain_points[0] = new Point(
+      this.mountain_points[0].x,
+      last_point.y
+    );
 
     const mountain_poly = new PolygonPrimitive(
       [...this.mountain_points, new Point(500, 100), new Point(0, 100)],
