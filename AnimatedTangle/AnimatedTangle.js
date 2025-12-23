@@ -1,4 +1,5 @@
 import { AnimationCurves } from "../lab/lablib/animation/AnimationCurves.js";
+import { ParamCurve } from "../lab/lablib/music/ParamCurve.js";
 import { Oklch } from "../lab/lablib/Oklch.js";
 import { Rational } from "../lab/lablib/Rational.js";
 import { Direction } from "../pga2d/Direction.js";
@@ -17,6 +18,7 @@ import { Style } from "../sketchlib/Style.js";
 import { CIRCLE_FAN } from "./patterns/circle_fan.js";
 import { CORAL_PANEL } from "./patterns/coral.js";
 import { GEODE } from "./patterns/geode.js";
+import { LANDSCAPE } from "./patterns/landscape.js";
 import { EYE } from "./patterns/peek.js";
 import { make_stripes } from "./patterns/stripes.js";
 
@@ -113,6 +115,7 @@ style(
 
 const TANGLE = new VectorTangle(
   [
+    [new Mask(PANEL_LANDSCAPE), LANDSCAPE.render()],
     [new Mask(PANEL_QUARTERS), QUARTERS],
     [new Mask(PANEL_CORAL), CORAL_PANEL],
     [new Mask(PANEL_GEODE), GEODE.render()],
@@ -172,6 +175,8 @@ export const sketch = (p) => {
 
     BACKGROUND_STRIPES.draw(p);
     TANGLE.draw(p);
+
+    LANDSCAPE.update(t_sec / length_sec);
 
     //EYE.eye.draw(p);
 
