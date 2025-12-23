@@ -6,7 +6,11 @@ const SCLERA_COLOR = 255;
 const PUPIL_COLOR = 0;
 
 /**
- * 👀
+ * Everything is better with googly eyes, so let's make it a full-fledged
+ * primitive 👀
+ *
+ * Besides adding whimsy, it's also helpful for visualizing quantities
+ * with a position and orientation
  *
  * @implements {Primitive}
  */
