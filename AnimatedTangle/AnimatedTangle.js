@@ -12,6 +12,7 @@ import { Transform } from "../sketchlib/primitives/Transform.js";
 import { VectorTangle } from "../sketchlib/primitives/VectorTangle.js";
 import { Style } from "../sketchlib/Style.js";
 import { CORAL } from "./patterns/coral.js";
+import { GEODE } from "./patterns/Geode.js";
 
 /**
  * Shorthand for making arrays of points
@@ -106,10 +107,13 @@ const STYLE_CORAL = new Style({
 });
 const COLORED_CORAL = style(CORAL_LAYER, STYLE_CORAL);
 
+// Full scene
+
 const TANGLE = new VectorTangle(
   [
     [new Mask(PANEL_QUARTERS), QUARTERS],
     [new Mask(PANEL_CORAL), COLORED_CORAL],
+    [new Mask(PANEL_GEODE), GEODE.render()],
   ],
   PANELS
 );
