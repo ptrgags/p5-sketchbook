@@ -1,3 +1,4 @@
+import { Oklch } from "../lab/lablib/Oklch.js";
 import { Direction } from "../pga2d/Direction.js";
 import { Point } from "../pga2d/Point.js";
 import { Color } from "../sketchlib/Color.js";
@@ -92,13 +93,25 @@ const QUARTERS = style(
   STYLE_QUARTERS
 );
 
-const TANGLE = new VectorTangle([[new Mask(PANEL_QUARTERS), QUARTERS]], PANELS);
-
 // TEMP
 const CORAL_LAYER = CORAL.render();
 const CORAL_DEBUG = style(
   CORAL.debug_render(),
   new Style({ stroke: Color.RED, width: 2 })
+);
+
+const COLOR_CORAL = new Oklch(0.7617, 0.14, 27.53).to_srgb();
+const STYLE_CORAL = new Style({
+  fill: COLOR_CORAL,
+});
+const COLORED_CORAL = style(CORAL_LAYER, STYLE_CORAL);
+
+const TANGLE = new VectorTangle(
+  [
+    [new Mask(PANEL_QUARTERS), QUARTERS],
+    [new Mask(PANEL_CORAL), COLORED_CORAL],
+  ],
+  PANELS
 );
 
 export const sketch = (p) => {
@@ -115,7 +128,7 @@ export const sketch = (p) => {
     p.background(0, 0, 63);
 
     TANGLE.draw(p);
-    CORAL_LAYER.draw(p);
+    //CORAL_LAYER.draw(p);
     //CORAL_DEBUG.draw(p);
   };
 };
