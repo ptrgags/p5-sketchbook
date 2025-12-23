@@ -165,7 +165,7 @@ export const sketch = (p) => {
     BACKGROUND_STRIPES.draw(p);
     TANGLE.draw(p);
 
-    EYE.eye.draw(p);
+    //EYE.eye.draw(p);
 
     p.push();
     p.fill(255);

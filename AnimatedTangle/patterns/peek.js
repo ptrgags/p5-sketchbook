@@ -93,6 +93,6 @@ class PeekingEye {
   }
 }
 
-const POINT_A = new Point(100, 400);
-const POINT_B = new Point(100 + 50, 400 - 50);
+const POINT_A = new Point(225, 375);
+const POINT_B = new Point(275, 325);
 export const EYE = new PeekingEye(POINT_A, POINT_B);
