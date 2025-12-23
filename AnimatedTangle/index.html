@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../libraries/p5.min.js"
+    ></script>
+    <script type="module">
+      import { sketch } from "./AnimatedTangle.js";
+      import "../sketchlib/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../styles/layout.css" />
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>Animated Tangle (Holiday 2025 🎄)</h1>
+      <div class="sketch">
+        <canvas id="sketch-canvas" width="500" height="700"></canvas>
+      </div>
+      <div class="description">
+        Continuing a past tradition of making a programming project in time for
+        the holidays, I designed this animation. It follows the principles of
+        how I draw on paper. However, since this is done with code, I can
+        animate it.
+      </div>
+    </div>
+  </body>
+</html>
