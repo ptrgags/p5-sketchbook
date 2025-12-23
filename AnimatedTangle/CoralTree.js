@@ -37,7 +37,7 @@ function get_forward_dir(node, parent) {
     return parent.circle.position.sub(node.circle.position).normalize();
   }
 
-  if (node.children.length === 0) {
+  if (node.children.length === 1) {
     return node.circle.position
       .sub(node.children[0].circle.position)
       .normalize();
@@ -102,9 +102,10 @@ export class CoralNode {
     const center = this.circle.position;
     const radius = this.circle.radius;
 
-    const dir_forward = parent
+    const dir_forward = get_forward_dir(this, parent);
+    /*const dir_forward = parent
       ? parent.circle.position.sub(center).normalize()
-      : Direction.DIR_X; // TODO: This is temporary
+      : Direction.DIR_X; // TODO: This is temporary*/
     // in P5's y-down coordinates, rotations are clockwise
     const dir_right = Motor.ROT90.transform_dir(dir_forward);
     const dir_left = dir_right.neg();

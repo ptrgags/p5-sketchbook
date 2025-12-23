@@ -3,9 +3,11 @@ import { Point } from "../pga2d/Point.js";
 import { Color } from "../sketchlib/Color.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { Mask } from "../sketchlib/primitives/ClipMask.js";
+import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
+import { Transform } from "../sketchlib/primitives/Transform.js";
 import { VectorTangle } from "../sketchlib/primitives/VectorTangle.js";
 import { Style } from "../sketchlib/Style.js";
 import { CORAL } from "./patterns/coral.js";
@@ -114,6 +116,6 @@ export const sketch = (p) => {
 
     TANGLE.draw(p);
     CORAL_LAYER.draw(p);
-    CORAL_DEBUG.draw(p);
+    //CORAL_DEBUG.draw(p);
   };
 };
