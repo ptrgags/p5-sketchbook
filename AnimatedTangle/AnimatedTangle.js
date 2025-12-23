@@ -1,8 +1,11 @@
+import { AnimationCurves } from "../lab/lablib/animation/AnimationCurves.js";
 import { Oklch } from "../lab/lablib/Oklch.js";
+import { Rational } from "../lab/lablib/Rational.js";
 import { Direction } from "../pga2d/Direction.js";
 import { Point } from "../pga2d/Point.js";
 import { Color } from "../sketchlib/Color.js";
 import { WIDTH, HEIGHT, SCREEN_CENTER } from "../sketchlib/dimensions.js";
+import { mod } from "../sketchlib/mod.js";
 import { Mask } from "../sketchlib/primitives/ClipMask.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
@@ -12,7 +15,8 @@ import { Transform } from "../sketchlib/primitives/Transform.js";
 import { VectorTangle } from "../sketchlib/primitives/VectorTangle.js";
 import { Style } from "../sketchlib/Style.js";
 import { CORAL_PANEL } from "./patterns/coral.js";
-import { GEODE } from "./patterns/Geode.js";
+import { GEODE } from "./patterns/geode.js";
+import { EYE } from "./patterns/peek.js";
 import { make_stripes } from "./patterns/stripes.js";
 
 /**
@@ -90,10 +94,19 @@ const STYLE_QUARTERS = new Style({
   stroke: Color.MAGENTA,
   width: 4,
 });
-const QUARTERS = style(
+const QUARTERS = new VectorTangle([
+  [new Mask(QUARTER_HITOMEZASHI), style(QUARTER_HITOMEZASHI, STYLE_QUARTERS)],
+  [new Mask(QUARTER_CIRCLE_FAN), style(QUARTER_CIRCLE_FAN, STYLE_QUARTERS)],
+  [new Mask(QUARTER_BRICK_WALL), style(QUARTER_BRICK_WALL, STYLE_QUARTERS)],
+  [new Mask(QUARTER_PEEK), EYE.eye],
+]);
+
+/*
+style(
   [QUARTER_HITOMEZASHI, QUARTER_CIRCLE_FAN, QUARTER_BRICK_WALL, QUARTER_PEEK],
   STYLE_QUARTERS
 );
+*/
 
 // Full scene
 
@@ -122,6 +135,12 @@ const BACKGROUND_STRIPES = style(
   STYLE_BACKGROUND_STRIPES
 );
 
+const ANIMATION_LENGTH = new Rational(8);
+
+const CURVE_DEFS = { ...EYE.make_curves(ANIMATION_LENGTH) };
+
+const ANIM = new AnimationCurves(CURVE_DEFS);
+
 export const sketch = (p) => {
   p.setup = () => {
     p.createCanvas(
@@ -135,9 +154,17 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
+    const frame = p.frameCount;
+    const elapsed_sec = frame / 60;
+    const length_sec = ANIMATION_LENGTH.real;
+    const t_sec = mod(elapsed_sec, length_sec);
+
+    ANIM.update(t_sec);
+    EYE.update(ANIM);
+
     BACKGROUND_STRIPES.draw(p);
     TANGLE.draw(p);
-    //CORAL_LAYER.draw(p);
-    //CORAL_DEBUG.draw(p);
+
+    EYE.eye.draw(p);
   };
 };
