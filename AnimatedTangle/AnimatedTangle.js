@@ -8,6 +8,7 @@ import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { VectorTangle } from "../sketchlib/primitives/VectorTangle.js";
 import { Style } from "../sketchlib/Style.js";
+import { CORAL } from "./patterns/coral.js";
 
 /**
  * Shorthand for making arrays of points
@@ -91,6 +92,13 @@ const QUARTERS = style(
 
 const TANGLE = new VectorTangle([[new Mask(PANEL_QUARTERS), QUARTERS]], PANELS);
 
+// TEMP
+const CORAL_LAYER = CORAL.render();
+const CORAL_DEBUG = style(
+  CORAL.debug_render(),
+  new Style({ stroke: Color.RED, width: 2 })
+);
+
 export const sketch = (p) => {
   p.setup = () => {
     p.createCanvas(
@@ -105,5 +113,7 @@ export const sketch = (p) => {
     p.background(0, 0, 63);
 
     TANGLE.draw(p);
+    CORAL_LAYER.draw(p);
+    CORAL_DEBUG.draw(p);
   };
 };
