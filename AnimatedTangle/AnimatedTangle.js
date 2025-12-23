@@ -11,7 +11,7 @@ import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Transform } from "../sketchlib/primitives/Transform.js";
 import { VectorTangle } from "../sketchlib/primitives/VectorTangle.js";
 import { Style } from "../sketchlib/Style.js";
-import { CORAL } from "./patterns/coral.js";
+import { CORAL_PANEL } from "./patterns/coral.js";
 import { GEODE } from "./patterns/Geode.js";
 
 /**
@@ -94,25 +94,12 @@ const QUARTERS = style(
   STYLE_QUARTERS
 );
 
-// TEMP
-const CORAL_LAYER = CORAL.render();
-const CORAL_DEBUG = style(
-  CORAL.debug_render(),
-  new Style({ stroke: Color.RED, width: 2 })
-);
-
-const COLOR_CORAL = new Oklch(0.7617, 0.14, 27.53).to_srgb();
-const STYLE_CORAL = new Style({
-  fill: COLOR_CORAL,
-});
-const COLORED_CORAL = style(CORAL_LAYER, STYLE_CORAL);
-
 // Full scene
 
 const TANGLE = new VectorTangle(
   [
     [new Mask(PANEL_QUARTERS), QUARTERS],
-    [new Mask(PANEL_CORAL), COLORED_CORAL],
+    [new Mask(PANEL_CORAL), CORAL_PANEL],
     [new Mask(PANEL_GEODE), GEODE.render()],
   ],
   PANELS

@@ -1,12 +1,20 @@
+import { Oklch } from "../../lab/lablib/Oklch.js";
 import { Direction } from "../../pga2d/Direction.js";
 import { Point } from "../../pga2d/Point.js";
+import { Color } from "../../sketchlib/Color.js";
 import { CirclePrimitive } from "../../sketchlib/primitives/CirclePrimitive.js";
+import { InvMask, Mask } from "../../sketchlib/primitives/ClipMask.js";
+import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
+import { group, style } from "../../sketchlib/primitives/shorthand.js";
+import { VectorTangle } from "../../sketchlib/primitives/VectorTangle.js";
+import { Style } from "../../sketchlib/Style.js";
 import { CoralNode, CoralTree } from "../CoralTree.js";
+import { make_stripes } from "./stripes.js";
 
 const RADIUS_BIG = 25;
 const RADIUS_SMALL = RADIUS_BIG / 2;
 
-export const CORAL = new CoralTree(
+const TREE = new CoralTree(
   // Node A in diagram on paper
   new CoralNode(
     CirclePrimitive.from_two_points(new Point(-75, 600), new Point(0, 600)),
@@ -135,3 +143,31 @@ export const CORAL = new CoralTree(
     ]
   )
 );
+
+const CORAL = TREE.render();
+
+const COLOR_CORAL = new Oklch(0.7617, 0.14, 27.53);
+const STYLE_CORAL = new Style({
+  fill: COLOR_CORAL.to_srgb(),
+  stroke: COLOR_CORAL.adjust_lightness(-0.2).to_srgb(),
+  width: 4,
+});
+const COLORED_CORAL = style(CORAL, STYLE_CORAL);
+
+const STRIPES = make_stripes(
+  new Point(150, 500),
+  new Direction(1, -2).normalize(),
+  10,
+  new Direction(550, 600),
+  0
+);
+
+const STYLE_STRIPES = new Style({
+  stroke: new Oklch(0.5386, 0.0765, 147.18).to_srgb(),
+  width: 4,
+});
+
+const GREEN_STRIPES = style(STRIPES, STYLE_STRIPES);
+
+// Somehow InvMask wasn't working... so let's just layer the coral over the stripes
+export const CORAL_PANEL = group(GREEN_STRIPES, COLORED_CORAL);
