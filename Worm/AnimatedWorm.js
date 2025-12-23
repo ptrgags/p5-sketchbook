@@ -3,7 +3,6 @@ import { Color } from "../sketchlib/Color.js";
 import { Motor } from "../pga2d/versors.js";
 import { AnimationChain, Joint } from "../sketchlib/AnimationChain.js";
 import { is_nearly } from "../sketchlib/is_nearly.js";
-import { GooglyEye } from "./GooglyEye.js";
 import { BeziergonPrimitive } from "../sketchlib/primitives/BeziergonPrimitive.js";
 import { CirclePrimitive } from "../sketchlib/primitives/CirclePrimitive.js";
 import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
@@ -12,6 +11,7 @@ import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Direction } from "../pga2d/Direction.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { Point } from "../pga2d/Point.js";
+import { GooglyEye } from "../sketchlib/primitives/GooglyEye.js";
 
 const WORM_SEGMENTS = 60;
 const WORM_SEGMENT_SEPARATION = 30;
@@ -68,6 +68,10 @@ export class AnimatedWorm {
     this.chain = new AnimationChain(joints, WORM_MIN_BEND_ANGLE);
 
     this.look_direction = new Direction(0, 1);
+
+    /**
+     * @type {GooglyEye[]}
+     */
     this.googly = [
       new GooglyEye(
         first_point.add(Direction.DIR_X.scale(-WORM_EYE_SEPARATION)),
@@ -82,6 +86,10 @@ export class AnimatedWorm {
         WORM_PUPIL_RADIUS
       ),
     ];
+    /**
+     * @type {GroupPrimitive}
+     */
+    this.eyes = group(...this.googly);
   }
 
   /**
@@ -231,7 +239,7 @@ export class AnimatedWorm {
     return style(beziergon, WORM_STYLE);
   }
 
-  render_eyes() {
+  update_eyes() {
     const [left, right] = this.googly;
 
     const center = this.chain.get_joint(1).position;
@@ -242,18 +250,18 @@ export class AnimatedWorm {
     const right_position = center.add(right_dir.scale(WORM_EYE_SEPARATION));
     left.update(left_position, this.look_direction);
     right.update(right_position, this.look_direction);
-    return group(left.render(), right.render());
   }
 
   render() {
+    this.update_eyes();
+
     // Who said worms can't be vertibrates?
     const spine = this.render_spine();
     const body = this.render_body();
-    const eyes = this.render_eyes();
     if (DEBUG_SHOW_SPINE) {
-      return group(body, spine, eyes);
+      return group(body, spine, this.eyes);
     } else {
-      return group(body, eyes);
+      return group(body, this.eyes);
     }
   }
 }
