@@ -40,7 +40,7 @@ export class AnimationCurve {
 
     const float_index = this.time_to_index.value(time);
     const tween_index = Math.floor(float_index);
-    const t = time - tween_index; // fract
+    const t = float_index - tween_index; // fract
 
     if (tween_index === this.tweens.length) {
       return this.tweens[tween_index - 1].end_value;

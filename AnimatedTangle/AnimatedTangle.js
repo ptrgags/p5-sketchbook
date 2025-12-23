@@ -14,6 +14,7 @@ import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Transform } from "../sketchlib/primitives/Transform.js";
 import { VectorTangle } from "../sketchlib/primitives/VectorTangle.js";
 import { Style } from "../sketchlib/Style.js";
+import { CIRCLE_FAN } from "./patterns/circle_fan.js";
 import { CORAL_PANEL } from "./patterns/coral.js";
 import { GEODE } from "./patterns/geode.js";
 import { EYE } from "./patterns/peek.js";
@@ -96,7 +97,7 @@ const STYLE_QUARTERS = new Style({
 });
 const QUARTERS = new VectorTangle([
   [new Mask(QUARTER_HITOMEZASHI), style(QUARTER_HITOMEZASHI, STYLE_QUARTERS)],
-  [new Mask(QUARTER_CIRCLE_FAN), style(QUARTER_CIRCLE_FAN, STYLE_QUARTERS)],
+  [new Mask(QUARTER_CIRCLE_FAN), CIRCLE_FAN.render()],
   [new Mask(QUARTER_BRICK_WALL), style(QUARTER_BRICK_WALL, STYLE_QUARTERS)],
   [new Mask(QUARTER_PEEK), EYE.eye],
 ]);
@@ -135,9 +136,13 @@ const BACKGROUND_STRIPES = style(
   STYLE_BACKGROUND_STRIPES
 );
 
+// Needs to be a multiple of 4 seconds due to some of the looping animation
 const ANIMATION_LENGTH = new Rational(8);
 
-const CURVE_DEFS = { ...EYE.make_curves(ANIMATION_LENGTH) };
+const CURVE_DEFS = {
+  ...EYE.make_curves(ANIMATION_LENGTH),
+  ...CIRCLE_FAN.make_curves(),
+};
 
 const ANIM = new AnimationCurves(CURVE_DEFS);
 
@@ -161,6 +166,7 @@ export const sketch = (p) => {
 
     ANIM.update(t_sec);
     EYE.update(ANIM);
+    CIRCLE_FAN.update(ANIM);
 
     BACKGROUND_STRIPES.draw(p);
     TANGLE.draw(p);
@@ -171,9 +177,9 @@ export const sketch = (p) => {
     p.fill(255);
     p.textSize(24);
     p.text(
-      `t:${t_sec.toPrecision(2)}, pos:${ANIM.get_curve_val(
-        "peek_pos"
-      ).toPrecision(2)}, angle:${ANIM.get_curve_val("peek_angle").toPrecision(
+      `t:${t_sec.toPrecision(2)}, r:${ANIM.get_curve_val(
+        "circle_fan"
+      ).toPrecision(3)}, angle:${ANIM.get_curve_val("peek_angle").toPrecision(
         2
       )}`,
       100,
