@@ -40,6 +40,18 @@ describe("PiecewiseLinear", () => {
     expect(result).toBe(0.75);
   });
 
+  it("with value exactly at the last x clamps", () => {
+    const curve = new PiecewiseLinear([
+      [2.5, 0.25],
+      [3.0, 0.5],
+      [5.0, 0.75],
+    ]);
+
+    const result = curve.value(5.0);
+
+    expect(result).toBe(0.75);
+  });
+
   it("with value at point returns correct value", () => {
     const curve = new PiecewiseLinear([
       [2.5, 0.25],

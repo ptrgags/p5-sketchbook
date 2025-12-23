@@ -10,8 +10,6 @@ export class AnimationCurve {
    * @param {Tween[]} tweens
    */
   constructor(tweens) {
-    this.tweens = tweens;
-
     /**
      * @type {[number, number][]}
      */
@@ -23,6 +21,11 @@ export class AnimationCurve {
      * @type {PiecewiseLinear}
      */
     this.time_to_index = new PiecewiseLinear(start_times);
+
+    // Remap the tweens to have a domain of [0, 1] so we can use them with time_to_index
+    this.tweens = tweens.map((x) =>
+      Tween.scalar(x.start_value, x.end_value, 0, 1)
+    );
   }
 
   /**
@@ -54,6 +57,7 @@ export class AnimationCurve {
   static from_timeline(timeline) {
     const events = to_events(Rational.ZERO, timeline);
     const tweens = events.map(([curve, start_time]) => {
+      // Tween is from [start_time, start_time + duration] -> [start_value, end_value]
       return Tween.scalar(
         curve.start_value,
         curve.end_value,

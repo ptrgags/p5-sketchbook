@@ -28,7 +28,7 @@ export class PiecewiseLinear {
       return this.points[0][1];
     }
 
-    if (x > this.points[this.points.length - 1][0]) {
+    if (x >= this.points[this.points.length - 1][0]) {
       return this.points[this.points.length - 1][1];
     }
 

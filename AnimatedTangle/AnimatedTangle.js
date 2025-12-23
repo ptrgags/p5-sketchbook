@@ -166,5 +166,19 @@ export const sketch = (p) => {
     TANGLE.draw(p);
 
     EYE.eye.draw(p);
+
+    p.push();
+    p.fill(255);
+    p.textSize(24);
+    p.text(
+      `t:${t_sec.toPrecision(2)}, pos:${ANIM.get_curve_val(
+        "peek_pos"
+      ).toPrecision(2)}, angle:${ANIM.get_curve_val("peek_angle").toPrecision(
+        2
+      )}`,
+      100,
+      50
+    );
+    p.pop();
   };
 };
