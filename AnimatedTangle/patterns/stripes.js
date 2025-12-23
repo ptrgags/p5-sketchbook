@@ -30,10 +30,54 @@ export function make_stripes(center, dir_forward, spacing, dimensions, phase) {
 
   const lines = [];
   for (let i = 0; i < num_stripes; i++) {
-    const start = corner.add(forward_stride.scale(i));
+    const start = corner
+      .add(forward_stride.scale(i))
+      .add(dir_forward.scale(phase));
     const end = start.add(right_stride);
     lines.push(new LinePrimitive(start, end));
   }
 
   return group(...lines);
+}
+
+export class AnimatedStripes {
+  /**
+   * Constructor
+   * @param {Point} center Center of the pattern
+   * @param {Direction} dir_forward Forward direction, perpendicular to the lines
+   * @param {number} spacing Spacing between lines
+   * @param {Direction} dimensions width and height of an oriented rect centered on center with the y direction facing forward.
+   */
+  constructor(center, dir_forward, spacing, dimensions) {
+    this.center = center;
+    this.dir_forward = dir_forward;
+    this.spacing = spacing;
+    this.dimensions = dimensions;
+
+    /**
+     * @type {GroupPrimitive}
+     */
+    this.primitive = make_stripes(center, dir_forward, spacing, dimensions, 0);
+    this.lines_array = this.primitive.primitives;
+  }
+
+  /**
+   * Update the stripes with a new offset
+   * @param {number} phase Phase amount in [0, 1]
+   */
+  update(phase) {
+    const new_stripes = make_stripes(
+      this.center,
+      this.dir_forward,
+      this.spacing,
+      this.dimensions,
+      phase
+    );
+    this.lines_array.length = 0;
+    this.lines_array.push(...new_stripes);
+  }
+
+  render() {
+    return this.primitive;
+  }
 }

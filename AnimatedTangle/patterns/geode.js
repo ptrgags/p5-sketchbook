@@ -1,15 +1,46 @@
 import { ParamCurve } from "../../lab/lablib/music/ParamCurve.js";
+import { Sequential } from "../../lab/lablib/music/Timeline.js";
 import { Rational } from "../../lab/lablib/Rational.js";
+import { Direction } from "../../pga2d/Direction.js";
 import { Point } from "../../pga2d/Point.js";
 import { Color } from "../../sketchlib/Color.js";
 import { BeziergonPrimitive } from "../../sketchlib/primitives/BeziergonPrimitive.js";
 import { BezierPrimitive } from "../../sketchlib/primitives/BezierPrimitive.js";
+import { CirclePrimitive } from "../../sketchlib/primitives/CirclePrimitive.js";
 import { Mask } from "../../sketchlib/primitives/ClipMask.js";
 import { ClipPrimitive } from "../../sketchlib/primitives/ClipPrimitive.js";
 import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
 import { Primitive } from "../../sketchlib/primitives/Primitive.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
+import { make_stripes } from "./stripes.js";
+
+const STYLE_ROCK = new Style({
+  stroke: Color.from_hex_code("#555555"),
+  width: 4,
+});
+
+const ROCK_CIRCLE = new CirclePrimitive(new Point(350, 600), 150);
+
+const ROCK_STRIPES1 = make_stripes(
+  new Point(350, 600),
+  new Direction(2, 1).normalize(),
+  6,
+  new Direction(400, 400),
+  0
+);
+const ROCK_STRIPES2 = make_stripes(
+  new Point(350, 600),
+  new Direction(2, -1).normalize(),
+  6,
+  new Direction(400, 400),
+  0
+);
+
+const STYLE_INSIDE_GEODE = new Style({
+  fill: Color.from_hex_code("#222222"),
+});
+
 export class Geode {
   /**
    * Constructor
@@ -22,7 +53,17 @@ export class Geode {
     this.stripe_styles = stripe_styles;
 
     const layers = stripe_styles.map((x) => style(boundary, x));
-    this.primitive = new ClipPrimitive(new Mask(boundary), group(...layers));
+    this.primitive = group(
+      new ClipPrimitive(
+        new Mask(ROCK_CIRCLE),
+        group(
+          style(ROCK_STRIPES1, STYLE_ROCK),
+          style(ROCK_STRIPES2, STYLE_ROCK)
+        )
+      ),
+      style(boundary, STYLE_INSIDE_GEODE),
+      new ClipPrimitive(new Mask(boundary), group(...layers))
+    );
   }
 
   update(anim) {
@@ -43,9 +84,15 @@ export class Geode {
    * @returns {{[key:string]: import("../../lab/lablib/music/Timeline.js").Timeline<ParamCurve>}}
    */
   make_curves(duration) {
+    const grow_duration = duration.mul(new Rational(2, 3));
+    const pause_duration = duration.mul(new Rational(1, 3));
+    const max_width = this.stripe_styles[0].stroke_width;
     return {
       // go from 0 to the thickest width
-      geode: new ParamCurve(0, this.stripe_styles[0].stroke_width, duration),
+      geode: new Sequential(
+        new ParamCurve(0, max_width, grow_duration),
+        new ParamCurve(max_width, max_width, pause_duration)
+      ),
     };
   }
 }
@@ -61,18 +108,15 @@ const GEODE_BOUNDARY = new PolygonPrimitive(
   true
 );
 
+const WIDTHS = [8, 7, 6, 5, 4, 3, 2, 1].map((x) => 8 * x);
+
 /**
  * @type {[Color, number][]}
  */
-const GEODE_BANDS = [
-  [Color.RED, 200],
-  [Color.GREEN, 180],
-  [Color.RED, 160],
-  [Color.BLUE, 120],
-  [Color.CYAN, 80],
-  [Color.MAGENTA, 60],
-  [Color.GREEN, 20],
-];
+const GEODE_BANDS = "7b2cbf-3c096c-c77dff-240046-5a189a-10002b-e0aaff-9d4edd"
+  .split("-")
+  .map((x, i) => [Color.from_hex_code(x), WIDTHS[i]]);
+
 const GEODE_STYLES = GEODE_BANDS.map(
   ([color, width]) => new Style({ stroke: color, width })
 );
