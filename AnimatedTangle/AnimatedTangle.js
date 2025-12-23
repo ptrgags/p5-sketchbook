@@ -2,7 +2,7 @@ import { Oklch } from "../lab/lablib/Oklch.js";
 import { Direction } from "../pga2d/Direction.js";
 import { Point } from "../pga2d/Point.js";
 import { Color } from "../sketchlib/Color.js";
-import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
+import { WIDTH, HEIGHT, SCREEN_CENTER } from "../sketchlib/dimensions.js";
 import { Mask } from "../sketchlib/primitives/ClipMask.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
@@ -13,6 +13,7 @@ import { VectorTangle } from "../sketchlib/primitives/VectorTangle.js";
 import { Style } from "../sketchlib/Style.js";
 import { CORAL_PANEL } from "./patterns/coral.js";
 import { GEODE } from "./patterns/Geode.js";
+import { make_stripes } from "./patterns/stripes.js";
 
 /**
  * Shorthand for making arrays of points
@@ -105,6 +106,22 @@ const TANGLE = new VectorTangle(
   PANELS
 );
 
+const STYLE_BACKGROUND_STRIPES = new Style({
+  // navy blue
+  stroke: new Color(0, 0, 63),
+  width: 15,
+});
+const BACKGROUND_STRIPES = style(
+  make_stripes(
+    SCREEN_CENTER,
+    new Direction(1, 1).normalize(),
+    20,
+    new Direction(800, 800),
+    0
+  ),
+  STYLE_BACKGROUND_STRIPES
+);
+
 export const sketch = (p) => {
   p.setup = () => {
     p.createCanvas(
@@ -116,8 +133,9 @@ export const sketch = (p) => {
   };
 
   p.draw = () => {
-    p.background(0, 0, 63);
+    p.background(0);
 
+    BACKGROUND_STRIPES.draw(p);
     TANGLE.draw(p);
     //CORAL_LAYER.draw(p);
     //CORAL_DEBUG.draw(p);
