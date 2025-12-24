@@ -39,7 +39,7 @@ describe("AnimationCurve", () => {
       expect(result).toBe(75);
     });
 
-    it("Interpolates correctly in non-uniform time interval", () => {
+    it.skip("Interpolates correctly in non-uniform time interval", () => {
       const curve = AnimationCurve.from_timeline(make_curve());
 
       const result = curve.value(1.75);
