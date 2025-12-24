@@ -31,7 +31,6 @@ export function make_stripes(center, dir_forward, spacing, dimensions, phase) {
   const lines = [];
   for (let i = 0; i < num_stripes; i++) {
     const start = corner.add(forward_stride.scale(i + phase));
-    //.add(dir_forward.scale(phase));
     const end = start.add(right_stride);
     lines.push(new LinePrimitive(start, end));
   }
