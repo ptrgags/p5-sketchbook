@@ -1,4 +1,5 @@
 import { Tween } from "../../sketchlib/Tween.js";
+import { BasicSynth } from "./instruments/BasicSynth.js";
 import { ParamCurve } from "./music/ParamCurve.js";
 import { Score } from "./music/Score.js";
 import { to_events } from "./music/Timeline.js";
@@ -100,11 +101,9 @@ export class SoundManager {
   }
 
   init_synths() {
-    const sine = new this.tone.Synth({
-      oscillator: {
-        type: "sine",
-      },
-    }).toDestination();
+    const sine = new BasicSynth("sine");
+    sine.init_mono(this.tone);
+    sine.volume = -3;
 
     const square = new this.tone.Synth({
       oscillator: { type: "triangle" },
@@ -156,7 +155,22 @@ export class SoundManager {
     }).toDestination();
     tick.volume.value = -2;
 
-    this.synths.sine = sine;
+    // attack
+    /*
+: 
+0.005
+decay
+: 
+0.1
+release
+: 
+1
+sustain
+: 
+0.3*/
+    console.log(sine.envelope);
+
+    this.synths.sine = sine.synth;
     this.synths.square = square;
     this.synths.poly = poly;
     this.synths.supersaw = supersaw;
