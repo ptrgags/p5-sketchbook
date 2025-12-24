@@ -1,10 +1,10 @@
-import { AnimationCurves } from "../../lab/lablib/animation/AnimationCurves.js";
-import { ParamCurve } from "../../lab/lablib/animation/ParamCurve.js";
-import { Gap, Sequential } from "../../lab/lablib/music/Timeline.js";
-import { Rational } from "../../lab/lablib/Rational.js";
-import { Direction } from "../../pga2d/Direction.js";
-import { Point } from "../../pga2d/Point.js";
-import { GooglyEye } from "../../sketchlib/primitives/GooglyEye.js";
+import { AnimationCurves } from "../../lablib/animation/AnimationCurves.js";
+import { ParamCurve } from "../../lablib/animation/ParamCurve.js";
+import { Gap, Sequential } from "../../lablib/music/Timeline.js";
+import { Rational } from "../../lablib/Rational.js";
+import { Direction } from "../../../pga2d/Direction.js";
+import { Point } from "../../../pga2d/Point.js";
+import { GooglyEye } from "../../../sketchlib/primitives/GooglyEye.js";
 
 const SCLERA_RADIUS = 20;
 const PUPIL_RADIUS = 10;
@@ -45,7 +45,7 @@ class PeekingEye {
 
   /**
    * @param {Rational} duration Duration of the whole animation in seconds
-   * @returns {{[curve_id: string]: import("../../lab/lablib/music/Timeline").Timeline<ParamCurve>}}
+   * @returns {{[curve_id: string]: import("../../lablib/music/Timeline.js").Timeline<ParamCurve>}}
    */
   make_curves(duration) {
     // 1 second per frame

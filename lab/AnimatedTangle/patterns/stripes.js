@@ -1,9 +1,9 @@
-import { Direction } from "../../pga2d/Direction.js";
-import { Point } from "../../pga2d/Point.js";
-import { Motor } from "../../pga2d/versors.js";
-import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
-import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
-import { group } from "../../sketchlib/primitives/shorthand.js";
+import { Direction } from "../../../pga2d/Direction.js";
+import { Point } from "../../../pga2d/Point.js";
+import { Motor } from "../../../pga2d/versors.js";
+import { GroupPrimitive } from "../../../sketchlib/primitives/GroupPrimitive.js";
+import { LinePrimitive } from "../../../sketchlib/primitives/LinePrimitive.js";
+import { group } from "../../../sketchlib/primitives/shorthand.js";
 
 /**
  * Make a set of parallel stripes

@@ -1,18 +1,18 @@
-import { ParamCurve } from "../../lab/lablib/music/ParamCurve.js";
-import { Sequential } from "../../lab/lablib/music/Timeline.js";
-import { Rational } from "../../lab/lablib/Rational.js";
-import { Direction } from "../../pga2d/Direction.js";
-import { Point } from "../../pga2d/Point.js";
-import { Color } from "../../sketchlib/Color.js";
-import { BeziergonPrimitive } from "../../sketchlib/primitives/BeziergonPrimitive.js";
-import { BezierPrimitive } from "../../sketchlib/primitives/BezierPrimitive.js";
-import { CirclePrimitive } from "../../sketchlib/primitives/CirclePrimitive.js";
-import { Mask } from "../../sketchlib/primitives/ClipMask.js";
-import { ClipPrimitive } from "../../sketchlib/primitives/ClipPrimitive.js";
-import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
-import { Primitive } from "../../sketchlib/primitives/Primitive.js";
-import { group, style } from "../../sketchlib/primitives/shorthand.js";
-import { Style } from "../../sketchlib/Style.js";
+import { ParamCurve } from "../../lablib/music/ParamCurve.js";
+import { Sequential } from "../../lablib/music/Timeline.js";
+import { Rational } from "../../lablib/Rational.js";
+import { Direction } from "../../../pga2d/Direction.js";
+import { Point } from "../../../pga2d/Point.js";
+import { Color } from "../../../sketchlib/Color.js";
+import { BeziergonPrimitive } from "../../../sketchlib/primitives/BeziergonPrimitive.js";
+import { BezierPrimitive } from "../../../sketchlib/primitives/BezierPrimitive.js";
+import { CirclePrimitive } from "../../../sketchlib/primitives/CirclePrimitive.js";
+import { Mask } from "../../../sketchlib/primitives/ClipMask.js";
+import { ClipPrimitive } from "../../../sketchlib/primitives/ClipPrimitive.js";
+import { PolygonPrimitive } from "../../../sketchlib/primitives/PolygonPrimitive.js";
+import { Primitive } from "../../../sketchlib/primitives/Primitive.js";
+import { group, style } from "../../../sketchlib/primitives/shorthand.js";
+import { Style } from "../../../sketchlib/Style.js";
 import { make_stripes } from "./stripes.js";
 
 const STYLE_ROCK = new Style({
@@ -81,7 +81,7 @@ export class Geode {
   /**
    *
    * @param {Rational} duration
-   * @returns {{[key:string]: import("../../lab/lablib/music/Timeline.js").Timeline<ParamCurve>}}
+   * @returns {{[key:string]: import("../../lablib/music/Timeline.js").Timeline<ParamCurve>}}
    */
   make_curves(duration) {
     const grow_duration = duration.mul(new Rational(2, 3));

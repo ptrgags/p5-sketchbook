@@ -1,13 +1,13 @@
-import { Oklch } from "../../lab/lablib/Oklch.js";
-import { Direction } from "../../pga2d/Direction.js";
-import { Point } from "../../pga2d/Point.js";
-import { Color } from "../../sketchlib/Color.js";
-import { CirclePrimitive } from "../../sketchlib/primitives/CirclePrimitive.js";
-import { InvMask, Mask } from "../../sketchlib/primitives/ClipMask.js";
-import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
-import { group, style } from "../../sketchlib/primitives/shorthand.js";
-import { VectorTangle } from "../../sketchlib/primitives/VectorTangle.js";
-import { Style } from "../../sketchlib/Style.js";
+import { Oklch } from "../../lablib/Oklch.js";
+import { Direction } from "../../../pga2d/Direction.js";
+import { Point } from "../../../pga2d/Point.js";
+import { Color } from "../../../sketchlib/Color.js";
+import { CirclePrimitive } from "../../../sketchlib/primitives/CirclePrimitive.js";
+import { InvMask, Mask } from "../../../sketchlib/primitives/ClipMask.js";
+import { RectPrimitive } from "../../../sketchlib/primitives/RectPrimitive.js";
+import { group, style } from "../../../sketchlib/primitives/shorthand.js";
+import { VectorTangle } from "../../../sketchlib/primitives/VectorTangle.js";
+import { Style } from "../../../sketchlib/Style.js";
 import { CoralNode, CoralTree } from "../CoralTree.js";
 import { AnimatedStripes, make_stripes } from "./stripes.js";
 
