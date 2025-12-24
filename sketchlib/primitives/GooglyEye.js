@@ -58,6 +58,7 @@ export class GooglyEye {
     p.noStroke();
     // Draw the white of the eye
     p.fill(SCLERA_COLOR);
+    p.stroke(0);
     p.circle(this.position.x, this.position.y, 2 * this.sclera_radius);
 
     // Draw the pupil

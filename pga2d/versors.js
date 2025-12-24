@@ -77,6 +77,7 @@ export class Motor {
     return `Motor(${this.even})`;
   }
 }
+Motor.ROT90 = Object.freeze(Motor.rotation(Point.ORIGIN, Math.PI / 2));
 
 /**
  * A flector is an odd versor. This includes reflections and glide reflections
