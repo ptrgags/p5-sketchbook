@@ -9,7 +9,7 @@ import { group, style } from "../../sketchlib/primitives/shorthand.js";
 import { VectorTangle } from "../../sketchlib/primitives/VectorTangle.js";
 import { Style } from "../../sketchlib/Style.js";
 import { CoralNode, CoralTree } from "../CoralTree.js";
-import { make_stripes } from "./stripes.js";
+import { AnimatedStripes, make_stripes } from "./stripes.js";
 
 const RADIUS_BIG = 25;
 const RADIUS_SMALL = RADIUS_BIG / 2;
@@ -154,12 +154,11 @@ const STYLE_CORAL = new Style({
 });
 const COLORED_CORAL = style(CORAL, STYLE_CORAL);
 
-const STRIPES = make_stripes(
+export const CORAL_STRIPES = new AnimatedStripes(
   new Point(150, 500),
-  new Direction(1, -2).normalize(),
+  new Direction(-1, 2).normalize(),
   10,
-  new Direction(550, 600),
-  0
+  new Direction(550, 600)
 );
 
 const STYLE_STRIPES = new Style({
@@ -167,7 +166,7 @@ const STYLE_STRIPES = new Style({
   width: 4,
 });
 
-const GREEN_STRIPES = style(STRIPES, STYLE_STRIPES);
+const GREEN_STRIPES = style(CORAL_STRIPES.render(), STYLE_STRIPES);
 
 // Somehow InvMask wasn't working... so let's just layer the coral over the stripes
 export const CORAL_PANEL = group(GREEN_STRIPES, COLORED_CORAL);

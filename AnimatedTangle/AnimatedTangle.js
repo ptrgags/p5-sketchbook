@@ -16,7 +16,7 @@ import { Transform } from "../sketchlib/primitives/Transform.js";
 import { VectorTangle } from "../sketchlib/primitives/VectorTangle.js";
 import { Style } from "../sketchlib/Style.js";
 import { CIRCLE_FAN } from "./patterns/circle_fan.js";
-import { CORAL_PANEL } from "./patterns/coral.js";
+import { CORAL_PANEL, CORAL_STRIPES } from "./patterns/coral.js";
 import { GEODE } from "./patterns/geode.js";
 import { LANDSCAPE } from "./patterns/landscape.js";
 import { EYE } from "./patterns/peek.js";
@@ -168,6 +168,10 @@ export const sketch = (p) => {
     const length_sec = ANIMATION_LENGTH.real;
     const t_sec = mod(elapsed_sec, length_sec);
 
+    const t_normalized = t_sec / length_sec;
+    LANDSCAPE.update(t_sec / length_sec);
+    CORAL_STRIPES.update(mod(5 * t_normalized, 1.0));
+
     ANIM.update(t_sec);
     EYE.update(ANIM);
     CIRCLE_FAN.update(ANIM);
@@ -175,8 +179,6 @@ export const sketch = (p) => {
 
     BACKGROUND_STRIPES.draw(p);
     TANGLE.draw(p);
-
-    LANDSCAPE.update(t_sec / length_sec);
 
     //EYE.eye.draw(p);
 
