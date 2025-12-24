@@ -52,5 +52,7 @@ export class ADSR {
     return new ADSR(NEAR_INSTANT, 0, 1, release);
   }
 }
-// Default is a digital envelope - instant attack and release
+// Default is an organ envelope
 ADSR.DEFAULT = Object.freeze(ADSR.organ(1));
+// (near instant) attack, sustain at max level, (near) instant release
+ADSR.DIGITAL = Object.freeze(new ADSR(NEAR_INSTANT, 0, 1, NEAR_INSTANT));

@@ -1,4 +1,5 @@
 import { Tween } from "../../sketchlib/Tween.js";
+import { ADSR } from "./instruments/ADSR.js";
 import { BasicSynth } from "./instruments/BasicSynth.js";
 import { ParamCurve } from "./music/ParamCurve.js";
 import { Score } from "./music/Score.js";
@@ -105,10 +106,9 @@ export class SoundManager {
     sine.init_mono(this.tone);
     sine.volume = -3;
 
-    const square = new this.tone.Synth({
-      oscillator: { type: "triangle" },
-    }).toDestination();
-    square.volume.value = -3;
+    const square = new BasicSynth("square");
+    square.init_mono(this.tone);
+    square.volume = -12;
 
     const poly = new this.tone.PolySynth(this.tone.Synth, {
       oscillator: { type: "fmsine2" },
@@ -121,12 +121,7 @@ export class SoundManager {
     supersaw.volume.value = -9;
 
     const bell = new this.tone.FMSynth({
-      envelope: {
-        attack: 0,
-        decay: 2.0,
-        sustain: 0.0,
-        release: 2.0,
-      },
+      envelope: ADSR.pluck(2.0),
     }).toDestination();
     bell.volume.value = -3;
 
@@ -140,38 +135,13 @@ export class SoundManager {
       modulation: {
         type: "sine",
       },
-      modulationEnvelope: {
-        attack: 0,
-        sustain: 1,
-        decay: 0,
-        release: 0,
-      },
-      envelope: {
-        attack: 0,
-        decay: 0.05,
-        sustain: 0.0,
-        release: 0.05,
-      },
+      modulationEnvelope: ADSR.DIGITAL,
+      envelope: ADSR.pluck(0.05),
     }).toDestination();
     tick.volume.value = -2;
 
-    // attack
-    /*
-: 
-0.005
-decay
-: 
-0.1
-release
-: 
-1
-sustain
-: 
-0.3*/
-    console.log(sine.envelope);
-
     this.synths.sine = sine.synth;
-    this.synths.square = square;
+    this.synths.square = square.synth;
     this.synths.poly = poly;
     this.synths.supersaw = supersaw;
     this.synths.bell = bell;
