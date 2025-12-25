@@ -10,6 +10,7 @@ import { TextPrimitive } from "../../sketchlib/primitives/TextPrimitive.js";
 import { TextStyle } from "../../sketchlib/primitives/TextStyle.js";
 import { Transform } from "../../sketchlib/primitives/Transform.js";
 import { Style } from "../../sketchlib/Style.js";
+import { AnimationCurves } from "../lablib/animation/AnimationCurves.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { MouseInput } from "../lablib/MouseInput.js";
 import { render_score } from "../lablib/music/render_score.js";
@@ -63,6 +64,15 @@ for (const [key, score] of Object.entries(SOUND_MANIFEST.scores)) {
     PART_STYLES
   );
 }
+
+/**
+ * @type {{[score_id: string]: AnimationCurves}}
+ */
+const ANIM = {};
+for (const [score_id, score] of Object.entries(SOUND_MANIFEST.scores)) {
+  ANIM[score_id] = score.curves;
+}
+const DEFAULT_CURVES = new AnimationCurves({});
 
 //@ts-ignore
 const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
@@ -205,30 +215,37 @@ class SoundScene {
     });
   }
 
-  render() {
-    const mute = this.mute_button.render();
-
-    const melody_buttons = this.melody_buttons.map((x) => x.debug_render());
-
-    const piano = this.piano.render();
-
-    const burst = this.spiral_burst.render(SOUND);
-
-    const primitives = [mute, ...melody_buttons, BUTTON_LABELS, piano, burst];
-
-    if (this.selected_melody !== undefined) {
-      const current_time = SOUND.transport_time;
-      const x = current_time * MEASURE_DIMENSIONS.x;
-      const transform = new Transform(
-        new Direction(WIDTH / 2 - x, TIMELINE_TOP)
-      );
-      const timeline = RENDERED_TIMELINES[this.selected_melody];
-      const shifted = xform(timeline, transform);
-
-      return group(...primitives, shifted, CURSOR);
+  render_timeline(time) {
+    if (this.selected_melody === undefined) {
+      return GroupPrimitive.EMPTY;
     }
 
-    return group(...primitives);
+    const x = time * MEASURE_DIMENSIONS.x;
+    const transform = new Transform(new Direction(WIDTH / 2 - x, TIMELINE_TOP));
+    const timeline = RENDERED_TIMELINES[this.selected_melody];
+    return xform(timeline, transform);
+  }
+
+  render() {
+    const current_time = SOUND.transport_time;
+    const animation = ANIM[this.selected_melody] ?? DEFAULT_CURVES;
+    animation.update(current_time);
+
+    const mute = this.mute_button.render();
+    const melody_buttons = this.melody_buttons.map((x) => x.debug_render());
+    const piano = this.piano.render();
+    const burst = this.spiral_burst.render(animation);
+    const timeline = this.render_timeline(current_time);
+
+    return group(
+      mute,
+      ...melody_buttons,
+      BUTTON_LABELS,
+      piano,
+      timeline,
+      CURSOR,
+      burst
+    );
   }
 
   update() {}

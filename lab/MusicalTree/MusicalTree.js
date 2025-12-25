@@ -50,8 +50,12 @@ class SoundScene {
   }
 
   render() {
+    const current_time = SOUND.transport_time;
+    const curves = ANIMATION.score.curves;
+    curves.update(current_time);
+
     const mute = this.mute_button.render();
-    const animation = ANIMATION.render(this.sound);
+    const animation = ANIMATION.render(curves);
     return group(animation, mute);
   }
 

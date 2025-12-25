@@ -4,10 +4,37 @@ import { Rational } from "../Rational.js";
 import { ParamCurve } from "./ParamCurve.js";
 import { PiecewiseLinear } from "./PiecewiseLinear.js";
 
+/**
+ * Iterate over a collection of tweens, filling gaps with
+ * constant tweens, holding the end value of the previous tween.
+ * @param {Tween<number>[]} tweens List of tween
+ * @return {Generator<Tween<number>>}
+ */
+function* fill_gaps(tweens) {
+  for (let i = 1; i < tweens.length; i++) {
+    const before = tweens[i - 1];
+    const after = tweens[i];
+    yield before;
+    if (before.end_time < after.start_time) {
+      yield Tween.scalar(
+        before.end_value,
+        before.end_value,
+        before.end_time,
+        after.start_time - before.end_time
+      );
+    }
+  }
+  yield tweens[tweens.length - 1];
+}
+
+/**
+ * Single animation curve - a function from the current animation
+ * time (e.g. elapsed time in seconds, musical time in measures)
+ */
 export class AnimationCurve {
   /**
    * Constructor
-   * @param {Tween[]} tweens
+   * @param {Tween<number>[]} tweens
    */
   constructor(tweens) {
     /**
@@ -65,6 +92,8 @@ export class AnimationCurve {
         curve.duration.real
       );
     });
-    return new AnimationCurve(tweens);
+    const with_holds = [...fill_gaps(tweens)];
+
+    return new AnimationCurve(with_holds);
   }
 }

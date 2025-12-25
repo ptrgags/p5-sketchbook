@@ -1,5 +1,3 @@
-import { Tween } from "../../sketchlib/Tween.js";
-import { ParamCurve } from "./music/ParamCurve.js";
 import { Score } from "./music/Score.js";
 import { to_events } from "./music/Timeline.js";
 import { Rational } from "./Rational.js";
@@ -41,12 +39,6 @@ export class SoundManager {
     this.current_score = undefined;
     this.scores = {};
     this.score_note_events = {};
-    /**
-     * Compiled tweens stored by (score_id, param_id)
-     * @private
-     * @type {{[score_id: string]: {[param_id: string]: Tween<number>[]}}}
-     */
-    this.score_tweens = {};
     this.sfx = {};
 
     /**
@@ -181,51 +173,6 @@ export class SoundManager {
   }
 
   /**
-   * Get the current value of a parameter from the currently playing score
-   * @param {string} param_id The ID of the parameter in the score
-   * @returns {number | undefined} The current value of the parameter, or undefined if no value is set
-   */
-  get_param(param_id) {
-    const tween_list = this.score_tweens[this?.current_score]?.[param_id];
-    if (tween_list === undefined || tween_list.length === 0) {
-      return undefined;
-    }
-
-    const time = this.transport_time;
-
-    // Find the last tween that's before or during the current time.
-    let tween = tween_list[0];
-    for (const candidate of tween_list) {
-      if (candidate.start_time > time) {
-        break;
-      }
-
-      tween = candidate;
-    }
-
-    // Get the current value. This uses the fact that the tween holds its
-    // value constant if you use an out of range time
-    return tween.get_value(time);
-  }
-
-  /**
-   * Convert a timeline of ParamCurve to an array of Tween, assuming a start time of 0
-   * @param {import("./music/Timeline.js").Timeline<ParamCurve>} timeline the timeline to convert
-   * @return {Tween[]} The corresponding tweens,
-   */
-  compile_tweens(timeline) {
-    const events = to_events(Rational.ZERO, timeline);
-    return events.map(([curve, start_time]) => {
-      return Tween.scalar(
-        curve.start_value,
-        curve.end_value,
-        start_time.real,
-        curve.duration.real
-      );
-    });
-  }
-
-  /**
    * Compile and save a score
    * @param {string} score_id The score ID to use. This must be the same as
    * the ID used for play_score() later.
@@ -244,17 +191,6 @@ export class SoundManager {
       });
     }
     this.score_note_events[score_id] = score_events;
-
-    if (score.params) {
-      /**
-       * @type {{[param_id: string]: Tween<number>[]}}
-       */
-      const score_params = {};
-      for (const [param_id, timeline] of score.params) {
-        score_params[param_id] = this.compile_tweens(timeline);
-      }
-      this.score_tweens[score_id] = score_params;
-    }
   }
 
   /**
