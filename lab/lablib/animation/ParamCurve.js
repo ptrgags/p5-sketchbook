@@ -15,4 +15,9 @@ export class ParamCurve {
   }
 }
 
+/**
+ * Alias for Gap to make it clearer that we're holding the
+ * previous animation curve value (or the first/last value)
+ * if the hold appears at the ends of the timeline.
+ */
 export const Hold = Gap;
