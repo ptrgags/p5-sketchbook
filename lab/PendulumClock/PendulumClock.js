@@ -86,9 +86,7 @@ class PendulumClockScene {
     } else if (minutes === 45 && seconds === 0) {
       this.sound.play_sfx("quarter3");
       this.next_available_second = WESTMINSTER_SCORE_LENGTHS.quarter3;
-    } /*else if (seconds === 0) {
-      this.sound.play_sfx("quarter1");
-    } */ else if (seconds > Math.ceil(this.next_available_second)) {
+    } else if (seconds > Math.ceil(this.next_available_second)) {
       this.sound.play_sfx("tick_tock");
       this.next_available_second = -1;
     }
