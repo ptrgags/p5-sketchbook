@@ -1,5 +1,5 @@
 import { AnimationCurves } from "../../lablib/animation/AnimationCurves.js";
-import { ParamCurve } from "../../lablib/animation/ParamCurve.js";
+import { Hold, ParamCurve } from "../../lablib/animation/ParamCurve.js";
 import { Gap, Sequential } from "../../lablib/music/Timeline.js";
 import { Rational } from "../../lablib/Rational.js";
 import { Direction } from "../../../pga2d/Direction.js";
@@ -40,7 +40,7 @@ class PeekingEye {
 
     const angle = curves.get_curve_val("peek_angle") ?? 0;
 
-    const direction = this.eye.update(position, Direction.from_angle(angle));
+    this.eye.update(position, Direction.from_angle(angle));
   }
 
   /**
@@ -64,18 +64,14 @@ class PeekingEye {
 
     const angle = new Sequential(
       // Look in the direction from start -> end
-      new ParamCurve(this.angle_offset, this.angle_offset, DURATION_FRAME),
+      new Hold(DURATION_FRAME),
       // Rotate CCW back towards start
       new ParamCurve(
         this.angle_offset,
         this.angle_offset + Math.PI,
         DURATION_FRAME
       ),
-      new ParamCurve(
-        this.angle_offset + Math.PI,
-        this.angle_offset + Math.PI,
-        DURATION_FRAME
-      ),
+      new Hold(DURATION_FRAME),
       // Rotate CCW towards end
       new ParamCurve(
         this.angle_offset + Math.PI,
