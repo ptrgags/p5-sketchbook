@@ -5,6 +5,7 @@ import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { PointPrimitive } from "../../sketchlib/primitives/PointPrimitive.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
+import { AnimationCurves } from "../lablib/animation/AnimationCurves.js";
 import { N1, N4 } from "../lablib/music/durations.js";
 import { ParamCurve } from "../lablib/music/ParamCurve.js";
 import { Sequential } from "../lablib/music/Timeline.js";
@@ -28,15 +29,15 @@ export class SpiralBurst {
 
   /**
    * Render the circles that make up the burst
-   * @param {SoundManager} sound the sound/animation system
+   * @param {AnimationCurves} curves the sound/animation system
    * @return {GroupPrimitive} the primitives to render
    */
-  render(sound) {
-    const radius_scale = sound.get_param("radius") ?? 0.0;
-    const phase_shift = sound.get_param("phase") ?? 0;
-    const lightness = sound.get_param("lightness") ?? 0.7;
-    const chroma = sound.get_param("chroma") ?? 0.1;
-    const hue = sound.get_param("hue") ?? 130;
+  render(curves) {
+    const radius_scale = curves.get_curve_val("radius") ?? 0.0;
+    const phase_shift = curves.get_curve_val("phase") ?? 0;
+    const lightness = curves.get_curve_val("lightness") ?? 0.7;
+    const chroma = curves.get_curve_val("chroma") ?? 0.1;
+    const hue = curves.get_curve_val("hue") ?? 130;
 
     const color = new Oklch(lightness, chroma, hue);
     const point_style = new Style({
@@ -62,9 +63,9 @@ export class SpiralBurst {
    * Generate the parameters for a spiral burst, to be used with a score.
    * The animation will loop every measure of 4/4 time.
    * @param {Rational} duration Total duration of the animation
-   * @return {[string, import("../lablib/music/Timeline.js").Timeline<ParamCurve>][]} Parameter entries to include in a score
+   * @return {AnimationCurves} Parameter entries to include in a score
    */
-  static spiral_burst_params(duration) {
+  static make_curves(duration) {
     const spiral_duration = new Rational(15, 16);
     const burst_duration = Rational.ONE.sub(spiral_duration);
 
@@ -109,12 +110,12 @@ export class SpiralBurst {
       duration
     );
 
-    return [
-      ["radius", radius],
-      ["phase", phase],
-      ["lightness", lightness],
-      ["hue", hue],
-      ["chroma", chroma],
-    ];
+    return new AnimationCurves({
+      radius,
+      phase,
+      lightness,
+      hue,
+      chroma,
+    });
   }
 }
