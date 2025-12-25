@@ -1,11 +1,11 @@
-import { ParamCurve } from "../../lablib/music/ParamCurve.js";
-import { Sequential } from "../../lablib/music/Timeline.js";
+import { Gap, Sequential } from "../../lablib/music/Timeline.js";
 import { Rational } from "../../lablib/Rational.js";
 import { Point } from "../../../pga2d/Point.js";
 import { Color } from "../../../sketchlib/Color.js";
 import { CirclePrimitive } from "../../../sketchlib/primitives/CirclePrimitive.js";
 import { style } from "../../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../../sketchlib/Style.js";
+import { Hold, ParamCurve } from "../../lablib/animation/ParamCurve.js";
 
 const CENTER = new Point(500, 300);
 const MAX_RADII = [5, 4, 3, 2, 1].map((x) => x * 50);
@@ -39,17 +39,13 @@ class CircleFan {
   }
 
   make_curves() {
-    const EXPAND_DURATION = 3;
-    const PAUSE_DURATION = 1;
+    const EXPAND_DURATION = new Rational(3);
+    const PAUSE_DURATION = new Rational(1);
     return {
       circle_fan: new Sequential(
-        new ParamCurve(0, CIRCLE_COUNT * 50, new Rational(EXPAND_DURATION)),
-        new ParamCurve(
-          CIRCLE_COUNT * 50,
-          CIRCLE_COUNT * 50,
-          new Rational(PAUSE_DURATION)
-        ),
-        new ParamCurve(CIRCLE_COUNT * 50, 0, new Rational(EXPAND_DURATION))
+        new ParamCurve(0, CIRCLE_COUNT * 50, EXPAND_DURATION),
+        new Hold(PAUSE_DURATION),
+        new ParamCurve(CIRCLE_COUNT * 50, 0, EXPAND_DURATION)
       ),
     };
   }

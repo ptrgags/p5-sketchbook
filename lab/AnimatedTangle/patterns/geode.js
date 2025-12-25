@@ -1,4 +1,3 @@
-import { ParamCurve } from "../../lablib/music/ParamCurve.js";
 import { Sequential } from "../../lablib/music/Timeline.js";
 import { Rational } from "../../lablib/Rational.js";
 import { Direction } from "../../../pga2d/Direction.js";
@@ -14,6 +13,7 @@ import { Primitive } from "../../../sketchlib/primitives/Primitive.js";
 import { group, style } from "../../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../../sketchlib/Style.js";
 import { make_stripes } from "./stripes.js";
+import { ParamCurve } from "../../lablib/animation/ParamCurve.js";
 
 const STYLE_ROCK = new Style({
   stroke: Color.from_hex_code("#555555"),
