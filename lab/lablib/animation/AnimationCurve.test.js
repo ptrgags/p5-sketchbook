@@ -39,14 +39,14 @@ describe("AnimationCurve", () => {
       expect(result).toBe(75);
     });
 
-    it.skip("Interpolates correctly in non-uniform time interval", () => {
+    it("Interpolates correctly in non-uniform time interval", () => {
       const curve = AnimationCurve.from_timeline(make_curve());
 
       const result = curve.value(1.75);
 
       // t value is (1.75 - 1.5)/(2.5 - 1.5) = 0.25/1 = 0.25
-      // lerp(100, 0, 0.25) is 25
-      expect(result).toBeCloseTo(25);
+      // lerp(100, 0, 0.25) = (1 - 0.25) * 100 + 0.25 * 0 = 75
+      expect(result).toBeCloseTo(75);
     });
 
     it("with time exactly boundary returns start of next interval", () => {
