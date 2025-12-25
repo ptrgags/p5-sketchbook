@@ -11,7 +11,6 @@ import { ParamCurve } from "../lablib/music/ParamCurve.js";
 import { Sequential } from "../lablib/music/Timeline.js";
 import { Oklch } from "../lablib/Oklch.js";
 import { Rational } from "../lablib/Rational.js";
-import { SoundManager } from "../lablib/SoundManager.js";
 
 const N = 10;
 const CENTER = new Point(WIDTH / 2, (3 * HEIGHT) / 4);

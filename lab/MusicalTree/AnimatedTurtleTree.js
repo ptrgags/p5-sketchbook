@@ -8,7 +8,6 @@ import { Style } from "../../sketchlib/Style.js";
 import { Color } from "../../sketchlib/Color.js";
 import { Gap, Sequential } from "../lablib/music/Timeline.js";
 import { ParamCurve } from "../lablib/music/ParamCurve.js";
-import { SoundManager } from "../lablib/SoundManager.js";
 import { is_nearly } from "../../sketchlib/is_nearly.js";
 import { lerp } from "../../sketchlib/lerp.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
@@ -18,6 +17,7 @@ import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js
 import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
 import { Point } from "../../pga2d/Point.js";
 import { Direction } from "../../pga2d/Direction.js";
+import { AnimationCurves } from "../lablib/animation/AnimationCurves.js";
 
 const TREE_LSYSTEM = new LSystem("Fa", {
   a: "[+Fa][-Fa]",
@@ -352,18 +352,18 @@ class TreeAnimationBuilder {
 
   /**
    * Build the animation part of a score
-   * @returns {[string, import("../lablib/music/Timeline.js").Timeline<ParamCurve>][]}
+   * @returns {AnimationCurves}
    */
   build() {
-    const line_part = new Sequential(...this.line_count_curve);
-    const state_part = new Sequential(...this.state_curve);
-    const depth_part = new Sequential(...this.depth_curve);
+    const line_count = new Sequential(...this.line_count_curve);
+    const state = new Sequential(...this.state_curve);
+    const depth = new Sequential(...this.depth_curve);
 
-    return [
-      ["line_count", line_part],
-      ["state", state_part],
-      ["depth", depth_part],
-    ];
+    return new AnimationCurves({
+      line_count,
+      state,
+      depth,
+    });
   }
 }
 
@@ -432,18 +432,18 @@ export class AnimatedTurtleTree {
 
     this.score = new Score({
       parts: music_builder.build(),
-      params: animation_builder.build(),
+      animation_curves: animation_builder.build(),
     });
     [this.lines, this.states] = primitive_builder.build();
   }
 
   /**
    * Render the tree animation
-   * @param {SoundManager} sound The sound system
+   * @param {AnimationCurves} curves The animation curves
    * @returns {GroupPrimitive}
    */
-  render(sound) {
-    const line_count = sound.get_param("line_count");
+  render(curves) {
+    const line_count = curves.get_curve_val("line_count");
     const [whole_lines, fract_lines] = whole_fract(line_count);
 
     // Render all of the lines we've already seen, and possibly one
@@ -459,7 +459,7 @@ export class AnimatedTurtleTree {
       tree = style(visible_lines, STYLE_TREE);
     }
 
-    const state_param = sound.get_param("state");
+    const state_param = curves.get_curve_val("state");
     const [state_index, state_t] = whole_fract(state_param);
 
     let position;
@@ -473,7 +473,7 @@ export class AnimatedTurtleTree {
       orientation = lerp(prev_orientation, next_orientation, state_t);
     }
 
-    const depth = sound.get_param("depth");
+    const depth = curves.get_curve_val("depth");
 
     const turtle = render_turtle(position, orientation);
     const stack = render_stack(position, depth);
