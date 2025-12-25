@@ -2,6 +2,7 @@ import { Tween } from "../../sketchlib/Tween.js";
 import { ADSR } from "./instruments/ADSR.js";
 import { BasicSynth } from "./instruments/BasicSynth.js";
 import { FMSynth } from "./instruments/FMSynth.js";
+import { WaveStack } from "./instruments/Wavestack.js";
 import { ParamCurve } from "./music/ParamCurve.js";
 import { Score } from "./music/Score.js";
 import { to_events } from "./music/Timeline.js";
@@ -115,10 +116,9 @@ export class SoundManager {
     poly.init_poly(this.tone);
     poly.volume = -18;
 
-    const supersaw = new this.tone.PolySynth(this.tone.Synth, {
-      oscillator: { type: "fatsawtooth" },
-    }).toDestination();
-    supersaw.volume.value = -9;
+    const supersaw = new WaveStack("sawtooth", 3, 20);
+    supersaw.init_poly(this.tone);
+    supersaw.volume = -18;
 
     const bell = new FMSynth(3, 12, ADSR.pluck(2.0));
     bell.init_mono(this.tone);
@@ -131,7 +131,7 @@ export class SoundManager {
     this.synths.sine = sine.synth;
     this.synths.square = square.synth;
     this.synths.poly = poly.synth;
-    this.synths.supersaw = supersaw;
+    this.synths.supersaw = supersaw.synth;
     this.synths.bell = bell.synth;
     this.synths.tick = tick.synth;
   }
