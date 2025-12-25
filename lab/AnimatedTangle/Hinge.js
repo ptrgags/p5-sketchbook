@@ -16,8 +16,12 @@ export class Hinge {
    */
   constructor(anchor, position, amplitude, frequency, phase = 0) {
     this.anchor = anchor;
-    this.position = position;
+    this.amplitude = amplitude;
+    this.initial_position = position;
     this.frequency = frequency;
+    this.phase = phase;
+
+    this.initial_position = position;
   }
 
   /**
@@ -25,8 +29,10 @@ export class Hinge {
    * @param {number} time Elapsed time
    */
   update(time) {
-    const angle = Math.sin(2 * Math.PI * this.frequency * time);
+    const angle =
+      this.amplitude *
+      Math.sin(2 * Math.PI * this.frequency * time - this.phase);
     const rotation = Motor.rotation(this.anchor, angle);
-    this.position = rotation.transform_point(this.position);
+    this.position = rotation.transform_point(this.initial_position);
   }
 }
