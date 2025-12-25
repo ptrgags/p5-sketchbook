@@ -1,3 +1,7 @@
+import { ADSR } from "./instruments/ADSR.js";
+import { BasicSynth } from "./instruments/BasicSynth.js";
+import { FMSynth } from "./instruments/FMSynth.js";
+import { WaveStack } from "./instruments/Wavestack.js";
 import { Score } from "./music/Score.js";
 import { to_events } from "./music/Timeline.js";
 import { Rational } from "./Rational.js";
@@ -92,68 +96,36 @@ export class SoundManager {
   }
 
   init_synths() {
-    const sine = new this.tone.Synth({
-      oscillator: {
-        type: "sine",
-      },
-    }).toDestination();
+    const sine = new BasicSynth("sine");
+    sine.init_mono(this.tone);
+    sine.volume = -6;
 
-    const square = new this.tone.Synth({
-      oscillator: { type: "triangle" },
-    }).toDestination();
-    square.volume.value = -3;
+    const square = new BasicSynth("square");
+    square.init_mono(this.tone);
+    square.volume = -24;
 
-    const poly = new this.tone.PolySynth(this.tone.Synth, {
-      oscillator: { type: "fmsine2" },
-    }).toDestination();
-    poly.volume.value = -9;
+    const poly = new BasicSynth("triangle");
+    poly.init_poly(this.tone);
+    poly.volume = -18;
 
-    const supersaw = new this.tone.PolySynth(this.tone.Synth, {
-      oscillator: { type: "fatsawtooth" },
-    }).toDestination();
-    supersaw.volume.value = -9;
+    const supersaw = new WaveStack("sawtooth", 3, 20);
+    supersaw.init_poly(this.tone);
+    supersaw.volume = -18;
 
-    const bell = new this.tone.FMSynth({
-      envelope: {
-        attack: 0,
-        decay: 2.0,
-        sustain: 0.0,
-        release: 2.0,
-      },
-    }).toDestination();
-    bell.volume.value = -3;
+    const bell = new FMSynth(3, 12, ADSR.pluck(2.0));
+    bell.init_mono(this.tone);
+    bell.volume = -3;
 
-    const tick = new this.tone.FMSynth({
-      modulationIndex: 25,
-      // C:M ratio
-      harmonicity: 2,
-      oscillator: {
-        type: "sine",
-      },
-      modulation: {
-        type: "sine",
-      },
-      modulationEnvelope: {
-        attack: 0,
-        sustain: 1,
-        decay: 0,
-        release: 0,
-      },
-      envelope: {
-        attack: 0,
-        decay: 0.05,
-        sustain: 0.0,
-        release: 0.05,
-      },
-    }).toDestination();
-    tick.volume.value = -2;
+    const tick = new FMSynth(2, 25, ADSR.pluck(0.05));
+    tick.init_mono(this.tone);
+    tick.volume = -2;
 
-    this.synths.sine = sine;
-    this.synths.square = square;
-    this.synths.poly = poly;
-    this.synths.supersaw = supersaw;
-    this.synths.bell = bell;
-    this.synths.tick = tick;
+    this.synths.sine = sine.synth;
+    this.synths.square = square.synth;
+    this.synths.poly = poly.synth;
+    this.synths.supersaw = supersaw.synth;
+    this.synths.bell = bell.synth;
+    this.synths.tick = tick.synth;
   }
 
   /**
