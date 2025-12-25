@@ -1,5 +1,4 @@
 import { AnimationCurves } from "../lablib/animation/AnimationCurves.js";
-import { ParamCurve } from "../lablib/music/ParamCurve.js";
 import { Oklch } from "../lablib/Oklch.js";
 import { Rational } from "../lablib/Rational.js";
 import { Direction } from "../../pga2d/Direction.js";

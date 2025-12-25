@@ -1,6 +1,5 @@
 import { AnimationCurves } from "../animation/AnimationCurves.js";
 import { Rational } from "../Rational.js";
-import { ParamCurve } from "./ParamCurve.js";
 import { REST } from "./pitches.js";
 import { Gap, Parallel, Sequential, timeline_map } from "./Timeline.js";
 

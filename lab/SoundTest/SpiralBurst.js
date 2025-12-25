@@ -6,8 +6,8 @@ import { PointPrimitive } from "../../sketchlib/primitives/PointPrimitive.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { AnimationCurves } from "../lablib/animation/AnimationCurves.js";
+import { Hold, ParamCurve } from "../lablib/animation/ParamCurve.js";
 import { N1, N4 } from "../lablib/music/durations.js";
-import { ParamCurve } from "../lablib/music/ParamCurve.js";
 import { Sequential } from "../lablib/music/Timeline.js";
 import { Oklch } from "../lablib/Oklch.js";
 import { Rational } from "../lablib/Rational.js";
@@ -77,7 +77,8 @@ export class SpiralBurst {
     );
     const phase = Sequential.from_loop(
       new Sequential(
-        new ParamCurve(0, 0, burst_duration),
+        // Hold the angle steady while bursting
+        new Hold(burst_duration),
         new ParamCurve(0, 1, spiral_duration)
       ),
       duration

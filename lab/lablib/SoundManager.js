@@ -1,5 +1,3 @@
-import { Tween } from "../../sketchlib/Tween.js";
-import { ParamCurve } from "./music/ParamCurve.js";
 import { Score } from "./music/Score.js";
 import { to_events } from "./music/Timeline.js";
 import { Rational } from "./Rational.js";

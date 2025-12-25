@@ -1,4 +1,3 @@
-import { ParamCurve } from "../../lablib/music/ParamCurve.js";
 import { Gap, Sequential } from "../../lablib/music/Timeline.js";
 import { Rational } from "../../lablib/Rational.js";
 import { Point } from "../../../pga2d/Point.js";
@@ -6,7 +5,7 @@ import { Color } from "../../../sketchlib/Color.js";
 import { CirclePrimitive } from "../../../sketchlib/primitives/CirclePrimitive.js";
 import { style } from "../../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../../sketchlib/Style.js";
-import { Hold } from "../../lablib/animation/ParamCurve.js";
+import { Hold, ParamCurve } from "../../lablib/animation/ParamCurve.js";
 
 const CENTER = new Point(500, 300);
 const MAX_RADII = [5, 4, 3, 2, 1].map((x) => x * 50);

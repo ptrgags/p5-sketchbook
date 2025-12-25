@@ -7,7 +7,6 @@ import { HEIGHT, WIDTH } from "../../sketchlib/dimensions.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Color } from "../../sketchlib/Color.js";
 import { Gap, Sequential } from "../lablib/music/Timeline.js";
-import { ParamCurve } from "../lablib/music/ParamCurve.js";
 import { is_nearly } from "../../sketchlib/is_nearly.js";
 import { lerp } from "../../sketchlib/lerp.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
@@ -18,6 +17,7 @@ import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
 import { Point } from "../../pga2d/Point.js";
 import { Direction } from "../../pga2d/Direction.js";
 import { AnimationCurves } from "../lablib/animation/AnimationCurves.js";
+import { ParamCurve } from "../lablib/animation/ParamCurve.js";
 
 const TREE_LSYSTEM = new LSystem("Fa", {
   a: "[+Fa][-Fa]",
