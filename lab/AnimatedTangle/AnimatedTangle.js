@@ -116,7 +116,7 @@ const TANGLE = new VectorTangle(
   [
     [new Mask(PANEL_LANDSCAPE), LANDSCAPE.render()],
     [new Mask(PANEL_QUARTERS), QUARTERS],
-    [new Mask(PANEL_CORAL), CORAL_PANEL],
+    [new Mask(PANEL_CORAL), CORAL_PANEL.render()],
     [new Mask(PANEL_GEODE), GEODE.render()],
   ],
   PANELS
@@ -168,8 +168,9 @@ export const sketch = (p) => {
     const t_sec = mod(elapsed_sec, length_sec);
 
     const t_normalized = t_sec / length_sec;
-    LANDSCAPE.update(t_sec / length_sec);
-    CORAL_STRIPES.update(mod(5 * t_normalized, 1.0));
+    LANDSCAPE.update(t_normalized);
+    CORAL_STRIPES.update(mod(10 * t_normalized, 1.0));
+    CORAL_PANEL.update(t_sec);
 
     ANIM.update(t_sec);
     EYE.update(ANIM);
@@ -178,23 +179,5 @@ export const sketch = (p) => {
 
     BACKGROUND_STRIPES.draw(p);
     TANGLE.draw(p);
-
-    //EYE.eye.draw(p);
-
-    /*
-    p.push();
-    p.fill(255);
-    p.textSize(24);
-    p.text(
-      `t:${t_sec.toPrecision(2)}, r:${ANIM.get_curve_val(
-        "circle_fan"
-      ).toPrecision(3)}, angle:${ANIM.get_curve_val("peek_angle").toPrecision(
-        2
-      )}`,
-      100,
-      50
-    );
-    p.pop();
-    */
   };
 };
