@@ -11,6 +11,8 @@ import { Style } from "../../../sketchlib/Style.js";
 import { CoralNode, CoralTree } from "../CoralTree.js";
 import { AnimatedStripes, make_stripes } from "./stripes.js";
 import { Hinge } from "../Hinge.js";
+import { Polyps } from "./polyps.js";
+import { ClipPrimitive } from "../../../sketchlib/primitives/ClipPrimitive.js";
 
 const RADIUS_BIG = 25;
 const RADIUS_SMALL = RADIUS_BIG / 2;
@@ -205,12 +207,20 @@ class SwayingCoral {
       )
     );
 
-    const colored_coral = style(this.tree.render(), STYLE_CORAL);
-    // Save a reference for modifying the group when the tree
-    // refreshes
-    this.coral_slot = colored_coral.primitives;
+    const coral_prim = this.tree.render();
 
-    this.primitive = group(GREEN_STRIPES, colored_coral);
+    // Save a reference because the coral shape will be regenerated
+    this.colored_coral = style(coral_prim, STYLE_CORAL);
+    this.coral_mask = new Mask(coral_prim);
+
+    this.polyps = new Polyps();
+
+    const clipped_polyps = new ClipPrimitive(
+      this.coral_mask,
+      this.polyps.render()
+    );
+
+    this.primitive = group(GREEN_STRIPES, this.colored_coral, clipped_polyps);
   }
 
   /**
@@ -236,8 +246,18 @@ class SwayingCoral {
     this.node_n.circle.position = this.hinge_n.position;
     this.node_p.circle.position = this.hinge_p.position;
 
-    // re-draw the primitive
-    this.coral_slot[0] = this.tree.render();
+    this.polyps.update(time);
+
+    const coral_prim = this.tree.render();
+
+    // re-draw the primitive in place
+    const prims = this.colored_coral.primitives;
+    prims.length = 0;
+    prims.push(coral_prim);
+
+    const mask_prims = this.coral_mask.primitives;
+    mask_prims.length = 0;
+    mask_prims.push(coral_prim);
   }
 
   render() {
