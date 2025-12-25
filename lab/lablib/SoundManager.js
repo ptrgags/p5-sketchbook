@@ -105,16 +105,15 @@ export class SoundManager {
   init_synths() {
     const sine = new BasicSynth("sine");
     sine.init_mono(this.tone);
-    sine.volume = -3;
+    sine.volume = -6;
 
     const square = new BasicSynth("square");
     square.init_mono(this.tone);
-    square.volume = -12;
+    square.volume = -24;
 
-    const poly = new this.tone.PolySynth(this.tone.Synth, {
-      oscillator: { type: "fmsine2" },
-    }).toDestination();
-    poly.volume.value = -9;
+    const poly = new BasicSynth("triangle");
+    poly.init_poly(this.tone);
+    poly.volume = -18;
 
     const supersaw = new this.tone.PolySynth(this.tone.Synth, {
       oscillator: { type: "fatsawtooth" },
@@ -131,7 +130,7 @@ export class SoundManager {
 
     this.synths.sine = sine.synth;
     this.synths.square = square.synth;
-    this.synths.poly = poly;
+    this.synths.poly = poly.synth;
     this.synths.supersaw = supersaw;
     this.synths.bell = bell.synth;
     this.synths.tick = tick.synth;
