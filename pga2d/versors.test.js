@@ -1,7 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { Line, Point } from "./objects";
 import { Motor, Flector } from "./versors";
 import { PGA_MATCHERS } from "./pga_matchers";
+import { Point } from "./Point";
+import { Line } from "./Line";
+import { Direction } from "./Direction";
 
 expect.extend(PGA_MATCHERS);
 
@@ -10,7 +12,7 @@ expect.extend(PGA_MATCHERS);
 describe("Motor", () => {
   describe("rotation", () => {
     it("reverse of a rotation in the origin is its inverse", () => {
-      const test_point = Point.point(1, -2);
+      const test_point = new Point(1, -2);
       const rotation = Motor.rotation(Point.ORIGIN, Math.PI / 3);
 
       const inverse = rotation.reverse();
@@ -25,14 +27,14 @@ describe("Motor", () => {
     });
 
     it("Rotates points counterclockwise", () => {
-      const center = Point.point(1, -2);
+      const center = new Point(1, -2);
       const rotation = Motor.rotation(center, Math.PI / 3);
-      const point = Point.point(1, 0);
+      const point = new Point(1, 0);
 
       const result = rotation.transform_point(point);
 
       // The point gets rotated a little bit past the y-axis into quadrant III
-      const expected = Point.point(-0.732050807, -1);
+      const expected = new Point(-0.732050807, -1);
       expect(result).toBePoint(expected);
     });
   });
@@ -41,41 +43,40 @@ describe("Motor", () => {
 describe("Flector", () => {
   describe("reflection", () => {
     it("reflection in y-axis flips x-component", () => {
-      const point = Point.point(3, 4);
+      const point = new Point(3, 4);
       const line = new Line(1, 0, 0);
       const reflection = Flector.reflection(line);
 
       const result = reflection.transform_point(point);
 
-      const expected = Point.point(-3, 4);
+      const expected = new Point(-3, 4);
       expect(result).toBePoint(expected);
       expect(result.equals(expected)).toBe(true);
     });
 
     it("reflection in x-axis flips y-component", () => {
-      const point = Point.point(3, 4);
+      const point = new Point(3, 4);
       const line = new Line(0, 1, 0);
       const reflection = Flector.reflection(line);
 
       const result = reflection.transform_point(point);
 
-      const expected = Point.point(3, -4);
+      const expected = new Point(3, -4);
       expect(result).toBePoint(expected);
     });
 
-    it("reflection in plane at infinity returns 0", () => {
-      const point = Point.point(3, 4);
+    it("reflection in plane at infinity throws error", () => {
+      const point = new Point(3, 4);
       const line = new Line(0, 0, 1);
       const reflection = Flector.reflection(line);
 
-      const result = reflection.transform_point(point);
-
-      const expected = Point.ZERO;
-      expect(result).toBePoint(expected);
+      expect(() => {
+        reflection.transform_point(point);
+      }).toThrowError("Trying to create a Point from a direction!");
     });
 
     it("reflecting twice leaves point unchanged", () => {
-      const point = Point.point(3, 4);
+      const point = new Point(3, 4);
       const line = new Line(1, 2, 3);
       const reflection = Flector.reflection(line);
 
@@ -86,28 +87,28 @@ describe("Flector", () => {
     });
 
     it("reflects point in a line", () => {
-      const point = Point.point(3, 4);
+      const point = new Point(3, 4);
       const line = new Line(1, -1, 0);
       const reflection = Flector.reflection(line);
 
       const result = reflection.transform_point(point);
 
-      const expected = Point.point(4, 3);
+      const expected = new Point(4, 3);
       expect(result).toBePoint(expected);
     });
 
     it("reflects direction in a line", () => {
-      const direction = Point.direction(1, 2);
+      const direction = new Direction(1, 2);
       const line = new Line(1, -1, 0);
       const reflection = Flector.reflection(line);
 
-      const result = reflection.transform_point(direction);
+      const result = reflection.transform_dir(direction);
 
       // Note: bivectors are inverted in the mirror. Since this is
       // an ideal direction, the minus sign doesn't get normalized hence
       // the negative coefficients here
-      const expected = Point.direction(-2, -1);
-      expect(result).toBePoint(expected);
+      const expected = new Direction(-2, -1);
+      expect(result).toBeDirection(expected);
     });
   });
 });

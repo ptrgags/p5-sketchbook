@@ -1,15 +1,17 @@
-import { Point } from "../pga2d/objects.js";
 import { Style } from "../sketchlib/Style.js";
 import { Color } from "../sketchlib/Color.js";
 import { Motor } from "../pga2d/versors.js";
 import { AnimationChain, Joint } from "../sketchlib/AnimationChain.js";
 import { is_nearly } from "../sketchlib/is_nearly.js";
-import { GooglyEye } from "./GooglyEye.js";
 import { BeziergonPrimitive } from "../sketchlib/primitives/BeziergonPrimitive.js";
 import { CirclePrimitive } from "../sketchlib/primitives/CirclePrimitive.js";
 import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
 import { PointPrimitive } from "../sketchlib/primitives/PointPrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
+import { Direction } from "../pga2d/Direction.js";
+import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
+import { Point } from "../pga2d/Point.js";
+import { GooglyEye } from "../sketchlib/primitives/GooglyEye.js";
 
 const WORM_SEGMENTS = 60;
 const WORM_SEGMENT_SEPARATION = 30;
@@ -43,7 +45,7 @@ export class AnimatedWorm {
    */
   constructor(initial_position) {
     const first_point = initial_position;
-    const down = Point.direction(0, WORM_SEGMENT_SEPARATION);
+    const down = new Direction(0, WORM_SEGMENT_SEPARATION);
 
     const joints = new Array(WORM_SEGMENTS);
     for (let i = 0; i < WORM_SEGMENTS; i++) {
@@ -65,31 +67,48 @@ export class AnimatedWorm {
 
     this.chain = new AnimationChain(joints, WORM_MIN_BEND_ANGLE);
 
-    this.look_direction = Point.direction(0, 1);
+    this.look_direction = new Direction(0, 1);
+
+    /**
+     * @type {GooglyEye[]}
+     */
     this.googly = [
       new GooglyEye(
-        first_point.add(Point.DIR_X.scale(-WORM_EYE_SEPARATION)),
+        first_point.add(Direction.DIR_X.scale(-WORM_EYE_SEPARATION)),
         this.look_direction,
         WORM_EYE_RADIUS,
         WORM_PUPIL_RADIUS
       ),
       new GooglyEye(
-        first_point.add(Point.DIR_X.scale(WORM_EYE_SEPARATION)),
+        first_point.add(Direction.DIR_X.scale(WORM_EYE_SEPARATION)),
         this.look_direction,
         WORM_EYE_RADIUS,
         WORM_PUPIL_RADIUS
       ),
     ];
+    /**
+     * @type {GroupPrimitive}
+     */
+    this.eyes = group(...this.googly);
   }
 
+  /**
+   * @type {Joint}
+   */
   get nose() {
     return this.chain.head;
   }
 
+  /**
+   * @type {Joint}
+   */
   get head() {
     return this.chain.get_joint(1);
   }
 
+  /**
+   * @type {Joint}
+   */
   get tail() {
     return this.chain.tail;
   }
@@ -103,7 +122,7 @@ export class AnimatedWorm {
     const to_point = point.sub(nose_position);
 
     const velocity = to_point.limit_length(WORM_MAX_SPEED);
-    if (is_nearly(velocity.ideal_norm_sqr(), 0)) {
+    if (is_nearly(velocity.mag_sqr(), 0)) {
       return;
     }
 
@@ -112,6 +131,10 @@ export class AnimatedWorm {
     this.chain.move(target);
   }
 
+  /**
+   *
+   * @returns {GroupPrimitive}
+   */
   render_spine() {
     const lines = new Array(this.chain.length - 1);
     const positions = this.chain.get_positions();
@@ -126,6 +149,10 @@ export class AnimatedWorm {
     return group(spine_group, centers_group);
   }
 
+  /**
+   *
+   * @returns {CirclePrimitive[]}
+   */
   compute_circles() {
     const positions = this.chain.get_positions();
     const circles = new Array(positions.length);
@@ -136,6 +163,10 @@ export class AnimatedWorm {
     return circles;
   }
 
+  /**
+   *
+   * @returns {{left: Point[], right: Point[]}} Points along the side of the worm
+   */
   compute_side_points() {
     // Ignore the first joint (nose), that will be handled in compute_head_points
     const positions = this.chain.get_positions().slice(1);
@@ -145,7 +176,7 @@ export class AnimatedWorm {
       const forward_direction =
         i == 0 ? center.sub(positions[1]) : positions[i - 1].sub(center);
 
-      const left_dir = ROT90.transform_point(forward_direction).normalize();
+      const left_dir = ROT90.transform_dir(forward_direction).normalize();
       const right_dir = left_dir.neg();
 
       left_points[i] = center.add(left_dir.scale(WORM_THICKNESS));
@@ -160,12 +191,16 @@ export class AnimatedWorm {
     };
   }
 
+  /**
+   *
+   * @returns {[Point, Point, Point]} (head_right, head_point, head_left) three points defining the shape of the worm's head
+   */
   compute_head_points() {
     const head = this.chain.get_joint(1).position;
     const heading = head.sub(this.chain.get_joint(2).position).normalize();
 
-    const left_45 = ROT45.transform_point(heading);
-    const right_45 = ROT45.reverse().transform_point(heading);
+    const left_45 = ROT45.transform_dir(heading);
+    const right_45 = ROT45.reverse().transform_dir(heading);
 
     const head_point = head.add(heading.scale(1.5 * WORM_THICKNESS));
     const head_left = head.add(left_45.scale(WORM_THICKNESS));
@@ -174,13 +209,17 @@ export class AnimatedWorm {
     return [head_right, head_point, head_left];
   }
 
+  /**
+   *
+   * @returns {[Point, Point, Point]} (tail_right, tail_point, tail_left) Three points defining the shape of the worm's tail
+   */
   compute_tail_points() {
     const tail = this.tail.position;
     // It's a pun on "heading" :P
     const tailing = tail.sub(this.chain.get_joint(-2).position).normalize();
 
-    const left_45 = ROT45.transform_point(tailing);
-    const right_45 = ROT45.reverse().transform_point(tailing);
+    const left_45 = ROT45.transform_dir(tailing);
+    const right_45 = ROT45.reverse().transform_dir(tailing);
 
     const tail_point = tail.add(tailing.scale(WORM_THICKNESS));
     const tail_left = tail.add(left_45.scale(WORM_THICKNESS));
@@ -200,29 +239,29 @@ export class AnimatedWorm {
     return style(beziergon, WORM_STYLE);
   }
 
-  render_eyes() {
+  update_eyes() {
     const [left, right] = this.googly;
 
     const center = this.chain.get_joint(1).position;
-    const left_dir = ROT90.transform_point(this.look_direction);
-    const right_dir = ROT90.reverse().transform_point(this.look_direction);
+    const left_dir = ROT90.transform_dir(this.look_direction);
+    const right_dir = ROT90.reverse().transform_dir(this.look_direction);
 
     const left_position = center.add(left_dir.scale(WORM_EYE_SEPARATION));
     const right_position = center.add(right_dir.scale(WORM_EYE_SEPARATION));
     left.update(left_position, this.look_direction);
     right.update(right_position, this.look_direction);
-    return group(left.render(), right.render());
   }
 
   render() {
+    this.update_eyes();
+
     // Who said worms can't be vertibrates?
     const spine = this.render_spine();
     const body = this.render_body();
-    const eyes = this.render_eyes();
     if (DEBUG_SHOW_SPINE) {
-      return group(body, spine, eyes);
+      return group(body, spine, this.eyes);
     } else {
-      return group(body, eyes);
+      return group(body, this.eyes);
     }
   }
 }

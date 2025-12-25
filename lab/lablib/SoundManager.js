@@ -1,5 +1,7 @@
-import { Tween } from "../../sketchlib/Tween.js";
-import { ParamCurve } from "./music/ParamCurve.js";
+import { ADSR } from "./instruments/ADSR.js";
+import { BasicSynth } from "./instruments/BasicSynth.js";
+import { FMSynth } from "./instruments/FMSynth.js";
+import { WaveStack } from "./instruments/Wavestack.js";
 import { Score } from "./music/Score.js";
 import { to_events } from "./music/Timeline.js";
 import { Rational } from "./Rational.js";
@@ -41,12 +43,6 @@ export class SoundManager {
     this.current_score = undefined;
     this.scores = {};
     this.score_note_events = {};
-    /**
-     * Compiled tweens stored by (score_id, param_id)
-     * @private
-     * @type {{[score_id: string]: {[param_id: string]: Tween<number>[]}}}
-     */
-    this.score_tweens = {};
     this.sfx = {};
 
     /**
@@ -100,68 +96,36 @@ export class SoundManager {
   }
 
   init_synths() {
-    const sine = new this.tone.Synth({
-      oscillator: {
-        type: "sine",
-      },
-    }).toDestination();
+    const sine = new BasicSynth("sine");
+    sine.init_mono(this.tone);
+    sine.volume = -6;
 
-    const square = new this.tone.Synth({
-      oscillator: { type: "triangle" },
-    }).toDestination();
-    square.volume.value = -3;
+    const square = new BasicSynth("square");
+    square.init_mono(this.tone);
+    square.volume = -24;
 
-    const poly = new this.tone.PolySynth(this.tone.Synth, {
-      oscillator: { type: "fmsine2" },
-    }).toDestination();
-    poly.volume.value = -9;
+    const poly = new BasicSynth("triangle");
+    poly.init_poly(this.tone);
+    poly.volume = -18;
 
-    const supersaw = new this.tone.PolySynth(this.tone.Synth, {
-      oscillator: { type: "fatsawtooth" },
-    }).toDestination();
-    supersaw.volume.value = -9;
+    const supersaw = new WaveStack("sawtooth", 3, 20);
+    supersaw.init_poly(this.tone);
+    supersaw.volume = -18;
 
-    const bell = new this.tone.FMSynth({
-      envelope: {
-        attack: 0,
-        decay: 2.0,
-        sustain: 0.0,
-        release: 2.0,
-      },
-    }).toDestination();
-    bell.volume.value = -3;
+    const bell = new FMSynth(3, 12, ADSR.pluck(2.0));
+    bell.init_mono(this.tone);
+    bell.volume = -3;
 
-    const tick = new this.tone.FMSynth({
-      modulationIndex: 25,
-      // C:M ratio
-      harmonicity: 2,
-      oscillator: {
-        type: "sine",
-      },
-      modulation: {
-        type: "sine",
-      },
-      modulationEnvelope: {
-        attack: 0,
-        sustain: 1,
-        decay: 0,
-        release: 0,
-      },
-      envelope: {
-        attack: 0,
-        decay: 0.05,
-        sustain: 0.0,
-        release: 0.05,
-      },
-    }).toDestination();
-    tick.volume.value = -2;
+    const tick = new FMSynth(2, 25, ADSR.pluck(0.05));
+    tick.init_mono(this.tone);
+    tick.volume = -2;
 
-    this.synths.sine = sine;
-    this.synths.square = square;
-    this.synths.poly = poly;
-    this.synths.supersaw = supersaw;
-    this.synths.bell = bell;
-    this.synths.tick = tick;
+    this.synths.sine = sine.synth;
+    this.synths.square = square.synth;
+    this.synths.poly = poly.synth;
+    this.synths.supersaw = supersaw.synth;
+    this.synths.bell = bell.synth;
+    this.synths.tick = tick.synth;
   }
 
   /**
@@ -178,51 +142,6 @@ export class SoundManager {
     return (
       parseFloat(measures) + parseFloat(beats) / 4 + parseFloat(sixteenths) / 16
     );
-  }
-
-  /**
-   * Get the current value of a parameter from the currently playing score
-   * @param {string} param_id The ID of the parameter in the score
-   * @returns {number | undefined} The current value of the parameter, or undefined if no value is set
-   */
-  get_param(param_id) {
-    const tween_list = this.score_tweens[this?.current_score]?.[param_id];
-    if (tween_list === undefined || tween_list.length === 0) {
-      return undefined;
-    }
-
-    const time = this.transport_time;
-
-    // Find the last tween that's before or during the current time.
-    let tween = tween_list[0];
-    for (const candidate of tween_list) {
-      if (candidate.start_time > time) {
-        break;
-      }
-
-      tween = candidate;
-    }
-
-    // Get the current value. This uses the fact that the tween holds its
-    // value constant if you use an out of range time
-    return tween.get_value(time);
-  }
-
-  /**
-   * Convert a timeline of ParamCurve to an array of Tween, assuming a start time of 0
-   * @param {import("./music/Timeline.js").Timeline<ParamCurve>} timeline the timeline to convert
-   * @return {Tween[]} The corresponding tweens,
-   */
-  compile_tweens(timeline) {
-    const events = to_events(Rational.ZERO, timeline);
-    return events.map(([curve, start_time]) => {
-      return Tween.scalar(
-        curve.start_value,
-        curve.end_value,
-        start_time.real,
-        curve.duration.real
-      );
-    });
   }
 
   /**
@@ -244,17 +163,6 @@ export class SoundManager {
       });
     }
     this.score_note_events[score_id] = score_events;
-
-    if (score.params) {
-      /**
-       * @type {{[param_id: string]: Tween<number>[]}}
-       */
-      const score_params = {};
-      for (const [param_id, timeline] of score.params) {
-        score_params[param_id] = this.compile_tweens(timeline);
-      }
-      this.score_tweens[score_id] = score_params;
-    }
   }
 
   /**

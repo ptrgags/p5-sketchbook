@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../../libraries/p5.min.js"
+    ></script>
+    <script type="module">
+      import { sketch } from "./AnimatedTangle.js";
+      import "../../sketchlib/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../../styles/layout.css" />
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>🧪Animated Tangle (2025)</h1>
+      <div class="sketch">
+        <canvas id="sketch-canvas" width="500" height="700"></canvas>
+      </div>
+      <div class="description">
+        <p>
+          This sketch is a doodle in the same style as how I draw on paper.
+          However, here I can animate the patterns!
+        </p>
+        <p>
+          The animation is still a work in progress. I'm still working on
+          filling the remaining panels, and adding embelishments to some of the
+          shapes.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

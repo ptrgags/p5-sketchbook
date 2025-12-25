@@ -1,4 +1,3 @@
-import { Point } from "../../pga2d/objects.js";
 import { RungeKuttaIntegrator } from "../lablib/RungeKuttaIntegrator.js";
 import { Style } from "../../sketchlib/Style.js";
 import { RingBuffer } from "../lablib/RingBuffer.js";
@@ -10,6 +9,8 @@ import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
 import { style } from "../../sketchlib/primitives/shorthand.js";
 import { CirclePrimitive } from "../../sketchlib/primitives/CirclePrimitive.js";
+import { Point } from "../../pga2d/Point.js";
+import { Direction } from "../../pga2d/Direction.js";
 
 const STYLE_AXIS = Style.DEFAULT_STROKE.with_width(2);
 const ARM_STYLE = STYLE_AXIS;
@@ -129,8 +130,8 @@ export class DoublePendulumSystem {
    * @returns {[GroupPrimitive, GroupPrimitive]} The two phase plots
    */
   render_phase(origin, theta_scale, theta_dot_scale) {
-    const theta_dir = Point.DIR_X.scale(theta_scale);
-    const theta_dot_dir = Point.DIR_Y.scale(-theta_dot_scale);
+    const theta_dir = Direction.DIR_X.scale(theta_scale);
+    const theta_dot_dir = Direction.DIR_Y.scale(-theta_dot_scale);
 
     const states = [...this.history];
     const points1 = states.map(([theta1, theta_dot1, ,]) => {
@@ -178,8 +179,8 @@ export class DoublePendulumSystem {
    * @returns {GroupPrimitive}
    */
   render_phase_axes(origin, theta_scale, theta_dot_scale) {
-    const theta_dir = Point.DIR_X.scale(theta_scale);
-    const theta_dot_dir = Point.DIR_Y.scale(-theta_dot_scale);
+    const theta_dir = Direction.DIR_X.scale(theta_scale);
+    const theta_dot_dir = Direction.DIR_Y.scale(-theta_dot_scale);
 
     const primitives = [
       new LinePrimitive(origin.sub(theta_dir), origin.add(theta_dir)),
@@ -190,10 +191,10 @@ export class DoublePendulumSystem {
   }
 
   angles_to_positions(origin, theta1, theta2) {
-    const offset1 = Point.dir_from_angle(Math.PI / 2 - theta1).scale(
+    const offset1 = Direction.from_angle(Math.PI / 2 - theta1).scale(
       this.pendulum1.length * PIXELS_PER_METER
     );
-    const offset2 = Point.dir_from_angle(Math.PI / 2 - theta2).scale(
+    const offset2 = Direction.from_angle(Math.PI / 2 - theta2).scale(
       this.pendulum2.length * PIXELS_PER_METER
     );
 

@@ -1,4 +1,4 @@
-import { Point } from "../../pga2d/objects.js";
+import { Point } from "../../pga2d/Point.js";
 import { Motor } from "../../pga2d/versors.js";
 
 const ARROW_ANGLE = Math.PI / 6;

@@ -1,12 +1,12 @@
-import { Point } from "../../pga2d/objects.js";
-import { Direction } from "../../sketchlib/Direction.js";
+import { Direction } from "../../pga2d/Direction.js";
+import { CardinalDirection } from "../../sketchlib/CardinalDirection.js";
 
 export class DirectionInput {
   /**
    *
-   * @param {Direction | undefined} digital The direction that was pressed as a
+   * @param {CardinalDirection | undefined} digital The direction that was pressed as a
    * cardinal direction, or undefined if there's no input
-   * @param {Point} analog The direction that was pressed as an analog value.
+   * @param {Direction} analog The direction that was pressed as an analog value.
    * It is either Point.ZERO (no input)
    */
   constructor(digital, analog) {
@@ -25,5 +25,5 @@ export class DirectionInput {
   }
 }
 DirectionInput.NO_INPUT = Object.freeze(
-  new DirectionInput(undefined, Point.ZERO)
+  new DirectionInput(undefined, Direction.ZERO)
 );

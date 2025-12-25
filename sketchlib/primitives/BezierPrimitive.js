@@ -1,4 +1,4 @@
-import { Point } from "../../pga2d/objects.js";
+import { Point } from "../../pga2d/Point.js";
 
 /**
  * Cubic Bezier curve
@@ -39,7 +39,7 @@ export class BezierPrimitive {
 
     // p0 = 1/6(b0 + 4 b1 + b2)
     const sixth = 1 / 6;
-    const p0 = Point.point(
+    const p0 = new Point(
       sixth * (x0 + 4 * x1 + x2),
       sixth * (y0 + 4 * y1 + y2)
     );
@@ -50,7 +50,7 @@ export class BezierPrimitive {
     const p2 = Point.lerp(b1, b2, 2 / 3);
 
     // p3 =
-    const p3 = Point.point(
+    const p3 = new Point(
       sixth * (x1 + 4 * x2 + x3),
       sixth * (y1 + 4 * y2 + y3)
     );

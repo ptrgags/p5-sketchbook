@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { PGA_MATCHERS } from "../pga2d/pga_matchers";
 import { RobotCommand } from "./RobotCommand";
-import { Point } from "../pga2d/objects";
+import { Direction } from "../pga2d/Direction";
 
 expect.extend(PGA_MATCHERS);
 
@@ -15,7 +15,7 @@ describe("RobotCommand", () => {
 
       const result = id.offset;
 
-      expect(result).toBePoint(Point.ZERO);
+      expect(result).toBePoint(Direction.ZERO);
     });
 
     it("LEFT_TURN has expected offset", () => {
@@ -24,7 +24,7 @@ describe("RobotCommand", () => {
       const result = left.offset;
 
       // omega - 1 = (cos(tau/5), sin(tau/5)) - (1, 0)
-      const expected = Point.direction(
+      const expected = new Direction(
         Math.cos(FIFTH_TURN) - 1.0,
         Math.sin(FIFTH_TURN)
       );
@@ -37,7 +37,7 @@ describe("RobotCommand", () => {
       const result = right.offset;
 
       // 1 - omega^4 = (1, 0) - (cos(4tau/5), sin(4tau/5))
-      const expected = Point.direction(
+      const expected = new Direction(
         1 - Math.cos(4 * FIFTH_TURN),
         -Math.sin(4 * FIFTH_TURN)
       );
@@ -49,7 +49,7 @@ describe("RobotCommand", () => {
 
       const result = full_turn.offset;
 
-      expect(result).toBePoint(Point.ZERO);
+      expect(result).toBePoint(Direction.ZERO);
     });
 
     it("computes offset for nontrivial path", () => {
@@ -67,11 +67,11 @@ describe("RobotCommand", () => {
       // 2 * (omega - 1) + (1 - omega^4)
       // 2 * omega - 2 + 1 - omega^4
       // 2 * omega -1 - omega^4
-      const expected = Point.direction(
+      const expected = new Direction(
         2 * Math.cos(FIFTH_TURN) - 1 - Math.cos(4 * FIFTH_TURN),
         2 * Math.sin(FIFTH_TURN) - Math.sin(4 * FIFTH_TURN)
       );
-      expect(result).toBePoint(expected);
+      expect(result).toBeDirection(expected);
     });
   });
 

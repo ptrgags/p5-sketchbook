@@ -1,4 +1,4 @@
-import { Point } from "../pga2d/objects.js";
+import { Direction } from "../pga2d/Direction.js";
 import { mod } from "../sketchlib/mod.js";
 
 export const MAX_N = 12;
@@ -6,18 +6,18 @@ export const MAX_N = 12;
 /**
  * LUT of roots of unity for i in [1, MAX_N] (inclusive). Index 0 is undefined.
  * Each one is an array of a different length
- * @type {Point[][]}
+ * @type {Direction[][]}
  */
 export const ROOTS_OF_UNITY = new Array(MAX_N);
 for (let i = 1; i <= MAX_N; i++) {
-  ROOTS_OF_UNITY[i] = Point.roots_of_unity(i);
+  ROOTS_OF_UNITY[i] = Direction.roots_of_unity(i);
 }
 
 /**
  * Displacement between the start and end of an arc. It will always be
  * the difference of two adjacent nth roots of unity.
  * Again, this is a LUT for each of the values of N
- * @type {Point[][]}
+ * @type {Direction[][]}
  */
 export const OFFSETS = new Array(MAX_N);
 for (let n = 1; n <= MAX_N; n++) {
@@ -50,12 +50,12 @@ export class RobotCommand {
   }
 
   /**
-   * Get a Point.direction representing the offset from the start. Units
+   * Get a Direction representing the offset from the start. Units
    * are in model space, i.e. meters, y-up
-   * @type {Point}
+   * @type {Direction}
    */
   get offset() {
-    let result = Point.ZERO;
+    let result = Direction.ZERO;
     for (let i = 0; i < this.n; i++) {
       const weight = this.weights[i];
       const offset = OFFSETS[this.n][i];

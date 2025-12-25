@@ -1,4 +1,5 @@
-import { Point } from "../pga2d/objects.js";
+import { Direction } from "../pga2d/Direction.js";
+import { Point } from "../pga2d/Point.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
@@ -41,7 +42,7 @@ export class PixelSwapPair {
       start_frame,
       duration_frames
     );
-    this.pixel_dimensions = Point.direction(pixel_width, pixel_width);
+    this.pixel_dimensions = new Direction(pixel_width, pixel_width);
   }
 
   /**

@@ -1,6 +1,7 @@
 import { Rectangle } from "../lab/lablib/Rectangle.js";
-import { Point } from "../pga2d/objects.js";
-import { Direction } from "./Direction.js";
+import { Direction } from "../pga2d/Direction.js";
+import { Point } from "../pga2d/Point.js";
+import { CardinalDirection } from "./CardinalDirection.js";
 
 /**
  * Iterate over a 2D range of values, performing an action at each step.
@@ -86,7 +87,7 @@ export class Index2D {
   /**
    * Compute the direction to a neighboring cell.
    * @param {Index2D} other Another cell
-   * @returns {Direction|undefined} If the cell neighbors this one, the grid direction is returned. Else undefined is returned to indicate not adjacent.
+   * @returns {CardinalDirection|undefined} If the cell neighbors this one, the grid direction is returned. Else undefined is returned to indicate not adjacent.
    */
   direction_to(other) {
     const { i: ai, j: aj } = this;
@@ -96,19 +97,19 @@ export class Index2D {
     const dj = bj - aj;
 
     if (dj === 1 && di === 0) {
-      return Direction.RIGHT;
+      return CardinalDirection.RIGHT;
     }
 
     if (dj === -1 && di === 0) {
-      return Direction.LEFT;
+      return CardinalDirection.LEFT;
     }
 
     if (dj === 0 && di === 1) {
-      return Direction.DOWN;
+      return CardinalDirection.DOWN;
     }
 
     if (dj === 0 && di === -1) {
-      return Direction.UP;
+      return CardinalDirection.UP;
     }
 
     return undefined;
@@ -116,15 +117,15 @@ export class Index2D {
 
   /**
    * Convert an index (assumed to be row-major) to a point in the world
-   * @param {Point} offset The offset in units of the world as a Point.point
-   * @param {Point} stride A Point.direction for the stride
+   * @param {Point} offset The offset in units of the world as a Point
+   * @param {Direction} stride A Direction for the stride
    * @returns {Point} A point in the world
    */
   to_world(offset, stride) {
     const { i, j } = this;
     const { x, y } = offset;
     const { x: dx, y: dy } = stride;
-    return Point.direction(x + j * dx, y + i * dy);
+    return new Point(x + j * dx, y + i * dy);
   }
 }
 
@@ -275,19 +276,19 @@ export class Grid {
   /**
    * Get a neighbor from the grid.
    * @param {Index2D} index the index to check
-   * @param {Direction} direction The direction to the adjacent cell
+   * @param {CardinalDirection} direction The direction to the adjacent cell
    * @returns {Index2D | undefined} The neighbor, or undefined if at the edge
    * of the grid.
    */
   get_neighbor(index, direction) {
     switch (direction) {
-      case Direction.RIGHT:
+      case CardinalDirection.RIGHT:
         return this.right(index);
-      case Direction.UP:
+      case CardinalDirection.UP:
         return index.up();
-      case Direction.LEFT:
+      case CardinalDirection.LEFT:
         return index.left();
-      case Direction.DOWN:
+      case CardinalDirection.DOWN:
         return this.down(index);
     }
   }
@@ -322,21 +323,21 @@ export class Grid {
    * Evenly space items of item_size within the bounding rectangle according
    * to the number of rows/columns in this grid.
    * @param {Rectangle} boundary The bounding rectangle
-   * @param {Point} item_size The size of each item as a Point.direction
-   * @param {Point} margin How much space to leave around the x or y direction (note that this will be doubled). Any remaining space will be used as padding
-   * @return {[Point, Point]} [offset, stride] The computed offset and stride
+   * @param {Direction} item_size The size of each item as a Direction
+   * @param {Direction} margin How much space to leave around the x or y direction (note that this will be doubled). Any remaining space will be used as padding
+   * @return {[Point, Direction]} [offset, stride] The computed offset and stride
    */
   compute_layout(boundary, item_size, margin) {
     // If we arranged the items as tightly as possible, how big would this
     // rectangle be?
-    const total_item_space = Point.direction(
+    const total_item_space = new Direction(
       item_size.x * this.cols,
       item_size.y * this.rows
     );
     const remaining_space = boundary.dimensions.sub(total_item_space);
     const padding = remaining_space.sub(margin.scale(2));
 
-    const padding_size = Point.direction(
+    const padding_size = new Direction(
       padding.x / (this.cols - 1),
       padding.y / (this.rows - 1)
     );

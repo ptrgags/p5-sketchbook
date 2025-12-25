@@ -3,32 +3,33 @@ import { DirectionalPad } from "../lab/lablib/DirectionalPad.js";
 import { ArcRobot, N_VALUES } from "./ArcRobot.js";
 import { TouchButton } from "../lab/lablib/TouchButton.js";
 import { Rectangle } from "../lab/lablib/Rectangle.js";
-import { Point } from "../pga2d/objects.js";
 import { CanvasMouseHandler } from "../lab/lablib/CanvasMouseHandler.js";
 import { AnimatedPath } from "./AnimatedPath.js";
 import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
 import { ArcAngles } from "../sketchlib/ArcAngles.js";
+import { Point } from "../pga2d/Point.js";
+import { Direction } from "../pga2d/Direction.js";
 
 const MOUSE = new CanvasMouseHandler();
 const DPAD = new DirectionalPad();
-const THIRD_SCREEN = Point.direction(WIDTH / 3, HEIGHT);
+const THIRD_SCREEN = new Direction(WIDTH / 3, HEIGHT);
 
 // Virtual touch buttons for directional buttons on mobile.
 const TOUCH_LEFT = new TouchButton(new Rectangle(Point.ORIGIN, THIRD_SCREEN));
 const TOUCH_RIGHT = new TouchButton(
-  new Rectangle(Point.point((2 * WIDTH) / 3, 0), THIRD_SCREEN)
+  new Rectangle(new Point((2 * WIDTH) / 3, 0), THIRD_SCREEN)
 );
 const TOUCH_DOWN = new TouchButton(
   new Rectangle(
-    Point.point(WIDTH / 3, (3 * HEIGHT) / 4),
-    Point.direction(WIDTH / 3, HEIGHT / 4)
+    new Point(WIDTH / 3, (3 * HEIGHT) / 4),
+    new Direction(WIDTH / 3, HEIGHT / 4)
   )
 );
 
 // TEMP CODE
 const RIGHT_ARC = new ArcAngles(-Math.PI / 2, Math.PI / 2);
 const LEFT_ARC = new ArcAngles((3 * Math.PI) / 2, Math.PI / 2);
-const DOWN_STRIDE = Point.DIR_Y.scale(100);
+const DOWN_STRIDE = Direction.DIR_Y.scale(100);
 
 const ANIMATED_PATH_EX = new AnimatedPath(
   [

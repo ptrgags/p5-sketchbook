@@ -1,4 +1,5 @@
-import { Point } from "../../pga2d/objects.js";
+import { Direction } from "../../pga2d/Direction.js";
+import { Point } from "../../pga2d/Point.js";
 import { HEIGHT, WIDTH } from "../../sketchlib/dimensions.js";
 
 /**
@@ -10,7 +11,7 @@ export class Rectangle {
   /**
    * Constructor
    * @param {Point} position The position of the top left corner
-   * @param {Point} dimensions The dimensions of the rectangle
+   * @param {Direction} dimensions The dimensions of the rectangle
    */
   constructor(position, dimensions) {
     this.position = position;
@@ -46,5 +47,5 @@ export class Rectangle {
  */
 export const SCREEN_RECT = new Rectangle(
   Point.ORIGIN,
-  Point.direction(WIDTH, HEIGHT)
+  new Direction(WIDTH, HEIGHT)
 );

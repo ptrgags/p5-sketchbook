@@ -1,4 +1,5 @@
-import { Point } from "../../pga2d/objects.js";
+import { Direction } from "../../pga2d/Direction.js";
+import { Point } from "../../pga2d/Point.js";
 import { Color } from "../../sketchlib/Color.js";
 import { HEIGHT, WIDTH } from "../../sketchlib/dimensions.js";
 import { PI, TAU } from "../../sketchlib/math_consts.js";
@@ -11,12 +12,12 @@ import { ClockTime } from "./ClockTime.js";
 
 const OUTER_RADIUS = 100;
 const INNER_RADIUS = 70;
-const CLOCK_CENTER = Point.point(WIDTH / 2, HEIGHT / 4);
+const CLOCK_CENTER = new Point(WIDTH / 2, HEIGHT / 4);
 const CLOCK_CIRCLE = new CirclePrimitive(CLOCK_CENTER, OUTER_RADIUS);
 
 const DIRS_12 = new Array(12).fill(0).map((_, i) => {
   const angle = (TAU * i) / 12;
-  return Point.dir_from_angle(angle);
+  return Direction.from_angle(angle);
 });
 const HASH_LENGTH = OUTER_RADIUS - INNER_RADIUS;
 const CLOCK_HASHES = DIRS_12.map((dir) => {
@@ -55,9 +56,9 @@ function render_clock_hands(time) {
   const minute_angle = time.minute_percent * TAU - PI / 2;
   const second_angle = time.second_percent * TAU - PI / 2;
 
-  const dir_hour = Point.dir_from_angle(hour_angle);
-  const dir_minute = Point.dir_from_angle(minute_angle);
-  const dir_second = Point.dir_from_angle(second_angle);
+  const dir_hour = Direction.from_angle(hour_angle);
+  const dir_minute = Direction.from_angle(minute_angle);
+  const dir_second = Direction.from_angle(second_angle);
 
   const hour_hand = new VectorPrimitive(
     CLOCK_CENTER,
@@ -100,7 +101,7 @@ function render_pendulum(time) {
 
   const angle_variation = (PI / 24) * Math.cos(percent_of_period * TAU);
   const angle = PI / 2 + angle_variation;
-  const dir = Point.dir_from_angle(angle);
+  const dir = Direction.from_angle(angle);
 
   const bob_center = CLOCK_CENTER.add(dir.scale(ARM_LENGTH));
 

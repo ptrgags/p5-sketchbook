@@ -31,7 +31,7 @@ export class PhyllotaxisPalette {
    * colors from the color wheel, but also for some of the spiral patterns in
    * some sketches.
    * @param {number} index Integer index into the Phyllotactic spiral from [0, N)
-   * @returns {PolarCoords} The coordinates of the point in the unit circle. The angle will be reduced to be in the range [0, 2pi)
+   * @returns {Polar} The coordinates of the point in the unit circle. The angle will be reduced to be in the range [0, 2pi)
    */
   get_point(index) {
     if (index < 0) {

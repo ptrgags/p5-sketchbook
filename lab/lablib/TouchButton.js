@@ -1,4 +1,4 @@
-import { Point } from "../../pga2d/objects.js";
+import { Point } from "../../pga2d/Point.js";
 import { Color } from "../../sketchlib/Color.js";
 import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
 import { style } from "../../sketchlib/primitives/shorthand.js";

@@ -1,4 +1,3 @@
-import { Point } from "../pga2d/objects.js";
 import { Grid, Index2D } from "../sketchlib/Grid.js";
 import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
 import { Style } from "../sketchlib/Style.js";
@@ -9,14 +8,16 @@ import { Color } from "../sketchlib/Color.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
+import { Direction } from "../pga2d/Direction.js";
+import { Point } from "../pga2d/Point.js";
 
 const ROWS = 16;
 const COLS = 16;
 const SQUARE_SIZE = 30;
 const MARGIN_X = (WIDTH - COLS * SQUARE_SIZE) / 2;
 const MARGIN_Y = (HEIGHT - ROWS * SQUARE_SIZE) / 2;
-const STRIDE = Point.direction(SQUARE_SIZE, SQUARE_SIZE);
-const CORNER = Point.point(MARGIN_X, MARGIN_Y);
+const STRIDE = new Direction(SQUARE_SIZE, SQUARE_SIZE);
+const CORNER = new Point(MARGIN_X, MARGIN_Y);
 const SWAP_DURATION = sec_to_frames(1 / 16);
 const PIXEL_STYLE = new Style({ stroke: Color.BLACK, width: 2 });
 
@@ -97,7 +98,7 @@ export class MosaicGrid {
 
     // Look at the vector between the cell's center and the mouse.
     // Pick the closest cardinal direction and move one cell in that direction.
-    const src_center = Point.point(
+    const src_center = new Point(
       MARGIN_X + (j + 0.5) * SQUARE_SIZE,
       MARGIN_Y + (i + 0.5) * SQUARE_SIZE
     );
@@ -141,7 +142,7 @@ export class MosaicGrid {
       }
 
       const { i, j } = index;
-      const offset = Point.direction(j * SQUARE_SIZE, i * SQUARE_SIZE);
+      const offset = new Direction(j * SQUARE_SIZE, i * SQUARE_SIZE);
       const position = CORNER.add(offset);
       const rect = new RectPrimitive(position, STRIDE);
       by_colors[color_index].push(rect);
@@ -164,11 +165,11 @@ export class MosaicGrid {
     const { i: src_i, j: src_j } = src_index;
     const { i: dst_i, j: dst_j } = dst_index;
     const position_a = CORNER.add(
-      Point.direction(src_j * SQUARE_SIZE, src_i * SQUARE_SIZE)
+      new Direction(src_j * SQUARE_SIZE, src_i * SQUARE_SIZE)
     );
     const style_a = this.get_style(src_index);
     const position_b = CORNER.add(
-      Point.direction(dst_j * SQUARE_SIZE, dst_i * SQUARE_SIZE)
+      new Direction(dst_j * SQUARE_SIZE, dst_i * SQUARE_SIZE)
     );
     const style_b = this.get_style(dst_index);
     return new PixelSwapPair(

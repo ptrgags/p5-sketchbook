@@ -1,15 +1,15 @@
-import { Oklch } from "../lab/lablib/Oklch.js";
-import { Point } from "../pga2d/objects.js";
 import { ArcAngles } from "../sketchlib/ArcAngles.js";
 import { Color } from "../sketchlib/Color.js";
 import { SCREEN_CENTER } from "../sketchlib/dimensions.js";
-import { Direction } from "../sketchlib/Direction.js";
 import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 import { AnimatedPath } from "./AnimatedPath.js";
+import { CardinalDirection } from "../sketchlib/CardinalDirection.js";
+import { Oklch } from "../lab/lablib/Oklch.js";
 import { RobotCommand, ROOTS_OF_UNITY } from "./RobotCommand.js";
+import { Direction } from "../pga2d/Direction.js";
 
 /**
  * Given an array, make a reverse lookup table
@@ -51,7 +51,7 @@ const FULL_CIRCLE_DURATION = 120;
 const DURATION_UNWIND_PATH = 50;
 
 const PIXELS_PER_METER = 25;
-const START_POINT = Point.ORIGIN.add(SCREEN_CENTER);
+const START_POINT = SCREEN_CENTER;
 
 /**
  * @enum {number}
@@ -96,7 +96,7 @@ class ArcRobotState {
     // the arc radius as 1 meter. So the right direction is _exactly_ the
     // corresponding root of unity. And left is just its negation.
     /**
-     * @type {Point}
+     * @type {Direction}
      */
     let to_center_model = ROOTS_OF_UNITY[n][prev_command.orientation];
     /**
@@ -260,10 +260,10 @@ export class ArcRobot {
   /**
    *
    * @param {number} frame The current frame number
-   * @param {Direction} dpad_direction
+   * @param {CardinalDirection} dpad_direction
    */
   start_step(frame, dpad_direction) {
-    const arc_dir = dpad_direction === Direction.LEFT ? "L" : "R";
+    const arc_dir = dpad_direction === CardinalDirection.LEFT ? "L" : "R";
     const prev_state = this.history[this.history.length - 1];
     this.history.push(ArcRobotState.take_step(this.n, arc_dir, prev_state));
 
@@ -281,14 +281,19 @@ export class ArcRobot {
     );
   }
 
+  /**
+   *
+   * @param {number} frame
+   * @param {CardinalDirection} dpad_direction
+   */
   update_idle(frame, dpad_direction) {
-    if (dpad_direction === Direction.DOWN) {
+    if (dpad_direction === CardinalDirection.DOWN) {
       this.start_undo(frame);
       this.animation_state = RobotAnimationState.MOVING;
       return;
     } else if (
-      dpad_direction === Direction.LEFT ||
-      dpad_direction === Direction.RIGHT
+      dpad_direction === CardinalDirection.LEFT ||
+      dpad_direction === CardinalDirection.RIGHT
     ) {
       this.start_step(frame, dpad_direction);
       this.animation_state = RobotAnimationState.MOVING;
@@ -296,18 +301,23 @@ export class ArcRobot {
     }
   }
 
+  /**
+   *
+   * @param {Number} frame
+   * @param {CardinalDirection} dpad_direction
+   */
   update_animate(frame, dpad_direction) {
     if (!this.current_path.is_done(frame)) {
       return;
     }
 
-    if (dpad_direction === Direction.DOWN) {
+    if (dpad_direction === CardinalDirection.DOWN) {
       this.start_undo(frame);
       this.animation_state = RobotAnimationState.MOVING;
       return;
     } else if (
-      dpad_direction === Direction.LEFT ||
-      dpad_direction === Direction.RIGHT
+      dpad_direction === CardinalDirection.LEFT ||
+      dpad_direction === CardinalDirection.RIGHT
     ) {
       this.start_step(frame, dpad_direction);
       this.animation_state = RobotAnimationState.MOVING;
@@ -317,6 +327,12 @@ export class ArcRobot {
     }
   }
 
+  /**
+   *
+   * @param {number} frame
+   * @param {CardinalDirection} dpad_direction
+   * @returns
+   */
   update_reset(frame, dpad_direction) {
     if (!this.current_path.is_done(frame)) {
       return;
@@ -325,8 +341,8 @@ export class ArcRobot {
     this.events.dispatchEvent(new CustomEvent("reset"));
 
     if (
-      dpad_direction === Direction.LEFT ||
-      dpad_direction === Direction.RIGHT
+      dpad_direction === CardinalDirection.LEFT ||
+      dpad_direction === CardinalDirection.RIGHT
     ) {
       this.start_step(frame, dpad_direction);
       this.animation_state = RobotAnimationState.MOVING;
@@ -339,7 +355,7 @@ export class ArcRobot {
   /**
    * Update the robot each frame
    * @param {number} frame The current frame number
-   * @param {Direction | undefined} dpad_direction The current direction button pressed
+   * @param {CardinalDirection | undefined} dpad_direction The current direction button pressed
    */
   update(frame, dpad_direction) {
     // On the first frame, if we have initial commands, start a winding

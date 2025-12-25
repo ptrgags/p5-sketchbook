@@ -1,4 +1,3 @@
-import { Point } from "../../pga2d/objects.js";
 import { RungeKuttaIntegrator } from "../lablib/RungeKuttaIntegrator.js";
 import { Style } from "../../sketchlib/Style.js";
 import { RingBuffer } from "../lablib/RingBuffer.js";
@@ -8,10 +7,12 @@ import { group, style } from "../../sketchlib/primitives/shorthand.js";
 import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
 import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
+import { Direction } from "../../pga2d/Direction.js";
+import { Point } from "../../pga2d/Point.js";
 
 const PIXELS_PER_METER = 100;
-const X_METERS = Point.DIR_X.scale(PIXELS_PER_METER);
-const Y_METERS = Point.DIR_Y.scale(-PIXELS_PER_METER);
+const X_METERS = Direction.DIR_X.scale(PIXELS_PER_METER);
+const Y_METERS = Direction.DIR_Y.scale(-PIXELS_PER_METER);
 const NUM_COILS = 10;
 
 const STYLE_AXIS = Style.DEFAULT_STROKE;
@@ -52,8 +53,8 @@ export class Spring {
 function render_horizontal_spring(position, dimensions, num_coils, line_style) {
   const { x: w, y: h } = dimensions;
 
-  const delta_x = Point.direction(w / num_coils, 0);
-  const delta_y = Point.DIR_Y.scale(h);
+  const delta_x = new Direction(w / num_coils, 0);
+  const delta_y = Direction.DIR_Y.scale(h);
   const wires = [];
 
   for (let i = 0; i < num_coils; i++) {
@@ -122,8 +123,8 @@ export class DoubleSpringSystem {
    * @returns {[GroupPrimitive, GroupPrimitive]} The two phase plots
    */
   render_phase(origin, x_scale, v_scale) {
-    const x_dir = Point.DIR_X.scale(x_scale);
-    const v_dir = Point.DIR_Y.scale(-v_scale);
+    const x_dir = Direction.DIR_X.scale(x_scale);
+    const v_dir = Direction.DIR_Y.scale(-v_scale);
 
     const states = [...this.history];
     const points1 = states.map(([x1, v1, ,]) =>
@@ -157,12 +158,12 @@ export class DoubleSpringSystem {
    * @returns {GroupPrimitive}
    */
   render_phase_axes(origin, x_scale, v_scale) {
-    const x_dir = Point.DIR_X.scale(x_scale);
-    const v_dir = Point.DIR_Y.scale(-v_scale);
+    const x_dir = Direction.DIR_X.scale(x_scale);
+    const v_dir = Direction.DIR_Y.scale(-v_scale);
 
     const primitives = [
-      new LinePrimitive(origin.sub(x_dir), origin.add(x_dir)),
-      new LinePrimitive(origin.sub(v_dir), origin.add(v_dir)),
+      new LinePrimitive(origin.add(x_dir.neg()), origin.add(x_dir)),
+      new LinePrimitive(origin.add(v_dir.neg()), origin.add(v_dir)),
     ];
 
     return style(primitives, STYLE_AXIS);
@@ -185,7 +186,7 @@ export class DoubleSpringSystem {
     const bob1_position = bob_height.add(X_METERS.scale(l1 + x1));
     const bob1 = new RectPrimitive(
       bob1_position,
-      Point.direction(w1, w1).scale(PIXELS_PER_METER)
+      new Direction(w1, w1).scale(PIXELS_PER_METER)
     );
 
     const left_spring = render_horizontal_spring(
@@ -199,7 +200,7 @@ export class DoubleSpringSystem {
     const bob2_position = bob_height.add(X_METERS.scale(rest_length2 + x2));
     const bob2 = new RectPrimitive(
       bob2_position,
-      Point.direction(w2, w2).scale(PIXELS_PER_METER)
+      new Direction(w2, w2).scale(PIXELS_PER_METER)
     );
 
     const right_spring = render_horizontal_spring(

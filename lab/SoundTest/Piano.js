@@ -1,4 +1,4 @@
-import { Point } from "../../pga2d/objects.js";
+import { Direction } from "../../pga2d/Direction.js";
 import { Color } from "../../sketchlib/Color.js";
 import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
@@ -16,12 +16,12 @@ const NUM_WHITE_KEYS = 7;
  */
 function make_white_keys(bounding_rect) {
   const { x: width, y: height } = bounding_rect.dimensions;
-  const key_dimensions = Point.direction(width / 7, height);
+  const key_dimensions = new Direction(width / 7, height);
 
   const result = new Array(7);
 
   for (let i = 0; i < NUM_WHITE_KEYS; i++) {
-    const offset = Point.DIR_X.scale(i * key_dimensions.x);
+    const offset = Direction.DIR_X.scale(i * key_dimensions.x);
     result[i] = new RectPrimitive(
       bounding_rect.position.add(offset),
       key_dimensions
@@ -37,14 +37,14 @@ function make_white_keys(bounding_rect) {
  */
 function make_black_keys(bounding_rect) {
   const { x: width, y: height } = bounding_rect.dimensions;
-  const key_dimensions = Point.direction(width / 14, (9 * height) / 16);
+  const key_dimensions = new Direction(width / 14, (9 * height) / 16);
 
   // key offsets in multiples of half the black key width, i.e. 1/28 of
   // the width of the keyboard
   const key_offsets = [3, 7, 15, 19, 23];
 
   return key_offsets.map((i) => {
-    const offset = Point.DIR_X.scale((i * width) / 28);
+    const offset = Direction.DIR_X.scale((i * width) / 28);
     return new RectPrimitive(
       bounding_rect.position.add(offset),
       key_dimensions
@@ -172,13 +172,13 @@ export class Piano {
 
     const { x: width, y: height } = bounding_rect.dimensions;
     const octave_width = width / num_octaves;
-    const octave_dimensions = Point.direction(octave_width, height);
+    const octave_dimensions = new Direction(octave_width, height);
 
     // Create a number of single-octave pianos
     this.octave_pianos = new Array(this.num_octaves);
     for (let i = 0; i < num_octaves; i++) {
       const offset = bounding_rect.position.add(
-        Point.DIR_X.scale(i * octave_width)
+        Direction.DIR_X.scale(i * octave_width)
       );
       this.octave_pianos[i] = new SingleOctavePiano(
         new Rectangle(offset, octave_dimensions)

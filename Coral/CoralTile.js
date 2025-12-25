@@ -1,13 +1,14 @@
 import { ControlPoint } from "./ControlPoint.js";
-import { Point } from "../pga2d/objects.js";
 import { Rect } from "./Rect.js";
 import { FlagSet } from "../sketchlib/FlagSet.js";
-import { Direction } from "../sketchlib/Direction.js";
+import { CardinalDirection } from "../sketchlib/CardinalDirection.js";
+import { Point } from "../pga2d/Point.js";
+import { Direction } from "../pga2d/Direction.js";
 
-const DIR_LEFT = Point.DIR_X.neg();
-const DIR_RIGHT = Point.DIR_X;
-const DIR_UP = Point.DIR_Y;
-const DIR_DOWN = Point.DIR_Y.neg();
+const DIR_LEFT = Direction.DIR_X.neg();
+const DIR_RIGHT = Direction.DIR_X;
+const DIR_UP = Direction.DIR_Y;
+const DIR_DOWN = Direction.DIR_Y.neg();
 
 /**
  * @enum {number}
@@ -21,14 +22,20 @@ export const Quadrant = {
 Object.freeze(Quadrant);
 
 export class CoralTile {
+  /**
+   *
+   * @param {Rect} quad
+   * @param {FlagSet} connection_flags
+   * @param {ControlPoint[]} [control_points]
+   */
   constructor(quad, connection_flags, control_points) {
     this.quad = quad;
     this.connection_flags = connection_flags;
 
-    const connects_down = connection_flags.has_flag(Direction.DOWN);
-    const connects_right = connection_flags.has_flag(Direction.RIGHT);
-    const connects_up = connection_flags.has_flag(Direction.UP);
-    const connects_left = connection_flags.has_flag(Direction.LEFT);
+    const connects_down = connection_flags.has_flag(CardinalDirection.DOWN);
+    const connects_right = connection_flags.has_flag(CardinalDirection.RIGHT);
+    const connects_up = connection_flags.has_flag(CardinalDirection.UP);
+    const connects_left = connection_flags.has_flag(CardinalDirection.LEFT);
 
     const se_dir = connects_down ? DIR_UP : DIR_RIGHT;
     const ne_dir = connects_right ? DIR_LEFT : DIR_UP;
@@ -40,17 +47,17 @@ export class CoralTile {
       this.control_points = control_points;
     } else {
       const se_position = connects_down
-        ? Point.point(0.75, 0)
-        : Point.point(0.5, 0.25);
+        ? new Point(0.75, 0)
+        : new Point(0.5, 0.25);
       const ne_position = connects_right
-        ? Point.point(1, 0.75)
-        : Point.point(0.75, 0.5);
+        ? new Point(1, 0.75)
+        : new Point(0.75, 0.5);
       const nw_position = connects_up
-        ? Point.point(0.25, 1)
-        : Point.point(0.5, 0.75);
+        ? new Point(0.25, 1)
+        : new Point(0.5, 0.75);
       const sw_position = connects_left
-        ? Point.point(0, 0.25)
-        : Point.point(0.25, 0.5);
+        ? new Point(0, 0.25)
+        : new Point(0.25, 0.5);
       const se = new ControlPoint(se_position, se_dir.scale(0.1));
       const ne = new ControlPoint(ne_position, ne_dir.scale(0.1));
       const nw = new ControlPoint(nw_position, nw_dir.scale(0.1));
@@ -78,14 +85,28 @@ export class CoralTile {
     ];
   }
 
+  /**
+   *
+   * @param {CardinalDirection} direction
+   * @returns {boolean}
+   */
   is_connected(direction) {
     return this.connection_flags.has_flag(direction);
   }
 
+  /**
+   *
+   * @param {Quadrant} quadrant
+   * @returns {ControlPoint}
+   */
   get_control_point(quadrant) {
     return this.control_points[quadrant];
   }
 
+  /**
+   *
+   * @returns {[ControlPoint, Rect, Direction][]} (control point, vertex constraint, tangent constraint)
+   */
   get_constraints() {
     // control point, vertex constraint, tangent constraint
     return this.control_points.map((point, i) => [
@@ -95,6 +116,15 @@ export class CoralTile {
     ]);
   }
 
+  /**
+   *
+   * @returns {{
+   * connections: number,
+   * control_points: {
+   *    position: number[],
+   *    tangent: number[]
+   * }[]}}
+   */
   to_json() {
     return {
       connections: this.connection_flags.to_int(),
@@ -102,6 +132,12 @@ export class CoralTile {
     };
   }
 
+  /**
+   *
+   * @param {object} json
+   * @param {Rect} quad
+   * @returns {CoralTile}
+   */
   static parse_json(json, quad) {
     const { connections, control_points } = json;
 
@@ -109,7 +145,7 @@ export class CoralTile {
       throw new Error("connections must be an int");
     }
 
-    const connection_flags = new FlagSet(connections, Direction.COUNT);
+    const connection_flags = new FlagSet(connections, CardinalDirection.COUNT);
 
     if (!Array.isArray(control_points) || control_points.length !== 4) {
       throw new Error("control_points must be an array of length 4");

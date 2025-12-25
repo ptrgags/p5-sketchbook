@@ -1,5 +1,7 @@
+import { Direction } from "./Direction.js";
+import { Line } from "./Line.js";
 import { Even, Odd } from "./multivectors.js";
-import { Line, Point } from "./objects.js";
+import { Point } from "./Point.js";
 
 /**
  * A motor is an even versor. in 2D PGA, these are rotations and translations.
@@ -61,10 +63,21 @@ export class Motor {
     return Point.from_bivec(bivec);
   }
 
+  /**
+   * Transform a direction
+   * @param {Direction} dir The direction to transform
+   * @returns {Direction}
+   */
+  transform_dir(dir) {
+    const bivec = this.even.sandwich_even(dir.bivec);
+    return Direction.from_bivec(bivec);
+  }
+
   toString() {
     return `Motor(${this.even})`;
   }
 }
+Motor.ROT90 = Object.freeze(Motor.rotation(Point.ORIGIN, Math.PI / 2));
 
 /**
  * A flector is an odd versor. This includes reflections and glide reflections
@@ -105,6 +118,16 @@ export class Flector {
   transform_point(point) {
     const bivec = this.odd.sandwich_even(point.bivec);
     return Point.from_bivec(bivec);
+  }
+
+  /**
+   * Transform a direction
+   * @param {Direction} dir the point to transform
+   * @returns {Direction} the transformed point
+   */
+  transform_dir(dir) {
+    const bivec = this.odd.sandwich_even(dir.bivec);
+    return Direction.from_bivec(bivec);
   }
 
   toString() {

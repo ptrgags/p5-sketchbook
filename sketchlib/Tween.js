@@ -1,4 +1,5 @@
-import { Point } from "../pga2d/objects.js";
+import { Direction } from "../pga2d/Direction.js";
+import { Point } from "../pga2d/Point.js";
 import { clamp } from "./clamp.js";
 import { lerp } from "./lerp.js";
 
@@ -93,6 +94,18 @@ export class Tween {
    */
   static point(start_point, end_point, start_time, duration) {
     return new Tween(start_point, end_point, Point.lerp, start_time, duration);
+  }
+
+  /**
+   * Tween for animating a 2D PGA point
+   * @param {Direction} start_dir The starting point
+   * @param {Direction} end_dir The ending point
+   * @param {number} start_time The start time in frames, seconds or other time units
+   * @param {number} duration The end time in the same units as start_time
+   * @returns {Tween<Direction>} A point-valued tween
+   */
+  static dir(start_dir, end_dir, start_time, duration) {
+    return new Tween(start_dir, end_dir, Direction.lerp, start_time, duration);
   }
 
   /**

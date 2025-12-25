@@ -1,40 +1,66 @@
-import { Point } from "../pga2d/objects.js";
+import { Direction } from "../pga2d/Direction.js";
+import { Point } from "../pga2d/Point.js";
 import { Grid } from "../sketchlib/Grid.js";
 import { clamp } from "../sketchlib/clamp.js";
 
 export class Rect {
+  /**
+   * Consructor
+   * @param {number} x
+   * @param {number} y
+   * @param {number} width
+   * @param {number} height
+   */
   constructor(x, y, width, height) {
-    this.position = Point.point(x, y);
-    this.dimensions = Point.direction(width, height);
+    this.position = new Point(x, y);
+    this.dimensions = new Direction(width, height);
   }
 
+  /**
+   * @type {Point}
+   */
   get far_corner() {
     return this.position.add(this.dimensions);
   }
 
+  /**
+   * Clamp a point to fit within the bounds
+   * @param {Point} point
+   * @returns {Point}
+   */
   clamp(point) {
     const { x, y } = point;
     const { x: near_x, y: near_y } = this.position;
     const { x: far_x, y: far_y } = this.far_corner;
 
-    return Point.point(clamp(x, near_x, far_x), clamp(y, near_y, far_y));
+    return new Point(clamp(x, near_x, far_x), clamp(y, near_y, far_y));
   }
 
+  /**
+   * Convert a position from UV coordinates to screen pixels
+   * @param {Point} uv
+   * @returns {Point}
+   */
   uv_to_world(uv) {
     const { x: u, y: v } = uv;
 
-    return Point.point(
+    return new Point(
       this.position.x + u * this.dimensions.x,
       this.position.y + (1 - v) * this.dimensions.y
     );
   }
 
+  /**
+   * Convert screen pixels to UV coordinates
+   * @param {Point} world
+   * @returns {Point}
+   */
   world_to_uv(world) {
     const { x, y } = world;
 
     const u = (x - this.position.x) / this.dimensions.x;
     const v = 1 - (y - this.position.y) / this.dimensions.y;
-    return Point.point(u, v);
+    return new Point(u, v);
   }
 
   /**

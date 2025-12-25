@@ -1,6 +1,8 @@
 import { is_nearly } from "../sketchlib/is_nearly";
+import { Direction } from "./Direction";
+import { Line } from "./Line";
 import { Even, Odd } from "./multivectors";
-import { Point, Line } from "./objects";
+import { Point } from "./Point";
 
 function diff_property(diffs, received, expected, property_name) {
   const received_value = received[property_name];
@@ -67,6 +69,23 @@ function format_point_diff(received, expected) {
   return "actual | expected\n" + diffs.join("\n");
 }
 
+function format_dir_diff(received, expected) {
+  if (!(received instanceof Direction)) {
+    return `recieved is not a Direction object: ${received}`;
+  }
+
+  const diffs = [];
+
+  diff_property(diffs, received, expected, "is_direction");
+  const r_bivec = received.bivec;
+  const e_bivec = expected.bivec;
+  diff_float_property(diffs, r_bivec, e_bivec, "yo", "x");
+  diff_float_property(diffs, r_bivec, e_bivec, "xo", "-y");
+  diff_float_property(diffs, r_bivec, e_bivec, "xy", "weight");
+
+  return "actual | expected\n" + diffs.join("\n");
+}
+
 function format_line_diff(received, expected) {
   if (!(received instanceof Line)) {
     return `recieved is not a Line object: ${received}`;
@@ -89,6 +108,12 @@ export const PGA_MATCHERS = {
     return {
       pass: received.equals(expected),
       message: () => format_point_diff(received, expected),
+    };
+  },
+  toBeDirection(received, expected) {
+    return {
+      pass: received.equals(expected),
+      message: () => format_dir_diff(received, expected),
     };
   },
   toBeLine(received, expected) {

@@ -1,21 +1,38 @@
-import { Point } from "../../pga2d/objects.js";
+import { Direction } from "../../pga2d/Direction.js";
+import { Point } from "../../pga2d/Point.js";
 import { Flector } from "../../pga2d/versors.js";
+import { ControlPoint } from "../ControlPoint.js";
+import { Rect } from "../Rect.js";
 
 export const SELECT_RADIUS = 10;
 const SELECT_RADIUS_SQR = SELECT_RADIUS * SELECT_RADIUS;
 const MAX_TANGENT_MAGNITUDE = 0.5;
 
 export class InteractiveVertex {
+  /**
+   *
+   * @param {ControlPoint} control_point
+   * @param {Rect} constraint
+   * @param {Rect} tile_quad
+   */
   constructor(control_point, constraint, tile_quad) {
     this.control_point = control_point;
     this.constraint = constraint;
     this.tile_quad = tile_quad;
   }
 
+  /**
+   * @type {Point}
+   */
   get position_world() {
     return this.tile_quad.uv_to_world(this.control_point.position);
   }
 
+  /**
+   *
+   * @param {Point} mouse
+   * @returns {boolean}
+   */
   is_hovering(mouse) {
     const position_world = this.tile_quad.uv_to_world(
       this.control_point.position
@@ -25,6 +42,10 @@ export class InteractiveVertex {
     return dist_sqr < SELECT_RADIUS_SQR;
   }
 
+  /**
+   *
+   * @param {Point} mouse
+   */
   move(mouse) {
     const uv = this.tile_quad.world_to_uv(mouse);
     this.control_point.position = this.constraint.clamp(uv);
@@ -32,6 +53,12 @@ export class InteractiveVertex {
 }
 
 export class InteractiveTangent {
+  /**
+   *
+   * @param {ControlPoint} control_point
+   * @param {Direction} forward_direction
+   * @param {Rect} tile_quad
+   */
   constructor(control_point, forward_direction, tile_quad) {
     // The forward direction serves as a constraint so we never have
     // a backwards-pointing tangent. To reflect a point forward, we need
@@ -45,10 +72,18 @@ export class InteractiveTangent {
     this.tile_quad = tile_quad;
   }
 
+  /**
+   * @type {Point}
+   */
   get position_world() {
     return this.tile_quad.uv_to_world(this.control_point.forward_point);
   }
 
+  /**
+   *
+   * @param {Point} mouse
+   * @returns {boolean}
+   */
   is_hovering(mouse) {
     const position_world = this.tile_quad.uv_to_world(
       this.control_point.forward_point
@@ -72,7 +107,7 @@ export class InteractiveTangent {
         ? // Since directions are represented as ideal points (bivectors)
           // not vectors, you get a negative sign which is unwanted here. Hence
           // the .neg()
-          this.flip_forward.transform_point(original_tangent).neg()
+          this.flip_forward.transform_dir(original_tangent).neg()
         : original_tangent;
 
     this.control_point.tangent = corrected_tangent.limit_length(

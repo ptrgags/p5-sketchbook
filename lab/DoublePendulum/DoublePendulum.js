@@ -1,4 +1,4 @@
-import { Point } from "../../pga2d/objects.js";
+import { Point } from "../../pga2d/Point.js";
 import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
 import { group } from "../../sketchlib/primitives/shorthand.js";
 import { DoublePendulumSystem, Pendulum } from "./DoublePendulumSystem.js";
@@ -35,11 +35,11 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    const center_offset = Point.point(WIDTH / 2, (3 * HEIGHT) / 4);
+    const center_offset = new Point(WIDTH / 2, (3 * HEIGHT) / 4);
     const pendulum_animation = SYSTEM.render(center_offset);
     const [history1, history2] = SYSTEM.render_history(center_offset);
 
-    const phase_origin = Point.point(WIDTH / 2, HEIGHT / 4);
+    const phase_origin = new Point(WIDTH / 2, HEIGHT / 4);
     const phase_axes = SYSTEM.render_phase_axes(
       phase_origin,
       THETA_SCALE,

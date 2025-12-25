@@ -1,4 +1,5 @@
-import { Point } from "../../pga2d/objects.js";
+import { Direction } from "../../pga2d/Direction.js";
+import { Point } from "../../pga2d/Point.js";
 
 /**
  * Rectangle
@@ -6,8 +7,8 @@ import { Point } from "../../pga2d/objects.js";
 export class RectPrimitive {
   /**
    * Constructor
-   * @param {Point} position The top left corner of the rectangle as a Point.point
-   * @param {Point} dimensions The dimensions of the rectangle as a Point.direction
+   * @param {Point} position The top left corner of the rectangle as a Point
+   * @param {Direction} dimensions The dimensions of the rectangle as a Direction
    */
   constructor(position, dimensions) {
     this.position = position;

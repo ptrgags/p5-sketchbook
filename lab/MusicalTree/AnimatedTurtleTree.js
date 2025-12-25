@@ -1,4 +1,3 @@
-import { Point } from "../../pga2d/objects.js";
 import { LSystem } from "../../sketchlib/LSystem.js";
 import { N16 } from "../lablib/music/durations.js";
 import { map_pitch, Melody, Note, Rest, Score } from "../lablib/music/Score.js";
@@ -8,8 +7,6 @@ import { HEIGHT, WIDTH } from "../../sketchlib/dimensions.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Color } from "../../sketchlib/Color.js";
 import { Gap, Sequential } from "../lablib/music/Timeline.js";
-import { ParamCurve } from "../lablib/music/ParamCurve.js";
-import { SoundManager } from "../lablib/SoundManager.js";
 import { is_nearly } from "../../sketchlib/is_nearly.js";
 import { lerp } from "../../sketchlib/lerp.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
@@ -18,6 +15,10 @@ import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
 import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
 import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
 import { whole_fract } from "../../sketchlib/whole_fract.js";
+import { Point } from "../../pga2d/Point.js";
+import { Direction } from "../../pga2d/Direction.js";
+import { AnimationCurves } from "../lablib/animation/AnimationCurves.js";
+import { ParamCurve } from "../lablib/animation/ParamCurve.js";
 
 const TREE_LSYSTEM = new LSystem("Fa", {
   a: "[+Fa][-Fa]",
@@ -39,12 +40,12 @@ export class TurtleGraphics {
 
   /**
    * Get the forward direction in p5's y-down coordinate system
-   * @type {Point} A Point.direction representing the current forward direction as a unit direction
+   * @type {Direction} A Direction representing the current forward direction as a unit direction
    */
   get dir_forward() {
     // Angles are measured from vertical, not horizontal
     const ANGLE_ZERO = -Math.PI / 2;
-    return Point.dir_from_angle(
+    return Direction.from_angle(
       ANGLE_ZERO + this.delta_angle * this.orientation
     );
   }
@@ -89,7 +90,7 @@ export class TurtleGraphics {
 }
 
 const DELTA_ANGLE = Math.PI / 5;
-const START_POINT = Point.point(WIDTH / 2, (3 * HEIGHT) / 4);
+const START_POINT = new Point(WIDTH / 2, (3 * HEIGHT) / 4);
 const MAX_LENGTH = 100;
 const LENGTH_SCALE = 0.7;
 
@@ -352,18 +353,18 @@ class TreeAnimationBuilder {
 
   /**
    * Build the animation part of a score
-   * @returns {[string, import("../lablib/music/Timeline.js").Timeline<ParamCurve>][]}
+   * @returns {AnimationCurves}
    */
   build() {
-    const line_part = new Sequential(...this.line_count_curve);
-    const state_part = new Sequential(...this.state_curve);
-    const depth_part = new Sequential(...this.depth_curve);
+    const line_count = new Sequential(...this.line_count_curve);
+    const state = new Sequential(...this.state_curve);
+    const depth = new Sequential(...this.depth_curve);
 
-    return [
-      ["line_count", line_part],
-      ["state", state_part],
-      ["depth", depth_part],
-    ];
+    return new AnimationCurves({
+      line_count,
+      state,
+      depth,
+    });
   }
 }
 
@@ -432,18 +433,18 @@ export class AnimatedTurtleTree {
 
     this.score = new Score({
       parts: music_builder.build(),
-      params: animation_builder.build(),
+      animation_curves: animation_builder.build(),
     });
     [this.lines, this.states] = primitive_builder.build();
   }
 
   /**
    * Render the tree animation
-   * @param {SoundManager} sound The sound system
+   * @param {AnimationCurves} curves The animation curves
    * @returns {GroupPrimitive}
    */
-  render(sound) {
-    const line_count = sound.get_param("line_count");
+  render(curves) {
+    const line_count = curves.get_curve_val("line_count");
     const [whole_lines, fract_lines] = whole_fract(line_count);
 
     // Render all of the lines we've already seen, and possibly one
@@ -459,7 +460,7 @@ export class AnimatedTurtleTree {
       tree = style(visible_lines, STYLE_TREE);
     }
 
-    const state_param = sound.get_param("state");
+    const state_param = curves.get_curve_val("state");
     const [state_index, state_t] = whole_fract(state_param);
 
     let position;
@@ -473,7 +474,7 @@ export class AnimatedTurtleTree {
       orientation = lerp(prev_orientation, next_orientation, state_t);
     }
 
-    const depth = sound.get_param("depth");
+    const depth = curves.get_curve_val("depth");
 
     const turtle = render_turtle(position, orientation);
     const stack = render_stack(position, depth);
@@ -490,17 +491,17 @@ const STYLE_TURTLE = new Style({
 
 /**
  * Draw a turtle as an isoceles triangle for now.
- * @param {Point} position Point.point for the turtle position
+ * @param {Point} position Point for the turtle position
  * @param {number} orientation orientation of the turtle
  */
 function render_turtle(position, orientation) {
-  const dir_front = Point.dir_from_angle(
+  const dir_front = Direction.from_angle(
     -Math.PI / 2 + orientation * DELTA_ANGLE
   );
-  const dir_back_left = Point.dir_from_angle(
+  const dir_back_left = Direction.from_angle(
     -Math.PI / 2 + orientation * DELTA_ANGLE + (5 * Math.PI) / 6
   );
-  const dir_back_right = Point.dir_from_angle(
+  const dir_back_right = Direction.from_angle(
     -Math.PI / 2 + orientation * DELTA_ANGLE - (5 * Math.PI) / 6
   );
 
@@ -516,13 +517,10 @@ function render_turtle(position, orientation) {
   return style(polygon, STYLE_TURTLE);
 }
 
-const STACK_RECT_DIMENSIONS = Point.direction(RADIUS_TURTLE / 2, RADIUS_TURTLE);
-const OFFSET_STACK_START = Point.direction(
-  RADIUS_TURTLE + 4,
-  -RADIUS_TURTLE / 2
-);
+const STACK_RECT_DIMENSIONS = new Direction(RADIUS_TURTLE / 2, RADIUS_TURTLE);
+const OFFSET_STACK_START = new Direction(RADIUS_TURTLE + 4, -RADIUS_TURTLE / 2);
 const STACK_SPACING = 2;
-const OFFSET_STACK_STRIDE = Point.DIR_X.scale(
+const OFFSET_STACK_STRIDE = Direction.DIR_X.scale(
   STACK_RECT_DIMENSIONS.x + STACK_SPACING
 );
 

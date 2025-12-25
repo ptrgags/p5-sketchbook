@@ -1,4 +1,5 @@
-import { Point } from "../../pga2d/objects.js";
+import { Direction } from "../../pga2d/Direction.js";
+import { Point } from "../../pga2d/Point.js";
 import { Color } from "../../sketchlib/Color.js";
 import { WIDTH, HEIGHT } from "../../sketchlib/dimensions.js";
 import { Grid, Index2D } from "../../sketchlib/Grid.js";
@@ -9,6 +10,7 @@ import { TextPrimitive } from "../../sketchlib/primitives/TextPrimitive.js";
 import { TextStyle } from "../../sketchlib/primitives/TextStyle.js";
 import { Transform } from "../../sketchlib/primitives/Transform.js";
 import { Style } from "../../sketchlib/Style.js";
+import { AnimationCurves } from "../lablib/animation/AnimationCurves.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { MouseInput } from "../lablib/MouseInput.js";
 import { render_score } from "../lablib/music/render_score.js";
@@ -52,7 +54,7 @@ const PART_STYLES = Oklch.gradient(
 );
 
 const RENDERED_TIMELINES = {};
-const MEASURE_DIMENSIONS = Point.direction(25, 50);
+const MEASURE_DIMENSIONS = new Direction(25, 50);
 
 for (const [key, score] of Object.entries(SOUND_MANIFEST.scores)) {
   RENDERED_TIMELINES[key] = render_score(
@@ -62,6 +64,15 @@ for (const [key, score] of Object.entries(SOUND_MANIFEST.scores)) {
     PART_STYLES
   );
 }
+
+/**
+ * @type {{[score_id: string]: AnimationCurves}}
+ */
+const ANIM = {};
+for (const [score_id, score] of Object.entries(SOUND_MANIFEST.scores)) {
+  ANIM[score_id] = score.curves;
+}
+const DEFAULT_CURVES = new AnimationCurves({});
 
 //@ts-ignore
 const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
@@ -97,7 +108,7 @@ MELODY_BUTTONS.set(
 );
 
 const MELODY_BUTTON_SIZE = 150;
-const MELODY_BUTTON_DIMENSIONS = Point.direction(
+const MELODY_BUTTON_DIMENSIONS = new Direction(
   MELODY_BUTTON_SIZE,
   MELODY_BUTTON_SIZE / 2
 );
@@ -108,11 +119,11 @@ const TEXT_COLOR = new Style({
 });
 
 const GRID_BOUNDARY = new Rectangle(
-  Point.point(0, HEIGHT / 2),
-  Point.direction(WIDTH, HEIGHT / 2)
+  new Point(0, HEIGHT / 2),
+  new Direction(WIDTH, HEIGHT / 2)
 );
-const GRID_MARGIN = Point.direction(75, 80);
-const [BUTTON_OFFSET, BUTTON_STRIDE] = MELODY_BUTTONS.compute_layout(
+const GRID_MARGIN = new Direction(75, 80);
+const [FIRST_BUTTON_POSITION, BUTTON_STRIDE] = MELODY_BUTTONS.compute_layout(
   GRID_BOUNDARY,
   MELODY_BUTTON_DIMENSIONS,
   GRID_MARGIN
@@ -125,11 +136,9 @@ const [BUTTON_OFFSET, BUTTON_STRIDE] = MELODY_BUTTONS.compute_layout(
  */
 function make_button_labels(buttons) {
   const primitives = buttons.map_array((index, descriptor) => {
-    const point = index.to_world(
-      BUTTON_OFFSET.add(MELODY_BUTTON_CENTER_OFFSET),
-      BUTTON_STRIDE
-    );
-    return new TextPrimitive(descriptor.label, point);
+    const offset = FIRST_BUTTON_POSITION.add(MELODY_BUTTON_CENTER_OFFSET);
+    const position_world = index.to_world(offset, BUTTON_STRIDE);
+    return new TextPrimitive(descriptor.label, position_world);
   });
 
   return new GroupPrimitive(primitives, {
@@ -144,8 +153,8 @@ const TIMELINE_TOP = HEIGHT / 8;
 
 const CURSOR = style(
   new LinePrimitive(
-    Point.point(WIDTH / 2, TIMELINE_TOP),
-    Point.point(WIDTH / 2, TIMELINE_TOP + HEIGHT / 4)
+    new Point(WIDTH / 2, TIMELINE_TOP),
+    new Point(WIDTH / 2, TIMELINE_TOP + HEIGHT / 4)
   ),
   Style.DEFAULT_STROKE
 );
@@ -161,7 +170,7 @@ class SoundScene {
     this.mute_button = new MuteButton();
     this.events = new EventTarget();
     this.piano = new Piano(
-      new Rectangle(Point.point(0, 300), Point.direction(500, 300 / 3)),
+      new Rectangle(new Point(0, 300), new Direction(500, 300 / 3)),
       3,
       4
     );
@@ -194,7 +203,7 @@ class SoundScene {
     );
 
     this.melody_buttons = melodies.map_array((index, descriptor) => {
-      const corner = index.to_world(BUTTON_OFFSET, BUTTON_STRIDE);
+      const corner = index.to_world(FIRST_BUTTON_POSITION, BUTTON_STRIDE);
       const rectangle = new Rectangle(corner, MELODY_BUTTON_DIMENSIONS);
       const button = new TouchButton(rectangle);
       button.events.addEventListener("click", () => {
@@ -206,30 +215,37 @@ class SoundScene {
     });
   }
 
-  render() {
-    const mute = this.mute_button.render();
-
-    const melody_buttons = this.melody_buttons.map((x) => x.debug_render());
-
-    const piano = this.piano.render();
-
-    const burst = this.spiral_burst.render(SOUND);
-
-    const primitives = [mute, ...melody_buttons, BUTTON_LABELS, piano, burst];
-
-    if (this.selected_melody !== undefined) {
-      const current_time = SOUND.transport_time;
-      const x = current_time * MEASURE_DIMENSIONS.x;
-      const transform = new Transform(
-        Point.direction(WIDTH / 2 - x, TIMELINE_TOP)
-      );
-      const timeline = RENDERED_TIMELINES[this.selected_melody];
-      const shifted = xform(timeline, transform);
-
-      return group(...primitives, shifted, CURSOR);
+  render_timeline(time) {
+    if (this.selected_melody === undefined) {
+      return GroupPrimitive.EMPTY;
     }
 
-    return group(...primitives);
+    const x = time * MEASURE_DIMENSIONS.x;
+    const transform = new Transform(new Direction(WIDTH / 2 - x, TIMELINE_TOP));
+    const timeline = RENDERED_TIMELINES[this.selected_melody];
+    return xform(timeline, transform);
+  }
+
+  render() {
+    const current_time = SOUND.transport_time;
+    const animation = ANIM[this.selected_melody] ?? DEFAULT_CURVES;
+    animation.update(current_time);
+
+    const mute = this.mute_button.render();
+    const melody_buttons = this.melody_buttons.map((x) => x.debug_render());
+    const piano = this.piano.render();
+    const burst = this.spiral_burst.render(animation);
+    const timeline = this.render_timeline(current_time);
+
+    return group(
+      mute,
+      ...melody_buttons,
+      BUTTON_LABELS,
+      piano,
+      timeline,
+      CURSOR,
+      burst
+    );
   }
 
   update() {}

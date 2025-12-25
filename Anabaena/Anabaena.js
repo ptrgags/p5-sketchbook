@@ -1,7 +1,8 @@
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { fix_mouse_coords } from "../sketchlib/fix_mouse_coords.js";
 
-import { Point } from "../pga2d/objects.js";
+import { Point } from "../pga2d/Point.js";
+import { Direction } from "../pga2d/Direction.js";
 import { prevent_mobile_scroll } from "../sketchlib/prevent_mobile_scroll.js";
 import { LSystem } from "../sketchlib/LSystem.js";
 import { sec_to_frames, Tween } from "../sketchlib/Tween.js";
@@ -13,7 +14,7 @@ import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
 import { VectorPrimitive } from "../sketchlib/primitives/VectorPrimitive.js";
 
-const INITIAL_POSITION = Point.point(WIDTH / 2, HEIGHT - 50);
+const INITIAL_POSITION = new Point(WIDTH / 2, HEIGHT - 50);
 const MIN_BEND_ANGLE = (7 * Math.PI) / 8;
 
 const LENGTH_SHORT = 20;
@@ -83,7 +84,7 @@ class AnabaenaCatenula {
       [
         new Joint(INITIAL_POSITION, 0),
         new Joint(
-          INITIAL_POSITION.add(Point.DIR_Y.scale(LENGTH_SHORT)),
+          INITIAL_POSITION.add(Direction.DIR_Y.scale(LENGTH_SHORT)),
           LENGTH_SHORT
         ),
       ],
