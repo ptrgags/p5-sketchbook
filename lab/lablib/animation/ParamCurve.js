@@ -1,3 +1,4 @@
+import { Gap } from "../music/Timeline.js";
 import { Rational } from "../Rational.js";
 
 export class ParamCurve {
@@ -13,3 +14,5 @@ export class ParamCurve {
     this.duration = duration;
   }
 }
+
+export const Hold = Gap;
