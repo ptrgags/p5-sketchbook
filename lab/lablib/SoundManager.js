@@ -1,6 +1,7 @@
 import { Tween } from "../../sketchlib/Tween.js";
 import { ADSR } from "./instruments/ADSR.js";
 import { BasicSynth } from "./instruments/BasicSynth.js";
+import { FMSynth } from "./instruments/FMSynth.js";
 import { ParamCurve } from "./music/ParamCurve.js";
 import { Score } from "./music/Score.js";
 import { to_events } from "./music/Timeline.js";
@@ -120,32 +121,20 @@ export class SoundManager {
     }).toDestination();
     supersaw.volume.value = -9;
 
-    const bell = new this.tone.FMSynth({
-      envelope: ADSR.pluck(2.0),
-    }).toDestination();
-    bell.volume.value = -3;
+    const bell = new FMSynth(3, 12, ADSR.pluck(2.0));
+    bell.init_mono(this.tone);
+    bell.volume = -3;
 
-    const tick = new this.tone.FMSynth({
-      modulationIndex: 25,
-      // C:M ratio
-      harmonicity: 2,
-      oscillator: {
-        type: "sine",
-      },
-      modulation: {
-        type: "sine",
-      },
-      modulationEnvelope: ADSR.DIGITAL,
-      envelope: ADSR.pluck(0.05),
-    }).toDestination();
-    tick.volume.value = -2;
+    const tick = new FMSynth(2, 25, ADSR.pluck(0.05));
+    tick.init_mono(this.tone);
+    tick.volume = -2;
 
     this.synths.sine = sine.synth;
     this.synths.square = square.synth;
     this.synths.poly = poly;
     this.synths.supersaw = supersaw;
-    this.synths.bell = bell;
-    this.synths.tick = tick;
+    this.synths.bell = bell.synth;
+    this.synths.tick = tick.synth;
   }
 
   /**
