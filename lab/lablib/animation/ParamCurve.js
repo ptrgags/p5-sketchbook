@@ -13,6 +13,17 @@ export class ParamCurve {
     this.end_value = end_value;
     this.duration = duration;
   }
+
+  /**
+   * Shorthand for ParamCurve(value, value, duration)
+   * for making a constant interval
+   * @param {number} value Start/end
+   * @param {Rational} duration Duration of the value
+   * @returns {ParamCurve}
+   */
+  static const_val(value, duration) {
+    return new ParamCurve(value, value, duration);
+  }
 }
 
 /**

@@ -97,15 +97,15 @@ export class SpiralBurst {
       duration
     );
 
-    // The hue changes every quarter note
+    // The hue changes every quarter note as a step function
     const start_hue = 80;
     const hue_step = 60;
     const hue = Sequential.from_loop(
       new Sequential(
-        new ParamCurve(start_hue + 0 * hue_step, start_hue + 0 * hue_step, N4),
-        new ParamCurve(start_hue + 1 * hue_step, start_hue + 1 * hue_step, N4),
-        new ParamCurve(start_hue + 2 * hue_step, start_hue + 2 * hue_step, N4),
-        new ParamCurve(start_hue + 3 * hue_step, start_hue + 3 * hue_step, N4)
+        ParamCurve.const_val(start_hue + 0 * hue_step, N4),
+        ParamCurve.const_val(start_hue + 1 * hue_step, N4),
+        ParamCurve.const_val(start_hue + 2 * hue_step, N4),
+        ParamCurve.const_val(start_hue + 3 * hue_step, N4)
       ),
       duration
     );
