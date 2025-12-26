@@ -37,6 +37,12 @@ export const LINKS = [
     year: "2025",
   },
   {
+    link: "./lab/DoublePendulum",
+    title: "Double Pendulum",
+    is_lab: true,
+    year: "2016, 2025",
+  },
+  {
     title: "String Art",
     year: "2017, 2024",
   },

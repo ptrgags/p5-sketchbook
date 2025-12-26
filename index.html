@@ -35,46 +35,17 @@
     <script type="module" src="./sketchlib/sketchbook-navbar.js"></script>
     <script type="module">
       import { LINKS } from "./sketchlib/links.js";
+      import { make_sketch_link } from "./sketchlib/make_sketch_link.js";
       import {
         get_sketch_url,
         get_thumbnail_url,
       } from "./sketchlib/format_links.js";
 
-      function make_link(link_info) {
-        const title = link_info.title;
-        const sketch_url = link_info.link ?? get_sketch_url(title);
-        const thumbnail_url = link_info.thumbnail ?? get_thumbnail_url(title);
-
-        // Clickable thumbnail
-        const img = document.createElement("img");
-        img.setAttribute("alt", `view ${title} example`);
-        img.setAttribute("src", thumbnail_url);
-        img.setAttribute("width", "250");
-        img.setAttribute("height", "350");
-
-        const img_link = document.createElement("a");
-        img_link.setAttribute("href", sketch_url);
-        img_link.appendChild(img);
-
-        // Make the title clickable too
-        const text_link = document.createElement("a");
-        text_link.setAttribute("href", sketch_url);
-        text_link.innerText = title;
-
-        const date = document.createTextNode(` (${link_info.year})`);
-
-        const link = document.createElement("div");
-        link.classList.add("link");
-        link.append(img_link, text_link, date);
-
-        return link;
-      }
-
       window.addEventListener("load", () => {
         const link_list = document.getElementById("container");
 
         for (const link_info of LINKS) {
-          const link = make_link(link_info);
+          const link = make_sketch_link(link_info);
           link_list.appendChild(link);
         }
       });
