@@ -14,6 +14,7 @@ import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
 import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
 import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
+import { whole_fract } from "../../sketchlib/whole_fract.js";
 import { Point } from "../../pga2d/Point.js";
 import { Direction } from "../../pga2d/Direction.js";
 import { AnimationCurves } from "../lablib/animation/AnimationCurves.js";
@@ -479,10 +480,6 @@ export class AnimatedTurtleTree {
     const stack = render_stack(position, depth);
     return group(tree, turtle, stack);
   }
-}
-
-function whole_fract(x) {
-  return [Math.floor(x), x % 1.0];
 }
 
 const RADIUS_TURTLE = 10;

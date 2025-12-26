@@ -5,12 +5,13 @@ import { Direction } from "../pga2d/Direction";
 
 expect.extend(PGA_MATCHERS);
 
-const FIFTH_TURN = (2.0 * Math.PI) / 5;
-
 describe("RobotCommand", () => {
+  const N = 5;
+  const FIFTH_TURN = (2.0 * Math.PI) / 5;
+
   describe("offset", () => {
     it("IDENTITY has 0 offset", () => {
-      const id = RobotCommand.IDENTITY;
+      const id = RobotCommand.identity(N);
 
       const result = id.offset;
 
@@ -18,7 +19,7 @@ describe("RobotCommand", () => {
     });
 
     it("LEFT_TURN has expected offset", () => {
-      const left = RobotCommand.LEFT_TURN;
+      const left = RobotCommand.left_turn(N);
 
       const result = left.offset;
 
@@ -31,7 +32,7 @@ describe("RobotCommand", () => {
     });
 
     it("RIGHT_TURN has expected offset", () => {
-      const right = RobotCommand.RIGHT_TURN;
+      const right = RobotCommand.right_turn(N);
 
       const result = right.offset;
 
@@ -44,7 +45,7 @@ describe("RobotCommand", () => {
     });
 
     it("full turn has an offset of 0", () => {
-      const full_turn = new RobotCommand([1, 1, 1, 1, 1], 0, "full_turn");
+      const full_turn = new RobotCommand(N, [1, 1, 1, 1, 1], 0, "full_turn");
 
       const result = full_turn.offset;
 
@@ -53,10 +54,10 @@ describe("RobotCommand", () => {
 
     it("computes offset for nontrivial path", () => {
       let path = RobotCommand.compose(
-        RobotCommand.RIGHT_TURN,
-        RobotCommand.LEFT_TURN
+        RobotCommand.right_turn(N),
+        RobotCommand.left_turn(N)
       );
-      path = RobotCommand.compose(RobotCommand.RIGHT_TURN, path);
+      path = RobotCommand.compose(RobotCommand.right_turn(N), path);
 
       const result = path.offset;
 
@@ -76,8 +77,8 @@ describe("RobotCommand", () => {
 
   describe("compose", () => {
     it("IDENTITY is the identity", () => {
-      const left = RobotCommand.LEFT_TURN;
-      const id = RobotCommand.IDENTITY;
+      const left = RobotCommand.left_turn(N);
+      const id = RobotCommand.identity(N);
 
       // check that I * L = L = I * L
       const id_left = RobotCommand.compose(id, left);
@@ -88,16 +89,16 @@ describe("RobotCommand", () => {
     });
 
     it("CCW circle gives correct path", () => {
-      const left = RobotCommand.LEFT_TURN;
+      const left = RobotCommand.left_turn(N);
       const left2 = RobotCommand.compose(left, left);
       const left3 = RobotCommand.compose(left, left2);
       const left4 = RobotCommand.compose(left, left3);
       const left5 = RobotCommand.compose(left, left4);
 
-      const expected2 = new RobotCommand([1, 1, 0, 0, 0], 2, "LL");
-      const expected3 = new RobotCommand([1, 1, 1, 0, 0], 3, "LLL");
-      const expected4 = new RobotCommand([1, 1, 1, 1, 0], 4, "LLLL");
-      const expected5 = new RobotCommand([1, 1, 1, 1, 1], 0, "LLLLL");
+      const expected2 = new RobotCommand(N, [1, 1, 0, 0, 0], 2, "LL");
+      const expected3 = new RobotCommand(N, [1, 1, 1, 0, 0], 3, "LLL");
+      const expected4 = new RobotCommand(N, [1, 1, 1, 1, 0], 4, "LLLL");
+      const expected5 = new RobotCommand(N, [1, 1, 1, 1, 1], 0, "LLLLL");
 
       expect(left2).toEqual(expected2);
       expect(left3).toEqual(expected3);
@@ -106,16 +107,16 @@ describe("RobotCommand", () => {
     });
 
     it("CW circle gives correct path", () => {
-      const right = RobotCommand.RIGHT_TURN;
+      const right = RobotCommand.right_turn(N);
       const right2 = RobotCommand.compose(right, right);
       const right3 = RobotCommand.compose(right, right2);
       const right4 = RobotCommand.compose(right, right3);
       const right5 = RobotCommand.compose(right, right4);
 
-      const expected2 = new RobotCommand([0, 0, 0, 1, 1], 3, "RR");
-      const expected3 = new RobotCommand([0, 0, 1, 1, 1], 2, "RRR");
-      const expected4 = new RobotCommand([0, 1, 1, 1, 1], 1, "RRRR");
-      const expected5 = new RobotCommand([1, 1, 1, 1, 1], 0, "RRRRR");
+      const expected2 = new RobotCommand(N, [0, 0, 0, 1, 1], 3, "RR");
+      const expected3 = new RobotCommand(N, [0, 0, 1, 1, 1], 2, "RRR");
+      const expected4 = new RobotCommand(N, [0, 1, 1, 1, 1], 1, "RRRR");
+      const expected5 = new RobotCommand(N, [1, 1, 1, 1, 1], 0, "RRRRR");
 
       expect(right2).toEqual(expected2);
       expect(right3).toEqual(expected3);
@@ -124,19 +125,19 @@ describe("RobotCommand", () => {
     });
 
     it("CCW circle gives correct path", () => {
-      const left = RobotCommand.LEFT_TURN;
+      const left = RobotCommand.left_turn(N);
       const left2 = RobotCommand.compose(left, left);
       const left4 = RobotCommand.compose(left2, left2);
       const circle = RobotCommand.compose(left, left4);
 
-      const expected = new RobotCommand([1, 1, 1, 1, 1], 0, "LLLLL");
+      const expected = new RobotCommand(N, [1, 1, 1, 1, 1], 0, "LLLLL");
 
       expect(circle).toEqual(expected);
     });
 
     it("composes left, then right", () => {
-      const left = RobotCommand.LEFT_TURN;
-      const right = RobotCommand.RIGHT_TURN;
+      const left = RobotCommand.left_turn(N);
+      const right = RobotCommand.right_turn(N);
 
       const result = RobotCommand.compose(right, left);
 
@@ -144,13 +145,13 @@ describe("RobotCommand", () => {
       // now the rightward arc's offset is also v0. Hence [2, 0, 0, 0, 0]
       // the orientation adds and subtracts 1
       // the label is RL since R was applyed second.
-      const expected = new RobotCommand([2, 0, 0, 0, 0], 0, "RL");
+      const expected = new RobotCommand(N, [2, 0, 0, 0, 0], 0, "RL");
       expect(result).toEqual(expected);
     });
 
     it("composes right, then left", () => {
-      const left = RobotCommand.LEFT_TURN;
-      const right = RobotCommand.RIGHT_TURN;
+      const left = RobotCommand.left_turn(N);
+      const right = RobotCommand.right_turn(N);
 
       const result = RobotCommand.compose(left, right);
 
@@ -158,13 +159,13 @@ describe("RobotCommand", () => {
       // now the rightward arc's offset is also v0. Hence [2, 0, 0, 0, 0]
       // the orientation adds and subtracts 1
       // the label is RL since R was applyed second.
-      const expected = new RobotCommand([0, 0, 0, 0, 2], 0, "LR");
+      const expected = new RobotCommand(N, [0, 0, 0, 0, 2], 0, "LR");
       expect(result).toEqual(expected);
     });
 
     it("composition is associative", () => {
-      const left = RobotCommand.LEFT_TURN;
-      const right = RobotCommand.RIGHT_TURN;
+      const left = RobotCommand.left_turn(N);
+      const right = RobotCommand.right_turn(N);
 
       // Check the associative rule
       // (ll)r = l(lr)

@@ -18,5 +18,7 @@ export class Primitive {
    * Draw the primitive to the screen
    * @param {import("p5")} p the p5.js instance
    */
-  draw(p) {}
+  draw(p) {
+    throw new Error("not implemented: draw(p)")
+  }
 }

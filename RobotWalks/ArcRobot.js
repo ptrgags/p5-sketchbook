@@ -1,172 +1,130 @@
 import { ArcAngles } from "../sketchlib/ArcAngles.js";
 import { Color } from "../sketchlib/Color.js";
 import { SCREEN_CENTER } from "../sketchlib/dimensions.js";
-import { CardinalDirection } from "../sketchlib/CardinalDirection.js";
-import { Style } from "../sketchlib/Style.js";
-import { Oklch } from "../lab/lablib/Oklch.js";
-import { AnimatedArc } from "./AnimatedArc.js";
-import { RobotCommand, ROOTS_OF_UNITY } from "./RobotCommand.js";
-import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
-import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
-import { PointPrimitive } from "../sketchlib/primitives/PointPrimitive.js";
+import { group, style } from "../sketchlib/primitives/shorthand.js";
+import { Style } from "../sketchlib/Style.js";
+import { AnimatedPath } from "./AnimatedPath.js";
+import { CardinalDirection } from "../sketchlib/CardinalDirection.js";
+import { Oklch } from "../lab/lablib/Oklch.js";
+import { RobotCommand, ROOTS_OF_UNITY } from "./RobotCommand.js";
 import { Direction } from "../pga2d/Direction.js";
-import { Point } from "../pga2d/Point.js";
 
-// How many frames to animate each 1/5 turn arc
-const MOVEMENT_DURATION = 25;
-const PIXELS_PER_METER = 25;
-const ORIENTATION_LINE_LENGTH = 25;
+/**
+ * Given an array, make a reverse lookup table
+ * @template T
+ * @param {Array<T>} arr The original array
+ * @returns {Object.<T, number>}
+ */
+function inverse_array(arr) {
+  /**
+   * @type {Object.<T, number>}
+   */
+  const result = {};
+  for (const [i, x] of arr.entries()) {
+    result[x] = i;
+  }
+  return result;
+}
 
-const FIFTH_TURN = (2 * Math.PI) / 5;
+// I'm allowing onlythe following values for their visual interest
+export const N_VALUES = [3, 4, 5, 6, 8, 12];
+export const N_VALUES_INV = inverse_array(N_VALUES);
+const COLORS = Oklch.gradient(
+  new Oklch(0.7, 0.1, 0),
+  new Oklch(0.7, 0.1, 360),
+  N_VALUES.length
+);
+const N_STYLES = COLORS.map(
+  (x) => new Style({ stroke: x.to_srgb(), width: 2 })
+);
 
-const START_POINT = Point.ORIGIN.add(SCREEN_CENTER);
-
-const RED_LINES = new Style({
-  stroke: Color.RED,
-  width: 2,
-});
 const GREY_LINES = new Style({
   stroke: Color.from_hex_code("#777777"),
   width: 2,
 });
-const YELLOW_LINES = new Style({
-  stroke: Color.YELLOW,
-  width: 2,
-});
 
-const SEA_GREEN = new Oklch(0.7, 0.1, 196);
-const POINT_STYLE = new Style({
-  stroke: SEA_GREEN.adjust_lightness(-0.15).to_srgb(),
-  fill: SEA_GREEN.to_srgb(),
-  width: 2,
-});
+// How many frames to animate a single arc
+const FULL_CIRCLE_DURATION = 120;
+// Duration to unwind the path in frames
+const DURATION_UNWIND_PATH = 50;
+
+const PIXELS_PER_METER = 25;
+const START_POINT = SCREEN_CENTER;
 
 /**
- * @enum
+ * @enum {number}
  */
 const RobotAnimationState = {
   // Idle, waiting for commands
   IDLE: 0,
-  // Currently
+  // Currently animating a single arc path or undo
   MOVING: 1,
+  // Unwinding back to the original state
+  RESETTING: 2,
 };
 
-/**
- * Robot based on Project Euler #208, see https://projecteuler.net/problem=208
- */
-export class ArcRobot {
-  constructor() {
-    /**
-     * @type {RobotAnimationState}
-     */
-    this.animation_state = RobotAnimationState.IDLE;
-
-    /**
-     * The sequence of commands that led the robot to its current state.
-     * @type {RobotCommand}
-     */
-    this.command_seq = RobotCommand.IDENTITY;
-
-    /**
-     * List of arcs the robot has already traversed, in pixels
-     * @type {ArcPrimitive[]}
-     */
-    this.history = [];
-    /**
-     * Styled version of the history primitive
-     * @type {GroupPrimitive}
-     */
-    this.history_primitive = style(this.history, RED_LINES);
-
-    /**
-     * List of line segments the robot has already traversed, in pixels
-     * @type {LinePrimitive[]}
-     */
-    this.polyline_history = [];
-    /**
-     * Styled version of the polyline history
-     * @type {GroupPrimitive}
-     */
-    this.polyline_primitive = style(this.polyline_history, YELLOW_LINES);
-
-    /**
-     * If the robot is currently moving, this will be an AnimatedArc for that
-     * segment in pixel space
-     * @type {AnimatedArc | undefined}
-     */
-    this.current_arc = undefined;
+class ArcRobotState {
+  /**
+   * Constructor
+   * @param {number} n the n value for this n-robot
+   * @param {"L" | "R"} arc_dir The arc direction
+   * @param {RobotCommand} command The command from the start to the latest step
+   * @param {ArcPrimitive} arc The arc for the latest step
+   */
+  constructor(n, arc_dir, command, arc) {
+    this.n = n;
+    this.arc_dir = arc_dir;
+    this.command = command;
+    this.arc = arc;
   }
 
   /**
-   *
-   * @param {number} frame
-   * @returns {Point}
+   * Compute the state after the robot takes a single step
+   * @param {number} n The n-value for this n-robot
+   * @param {"L" | "R"} arc_dir Arc direction
+   * @param {ArcRobotState | undefined} prev_state Previous state
    */
-  current_position(frame) {
-    if (this.animation_state === RobotAnimationState.IDLE) {
-      const offset = this.command_seq.offset.scale(PIXELS_PER_METER);
-      return START_POINT.add(offset);
-    }
+  static take_step(n, arc_dir, prev_state) {
+    const prev_command = prev_state?.command ?? RobotCommand.identity(n);
 
-    return this.current_arc.current_position(frame);
-  }
-
-  /**
-   *
-   * @param {number} frame
-   * @returns {Direction}
-   */
-  forward_dir(frame) {
-    if (this.animation_state === RobotAnimationState.IDLE) {
-      const orientation = this.command_seq.orientation;
-      // Orientation is measured from north, so add a quarter turn
-      const angle = orientation * FIFTH_TURN + Math.PI / 2;
-      return Direction.from_angle(angle).flip_y();
-    }
-
-    return this.current_arc.forward_dir(frame);
-  }
-
-  /**
-   *
-   * @param {number} frame
-   * @param {CardinalDirection} dpad_direction
-   */
-  start_moving(frame, dpad_direction) {
-    // The D-pad key determines whether the arc curves to the left or right.
-    let command;
     // Imagine the robot's orientation as the robot walking CCW around the
-    // unit circle. At each point 1/5 of the way around, the "left" direction
+    // unit circle. At each point 1/n of the way around, the "left" direction
     // points towards the center of the circle, and the "right" direction
     // points directly outwards. Furthermore, in model space we defined
     // the arc radius as 1 meter. So the right direction is _exactly_ the
     // corresponding root of unity. And left is just its negation.
-    let to_center_model = ROOTS_OF_UNITY[this.command_seq.orientation];
-    if (dpad_direction === CardinalDirection.LEFT) {
-      command = RobotCommand.LEFT_TURN;
+    /**
+     * @type {Direction}
+     */
+    let to_center_model = ROOTS_OF_UNITY[n][prev_command.orientation];
+    /**
+     * @type {RobotCommand}
+     */
+    let step_command;
+    if (arc_dir === "L") {
+      step_command = RobotCommand.left_turn(n);
       to_center_model = to_center_model.neg();
     } else {
-      command = RobotCommand.RIGHT_TURN;
+      step_command = RobotCommand.right_turn(n);
     }
 
-    const start_offset_model = this.command_seq.offset;
+    const start_offset_model = prev_command.offset;
     // this is still a direction for now
     const arc_center_model = start_offset_model.add(to_center_model);
 
-    // Full command sequence when we append the new command
-    const full_command_seq = RobotCommand.compose(command, this.command_seq);
+    const start_orientation = prev_command.orientation;
 
-    const start_orientation = this.command_seq.orientation;
+    const turn_angle = (2 * Math.PI) / n;
 
     let angles_model;
-    if (dpad_direction === CardinalDirection.LEFT) {
-      const start_angle = start_orientation * FIFTH_TURN;
-      angles_model = new ArcAngles(start_angle, start_angle + FIFTH_TURN);
+    if (arc_dir === "L") {
+      const start_angle = start_orientation * turn_angle;
+      angles_model = new ArcAngles(start_angle, start_angle + turn_angle);
     } else {
-      const start_angle = start_orientation * FIFTH_TURN + Math.PI;
-      angles_model = new ArcAngles(start_angle, start_angle - FIFTH_TURN);
+      const start_angle = start_orientation * turn_angle + Math.PI;
+      angles_model = new ArcAngles(start_angle, start_angle - turn_angle);
     }
 
     // Model space is y-up, but screen space is y-down
@@ -176,16 +134,151 @@ export class ArcRobot {
     const angles_screen = angles_model.flip_y();
 
     // Create the arc which uses units of screen space (y-down!!)
-    this.current_arc = new AnimatedArc(
+    const arc = new ArcPrimitive(
       arc_center_screen,
-      // the arcs are always 1 meter in radius
       PIXELS_PER_METER,
-      angles_screen,
-      frame,
-      MOVEMENT_DURATION
+      angles_screen
     );
+
+    const full_command = RobotCommand.compose(step_command, prev_command);
+
+    return new ArcRobotState(n, arc_dir, full_command, arc);
+  }
+}
+
+/**
+ * Robot based on Project Euler #208, see https://projecteuler.net/problem=208
+ */
+export class ArcRobot {
+  /**
+   * Constructor
+   * @param {number} n Positive integer n to determine the arc angle 2pi/n
+   * @param {("L" | "R")[]} [command_list] String of L and R to start the robot with an initial path
+   */
+  constructor(n, command_list) {
+    this.n = n;
+
+    /**
+     * @type {number}
+     */
+    this.movement_duration = FULL_CIRCLE_DURATION / n;
+
+    /**
+     * @type {Style}
+     */
+    this.line_style = N_STYLES[N_VALUES_INV[n]];
+
+    /**
+     * @type {RobotAnimationState}
+     */
+    this.animation_state = RobotAnimationState.IDLE;
+
+    /**
+     * Event target with the following events
+     * - reset - when the robot finishes the resetting animation and returns to the IDLE state.
+     * @type {EventTarget}
+     */
+    this.events = new EventTarget();
+
+    /**
+     * Sequence of states for this robot
+     * @type {ArcRobotState[]}
+     */
+    this.history = [];
+
+    /**
+     * Collection of path primitives for the past portion of the path
+     * @type {GroupPrimitive}
+     */
+    this.past_path = GroupPrimitive.EMPTY;
+
+    /**
+     * Currently animating part of the path
+     * @type {AnimatedPath}
+     */
+    this.current_path = new AnimatedPath([], 0, 0, false);
+
+    /**
+     *
+     * @type {("L" | "R")[] | undefined}
+     */
+    this.initial_commands = command_list;
+  }
+
+  /**
+   * Get a list of L/R commands as a str
+   * @type {("L" | "R")[]}
+   */
+  get command_list() {
+    return this.history.map((x) => x.arc_dir);
+  }
+
+  /**
+   *
+   * @param {("L" | "R")[]} command_list
+   */
+  start_winding(frame, command_list) {
+    for (const [i, arc_dir] of command_list.entries()) {
+      const state = ArcRobotState.take_step(
+        this.n,
+        arc_dir,
+        this.history[i - 1]
+      );
+      this.history.push(state);
+    }
+
+    this.past_path = GroupPrimitive.EMPTY;
+    const all_arcs = this.history.map((x) => x.arc);
+    this.current_path = new AnimatedPath(
+      all_arcs,
+      frame,
+      DURATION_UNWIND_PATH,
+      // wind forwards
+      false
+    );
+
     this.animation_state = RobotAnimationState.MOVING;
-    this.command_seq = full_command_seq;
+  }
+
+  start_undo(frame) {
+    this.history.pop();
+
+    const all_arcs = this.history.map((x) => x.arc);
+    const past_arcs = all_arcs.slice(0, all_arcs.length - 1);
+    this.past_path = style(past_arcs, this.line_style);
+
+    const last_arc = all_arcs[all_arcs.length - 1];
+    this.current_path = new AnimatedPath(
+      [last_arc],
+      frame,
+      this.movement_duration,
+      // animate in reverse
+      true
+    );
+  }
+
+  /**
+   *
+   * @param {number} frame The current frame number
+   * @param {CardinalDirection} dpad_direction
+   */
+  start_step(frame, dpad_direction) {
+    const arc_dir = dpad_direction === CardinalDirection.LEFT ? "L" : "R";
+    const prev_state = this.history[this.history.length - 1];
+    this.history.push(ArcRobotState.take_step(this.n, arc_dir, prev_state));
+
+    const all_arcs = this.history.map((x) => x.arc);
+    const past_arcs = all_arcs.slice(0, all_arcs.length - 1);
+    this.past_path = style(past_arcs, this.line_style);
+
+    const last_arc = all_arcs[all_arcs.length - 1];
+    this.current_path = new AnimatedPath(
+      [last_arc],
+      frame,
+      this.movement_duration,
+      // forwards
+      false
+    );
   }
 
   /**
@@ -194,14 +287,18 @@ export class ArcRobot {
    * @param {CardinalDirection} dpad_direction
    */
   update_idle(frame, dpad_direction) {
-    if (
-      dpad_direction !== CardinalDirection.LEFT &&
-      dpad_direction !== CardinalDirection.RIGHT
+    if (dpad_direction === CardinalDirection.DOWN) {
+      this.start_undo(frame);
+      this.animation_state = RobotAnimationState.MOVING;
+      return;
+    } else if (
+      dpad_direction === CardinalDirection.LEFT ||
+      dpad_direction === CardinalDirection.RIGHT
     ) {
+      this.start_step(frame, dpad_direction);
+      this.animation_state = RobotAnimationState.MOVING;
       return;
     }
-
-    this.start_moving(frame, dpad_direction);
   }
 
   /**
@@ -210,69 +307,99 @@ export class ArcRobot {
    * @param {CardinalDirection} dpad_direction
    */
   update_animate(frame, dpad_direction) {
-    if (this.current_arc === undefined) {
-      throw new Error("Current Arc not set!");
+    if (!this.current_path.is_done(frame)) {
+      return;
     }
 
-    if (this.current_arc.is_done(frame)) {
-      const { arc_primitive, line_primitive } = this.current_arc;
-      this.history.push(arc_primitive);
-      this.polyline_history.push(line_primitive);
-
-      if (
-        dpad_direction === CardinalDirection.LEFT ||
-        dpad_direction === CardinalDirection.RIGHT
-      ) {
-        this.start_moving(frame, dpad_direction);
-      }
-    }
-  }
-
-  /**
-   * Update the robot
-   * @param {number} frame The frame number
-   * @param {Direction | undefined} dpad_direction The currently pressed DPAD direction
-   */
-  update(frame, dpad_direction) {
-    if (this.animation_state === RobotAnimationState.IDLE) {
-      this.update_idle(frame, dpad_direction);
+    if (dpad_direction === CardinalDirection.DOWN) {
+      this.start_undo(frame);
+      this.animation_state = RobotAnimationState.MOVING;
+      return;
+    } else if (
+      dpad_direction === CardinalDirection.LEFT ||
+      dpad_direction === CardinalDirection.RIGHT
+    ) {
+      this.start_step(frame, dpad_direction);
+      this.animation_state = RobotAnimationState.MOVING;
       return;
     } else {
-      this.update_animate(frame, dpad_direction);
-      return;
+      this.animation_state = RobotAnimationState.IDLE;
     }
   }
 
   /**
    *
    * @param {number} frame
-   * @returns {GroupPrimitive}
+   * @param {CardinalDirection} dpad_direction
+   * @returns
    */
-  render(frame) {
-    const pos = this.current_position(frame);
-    const step_forward = pos.add(
-      this.forward_dir(frame).scale(ORIENTATION_LINE_LENGTH)
-    );
-
-    const current_position = new PointPrimitive(pos);
-    const styled_position = style(current_position, POINT_STYLE);
-
-    const orientation_line = new LinePrimitive(pos, step_forward);
-    const styled_orientation = style(orientation_line, YELLOW_LINES);
-
-    if (this.current_arc) {
-      const arc_bg = style(this.current_arc.arc_primitive, GREY_LINES);
-      const arc_fg = style(this.current_arc.render(frame), RED_LINES);
-
-      return group(
-        this.history_primitive,
-        arc_bg,
-        arc_fg,
-        styled_orientation,
-        styled_position
-      );
+  update_reset(frame, dpad_direction) {
+    if (!this.current_path.is_done(frame)) {
+      return;
     }
 
-    return group(this.history_primitive, styled_orientation, styled_position);
+    this.events.dispatchEvent(new CustomEvent("reset"));
+
+    if (
+      dpad_direction === CardinalDirection.LEFT ||
+      dpad_direction === CardinalDirection.RIGHT
+    ) {
+      this.start_step(frame, dpad_direction);
+      this.animation_state = RobotAnimationState.MOVING;
+      return;
+    } else {
+      this.animation_state = RobotAnimationState.IDLE;
+    }
+  }
+
+  /**
+   * Update the robot each frame
+   * @param {number} frame The current frame number
+   * @param {CardinalDirection | undefined} dpad_direction The current direction button pressed
+   */
+  update(frame, dpad_direction) {
+    // On the first frame, if we have initial commands, start a winding
+    // animation
+    if (this.initial_commands) {
+      this.start_winding(frame, this.initial_commands);
+      this.initial_commands = undefined;
+      return;
+    }
+
+    if (this.animation_state === RobotAnimationState.IDLE) {
+      this.update_idle(frame, dpad_direction);
+      return;
+    } else if (this.animation_state === RobotAnimationState.MOVING) {
+      this.update_animate(frame, dpad_direction);
+      return;
+    }
+    if (this.animation_state === RobotAnimationState.RESETTING) {
+      this.update_reset(frame, dpad_direction);
+      return;
+    }
+  }
+
+  /**
+   * @param {number} frame the current frame number
+   * @returns {GroupPrimitive} The primitive to render
+   */
+  render(frame) {
+    //const trajectory = style(this.current_path.trajectory, GREY_LINES);
+    const motion = style(this.current_path.render(frame), this.line_style);
+
+    return group(this.past_path, motion);
+  }
+
+  reset(frame) {
+    this.past_path = GroupPrimitive.EMPTY;
+    const all_arcs = this.history.map((x) => x.arc);
+    this.current_path = new AnimatedPath(
+      all_arcs,
+      frame,
+      DURATION_UNWIND_PATH,
+      true
+    );
+    this.history = [];
+    this.animation_state = RobotAnimationState.RESETTING;
   }
 }

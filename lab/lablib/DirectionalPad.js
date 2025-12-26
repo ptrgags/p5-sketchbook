@@ -35,6 +35,9 @@ export class DirectionalPad {
     return GroupPrimitive.EMPTY;
   }
 
+  /**
+   * @type {DirectionInput}
+   */
   get direction() {
     return DirectionInput.first_nonzero(
       this.keyboard_dpad.direction,
