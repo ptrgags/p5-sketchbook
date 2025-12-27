@@ -3,8 +3,6 @@ import { Rational } from "../../lablib/Rational.js";
 import { Direction } from "../../../pga2d/Direction.js";
 import { Point } from "../../../pga2d/Point.js";
 import { Color } from "../../../sketchlib/Color.js";
-import { BeziergonPrimitive } from "../../../sketchlib/primitives/BeziergonPrimitive.js";
-import { BezierPrimitive } from "../../../sketchlib/primitives/BezierPrimitive.js";
 import { CirclePrimitive } from "../../../sketchlib/primitives/CirclePrimitive.js";
 import { Mask } from "../../../sketchlib/primitives/ClipMask.js";
 import { ClipPrimitive } from "../../../sketchlib/primitives/ClipPrimitive.js";
@@ -14,9 +12,14 @@ import { group, style } from "../../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../../sketchlib/Style.js";
 import { make_stripes } from "./stripes.js";
 import { ParamCurve } from "../../lablib/animation/ParamCurve.js";
+import { PALETTE_ROCK } from "../theme_colors.js";
 
-const STYLE_ROCK = new Style({
-  stroke: Color.from_hex_code("#555555"),
+const STYLE_ROCK1 = new Style({
+  stroke: PALETTE_ROCK[1].to_srgb(),
+  width: 4,
+});
+const STYLE_ROCK2 = new Style({
+  stroke: PALETTE_ROCK[2].to_srgb(),
   width: 4,
 });
 
@@ -38,7 +41,7 @@ const ROCK_STRIPES2 = make_stripes(
 );
 
 const STYLE_INSIDE_GEODE = new Style({
-  fill: Color.from_hex_code("#222222"),
+  fill: PALETTE_ROCK[0].to_srgb(),
 });
 
 export class Geode {
@@ -57,8 +60,8 @@ export class Geode {
       new ClipPrimitive(
         new Mask(ROCK_CIRCLE),
         group(
-          style(ROCK_STRIPES1, STYLE_ROCK),
-          style(ROCK_STRIPES2, STYLE_ROCK)
+          style(ROCK_STRIPES1, STYLE_ROCK1),
+          style(ROCK_STRIPES2, STYLE_ROCK2)
         )
       ),
       style(boundary, STYLE_INSIDE_GEODE),
