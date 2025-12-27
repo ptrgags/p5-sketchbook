@@ -1,7 +1,7 @@
 import { Direction } from "../pga2d/Direction.js";
 import { Point } from "../pga2d/Point.js";
 import { clamp } from "./clamp.js";
-import { Ease } from "./easing_curves.js";
+import { Ease } from "./Ease.js";
 import { lerp } from "./lerp.js";
 
 /**

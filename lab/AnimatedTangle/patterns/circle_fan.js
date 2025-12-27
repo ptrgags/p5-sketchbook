@@ -6,7 +6,7 @@ import { CirclePrimitive } from "../../../sketchlib/primitives/CirclePrimitive.j
 import { style } from "../../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../../sketchlib/Style.js";
 import { Hold, ParamCurve } from "../../lablib/animation/ParamCurve.js";
-import { Ease } from "../../../sketchlib/easing_curves.js";
+import { Ease } from "../../../sketchlib/Ease.js";
 
 const CENTER = new Point(500, 300);
 const MAX_RADII = [5, 4, 3, 2, 1].map((x) => x * 50);
