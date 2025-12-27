@@ -47,9 +47,9 @@ function make_test_tube(sketch_url) {
  * @returns {HTMLDivElement}
  */
 export function make_sketch_link(link_info) {
-  const title = link_info.title;
-  const sketch_url = link_info.link ?? get_sketch_url(title);
   const is_lab = link_info.is_lab ?? false;
+  const title = is_lab ? `WIP: ${link_info.title}` : link_info.title;
+  const sketch_url = link_info.link ?? get_sketch_url(title);
 
   // Make the title clickable too
   const text_link = document.createElement("a");
