@@ -3,6 +3,7 @@ import { frames_to_sec, sec_to_frames, Tween } from "./Tween.js";
 import { PGA_MATCHERS } from "../pga2d/pga_matchers.js";
 import { Point } from "../pga2d/Point.js";
 import { Direction } from "../pga2d/Direction.js";
+import { Ease } from "./Ease.js";
 
 function make_tween() {
   const start_value = 2;
@@ -147,6 +148,39 @@ describe("Tween", () => {
 
       const expected = 2.5;
       expect(result).toBe(expected);
+    });
+  });
+  describe("get_value with easing curve", () => {
+    function make_eased_tween() {
+      return Tween.scalar(0, 100, 1, 1, Ease.in_out_cubic);
+    }
+
+    it("with t before start time clamps correctly", () => {
+      const tween = make_eased_tween();
+
+      const result = tween.get_value(-1);
+
+      expect(result).toBe(0);
+    });
+
+    it("with t value in between returns eased value", () => {
+      const tween = make_eased_tween();
+
+      const result = tween.get_value(1.25);
+
+      // in-out-cubic at t = 0.25 gives 0.0625,
+      // See https://www.desmos.com/calculator/nwvjqtk4pw
+      // but our range is remapped to [0, 100] so multiply by 100
+      const expected = 6.25;
+      expect(result).toBeCloseTo(expected);
+    });
+
+    it("with t after end time clamps correctly", () => {
+      const tween = make_eased_tween();
+
+      const result = tween.get_value(5);
+
+      expect(result).toBe(100);
     });
   });
 });

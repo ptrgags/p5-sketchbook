@@ -2,9 +2,6 @@ import { Sequential } from "../../lablib/music/Timeline.js";
 import { Rational } from "../../lablib/Rational.js";
 import { Direction } from "../../../pga2d/Direction.js";
 import { Point } from "../../../pga2d/Point.js";
-import { Color } from "../../../sketchlib/Color.js";
-import { BeziergonPrimitive } from "../../../sketchlib/primitives/BeziergonPrimitive.js";
-import { BezierPrimitive } from "../../../sketchlib/primitives/BezierPrimitive.js";
 import { CirclePrimitive } from "../../../sketchlib/primitives/CirclePrimitive.js";
 import { Mask } from "../../../sketchlib/primitives/ClipMask.js";
 import { ClipPrimitive } from "../../../sketchlib/primitives/ClipPrimitive.js";
@@ -14,9 +11,16 @@ import { group, style } from "../../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../../sketchlib/Style.js";
 import { make_stripes } from "./stripes.js";
 import { ParamCurve } from "../../lablib/animation/ParamCurve.js";
+import { PALETTE_CORAL, PALETTE_ROCK, Values } from "../theme_colors.js";
+import { Oklch } from "../../lablib/Oklch.js";
+import { Random } from "../../../sketchlib/random.js";
 
-const STYLE_ROCK = new Style({
-  stroke: Color.from_hex_code("#555555"),
+const STYLE_ROCK1 = new Style({
+  stroke: PALETTE_ROCK[Values.MedDark].to_srgb(),
+  width: 4,
+});
+const STYLE_ROCK2 = new Style({
+  stroke: PALETTE_ROCK[Values.Medium].to_srgb(),
   width: 4,
 });
 
@@ -38,7 +42,7 @@ const ROCK_STRIPES2 = make_stripes(
 );
 
 const STYLE_INSIDE_GEODE = new Style({
-  fill: Color.from_hex_code("#222222"),
+  fill: PALETTE_ROCK[Values.Dark].to_srgb(),
 });
 
 export class Geode {
@@ -57,8 +61,8 @@ export class Geode {
       new ClipPrimitive(
         new Mask(ROCK_CIRCLE),
         group(
-          style(ROCK_STRIPES1, STYLE_ROCK),
-          style(ROCK_STRIPES2, STYLE_ROCK)
+          style(ROCK_STRIPES1, STYLE_ROCK1),
+          style(ROCK_STRIPES2, STYLE_ROCK2)
         )
       ),
       style(boundary, STYLE_INSIDE_GEODE),
@@ -110,15 +114,23 @@ const GEODE_BOUNDARY = new PolygonPrimitive(
 
 const WIDTHS = [8, 7, 6, 5, 4, 3, 2, 1].map((x) => 8 * x);
 
-/**
- * @type {[Color, number][]}
- */
-const GEODE_BANDS = "7b2cbf-3c096c-c77dff-240046-5a189a-10002b-e0aaff-9d4edd"
-  .split("-")
-  .map((x, i) => [Color.from_hex_code(x), WIDTHS[i]]);
+const PALETTE_AGATE = Random.shuffle(
+  Oklch.gradient(
+    PALETTE_CORAL[Values.Dark],
+    PALETTE_CORAL[Values.Light],
+    WIDTHS.length
+  )
+);
 
-const GEODE_STYLES = GEODE_BANDS.map(
-  ([color, width]) => new Style({ stroke: color, width })
+/**
+ * @type {Style[]}
+ */
+const GEODE_STYLES = PALETTE_AGATE.map(
+  (x, i) =>
+    new Style({
+      stroke: x.to_srgb(),
+      width: WIDTHS[i],
+    })
 );
 
 export const GEODE = new Geode(GEODE_BOUNDARY, GEODE_STYLES);
