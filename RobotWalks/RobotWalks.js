@@ -1,12 +1,9 @@
-import { WIDTH, HEIGHT, SCREEN_CENTER } from "../sketchlib/dimensions.js";
+import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { DirectionalPad } from "../lab/lablib/DirectionalPad.js";
 import { ArcRobot, N_VALUES } from "./ArcRobot.js";
 import { TouchButton } from "../lab/lablib/TouchButton.js";
 import { Rectangle } from "../lab/lablib/Rectangle.js";
 import { CanvasMouseHandler } from "../lab/lablib/CanvasMouseHandler.js";
-import { AnimatedPath } from "./AnimatedPath.js";
-import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
-import { ArcAngles } from "../sketchlib/ArcAngles.js";
 import { Point } from "../pga2d/Point.js";
 import { Direction } from "../pga2d/Direction.js";
 
