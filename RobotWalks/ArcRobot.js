@@ -10,6 +10,7 @@ import { CardinalDirection } from "../sketchlib/CardinalDirection.js";
 import { Oklch } from "../lab/lablib/Oklch.js";
 import { RobotCommand, ROOTS_OF_UNITY } from "./RobotCommand.js";
 import { Direction } from "../pga2d/Direction.js";
+import { GooglyEye } from "../sketchlib/primitives/GooglyEye.js";
 
 /**
  * Given an array, make a reverse lookup table
@@ -203,6 +204,8 @@ export class ArcRobot {
      * @type {("L" | "R")[] | undefined}
      */
     this.initial_commands = command_list;
+
+    this.eye = new GooglyEye(SCREEN_CENTER, Direction.DIR_Y.neg(), 8, 3);
   }
 
   /**
@@ -384,10 +387,18 @@ export class ArcRobot {
    * @returns {GroupPrimitive} The primitive to render
    */
   render(frame) {
-    //const trajectory = style(this.current_path.trajectory, GREY_LINES);
+    let position = SCREEN_CENTER;
+    let tangent = Direction.DIR_Y.neg();
+    if (this.command_list.length !== undefined) {
+      position = this.current_path.get_position(frame);
+      tangent = this.current_path.get_tangent(frame);
+    }
+
+    this.eye.update(position, tangent);
+
     const motion = style(this.current_path.render(frame), this.line_style);
 
-    return group(this.past_path, motion);
+    return group(this.past_path, motion, this.eye);
   }
 
   reset(frame) {

@@ -81,10 +81,19 @@ export class AnimatedPath {
   /**
    * Get the position at the given time
    * @param {number} time
-   * @returns {Point}
+   * @returns {Point | undefined}
    */
   get_position(time) {
+    if (this.segments.length === 0) {
+      return undefined;
+    }
+
     const [arc_index, t] = whole_fract(this.tween.get_value(time));
+
+    if (arc_index === this.segments.length) {
+      return this.segments.at(-1).get_position(1);
+    }
+
     const partial_segment = this.segments[arc_index];
     return partial_segment.get_position(t);
   }
@@ -92,10 +101,18 @@ export class AnimatedPath {
   /**
    * Get the unit tangent at the given time
    * @param {number} time
-   * @returns {Direction}
+   * @returns {Direction | undefined}
    */
   get_tangent(time) {
+    if (this.segments.length === 0) {
+      return undefined;
+    }
     const [arc_index, t] = whole_fract(this.tween.get_value(time));
+
+    if (arc_index === this.segments.length) {
+      return this.segments.at(-1).get_tangent(1);
+    }
+
     const partial_segment = this.segments[arc_index];
     return partial_segment.get_tangent(t);
   }
