@@ -26,22 +26,6 @@ const TOUCH_DOWN = new TouchButton(
   )
 );
 
-// TEMP CODE
-const RIGHT_ARC = new ArcAngles(-Math.PI / 2, Math.PI / 2);
-const LEFT_ARC = new ArcAngles((3 * Math.PI) / 2, Math.PI / 2);
-const DOWN_STRIDE = Direction.DIR_Y.scale(100);
-
-const ANIMATED_PATH_EX = new AnimatedPath(
-  [
-    new ArcPrimitive(SCREEN_CENTER, 50, RIGHT_ARC),
-    new ArcPrimitive(SCREEN_CENTER.add(DOWN_STRIDE), 50, LEFT_ARC),
-    new ArcPrimitive(SCREEN_CENTER.add(DOWN_STRIDE.scale(2.0)), 50, RIGHT_ARC),
-  ],
-  0,
-  500,
-  false
-);
-
 export const sketch = (p) => {
   let robot = new ArcRobot(5);
 
