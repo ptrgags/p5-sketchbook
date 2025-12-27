@@ -1,4 +1,4 @@
-import { Gap, Sequential } from "../../lablib/music/Timeline.js";
+import { Sequential } from "../../lablib/music/Timeline.js";
 import { Rational } from "../../lablib/Rational.js";
 import { Point } from "../../../pga2d/Point.js";
 import { Color } from "../../../sketchlib/Color.js";
@@ -6,6 +6,7 @@ import { CirclePrimitive } from "../../../sketchlib/primitives/CirclePrimitive.j
 import { style } from "../../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../../sketchlib/Style.js";
 import { Hold, ParamCurve } from "../../lablib/animation/ParamCurve.js";
+import { Ease } from "../../../sketchlib/easing_curves.js";
 
 const CENTER = new Point(500, 300);
 const MAX_RADII = [5, 4, 3, 2, 1].map((x) => x * 50);
@@ -39,13 +40,26 @@ class CircleFan {
   }
 
   make_curves() {
-    const EXPAND_DURATION = new Rational(3);
+    const EXPAND_DURATION = new Rational(3, CIRCLE_COUNT);
     const PAUSE_DURATION = new Rational(1);
+
+    const radius_steps = [];
+    for (let i = 0; i < CIRCLE_COUNT; i++) {
+      radius_steps.push(
+        new ParamCurve(i * 50, (i + 1) * 50, EXPAND_DURATION, Ease.in_out_cubic)
+      );
+    }
+
     return {
       circle_fan: new Sequential(
-        new ParamCurve(0, CIRCLE_COUNT * 50, EXPAND_DURATION),
+        ...radius_steps,
         new Hold(PAUSE_DURATION),
-        new ParamCurve(CIRCLE_COUNT * 50, 0, EXPAND_DURATION)
+        new ParamCurve(
+          CIRCLE_COUNT * 50,
+          0,
+          EXPAND_DURATION.mul(new Rational(CIRCLE_COUNT)),
+          Ease.in_out_cubic
+        )
       ),
     };
   }
