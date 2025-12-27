@@ -36,7 +36,7 @@ function make_thumbnail(sketch_url, title, thumbnail) {
 function make_test_tube(sketch_url) {
   const tube = document.createElement("span");
   tube.innerText = "🧪";
-  tube.style.setProperty("font-size", "100px");
+  tube.style.setProperty("font-size", "50px");
 
   return tube;
 }
