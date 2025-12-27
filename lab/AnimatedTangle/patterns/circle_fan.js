@@ -10,13 +10,13 @@ import {
 } from "../../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../../sketchlib/Style.js";
 import { Hold, ParamCurve } from "../../lablib/animation/ParamCurve.js";
-import { Ease } from "../../../sketchlib/easing_curves.js";
 import { lerp } from "../../../sketchlib/lerp.js";
 import { Direction } from "../../../pga2d/Direction.js";
 import { PolygonPrimitive } from "../../../sketchlib/primitives/PolygonPrimitive.js";
 import { Motor } from "../../../pga2d/versors.js";
 import { Transform } from "../../../sketchlib/primitives/Transform.js";
 import { GroupPrimitive } from "../../../sketchlib/primitives/GroupPrimitive.js";
+import { Ease } from "../../../sketchlib/Ease.js";
 
 const CENTER = new Point(500, 300);
 const BAND_THICKNESS = 50;
