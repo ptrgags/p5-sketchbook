@@ -6,36 +6,36 @@
  */
 export class Ease {
   /**
-   *
-   * @param {number} t
-   * @returns {number}
+   * Default linear progression
+   * @param {number} t Time parameter
+   * @returns {number} Progress value
    */
   static identity(t) {
     return t;
   }
 
   /**
-   *
-   * @param {number} t
-   * @returns {number}
+   * Speed up at the beginning, near linear at the end. Uses a cubic curve.
+   * @param {number} t Time parameter
+   * @returns {number} Progress value
    */
   static in_cubic(t) {
     return t * t * t;
   }
 
   /**
-   *
-   * @param {number} t
-   * @returns {number}
+   * Near linear at the beginning, slow down at the end. Uses a cubic curve.
+   * @param {number} t Time parameter
+   * @returns {number} Progress value
    */
   static out_cubic(t) {
     return 1 - Math.pow(1 - t, 3);
   }
 
   /**
-   *
-   * @param {number} t
-   * @returns {number}
+   * Speed up at the beginning, slow down at the end. Uses a cubic curve.
+   * @param {number} t Time parameter
+   * @returns {number} Progress value
    */
   static in_out_cubic(t) {
     if (t < 0.5) {
