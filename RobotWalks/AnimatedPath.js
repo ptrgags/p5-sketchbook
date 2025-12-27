@@ -1,3 +1,5 @@
+import { Direction } from "../pga2d/Direction.js";
+import { Point } from "../pga2d/Point.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { Primitive } from "../sketchlib/primitives/Primitive.js";
 import { group } from "../sketchlib/primitives/shorthand.js";
@@ -18,7 +20,25 @@ export class PartialPrimitive extends Primitive {
    * @returns {Primitive}
    */
   render_partial(t) {
-    throw new Error("not implemented: render_partial(t)");
+    throw new Error("not implemented");
+  }
+
+  /**
+   * Get the position at time t in the curve
+   * @param {number} t Interpolation factor in [0, 1]
+   * @returns {Point} Current point at the curve a time t
+   */
+  get_position(t) {
+    throw new Error("not implemented");
+  }
+
+  /**
+   * Get a tangent direction at time t
+   * @param {number} t Interpolation factor in [0, 1]
+   * @returns {Direction} Unit direction along the curve at time t
+   */
+  get_tangent(t) {
+    throw new Error("not implemented");
   }
 }
 
@@ -51,11 +71,33 @@ export class AnimatedPath {
 
   /**
    * Check if the animation is finished
-   * @param {number} frame Current frame number
+   * @param {number} time Current time
    * @returns {boolean} True if the animation is finished
    */
-  is_done(frame) {
-    return this.tween.is_done(frame);
+  is_done(time) {
+    return this.tween.is_done(time);
+  }
+
+  /**
+   * Get the position at the given time
+   * @param {number} time
+   * @returns {Point}
+   */
+  get_position(time) {
+    const [arc_index, t] = whole_fract(this.tween.get_value(time));
+    const partial_segment = this.segments[arc_index];
+    return partial_segment.get_position(t);
+  }
+
+  /**
+   * Get the unit tangent at the given time
+   * @param {number} time
+   * @returns {Direction}
+   */
+  get_tangent(time) {
+    const [arc_index, t] = whole_fract(this.tween.get_value(time));
+    const partial_segment = this.segments[arc_index];
+    return partial_segment.get_tangent(t);
   }
 
   /**

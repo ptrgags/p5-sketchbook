@@ -2,6 +2,8 @@ import { Point } from "../../pga2d/Point.js";
 import { ArcAngles } from "../ArcAngles.js";
 import { Primitive } from "./Primitive.js";
 import { lerp } from "../lerp.js";
+import { Direction } from "../../pga2d/Direction.js";
+import { Motor } from "../../pga2d/versors.js";
 
 /**
  * Circular arc primitive defined as a circle and start and stop angles
@@ -27,14 +29,37 @@ export class ArcPrimitive {
    * @return {Primitive}
    */
   render_partial(t) {
-    const interpolated_angles = new ArcAngles(this.angles.start_angle, 
+    const interpolated_angles = new ArcAngles(
+      this.angles.start_angle,
       lerp(this.angles.start_angle, this.angles.end_angle, t)
-    )
-    return new ArcPrimitive(
-      this.center,
-      this.radius,
-      interpolated_angles
-    )
+    );
+    return new ArcPrimitive(this.center, this.radius, interpolated_angles);
+  }
+
+  /**
+   * Get the position at time t
+   * @param {number} t Interpolation factor in [0, 1]
+   * @returns {Point} Current point at the curve a time t
+   */
+  get_position(t) {
+    const angle = lerp(this.angles.start_angle, this.angles.end_angle, t);
+    const offset = Direction.from_angle(angle).scale(this.radius);
+    return this.center.add(offset);
+  }
+
+  /**
+   * Get the tangent direction at time t
+   * @param {number} t Interpolation factor in [0, 1]
+   * @returns {Direction} Unit direction along the curve at time t
+   */
+  get_tangent(t) {
+    const angle = lerp(this.angles.start_angle, this.angles.end_angle, t);
+    // On a circle, the normal is always 90 degrees away from the tangent.
+    // though there are two options depending on the direction of the arc
+    const normal = Direction.from_angle(angle).scale(this.radius);
+    const rot = this.angles.direction < 0 ? Motor.ROT90.reverse() : Motor.ROT90;
+
+    return rot.transform_dir(normal);
   }
 
   /**
