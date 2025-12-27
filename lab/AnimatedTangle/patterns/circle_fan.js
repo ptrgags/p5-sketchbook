@@ -1,7 +1,6 @@
 import { Sequential } from "../../lablib/music/Timeline.js";
 import { Rational } from "../../lablib/Rational.js";
 import { Point } from "../../../pga2d/Point.js";
-import { Color } from "../../../sketchlib/Color.js";
 import { CirclePrimitive } from "../../../sketchlib/primitives/CirclePrimitive.js";
 import {
   group,
@@ -17,6 +16,7 @@ import { PolygonPrimitive } from "../../../sketchlib/primitives/PolygonPrimitive
 import { Motor } from "../../../pga2d/versors.js";
 import { Transform } from "../../../sketchlib/primitives/Transform.js";
 import { GroupPrimitive } from "../../../sketchlib/primitives/GroupPrimitive.js";
+import { PALETTE_CORAL, PALETTE_NAVY, PALETTE_SKY } from "../theme_colors.js";
 
 const CENTER = new Point(500, 300);
 const BAND_THICKNESS = 50;
@@ -24,14 +24,14 @@ const MAX_RADII = [5, 4, 3, 2, 1].map((x) => x * BAND_THICKNESS);
 const CIRCLE_COUNT = MAX_RADII.length;
 
 const STYLE_CIRCLES = new Style({
-  fill: Color.RED,
-  stroke: Color.WHITE,
+  fill: PALETTE_NAVY[3].to_srgb(),
+  stroke: PALETTE_SKY[4].to_srgb(),
   width: 5,
 });
 
 const STYLE_DIAMONDS = new Style({
-  fill: Color.YELLOW,
-  stroke: Color.BLUE,
+  fill: PALETTE_CORAL[3].to_srgb(),
+  stroke: PALETTE_NAVY[2].to_srgb(),
   width: 2,
 });
 

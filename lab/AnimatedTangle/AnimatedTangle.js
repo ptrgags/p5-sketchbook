@@ -17,7 +17,7 @@ import { GEODE } from "./patterns/geode.js";
 import { LANDSCAPE } from "./patterns/landscape.js";
 import { EYE } from "./patterns/peek.js";
 import { make_stripes } from "./patterns/stripes.js";
-import { PALETTE_NAVY, PALETTE_SKY } from "./theme_colors.js";
+import { PALETTE_CORAL, PALETTE_NAVY, PALETTE_SKY } from "./theme_colors.js";
 
 /**
  * Shorthand for making arrays of points
@@ -56,7 +56,7 @@ const PANEL_STRIPES = new PolygonPrimitive(
 );
 
 const PANEL_STYLE = new Style({
-  stroke: PALETTE_SKY[0].to_srgb(),
+  stroke: PALETTE_NAVY[4].to_srgb(),
   width: 10,
 });
 
@@ -91,7 +91,7 @@ const QUARTER_PEEK = new RectPrimitive(
 );
 
 const STYLE_QUARTERS = new Style({
-  stroke: Color.MAGENTA,
+  stroke: PALETTE_CORAL[4].to_srgb(),
   width: 4,
 });
 const QUARTERS = new VectorTangle([

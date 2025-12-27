@@ -1,24 +1,20 @@
 import { Oklch } from "../../lablib/Oklch.js";
 import { Direction } from "../../../pga2d/Direction.js";
 import { Point } from "../../../pga2d/Point.js";
-import { Color } from "../../../sketchlib/Color.js";
 import { CirclePrimitive } from "../../../sketchlib/primitives/CirclePrimitive.js";
-import { InvMask, Mask } from "../../../sketchlib/primitives/ClipMask.js";
-import { RectPrimitive } from "../../../sketchlib/primitives/RectPrimitive.js";
 import { group, style } from "../../../sketchlib/primitives/shorthand.js";
-import { VectorTangle } from "../../../sketchlib/primitives/VectorTangle.js";
 import { Style } from "../../../sketchlib/Style.js";
 import { CoralNode, CoralTree } from "../CoralTree.js";
-import { AnimatedStripes, make_stripes } from "./stripes.js";
+import { AnimatedStripes } from "./stripes.js";
 import { Hinge } from "../Hinge.js";
+import { PALETTE_CORAL, PALETTE_SKY } from "../theme_colors.js";
 
 const RADIUS_BIG = 25;
 const RADIUS_SMALL = RADIUS_BIG / 2;
 
-const COLOR_CORAL = new Oklch(0.7617, 0.14, 27.53);
 const STYLE_CORAL = new Style({
-  fill: COLOR_CORAL.to_srgb(),
-  stroke: COLOR_CORAL.adjust_lightness(-0.2).to_srgb(),
+  fill: PALETTE_CORAL.at(-1).to_srgb(),
+  stroke: PALETTE_CORAL.at(-2).adjust_lightness(-0.2).to_srgb(),
   width: 4,
 });
 
@@ -30,11 +26,11 @@ export const CORAL_STRIPES = new AnimatedStripes(
 );
 
 const STYLE_STRIPES = new Style({
-  stroke: new Oklch(0.5386, 0.0765, 147.18).to_srgb(),
+  stroke: PALETTE_SKY[3].to_srgb(),
   width: 4,
 });
 
-const GREEN_STRIPES = style(CORAL_STRIPES.render(), STYLE_STRIPES);
+const STRIPES = style(CORAL_STRIPES.render(), STYLE_STRIPES);
 
 const SWAY_AMPLITUDE = Math.PI / 12;
 const SWAY_FREQUENCY = 0.25;
@@ -210,7 +206,7 @@ class SwayingCoral {
     // refreshes
     this.coral_slot = colored_coral.primitives;
 
-    this.primitive = group(GREEN_STRIPES, colored_coral);
+    this.primitive = group(STRIPES, colored_coral);
   }
 
   /**
