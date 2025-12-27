@@ -1,6 +1,7 @@
 import { Direction } from "../pga2d/Direction.js";
 import { Point } from "../pga2d/Point.js";
 import { clamp } from "./clamp.js";
+import { Ease } from "./easing_curves.js";
 import { lerp } from "./lerp.js";
 
 /**
@@ -16,13 +17,21 @@ export class Tween {
    * Tween.scalar and Tween.point
    * @param {T} start_value The initial value
    * @param {T} end_value The end value
-   * @param {function(T, T, number): T} lerp_func - the interpolation function for the value type
    * @param {number} start_time The start time. This can be in frames, seconds,
    * or some artificial animation time.
    * @param {number} duration The duration. It must be the same units as
    * start_time.
+   * @param {function(T, T, number): T} lerp_func - the interpolation function for the value type
+   * @param {function(number): number} [easing_curve = Ease.identity] - Easing curve from [0, 1] to [0, 1] for adjusting the flow of the animation
    */
-  constructor(start_value, end_value, lerp_func, start_time, duration) {
+  constructor(
+    start_value,
+    end_value,
+    start_time,
+    duration,
+    lerp_func,
+    easing_curve = Ease.identity
+  ) {
     this.start_value = start_value;
     this.end_value = end_value;
     this.start_time = start_time;
@@ -32,6 +41,7 @@ export class Tween {
      * @type {function(T, T, number): T}
      */
     this.lerp_func = lerp_func;
+    this.easing_curve = easing_curve;
   }
 
   /**
@@ -58,7 +68,8 @@ export class Tween {
    */
   get_value(time) {
     const t_relative = (time - this.start_time) / this.duration;
-    const t = clamp(t_relative, 0.0, 1.0);
+    const t_linear = clamp(t_relative, 0.0, 1.0);
+    const t = this.easing_curve(t_linear);
     return this.lerp_func(this.start_value, this.end_value, t);
   }
 
@@ -78,10 +89,24 @@ export class Tween {
    * @param {number} end_value The ending value
    * @param {number} start_time The start time in frames, seconds or other time units
    * @param {number} duration The end time in the same units as start_time
+   * @param {function(number): number} [easing_curve = Ease.identity] - Easing curve from [0, 1] to [0, 1] for adjusting the flow of the animation
    * @returns {Tween<number>} A number-valued tween
    */
-  static scalar(start_value, end_value, start_time, duration) {
-    return new Tween(start_value, end_value, lerp, start_time, duration);
+  static scalar(
+    start_value,
+    end_value,
+    start_time,
+    duration,
+    easing_curve = Ease.identity
+  ) {
+    return new Tween(
+      start_value,
+      end_value,
+      start_time,
+      duration,
+      lerp,
+      easing_curve
+    );
   }
 
   /**
@@ -90,22 +115,50 @@ export class Tween {
    * @param {Point} end_point The ending point
    * @param {number} start_time The start time in frames, seconds or other time units
    * @param {number} duration The end time in the same units as start_time
+   * @param {function(number): number} [easing_curve = Ease.identity] - Easing curve from [0, 1] to [0, 1] for adjusting the flow of the animation
    * @returns {Tween<Point>} A point-valued tween
    */
-  static point(start_point, end_point, start_time, duration) {
-    return new Tween(start_point, end_point, Point.lerp, start_time, duration);
+  static point(
+    start_point,
+    end_point,
+    start_time,
+    duration,
+    easing_curve = Ease.identity
+  ) {
+    return new Tween(
+      start_point,
+      end_point,
+      start_time,
+      duration,
+      Point.lerp,
+      easing_curve
+    );
   }
 
   /**
-   * Tween for animating a 2D PGA point
-   * @param {Direction} start_dir The starting point
-   * @param {Direction} end_dir The ending point
+   * Tween for animating a 2D PGA direction
+   * @param {Direction} start_dir The starting direction
+   * @param {Direction} end_dir The ending direction
    * @param {number} start_time The start time in frames, seconds or other time units
    * @param {number} duration The end time in the same units as start_time
-   * @returns {Tween<Direction>} A point-valued tween
+   * @param {function(number): number} [easing_curve = Ease.identity] - Easing curve from [0, 1] to [0, 1] for adjusting the flow of the animation
+   * @returns {Tween<Direction>} A direction-valued tween
    */
-  static dir(start_dir, end_dir, start_time, duration) {
-    return new Tween(start_dir, end_dir, Direction.lerp, start_time, duration);
+  static dir(
+    start_dir,
+    end_dir,
+    start_time,
+    duration,
+    easing_curve = Ease.identity
+  ) {
+    return new Tween(
+      start_dir,
+      end_dir,
+      start_time,
+      duration,
+      Direction.lerp,
+      easing_curve
+    );
   }
 
   /**
