@@ -7,10 +7,12 @@ export class ParamCurve {
    * @param {number} start_value Initial value
    * @param {number} end_value Final value
    * @param {Rational} duration Duration of the interval
+   * @param {function(number): number} [easing_curve=Ease.identity] Easing curve
    */
-  constructor(start_value, end_value, duration) {
+  constructor(start_value, end_value, duration, easing_curve) {
     this.start_value = start_value;
     this.end_value = end_value;
+    this.easing_curve = easing_curve;
     this.duration = duration;
   }
 
