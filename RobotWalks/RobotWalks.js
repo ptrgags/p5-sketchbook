@@ -108,16 +108,6 @@ export const sketch = (p) => {
     robot.update(p.frameCount, DPAD.direction.digital);
     const robot_walk = robot.render(p.frameCount);
     robot_walk.draw(p);
-
-    TOUCH_LEFT.debug_render().draw(p);
-    TOUCH_RIGHT.debug_render().draw(p);
-    TOUCH_DOWN.debug_render().draw(p);
-
-    p.push();
-    p.noFill();
-    p.stroke(255);
-    ANIMATED_PATH_EX.render(p.frameCount).draw(p);
-    p.pop();
   };
 
   p.keyPressed = (/** @type {KeyboardEvent} */ e) => {
