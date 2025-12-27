@@ -51,7 +51,7 @@ export class AnimationCurve {
 
     // Remap the tweens to have a domain of [0, 1] so we can use them with time_to_index
     this.tweens = tweens.map((x) =>
-      Tween.scalar(x.start_value, x.end_value, 0, 1)
+      Tween.scalar(x.start_value, x.end_value, 0, 1, x.easing_curve)
     );
   }
 
@@ -89,7 +89,8 @@ export class AnimationCurve {
         curve.start_value,
         curve.end_value,
         start_time.real,
-        curve.duration.real
+        curve.duration.real,
+        curve.easing_curve
       );
     });
     const with_holds = [...fill_gaps(tweens)];
