@@ -12,9 +12,10 @@ import {
 } from "../../../sketchlib/primitives/shorthand.js";
 import { Transform } from "../../../sketchlib/primitives/Transform.js";
 import { Style } from "../../../sketchlib/Style.js";
+import { PALETTE_ROCK, Values } from "../theme_colors.js";
 
 const STYLE_MOUNTAINS = new Style({
-  fill: Color.from_hex_code("#555555"),
+  fill: PALETTE_ROCK[Values.MedDark].to_srgb(),
 });
 
 class Landscape {

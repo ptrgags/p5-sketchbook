@@ -1,5 +1,4 @@
 import { AnimationCurves } from "../lablib/animation/AnimationCurves.js";
-import { Oklch } from "../lablib/Oklch.js";
 import { Rational } from "../lablib/Rational.js";
 import { Direction } from "../../pga2d/Direction.js";
 import { Point } from "../../pga2d/Point.js";
@@ -7,11 +6,9 @@ import { Color } from "../../sketchlib/Color.js";
 import { WIDTH, HEIGHT, SCREEN_CENTER } from "../../sketchlib/dimensions.js";
 import { mod } from "../../sketchlib/mod.js";
 import { Mask } from "../../sketchlib/primitives/ClipMask.js";
-import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
 import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
-import { group, style } from "../../sketchlib/primitives/shorthand.js";
-import { Transform } from "../../sketchlib/primitives/Transform.js";
+import { style } from "../../sketchlib/primitives/shorthand.js";
 import { VectorTangle } from "../../sketchlib/primitives/VectorTangle.js";
 import { Style } from "../../sketchlib/Style.js";
 import { CIRCLE_FAN } from "./patterns/circle_fan.js";
@@ -20,6 +17,7 @@ import { GEODE } from "./patterns/geode.js";
 import { LANDSCAPE } from "./patterns/landscape.js";
 import { EYE } from "./patterns/peek.js";
 import { make_stripes } from "./patterns/stripes.js";
+import { PALETTE_CORAL, PALETTE_NAVY, Values } from "./theme_colors.js";
 
 /**
  * Shorthand for making arrays of points
@@ -58,7 +56,7 @@ const PANEL_STRIPES = new PolygonPrimitive(
 );
 
 const PANEL_STYLE = new Style({
-  stroke: Color.YELLOW,
+  stroke: PALETTE_NAVY[Values.Light].to_srgb(),
   width: 10,
 });
 
@@ -93,7 +91,7 @@ const QUARTER_PEEK = new RectPrimitive(
 );
 
 const STYLE_QUARTERS = new Style({
-  stroke: Color.MAGENTA,
+  stroke: PALETTE_CORAL[Values.Light].to_srgb(),
   width: 4,
 });
 const QUARTERS = new VectorTangle([
@@ -102,13 +100,6 @@ const QUARTERS = new VectorTangle([
   [new Mask(QUARTER_BRICK_WALL), style(QUARTER_BRICK_WALL, STYLE_QUARTERS)],
   [new Mask(QUARTER_PEEK), EYE.eye],
 ]);
-
-/*
-style(
-  [QUARTER_HITOMEZASHI, QUARTER_CIRCLE_FAN, QUARTER_BRICK_WALL, QUARTER_PEEK],
-  STYLE_QUARTERS
-);
-*/
 
 // Full scene
 
@@ -124,7 +115,7 @@ const TANGLE = new VectorTangle(
 
 const STYLE_BACKGROUND_STRIPES = new Style({
   // navy blue
-  stroke: new Color(0, 0, 63),
+  stroke: PALETTE_NAVY[Values.Dark].to_srgb(),
   width: 15,
 });
 const BACKGROUND_STRIPES = style(
