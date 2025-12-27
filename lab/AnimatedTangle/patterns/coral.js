@@ -7,14 +7,14 @@ import { Style } from "../../../sketchlib/Style.js";
 import { CoralNode, CoralTree } from "../CoralTree.js";
 import { AnimatedStripes } from "./stripes.js";
 import { Hinge } from "../Hinge.js";
-import { PALETTE_CORAL, PALETTE_SKY } from "../theme_colors.js";
+import { PALETTE_CORAL, PALETTE_SKY, Values } from "../theme_colors.js";
 
 const RADIUS_BIG = 25;
 const RADIUS_SMALL = RADIUS_BIG / 2;
 
 const STYLE_CORAL = new Style({
-  fill: PALETTE_CORAL.at(-1).to_srgb(),
-  stroke: PALETTE_CORAL.at(-2).adjust_lightness(-0.2).to_srgb(),
+  fill: PALETTE_CORAL[Values.Light].to_srgb(),
+  stroke: PALETTE_CORAL[Values.MedDark].to_srgb(),
   width: 4,
 });
 
@@ -26,7 +26,7 @@ export const CORAL_STRIPES = new AnimatedStripes(
 );
 
 const STYLE_STRIPES = new Style({
-  stroke: PALETTE_SKY[3].to_srgb(),
+  stroke: PALETTE_SKY[Values.MedLight].to_srgb(),
   width: 4,
 });
 

@@ -23,3 +23,15 @@ export const PALETTE_ROCK = Oklch.gradient(
   new Oklch(0.7, 0, 0),
   5
 );
+
+/**
+ * Color values for 5-step palettes
+ * @enum {number}
+ */
+export const Values = {
+  Dark: 0,
+  MedDark: 1,
+  Medium: 2,
+  MedLight: 3,
+  Light: 4,
+};

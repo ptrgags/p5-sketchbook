@@ -11,16 +11,16 @@ import { group, style } from "../../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../../sketchlib/Style.js";
 import { make_stripes } from "./stripes.js";
 import { ParamCurve } from "../../lablib/animation/ParamCurve.js";
-import { PALETTE_CORAL, PALETTE_ROCK } from "../theme_colors.js";
+import { PALETTE_CORAL, PALETTE_ROCK, Values } from "../theme_colors.js";
 import { Oklch } from "../../lablib/Oklch.js";
 import { Random } from "../../../sketchlib/random.js";
 
 const STYLE_ROCK1 = new Style({
-  stroke: PALETTE_ROCK[1].to_srgb(),
+  stroke: PALETTE_ROCK[Values.MedDark].to_srgb(),
   width: 4,
 });
 const STYLE_ROCK2 = new Style({
-  stroke: PALETTE_ROCK[2].to_srgb(),
+  stroke: PALETTE_ROCK[Values.Medium].to_srgb(),
   width: 4,
 });
 
@@ -42,7 +42,7 @@ const ROCK_STRIPES2 = make_stripes(
 );
 
 const STYLE_INSIDE_GEODE = new Style({
-  fill: PALETTE_ROCK[0].to_srgb(),
+  fill: PALETTE_ROCK[Values.Dark].to_srgb(),
 });
 
 export class Geode {
@@ -115,7 +115,11 @@ const GEODE_BOUNDARY = new PolygonPrimitive(
 const WIDTHS = [8, 7, 6, 5, 4, 3, 2, 1].map((x) => 8 * x);
 
 const PALETTE_AGATE = Random.shuffle(
-  Oklch.gradient(PALETTE_CORAL[0], PALETTE_CORAL.at(-1), WIDTHS.length)
+  Oklch.gradient(
+    PALETTE_CORAL[Values.Dark],
+    PALETTE_CORAL[Values.Light],
+    WIDTHS.length
+  )
 );
 
 /**
