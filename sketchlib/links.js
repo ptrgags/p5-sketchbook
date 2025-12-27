@@ -104,7 +104,7 @@ export const LINKS = [
   },
   {
     title: "Hyperbolic Connections",
-    year: "2021, 2024",
+    year: "2021, 2024-04",
   },
   {
     title: "Pentag Tiling",
