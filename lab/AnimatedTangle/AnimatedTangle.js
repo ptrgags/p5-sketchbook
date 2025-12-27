@@ -1,5 +1,4 @@
 import { AnimationCurves } from "../lablib/animation/AnimationCurves.js";
-import { Oklch } from "../lablib/Oklch.js";
 import { Rational } from "../lablib/Rational.js";
 import { Direction } from "../../pga2d/Direction.js";
 import { Point } from "../../pga2d/Point.js";
@@ -7,11 +6,9 @@ import { Color } from "../../sketchlib/Color.js";
 import { WIDTH, HEIGHT, SCREEN_CENTER } from "../../sketchlib/dimensions.js";
 import { mod } from "../../sketchlib/mod.js";
 import { Mask } from "../../sketchlib/primitives/ClipMask.js";
-import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
 import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
-import { group, style } from "../../sketchlib/primitives/shorthand.js";
-import { Transform } from "../../sketchlib/primitives/Transform.js";
+import { style } from "../../sketchlib/primitives/shorthand.js";
 import { VectorTangle } from "../../sketchlib/primitives/VectorTangle.js";
 import { Style } from "../../sketchlib/Style.js";
 import { CIRCLE_FAN } from "./patterns/circle_fan.js";
