@@ -20,6 +20,7 @@ import { GEODE } from "./patterns/geode.js";
 import { LANDSCAPE } from "./patterns/landscape.js";
 import { EYE } from "./patterns/peek.js";
 import { make_stripes } from "./patterns/stripes.js";
+import { PALETTE_NAVY, PALETTE_SKY } from "./theme_colors.js";
 
 /**
  * Shorthand for making arrays of points
@@ -58,7 +59,7 @@ const PANEL_STRIPES = new PolygonPrimitive(
 );
 
 const PANEL_STYLE = new Style({
-  stroke: Color.YELLOW,
+  stroke: PALETTE_SKY[0].to_srgb(),
   width: 10,
 });
 
@@ -103,13 +104,6 @@ const QUARTERS = new VectorTangle([
   [new Mask(QUARTER_PEEK), EYE.eye],
 ]);
 
-/*
-style(
-  [QUARTER_HITOMEZASHI, QUARTER_CIRCLE_FAN, QUARTER_BRICK_WALL, QUARTER_PEEK],
-  STYLE_QUARTERS
-);
-*/
-
 // Full scene
 
 const TANGLE = new VectorTangle(
@@ -124,7 +118,7 @@ const TANGLE = new VectorTangle(
 
 const STYLE_BACKGROUND_STRIPES = new Style({
   // navy blue
-  stroke: new Color(0, 0, 63),
+  stroke: PALETTE_NAVY[0].to_srgb(),
   width: 15,
 });
 const BACKGROUND_STRIPES = style(
