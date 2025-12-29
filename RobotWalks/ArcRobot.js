@@ -19,7 +19,7 @@ const MOVEMENT_DURATION = 25;
 const PIXELS_PER_METER = 25;
 const ORIENTATION_LINE_LENGTH = 25;
 
-const START_POINT = Point.ORIGIN.add(SCREEN_CENTER);
+const START_POINT = SCREEN_CENTER;
 
 /**
  * Given an array, make a reverse lookup table
@@ -43,9 +43,9 @@ export const N_VALUES = [3, 4, 5, 6, 8, 12];
 export const N_VALUES_INV = inverse_array(N_VALUES);
 
 const COLORS = [
-  Color.RED,
   Color.BLUE,
   Color.CYAN,
+  Color.RED,
   Color.MAGENTA,
   Color.YELLOW,
   Color.GREEN,
