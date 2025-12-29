@@ -1,3 +1,6 @@
+export const DEFAULT_TICKS_PER_QUARTER = 96;
+export const DEFAULT_VELOCITY = 127;
+
 /**
  * @enum {number}
  */
@@ -13,9 +16,13 @@ export class MIDIHeader {
    * Constructor
    * @param {MIDIFormat} format MIDI format
    * @param {number} num_tracks Number of tracks in the file
-   * @param {number} ticks_per_quarter How many ticks per quarter note
+   * @param {number} [ticks_per_quarter=DEFAULT_TICKS_PER_QUARTER] How many ticks per quarter note
    */
-  constructor(format, num_tracks, ticks_per_quarter) {
+  constructor(
+    format,
+    num_tracks,
+    ticks_per_quarter = DEFAULT_TICKS_PER_QUARTER
+  ) {
     this.format = format;
     this.num_tracks = num_tracks;
     this.ticks_per_quarter = ticks_per_quarter;
@@ -80,10 +87,10 @@ export class MIDIMessage {
    * @param {number} tick_delta Time delta for message
    * @param {number} channel Channel number 0-15
    * @param {number} pitch MIDI note number
-   * @param {number} velocity MIDI velocity 0-127
+   * @param {number} [velocity=DEFAULT_VELOCITY] MIDI velocity 0-127
    * @returns {MIDIMessage} The note event
    */
-  static note_on(tick_delta, channel, pitch, velocity) {
+  static note_on(tick_delta, channel, pitch, velocity = DEFAULT_VELOCITY) {
     return new MIDIMessage(
       tick_delta,
       MIDIMessageType.NOTE_ON,

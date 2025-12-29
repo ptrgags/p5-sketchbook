@@ -2,6 +2,8 @@ import { Score } from "../music/Score.js";
 import { to_events } from "../music/Timeline.js";
 import { Rational } from "../Rational.js";
 import {
+  DEFAULT_TICKS_PER_QUARTER,
+  DEFAULT_VELOCITY,
   MIDIFile,
   MIDIFormat,
   MIDIHeader,
@@ -12,11 +14,8 @@ import {
   MIDITrack,
 } from "./MidiFile.js";
 
-// Ableton's export format
-const TICKS_PER_QUARTER = 96;
 // Assuming 4/4 time
-const TICKS_PER_MEASURE = TICKS_PER_QUARTER / 4;
-const DEFAULT_VELOCITY = 127;
+const TICKS_PER_MEASURE = 4 * DEFAULT_TICKS_PER_QUARTER;
 
 /**
  * Get the number of ticks
@@ -33,7 +32,11 @@ function to_ticks(time_measures) {
  * @return {MIDIFile} The converted MIDI file
  */
 export function score_to_midi(score) {
-  const header = new MIDIHeader(MIDIFormat.SINGLE_TRACK, 1, TICKS_PER_QUARTER);
+  const header = new MIDIHeader(
+    MIDIFormat.SINGLE_TRACK,
+    1,
+    DEFAULT_TICKS_PER_QUARTER
+  );
 
   /**
    * @type {[number, number, MIDIMessageType, number][]}
