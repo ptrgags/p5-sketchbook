@@ -1,46 +1,13 @@
 import { Direction } from "../../../pga2d/Direction.js";
 import { Point } from "../../../pga2d/Point.js";
 import { GroupPrimitive } from "../../../sketchlib/primitives/GroupPrimitive.js";
-import { Primitive } from "../../../sketchlib/primitives/Primitive.js";
+import {
+  PartialPrimitive,
+  Primitive,
+} from "../../../sketchlib/primitives/Primitive.js";
 import { group } from "../../../sketchlib/primitives/shorthand.js";
 import { Tween } from "../../../sketchlib/Tween.js";
 import { whole_fract } from "../../../sketchlib/whole_fract.js";
-
-/**
- * A partial primitive is a Primitive that can also render a partial version
- * of itself. For example, a directed line segment or arc can be drawn
- * partially, this is often helpful for animation.
- *
- * @interface PartialPrimitive
- */
-export class PartialPrimitive extends Primitive {
-  /**
-   * Render a partial version of the primitive
-   * @param {number} t Interpolation factor in [0, 1]
-   * @returns {Primitive}
-   */
-  render_partial(t) {
-    throw new Error("not implemented");
-  }
-
-  /**
-   * Get the position at time t in the curve
-   * @param {number} t Interpolation factor in [0, 1]
-   * @returns {Point} Current point at the curve a time t
-   */
-  get_position(t) {
-    throw new Error("not implemented");
-  }
-
-  /**
-   * Get a tangent direction at time t
-   * @param {number} t Interpolation factor in [0, 1]
-   * @returns {Direction} Unit direction along the curve at time t
-   */
-  get_tangent(t) {
-    throw new Error("not implemented");
-  }
-}
 
 /**
  * Collection of primitives that can be chained together to form a path
@@ -135,5 +102,15 @@ export class AnimatedPath {
     }
 
     return group(...path);
+  }
+
+  /**
+   * Render the path between two times
+   * @param {number} time_a Start time
+   * @param {number} time_b End time
+   */
+  render_between(time_a, time_b) {
+    const [arc_a, t_a] = whole_fract(this.tween.get_value(time_a));
+    const [arc_b, t_b] = whole_fract(this.tween.get_value(time_b));
   }
 }
