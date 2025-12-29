@@ -12,6 +12,7 @@ import { Transform } from "../../sketchlib/primitives/Transform.js";
 import { Style } from "../../sketchlib/Style.js";
 import { AnimationCurves } from "../lablib/animation/AnimationCurves.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
+import { score_to_midi } from "../lablib/midi/score_to_midi.js";
 import { MouseInput } from "../lablib/MouseInput.js";
 import { render_score } from "../lablib/music/render_score.js";
 import { MuteButton } from "../lablib/MuteButton.js";
@@ -183,6 +184,12 @@ class SoundScene {
       }
     );
 
+    const export_button = document.getElementById("export");
+    if (export_button instanceof HTMLButtonElement) {
+      export_button.disabled = false;
+      export_button.addEventListener("click", () => this.export_selected());
+    }
+
     /**
      * ID of the score currently playing
      * @type {string}
@@ -213,6 +220,15 @@ class SoundScene {
       });
       return button;
     });
+  }
+
+  export_selected() {
+    if (!this.selected_melody) {
+      return;
+    }
+
+    const midi = score_to_midi(SOUND_MANIFEST.scores[this.selected_melody]);
+    console.log(midi);
   }
 
   render_timeline(time) {
