@@ -15,18 +15,43 @@ import { Direction } from "../pga2d/Direction.js";
 import { Point } from "../pga2d/Point.js";
 
 // How many frames to animate each 1/5 turn arc
-const MOVEMENT_DURATION = 25;
+const FULL_CIRCLE_DURATION = 120;
 const PIXELS_PER_METER = 25;
 const ORIENTATION_LINE_LENGTH = 25;
 
-const FIFTH_TURN = (2 * Math.PI) / 5;
+const START_POINT = SCREEN_CENTER;
 
-const START_POINT = Point.ORIGIN.add(SCREEN_CENTER);
+/**
+ * Given an array, make a reverse lookup table
+ * @template T
+ * @param {Array<T>} arr The original array
+ * @returns {Object.<T, number>}
+ */
+function inverse_array(arr) {
+  /**
+   * @type {Object.<T, number>}
+   */
+  const result = {};
+  for (const [i, x] of arr.entries()) {
+    result[x] = i;
+  }
+  return result;
+}
 
-const RED_LINES = new Style({
-  stroke: Color.RED,
-  width: 2,
-});
+// I'm allowing onlythe following values for their visual interest
+export const N_VALUES = [3, 4, 5, 6, 8, 12];
+export const N_VALUES_INV = inverse_array(N_VALUES);
+
+const COLORS = [
+  Color.BLUE,
+  Color.CYAN,
+  Color.RED,
+  Color.MAGENTA,
+  Color.YELLOW,
+  Color.GREEN,
+];
+
+const N_STYLES = COLORS.map((x) => new Style({ stroke: x, width: 2 }));
 const GREY_LINES = new Style({
   stroke: Color.from_hex_code("#777777"),
   width: 2,
@@ -44,7 +69,7 @@ const POINT_STYLE = new Style({
 });
 
 /**
- * @enum
+ * @enum {number}
  */
 const RobotAnimationState = {
   // Idle, waiting for commands
@@ -57,7 +82,16 @@ const RobotAnimationState = {
  * Robot based on Project Euler #208, see https://projecteuler.net/problem=208
  */
 export class ArcRobot {
-  constructor() {
+  /**
+   * Constructor
+   * @param {number} n Turn amount as a positive integer. This is the divisor of 2pi
+   */
+  constructor(n) {
+    this.n = n;
+    this.turn_angle = (2.0 * Math.PI) / n;
+    this.line_style = N_STYLES[N_VALUES_INV[n]];
+    this.movement_duration = FULL_CIRCLE_DURATION / n;
+
     /**
      * @type {RobotAnimationState}
      */
@@ -67,7 +101,7 @@ export class ArcRobot {
      * The sequence of commands that led the robot to its current state.
      * @type {RobotCommand}
      */
-    this.command_seq = RobotCommand.IDENTITY;
+    this.command_seq = RobotCommand.identity(this.n);
 
     /**
      * List of arcs the robot has already traversed, in pixels
@@ -78,7 +112,7 @@ export class ArcRobot {
      * Styled version of the history primitive
      * @type {GroupPrimitive}
      */
-    this.history_primitive = style(this.history, RED_LINES);
+    this.history_primitive = style(this.history, this.line_style);
 
     /**
      * List of line segments the robot has already traversed, in pixels
@@ -122,7 +156,7 @@ export class ArcRobot {
     if (this.animation_state === RobotAnimationState.IDLE) {
       const orientation = this.command_seq.orientation;
       // Orientation is measured from north, so add a quarter turn
-      const angle = orientation * FIFTH_TURN + Math.PI / 2;
+      const angle = orientation * this.turn_angle + Math.PI / 2;
       return Direction.from_angle(angle).flip_y();
     }
 
@@ -143,12 +177,12 @@ export class ArcRobot {
     // points directly outwards. Furthermore, in model space we defined
     // the arc radius as 1 meter. So the right direction is _exactly_ the
     // corresponding root of unity. And left is just its negation.
-    let to_center_model = ROOTS_OF_UNITY[this.command_seq.orientation];
+    let to_center_model = ROOTS_OF_UNITY[this.n][this.command_seq.orientation];
     if (dpad_direction === CardinalDirection.LEFT) {
-      command = RobotCommand.LEFT_TURN;
+      command = RobotCommand.left_turn(this.n);
       to_center_model = to_center_model.neg();
     } else {
-      command = RobotCommand.RIGHT_TURN;
+      command = RobotCommand.right_turn(this.n);
     }
 
     const start_offset_model = this.command_seq.offset;
@@ -162,11 +196,11 @@ export class ArcRobot {
 
     let angles_model;
     if (dpad_direction === CardinalDirection.LEFT) {
-      const start_angle = start_orientation * FIFTH_TURN;
-      angles_model = new ArcAngles(start_angle, start_angle + FIFTH_TURN);
+      const start_angle = start_orientation * this.turn_angle;
+      angles_model = new ArcAngles(start_angle, start_angle + this.turn_angle);
     } else {
-      const start_angle = start_orientation * FIFTH_TURN + Math.PI;
-      angles_model = new ArcAngles(start_angle, start_angle - FIFTH_TURN);
+      const start_angle = start_orientation * this.turn_angle + Math.PI;
+      angles_model = new ArcAngles(start_angle, start_angle - this.turn_angle);
     }
 
     // Model space is y-up, but screen space is y-down
@@ -182,7 +216,7 @@ export class ArcRobot {
       PIXELS_PER_METER,
       angles_screen,
       frame,
-      MOVEMENT_DURATION
+      this.movement_duration
     );
     this.animation_state = RobotAnimationState.MOVING;
     this.command_seq = full_command_seq;
@@ -231,7 +265,7 @@ export class ArcRobot {
   /**
    * Update the robot
    * @param {number} frame The frame number
-   * @param {Direction | undefined} dpad_direction The currently pressed DPAD direction
+   * @param {CardinalDirection | undefined} dpad_direction The currently pressed DPAD direction
    */
   update(frame, dpad_direction) {
     if (this.animation_state === RobotAnimationState.IDLE) {
@@ -244,9 +278,9 @@ export class ArcRobot {
   }
 
   /**
-   *
-   * @param {number} frame
-   * @returns {GroupPrimitive}
+   * Render the current frame
+   * @param {number} frame The frame number
+   * @returns {GroupPrimitive} Primitives to render
    */
   render(frame) {
     const pos = this.current_position(frame);
@@ -262,7 +296,7 @@ export class ArcRobot {
 
     if (this.current_arc) {
       const arc_bg = style(this.current_arc.arc_primitive, GREY_LINES);
-      const arc_fg = style(this.current_arc.render(frame), RED_LINES);
+      const arc_fg = style(this.current_arc.render(frame), this.line_style);
 
       return group(
         this.history_primitive,
