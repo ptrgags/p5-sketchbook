@@ -18,6 +18,7 @@ import { LANDSCAPE } from "./patterns/landscape.js";
 import { EYE } from "./patterns/peek.js";
 import { make_stripes } from "./patterns/stripes.js";
 import { PALETTE_CORAL, PALETTE_NAVY, Values } from "./theme_colors.js";
+import { HITOMEZASHI } from "./patterns/hitomezashi.js";
 
 /**
  * Shorthand for making arrays of points
@@ -95,7 +96,7 @@ const STYLE_QUARTERS = new Style({
   width: 4,
 });
 const QUARTERS = new VectorTangle([
-  [new Mask(QUARTER_HITOMEZASHI), style(QUARTER_HITOMEZASHI, STYLE_QUARTERS)],
+  [new Mask(QUARTER_HITOMEZASHI), style(HITOMEZASHI.render(), STYLE_QUARTERS)],
   [new Mask(QUARTER_CIRCLE_FAN), CIRCLE_FAN.render()],
   [new Mask(QUARTER_BRICK_WALL), style(QUARTER_BRICK_WALL, STYLE_QUARTERS)],
   [new Mask(QUARTER_PEEK), EYE.eye],
