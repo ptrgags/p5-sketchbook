@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { ParamCurve } from "./ParamCurve";
+import { Hold, ParamCurve } from "./ParamCurve";
 import { Rational } from "../Rational";
 import { Gap, Sequential } from "../music/Timeline";
 import { AnimationCurve } from "./AnimationCurve";
@@ -38,6 +38,40 @@ describe("AnimationCurve", () => {
 
     it("with several tweens computes correct duration", () => {
       const curve = AnimationCurve.from_timeline(make_curve());
+
+      expect(curve.duration).toBe(3);
+    });
+
+    it("with timeline with gap computes correct duration", () => {
+      const curve = AnimationCurve.from_timeline(
+        new Sequential(
+          new ParamCurve(0, 1, Rational.ONE),
+          new Hold(new Rational(2)),
+          new ParamCurve(1, 2, Rational.ONE)
+        )
+      );
+
+      expect(curve.duration).toBe(4);
+    });
+
+    it("with timeline ending in hold computes correct duration", () => {
+      const curve = AnimationCurve.from_timeline(
+        new Sequential(
+          new ParamCurve(0, 1, Rational.ONE),
+          new Hold(new Rational(2))
+        )
+      );
+
+      expect(curve.duration).toBe(3);
+    });
+
+    it("with timeline beginning in hold computes correct duration", () => {
+      const curve = AnimationCurve.from_timeline(
+        new Sequential(
+          new Hold(new Rational(2)),
+          new ParamCurve(0, 1, Rational.ONE)
+        )
+      );
 
       expect(curve.duration).toBe(3);
     });
