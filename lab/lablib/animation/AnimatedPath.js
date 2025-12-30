@@ -108,9 +108,24 @@ export class AnimatedPath {
    * Render the path between two times
    * @param {number} time_a Start time
    * @param {number} time_b End time
+   * @return {Primitive} the resulting portion of the path. May be empty.
    */
   render_between(time_a, time_b) {
+    if (time_a >= time_b) {
+      return GroupPrimitive.EMPTY;
+    }
+
     const [arc_a, t_a] = whole_fract(this.tween.get_value(time_a));
     const [arc_b, t_b] = whole_fract(this.tween.get_value(time_b));
+
+    if (arc_a === arc_b) {
+      return this.segments[arc_a].render_between(t_a, t_b);
+    }
+
+    return group(
+      this.segments[arc_a].render_between(t_a, 1),
+      ...this.segments.slice(arc_a + 1, arc_b),
+      this.segments[arc_b].render_between(0, t_b)
+    );
   }
 }

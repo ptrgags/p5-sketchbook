@@ -41,7 +41,7 @@ export class AnimationCurve {
      * @type {[number, number][]}
      */
     const start_times = tweens.map((x, i) => [x.start_time, i]);
-    start_times.push([tweens[tweens.length - 1].end_time, tweens.length]);
+    start_times.push([tweens.at(-1).end_time, tweens.length]);
 
     /**
      * Mapping of animation time -> [0, N]
@@ -53,6 +53,17 @@ export class AnimationCurve {
     this.tweens = tweens.map((x) =>
       Tween.scalar(x.start_value, x.end_value, 0, 1, x.easing_curve)
     );
+  }
+
+  /**
+   * Get the duration from the start of the first tween to the end of the
+   * last tween
+   * @type {number}
+   */
+  get duration() {
+    const start_time = this.tweens[0].start_time;
+    const end_time = this.tweens.at(-1).end_time;
+    return end_time - start_time;
   }
 
   /**

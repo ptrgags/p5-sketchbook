@@ -5,6 +5,11 @@ import { LinePrimitive } from "../../../sketchlib/primitives/LinePrimitive.js";
 import { style } from "../../../sketchlib/primitives/shorthand.js";
 import { Random } from "../../../sketchlib/random.js";
 import { Style } from "../../../sketchlib/Style.js";
+import { AnimatedPath } from "../../lablib/animation/AnimatedPath.js";
+import { AnimationCurve } from "../../lablib/animation/AnimationCurve.js";
+import { Hold, ParamCurve } from "../../lablib/animation/ParamCurve.js";
+import { Sequential } from "../../lablib/music/Timeline.js";
+import { Rational } from "../../lablib/Rational.js";
 import { PALETTE_CORAL, Values } from "../theme_colors.js";
 
 const SPACING = 25;
@@ -16,9 +21,88 @@ const BITS = [0, 1];
 const X_BITS = new Array(NUM_COLS).fill(0).map(() => Random.rand_choice(BITS));
 const Y_BITS = new Array(NUM_ROWS).fill(0).map(() => Random.rand_choice(BITS));
 
-const ORIGIN = new Point(300, 300);
+const PADDING = 5;
+const ORIGIN = new Point(300 - PADDING, 300 - PADDING);
 const X_STEP = new Direction(-SPACING, 0);
 const Y_STEP = new Direction(0, -SPACING);
+
+const VERTICAL_PATHS = [];
+for (let i = 0; i < NUM_COLS; i++) {
+  const start = X_BITS[i];
+  const column_origin = ORIGIN.add(X_STEP.scale(i));
+  const column_stitches = [];
+  for (let j = start; j < NUM_ROWS; j += 2) {
+    const a = column_origin.add(Y_STEP.scale(j));
+    const b = column_origin.add(Y_STEP.scale(j + 1));
+
+    const stitch = new LinePrimitive(a, b);
+    column_stitches.push(stitch);
+  }
+  VERTICAL_PATHS.push(new AnimatedPath(column_stitches, 0, 1, false));
+}
+
+const HORIZONTAL_PATHS = [];
+for (let i = 0; i < NUM_ROWS; i++) {
+  const start = Y_BITS[i];
+  const row_origin = ORIGIN.add(Y_STEP.scale(i));
+  const row_stitches = [];
+  for (let j = start; j < NUM_COLS; j += 2) {
+    const a = row_origin.add(X_STEP.scale(j));
+    const b = row_origin.add(X_STEP.scale(j + 1));
+
+    const stitch = new LinePrimitive(a, b);
+    row_stitches.push(stitch);
+  }
+  HORIZONTAL_PATHS.push(new AnimatedPath(row_stitches, 0, 1, false));
+}
+
+/**
+ * @template T
+ * @param {Array<T>} arr_a First array
+ * @param {Array<T>} arr_b Second array of same type and length
+ * @returns {Generator<T>} Generator of the elements interleaved
+ */
+function* interleave(arr_a, arr_b) {
+  for (let i = 0; i < arr_a.length; i++) {
+    yield arr_a[i];
+    yield arr_b[i];
+  }
+}
+
+const ALL_PATHS = [...interleave(HORIZONTAL_PATHS, VERTICAL_PATHS)];
+const NUM_CURVES = ALL_PATHS.length;
+
+const DURATION_STITCH = 1;
+const PHASES = new Array(ALL_PATHS.length)
+  .fill(0)
+  .map((_, i) => i * DURATION_STITCH);
+
+// from [0, 1] these control the path start/end for the stitching animation
+// from [1, 2] these control the path start/end for the unstitching animation
+const TIMELINE_START = new Sequential(
+  new Hold(Rational.ONE),
+  new ParamCurve(0, 1, Rational.ONE)
+);
+const TIMELINE_END = new Sequential(
+  new ParamCurve(0, 1, Rational.ONE),
+  new Hold(Rational.ONE)
+);
+const CURVE_START = AnimationCurve.from_timeline(TIMELINE_START);
+const CURVE_END = AnimationCurve.from_timeline(TIMELINE_END);
+
+const DURATION_PAUSE = 1;
+
+// Wait for the other curves to finish animating, plus a little pause
+const WAIT = new Hold(
+  new Rational((NUM_CURVES - 1) * DURATION_STITCH + DURATION_PAUSE)
+);
+const TIMELINE_TIMING = new Sequential(
+  new ParamCurve(0, 1, new Rational(DURATION_STITCH)),
+  WAIT,
+  new ParamCurve(1, 2, new Rational(DURATION_STITCH)),
+  WAIT
+);
+const CURVE_TIMING = AnimationCurve.from_timeline(TIMELINE_TIMING);
 
 const STYLE_STITCHES = new Style({
   stroke: PALETTE_CORAL[Values.Medium].to_srgb(),
@@ -27,37 +111,21 @@ const STYLE_STITCHES = new Style({
 
 class Hitomezashi {
   constructor() {
-    // vertical stitches
-    const vertical_stitches = [];
-    for (let i = 0; i < NUM_COLS; i++) {
-      const start = X_BITS[i];
-      const column_origin = ORIGIN.add(X_STEP.scale(i));
-      for (let j = start; j < NUM_ROWS; j += 2) {
-        const a = column_origin.add(Y_STEP.scale(j));
-        const b = column_origin.add(Y_STEP.scale(j + 1));
+    this.primitive = GroupPrimitive.EMPTY;
+  }
 
-        const stitch = new LinePrimitive(a, b);
-        vertical_stitches.push(stitch);
-      }
+  update(time) {
+    const primitive = this.primitive;
+    primitive.primitives.length = 0;
+
+    for (let i = 0; i < ALL_PATHS.length; i++) {
+      const path = ALL_PATHS[i];
+      const anim_t = CURVE_TIMING.value(time - PHASES[i]);
+      const start = CURVE_START.value(anim_t);
+      const end = CURVE_END.value(anim_t);
+      const prim = path.render_between(start, end);
+      primitive.primitives.push(prim);
     }
-
-    const horizontal_stitches = [];
-    for (let i = 0; i < NUM_ROWS; i++) {
-      const start = Y_BITS[i];
-      const row_origin = ORIGIN.add(Y_STEP.scale(i));
-      for (let j = start; j < NUM_COLS; j += 2) {
-        const a = row_origin.add(X_STEP.scale(j));
-        const b = row_origin.add(X_STEP.scale(j + 1));
-
-        const stitch = new LinePrimitive(a, b);
-        horizontal_stitches.push(stitch);
-      }
-    }
-
-    this.primitive = style(
-      [...vertical_stitches, ...horizontal_stitches],
-      STYLE_STITCHES
-    );
   }
 
   render() {
