@@ -4,6 +4,7 @@ import { Rational } from "../Rational.js";
 import {
   DEFAULT_TICKS_PER_QUARTER,
   DEFAULT_VELOCITY,
+  MIDIEvent,
   MIDIFile,
   MIDIFormat,
   MIDIHeader,
@@ -11,7 +12,7 @@ import {
   MIDIMessageType,
   MIDIMetaEvent,
   MIDIMetaType,
-  MIDITrack,
+  RelativeTimingTrack,
 } from "./MidiFile.js";
 
 // Assuming 4/4 time
@@ -29,7 +30,7 @@ function to_ticks(time_measures) {
 /**
  * Convert a Score to a file of MIDI messages
  * @param {Score<number>} score Score in terms of midi notes
- * @return {MIDIFile} The converted MIDI file
+ * @return {MIDIFile<RelativeTimingTrack>} The converted MIDI file
  */
 export function score_to_midi(score) {
   const header = new MIDIHeader(
@@ -71,26 +72,26 @@ export function score_to_midi(score) {
 
   const sorted = all_events.sort((a, b) => a[0] - b[0]);
 
+  /**
+   * @type {[number, MIDIEvent][]}
+   */
   const events = [];
   let prev_tick = 0;
   for (const [absolute_tick, channel, message_type, pitch] of sorted) {
     const delta = absolute_tick - prev_tick;
     const event = new MIDIMessage(
-      delta,
       message_type,
       channel,
       new Uint8Array([pitch, DEFAULT_VELOCITY])
     );
-    events.push(event);
+    events.push([delta, event]);
 
     prev_tick = absolute_tick;
   }
 
   // the End of Track message is required
-  events.push(
-    new MIDIMetaEvent(0, MIDIMetaType.END_OF_TRACK, new Uint8Array(0))
-  );
+  events.push([0, MIDIMetaEvent.END_OF_TRACK]);
 
-  const track = new MIDITrack(events);
+  const track = new RelativeTimingTrack(events);
   return new MIDIFile(header, [track]);
 }

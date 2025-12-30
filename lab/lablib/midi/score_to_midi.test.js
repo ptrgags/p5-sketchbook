@@ -1,13 +1,15 @@
 import { describe, it, expect } from "vitest";
 import { Harmony, Melody, Note, Rest, Score } from "../music/Score.js";
 import {
+  AbsoluteTimingTrack,
   DEFAULT_TICKS_PER_QUARTER,
+  MIDIEvent,
   MIDIFile,
   MIDIFormat,
   MIDIHeader,
   MIDIMessage,
   MIDIMetaEvent,
-  MIDITrack,
+  RelativeTimingTrack,
 } from "./MidiFile.js";
 import { score_to_midi } from "./score_to_midi.js";
 import { C4, D4, E4, F4, G4 } from "../music/pitches.js";
@@ -29,14 +31,17 @@ function make_score(music) {
 
 /**
  * Shorthand for constructing a format 0 file for the expected result
- * @param {MIDIMessage[]} messages
- * @returns {MIDIFile}
+ * @param {[number, MIDIEvent][]} messages Messages not including the end of track message
+ * @returns {MIDIFile<RelativeTimingTrack>}
  */
 function make_format0(...messages) {
   const header = new MIDIHeader(MIDIFormat.SINGLE_TRACK, 1);
 
-  const end_of_track = MIDIMetaEvent.end_of_track(0);
-  const track = new MIDITrack([...messages, end_of_track]);
+  /**
+   * @type {[number, MIDIEvent]}
+   */
+  const end_of_track = [0, MIDIMetaEvent.END_OF_TRACK];
+  const track = new RelativeTimingTrack([...messages, end_of_track]);
   return new MIDIFile(header, [track]);
 }
 
@@ -56,8 +61,8 @@ describe("score to midi", () => {
     const result = score_to_midi(single);
 
     const expected = make_format0(
-      MIDIMessage.note_on(0, 0, C4),
-      MIDIMessage.note_off(4 * QN, 0, C4)
+      [0, MIDIMessage.note_on(0, C4)],
+      [4 * QN, MIDIMessage.note_off(0, C4)]
     );
     expect(result).toEqual(expected);
   });
@@ -75,14 +80,14 @@ describe("score to midi", () => {
     const result = score_to_midi(single);
 
     const expected = make_format0(
-      MIDIMessage.note_on(0, 0, C4),
-      MIDIMessage.note_off(QN, 0, C4),
-      MIDIMessage.note_on(0, 0, D4),
-      MIDIMessage.note_off(QN, 0, D4),
-      MIDIMessage.note_on(0, 0, E4),
-      MIDIMessage.note_off(QN, 0, E4),
-      MIDIMessage.note_on(0, 0, F4),
-      MIDIMessage.note_off(QN, 0, F4)
+      [0, MIDIMessage.note_on(0, C4)],
+      [QN, MIDIMessage.note_off(0, C4)],
+      [0, MIDIMessage.note_on(0, D4)],
+      [QN, MIDIMessage.note_off(0, D4)],
+      [0, MIDIMessage.note_on(0, E4)],
+      [QN, MIDIMessage.note_off(0, E4)],
+      [0, MIDIMessage.note_on(0, F4)],
+      [QN, MIDIMessage.note_off(0, F4)]
     );
     expect(result).toEqual(expected);
   });
@@ -95,12 +100,12 @@ describe("score to midi", () => {
     const result = score_to_midi(single);
 
     const expected = make_format0(
-      MIDIMessage.note_on(0, 0, G4),
-      MIDIMessage.note_on(0, 0, E4),
-      MIDIMessage.note_on(0, 0, C4),
-      MIDIMessage.note_off(QN, 0, G4),
-      MIDIMessage.note_on(0, 0, E4),
-      MIDIMessage.note_on(0, 0, C4)
+      [0, MIDIMessage.note_on(0, G4)],
+      [0, MIDIMessage.note_on(0, E4)],
+      [0, MIDIMessage.note_on(0, C4)],
+      [QN, MIDIMessage.note_off(0, G4)],
+      [0, MIDIMessage.note_on(0, E4)],
+      [0, MIDIMessage.note_on(0, C4)]
     );
     expect(result).toEqual(expected);
   });

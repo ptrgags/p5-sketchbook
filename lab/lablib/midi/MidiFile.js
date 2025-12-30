@@ -67,16 +67,19 @@ export function get_data_length(message_type) {
   }
 }
 
+/**
+ * @interface MIDIEvent
+ */
+export class MIDIEvent {}
+
 export class MIDIMessage {
   /**
    * Constructor
-   * @param {number} tick_delta time since the previous message in ticks
    * @param {number} message_type the MIDI Message type
    * @param {number} channel The channel number 0-15
    * @param {Uint8Array} data 1-3 data bytes as a u8 array
    */
-  constructor(tick_delta, message_type, channel, data) {
-    this.tick_delta = tick_delta;
+  constructor(message_type, channel, data) {
     this.message_type = message_type;
     this.channel = channel;
     this.data = data;
@@ -84,15 +87,13 @@ export class MIDIMessage {
 
   /**
    * Shorthand for a note on event
-   * @param {number} tick_delta Time delta for message
    * @param {number} channel Channel number 0-15
    * @param {number} pitch MIDI note number
    * @param {number} [velocity=DEFAULT_VELOCITY] MIDI velocity 0-127
    * @returns {MIDIMessage} The note event
    */
-  static note_on(tick_delta, channel, pitch, velocity = DEFAULT_VELOCITY) {
+  static note_on(channel, pitch, velocity = DEFAULT_VELOCITY) {
     return new MIDIMessage(
-      tick_delta,
       MIDIMessageType.NOTE_ON,
       channel,
       new Uint8Array([pitch, velocity])
@@ -101,15 +102,13 @@ export class MIDIMessage {
 
   /**
    * Shorthand for a note off event
-   * @param {number} tick_delta Time delta for message
    * @param {number} channel Channel number 0-15
    * @param {number} pitch MIDI note number
    * @param {number} [velocity=0] MIDI velocity 0-127
    * @returns {MIDIMessage} The note event
    */
-  static note_off(tick_delta, channel, pitch, velocity = 0) {
+  static note_off(channel, pitch, velocity = 0) {
     return new MIDIMessage(
-      tick_delta,
       MIDIMessageType.NOTE_OFF,
       channel,
       new Uint8Array([pitch, velocity])
@@ -139,35 +138,26 @@ export const MIDIMetaType = {
 Object.freeze(MIDIMetaType);
 
 /**
- * Type for all other Meta events that I don't support
+ * Type for all MIDI meta events (aside from sysex)
  */
 export class MIDIMetaEvent {
   /**
    * Constructor
-   * @param {number} tick_delta Time delta in ticks
    * @param {number} meta_type MIDIMetaType
    * @param {Uint8Array} payload Raw bytes of message
    */
-  constructor(tick_delta, meta_type, payload) {
-    this.tick_delta = tick_delta;
+  constructor(meta_type, payload) {
     this.meta_type = meta_type;
     this.payload = payload;
   }
-
-  /**
-   * Shorthand for making an end of track message
-   * @param {number} tick_delta
-   * @returns
-   */
-  static end_of_track(tick_delta) {
-    return new MIDIMetaEvent(
-      tick_delta,
-      MIDIMetaType.END_OF_TRACK,
-      new Uint8Array(0)
-    );
-  }
 }
+MIDIMetaEvent.END_OF_TRACK = Object.freeze(
+  new MIDIMetaEvent(MIDIMetaType.END_OF_TRACK, new Uint8Array(0))
+);
 
+/**
+ * @implements {MIDIEvent}
+ */
 export class MIDISysex {
   /**
    * Constructor
@@ -181,24 +171,44 @@ export class MIDISysex {
 }
 
 /**
- * @typedef {MIDIMessage | MIDIMetaEvent | MIDISysex} MIDIEvent
+ * MIDI track with absolute tick deltas from the start of the track.
+ * This is used internally for easier comparisons in unit tests and converting
+ * MIDI to scores.
  */
-
-export class MIDITrack {
+export class AbsoluteTimingTrack {
   /**
    * constructor
-   * @param {MIDIEvent[]} events
+   * @param {[number, MIDIEvent][]} events Pairs of (absolute_t, msg)
    */
   constructor(events) {
     this.events = events;
   }
 }
 
+/**
+ * MIDI track with tick deltas relative to the previous message. This is
+ * required for encoding to a MIDI file.
+ */
+export class RelativeTimingTrack {
+  /**
+   * constructor
+   * @param {[number, MIDIEvent][]} events Pairs of (relative_t, msg)
+   */
+  constructor(events) {
+    this.events = events;
+  }
+}
+
+/**
+ * MIDI file as a collection of messages
+ *
+ * @template T The track type, either AbsoluteTimingTrack or RelativeTimingTrack
+ */
 export class MIDIFile {
   /**
    * Constructor
    * @param {MIDIHeader} header The file header
-   * @param {MIDITrack[]} tracks One or more tracks
+   * @param {T[]} tracks One or more tracks
    */
   constructor(header, tracks) {
     this.header = header;
