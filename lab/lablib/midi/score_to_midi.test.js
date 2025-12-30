@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { Harmony, Melody, Note, Rest, Score } from "../music/Score.js";
 import {
-  AbsoluteTimingTrack,
   DEFAULT_TICKS_PER_QUARTER,
   MIDIEvent,
   MIDIFile,

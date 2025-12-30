@@ -183,6 +183,25 @@ export class AbsoluteTimingTrack {
   constructor(events) {
     this.events = events;
   }
+
+  /**
+   * Convert absolute ticks to relative deltas
+   * @returns {RelativeTimingTrack}
+   */
+  to_relative() {
+    /**
+     * @type {[number, MIDIEvent][]}
+     */
+    const events = [];
+
+    let prev_tick = 0;
+    for (const [absolute_tick, msg] of this.events) {
+      const delta = absolute_tick - prev_tick;
+      events.push([delta, msg]);
+      prev_tick = absolute_tick;
+    }
+    return new RelativeTimingTrack(events);
+  }
 }
 
 /**

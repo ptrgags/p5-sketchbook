@@ -2,6 +2,7 @@ import { Score } from "../music/Score.js";
 import { to_events } from "../music/Timeline.js";
 import { Rational } from "../Rational.js";
 import {
+  AbsoluteTimingTrack,
   DEFAULT_TICKS_PER_QUARTER,
   DEFAULT_VELOCITY,
   MIDIEvent,
@@ -11,7 +12,6 @@ import {
   MIDIMessage,
   MIDIMessageType,
   MIDIMetaEvent,
-  MIDIMetaType,
   RelativeTimingTrack,
 } from "./MidiFile.js";
 
@@ -28,6 +28,38 @@ function to_ticks(time_measures) {
 }
 
 /**
+ * Gather the note on/off events into a track
+ * @param {Score<number>} score
+ * @returns {AbsoluteTimingTrack} Events sorted by absolute time
+ */
+function gather_note_events(score) {
+  /**
+   * @type {[number, MIDIEvent][]}
+   */
+  const all_events = [];
+  for (const [channel, [, music]] of score.parts.entries()) {
+    /**
+     * @type {[number, MIDIEvent][]}
+     */
+    const part_events = to_events(Rational.ZERO, music).flatMap(
+      ([note, start, end]) => {
+        const note_on = MIDIMessage.note_on(channel, note.pitch);
+        const note_off = MIDIMessage.note_off(channel, note.pitch);
+        return [
+          [to_ticks(start), note_on],
+          [to_ticks(end), note_off],
+        ];
+      }
+    );
+
+    all_events.push(...part_events);
+  }
+
+  const sorted = all_events.sort(([t_a], [t_b]) => t_a - t_b);
+  return new AbsoluteTimingTrack(sorted);
+}
+
+/**
  * Convert a Score to a file of MIDI messages
  * @param {Score<number>} score Score in terms of midi notes
  * @return {MIDIFile<RelativeTimingTrack>} The converted MIDI file
@@ -39,59 +71,8 @@ export function score_to_midi(score) {
     DEFAULT_TICKS_PER_QUARTER
   );
 
-  /**
-   * @type {[number, number, MIDIMessageType, number][]}
-   */
-  const all_events = [];
-  for (const [i, [, music]] of score.parts.entries()) {
-    const part_events = to_events(Rational.ZERO, music).flatMap(
-      ([note, start, end]) => {
-        /**
-         * @type {[number, number, MIDIMessageType, number]}
-         */
-        const start_event = [
-          to_ticks(start),
-          i,
-          MIDIMessageType.NOTE_ON,
-          note.pitch,
-        ];
-        /**
-         * @type {[number, number, MIDIMessageType, number]}
-         */
-        const end_event = [
-          to_ticks(end),
-          i,
-          MIDIMessageType.NOTE_OFF,
-          note.pitch,
-        ];
-        return [start_event, end_event];
-      }
-    );
-    all_events.push(...part_events);
-  }
+  const absolute_track = gather_note_events(score);
+  const relative_track = absolute_track.to_relative();
 
-  const sorted = all_events.sort((a, b) => a[0] - b[0]);
-
-  /**
-   * @type {[number, MIDIEvent][]}
-   */
-  const events = [];
-  let prev_tick = 0;
-  for (const [absolute_tick, channel, message_type, pitch] of sorted) {
-    const delta = absolute_tick - prev_tick;
-    const event = new MIDIMessage(
-      message_type,
-      channel,
-      new Uint8Array([pitch, DEFAULT_VELOCITY])
-    );
-    events.push([delta, event]);
-
-    prev_tick = absolute_tick;
-  }
-
-  // the End of Track message is required
-  events.push([0, MIDIMetaEvent.END_OF_TRACK]);
-
-  const track = new RelativeTimingTrack(events);
-  return new MIDIFile(header, [track]);
+  return new MIDIFile(header, [relative_track]);
 }
