@@ -98,8 +98,8 @@ describe("score to midi", () => {
       [0, MIDIMessage.note_on(0, E4)],
       [0, MIDIMessage.note_on(0, C4)],
       [QN, MIDIMessage.note_off(0, G4)],
-      [0, MIDIMessage.note_on(0, E4)],
-      [0, MIDIMessage.note_on(0, C4)]
+      [0, MIDIMessage.note_off(0, E4)],
+      [0, MIDIMessage.note_off(0, C4)]
     );
     expect(result).toEqual(expected);
   });
