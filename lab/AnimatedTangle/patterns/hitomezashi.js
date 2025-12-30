@@ -7,6 +7,7 @@ import { Random } from "../../../sketchlib/random.js";
 import { Style } from "../../../sketchlib/Style.js";
 import { AnimatedPath } from "../../lablib/animation/AnimatedPath.js";
 import { AnimationCurve } from "../../lablib/animation/AnimationCurve.js";
+import { LoopCurve } from "../../lablib/animation/LoopCurve.js";
 import { Hold, ParamCurve } from "../../lablib/animation/ParamCurve.js";
 import { Sequential } from "../../lablib/music/Timeline.js";
 import { Rational } from "../../lablib/Rational.js";
@@ -70,12 +71,12 @@ function* interleave(arr_a, arr_b) {
 }
 
 const ALL_PATHS = [...interleave(HORIZONTAL_PATHS, VERTICAL_PATHS)];
-const NUM_CURVES = ALL_PATHS.length;
 
 const DURATION_STITCH = 1;
 const PHASES = new Array(ALL_PATHS.length)
   .fill(0)
-  .map((_, i) => i * DURATION_STITCH);
+  .map((_, i) => -i * DURATION_STITCH);
+console.log(PHASES);
 
 // from [0, 1] these control the path start/end for the stitching animation
 // from [1, 2] these control the path start/end for the unstitching animation
@@ -94,7 +95,7 @@ const DURATION_PAUSE = 1;
 
 // Wait for the other curves to finish animating, plus a little pause
 const WAIT = new Hold(
-  new Rational((NUM_CURVES - 1) * DURATION_STITCH + DURATION_PAUSE)
+  new Rational((ALL_PATHS.length - 1) * DURATION_STITCH + DURATION_PAUSE)
 );
 const TIMELINE_TIMING = new Sequential(
   new ParamCurve(0, 1, new Rational(DURATION_STITCH)),
@@ -102,7 +103,9 @@ const TIMELINE_TIMING = new Sequential(
   new ParamCurve(1, 2, new Rational(DURATION_STITCH)),
   WAIT
 );
-const CURVE_TIMING = AnimationCurve.from_timeline(TIMELINE_TIMING);
+const CURVE_TIMING = new LoopCurve(
+  AnimationCurve.from_timeline(TIMELINE_TIMING)
+);
 
 const STYLE_STITCHES = new Style({
   stroke: PALETTE_CORAL[Values.Medium].to_srgb(),
@@ -111,7 +114,7 @@ const STYLE_STITCHES = new Style({
 
 class Hitomezashi {
   constructor() {
-    this.primitive = GroupPrimitive.EMPTY;
+    this.primitive = style(GroupPrimitive.EMPTY, STYLE_STITCHES);
   }
 
   update(time) {
@@ -119,11 +122,18 @@ class Hitomezashi {
     primitive.primitives.length = 0;
 
     for (let i = 0; i < ALL_PATHS.length; i++) {
-      const path = ALL_PATHS[i];
-      const anim_t = CURVE_TIMING.value(time - PHASES[i]);
+      // First use the timing curve to determine which part of the animation
+      // we're at.
+      const anim_t = CURVE_TIMING.value(time + PHASES[i]);
+
+      // For the stitch animation we animate    [0, end-->
+      // for the unstitch animation we animate  start-->, end]
+      // so we need two curves, one per variable
       const start = CURVE_START.value(anim_t);
       const end = CURVE_END.value(anim_t);
-      const prim = path.render_between(start, end);
+
+      // Use render_between to slice out a portion of the path
+      const prim = ALL_PATHS[i].render_between(start, end);
       primitive.primitives.push(prim);
     }
   }
