@@ -35,12 +35,7 @@ function make_score(music) {
  */
 function make_format0(...messages) {
   const header = new MIDIHeader(MIDIFormat.SINGLE_TRACK, 1);
-
-  /**
-   * @type {[number, MIDIEvent]}
-   */
-  const end_of_track = [0, MIDIMetaEvent.END_OF_TRACK];
-  const track = new RelativeTimingTrack([...messages, end_of_track]);
+  const track = new RelativeTimingTrack([...messages]);
   return new MIDIFile(header, [track]);
 }
 
