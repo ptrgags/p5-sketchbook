@@ -8,6 +8,7 @@ import {
 import { group } from "../../../sketchlib/primitives/shorthand.js";
 import { Tween } from "../../../sketchlib/Tween.js";
 import { whole_fract } from "../../../sketchlib/whole_fract.js";
+import { clamp } from "../../../sketchlib/clamp.js";
 
 /**
  * Collection of primitives that can be chained together to form a path
@@ -18,15 +19,11 @@ export class AnimatedPath {
    * @param {PartialPrimitive[]} segments The segments
    * @param {number} start_t Start time (usually a frame number)
    * @param {number} duration Duration in the same units as start_t
-   * @param {boolean} reverse If true, the path animates backwards
    */
-  constructor(segments, start_t, duration, reverse) {
+  constructor(segments, start_t, duration) {
     this.segments = segments;
 
-    // Configure a tween depending on the reverse parameter
-    this.tween = reverse
-      ? Tween.scalar(segments.length, 0, start_t, duration)
-      : Tween.scalar(0, segments.length, start_t, duration);
+    this.tween = Tween.scalar(0, segments.length, start_t, duration);
 
     /**
      * Full path for rendering the trajectory underneath the animated
@@ -111,6 +108,10 @@ export class AnimatedPath {
    * @return {Primitive} the resulting portion of the path. May be empty.
    */
   render_between(time_a, time_b) {
+    // Clamp values to make it easier to handle out-of-bounds values
+    time_a = clamp(time_a, this.tween.start_time, this.tween.end_time);
+    time_b = clamp(time_b, this.tween.start_time, this.tween.end_time);
+
     if (time_a >= time_b) {
       return GroupPrimitive.EMPTY;
     }

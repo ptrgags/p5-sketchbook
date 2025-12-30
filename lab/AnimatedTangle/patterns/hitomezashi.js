@@ -39,7 +39,7 @@ for (let i = 0; i < NUM_COLS; i++) {
     const stitch = new LinePrimitive(a, b);
     column_stitches.push(stitch);
   }
-  VERTICAL_PATHS.push(new AnimatedPath(column_stitches, 0, 1, false));
+  VERTICAL_PATHS.push(new AnimatedPath(column_stitches, 0, 1));
 }
 
 const HORIZONTAL_PATHS = [];
@@ -54,7 +54,7 @@ for (let i = 0; i < NUM_ROWS; i++) {
     const stitch = new LinePrimitive(a, b);
     row_stitches.push(stitch);
   }
-  HORIZONTAL_PATHS.push(new AnimatedPath(row_stitches, 0, 1, false));
+  HORIZONTAL_PATHS.push(new AnimatedPath(row_stitches, 0, 1));
 }
 
 /**
