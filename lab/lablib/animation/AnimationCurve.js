@@ -1,4 +1,5 @@
 import { Tween } from "../../../sketchlib/Tween.js";
+import { whole_fract } from "../../../sketchlib/whole_fract.js";
 import { to_events } from "../music/Timeline.js";
 import { Rational } from "../Rational.js";
 import { ParamCurve } from "./ParamCurve.js";
@@ -37,6 +38,10 @@ export class AnimationCurve {
    * @param {Tween<number>[]} tweens
    */
   constructor(tweens) {
+    if (tweens.length === 0) {
+      throw new Error("tweens must have at least one element");
+    }
+
     /**
      * @type {[number, number][]}
      */
@@ -61,18 +66,13 @@ export class AnimationCurve {
   }
 
   /**
-   *
+   * Get the value of the curve at the given time
    * @param {number} time Time to evaluate the animation curve
-   * @returns {number | undefined} Value of the curve at that point, or undefined if the curve is empty
+   * @returns {number} Value of the curve at that point, or undefined if the curve is empty
    */
   value(time) {
-    if (this.tweens.length === 0) {
-      return undefined;
-    }
-
     const float_index = this.time_to_index.value(time);
-    const tween_index = Math.floor(float_index);
-    const t = float_index - tween_index; // fract
+    const [tween_index, t] = whole_fract(float_index);
 
     if (tween_index === this.tweens.length) {
       return this.tweens[tween_index - 1].end_value;
@@ -83,7 +83,7 @@ export class AnimationCurve {
 
   /**
    * Convert a timeline of parameter curves to an AnimationCurve
-   * @param {import("../music/Timeline").Timeline<ParamCurve>} timeline Timeline of curves
+   * @param {import("../music/Timeline").Timeline<ParamCurve>} timeline Timeline of curves. It must have at least one ParamCurve
    * @returns {AnimationCurve}
    */
   static from_timeline(timeline) {

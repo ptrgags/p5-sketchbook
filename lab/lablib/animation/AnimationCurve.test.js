@@ -3,6 +3,7 @@ import { ParamCurve } from "./ParamCurve";
 import { Rational } from "../Rational";
 import { Gap, Sequential } from "../music/Timeline";
 import { AnimationCurve } from "./AnimationCurve";
+import { Tween } from "../../../sketchlib/Tween.js";
 
 /**
  *
@@ -22,6 +23,26 @@ function make_curve() {
 }
 
 describe("AnimationCurve", () => {
+  it("with no tweens throws", () => {
+    expect(() => {
+      return new AnimationCurve([]);
+    }).toThrowError("tweens must have at least one element");
+  });
+
+  describe("duration", () => {
+    it("with one tween computes the correct duration", () => {
+      const curve = new AnimationCurve([Tween.scalar(0, 10, 2, 8)]);
+
+      expect(curve.duration).toBe(8);
+    });
+
+    it("with several tweens computes correct duration", () => {
+      const curve = AnimationCurve.from_timeline(make_curve());
+
+      expect(curve.duration).toBe(3);
+    });
+  });
+
   describe("value", () => {
     it("with time before start returns first value", () => {
       const curve = AnimationCurve.from_timeline(make_curve());
