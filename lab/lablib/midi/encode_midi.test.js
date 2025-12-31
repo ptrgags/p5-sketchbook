@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { MIDIFile, MIDIFormat, MIDIHeader } from "./MidiFile.js";
+import { MIDIFile, MIDIFormat, MIDIHeader } from "./MIDIFile.js";
 import {
   encode_midi,
   HEADER_CHUNK_LENGTH,

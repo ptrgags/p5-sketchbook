@@ -1,5 +1,5 @@
 import { MIDIEvent } from "./MIDIEvent.js";
-import { MIDIFile, MIDIHeader } from "./MidiFile.js";
+import { MIDIFile, MIDIHeader } from "./MIDIFile.js";
 import { RelativeTimingTrack } from "./MIDITrack.js";
 import {
   compute_variable_length,

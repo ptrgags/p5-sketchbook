@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { Harmony, Melody, Note, Rest, Score } from "../music/Score.js";
-import { MIDIHeader } from "./MidiFile.js";
+import { MIDIHeader } from "./MIDIFile.js";
 import { score_to_midi } from "./score_to_midi.js";
 import { C3, C4, D4, E4, F4, G4 } from "../music/pitches.js";
 import { N1, N2, N4 } from "../music/durations.js";

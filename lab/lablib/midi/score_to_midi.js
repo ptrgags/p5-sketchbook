@@ -2,7 +2,7 @@ import { Score } from "../music/Score.js";
 import { to_events } from "../music/Timeline.js";
 import { Rational } from "../Rational.js";
 import { MIDIEvent, MIDIMessage } from "./MIDIEvent.js";
-import { MIDIFile, MIDIFormat, MIDIHeader } from "./MidiFile.js";
+import { MIDIFile, MIDIHeader } from "./MIDIFile.js";
 import { AbsoluteTimingTrack, RelativeTimingTrack } from "./MIDITrack.js";
 
 // Assuming 4/4 time
