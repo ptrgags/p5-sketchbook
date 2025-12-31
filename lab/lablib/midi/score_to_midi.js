@@ -37,6 +37,10 @@ function make_track(channel, music) {
       ];
     }
   );
+
+  // When harmony is involved, the messages may only be partially sorted in time.
+  events.sort((a, b) => a[0] - b[0]);
+
   const absolute_track = new AbsoluteTimingTrack(events);
   return absolute_track.to_relative();
 }
