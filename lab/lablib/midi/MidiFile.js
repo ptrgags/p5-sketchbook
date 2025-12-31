@@ -176,6 +176,19 @@ export class MIDIMessage {
       new Uint8Array([pitch, velocity])
     );
   }
+
+  /**
+   *
+   * @param {number} channel
+   * @param {number} instrument Instrument number
+   */
+  static program_change(channel, instrument) {
+    return new MIDIMessage(
+      MIDIMessageType.PROGRAM_CHANGE,
+      channel,
+      new Uint8Array([instrument])
+    );
+  }
 }
 
 /**
