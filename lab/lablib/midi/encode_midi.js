@@ -17,9 +17,9 @@ export const HEADER_MAGIC = [
 ];
 export const TRACK_MAGIC = [
   "M".charCodeAt(0),
-  "t".charCodeAt(0),
-  "h".charCodeAt(0),
-  "d".charCodeAt(0),
+  "T".charCodeAt(0),
+  "r".charCodeAt(0),
+  "k".charCodeAt(0),
 ];
 
 export const END_OF_TRACK = [0xff, 0x2f, 0x00];
