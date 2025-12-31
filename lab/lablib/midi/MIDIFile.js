@@ -28,6 +28,20 @@ export class MIDIHeader {
     this.num_tracks = num_tracks;
     this.ticks_per_quarter = ticks_per_quarter;
   }
+
+  /**
+   * Create a Format 1 MIDI header, which puts several tracks in parallel
+   * @param {number} num_tracks Number of tracks
+   * @param {number} [ticks_per_quarter=MIDIHeader.DEFAULT_TICKS_PER_QUARTER] How many ticks per quarter note
+   * @returns {MIDIHeader} The header
+   */
+  static format1(num_tracks, ticks_per_quarter = DEFAULT_TICKS_PER_QUARTER) {
+    return new MIDIHeader(
+      MIDIFormat.MULTI_PARALLEL,
+      num_tracks,
+      ticks_per_quarter
+    );
+  }
 }
 MIDIHeader.DEFAULT_FORMAT0 = Object.freeze(
   new MIDIHeader(MIDIFormat.SINGLE_TRACK, 1)
