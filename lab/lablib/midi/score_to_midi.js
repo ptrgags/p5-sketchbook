@@ -62,6 +62,10 @@ function gather_note_events(score) {
  * @return {MIDIFile<RelativeTimingTrack>} The converted MIDI file
  */
 export function score_to_midi(score) {
+  if (score.parts.length > 16) {
+    throw new Error("scores with more than 16 parts not supported!");
+  }
+
   const header = new MIDIHeader(
     MIDIFormat.SINGLE_TRACK,
     1,
