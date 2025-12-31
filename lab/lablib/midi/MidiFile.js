@@ -248,6 +248,10 @@ export class MIDIMetaEvent {
   encode(data_view, offset) {
     data_view.setUint8(offset, MIDIMetaEvent.MAGIC);
     data_view.setUint8(offset + 1, this.meta_type);
+    // NB: This should be a variable length quantity... but my music system
+    // doesn't produce any text or sysex messages at present, so the length
+    // will always fit within 7 bits. If that ever changes, use
+    // encode_variable_length() here and in the Sysex message
     data_view.setUint8(offset + 2, this.data.length);
     offset += 3;
 
