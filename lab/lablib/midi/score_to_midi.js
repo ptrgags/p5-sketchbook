@@ -4,14 +4,11 @@ import { Rational } from "../Rational.js";
 import {
   AbsoluteTimingTrack,
   DEFAULT_TICKS_PER_QUARTER,
-  DEFAULT_VELOCITY,
   MIDIEvent,
   MIDIFile,
   MIDIFormat,
   MIDIHeader,
   MIDIMessage,
-  MIDIMessageType,
-  MIDIMetaEvent,
   RelativeTimingTrack,
 } from "./MidiFile.js";
 
