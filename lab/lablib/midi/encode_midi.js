@@ -1,4 +1,38 @@
 import { MIDIFile, MIDIHeader, RelativeTimingTrack } from "./MidiFile.js";
+import { compute_variable_length } from "./variable_length.js";
+
+export const HEADER_MAGIC = [
+  "M".charCodeAt(0),
+  "T".charCodeAt(0),
+  "h".charCodeAt(0),
+  "d".charCodeAt(0),
+];
+export const TRACK_MAGIC = [
+  "M".charCodeAt(0),
+  "t".charCodeAt(0),
+  "h".charCodeAt(0),
+  "d".charCodeAt(0),
+];
+
+export const END_OF_TRACK = [0xff, 0x2f, 0x00];
+
+const SIZE_U32 = 4;
+const BIG_ENDIAN = false;
+
+/**
+ * Get the length of all the messages in the track. This does not include
+ * the end of track or the header
+ * @param {RelativeTimingTrack} track The track
+ * @returns {number} The length of the messages in this track
+ */
+function compute_messages_length(track) {
+  let total = 0;
+  for (const [t, message] of track.events) {
+    total += compute_variable_length(t);
+    total += message.byte_length;
+  }
+  return total;
+}
 
 /**
  * Compute the byte length of the encoded MIDI file up front before
@@ -6,7 +40,18 @@ import { MIDIFile, MIDIHeader, RelativeTimingTrack } from "./MidiFile.js";
  * @param {MIDIFile} midi The MIDI file
  */
 function compute_length(midi) {
-  return 0;
+  const header_length =
+    HEADER_MAGIC.length + SIZE_U32 + MIDIHeader.CHUNK_LENGTH;
+
+  let total_track_length = 0;
+  for (const track of midi.tracks) {
+    const message_length = compute_messages_length(track);
+    const track_length =
+      TRACK_MAGIC.length + SIZE_U32 + message_length + END_OF_TRACK.length;
+    total_track_length += track_length;
+  }
+
+  return header_length + total_track_length;
 }
 
 /**
@@ -17,6 +62,20 @@ function compute_length(midi) {
  * @returns {number} New offset after the end of the header
  */
 function encode_header(data_view, offset, header) {
+  // write Mthd in ASCII
+  for (let i = 0; i < HEADER_MAGIC.length; i++) {
+    data_view.setUint8(offset + i, HEADER_MAGIC[i]);
+  }
+  offset += HEADER_MAGIC.length;
+
+  data_view.setUint32(offset, MIDIHeader.CHUNK_LENGTH, BIG_ENDIAN);
+  offset += SIZE_U32;
+
+  data_view.setUint8(offset + 1, header.format);
+  data_view.setUint8(offset + 2, header.num_tracks);
+  data_view.setUint8(offset + 3, header.ticks_per_quarter);
+  offset += MIDIHeader.CHUNK_LENGTH;
+
   return offset;
 }
 
@@ -37,6 +96,10 @@ function encode_track(data_view, offset, track) {
  * @returns {ArrayBuffer} Binary MIDI data to put in a
  */
 export function encode_midi(midi) {
+  if (midi.tracks.length === 0) {
+    throw new Error("MIDI files must have at least one track");
+  }
+
   const length = compute_length(midi);
 
   const buffer = new ArrayBuffer(length);

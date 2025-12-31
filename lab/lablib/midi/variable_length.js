@@ -1,6 +1,16 @@
 const MAX_BYTES = 4;
 
 /**
+ * Compute the length of a variable length quantity when encoded as binary
+ * data.
+ * @param {number} value The value
+ * @returns {number} the length of the value when encoded
+ */
+export function compute_variable_length(value) {
+  return split_value_7bits(value).length;
+}
+
+/**
  * Decode a single variable-length number as described in the MIDI spec
  * @param {DataView} payload the payload to decode from
  * @param {number} offset Byte offset of the variable-length number within payload

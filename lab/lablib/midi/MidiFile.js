@@ -28,6 +28,7 @@ export class MIDIHeader {
     this.ticks_per_quarter = ticks_per_quarter;
   }
 }
+MIDIHeader.CHUNK_LENGTH = 3;
 MIDIHeader.DEFAULT_FORMAT0 = Object.freeze(
   new MIDIHeader(MIDIFormat.SINGLE_TRACK, 1)
 );
@@ -79,7 +80,15 @@ export class MIDIEvent {
    * @type {number[]}
    */
   get sort_key() {
-    throw new Error("Not Implemented");
+    throw new Error("not implemented");
+  }
+
+  /**
+   * How long will the message be when written in binary (counting any implicit bytes)
+   * @type {number}
+   */
+  get byte_length() {
+    throw new Error("not implemented");
   }
 }
 
@@ -103,6 +112,11 @@ export class MIDIMessage {
   get sort_key() {
     const status_byte = (this.message_type << 4) | this.channel;
     return [status_byte, ...this.data];
+  }
+
+  get byte_length() {
+    // status byte + payload
+    return 1 + this.data.length;
   }
 
   /**
@@ -178,6 +192,11 @@ export class MIDIMetaEvent {
   get sort_key() {
     return [MIDIMetaEvent.MAGIC, this.meta_type, ...this.payload];
   }
+
+  get byte_length() {
+    // 3 byte header + payload
+    return 3 + this.payload.length;
+  }
 }
 MIDIMetaEvent.MAGIC = 0xff;
 MIDIMetaEvent.END_OF_TRACK = Object.freeze(
@@ -201,6 +220,11 @@ export class MIDISysex {
    */
   get sort_key() {
     return [MIDISysex.MAGIC, ...this.data];
+  }
+
+  get byte_length() {
+    // F7 + length + payload length
+    return 2 + this.data.length;
   }
 }
 MIDISysex.MAGIC = 0xf7;
