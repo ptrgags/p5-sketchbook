@@ -18,35 +18,27 @@ function to_ticks(time_measures) {
 }
 
 /**
- * Gather the note on/off events into a track
- * @param {Score<number>} score
- * @returns {AbsoluteTimingTrack} Events sorted by absolute time
+ * Make a MIDI track from a single part from the score
+ * @param {number} channel MIDI channel number, in [0, 15]
+ * @param {import("../music/Score.js").Music<number>} music The music to write
+ * @returns {RelativeTimingTrack} The track, converted to use relative tick deltas as this is required by MIDI
  */
-function gather_note_events(score) {
+function make_track(channel, music) {
   /**
    * @type {[number, MIDIEvent][]}
    */
-  const all_events = [];
-  for (const [channel, [, music]] of score.parts.entries()) {
-    /**
-     * @type {[number, MIDIEvent][]}
-     */
-    const part_events = to_events(Rational.ZERO, music).flatMap(
-      ([note, start, end]) => {
-        const note_on = MIDIMessage.note_on(channel, note.pitch);
-        const note_off = MIDIMessage.note_off(channel, note.pitch);
-        return [
-          [to_ticks(start), note_on],
-          [to_ticks(end), note_off],
-        ];
-      }
-    );
-
-    all_events.push(...part_events);
-  }
-
-  const sorted = all_events.sort(([t_a], [t_b]) => t_a - t_b);
-  return new AbsoluteTimingTrack(sorted);
+  const events = to_events(Rational.ZERO, music).flatMap(
+    ([note, start, end]) => {
+      const note_on = MIDIMessage.note_on(channel, note.pitch);
+      const note_off = MIDIMessage.note_off(channel, note.pitch);
+      return [
+        [to_ticks(start), note_on],
+        [to_ticks(end), note_off],
+      ];
+    }
+  );
+  const absolute_track = new AbsoluteTimingTrack(events);
+  return absolute_track.to_relative();
 }
 
 /**
@@ -59,9 +51,21 @@ export function score_to_midi(score) {
     throw new Error("scores with more than 16 parts not supported!");
   }
 
-  const header = MIDIHeader.DEFAULT_FORMAT0;
-  const absolute_track = gather_note_events(score);
-  const relative_track = absolute_track.to_relative();
+  // If there's only a single part, make a Format 0 MIDI File which contains
+  // a single track
+  if (score.parts.length === 1) {
+    const header = MIDIHeader.DEFAULT_FORMAT0;
+    const channel = 0;
+    const [, music] = score.parts[channel];
+    const track = make_track(channel, music);
+    return new MIDIFile(header, [track]);
+  }
 
-  return new MIDIFile(header, [relative_track]);
+  // Otherwise, use Format 1 to split parts onto separate chacks
+  const header = MIDIHeader.format1(score.parts.length);
+  const tracks = score.parts.map((x, channel) => {
+    const [, music] = x;
+    return make_track(channel, music);
+  });
+  return new MIDIFile(header, tracks);
 }
