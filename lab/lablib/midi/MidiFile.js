@@ -238,8 +238,8 @@ export class MIDIMetaEvent {
     data_view.setUint8(offset + 2, this.data.length);
     offset += 3;
 
-    for (let i = 0; this.data.length; i++) {
-      data_view.setUint8(offset + i, this.data[i]);
+    for (const [i, x] of this.data.entries()) {
+      data_view.setUint8(offset + i, x);
     }
     offset += this.data.length;
 
@@ -271,8 +271,8 @@ export class MIDISysex {
   }
 
   get byte_length() {
-    // F7 + length + payload length
-    return 2 + this.data.length;
+    // F0 + length + payload length + F7
+    return 3 + this.data.length;
   }
 
   /**
@@ -283,18 +283,23 @@ export class MIDISysex {
    */
   encode(data_view, offset) {
     data_view.setUint8(offset, MIDISysex.MAGIC);
-    data_view.setUint8(offset + 1, this.data.length);
+    // +1 for the end of sysex byte
+    data_view.setUint8(offset + 1, this.data.length + 1);
     offset += 2;
 
-    for (let i = 0; this.data.length; i++) {
-      data_view.setUint8(offset + i, this.data[i]);
+    for (const [i, x] of this.data.entries()) {
+      data_view.setUint8(offset + i, x);
     }
     offset += this.data.length;
+
+    data_view.setUint8(offset, MIDISysex.END_OF_SYSEX);
+    offset++;
 
     return offset;
   }
 }
-MIDISysex.MAGIC = 0xf7;
+MIDISysex.MAGIC = 0xf0;
+MIDISysex.END_OF_SYSEX = 0xf7;
 
 /**
  * MIDITrack interface
