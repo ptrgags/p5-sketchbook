@@ -1,16 +1,13 @@
 import { describe, it, expect } from "vitest";
 import { Harmony, Melody, Note, Rest, Score } from "../music/Score.js";
-import {
-  DEFAULT_TICKS_PER_QUARTER,
-  MIDIHeader,
-  MIDIMessage,
-} from "./MidiFile.js";
+import { MIDIHeader } from "./MidiFile.js";
 import { score_to_midi } from "./score_to_midi.js";
 import { C3, C4, D4, E4, F4, G4 } from "../music/pitches.js";
 import { N1, N2, N4 } from "../music/durations.js";
+import { MIDIMessage } from "./MIDIEvent.js";
 
 // shorthand since this will be used quite a bit.
-const QN = DEFAULT_TICKS_PER_QUARTER;
+const QN = MIDIHeader.DEFAULT_TICKS_PER_QUARTER;
 
 /**
  * Shorthand to make a score with a single part

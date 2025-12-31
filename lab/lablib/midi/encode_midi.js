@@ -1,9 +1,6 @@
-import {
-  MIDIEvent,
-  MIDIFile,
-  MIDIHeader,
-  RelativeTimingTrack,
-} from "./MidiFile.js";
+import { MIDIEvent } from "./MIDIEvent.js";
+import { MIDIFile, MIDIHeader } from "./MidiFile.js";
+import { RelativeTimingTrack } from "./MIDITrack.js";
 import {
   compute_variable_length,
   encode_variable_length,
@@ -148,7 +145,7 @@ function encode_track(data_view, offset, track) {
 
 /**
  * Encode a MIDI file as binary
- * @param {MIDIFile<RelativeTimingTrack>} midi The MIDI file to encode
+ * @param {MIDIFile<RelativeTimingTrack>} midi The MIDI file to encode. This MUST use relative timing.
  * @returns {ArrayBuffer} Binary MIDI data to put in a
  */
 export function encode_midi(midi) {
@@ -172,7 +169,7 @@ export function encode_midi(midi) {
 
 /**
  * Encode MIDI to a File object, e.g. to be downloaded
- * @param {MIDIFile<RelativeTimingTrack>} midi The MIDI data to encode as binary
+ * @param {MIDIFile<RelativeTimingTrack>} midi The MIDI data to encode as binary. This MUST use relative timing
  * @param {string} filename Filename that must end in .mid
  * @returns {File} A file for downloading
  */

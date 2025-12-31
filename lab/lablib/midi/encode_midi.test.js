@@ -1,15 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  DEFAULT_TICKS_PER_QUARTER,
-  MIDIFile,
-  MIDIFormat,
-  MIDIHeader,
-  MIDIMessage,
-  MIDIMessageType,
-  MIDIMetaEvent,
-  MIDIMetaType,
-  RelativeTimingTrack,
-} from "./MidiFile.js";
+import { MIDIFile, MIDIFormat, MIDIHeader } from "./MidiFile.js";
 import {
   encode_midi,
   HEADER_CHUNK_LENGTH,
@@ -17,9 +7,11 @@ import {
   TRACK_MAGIC,
 } from "./encode_midi.js";
 import { C3, C4, E5, G4 } from "../music/pitches.js";
+import { RelativeTimingTrack } from "./MIDITrack.js";
+import { MIDIMessage, MIDIMetaEvent, MIDIMetaType } from "./MIDIEvent.js";
 
 // This will get used a lot, so use the abbreviation parts per quarter
-const PPQ = DEFAULT_TICKS_PER_QUARTER;
+const PPQ = MIDIHeader.DEFAULT_TICKS_PER_QUARTER;
 
 // This will be the same in many tests
 const FORMAT0_HEADER = [

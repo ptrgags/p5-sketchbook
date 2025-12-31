@@ -1,19 +1,12 @@
 import { Score } from "../music/Score.js";
 import { to_events } from "../music/Timeline.js";
 import { Rational } from "../Rational.js";
-import {
-  AbsoluteTimingTrack,
-  DEFAULT_TICKS_PER_QUARTER,
-  MIDIEvent,
-  MIDIFile,
-  MIDIFormat,
-  MIDIHeader,
-  MIDIMessage,
-  RelativeTimingTrack,
-} from "./MidiFile.js";
+import { MIDIEvent, MIDIMessage } from "./MIDIEvent.js";
+import { MIDIFile, MIDIFormat, MIDIHeader } from "./MidiFile.js";
+import { AbsoluteTimingTrack, RelativeTimingTrack } from "./MIDITrack.js";
 
 // Assuming 4/4 time
-const TICKS_PER_MEASURE = 4 * DEFAULT_TICKS_PER_QUARTER;
+const TICKS_PER_MEASURE = 4 * MIDIHeader.DEFAULT_TICKS_PER_QUARTER;
 
 /**
  * Get the number of ticks
@@ -66,12 +59,7 @@ export function score_to_midi(score) {
     throw new Error("scores with more than 16 parts not supported!");
   }
 
-  const header = new MIDIHeader(
-    MIDIFormat.SINGLE_TRACK,
-    1,
-    DEFAULT_TICKS_PER_QUARTER
-  );
-
+  const header = MIDIHeader.DEFAULT_FORMAT0;
   const absolute_track = gather_note_events(score);
   const relative_track = absolute_track.to_relative();
 

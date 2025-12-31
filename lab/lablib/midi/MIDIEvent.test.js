@@ -4,7 +4,7 @@ import {
   MIDIMetaEvent,
   MIDIMetaType,
   MIDISysex,
-} from "./MidiFile.js";
+} from "./MIDIEvent.js";
 import { C4, G4 } from "../music/pitches.js";
 
 function make_empty_view(length) {
