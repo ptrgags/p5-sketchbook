@@ -137,10 +137,10 @@ export class MIDIMessage {
   encode(data_view, offset) {
     const status_byte = (this.message_type << 4) | this.channel;
     data_view.setUint8(offset, status_byte);
-    offset += 1;
+    offset++;
 
-    for (let i = 0; this.data.length; i++) {
-      data_view.setUint8(offset + i, this.data[i]);
+    for (const [i, x] of this.data.entries()) {
+      data_view.setUint8(offset + i, x);
     }
     offset += this.data.length;
 
