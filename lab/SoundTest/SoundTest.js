@@ -30,6 +30,7 @@ import {
 } from "./example_scores.js";
 import { Piano } from "./Piano.js";
 import { SpiralBurst } from "./SpiralBurst.js";
+import { expect_element } from "../../sketchlib/dom/expect_element.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -201,11 +202,9 @@ class SoundScene {
       }
     );
 
-    const export_button = document.getElementById("export");
-    if (export_button instanceof HTMLButtonElement) {
-      export_button.disabled = false;
-      export_button.addEventListener("click", () => this.export_selected());
-    }
+    // This button is disabled until a score is selected.
+    this.export_button = expect_element("export", HTMLButtonElement);
+    this.export_button.addEventListener("click", () => this.export_selected());
 
     /**
      * ID of the score currently playing
@@ -232,6 +231,7 @@ class SoundScene {
       const button = new TouchButton(rectangle);
       button.events.addEventListener("click", () => {
         this.selected_melody = descriptor.id;
+        this.export_button.disabled = false;
         this.piano.reset();
         this.sound.play_score(this.selected_melody);
       });
