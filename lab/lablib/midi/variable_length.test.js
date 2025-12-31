@@ -47,12 +47,85 @@ describe("encode_variable_length", () => {
     expect(after).toBe(1);
   });
 
-  it("encodes a number between 128 and 255", () => {});
-  it("encodes the largest 2-byte value", () => {});
-  it("decodes a 3-byte value", () => {});
-  it("decodes a 4-byte value", () => {});
-  it("encodes largest value", () => {});
-  it("with value too large throws error", () => {});
+  it("encodes a number between 128 and 255", () => {
+    const value = 129;
+    const buffer = make_empty_view(2);
+
+    const after = encode_variable_length(buffer, 0, value);
+
+    // see explanation in the decode version of this test
+    const expected = make_view([0x81, 0x01]);
+    expect(buffer).toEqual(expected);
+    expect(after).toBe(2);
+  });
+
+  it("encodes the largest 2-byte value", () => {
+    // 14 bits set is the most MIDI allows since the high bit is used
+    // to indicate continuation
+    const value = (1 << 14) - 1;
+    const buffer = make_empty_view(2);
+
+    const after = encode_variable_length(buffer, 0, value);
+
+    const expected = make_view([0xff, 0x7f]);
+    expect(buffer).toEqual(expected);
+    expect(after).toBe(2);
+  });
+
+  it("decodes a 3-byte value", () => {
+    const value = 0x100000;
+    const buffer = make_empty_view(3);
+
+    const after = encode_variable_length(buffer, 0, value);
+
+    const expected = make_view([0xc0, 0x80, 0x00]);
+    expect(buffer).toEqual(expected);
+    expect(after).toBe(3);
+  });
+
+  it("decodes a 4-byte value", () => {
+    const value = 0x0800000;
+    const buffer = make_empty_view(4);
+
+    const after = encode_variable_length(buffer, 0, value);
+
+    const expected = make_view([0xc0, 0x80, 0x80, 0x00]);
+    expect(buffer).toEqual(expected);
+    expect(after).toBe(4);
+  });
+
+  it("encodes largest value", () => {
+    const value = 0xfffffff;
+    const buffer = make_empty_view(4);
+
+    const after = encode_variable_length(buffer, 0, value);
+
+    const expected = make_view([0xff, 0xff, 0xff, 0x7f]);
+    expect(buffer).toEqual(expected);
+    expect(after).toBe(4);
+  });
+
+  it("encodes with offset", () => {
+    // largest 2-byte value
+    const value = 0x3fff;
+    const buffer = make_empty_view(5);
+
+    const after = encode_variable_length(buffer, 2, value);
+
+    // only 2 bytes should be set
+    const expected = make_view([0x00, 0x00, 0xff, 0x7f, 0x00]);
+    expect(buffer).toEqual(expected);
+    expect(after).toBe(4);
+  });
+
+  it("with value too large throws error", () => {
+    const too_big = 0x10000000;
+    const buffer = make_empty_view(5);
+
+    expect(() => {
+      return encode_variable_length(buffer, 0, too_big);
+    }).toThrowError("MIDI only allows numbers up to 0x0fffffff");
+  });
 });
 
 describe("decode_variable_length", () => {
@@ -142,10 +215,38 @@ describe("decode_variable_length", () => {
     expect(after).toBe(4);
   });
 
-  it("with value too large throws error", () => {});
+  it("with value too large throws error", () => {
+    // continues for too long
+    const view = make_view([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f]);
+
+    expect(() => {
+      return decode_variable_length(view, 0);
+    }).toThrowError(
+      "invalid MIDI data: variable length quantity longer than 4 bytes detected"
+    );
+  });
 });
 
 describe("decode and encode variable length", () => {
-  it("encode then decoede is identity", () => {});
-  it("decode then encode is identity", () => {});
+  it("encode then decode is identity", () => {
+    const value = 1234;
+    const buffer = make_empty_view(4);
+
+    const after_encode = encode_variable_length(buffer, 0, value);
+    const [result, after_decode] = decode_variable_length(buffer, 0);
+
+    expect(result).toBe(value);
+    expect(after_encode).toBe(after_decode);
+  });
+
+  it("decode then encode is identity", () => {
+    // largest 2-byte number again
+    const view = make_view([0xff, 0x7f]);
+    const buffer = make_empty_view(2);
+
+    const [result, after_decode] = decode_variable_length(view, 0);
+    const after_encode = encode_variable_length(buffer, 0, result);
+    expect(buffer).toEqual(view);
+    expect(after_encode).toBe(after_decode);
+  });
 });

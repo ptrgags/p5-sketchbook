@@ -1,3 +1,5 @@
+const MAX_BYTES = 4;
+
 /**
  * Decode a single variable-length number as described in the MIDI spec
  * @param {DataView} payload the payload to decode from
@@ -6,19 +8,26 @@
  */
 export function decode_variable_length(payload, offset) {
   let index = offset;
-  let more_bytes = true;
   let value = 0;
-  while (more_bytes) {
+  for (let i = 0; i < MAX_BYTES; i++) {
     const byte = payload.getUint8(index);
     // the low 7 bits are tacked on to the value (MSBF)
     value = (value << 7) | (byte & 0x7f);
 
     // the top bit of the byte indicates that there's more bytes to come.
-    more_bytes = byte >> 7 === 1;
+    const more_bytes = byte >> 7 === 1;
     index++;
+
+    if (!more_bytes) {
+      return [value, index];
+    }
   }
 
-  return [value, index];
+  // If we reached here, then all 4 bytes had the high bit set. This is not
+  // allowed by the MIDI spec
+  throw new Error(
+    "invalid MIDI data: variable length quantity longer than 4 bytes detected!"
+  );
 }
 
 /**
@@ -40,6 +49,8 @@ function split_value_7bits(value) {
   return values;
 }
 
+const MAX_MIDI_VALUE = 0x0fffffff;
+
 /**
  * Write a variable-length quantity as described in the MIDI spec
  * @param {DataView} data_view The buffer to write to
@@ -48,6 +59,10 @@ function split_value_7bits(value) {
  * @returns {number} the new offset after writing the variable-length quantity
  */
 export function encode_variable_length(data_view, offset, value) {
+  if (value > MAX_MIDI_VALUE) {
+    throw new Error("MIDI only allows numbers up to 0x0fffffff");
+  }
+
   const values_lsbf = split_value_7bits(value);
   const values_msbf = values_lsbf.reverse();
 
