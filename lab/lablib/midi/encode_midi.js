@@ -1,5 +1,13 @@
-import { MIDIFile, MIDIHeader, RelativeTimingTrack } from "./MidiFile.js";
-import { compute_variable_length } from "./variable_length.js";
+import {
+  MIDIEvent,
+  MIDIFile,
+  MIDIHeader,
+  RelativeTimingTrack,
+} from "./MidiFile.js";
+import {
+  compute_variable_length,
+  encode_variable_length,
+} from "./variable_length.js";
 
 export const HEADER_MAGIC = [
   "M".charCodeAt(0),
@@ -16,6 +24,9 @@ export const TRACK_MAGIC = [
 
 export const END_OF_TRACK = [0xff, 0x2f, 0x00];
 
+export const HEADER_CHUNK_LENGTH = 6;
+
+const SIZE_U16 = 2;
 const SIZE_U32 = 4;
 const BIG_ENDIAN = false;
 
@@ -34,21 +45,22 @@ function compute_messages_length(track) {
   return total;
 }
 
+function compute_track_length(track) {
+  const message_length = compute_messages_length(track);
+  return TRACK_MAGIC.length + SIZE_U32 + message_length + END_OF_TRACK.length;
+}
+
 /**
  * Compute the byte length of the encoded MIDI file up front before
  * allocating the buffer
  * @param {MIDIFile} midi The MIDI file
  */
 function compute_length(midi) {
-  const header_length =
-    HEADER_MAGIC.length + SIZE_U32 + MIDIHeader.CHUNK_LENGTH;
+  const header_length = HEADER_MAGIC.length + SIZE_U32 + HEADER_CHUNK_LENGTH;
 
   let total_track_length = 0;
   for (const track of midi.tracks) {
-    const message_length = compute_messages_length(track);
-    const track_length =
-      TRACK_MAGIC.length + SIZE_U32 + message_length + END_OF_TRACK.length;
-    total_track_length += track_length;
+    total_track_length += compute_track_length(track);
   }
 
   return header_length + total_track_length;
@@ -68,14 +80,33 @@ function encode_header(data_view, offset, header) {
   }
   offset += HEADER_MAGIC.length;
 
-  data_view.setUint32(offset, MIDIHeader.CHUNK_LENGTH, BIG_ENDIAN);
+  data_view.setUint32(offset, HEADER_CHUNK_LENGTH, BIG_ENDIAN);
   offset += SIZE_U32;
 
-  data_view.setUint8(offset + 1, header.format);
-  data_view.setUint8(offset + 2, header.num_tracks);
-  data_view.setUint8(offset + 3, header.ticks_per_quarter);
-  offset += MIDIHeader.CHUNK_LENGTH;
+  data_view.setUint16(offset, header.format, BIG_ENDIAN);
+  data_view.setUint16(offset + SIZE_U16, header.num_tracks, BIG_ENDIAN);
+  data_view.setUint16(
+    offset + 2 * SIZE_U16,
+    header.ticks_per_quarter,
+    BIG_ENDIAN
+  );
+  offset += HEADER_CHUNK_LENGTH;
 
+  return offset;
+}
+
+/**
+ * Encode messages in binary
+ * @param {DataView} data_view
+ * @param {number} offset Start offset for writing
+ * @param {[number, MIDIEvent][]} events Events with relative times
+ * @returns {number} New offset after the end of the written data
+ */
+function encode_messages(data_view, offset, events) {
+  for (const [t, message] of events) {
+    offset = encode_variable_length(data_view, offset, t);
+    offset = message.encode(data_view, offset);
+  }
   return offset;
 }
 
@@ -87,12 +118,30 @@ function encode_header(data_view, offset, header) {
  * @return {number} New offset after the end of the track
  */
 function encode_track(data_view, offset, track) {
+  // write Mtrk in ASCII
+  for (let i = 0; i < TRACK_MAGIC.length; i++) {
+    data_view.setUint8(offset + i, TRACK_MAGIC[i]);
+  }
+  offset += TRACK_MAGIC.length;
+
+  const track_length = compute_track_length(track);
+  data_view.setUint32(offset, track_length, BIG_ENDIAN);
+  offset += SIZE_U32;
+
+  offset = encode_messages(data_view, offset, track.events);
+
+  // Add the end of track message, which is required by the MIDI spec
+  for (let i = 0; i < END_OF_TRACK.length; i++) {
+    data_view.setUint8(offset + i, END_OF_TRACK[i]);
+  }
+  offset += END_OF_TRACK.length;
+
   return offset;
 }
 
 /**
- *
- * @param {MIDIFile} midi The MIDI file to encode
+ * Encode a MIDI file as binary
+ * @param {MIDIFile<RelativeTimingTrack>} midi The MIDI file to encode
  * @returns {ArrayBuffer} Binary MIDI data to put in a
  */
 export function encode_midi(midi) {
@@ -116,7 +165,7 @@ export function encode_midi(midi) {
 
 /**
  * Encode MIDI to a File object, e.g. to be downloaded
- * @param {MIDIFile} midi The MIDI data to encode as binary
+ * @param {MIDIFile<RelativeTimingTrack>} midi The MIDI data to encode as binary
  * @param {string} filename Filename that must end in .mid
  * @returns {File} A file for downloading
  */

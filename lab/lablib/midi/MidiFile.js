@@ -28,7 +28,6 @@ export class MIDIHeader {
     this.ticks_per_quarter = ticks_per_quarter;
   }
 }
-MIDIHeader.CHUNK_LENGTH = 3;
 MIDIHeader.DEFAULT_FORMAT0 = Object.freeze(
   new MIDIHeader(MIDIFormat.SINGLE_TRACK, 1)
 );
@@ -90,6 +89,16 @@ export class MIDIEvent {
   get byte_length() {
     throw new Error("not implemented");
   }
+
+  /**
+   * Encode the message to binary
+   * @param {DataView} data_view DataView to write to
+   * @param {number} offset Starting offset
+   * @return {number} New offset after writing
+   */
+  encode(data_view, offset) {
+    throw new Error("not implemented");
+  }
 }
 
 /**
@@ -117,6 +126,25 @@ export class MIDIMessage {
   get byte_length() {
     // status byte + payload
     return 1 + this.data.length;
+  }
+
+  /**
+   * Encode the message to binary
+   * @param {DataView} data_view DataView to write to
+   * @param {number} offset Starting offset
+   * @return {number} New offset after writing
+   */
+  encode(data_view, offset) {
+    const status_byte = (this.message_type << 4) | this.channel;
+    data_view.setUint8(offset, status_byte);
+    offset += 1;
+
+    for (let i = 0; this.data.length; i++) {
+      data_view.setUint8(offset + i, this.data[i]);
+    }
+    offset += this.data.length;
+
+    return offset;
   }
 
   /**
@@ -179,23 +207,43 @@ export class MIDIMetaEvent {
   /**
    * Constructor
    * @param {number} meta_type MIDIMetaType
-   * @param {Uint8Array} payload Raw bytes of message
+   * @param {Uint8Array} data Raw bytes of message
    */
-  constructor(meta_type, payload) {
+  constructor(meta_type, data) {
     this.meta_type = meta_type;
-    this.payload = payload;
+    this.data = data;
   }
 
   /**
    * @type {number[]}
    */
   get sort_key() {
-    return [MIDIMetaEvent.MAGIC, this.meta_type, ...this.payload];
+    return [MIDIMetaEvent.MAGIC, this.meta_type, ...this.data];
   }
 
   get byte_length() {
-    // 3 byte header + payload
-    return 3 + this.payload.length;
+    // 3 byte header + data
+    return 3 + this.data.length;
+  }
+
+  /**
+   * Encode the message to binary
+   * @param {DataView} data_view DataView to write to
+   * @param {number} offset Starting offset
+   * @return {number} New offset after writing
+   */
+  encode(data_view, offset) {
+    data_view.setUint8(offset, MIDIMetaEvent.MAGIC);
+    data_view.setUint8(offset + 1, this.meta_type);
+    data_view.setUint8(offset + 2, this.data.length);
+    offset += 3;
+
+    for (let i = 0; this.data.length; i++) {
+      data_view.setUint8(offset + i, this.data[i]);
+    }
+    offset += this.data.length;
+
+    return offset;
   }
 }
 MIDIMetaEvent.MAGIC = 0xff;
@@ -225,6 +273,25 @@ export class MIDISysex {
   get byte_length() {
     // F7 + length + payload length
     return 2 + this.data.length;
+  }
+
+  /**
+   * Encode the message to binary
+   * @param {DataView} data_view DataView to write to
+   * @param {number} offset Starting offset
+   * @return {number} New offset after writing
+   */
+  encode(data_view, offset) {
+    data_view.setUint8(offset, MIDISysex.MAGIC);
+    data_view.setUint8(offset + 1, this.data.length);
+    offset += 2;
+
+    for (let i = 0; this.data.length; i++) {
+      data_view.setUint8(offset + i, this.data[i]);
+    }
+    offset += this.data.length;
+
+    return offset;
   }
 }
 MIDISysex.MAGIC = 0xf7;
