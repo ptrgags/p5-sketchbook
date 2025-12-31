@@ -31,8 +31,8 @@ const SIZE_U32 = 4;
 const BIG_ENDIAN = false;
 
 /**
- * Get the length of all the messages in the track. This does not include
- * the end of track or the header
+ * Get the length of all the messages in the track. This includes
+ * the implicit end of track message
  * @param {RelativeTimingTrack} track The track
  * @returns {number} The length of the messages in this track
  */
@@ -42,12 +42,16 @@ function compute_messages_length(track) {
     total += compute_variable_length(t);
     total += message.byte_length;
   }
+
+  // another tick delta + end of track message at end
+  total += END_OF_TRACK.length + 1;
+
   return total;
 }
 
 function compute_track_length(track) {
   const message_length = compute_messages_length(track);
-  return TRACK_MAGIC.length + SIZE_U32 + message_length + END_OF_TRACK.length;
+  return TRACK_MAGIC.length + SIZE_U32 + message_length;
 }
 
 /**
@@ -124,13 +128,16 @@ function encode_track(data_view, offset, track) {
   }
   offset += TRACK_MAGIC.length;
 
-  const track_length = compute_track_length(track);
-  data_view.setUint32(offset, track_length, BIG_ENDIAN);
+  const messages_length = compute_messages_length(track);
+  data_view.setUint32(offset, messages_length, BIG_ENDIAN);
   offset += SIZE_U32;
 
   offset = encode_messages(data_view, offset, track.events);
 
   // Add the end of track message, which is required by the MIDI spec
+  const delta = 0;
+  data_view.setUint8(offset, delta);
+  offset++;
   for (let i = 0; i < END_OF_TRACK.length; i++) {
     data_view.setUint8(offset + i, END_OF_TRACK[i]);
   }

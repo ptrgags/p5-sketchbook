@@ -67,7 +67,7 @@ describe("encode_midi", () => {
       ...END_OF_TRACK,
     ]);
 
-    expect(result).toEqual(expected.buffer);
+    expect(result).toStrictEqual(expected.buffer);
   });
 
   it("with single note encodes correctly", () => {
@@ -80,7 +80,7 @@ describe("encode_midi", () => {
 
     const result = encode_midi(midi);
 
-    const expected_length = END_OF_TRACK.length + 1;
+    const expected_length = 12;
     const expected = new Uint8Array([
       ...FORMAT0_HEADER,
       // TRACK --------------------
@@ -107,13 +107,13 @@ describe("encode_midi", () => {
       ...END_OF_TRACK,
     ]);
 
-    expect(result).toEqual(expected.buffer);
+    expect(result).toStrictEqual(expected.buffer);
   });
 
   it("encodes example file correctly", () => {
     // Data based on https://midimusic.github.io/tech/midispec.html#BM3_1, however
     // I tweaked some entries since my encoder does not make use of running status
-    const header = new MIDIHeader(MIDIFormat.SINGLE_TRACK, 1);
+    const header = MIDIHeader.DEFAULT_FORMAT0;
     const forte = 96;
     const mezzo_forte = 64;
     const piano = 32;
@@ -151,8 +151,15 @@ describe("encode_midi", () => {
 
     const expected = new Uint8Array([
       ...FORMAT0_HEADER,
-
       // track ---------------------------
+      ...TRACK_MAGIC,
+      // length
+      0,
+      0,
+      0,
+      // the example originally had 59 bytes, but I'm not using running status
+      // so I added 2 more bytes
+      59 + 2,
       // dt
       0,
       // time sig
@@ -241,6 +248,68 @@ describe("encode_midi", () => {
       // end of track
       ...END_OF_TRACK,
     ]);
-    expect(result).toEqual(expected.buffer);
+    expect(result).toStrictEqual(expected.buffer);
+  });
+
+  it("encodes Ableton-style empty clip", () => {
+    const header = MIDIHeader.DEFAULT_FORMAT0;
+    const track = new RelativeTimingTrack([
+      [0, MIDIMetaEvent.track_name("")],
+      [
+        0,
+        new MIDIMetaEvent(
+          MIDIMetaType.TIME_SIGNATURE,
+          new Uint8Array([0x04, 0x02, 0x24, 0x08])
+        ),
+      ],
+      [
+        0,
+        new MIDIMetaEvent(
+          MIDIMetaType.TIME_SIGNATURE,
+          new Uint8Array([0x04, 0x02, 0x24, 0x08])
+        ),
+      ],
+    ]);
+    const midi = new MIDIFile(header, [track]);
+
+    const result = encode_midi(midi);
+
+    // Bytes from an empty clip exported from Ableton
+    // https://hexed.it/ was helpful for formatting
+    const expected = new Uint8Array([
+      // MIDI Header chunk ----------------------------
+      // MThd
+      0x4d, 0x54, 0x68, 0x64,
+      // Length
+      0x00, 0x00, 0x00, 0x06,
+      // format 0
+      0x00, 0x00,
+      // number of tracks
+      0x00, 0x01,
+      // PPQ
+      0x00, 0x60,
+      // MIDI Track chunk --------------------------
+      // MTrk
+      0x4d, 0x54, 0x72, 0x6b,
+      // Length - 24 bytes from the dt to the end of the end of track
+      0x00, 0x00, 0x00, 0x18,
+      // dt,
+      0x00,
+      // track name: empty string
+      0xff, 0x03, 0x00,
+      // dt
+      0x00,
+      // time signature
+      0xff, 0x58, 0x04, 0x04, 0x02, 0x24, 0x08,
+      // dt
+      0x00,
+      // time signature, again for some reason?
+      0xff, 0x58, 0x04, 0x04, 0x02, 0x24, 0x08,
+      // dt
+      0x00,
+      // end of track
+      0xff, 0x2f, 0x00,
+    ]);
+    expect(result).toStrictEqual(expected.buffer);
   });
 });

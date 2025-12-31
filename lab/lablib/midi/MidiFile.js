@@ -258,6 +258,18 @@ export class MIDIMetaEvent {
 
     return offset;
   }
+
+  /**
+   * Track Name event
+   * @param {string} track_name Track name. This method only supports ASCII characters
+   */
+  static track_name(track_name) {
+    const encoded_name = new Uint8Array(track_name.length);
+    for (let i = 0; i < track_name.length; i++) {
+      encoded_name[i] = track_name.charCodeAt(i);
+    }
+    return new MIDIMetaEvent(MIDIMetaType.TRACK_NAME, encoded_name);
+  }
 }
 MIDIMetaEvent.MAGIC = 0xff;
 MIDIMetaEvent.END_OF_TRACK = Object.freeze(
