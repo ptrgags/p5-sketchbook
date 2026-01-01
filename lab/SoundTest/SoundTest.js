@@ -31,6 +31,7 @@ import {
 import { Piano } from "./Piano.js";
 import { SpiralBurst } from "./SpiralBurst.js";
 import { expect_element } from "../../sketchlib/dom/expect_element.js";
+import { decode_midi } from "../lablib/midi/decode_midi.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -178,6 +179,31 @@ function download_file(file) {
   URL.revokeObjectURL(url);
 }
 
+function clear_errors() {
+  document.getElementById("errors").innerText = "";
+}
+
+function show_error(message) {
+  document.getElementById("errors").innerText = message;
+}
+
+/**
+ * Import a MIDI file from a file picker
+ * @param {File[]} file_list
+ * @returns {Promise<[string, ArrayBuffer]>} The filename and the buffer containing the MIDI data
+ */
+async function import_midi_file(file_list) {
+  if (file_list.length === 0) {
+    throw new Error("please chose a .mid file");
+  }
+
+  const file = file_list[0];
+  const fname = file.name;
+  const buffer = await file.arrayBuffer();
+
+  return [fname, buffer];
+}
+
 class SoundScene {
   /**
    * Constructor
@@ -205,6 +231,21 @@ class SoundScene {
     // This button is disabled until a score is selected.
     this.export_button = expect_element("export", HTMLButtonElement);
     this.export_button.addEventListener("click", () => this.export_selected());
+
+    this.import_input = expect_element("import", HTMLInputElement);
+    this.import_input.addEventListener("input", async (e) => {
+      clear_errors();
+      try {
+        //@ts-ignore
+        const [fname, midi_data] = await import_midi_file(e.target.files);
+        const midi = decode_midi(midi_data);
+        console.log(midi);
+      } catch (err) {
+        console.error(err);
+        show_error(err);
+      }
+    });
+    this.import_input.disabled = false;
 
     /**
      * ID of the score currently playing
