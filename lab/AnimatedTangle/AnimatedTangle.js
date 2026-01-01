@@ -19,6 +19,7 @@ import { EYE } from "./patterns/peek.js";
 import { make_stripes } from "./patterns/stripes.js";
 import { PALETTE_CORAL, PALETTE_NAVY, Values } from "./theme_colors.js";
 import { HITOMEZASHI } from "./patterns/hitomezashi.js";
+import { TRAFFIC } from "./patterns/traffic.js";
 
 /**
  * Shorthand for making arrays of points
@@ -107,6 +108,7 @@ const QUARTERS = new VectorTangle([
 const TANGLE = new VectorTangle(
   [
     [new Mask(PANEL_LANDSCAPE), LANDSCAPE.render()],
+    [new Mask(PANEL_TRAFFIC), TRAFFIC.render()],
     [new Mask(PANEL_QUARTERS), QUARTERS],
     [new Mask(PANEL_CORAL), CORAL_PANEL.render()],
     [new Mask(PANEL_GEODE), GEODE.render()],
@@ -166,6 +168,7 @@ export const sketch = (p) => {
 
     ANIM.update(t_sec);
     HITOMEZASHI.update(0.1 * t_sec);
+    TRAFFIC.update(t_sec);
     EYE.update(ANIM);
     CIRCLE_FAN.update(ANIM);
     GEODE.update(ANIM);
