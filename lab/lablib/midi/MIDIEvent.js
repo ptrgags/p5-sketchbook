@@ -1,3 +1,5 @@
+import { decode_variable_length } from "./variable_length.js";
+
 /**
  * @interface MIDIEvent
  */
@@ -157,14 +159,26 @@ export class MIDIMessage {
   }
 
   /**
-   *
-   * @param {number} status_byte
-   * @param {DataView} data_view
-   * @param {number} offset
-   * @returns {[MIDIMessage, number]}
+   * Decode a single MIDI message from binary
+   * @param {number} running_status Running status byte - sometimes this is implicit, so it is passed in by the decoder rather than read from the array
+   * @param {DataView} data_view DataView to read from
+   * @param {number} offset Byte offset of the first data byte within the DataView. this is the byte _after_ the status byte (when present)
+   * @returns {[MIDIMessage, number]} (message, after_offset)
    */
-  static decode(status_byte, data_view, offset) {
-    return [new MIDIMessage(0, 0, new Uint8Array(0)), offset];
+  static decode(running_status, data_view, offset) {
+    const message_type = running_status >> 4;
+    const channel = running_status & 0xf;
+
+    const data_length = get_data_length(message_type);
+    const data = new Uint8Array(
+      data_view.buffer,
+      data_view.byteOffset + offset,
+      data_length
+    );
+
+    const msg = new MIDIMessage(message_type, channel, data);
+    const after_offset = offset + data_length;
+    return [msg, after_offset];
   }
 }
 MIDIMessage.DEFAULT_VELOCITY = 127;
@@ -260,7 +274,22 @@ export class MIDIMetaEvent {
    * @return {[MIDIMetaEvent, number]}
    */
   static decode(data_view, offset) {
-    return [new MIDIMetaEvent(0, new Uint8Array([0])), offset];
+    const meta_type = data_view.getUint8(offset);
+    offset++;
+
+    const [length, after] = decode_variable_length(data_view, offset + 1);
+    const length_length = after - offset;
+    offset = after;
+
+    const body = new Uint8Array(
+      data_view.buffer,
+      data_view.byteOffset + offset + 1 + length_length,
+      length
+    );
+
+    const message = new MIDIMetaEvent(meta_type, body);
+    const after_offset = offset + 1 + length_length + length;
+    return [message, after_offset];
   }
 }
 MIDIMetaEvent.MAGIC = 0xff;
@@ -274,7 +303,7 @@ MIDIMetaEvent.END_OF_TRACK = Object.freeze(
 export class MIDISysex {
   /**
    * Constructor
-   * @param {Uint8Array} data Payload of the sysex message
+   * @param {Uint8Array} data Payload of the sysex message (not including the ending 0xF7 byte)
    */
   constructor(data) {
     this.data = data;
@@ -288,7 +317,7 @@ export class MIDISysex {
   }
 
   get byte_length() {
-    // F0 + length + payload length + F7
+    // 0xF0 + length + payload length + 0xF7
     return 3 + this.data.length;
   }
 
@@ -318,11 +347,23 @@ export class MIDISysex {
   /**
    *
    * @param {DataView} data_view
-   * @param {number} offset
+   * @param {number} offset Offset of the first byte after the 0xf0, i.e. the length byte
    * @return {[MIDISysex, number]}
    */
   static decode(data_view, offset) {
-    return [new MIDISysex(new Uint8Array([])), offset];
+    const [length, after] = decode_variable_length(data_view, offset);
+    const length_length = after - offset;
+
+    const data = new Uint8Array(
+      data_view.buffer,
+      data_view.byteOffset + offset + length_length,
+      // length includes the end of sysex byte
+      length - 1
+    );
+
+    const message = new MIDISysex(data);
+    const after_offset = after + length;
+    return [message, after_offset];
   }
 }
 MIDISysex.MAGIC = 0xf0;
