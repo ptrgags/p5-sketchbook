@@ -25,6 +25,13 @@ function make_empty_view(length) {
 }
 
 describe("encode_variable_length", () => {
+  it("throws for negative value", () => {
+    const buffer = make_empty_view(4);
+    expect(() => {
+      return encode_variable_length(buffer, 0, -1);
+    }).toThrowError("value must be non-negative");
+  });
+
   it("encodes 0 as 0", () => {
     const buffer = make_view([0xff]);
     const value = 0;

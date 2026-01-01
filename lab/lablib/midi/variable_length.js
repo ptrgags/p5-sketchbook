@@ -65,10 +65,14 @@ const MAX_MIDI_VALUE = 0x0fffffff;
  * Write a variable-length quantity as described in the MIDI spec
  * @param {DataView} data_view The buffer to write to
  * @param {number} offset The offset of the first byte to write
- * @param {number} value value to encode
+ * @param {number} value non-negative value to encode.
  * @returns {number} the new offset after writing the variable-length quantity
  */
 export function encode_variable_length(data_view, offset, value) {
+  if (value < 0) {
+    throw new Error("value must be non-negative");
+  }
+
   if (value > MAX_MIDI_VALUE) {
     throw new Error("MIDI only allows numbers up to 0x0fffffff");
   }
