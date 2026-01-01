@@ -155,6 +155,17 @@ export class MIDIMessage {
       new Uint8Array([instrument])
     );
   }
+
+  /**
+   *
+   * @param {number} status_byte
+   * @param {DataView} data_view
+   * @param {number} offset
+   * @returns {[MIDIMessage, number]}
+   */
+  static decode(status_byte, data_view, offset) {
+    return [new MIDIMessage(0, 0, new Uint8Array(0)), offset];
+  }
 }
 MIDIMessage.DEFAULT_VELOCITY = 127;
 
@@ -241,6 +252,16 @@ export class MIDIMetaEvent {
     }
     return new MIDIMetaEvent(MIDIMetaType.TRACK_NAME, encoded_name);
   }
+
+  /**
+   *
+   * @param {DataView} data_view
+   * @param {number} offset
+   * @return {[MIDIMetaEvent, number]}
+   */
+  static decode(data_view, offset) {
+    return [new MIDIMetaEvent(0, new Uint8Array([0])), offset];
+  }
 }
 MIDIMetaEvent.MAGIC = 0xff;
 MIDIMetaEvent.END_OF_TRACK = Object.freeze(
@@ -292,6 +313,16 @@ export class MIDISysex {
     offset++;
 
     return offset;
+  }
+
+  /**
+   *
+   * @param {DataView} data_view
+   * @param {number} offset
+   * @return {[MIDISysex, number]}
+   */
+  static decode(data_view, offset) {
+    return [new MIDISysex(new Uint8Array([])), offset];
   }
 }
 MIDISysex.MAGIC = 0xf0;
