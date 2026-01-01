@@ -42,10 +42,18 @@ export function decode_variable_length(payload, offset) {
 
 /**
  * Split a value into 7-bit chunks
- * @param {number} value The value to split
+ * @param {number} value The non-negative value to split
  * @returns {number[]} the 7-bit values in LSBF order
  */
 function split_value_7bits(value) {
+  if (value > MAX_MIDI_VALUE) {
+    throw new Error("MIDI only allows numbers up to 0x0fffffff");
+  }
+
+  if (value < 0) {
+    throw new Error("value must be non-negative");
+  }
+
   if (value === 0) {
     return [0];
   }
@@ -65,14 +73,10 @@ const MAX_MIDI_VALUE = 0x0fffffff;
  * Write a variable-length quantity as described in the MIDI spec
  * @param {DataView} data_view The buffer to write to
  * @param {number} offset The offset of the first byte to write
- * @param {number} value value to encode
+ * @param {number} value non-negative value to encode.
  * @returns {number} the new offset after writing the variable-length quantity
  */
 export function encode_variable_length(data_view, offset, value) {
-  if (value > MAX_MIDI_VALUE) {
-    throw new Error("MIDI only allows numbers up to 0x0fffffff");
-  }
-
   const values_lsbf = split_value_7bits(value);
   const values_msbf = values_lsbf.reverse();
 

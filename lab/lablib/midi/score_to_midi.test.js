@@ -177,7 +177,27 @@ describe("score_to_midi", () => {
     expect(result).toEqual(expected);
   });
 
-  it("with multiple parts produces MIDI notes on different channels", () => {
+  it("with multiple parts produces a format 1 MIDI file", () => {
+    // same material as in the harmony test, but now expressed as multiple parts
+    const score = new Score({
+      parts: [
+        [
+          "channel0",
+          new Melody(new Note(C4, N4), new Note(E4, N4), new Note(G4, N2)),
+        ],
+        ["channel1", new Note(C3, N1)],
+      ],
+    });
+
+    const result = score_to_midi(score);
+
+    const expected_tracks = 2;
+    const expected_header = MIDIHeader.format1(expected_tracks);
+    expect(result.header).toStrictEqual(expected_header);
+    expect(result.tracks.length).toBe(expected_tracks);
+  });
+
+  it("with multiple parts produces MIDI notes on different tracks by channel", () => {
     // same material as in the harmony test, but now expressed as multiple parts
     const score = new Score({
       parts: [
@@ -194,12 +214,14 @@ describe("score_to_midi", () => {
     const expected = [
       [
         [0, MIDIMessage.note_on(0, C4)],
-        [0, MIDIMessage.note_on(1, C3)],
         [QN, MIDIMessage.note_off(0, C4)],
         [QN, MIDIMessage.note_on(0, E4)],
         [2 * QN, MIDIMessage.note_off(0, E4)],
         [2 * QN, MIDIMessage.note_on(0, G4)],
         [4 * QN, MIDIMessage.note_off(0, G4)],
+      ],
+      [
+        [0, MIDIMessage.note_on(1, C3)],
         [4 * QN, MIDIMessage.note_off(1, C3)],
       ],
     ];

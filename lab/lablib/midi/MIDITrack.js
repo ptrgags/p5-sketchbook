@@ -45,10 +45,13 @@ function compare_shortlex(a, b) {
 export class AbsoluteTimingTrack {
   /**
    * constructor
-   * @param {[number, MIDIEvent][]} events Pairs of (absolute_t, msg)
+   * @param {[number, MIDIEvent][]} events Pairs of (absolute_t, msg).
    */
   constructor(events) {
-    this.events = events;
+    this.events = events.slice();
+
+    // Sort by absolute time to ensure times are monotomically increasing
+    this.events.sort((a, b) => a[0] - b[0]);
   }
 
   /**

@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
+  compute_variable_length,
   decode_variable_length,
   encode_variable_length,
 } from "./variable_length";
@@ -24,7 +25,71 @@ function make_empty_view(length) {
   return new DataView(u8.buffer);
 }
 
+describe("compute_variable_length", () => {
+  it("throws for negative value", () => {
+    expect(() => {
+      return compute_variable_length(-1);
+    }).toThrowError("value must be non-negative");
+  });
+
+  it("with 0 returns length of 1", () => {
+    const result = compute_variable_length(0);
+
+    expect(result).toBe(1);
+  });
+
+  it("with small value returns 1", () => {
+    const result = compute_variable_length(0x7f);
+
+    expect(result).toBe(1);
+  });
+
+  it("with value between 128 and 255 returns 2", () => {
+    const result = compute_variable_length(129);
+
+    expect(result).toBe(2);
+  });
+
+  it("with largest 14-bit value returns 2", () => {
+    const value = (1 << 14) - 1;
+    const result = compute_variable_length(value);
+
+    expect(result).toBe(2);
+  });
+
+  it("with 3-byte value returns 3", () => {
+    const result = compute_variable_length(0x100000);
+
+    expect(result).toBe(3);
+  });
+
+  it("with 4-byte value returns 4", () => {
+    const result = compute_variable_length(0x0800000);
+
+    expect(result).toBe(4);
+  });
+
+  it("with largest value returns 4", () => {
+    const result = compute_variable_length(0x0fffffff);
+
+    expect(result).toBe(4);
+  });
+
+  it("with value too large throws error", () => {
+    expect(() => {
+      return compute_variable_length(0x10000000);
+    }).toThrowError("MIDI only allows numbers up to 0x0fffffff");
+  });
+});
+
 describe("encode_variable_length", () => {
+  it("throws for negative value", () => {
+    const buffer = make_empty_view(4);
+    expect(() => {
+      return encode_variable_length(buffer, 0, -1);
+    }).toThrowError("value must be non-negative");
+  });
+
   it("encodes 0 as 0", () => {
     const buffer = make_view([0xff]);
     const value = 0;
