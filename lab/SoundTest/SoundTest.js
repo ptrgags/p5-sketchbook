@@ -12,6 +12,8 @@ import { Transform } from "../../sketchlib/primitives/Transform.js";
 import { Style } from "../../sketchlib/Style.js";
 import { AnimationCurves } from "../lablib/animation/AnimationCurves.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
+import { encode_midi_file } from "../lablib/midi/encode_midi.js";
+import { score_to_midi } from "../lablib/midi/score_to_midi.js";
 import { MouseInput } from "../lablib/MouseInput.js";
 import { render_score } from "../lablib/music/render_score.js";
 import { MuteButton } from "../lablib/MuteButton.js";
@@ -28,6 +30,7 @@ import {
 } from "./example_scores.js";
 import { Piano } from "./Piano.js";
 import { SpiralBurst } from "./SpiralBurst.js";
+import { expect_element } from "../../sketchlib/dom/expect_element.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -159,6 +162,22 @@ const CURSOR = style(
   Style.DEFAULT_STROKE
 );
 
+/**
+ * Download a generated file
+ * @param {File} file The file to downlowd
+ */
+function download_file(file) {
+  const url = URL.createObjectURL(file);
+
+  const anchor = document.createElement("a");
+  anchor.setAttribute("href", url);
+  anchor.setAttribute("download", file.name);
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+}
+
 class SoundScene {
   /**
    * Constructor
@@ -182,6 +201,10 @@ class SoundScene {
         this.sound.toggle_sound(e.detail.sound_on);
       }
     );
+
+    // This button is disabled until a score is selected.
+    this.export_button = expect_element("export", HTMLButtonElement);
+    this.export_button.addEventListener("click", () => this.export_selected());
 
     /**
      * ID of the score currently playing
@@ -208,11 +231,22 @@ class SoundScene {
       const button = new TouchButton(rectangle);
       button.events.addEventListener("click", () => {
         this.selected_melody = descriptor.id;
+        this.export_button.disabled = false;
         this.piano.reset();
         this.sound.play_score(this.selected_melody);
       });
       return button;
     });
+  }
+
+  export_selected() {
+    if (!this.selected_melody) {
+      return;
+    }
+
+    const midi = score_to_midi(SOUND_MANIFEST.scores[this.selected_melody]);
+    const file = encode_midi_file(midi, `${this.selected_melody}.mid`);
+    download_file(file);
   }
 
   render_timeline(time) {
