@@ -2,16 +2,22 @@ import { Direction } from "../../../pga2d/Direction.js";
 import { Point } from "../../../pga2d/Point.js";
 import { Ease } from "../../../sketchlib/Ease.js";
 import { RectPrimitive } from "../../../sketchlib/primitives/RectPrimitive.js";
-import { group, xform } from "../../../sketchlib/primitives/shorthand.js";
+import {
+  group,
+  style,
+  xform,
+} from "../../../sketchlib/primitives/shorthand.js";
 import { Transform } from "../../../sketchlib/primitives/Transform.js";
+import { Style } from "../../../sketchlib/Style.js";
 import { AnimationCurve } from "../../lablib/animation/AnimationCurve.js";
 import { LoopCurve } from "../../lablib/animation/LoopCurve.js";
 import { ParamCurve } from "../../lablib/animation/ParamCurve.js";
 import { Sequential } from "../../lablib/music/Timeline.js";
 import { Rational } from "../../lablib/Rational.js";
+import { PALETTE_CORAL, PALETTE_SKY, Values } from "../theme_colors.js";
 
 const HALF_DIST = 300;
-const HALF_DURATION = new Rational(1, 2);
+const HALF_DURATION = new Rational(2);
 const POSITION = new Sequential(
   // Enter from the left, slowing down when we reach the center of motion
   new ParamCurve(-HALF_DIST, 0, HALF_DURATION, Ease.out_cubic),
@@ -21,6 +27,16 @@ const POSITION = new Sequential(
 const CURVE_POSITION = new LoopCurve(AnimationCurve.from_timeline(POSITION));
 
 const BOX = new RectPrimitive(Point.ORIGIN, new Direction(25, 25));
+const STYLE_BOX = new Style({
+  fill: PALETTE_CORAL[Values.MedLight].to_srgb(),
+});
+
+// This should always be odd so one box sits exactly in the center
+const NUM_BOXES = 11;
+const PHASES = new Array(NUM_BOXES).fill(0).map((_, i) => {
+  const t_step = POSITION.duration.real / (NUM_BOXES - 1);
+  return i * t_step;
+});
 
 class TrafficLane {
   /**
@@ -29,15 +45,21 @@ class TrafficLane {
    */
   constructor(center_offset) {
     this.center_offset = center_offset;
-    this.translation = new Transform(center_offset);
-    this.primitive = xform(BOX, this.translation);
+
+    this.transforms = PHASES.map((phase) => {
+      const dx = CURVE_POSITION.value(phase);
+      return new Transform(center_offset.add(Direction.DIR_X.scale(dx)));
+    });
+
+    const boxes = this.transforms.map((t) => xform(BOX, t));
+    this.primitive = style(boxes, STYLE_BOX);
   }
 
   update(time) {
-    const dx = CURVE_POSITION.value(time);
-    this.translation.translation = this.center_offset.add(
-      Direction.DIR_X.scale(dx)
-    );
+    this.transforms.forEach((t, i) => {
+      const dx = CURVE_POSITION.value(time + PHASES[i]);
+      t.translation = this.center_offset.add(Direction.DIR_X.scale(dx));
+    });
   }
 
   render() {
@@ -68,7 +90,7 @@ class Traffic {
 
 export const TRAFFIC = new Traffic(
   new Direction(250, 100),
-  new Direction(250, 125),
-  new Direction(250, 150),
-  new Direction(250, 175)
+  new Direction(200, 125),
+  new Direction(150, 150),
+  new Direction(100, 175)
 );
