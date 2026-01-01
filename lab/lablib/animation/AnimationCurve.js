@@ -8,10 +8,27 @@ import { PiecewiseLinear } from "./PiecewiseLinear.js";
 /**
  * Iterate over a collection of tweens, filling gaps with
  * constant tweens, holding the end value of the previous tween.
- * @param {Tween<number>[]} tweens List of tween
- * @return {Generator<Tween<number>>}
+ * @param {Tween<number>[]} tweens List of tweens
+ * @param {number} timeline_start Start time of the timeline (may be before first tween's start time)
+ * @param {number} timeline_end End time of the timeline (may be after last tween's end time)
+ * @return {Generator<Tween<number>>} Sequence of tweens with gaps turned into constant tweens
  */
-function* fill_gaps(tweens) {
+function* fill_gaps(tweens, timeline_start, timeline_end) {
+  if (tweens.length === 0) {
+    return;
+  }
+
+  // Convert starting gap to explicitly holding the start value.
+  const first_tween = tweens[0];
+  if (timeline_start < first_tween.start_time) {
+    yield Tween.scalar(
+      first_tween.start_value,
+      first_tween.start_value,
+      timeline_start,
+      first_tween.start_time - timeline_start
+    );
+  }
+
   for (let i = 1; i < tweens.length; i++) {
     const before = tweens[i - 1];
     const after = tweens[i];
@@ -25,7 +42,18 @@ function* fill_gaps(tweens) {
       );
     }
   }
-  yield tweens[tweens.length - 1];
+  const last_tween = tweens.at(-1);
+  yield last_tween;
+
+  // Convert ending gap to explicitly holding the end value
+  if (last_tween.end_time < timeline_end) {
+    yield Tween.scalar(
+      last_tween.end_value,
+      last_tween.end_value,
+      last_tween.end_time,
+      timeline_end - last_tween.end_time
+    );
+  }
 }
 
 /**
@@ -98,7 +126,7 @@ export class AnimationCurve {
         curve.easing_curve
       );
     });
-    const with_holds = [...fill_gaps(tweens)];
+    const with_holds = [...fill_gaps(tweens, 0, timeline.duration.real)];
 
     return new AnimationCurve(with_holds);
   }
