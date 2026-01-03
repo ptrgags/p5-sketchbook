@@ -165,12 +165,25 @@ export const sketch = (p) => {
     CORAL_PANEL.update(t_sec);
 
     ANIM.update(t_sec);
-    HITOMEZASHI.update(0.1 * t_sec);
+    HITOMEZASHI.update(t_sec);
     EYE.update(ANIM);
     CIRCLE_FAN.update(ANIM);
     GEODE.update(ANIM);
 
     BACKGROUND_STRIPES.draw(p);
     TANGLE.draw(p);
+
+    /*
+    p.push();
+    p.rect(0, 0, 500, 100);
+    p.text(
+      `${t_sec.toPrecision(3)}, ${HITOMEZASHI.start.toPrecision(
+        3
+      )}, ${HITOMEZASHI.end.toPrecision(3)}`,
+      10,
+      50
+    );
+    p.pop();
+    */
   };
 };

@@ -106,6 +106,9 @@ class Hitomezashi {
     const start = CURVE_START.value(time);
     const end = CURVE_END.value(time);
 
+    this.start = start;
+    this.end = end;
+
     // Use render_between to slice out a portion of the path
     const prim = STITCH_PATH.render_between(start, end);
     primitive.primitives.push(prim);
