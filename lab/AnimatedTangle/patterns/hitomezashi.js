@@ -73,15 +73,18 @@ function* interleave(arr_a, arr_b) {
 const ALL_PATHS = [...interleave(HORIZONTAL_PATHS, VERTICAL_PATHS)].flat();
 const STITCH_PATH = new AnimatedPath(ALL_PATHS, 0, 1);
 
+const STITCH_DURATION = new Rational(8);
+const UNSTITCH_DURATION = new Rational(4);
+
 // from [0, 1] these control the path start/end for the stitching animation
 // from [1, 2] these control the path start/end for the unstitching animation
 const TIMELINE_START = new Sequential(
-  new Hold(Rational.ONE),
-  new ParamCurve(0, 1, Rational.ONE)
+  new Hold(STITCH_DURATION),
+  new ParamCurve(0, 1, UNSTITCH_DURATION)
 );
 const TIMELINE_END = new Sequential(
-  new ParamCurve(0, 1, Rational.ONE),
-  new Hold(Rational.ONE)
+  new ParamCurve(0, 1, STITCH_DURATION),
+  new Hold(UNSTITCH_DURATION)
 );
 const CURVE_START = new LoopCurve(AnimationCurve.from_timeline(TIMELINE_START));
 const CURVE_END = new LoopCurve(AnimationCurve.from_timeline(TIMELINE_END));

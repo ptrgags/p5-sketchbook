@@ -165,7 +165,7 @@ export const sketch = (p) => {
     CORAL_PANEL.update(t_sec);
 
     ANIM.update(t_sec);
-    HITOMEZASHI.update(t_sec);
+    HITOMEZASHI.update(elapsed_sec);
     EYE.update(ANIM);
     CIRCLE_FAN.update(ANIM);
     GEODE.update(ANIM);
