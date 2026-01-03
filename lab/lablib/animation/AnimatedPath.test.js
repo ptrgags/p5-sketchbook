@@ -146,7 +146,7 @@ describe("AnimatedPath", () => {
 
       const half_bc = new LinePrimitive(B, new Point(1, 0.5));
       const expected = group(AB, half_bc);
-      expect(result).toBe(expected);
+      expect(result).toEqual(expected);
     });
 
     it("with time greater than end returns whole path", () => {
@@ -173,7 +173,7 @@ describe("AnimatedPath", () => {
 
       const result = path.render_between(3, 3);
 
-      expect(result).toBe(GroupPrimitive.EMPTY);
+      expect(result).toEqual(GroupPrimitive.EMPTY);
     });
 
     it("with both times before start returns empty group", () => {
@@ -181,7 +181,7 @@ describe("AnimatedPath", () => {
 
       const result = path.render_between(0, 0.5);
 
-      expect(result).toBe(GroupPrimitive.EMPTY);
+      expect(result).toEqual(GroupPrimitive.EMPTY);
     });
 
     it("with time_a before start returns path up to time_b", () => {
@@ -199,7 +199,7 @@ describe("AnimatedPath", () => {
       const result = path.render_between(2, 10);
 
       const expected = group(BC, CD, DA);
-      expect(result).toBe(expected);
+      expect(result).toEqual(expected);
     });
 
     it("with both times after end returns empty path", () => {
@@ -207,7 +207,7 @@ describe("AnimatedPath", () => {
 
       const result = path.render_between(8, 10);
 
-      expect(result).toBe(GroupPrimitive.EMPTY);
+      expect(result).toEqual(GroupPrimitive.EMPTY);
     });
   });
 });
