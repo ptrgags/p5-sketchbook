@@ -1,4 +1,5 @@
 import { Tween } from "../../../sketchlib/Tween.js";
+import { whole_fract } from "../../../sketchlib/whole_fract.js";
 import { to_events } from "../music/Timeline.js";
 import { Rational } from "../Rational.js";
 import { ParamCurve } from "./ParamCurve.js";
@@ -7,10 +8,27 @@ import { PiecewiseLinear } from "./PiecewiseLinear.js";
 /**
  * Iterate over a collection of tweens, filling gaps with
  * constant tweens, holding the end value of the previous tween.
- * @param {Tween<number>[]} tweens List of tween
- * @return {Generator<Tween<number>>}
+ * @param {Tween<number>[]} tweens List of tweens
+ * @param {number} timeline_start Start time of the timeline (may be before first tween's start time)
+ * @param {number} timeline_end End time of the timeline (may be after last tween's end time)
+ * @return {Generator<Tween<number>>} Sequence of tweens with gaps turned into constant tweens
  */
-function* fill_gaps(tweens) {
+function* fill_gaps(tweens, timeline_start, timeline_end) {
+  if (tweens.length === 0) {
+    return;
+  }
+
+  // Convert starting gap to explicitly holding the start value.
+  const first_tween = tweens[0];
+  if (timeline_start < first_tween.start_time) {
+    yield Tween.scalar(
+      first_tween.start_value,
+      first_tween.start_value,
+      timeline_start,
+      first_tween.start_time - timeline_start
+    );
+  }
+
   for (let i = 1; i < tweens.length; i++) {
     const before = tweens[i - 1];
     const after = tweens[i];
@@ -24,7 +42,18 @@ function* fill_gaps(tweens) {
       );
     }
   }
-  yield tweens[tweens.length - 1];
+  const last_tween = tweens.at(-1);
+  yield last_tween;
+
+  // Convert ending gap to explicitly holding the end value
+  if (last_tween.end_time < timeline_end) {
+    yield Tween.scalar(
+      last_tween.end_value,
+      last_tween.end_value,
+      last_tween.end_time,
+      timeline_end - last_tween.end_time
+    );
+  }
 }
 
 /**
@@ -37,11 +66,20 @@ export class AnimationCurve {
    * @param {Tween<number>[]} tweens
    */
   constructor(tweens) {
+    if (tweens.length === 0) {
+      throw new Error("tweens must have at least one element");
+    }
+
     /**
      * @type {[number, number][]}
      */
     const start_times = tweens.map((x, i) => [x.start_time, i]);
-    start_times.push([tweens[tweens.length - 1].end_time, tweens.length]);
+    start_times.push([tweens.at(-1).end_time, tweens.length]);
+
+    /**
+     * @type {number}
+     */
+    this.duration = start_times.at(-1)[0] - start_times[0][0];
 
     /**
      * Mapping of animation time -> [0, N]
@@ -56,18 +94,13 @@ export class AnimationCurve {
   }
 
   /**
-   *
+   * Get the value of the curve at the given time
    * @param {number} time Time to evaluate the animation curve
-   * @returns {number | undefined} Value of the curve at that point, or undefined if the curve is empty
+   * @returns {number} Value of the curve at that point, or undefined if the curve is empty
    */
   value(time) {
-    if (this.tweens.length === 0) {
-      return undefined;
-    }
-
     const float_index = this.time_to_index.value(time);
-    const tween_index = Math.floor(float_index);
-    const t = float_index - tween_index; // fract
+    const [tween_index, t] = whole_fract(float_index);
 
     if (tween_index === this.tweens.length) {
       return this.tweens[tween_index - 1].end_value;
@@ -78,7 +111,7 @@ export class AnimationCurve {
 
   /**
    * Convert a timeline of parameter curves to an AnimationCurve
-   * @param {import("../music/Timeline").Timeline<ParamCurve>} timeline Timeline of curves
+   * @param {import("../music/Timeline").Timeline<ParamCurve>} timeline Timeline of curves. It must have at least one ParamCurve
    * @returns {AnimationCurve}
    */
   static from_timeline(timeline) {
@@ -93,7 +126,7 @@ export class AnimationCurve {
         curve.easing_curve
       );
     });
-    const with_holds = [...fill_gaps(tweens)];
+    const with_holds = [...fill_gaps(tweens, 0, timeline.duration.real)];
 
     return new AnimationCurve(with_holds);
   }

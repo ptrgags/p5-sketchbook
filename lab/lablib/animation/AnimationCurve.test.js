@@ -1,8 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { ParamCurve } from "./ParamCurve";
+import { Hold, ParamCurve } from "./ParamCurve";
 import { Rational } from "../Rational";
 import { Gap, Sequential } from "../music/Timeline";
 import { AnimationCurve } from "./AnimationCurve";
+import { Tween } from "../../../sketchlib/Tween.js";
 
 /**
  *
@@ -22,6 +23,60 @@ function make_curve() {
 }
 
 describe("AnimationCurve", () => {
+  it("with no tweens throws", () => {
+    expect(() => {
+      return new AnimationCurve([]);
+    }).toThrowError("tweens must have at least one element");
+  });
+
+  describe("duration", () => {
+    it("with one tween computes the correct duration", () => {
+      const curve = new AnimationCurve([Tween.scalar(0, 10, 2, 8)]);
+
+      expect(curve.duration).toBe(8);
+    });
+
+    it("with several tweens computes correct duration", () => {
+      const curve = AnimationCurve.from_timeline(make_curve());
+
+      expect(curve.duration).toBe(3);
+    });
+
+    it("with timeline with gap computes correct duration", () => {
+      const curve = AnimationCurve.from_timeline(
+        new Sequential(
+          new ParamCurve(0, 1, Rational.ONE),
+          new Hold(new Rational(2)),
+          new ParamCurve(1, 2, Rational.ONE)
+        )
+      );
+
+      expect(curve.duration).toBe(4);
+    });
+
+    it("with timeline ending in hold computes correct duration", () => {
+      const curve = AnimationCurve.from_timeline(
+        new Sequential(
+          new ParamCurve(0, 1, Rational.ONE),
+          new Hold(new Rational(2))
+        )
+      );
+
+      expect(curve.duration).toBe(3);
+    });
+
+    it("with timeline beginning in hold computes correct duration", () => {
+      const curve = AnimationCurve.from_timeline(
+        new Sequential(
+          new Hold(new Rational(2)),
+          new ParamCurve(0, 1, Rational.ONE)
+        )
+      );
+
+      expect(curve.duration).toBe(3);
+    });
+  });
+
   describe("value", () => {
     it("with time before start returns first value", () => {
       const curve = AnimationCurve.from_timeline(make_curve());
