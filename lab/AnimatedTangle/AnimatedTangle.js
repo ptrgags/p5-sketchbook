@@ -2,13 +2,12 @@ import { AnimationCurves } from "../lablib/animation/AnimationCurves.js";
 import { Rational } from "../lablib/Rational.js";
 import { Direction } from "../../pga2d/Direction.js";
 import { Point } from "../../pga2d/Point.js";
-import { Color } from "../../sketchlib/Color.js";
 import { WIDTH, HEIGHT, SCREEN_CENTER } from "../../sketchlib/dimensions.js";
 import { mod } from "../../sketchlib/mod.js";
 import { Mask } from "../../sketchlib/primitives/ClipMask.js";
 import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
 import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
-import { style } from "../../sketchlib/primitives/shorthand.js";
+import { group, style } from "../../sketchlib/primitives/shorthand.js";
 import { VectorTangle } from "../../sketchlib/primitives/VectorTangle.js";
 import { Style } from "../../sketchlib/Style.js";
 import { CIRCLE_FAN } from "./patterns/circle_fan.js";
@@ -20,6 +19,8 @@ import { make_stripes } from "./patterns/stripes.js";
 import { PALETTE_CORAL, PALETTE_NAVY, Values } from "./theme_colors.js";
 import { HITOMEZASHI } from "./patterns/hitomezashi.js";
 import { TRAFFIC } from "./patterns/traffic.js";
+import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
+import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 
 /**
  * Shorthand for making arrays of points
@@ -96,12 +97,24 @@ const STYLE_QUARTERS = new Style({
   stroke: PALETTE_CORAL[Values.Light].to_srgb(),
   width: 4,
 });
-const QUARTERS = new VectorTangle([
-  [new Mask(QUARTER_HITOMEZASHI), style(HITOMEZASHI.render(), STYLE_QUARTERS)],
-  [new Mask(QUARTER_CIRCLE_FAN), CIRCLE_FAN.render()],
-  [new Mask(QUARTER_BRICK_WALL), style(QUARTER_BRICK_WALL, STYLE_QUARTERS)],
-  [new Mask(QUARTER_PEEK), EYE.eye],
-]);
+
+const QUARTER_DIVIDER = style(
+  [
+    new LinePrimitive(new Point(100, 300), new Point(500, 300)),
+    new LinePrimitive(new Point(300, 100), new Point(300, 500)),
+  ],
+  STYLE_QUARTERS
+);
+
+const QUARTERS = new VectorTangle(
+  [
+    [new Mask(QUARTER_HITOMEZASHI), HITOMEZASHI.render()],
+    [new Mask(QUARTER_CIRCLE_FAN), CIRCLE_FAN.render()],
+    [new Mask(QUARTER_BRICK_WALL), GroupPrimitive.EMPTY],
+    [new Mask(QUARTER_PEEK), EYE.eye],
+  ],
+  QUARTER_DIVIDER
+);
 
 // Full scene
 
@@ -167,8 +180,8 @@ export const sketch = (p) => {
     CORAL_PANEL.update(t_sec);
 
     ANIM.update(t_sec);
-    HITOMEZASHI.update(0.1 * t_sec);
     TRAFFIC.update(t_sec);
+    HITOMEZASHI.update(elapsed_sec);
     EYE.update(ANIM);
     CIRCLE_FAN.update(ANIM);
     GEODE.update(ANIM);

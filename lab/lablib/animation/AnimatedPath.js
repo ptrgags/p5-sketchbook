@@ -9,6 +9,7 @@ import { group } from "../../../sketchlib/primitives/shorthand.js";
 import { Tween } from "../../../sketchlib/Tween.js";
 import { whole_fract } from "../../../sketchlib/whole_fract.js";
 import { clamp } from "../../../sketchlib/clamp.js";
+import { is_nearly } from "../../../sketchlib/is_nearly.js";
 
 /**
  * Collection of primitives that can be chained together to form a path
@@ -86,6 +87,10 @@ export class AnimatedPath {
    * @param {number} time
    */
   render(time) {
+    if (time < this.tween.start_time) {
+      return GroupPrimitive.EMPTY;
+    }
+
     const [arc_index, t] = whole_fract(this.tween.get_value(time));
 
     /**
@@ -99,6 +104,39 @@ export class AnimatedPath {
     }
 
     return group(...path);
+  }
+
+  /**
+   * Helper generator for render_between
+   * @param {number} arc_a Whole part of start time
+   * @param {number} t_a Fractional part of start time
+   * @param {number} arc_b Whole part of end time
+   * @param {number} t_b Fractional part of end time
+   * @returns {Generator<Primitive>}
+   */
+  *render_range(arc_a, t_a, arc_b, t_b) {
+    // The range starts at the end time, so there's nothing to render!
+    if (arc_a === this.tween.end_time) {
+      return;
+    }
+
+    let first_full_arc = arc_a;
+
+    // First arc is a partial one, so render that explicitly
+    if (t_a > 0) {
+      yield this.segments[arc_a].render_between(t_a, 1);
+      first_full_arc++;
+    }
+
+    // for arcs in the middle of the range, render the full arc.
+    for (let i = first_full_arc; i < arc_b; i++) {
+      yield this.segments[i];
+    }
+
+    // If we have a final partial arc, render that explicitly
+    if (arc_b < this.segments.length && t_b > 0) {
+      yield this.segments[arc_b].render_between(0, t_b);
+    }
   }
 
   /**
@@ -123,10 +161,16 @@ export class AnimatedPath {
       return this.segments[arc_a].render_between(t_a, t_b);
     }
 
-    return group(
-      this.segments[arc_a].render_between(t_a, 1),
-      ...this.segments.slice(arc_a + 1, arc_b),
-      this.segments[arc_b].render_between(0, t_b)
-    );
+    const children = [...this.render_range(arc_a, t_a, arc_b, t_b)];
+
+    if (children.length === 0) {
+      return GroupPrimitive.EMPTY;
+    }
+
+    if (children.length === 1) {
+      return children[0];
+    }
+
+    return group(...children);
   }
 }

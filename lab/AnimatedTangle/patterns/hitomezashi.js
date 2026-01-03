@@ -39,7 +39,7 @@ for (let i = 0; i < NUM_COLS; i++) {
     const stitch = new LinePrimitive(a, b);
     column_stitches.push(stitch);
   }
-  VERTICAL_PATHS.push(new AnimatedPath(column_stitches, 0, 1));
+  VERTICAL_PATHS.push(column_stitches);
 }
 
 const HORIZONTAL_PATHS = [];
@@ -54,7 +54,7 @@ for (let i = 0; i < NUM_ROWS; i++) {
     const stitch = new LinePrimitive(a, b);
     row_stitches.push(stitch);
   }
-  HORIZONTAL_PATHS.push(new AnimatedPath(row_stitches, 0, 1));
+  HORIZONTAL_PATHS.push(row_stitches);
 }
 
 /**
@@ -70,42 +70,24 @@ function* interleave(arr_a, arr_b) {
   }
 }
 
-const ALL_PATHS = [...interleave(HORIZONTAL_PATHS, VERTICAL_PATHS)];
+const ALL_PATHS = [...interleave(HORIZONTAL_PATHS, VERTICAL_PATHS)].flat();
+const STITCH_PATH = new AnimatedPath(ALL_PATHS, 0, 1);
 
-const DURATION_STITCH = 1;
-const PHASES = new Array(ALL_PATHS.length)
-  .fill(0)
-  .map((_, i) => -i * DURATION_STITCH);
-console.log(PHASES);
+const STITCH_DURATION = new Rational(8);
+const UNSTITCH_DURATION = new Rational(4);
 
 // from [0, 1] these control the path start/end for the stitching animation
 // from [1, 2] these control the path start/end for the unstitching animation
 const TIMELINE_START = new Sequential(
-  new Hold(Rational.ONE),
-  new ParamCurve(0, 1, Rational.ONE)
+  new Hold(STITCH_DURATION),
+  new ParamCurve(0, 1, UNSTITCH_DURATION)
 );
 const TIMELINE_END = new Sequential(
-  new ParamCurve(0, 1, Rational.ONE),
-  new Hold(Rational.ONE)
+  new ParamCurve(0, 1, STITCH_DURATION),
+  new Hold(UNSTITCH_DURATION)
 );
-const CURVE_START = AnimationCurve.from_timeline(TIMELINE_START);
-const CURVE_END = AnimationCurve.from_timeline(TIMELINE_END);
-
-const DURATION_PAUSE = 1;
-
-// Wait for the other curves to finish animating, plus a little pause
-const WAIT = new Hold(
-  new Rational((ALL_PATHS.length - 1) * DURATION_STITCH + DURATION_PAUSE)
-);
-const TIMELINE_TIMING = new Sequential(
-  new ParamCurve(0, 1, new Rational(DURATION_STITCH)),
-  WAIT,
-  new ParamCurve(1, 2, new Rational(DURATION_STITCH)),
-  WAIT
-);
-const CURVE_TIMING = new LoopCurve(
-  AnimationCurve.from_timeline(TIMELINE_TIMING)
-);
+const CURVE_START = new LoopCurve(AnimationCurve.from_timeline(TIMELINE_START));
+const CURVE_END = new LoopCurve(AnimationCurve.from_timeline(TIMELINE_END));
 
 const STYLE_STITCHES = new Style({
   stroke: PALETTE_CORAL[Values.Medium].to_srgb(),
@@ -121,21 +103,18 @@ class Hitomezashi {
     const primitive = this.primitive;
     primitive.primitives.length = 0;
 
-    for (let i = 0; i < ALL_PATHS.length; i++) {
-      // First use the timing curve to determine which part of the animation
-      // we're at.
-      const anim_t = CURVE_TIMING.value(time + PHASES[i]);
+    // For the stitch animation we animate    [0, end-->
+    // for the unstitch animation we animate  start-->, end]
+    // so we need two curves, one per variable
+    const start = CURVE_START.value(time);
+    const end = CURVE_END.value(time);
 
-      // For the stitch animation we animate    [0, end-->
-      // for the unstitch animation we animate  start-->, end]
-      // so we need two curves, one per variable
-      const start = CURVE_START.value(anim_t);
-      const end = CURVE_END.value(anim_t);
+    this.start = start;
+    this.end = end;
 
-      // Use render_between to slice out a portion of the path
-      const prim = ALL_PATHS[i].render_between(start, end);
-      primitive.primitives.push(prim);
-    }
+    // Use render_between to slice out a portion of the path
+    const prim = STITCH_PATH.render_between(start, end);
+    primitive.primitives.push(prim);
   }
 
   render() {
