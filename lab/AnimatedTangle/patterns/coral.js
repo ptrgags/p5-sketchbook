@@ -18,19 +18,10 @@ const STYLE_CORAL = new Style({
   width: 4,
 });
 
-export const CORAL_STRIPES = new AnimatedStripes(
-  new Point(150, 500),
-  new Direction(-1, 2).normalize(),
-  10,
-  new Direction(550, 600)
-);
-
 const STYLE_STRIPES = new Style({
   stroke: PALETTE_SKY[Values.MedLight].to_srgb(),
   width: 4,
 });
-
-const STRIPES = style(CORAL_STRIPES.render(), STYLE_STRIPES);
 
 const SWAY_AMPLITUDE = Math.PI / 12;
 const SWAY_FREQUENCY = 0.25;
@@ -206,7 +197,15 @@ class SwayingCoral {
     // refreshes
     this.coral_slot = colored_coral.primitives;
 
-    this.primitive = group(STRIPES, colored_coral);
+    this.stripes = new AnimatedStripes(
+      new Point(150, 500),
+      new Direction(-1, 2).normalize(),
+      10,
+      new Direction(550, 600)
+    );
+    const styled_stripes = style(this.stripes.render(), STYLE_STRIPES);
+
+    this.primitive = group(styled_stripes, colored_coral);
   }
 
   /**
@@ -214,6 +213,8 @@ class SwayingCoral {
    * @param {number} time Animation time
    */
   update(time) {
+    this.stripes.update(10 * time);
+
     // Make the hinges sway
     this.hinge_c.update(time);
     this.hinge_e.update(time);
@@ -241,4 +242,4 @@ class SwayingCoral {
   }
 }
 
-export const CORAL_PANEL = new SwayingCoral();
+export const SWAYING_CORAL = new SwayingCoral();

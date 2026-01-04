@@ -1,6 +1,7 @@
 import { Direction } from "../../../pga2d/Direction.js";
 import { Point } from "../../../pga2d/Point.js";
 import { Motor } from "../../../pga2d/versors.js";
+import { mod } from "../../../sketchlib/mod.js";
 import { GroupPrimitive } from "../../../sketchlib/primitives/GroupPrimitive.js";
 import { LinePrimitive } from "../../../sketchlib/primitives/LinePrimitive.js";
 import { group } from "../../../sketchlib/primitives/shorthand.js";
@@ -61,15 +62,15 @@ export class AnimatedStripes {
 
   /**
    * Update the stripes with a new offset
-   * @param {number} phase Phase amount in [0, 1]
+   * @param {number} time
    */
-  update(phase) {
+  update(time) {
     const new_stripes = make_stripes(
       this.center,
       this.dir_forward,
       this.spacing,
       this.dimensions,
-      phase
+      mod(time, 1.0)
     );
     this.lines_array.length = 0;
     this.lines_array.push(...new_stripes);

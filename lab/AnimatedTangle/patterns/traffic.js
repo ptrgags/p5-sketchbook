@@ -14,7 +14,7 @@ import { LoopCurve } from "../../lablib/animation/LoopCurve.js";
 import { ParamCurve } from "../../lablib/animation/ParamCurve.js";
 import { Sequential } from "../../lablib/music/Timeline.js";
 import { Rational } from "../../lablib/Rational.js";
-import { PALETTE_CORAL, PALETTE_SKY, Values } from "../theme_colors.js";
+import { PALETTE_CORAL, Values } from "../theme_colors.js";
 
 const HALF_DIST = 300;
 const HALF_DURATION = new Rational(2);
