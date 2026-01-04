@@ -4,7 +4,8 @@ import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { N16, N32, N8 } from "../lablib/music/durations.js";
 import { A3, C4, D4, E4, G4 } from "../lablib/music/pitches.js";
 
-import { Melody, Note, Rest, Score } from "../lablib/music/Score.js";
+import { Melody, Note } from "../lablib/music/Music.js";
+import { Score } from "../lablib/music/Score.js";
 import { MuteButton } from "../lablib/MuteButton.js";
 import { PlayButtonScene } from "../lablib/PlayButtonScene.js";
 import { SoundManager } from "../lablib/SoundManager.js";

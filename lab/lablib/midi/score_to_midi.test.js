@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { Harmony, Melody, Note, Rest, Score } from "../music/Score.js";
+import { Harmony, Melody, Note, Rest } from "../music/Music.js";
+import { Score } from "../music/Score.js";
 import { MIDIHeader } from "./MIDIFile.js";
 import { score_to_midi } from "./score_to_midi.js";
 import { C3, C4, D4, E4, F4, G4 } from "../music/pitches.js";
@@ -11,7 +12,7 @@ const QN = MIDIHeader.DEFAULT_TICKS_PER_QUARTER;
 
 /**
  * Shorthand to make a score with a single part
- * @param {import("../music/Score.js").Music<number>} music
+ * @param {import("../music/Music.js").Music<number>} music
  * @returns {Score<number>}
  */
 function make_score(music) {
@@ -231,10 +232,10 @@ describe("score_to_midi", () => {
   it("with too many parts throws", () => {
     const music = new Note(C4, N1);
     /**
-     * @type {[string, import("../music/Score.js").Music<number>][]}
+     * @type {[string, import("../music/Music.js").Music<number>][]}
      */
     const parts = new Array(20).fill(0).map((x, i) => {
-      /** @type {[string, import("../music/Score.js").Music<number>]}*/
+      /** @type {[string, import("../music/Music.js").Music<number>]}*/
       return [`channel${x}`, music];
     });
     const sick_unison = new Score({

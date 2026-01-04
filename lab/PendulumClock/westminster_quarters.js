@@ -1,5 +1,5 @@
-import { Rational } from "../lablib/Rational.js";
-import { Melody, Note, parse_melody, Score } from "../lablib/music/Score.js";
+import { Melody, Note, parse_melody } from "../lablib/music/Music.js";
+import { Score } from "../lablib/music/Score.js";
 import { N1, N2, N4, N8 } from "../lablib/music/durations.js";
 import { B3, E3, E4, FS4, GS4 } from "../lablib/music/pitches.js";
 

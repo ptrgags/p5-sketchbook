@@ -26,12 +26,11 @@ import {
   parse_cycle,
   parse_melody,
   Rest,
-  Score,
-} from "../lablib/music/Score.js";
+} from "../lablib/music/Music.js";
+import { Score } from "../lablib/music/Score.js";
 import { Gap } from "../lablib/music/Timeline.js";
 import { transpose_scale_degree } from "../lablib/music/transpose.js";
 import { Rational } from "../lablib/Rational.js";
-import { SpiralBurst } from "./SpiralBurst.js";
 
 /**
  * Convert a scale to a pitch, using a fixed octave

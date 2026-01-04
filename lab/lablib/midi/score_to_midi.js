@@ -20,7 +20,7 @@ function to_ticks(time_measures) {
 /**
  * Make a MIDI track from a single part from the score
  * @param {number} channel MIDI channel number, in [0, 15]
- * @param {import("../music/Score.js").Music<number>} music The music to write
+ * @param {import("../music/Music.js").Music<number>} music The music to write
  * @returns {RelativeTimingTrack} The track, converted to use relative tick deltas as this is required by MIDI
  */
 function make_track(channel, music) {

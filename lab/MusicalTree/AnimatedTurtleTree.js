@@ -1,6 +1,7 @@
 import { LSystem } from "../../sketchlib/LSystem.js";
 import { N16 } from "../lablib/music/durations.js";
-import { map_pitch, Melody, Note, Rest, Score } from "../lablib/music/Score.js";
+import { map_pitch, Melody, Note, Rest } from "../lablib/music/Music.js";
+import { Score } from "../lablib/music/Score.js";
 import { Rational } from "../lablib/Rational.js";
 import { MAJOR_PENTATONIC, make_scale } from "../lablib/music/scales.js";
 import { HEIGHT, WIDTH } from "../../sketchlib/dimensions.js";
@@ -243,7 +244,7 @@ class TreeMusicBuilder {
 
   /**
    * Build a Score from the various parts. Call this once at the very end.
-   * @returns {[string, import("../lablib/music/Score").Music<number>][]} THe musical part of the score
+   * @returns {[string, import("../lablib/music/Music.js").Music<number>][]} THe musical part of the score
    */
   build() {
     // Convert from scale degrees to MIDI pitch
