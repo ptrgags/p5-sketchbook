@@ -6,7 +6,6 @@ import { style } from "../../../sketchlib/primitives/shorthand.js";
 import { Random } from "../../../sketchlib/random.js";
 import { Style } from "../../../sketchlib/Style.js";
 import { AnimatedPath } from "../../lablib/animation/AnimatedPath.js";
-import { AnimationCurve } from "../../lablib/animation/AnimationCurve.js";
 import { LoopCurve } from "../../lablib/animation/LoopCurve.js";
 import { Hold, ParamCurve } from "../../lablib/animation/ParamCurve.js";
 import { Sequential } from "../../lablib/music/Timeline.js";
@@ -78,16 +77,18 @@ const UNSTITCH_DURATION = new Rational(4);
 
 // from [0, 1] these control the path start/end for the stitching animation
 // from [1, 2] these control the path start/end for the unstitching animation
-const TIMELINE_START = new Sequential(
-  new Hold(STITCH_DURATION),
-  new ParamCurve(0, 1, UNSTITCH_DURATION)
+const CURVE_START = LoopCurve.from_timeline(
+  new Sequential(
+    new Hold(STITCH_DURATION),
+    new ParamCurve(0, 1, UNSTITCH_DURATION)
+  )
 );
-const TIMELINE_END = new Sequential(
-  new ParamCurve(0, 1, STITCH_DURATION),
-  new Hold(UNSTITCH_DURATION)
+const CURVE_END = LoopCurve.from_timeline(
+  new Sequential(
+    new ParamCurve(0, 1, STITCH_DURATION),
+    new Hold(UNSTITCH_DURATION)
+  )
 );
-const CURVE_START = new LoopCurve(AnimationCurve.from_timeline(TIMELINE_START));
-const CURVE_END = new LoopCurve(AnimationCurve.from_timeline(TIMELINE_END));
 
 const STYLE_STITCHES = new Style({
   stroke: PALETTE_CORAL[Values.Medium].to_srgb(),

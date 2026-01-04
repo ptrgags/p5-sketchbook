@@ -13,32 +13,32 @@ const PUPIL_RADIUS = 10;
 // 1 second per frame
 const DURATION_FRAME = new Rational(1);
 
-const TIMELINE_POSITION = new Sequential(
-  // move from start -> end
-  new ParamCurve(0, 1, DURATION_FRAME),
-  // stay in place while turning
-  new ParamCurve(1, 1, DURATION_FRAME),
-  // return to start
-  new ParamCurve(1, 0, DURATION_FRAME),
-  // stay in place while turning
-  new ParamCurve(0, 0, DURATION_FRAME)
-);
-const CURVE_POSITION = new LoopCurve(
-  AnimationCurve.from_timeline(TIMELINE_POSITION)
+const CURVE_POSITION = LoopCurve.from_timeline(
+  new Sequential(
+    // move from start -> end
+    new ParamCurve(0, 1, DURATION_FRAME),
+    // stay in place while turning
+    new ParamCurve(1, 1, DURATION_FRAME),
+    // return to start
+    new ParamCurve(1, 0, DURATION_FRAME),
+    // stay in place while turning
+    new ParamCurve(0, 0, DURATION_FRAME)
+  )
 );
 
-const TIMELINE_ANGLE = new Sequential(
-  // Look in the direction from start -> end
-  new Hold(DURATION_FRAME),
-  // Rotate CCW back towards start
-  new ParamCurve(0, Math.PI, DURATION_FRAME),
-  new Hold(DURATION_FRAME),
-  // Rotate CCW towards end
-  new ParamCurve(Math.PI, 2 * Math.PI, DURATION_FRAME)
-  // End of the loop, we jump from angle + 2pi to angle, which are
-  // equivalent
+const CURVE_ANGLE = LoopCurve.from_timeline(
+  new Sequential(
+    // Look in the direction from start -> end
+    new Hold(DURATION_FRAME),
+    // Rotate CCW back towards start
+    new ParamCurve(0, Math.PI, DURATION_FRAME),
+    new Hold(DURATION_FRAME),
+    // Rotate CCW towards end
+    new ParamCurve(Math.PI, 2 * Math.PI, DURATION_FRAME)
+    // End of the loop, we jump from angle + 2pi to angle, which are
+    // equivalent
+  )
 );
-const CURVE_ANGLE = new LoopCurve(AnimationCurve.from_timeline(TIMELINE_ANGLE));
 
 class PeekingEye {
   /**

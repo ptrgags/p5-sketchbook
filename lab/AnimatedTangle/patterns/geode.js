@@ -65,12 +65,11 @@ export class Geode {
     const layers = stripe_styles.map((x) => style(boundary, x));
 
     const max_width = this.stripe_styles[0].stroke_width;
-    const timeline_thickness = new Sequential(
-      new ParamCurve(0, max_width, DURATION_GROW),
-      new ParamCurve(max_width, max_width, DURATION_PAUSE)
-    );
-    this.curve_thickness = new LoopCurve(
-      AnimationCurve.from_timeline(timeline_thickness)
+    this.curve_thickness = LoopCurve.from_timeline(
+      new Sequential(
+        new ParamCurve(0, max_width, DURATION_GROW),
+        new ParamCurve(max_width, max_width, DURATION_PAUSE)
+      )
     );
 
     this.primitive = group(

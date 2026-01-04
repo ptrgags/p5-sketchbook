@@ -23,7 +23,6 @@ import {
 } from "../theme_colors.js";
 import { Ease } from "../../../sketchlib/Ease.js";
 import { LoopCurve } from "../../lablib/animation/LoopCurve.js";
-import { AnimationCurve } from "../../lablib/animation/AnimationCurve.js";
 
 const CENTER = new Point(500, 300);
 const BAND_THICKNESS = 50;
@@ -40,18 +39,17 @@ for (let i = 0; i < CIRCLE_COUNT; i++) {
   );
 }
 
-const TIMELINE_RADIUS = new Sequential(
-  ...RADIUS_STEPS,
-  new Hold(PAUSE_DURATION),
-  new ParamCurve(
-    CIRCLE_COUNT * 50,
-    0,
-    EXPAND_DURATION.mul(new Rational(CIRCLE_COUNT)),
-    Ease.in_out_cubic
+const CURVE_RADIUS = LoopCurve.from_timeline(
+  new Sequential(
+    ...RADIUS_STEPS,
+    new Hold(PAUSE_DURATION),
+    new ParamCurve(
+      CIRCLE_COUNT * 50,
+      0,
+      EXPAND_DURATION.mul(new Rational(CIRCLE_COUNT)),
+      Ease.in_out_cubic
+    )
   )
-);
-const CURVE_RADIUS = new LoopCurve(
-  AnimationCurve.from_timeline(TIMELINE_RADIUS)
 );
 
 const STYLE_CIRCLES = new Style({

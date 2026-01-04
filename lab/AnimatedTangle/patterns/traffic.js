@@ -9,7 +9,6 @@ import {
 } from "../../../sketchlib/primitives/shorthand.js";
 import { Transform } from "../../../sketchlib/primitives/Transform.js";
 import { Style } from "../../../sketchlib/Style.js";
-import { AnimationCurve } from "../../lablib/animation/AnimationCurve.js";
 import { LoopCurve } from "../../lablib/animation/LoopCurve.js";
 import { ParamCurve } from "../../lablib/animation/ParamCurve.js";
 import { Sequential } from "../../lablib/music/Timeline.js";
@@ -18,13 +17,13 @@ import { PALETTE_CORAL, Values } from "../theme_colors.js";
 
 const HALF_DIST = 300;
 const HALF_DURATION = new Rational(2);
-const POSITION = new Sequential(
+const TIMELINE_POSITION = new Sequential(
   // Enter from the left, slowing down when we reach the center of motion
   new ParamCurve(-HALF_DIST, 0, HALF_DURATION, Ease.out_cubic),
   // Leave to the right, speeding up from rest
   new ParamCurve(0, HALF_DIST, HALF_DURATION, Ease.in_cubic)
 );
-const CURVE_POSITION = new LoopCurve(AnimationCurve.from_timeline(POSITION));
+const CURVE_POSITION = LoopCurve.from_timeline(TIMELINE_POSITION);
 
 const BOX = new RectPrimitive(Point.ORIGIN, new Direction(25, 25));
 const STYLE_BOX = new Style({
@@ -34,7 +33,7 @@ const STYLE_BOX = new Style({
 // This should always be odd so one box sits exactly in the center
 const NUM_BOXES = 11;
 const PHASES = new Array(NUM_BOXES).fill(0).map((_, i) => {
-  const t_step = POSITION.duration.real / (NUM_BOXES - 1);
+  const t_step = TIMELINE_POSITION.duration.real / (NUM_BOXES - 1);
   return i * t_step;
 });
 

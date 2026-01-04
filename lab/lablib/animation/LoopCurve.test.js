@@ -14,8 +14,7 @@ function make_loop() {
     new ParamCurve(0, 100, new Rational(1)),
     new Hold(new Rational(2))
   );
-  const curve = AnimationCurve.from_timeline(timeline);
-  return new LoopCurve(curve);
+  return LoopCurve.from_timeline(timeline);
 }
 
 describe("LoopCurve", () => {
