@@ -14,6 +14,8 @@ import { ParamCurve } from "../../lablib/animation/ParamCurve.js";
 import { PALETTE_CORAL, PALETTE_ROCK, Values } from "../theme_colors.js";
 import { Oklch } from "../../lablib/Oklch.js";
 import { Random } from "../../../sketchlib/random.js";
+import { LoopCurve } from "../../lablib/animation/LoopCurve.js";
+import { AnimationCurve } from "../../lablib/animation/AnimationCurve.js";
 
 const STYLE_ROCK1 = new Style({
   stroke: PALETTE_ROCK[Values.MedDark].to_srgb(),
@@ -23,6 +25,10 @@ const STYLE_ROCK2 = new Style({
   stroke: PALETTE_ROCK[Values.Medium].to_srgb(),
   width: 4,
 });
+
+const DURATION_TOTAL = new Rational(8);
+const DURATION_GROW = DURATION_TOTAL.mul(new Rational(2, 3));
+const DURATION_PAUSE = DURATION_TOTAL.mul(new Rational(1, 3));
 
 const ROCK_CIRCLE = new CirclePrimitive(new Point(350, 600), 150);
 
@@ -57,6 +63,16 @@ export class Geode {
     this.stripe_styles = stripe_styles;
 
     const layers = stripe_styles.map((x) => style(boundary, x));
+
+    const max_width = this.stripe_styles[0].stroke_width;
+    const timeline_thickness = new Sequential(
+      new ParamCurve(0, max_width, DURATION_GROW),
+      new ParamCurve(max_width, max_width, DURATION_PAUSE)
+    );
+    this.curve_thickness = new LoopCurve(
+      AnimationCurve.from_timeline(timeline_thickness)
+    );
+
     this.primitive = group(
       new ClipPrimitive(
         new Mask(ROCK_CIRCLE),
@@ -70,34 +86,20 @@ export class Geode {
     );
   }
 
-  update(anim) {
-    const thicc = anim.get_curve_val("geode");
+  /**
+   *
+   * @param {number} time
+   */
+  update(time) {
+    const thickness = this.curve_thickness.value(time);
 
     for (const [i, stripe_style] of this.stripe_styles.entries()) {
-      stripe_style.stroke_width = Math.min(thicc, this.max_widths[i]);
+      stripe_style.stroke_width = Math.min(thickness, this.max_widths[i]);
     }
   }
 
   render() {
     return this.primitive;
-  }
-
-  /**
-   *
-   * @param {Rational} duration
-   * @returns {{[key:string]: import("../../lablib/music/Timeline.js").Timeline<ParamCurve>}}
-   */
-  make_curves(duration) {
-    const grow_duration = duration.mul(new Rational(2, 3));
-    const pause_duration = duration.mul(new Rational(1, 3));
-    const max_width = this.stripe_styles[0].stroke_width;
-    return {
-      // go from 0 to the thickest width
-      geode: new Sequential(
-        new ParamCurve(0, max_width, grow_duration),
-        new ParamCurve(max_width, max_width, pause_duration)
-      ),
-    };
   }
 }
 

@@ -148,12 +148,6 @@ const BACKGROUND_STRIPES = style(
 // Needs to be a multiple of 4 seconds due to some of the looping animation
 const ANIMATION_LENGTH = new Rational(8);
 
-const CURVE_DEFS = {
-  ...GEODE.make_curves(ANIMATION_LENGTH),
-};
-
-const ANIM = new AnimationCurves(CURVE_DEFS);
-
 export const sketch = (p) => {
   p.setup = () => {
     p.createCanvas(
@@ -177,12 +171,11 @@ export const sketch = (p) => {
     CORAL_STRIPES.update(mod(10 * t_normalized, 1.0));
     CORAL_PANEL.update(t_sec);
 
-    ANIM.update(t_sec);
     TRAFFIC.update(t_sec);
     HITOMEZASHI.update(elapsed_sec);
     EYE.update(elapsed_sec);
     CIRCLE_FAN.update(elapsed_sec);
-    GEODE.update(ANIM);
+    GEODE.update(elapsed_sec);
 
     BACKGROUND_STRIPES.draw(p);
     TANGLE.draw(p);
