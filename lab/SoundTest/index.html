@@ -24,16 +24,18 @@
         <canvas id="sketch-canvas" width="500" height="700"></canvas>
       </div>
       <div class="controls">
-        <label for="import">Import MIDI (.mid) file</label>
-        <br />
-        <input
-          type="file"
-          name="import"
-          id="import"
-          accept="audio/mid"
-          disabled
-        />
-        <p class="errors" id="errors"></p>
+        <div style="display: none">
+          <label for="import">Import MIDI (.mid) file</label>
+          <br />
+          <input
+            type="file"
+            name="import"
+            id="import"
+            accept="audio/mid"
+            disabled
+          />
+          <p class="errors" id="errors"></p>
+        </div>
         <br />
         <button id="export" disabled>Export Score to MIDI</button>
       </div>
