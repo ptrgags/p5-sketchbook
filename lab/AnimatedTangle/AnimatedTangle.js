@@ -149,7 +149,6 @@ const BACKGROUND_STRIPES = style(
 const ANIMATION_LENGTH = new Rational(8);
 
 const CURVE_DEFS = {
-  ...EYE.make_curves(ANIMATION_LENGTH),
   ...CIRCLE_FAN.make_curves(),
   ...GEODE.make_curves(ANIMATION_LENGTH),
 };
@@ -182,7 +181,7 @@ export const sketch = (p) => {
     ANIM.update(t_sec);
     TRAFFIC.update(t_sec);
     HITOMEZASHI.update(elapsed_sec);
-    EYE.update(ANIM);
+    EYE.update(elapsed_sec);
     CIRCLE_FAN.update(ANIM);
     GEODE.update(ANIM);
 
