@@ -122,7 +122,6 @@ export function layered_melody() {
       ["square", square_part],
       ["poly", poly_part],
     ],
-    animation_curves: SpiralBurst.make_curves(sine_part.duration),
   });
 }
 
@@ -146,7 +145,6 @@ export function phase_scale() {
   const phase_part_midi = map_pitch(SCALE3, phase_part_scale);
   return new Score({
     parts: [["poly", phase_part_midi]],
-    animation_curves: SpiralBurst.make_curves(phase_part_scale.duration),
   });
 }
 
@@ -199,7 +197,6 @@ export function symmetry_melody() {
 
   return new Score({
     parts: [["supersaw", part_midi]],
-    animation_curves: SpiralBurst.make_curves(part_midi.duration),
   });
 }
 
@@ -281,6 +278,5 @@ export function binary_chords() {
       ["supersaw", full_progression],
       ["square", rhythm_loop],
     ],
-    animation_curves: SpiralBurst.make_curves(full_progression.duration),
   });
 }

@@ -5,7 +5,7 @@ import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { PointPrimitive } from "../../sketchlib/primitives/PointPrimitive.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
-import { AnimationCurves } from "../lablib/animation/AnimationCurves.js";
+import { LoopCurve } from "../lablib/animation/LoopCurve.js";
 import { Hold, ParamCurve } from "../lablib/animation/ParamCurve.js";
 import { N1, N4 } from "../lablib/music/durations.js";
 import { Sequential } from "../lablib/music/Timeline.js";
@@ -15,6 +15,42 @@ import { Rational } from "../lablib/Rational.js";
 const N = 10;
 const CENTER = new Point(WIDTH / 2, (3 * HEIGHT) / 4);
 const MAX_RADIUS = 50;
+
+const DURATION_SPIRAL = new Rational(15, 16);
+const DURATION_BURST = Rational.ONE.sub(DURATION_SPIRAL);
+
+const CURVE_RADIUS = LoopCurve.from_timeline(
+  new Sequential(
+    new ParamCurve(0, 1, DURATION_BURST),
+    new ParamCurve(1, 0, DURATION_SPIRAL)
+  )
+);
+const CURVE_PHASE = LoopCurve.from_timeline(
+  new Sequential(
+    // Hold the angle steady while bursting
+    new Hold(DURATION_BURST),
+    new ParamCurve(0, 1, DURATION_SPIRAL)
+  )
+);
+
+// Color parameters in Oklch color space
+
+// At the start of the burst, the lightness and chroma jump up,
+// then ramp down over the course of a measure
+const CURVE_LIGHTNESS = LoopCurve.from_timeline(new ParamCurve(0.7, 0.1, N1));
+const CURVE_CHROMA = LoopCurve.from_timeline(new ParamCurve(0.3, 0.05, N1));
+
+// The hue changes every quarter note as a step function
+const start_hue = 80;
+const hue_step = 60;
+const CURVE_HUE = LoopCurve.from_timeline(
+  new Sequential(
+    ParamCurve.const_val(start_hue + 0 * hue_step, N4),
+    ParamCurve.const_val(start_hue + 1 * hue_step, N4),
+    ParamCurve.const_val(start_hue + 2 * hue_step, N4),
+    ParamCurve.const_val(start_hue + 3 * hue_step, N4)
+  )
+);
 
 export class SpiralBurst {
   constructor() {
@@ -28,15 +64,15 @@ export class SpiralBurst {
 
   /**
    * Render the circles that make up the burst
-   * @param {AnimationCurves} curves the sound/animation system
+   * @param {number} time current animation time
    * @return {GroupPrimitive} the primitives to render
    */
-  render(curves) {
-    const radius_scale = curves.get_curve_val("radius") ?? 0.0;
-    const phase_shift = curves.get_curve_val("phase") ?? 0;
-    const lightness = curves.get_curve_val("lightness") ?? 0.7;
-    const chroma = curves.get_curve_val("chroma") ?? 0.1;
-    const hue = curves.get_curve_val("hue") ?? 130;
+  render(time) {
+    const radius_scale = CURVE_RADIUS.value(time);
+    const phase_shift = CURVE_PHASE.value(time);
+    const lightness = CURVE_LIGHTNESS.value(time);
+    const chroma = CURVE_CHROMA.value(time);
+    const hue = CURVE_HUE.value(time);
 
     const color = new Oklch(lightness, chroma, hue);
     const point_style = new Style({
@@ -56,66 +92,5 @@ export class SpiralBurst {
     }
 
     return group(...points);
-  }
-
-  /**
-   * Generate the parameters for a spiral burst, to be used with a score.
-   * The animation will loop every measure of 4/4 time.
-   * @param {Rational} duration Total duration of the animation
-   * @return {AnimationCurves} Parameter entries to include in a score
-   */
-  static make_curves(duration) {
-    const spiral_duration = new Rational(15, 16);
-    const burst_duration = Rational.ONE.sub(spiral_duration);
-
-    const radius = Sequential.from_loop(
-      new Sequential(
-        new ParamCurve(0, 1, burst_duration),
-        new ParamCurve(1, 0, spiral_duration)
-      ),
-      duration
-    );
-    const phase = Sequential.from_loop(
-      new Sequential(
-        // Hold the angle steady while bursting
-        new Hold(burst_duration),
-        new ParamCurve(0, 1, spiral_duration)
-      ),
-      duration
-    );
-
-    // Color parameters in Oklch color space
-
-    // At the start of the burst, the lightness and chroma jump up,
-    // then ramp down over the course of a measure
-    const lightness = Sequential.from_loop(
-      new ParamCurve(0.7, 0.1, N1),
-      duration
-    );
-    const chroma = Sequential.from_loop(
-      new ParamCurve(0.3, 0.05, N1),
-      duration
-    );
-
-    // The hue changes every quarter note as a step function
-    const start_hue = 80;
-    const hue_step = 60;
-    const hue = Sequential.from_loop(
-      new Sequential(
-        ParamCurve.const_val(start_hue + 0 * hue_step, N4),
-        ParamCurve.const_val(start_hue + 1 * hue_step, N4),
-        ParamCurve.const_val(start_hue + 2 * hue_step, N4),
-        ParamCurve.const_val(start_hue + 3 * hue_step, N4)
-      ),
-      duration
-    );
-
-    return new AnimationCurves({
-      radius,
-      phase,
-      lightness,
-      hue,
-      chroma,
-    });
   }
 }

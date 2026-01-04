@@ -10,7 +10,6 @@ import { TextPrimitive } from "../../sketchlib/primitives/TextPrimitive.js";
 import { TextStyle } from "../../sketchlib/primitives/TextStyle.js";
 import { Transform } from "../../sketchlib/primitives/Transform.js";
 import { Style } from "../../sketchlib/Style.js";
-import { AnimationCurves } from "../lablib/animation/AnimationCurves.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { encode_midi_file } from "../lablib/midi/encode_midi.js";
 import { score_to_midi } from "../lablib/midi/score_to_midi.js";
@@ -67,15 +66,6 @@ for (const [key, score] of Object.entries(SOUND_MANIFEST.scores)) {
     PART_STYLES
   );
 }
-
-/**
- * @type {{[score_id: string]: AnimationCurves}}
- */
-const ANIM = {};
-for (const [score_id, score] of Object.entries(SOUND_MANIFEST.scores)) {
-  ANIM[score_id] = score.curves;
-}
-const DEFAULT_CURVES = new AnimationCurves({});
 
 //@ts-ignore
 const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
@@ -262,13 +252,11 @@ class SoundScene {
 
   render() {
     const current_time = SOUND.transport_time;
-    const animation = ANIM[this.selected_melody] ?? DEFAULT_CURVES;
-    animation.update(current_time);
 
     const mute = this.mute_button.render();
     const melody_buttons = this.melody_buttons.map((x) => x.debug_render());
     const piano = this.piano.render();
-    const burst = this.spiral_burst.render(animation);
+    const burst = this.spiral_burst.render(current_time);
     const timeline = this.render_timeline(current_time);
 
     return group(
