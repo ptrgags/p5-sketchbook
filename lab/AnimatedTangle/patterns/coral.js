@@ -1,4 +1,3 @@
-import { Oklch } from "../../lablib/Oklch.js";
 import { Direction } from "../../../pga2d/Direction.js";
 import { Point } from "../../../pga2d/Point.js";
 import { CirclePrimitive } from "../../../sketchlib/primitives/CirclePrimitive.js";

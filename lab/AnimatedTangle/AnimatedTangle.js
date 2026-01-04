@@ -1,9 +1,6 @@
-import { AnimationCurves } from "../lablib/animation/AnimationCurves.js";
-import { Rational } from "../lablib/Rational.js";
 import { Direction } from "../../pga2d/Direction.js";
 import { Point } from "../../pga2d/Point.js";
 import { WIDTH, HEIGHT, SCREEN_CENTER } from "../../sketchlib/dimensions.js";
-import { mod } from "../../sketchlib/mod.js";
 import { Mask } from "../../sketchlib/primitives/ClipMask.js";
 import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
 import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";

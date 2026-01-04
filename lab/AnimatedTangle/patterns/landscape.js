@@ -1,9 +1,6 @@
-import { RingBuffer } from "../../lablib/RingBuffer.js";
 import { Direction } from "../../../pga2d/Direction.js";
 import { Point } from "../../../pga2d/Point.js";
-import { Color } from "../../../sketchlib/Color.js";
 import { WIDTH } from "../../../sketchlib/dimensions.js";
-import { GroupPrimitive } from "../../../sketchlib/primitives/GroupPrimitive.js";
 import { PolygonPrimitive } from "../../../sketchlib/primitives/PolygonPrimitive.js";
 import {
   group,
