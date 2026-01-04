@@ -18,6 +18,7 @@ import { Point } from "../../pga2d/Point.js";
 import { Direction } from "../../pga2d/Direction.js";
 import { ParamCurve } from "../lablib/animation/ParamCurve.js";
 import { AnimationCurve } from "../lablib/animation/AnimationCurve.js";
+import { whole_fract } from "../../sketchlib/whole_fract.js";
 
 const TREE_LSYSTEM = new LSystem("Fa", {
   a: "[+Fa][-Fa]",
@@ -487,10 +488,6 @@ export class AnimatedTurtleTree {
   }
 }
 
-function whole_fract(x) {
-  return [Math.floor(x), x % 1.0];
-}
-
 const RADIUS_TURTLE = 10;
 
 const STYLE_TURTLE = new Style({
@@ -539,8 +536,7 @@ const STYLE_STACK = new Style({
 });
 
 function render_stack(position, depth) {
-  const whole_depth = Math.floor(depth);
-  const fract_depth = depth % 1.0;
+  const [whole_depth, fract_depth] = whole_fract(depth);
 
   const rects = new Array(whole_depth);
   const first_offset = position.add(OFFSET_STACK_START);
