@@ -155,11 +155,10 @@ export class SoundManager {
     this.scores[score_id] = compiled;
 
     const score_events = [];
-    for (const [i, [part_id, music]] of score.parts.entries()) {
+    for (const part of score.parts) {
       score_events.push({
-        instrument_index: i,
-        instrument_id: part_id,
-        events: to_events(Rational.ZERO, music),
+        instrument: part.instrument,
+        events: to_events(Rational.ZERO, part.music),
       });
     }
     this.score_note_events[score_id] = score_events;
