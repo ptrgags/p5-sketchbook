@@ -1,9 +1,6 @@
-import { RingBuffer } from "../../lablib/RingBuffer.js";
 import { Direction } from "../../../pga2d/Direction.js";
 import { Point } from "../../../pga2d/Point.js";
-import { Color } from "../../../sketchlib/Color.js";
 import { WIDTH } from "../../../sketchlib/dimensions.js";
-import { GroupPrimitive } from "../../../sketchlib/primitives/GroupPrimitive.js";
 import { PolygonPrimitive } from "../../../sketchlib/primitives/PolygonPrimitive.js";
 import {
   group,
@@ -13,6 +10,7 @@ import {
 import { Transform } from "../../../sketchlib/primitives/Transform.js";
 import { Style } from "../../../sketchlib/Style.js";
 import { PALETTE_ROCK, Values } from "../theme_colors.js";
+import { mod } from "../../../sketchlib/mod.js";
 
 const STYLE_MOUNTAINS = new Style({
   fill: PALETTE_ROCK[Values.MedDark].to_srgb(),
@@ -57,7 +55,9 @@ class Landscape {
     this.primitive = group(original, copy);
   }
 
-  update(t) {
+  update(time) {
+    const DURATION = 8;
+    const t = mod(time, DURATION) / DURATION;
     const offset = WIDTH * t;
     this.transform_orig.translation = new Direction(offset, 0);
     this.transform_copy.translation = new Direction(offset - WIDTH, 0);

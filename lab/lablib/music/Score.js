@@ -1,4 +1,3 @@
-import { AnimationCurves } from "../animation/AnimationCurves.js";
 import { Rational } from "../Rational.js";
 import { REST } from "./pitches.js";
 import { Gap, Parallel, Sequential, timeline_map } from "./Timeline.js";
@@ -140,10 +139,5 @@ export class Score {
      * @type {[Instrument, Music<P>][]}
      */
     this.parts = options.parts;
-    /**
-     * Parameter curves
-     * @type {AnimationCurves}
-     */
-    this.curves = options.animation_curves ?? new AnimationCurves({});
   }
 }

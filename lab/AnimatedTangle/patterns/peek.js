@@ -1,13 +1,44 @@
-import { AnimationCurves } from "../../lablib/animation/AnimationCurves.js";
 import { Hold, ParamCurve } from "../../lablib/animation/ParamCurve.js";
-import { Gap, Sequential } from "../../lablib/music/Timeline.js";
+import { Sequential } from "../../lablib/music/Timeline.js";
 import { Rational } from "../../lablib/Rational.js";
 import { Direction } from "../../../pga2d/Direction.js";
 import { Point } from "../../../pga2d/Point.js";
 import { GooglyEye } from "../../../sketchlib/primitives/GooglyEye.js";
+import { AnimationCurve } from "../../lablib/animation/AnimationCurve.js";
+import { LoopCurve } from "../../lablib/animation/LoopCurve.js";
 
 const SCLERA_RADIUS = 20;
 const PUPIL_RADIUS = 10;
+
+// 1 second per frame
+const DURATION_FRAME = new Rational(1);
+
+const CURVE_POSITION = LoopCurve.from_timeline(
+  new Sequential(
+    // move from start -> end
+    new ParamCurve(0, 1, DURATION_FRAME),
+    // stay in place while turning
+    new ParamCurve(1, 1, DURATION_FRAME),
+    // return to start
+    new ParamCurve(1, 0, DURATION_FRAME),
+    // stay in place while turning
+    new ParamCurve(0, 0, DURATION_FRAME)
+  )
+);
+
+const CURVE_ANGLE = LoopCurve.from_timeline(
+  new Sequential(
+    // Look in the direction from start -> end
+    new Hold(DURATION_FRAME),
+    // Rotate CCW back towards start
+    new ParamCurve(0, Math.PI, DURATION_FRAME),
+    new Hold(DURATION_FRAME),
+    // Rotate CCW towards end
+    new ParamCurve(Math.PI, 2 * Math.PI, DURATION_FRAME)
+    // End of the loop, we jump from angle + 2pi to angle, which are
+    // equivalent
+  )
+);
 
 class PeekingEye {
   /**
@@ -20,7 +51,7 @@ class PeekingEye {
     this.end_point = end_point;
 
     const direction = end_point.sub(this.start_point).normalize();
-    this.angle_offset = Math.atan2(direction.y, direction.x);
+    this.start_angle = Math.atan2(direction.y, direction.x);
 
     this.eye = new GooglyEye(
       start_point,
@@ -32,60 +63,14 @@ class PeekingEye {
 
   /**
    *
-   * @param {AnimationCurves} curves
+   * @param {number} time Animation time
    */
-  update(curves) {
-    const position_t = curves.get_curve_val("peek_pos") ?? 0;
+  update(time) {
+    const position_t = CURVE_POSITION.value(time);
     const position = Point.lerp(this.start_point, this.end_point, position_t);
 
-    const angle = curves.get_curve_val("peek_angle") ?? 0;
-
+    const angle = this.start_angle + CURVE_ANGLE.value(time);
     this.eye.update(position, Direction.from_angle(angle));
-  }
-
-  /**
-   * @param {Rational} duration Duration of the whole animation in seconds
-   * @returns {{[curve_id: string]: import("../../lablib/music/Timeline.js").Timeline<ParamCurve>}}
-   */
-  make_curves(duration) {
-    // 1 second per frame
-    const DURATION_FRAME = new Rational(1);
-
-    const position = new Sequential(
-      // move from start -> end
-      new ParamCurve(0, 1, DURATION_FRAME),
-      // stay in place while turning
-      new ParamCurve(1, 1, DURATION_FRAME),
-      // return to start
-      new ParamCurve(1, 0, DURATION_FRAME),
-      // stay in place while turning
-      new ParamCurve(0, 0, DURATION_FRAME)
-    );
-
-    const angle = new Sequential(
-      // Look in the direction from start -> end
-      new Hold(DURATION_FRAME),
-      // Rotate CCW back towards start
-      new ParamCurve(
-        this.angle_offset,
-        this.angle_offset + Math.PI,
-        DURATION_FRAME
-      ),
-      new Hold(DURATION_FRAME),
-      // Rotate CCW towards end
-      new ParamCurve(
-        this.angle_offset + Math.PI,
-        this.angle_offset + 2 * Math.PI,
-        DURATION_FRAME
-      )
-      // End of the loop, we jump from angle + 2pi to angle, which are
-      // equivalent
-    );
-
-    return {
-      peek_pos: Sequential.from_loop(position, duration),
-      peek_angle: Sequential.from_loop(angle, duration),
-    };
   }
 }
 
