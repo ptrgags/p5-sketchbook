@@ -2,6 +2,7 @@ import {
   MIDIEvent,
   MIDIMessage,
   MIDIMetaEvent,
+  MIDIMetaType,
   MIDISysex,
 } from "./MIDIEvent.js";
 import { MIDIFile, MIDIFormat, MIDIHeader } from "./MIDIFile.js";
@@ -112,6 +113,11 @@ function parse_midi_message(status_byte, track_payload, data_offset) {
   return MIDIMessage.decode(status_byte, track_payload, data_offset);
 }
 
+/**
+ *
+ * @param {MIDIChunk} chunk
+ * @returns {RelativeTimingTrack}
+ */
 function parse_midi_track(chunk) {
   if (chunk.chunk_type !== "MTrk") {
     throw new Error(`Invalid track chunk type ${chunk.chunk_type}`);
@@ -157,6 +163,15 @@ function parse_midi_track(chunk) {
       offset
     );
     offset = after_offset;
+
+    // My implementation treats end of track messages as implicit, so
+    // filter it out here
+    if (
+      message instanceof MIDIMetaEvent &&
+      message.meta_type === MIDIMetaType.END_OF_TRACK
+    ) {
+      continue;
+    }
     events.push([tick_delta, message]);
   }
 
@@ -171,6 +186,6 @@ function parse_midi_track(chunk) {
 export function decode_midi(midi_buffer) {
   const [header_chunk, ...track_chunks] = parse_midi_chunks(midi_buffer);
   const header = parse_midi_header(header_chunk);
-  const tracks = track_chunks.map((x) => parse_midi_track(track_chunks));
+  const tracks = track_chunks.map(parse_midi_track);
   return new MIDIFile(header, tracks);
 }
