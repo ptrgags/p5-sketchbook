@@ -22,11 +22,37 @@ import {
   Values,
 } from "../theme_colors.js";
 import { Ease } from "../../../sketchlib/Ease.js";
+import { LoopCurve } from "../../lablib/animation/LoopCurve.js";
+import { AnimationCurve } from "../../lablib/animation/AnimationCurve.js";
 
 const CENTER = new Point(500, 300);
 const BAND_THICKNESS = 50;
 const MAX_RADII = [5, 4, 3, 2, 1].map((x) => x * BAND_THICKNESS);
 const CIRCLE_COUNT = MAX_RADII.length;
+
+const EXPAND_DURATION = new Rational(3, CIRCLE_COUNT);
+const PAUSE_DURATION = new Rational(1);
+
+const RADIUS_STEPS = [];
+for (let i = 0; i < CIRCLE_COUNT; i++) {
+  RADIUS_STEPS.push(
+    new ParamCurve(i * 50, (i + 1) * 50, EXPAND_DURATION, Ease.in_out_cubic)
+  );
+}
+
+const TIMELINE_RADIUS = new Sequential(
+  ...RADIUS_STEPS,
+  new Hold(PAUSE_DURATION),
+  new ParamCurve(
+    CIRCLE_COUNT * 50,
+    0,
+    EXPAND_DURATION.mul(new Rational(CIRCLE_COUNT)),
+    Ease.in_out_cubic
+  )
+);
+const CURVE_RADIUS = new LoopCurve(
+  AnimationCurve.from_timeline(TIMELINE_RADIUS)
+);
 
 const STYLE_CIRCLES = new Style({
   fill: PALETTE_NAVY[Values.MedLight].to_srgb(),
@@ -115,11 +141,15 @@ class CircleFan {
       return group(circle, diamond_row);
     });
 
-    this.prim = group(...layers);
+    this.primitive = group(...layers);
   }
 
-  update(anim) {
-    const r = anim.get_curve_val("circle_fan");
+  /**
+   *
+   * @param {number} time
+   */
+  update(time) {
+    const r = CURVE_RADIUS.value(time);
 
     for (const [i, max_radius] of MAX_RADII.entries()) {
       const outer_radius = Math.min(r, max_radius);
@@ -135,32 +165,7 @@ class CircleFan {
   }
 
   render() {
-    return this.prim;
-  }
-
-  make_curves() {
-    const EXPAND_DURATION = new Rational(3, CIRCLE_COUNT);
-    const PAUSE_DURATION = new Rational(1);
-
-    const radius_steps = [];
-    for (let i = 0; i < CIRCLE_COUNT; i++) {
-      radius_steps.push(
-        new ParamCurve(i * 50, (i + 1) * 50, EXPAND_DURATION, Ease.in_out_cubic)
-      );
-    }
-
-    return {
-      circle_fan: new Sequential(
-        ...radius_steps,
-        new Hold(PAUSE_DURATION),
-        new ParamCurve(
-          CIRCLE_COUNT * 50,
-          0,
-          EXPAND_DURATION.mul(new Rational(CIRCLE_COUNT)),
-          Ease.in_out_cubic
-        )
-      ),
-    };
+    return this.primitive;
   }
 }
 
