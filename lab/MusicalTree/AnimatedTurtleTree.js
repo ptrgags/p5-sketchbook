@@ -16,8 +16,8 @@ import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js
 import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
 import { Point } from "../../pga2d/Point.js";
 import { Direction } from "../../pga2d/Direction.js";
-import { AnimationCurves } from "../lablib/animation/AnimationCurves.js";
 import { ParamCurve } from "../lablib/animation/ParamCurve.js";
+import { AnimationCurve } from "../lablib/animation/AnimationCurve.js";
 
 const TREE_LSYSTEM = new LSystem("Fa", {
   a: "[+Fa][-Fa]",
@@ -352,18 +352,24 @@ class TreeAnimationBuilder {
 
   /**
    * Build the animation part of a score
-   * @returns {AnimationCurves}
+   * @returns {{line_count: AnimationCurve, state: AnimationCurve, depth: AnimationCurve}}
    */
   build() {
-    const line_count = new Sequential(...this.line_count_curve);
-    const state = new Sequential(...this.state_curve);
-    const depth = new Sequential(...this.depth_curve);
+    const line_count = AnimationCurve.from_timeline(
+      new Sequential(...this.line_count_curve)
+    );
+    const state = AnimationCurve.from_timeline(
+      new Sequential(...this.state_curve)
+    );
+    const depth = AnimationCurve.from_timeline(
+      new Sequential(...this.depth_curve)
+    );
 
-    return new AnimationCurves({
+    return {
       line_count,
       state,
       depth,
-    });
+    };
   }
 }
 
@@ -432,18 +438,18 @@ export class AnimatedTurtleTree {
 
     this.score = new Score({
       parts: music_builder.build(),
-      animation_curves: animation_builder.build(),
     });
+    this.curves = animation_builder.build();
     [this.lines, this.states] = primitive_builder.build();
   }
 
   /**
    * Render the tree animation
-   * @param {AnimationCurves} curves The animation curves
+   * @param {number} time The animation curves
    * @returns {GroupPrimitive}
    */
-  render(curves) {
-    const line_count = curves.get_curve_val("line_count");
+  render(time) {
+    const line_count = this.curves.line_count.value(time);
     const [whole_lines, fract_lines] = whole_fract(line_count);
 
     // Render all of the lines we've already seen, and possibly one
@@ -459,7 +465,7 @@ export class AnimatedTurtleTree {
       tree = style(visible_lines, STYLE_TREE);
     }
 
-    const state_param = curves.get_curve_val("state");
+    const state_param = this.curves.state.value(time);
     const [state_index, state_t] = whole_fract(state_param);
 
     let position;
@@ -473,7 +479,7 @@ export class AnimatedTurtleTree {
       orientation = lerp(prev_orientation, next_orientation, state_t);
     }
 
-    const depth = curves.get_curve_val("depth");
+    const depth = this.curves.depth.value(time);
 
     const turtle = render_turtle(position, orientation);
     const stack = render_stack(position, depth);

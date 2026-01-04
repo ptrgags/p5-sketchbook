@@ -51,11 +51,9 @@ class SoundScene {
 
   render() {
     const current_time = SOUND.transport_time;
-    const curves = ANIMATION.score.curves;
-    curves.update(current_time);
 
     const mute = this.mute_button.render();
-    const animation = ANIMATION.render(curves);
+    const animation = ANIMATION.render(current_time);
     return group(animation, mute);
   }
 
