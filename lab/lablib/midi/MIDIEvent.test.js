@@ -80,7 +80,7 @@ describe("MIDIMessage", () => {
 
       const expected = MIDIMessage.note_off(2, G5, 127);
       expect(result).toEqual(expected);
-      expect(after).toBe(3);
+      expect(after).toBe(8);
     });
   });
 });
@@ -113,6 +113,7 @@ describe("MIDIMetaEvent", () => {
       const data_view = make_view([
         MIDIMetaEvent.MAGIC,
         MIDIMetaType.CHANNEL_PREFIX,
+        1,
         3,
       ]);
 
@@ -123,7 +124,32 @@ describe("MIDIMetaEvent", () => {
         new Uint8Array([3])
       );
       expect(result).toEqual(expected);
-      expect(after).toBe(3);
+      expect(after).toBe(4);
+    });
+
+    it("decodes track_name", () => {
+      const data_view = make_view([
+        MIDIMetaEvent.MAGIC,
+        MIDIMetaType.TRACK_NAME,
+        11,
+        "H".charCodeAt(0),
+        "e".charCodeAt(0),
+        "l".charCodeAt(0),
+        "l".charCodeAt(0),
+        "o".charCodeAt(0),
+        " ".charCodeAt(0),
+        "W".charCodeAt(0),
+        "o".charCodeAt(0),
+        "r".charCodeAt(0),
+        "l".charCodeAt(0),
+        "d".charCodeAt(0),
+      ]);
+
+      const [result, after] = MIDIMetaEvent.decode(data_view, 1);
+
+      const expected = MIDIMetaEvent.track_name("Hello World");
+      expect(result).toEqual(expected);
+      expect(after).toBe(14);
     });
 
     it("decodes with offset", () => {
@@ -135,6 +161,7 @@ describe("MIDIMetaEvent", () => {
         0,
         0xff,
         MIDIMetaType.CHANNEL_PREFIX,
+        1,
         3,
       ]);
 
@@ -145,7 +172,7 @@ describe("MIDIMetaEvent", () => {
         new Uint8Array([3])
       );
       expect(result).toEqual(expected);
-      expect(after).toBe(3);
+      expect(after).toBe(9);
     });
   });
 });
@@ -178,7 +205,7 @@ describe("MIDISysex", () => {
     it("decodes sysex event", () => {
       const data_view = make_view([
         MIDISysex.MAGIC,
-        3,
+        4,
         1,
         2,
         3,
@@ -189,7 +216,7 @@ describe("MIDISysex", () => {
 
       const expected = new MIDISysex(new Uint8Array([1, 2, 3]));
       expect(result).toEqual(expected);
-      expect(after).toBe(3);
+      expect(after).toBe(6);
     });
 
     it("decodes with offset", () => {
@@ -211,7 +238,7 @@ describe("MIDISysex", () => {
 
       const expected = new MIDISysex(new Uint8Array([1, 2, 3]));
       expect(result).toEqual(expected);
-      expect(after).toBe(3);
+      expect(after).toBe(11);
     });
   });
 });

@@ -123,8 +123,14 @@ export class MIDIMessage {
    * @returns {MIDIMessage} The note event
    */
   static note_on(channel, pitch, velocity = MIDIMessage.DEFAULT_VELOCITY) {
+    // note on with velocity 0 is the same as a note off. See the
+    // MIDI 1.0 Detailed Specification
+
+    const message_type =
+      velocity === 0 ? MIDIMessageType.NOTE_OFF : MIDIMessageType.NOTE_ON;
+
     return new MIDIMessage(
-      MIDIMessageType.NOTE_ON,
+      message_type,
       channel,
       new Uint8Array([pitch, velocity])
     );
@@ -268,18 +274,16 @@ export class MIDIMetaEvent {
   }
 
   /**
-   *
-   * @param {DataView} data_view
-   * @param {number} offset
-   * @return {[MIDIMetaEvent, number]}
+   * Decode a binary meta message
+   * @param {DataView} data_view Data view to read from
+   * @param {number} offset Offset of the first byte after the 0xFF (i.e. the meta message type field)
+   * @return {[MIDIMetaEvent, number]} (message, after_offset)
    */
   static decode(data_view, offset) {
     const meta_type = data_view.getUint8(offset);
-    offset++;
 
     const [length, after] = decode_variable_length(data_view, offset + 1);
-    const length_length = after - offset;
-    offset = after;
+    const length_length = after - (offset + 1);
 
     const body = new Uint8Array(
       data_view.buffer,
