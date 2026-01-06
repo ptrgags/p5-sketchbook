@@ -7,8 +7,6 @@ import { Style } from "../../../sketchlib/Style.js";
 import { PALETTE_CORAL, Values } from "../theme_colors.js";
 import { make_stripes } from "./stripes.js";
 
-const BRICK_DIMENSIONS = new Direction(100, 50);
-
 const FALL_DURATION = 1;
 const HIT_TIMES = [
   0,
@@ -25,6 +23,9 @@ const HIT_TIMES = [
 
 const PANEL_CORNER = new Point(300, 300);
 const PANEL_DIMENSIONS = new Direction(200, 200);
+const BRICK_DIMENSIONS = PANEL_DIMENSIONS.mul_components(
+  new Direction(0.5, 0.25)
+);
 
 const STYLE_BACKGROUND = new Style({
   fill: PALETTE_CORAL[Values.MedDark].to_srgb(),
@@ -52,8 +53,8 @@ const BRICK_STRIPES = style(
 );
 
 class Brick {
-  constructor() {
-    this.primitive = group(BRICK_BACKGROUND, BRICK_STRIPES);
+  constructor(position) {
+    this.primitive = new RectPrimitive(position, BRICK_DIMENSIONS);
   }
 
   render() {
@@ -61,4 +62,35 @@ class Brick {
   }
 }
 
-export const BRICKS = new Brick();
+// Brick offsets in multiples of BRICK_DIMENSIONS
+const BRICK_OFFSETS = [
+  new Direction(1, 3),
+  new Direction(0, 3),
+  new Direction(1.5, 2),
+  new Direction(0.5, 2),
+  new Direction(-0.5, 2),
+  new Direction(1, 1),
+  new Direction(0, 1),
+  new Direction(1.5, 0),
+  new Direction(0.5, 0),
+  new Direction(-0.5, 0),
+];
+
+class BrickWall {
+  constructor() {
+    this.bricks = BRICK_OFFSETS.map((offset, i) => {
+      const position = PANEL_CORNER.add(
+        BRICK_DIMENSIONS.mul_components(offset)
+      );
+      return new Brick(position);
+    });
+
+    this.primitive = group(...this.bricks.map((x) => x.render()));
+  }
+
+  render() {
+    return this.primitive;
+  }
+}
+
+export const BRICKS = new BrickWall();
