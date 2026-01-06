@@ -7,6 +7,7 @@ import { RectPrimitive } from "../../../sketchlib/primitives/RectPrimitive.js";
 import { group, style } from "../../../sketchlib/primitives/shorthand.js";
 import { Transform } from "../../../sketchlib/primitives/Transform.js";
 import { Style } from "../../../sketchlib/Style.js";
+import { Tween } from "../../../sketchlib/Tween.js";
 import { PALETTE_CORAL, PALETTE_ROCK, Values } from "../theme_colors.js";
 import { make_stripes } from "./stripes.js";
 
@@ -57,8 +58,23 @@ const BRICK_STRIPES = style(
 const BRICK_PATTERN = group(BRICK_BACKGROUND, BRICK_STRIPES);
 
 class Brick {
-  constructor(position) {
+  /**
+   * Constructor
+   * @param {Point} position Point where the position will hit
+   * @param {number} hit_time The time when the brick should hit the bottom of its motion
+   */
+  constructor(position, hit_time) {
+    this.hit_position = position;
     this.primitive = new RectPrimitive(position, BRICK_DIMENSIONS);
+
+    this.tween = Tween.scalar(-200, 0, hit_time - FALL_DURATION, FALL_DURATION);
+  }
+
+  update(time) {
+    this.height = this.tween.get_value(time);
+    this.primitive.position = this.hit_position.add(
+      Direction.DIR_Y.scale(this.height)
+    );
   }
 
   render() {
@@ -91,7 +107,7 @@ class BrickWall {
       const position = PANEL_CORNER.add(
         BRICK_DIMENSIONS.mul_components(offset)
       );
-      return new Brick(position);
+      return new Brick(position, HIT_TIMES[i]);
     });
 
     // The Bricks will update their positions in place in update()
@@ -113,6 +129,10 @@ class BrickWall {
     );
 
     this.primitive = group(drop_shadow, striped_bricks);
+  }
+
+  update(time) {
+    this.bricks.forEach((x) => x.update(time));
   }
 
   render() {

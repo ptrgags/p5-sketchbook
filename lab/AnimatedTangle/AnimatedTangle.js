@@ -166,6 +166,7 @@ export const sketch = (p) => {
     EYE.update(t_sec);
     CIRCLE_FAN.update(t_sec);
     GEODE.update(t_sec);
+    BRICKS.update(t_sec);
 
     BACKGROUND_STRIPES.draw(p);
     TANGLE.draw(p);
