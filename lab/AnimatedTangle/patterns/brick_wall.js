@@ -17,13 +17,17 @@ import { make_stripes } from "./stripes.js";
 
 const FALL_DURATION = 1;
 const HIT_TIMES = [
+  // First layer hits on quarter notes (there are two bricks)
   0,
   1 / 2,
+  // Second layer hits on quarter note triplets (there are three bricks, although the ones on the end are slightly out-of-frame)
   1,
   1 + 1 / 3,
   1 + 2 / 3,
+  // Third layer hits on quarter notes
   2,
   2 + 1 / 2,
+  // Fourth layer hits on quarter note triplets
   3,
   3 + 1 / 3,
   3 + 2 / 3,
@@ -63,6 +67,7 @@ const BRICK_PATTERN = group(BRICK_BACKGROUND, BRICK_STRIPES);
 
 const FALL_LENGTH = 300;
 
+// Single falling brick
 class Brick {
   /**
    * Constructor
@@ -71,16 +76,24 @@ class Brick {
    */
   constructor(position, hit_time) {
     this.hit_position = position;
-    this.primitive = new RectPrimitive(position, BRICK_DIMENSIONS);
 
+    // Tween between above the panel and the hit position
     this.tween = Tween.scalar(
       -FALL_LENGTH,
       0,
       hit_time - FALL_DURATION,
       FALL_DURATION
     );
+
+    // The brick is an unstyled rectangle. BrickWall will use this primitive
+    // both for a drop shadow and a clip mask, hence the leaving it unstyled
+    this.primitive = new RectPrimitive(position, BRICK_DIMENSIONS);
   }
 
+  /**
+   *
+   * @param {number} time
+   */
   update(time) {
     this.height = this.tween.get_value(time);
     this.primitive.position = this.hit_position.add(
@@ -153,9 +166,15 @@ class BrickWall {
     this.primitive = group(drop_shadow, striped_bricks);
   }
 
+  /**
+   *
+   * @param {number} time Animation time
+   */
   update(time) {
+    // Apply a curve to adjust the playback speed and loop the animation.
     const brick_t = CURVE_TIMING.value(time);
 
+    // The warped time value is used to make the bricks fall/lift over time
     this.bricks.forEach((x) => x.update(brick_t));
   }
 
