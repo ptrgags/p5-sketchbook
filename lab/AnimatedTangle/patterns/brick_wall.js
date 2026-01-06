@@ -8,6 +8,10 @@ import { group, style } from "../../../sketchlib/primitives/shorthand.js";
 import { Transform } from "../../../sketchlib/primitives/Transform.js";
 import { Style } from "../../../sketchlib/Style.js";
 import { Tween } from "../../../sketchlib/Tween.js";
+import { LoopCurve } from "../../lablib/animation/LoopCurve.js";
+import { ParamCurve } from "../../lablib/animation/ParamCurve.js";
+import { Sequential } from "../../lablib/music/Timeline.js";
+import { Rational } from "../../lablib/Rational.js";
 import { PALETTE_CORAL, PALETTE_ROCK, Values } from "../theme_colors.js";
 import { make_stripes } from "./stripes.js";
 
@@ -57,6 +61,8 @@ const BRICK_STRIPES = style(
 );
 const BRICK_PATTERN = group(BRICK_BACKGROUND, BRICK_STRIPES);
 
+const FALL_LENGTH = 300;
+
 class Brick {
   /**
    * Constructor
@@ -67,7 +73,12 @@ class Brick {
     this.hit_position = position;
     this.primitive = new RectPrimitive(position, BRICK_DIMENSIONS);
 
-    this.tween = Tween.scalar(-200, 0, hit_time - FALL_DURATION, FALL_DURATION);
+    this.tween = Tween.scalar(
+      -FALL_LENGTH,
+      0,
+      hit_time - FALL_DURATION,
+      FALL_DURATION
+    );
   }
 
   update(time) {
@@ -101,6 +112,17 @@ const STYLE_DROP_SHADOW = new Style({
 });
 const DROP_SHADOW_OFFSET = new Direction(25, 25);
 
+const DURATION_FALL = new Rational(6);
+const DURATION_LIFT = new Rational(3);
+
+// Fall at a regular speed, then speed up when undoing the animation
+const CURVE_TIMING = LoopCurve.from_timeline(
+  new Sequential(
+    new ParamCurve(-FALL_DURATION, 4 + FALL_DURATION, DURATION_FALL),
+    new ParamCurve(4 + FALL_DURATION, -FALL_DURATION, DURATION_LIFT)
+  )
+);
+
 class BrickWall {
   constructor() {
     this.bricks = BRICK_OFFSETS.map((offset, i) => {
@@ -132,7 +154,9 @@ class BrickWall {
   }
 
   update(time) {
-    this.bricks.forEach((x) => x.update(time));
+    const brick_t = CURVE_TIMING.value(time);
+
+    this.bricks.forEach((x) => x.update(brick_t));
   }
 
   render() {
