@@ -1,10 +1,13 @@
 import { Direction } from "../../../pga2d/Direction.js";
 import { Point } from "../../../pga2d/Point.js";
+import { Mask } from "../../../sketchlib/primitives/ClipMask.js";
+import { ClipPrimitive } from "../../../sketchlib/primitives/ClipPrimitive.js";
 import { GroupPrimitive } from "../../../sketchlib/primitives/GroupPrimitive.js";
 import { RectPrimitive } from "../../../sketchlib/primitives/RectPrimitive.js";
 import { group, style } from "../../../sketchlib/primitives/shorthand.js";
+import { Transform } from "../../../sketchlib/primitives/Transform.js";
 import { Style } from "../../../sketchlib/Style.js";
-import { PALETTE_CORAL, Values } from "../theme_colors.js";
+import { PALETTE_CORAL, PALETTE_ROCK, Values } from "../theme_colors.js";
 import { make_stripes } from "./stripes.js";
 
 const FALL_DURATION = 1;
@@ -51,6 +54,7 @@ const BRICK_STRIPES = style(
   ),
   STYLE_STRIPES
 );
+const BRICK_PATTERN = group(BRICK_BACKGROUND, BRICK_STRIPES);
 
 class Brick {
   constructor(position) {
@@ -76,6 +80,11 @@ const BRICK_OFFSETS = [
   new Direction(-0.5, 0),
 ];
 
+const STYLE_DROP_SHADOW = new Style({
+  fill: PALETTE_ROCK[Values.Dark].to_srgb(),
+});
+const DROP_SHADOW_OFFSET = new Direction(25, 25);
+
 class BrickWall {
   constructor() {
     this.bricks = BRICK_OFFSETS.map((offset, i) => {
@@ -85,7 +94,25 @@ class BrickWall {
       return new Brick(position);
     });
 
-    this.primitive = group(...this.bricks.map((x) => x.render()));
+    // The Bricks will update their positions in place in update()
+    // BrickWall groups them together and composites the layers:
+    //
+    // ---TOP---
+    // bricks used as a clipping mask
+    //     - parts of the striped brick pattern are shown through the clipping path
+    // drop shadow (bricks offset down and right a bit)
+    // ---BOTTOM---
+    const brick_shape = group(...this.bricks.map((x) => x.render()));
+    const drop_shadow = new GroupPrimitive(brick_shape, {
+      transform: new Transform(DROP_SHADOW_OFFSET),
+      style: STYLE_DROP_SHADOW,
+    });
+    const striped_bricks = new ClipPrimitive(
+      new Mask(brick_shape),
+      BRICK_PATTERN
+    );
+
+    this.primitive = group(drop_shadow, striped_bricks);
   }
 
   render() {
