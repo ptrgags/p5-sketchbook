@@ -3,14 +3,25 @@ import { Point } from "../../../pga2d/Point.js";
 import { Ease } from "../../../sketchlib/Ease.js";
 import { GroupPrimitive } from "../../../sketchlib/primitives/GroupPrimitive.js";
 import { PolygonPrimitive } from "../../../sketchlib/primitives/PolygonPrimitive.js";
-import { group, xform } from "../../../sketchlib/primitives/shorthand.js";
+import { RectPrimitive } from "../../../sketchlib/primitives/RectPrimitive.js";
+import {
+  group,
+  style,
+  xform,
+} from "../../../sketchlib/primitives/shorthand.js";
 import { Transform } from "../../../sketchlib/primitives/Transform.js";
 import { Style } from "../../../sketchlib/Style.js";
 import { LoopCurve } from "../../lablib/animation/LoopCurve.js";
 import { ParamCurve } from "../../lablib/animation/ParamCurve.js";
 import { Sequential } from "../../lablib/music/Timeline.js";
 import { Rational } from "../../lablib/Rational.js";
-import { PALETTE_CORAL, PALETTE_SKY, Values } from "../theme_colors.js";
+import {
+  PALETTE_CORAL,
+  PALETTE_NAVY,
+  PALETTE_ROCK,
+  PALETTE_SKY,
+  Values,
+} from "../theme_colors.js";
 import { AnimatedStripes } from "./stripes.js";
 
 const STRIPE_CENTER = new Point(200, 650);
@@ -57,6 +68,7 @@ const BARBER_POLE = group(
   })
 );
 
+const DOOR_WIDTH = 50;
 const DOOR_HEIGHT = 150;
 const LOWER_DOOR = new PolygonPrimitive(
   [
@@ -103,6 +115,18 @@ const OPEN_AND_SHUT = LoopCurve.from_timeline(
   )
 );
 
+const STYLE_DOOR_BACKGROUND = new Style({
+  stroke: PALETTE_NAVY[Values.Dark].to_srgb(),
+  fill: PALETTE_NAVY[Values.Medium].to_srgb(),
+  width: 2,
+});
+
+const STYLE_DOOR = new Style({
+  stroke: PALETTE_ROCK[Values.MedDark].to_srgb(),
+  fill: PALETTE_ROCK[Values.MedLight].to_srgb(),
+  width: 1,
+});
+
 class Door {
   /**
    * Constructor
@@ -110,23 +134,37 @@ class Door {
    * @param {number} shut_time Time when the door should shut
    */
   constructor(shut_offset, shut_time) {
-    this.shut_point = shut_offset;
+    this.shut_offset = shut_offset;
     this.shut_time = shut_time;
     this.lower_xform = new Transform(shut_offset);
     this.upper_xform = new Transform(shut_offset);
 
+    const background = new RectPrimitive(
+      Point.ORIGIN.add(this.shut_offset).add(
+        Direction.DIR_Y.scale(-DOOR_HEIGHT)
+      ),
+      new Direction(DOOR_WIDTH, 2 * DOOR_HEIGHT)
+    );
+
     this.primitive = group(
-      xform(LOWER_DOOR, this.lower_xform),
-      xform(UPPER_DOOR, this.upper_xform)
+      style(background, STYLE_DOOR_BACKGROUND),
+      new GroupPrimitive(LOWER_DOOR, {
+        transform: this.lower_xform,
+        style: STYLE_DOOR,
+      }),
+      new GroupPrimitive(UPPER_DOOR, {
+        transform: this.upper_xform,
+        style: STYLE_DOOR,
+      })
     );
   }
 
   update(time) {
     const height = OPEN_AND_SHUT.value(time - this.shut_time);
-    this.lower_xform.translation = this.shut_point.add(
+    this.lower_xform.translation = this.shut_offset.add(
       Direction.DIR_Y.scale(height)
     );
-    this.upper_xform.translation = this.shut_point.add(
+    this.upper_xform.translation = this.shut_offset.add(
       Direction.DIR_Y.scale(-height)
     );
   }
