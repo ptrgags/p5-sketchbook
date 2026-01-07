@@ -70,19 +70,25 @@ const BARBER_POLE = group(
 
 const DOOR_WIDTH = 50;
 const DOOR_HEIGHT = 150;
+// some of the offsets in the concept art are 25/2 pixels wide, which is
+// halfway between pixels. So let's round to the nearest pixel for all
+// coordinates
+const QUARTER = Math.round(DOOR_WIDTH / 4);
+const HALF = DOOR_WIDTH / 2;
+const THREE_QUARTERS = Math.round((3 * DOOR_WIDTH) / 4);
 const LOWER_DOOR = new PolygonPrimitive(
   [
     // bottom points on door
     new Point(0, DOOR_HEIGHT),
-    new Point(50, DOOR_HEIGHT),
+    new Point(DOOR_WIDTH, DOOR_HEIGHT),
     // square shapes that jut in and out
-    new Point(50, 0),
-    new Point(75 / 2, 0),
-    new Point(75 / 2, -25 / 2),
-    new Point(25, -25 / 2),
-    new Point(25, 25 / 2),
-    new Point(25 / 2, 25 / 2),
-    new Point(25 / 2, 0),
+    new Point(DOOR_WIDTH, 0),
+    new Point(THREE_QUARTERS, 0),
+    new Point(THREE_QUARTERS, -QUARTER),
+    new Point(HALF, -QUARTER),
+    new Point(HALF, QUARTER),
+    new Point(QUARTER, QUARTER),
+    new Point(QUARTER, 0),
     new Point(0, 0),
   ],
   true
@@ -94,13 +100,13 @@ const UPPER_DOOR = new PolygonPrimitive(
     new Point(0, -DOOR_HEIGHT),
     // Same square shapes as for the lower door, but wound the other way
     new Point(0, 0),
-    new Point(25 / 2, 0),
-    new Point(25 / 2, 25 / 2),
-    new Point(25, 25 / 2),
-    new Point(25, -25 / 2),
-    new Point(75 / 2, -25 / 2),
-    new Point(75 / 2, 0),
-    new Point(50, 0),
+    new Point(QUARTER, 0),
+    new Point(QUARTER, QUARTER),
+    new Point(HALF, QUARTER),
+    new Point(HALF, -QUARTER),
+    new Point(THREE_QUARTERS, -QUARTER),
+    new Point(THREE_QUARTERS, 0),
+    new Point(DOOR_WIDTH, 0),
   ],
   true
 );
@@ -124,7 +130,7 @@ const STYLE_DOOR_BACKGROUND = new Style({
 const STYLE_DOOR = new Style({
   stroke: PALETTE_ROCK[Values.MedDark].to_srgb(),
   fill: PALETTE_ROCK[Values.MedLight].to_srgb(),
-  width: 1,
+  width: 2,
 });
 
 class Door {
