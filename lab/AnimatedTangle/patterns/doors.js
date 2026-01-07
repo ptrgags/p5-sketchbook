@@ -1,10 +1,15 @@
 import { Direction } from "../../../pga2d/Direction.js";
 import { Point } from "../../../pga2d/Point.js";
+import { Ease } from "../../../sketchlib/Ease.js";
 import { GroupPrimitive } from "../../../sketchlib/primitives/GroupPrimitive.js";
 import { PolygonPrimitive } from "../../../sketchlib/primitives/PolygonPrimitive.js";
 import { group, xform } from "../../../sketchlib/primitives/shorthand.js";
 import { Transform } from "../../../sketchlib/primitives/Transform.js";
 import { Style } from "../../../sketchlib/Style.js";
+import { LoopCurve } from "../../lablib/animation/LoopCurve.js";
+import { ParamCurve } from "../../lablib/animation/ParamCurve.js";
+import { Sequential } from "../../lablib/music/Timeline.js";
+import { Rational } from "../../lablib/Rational.js";
 import { PALETTE_CORAL, PALETTE_SKY, Values } from "../theme_colors.js";
 import { AnimatedStripes } from "./stripes.js";
 
@@ -88,15 +93,41 @@ const UPPER_DOOR = new PolygonPrimitive(
   true
 );
 
+const DURATION_OPEN = new Rational(1);
+const LIFT_HEIGHT = 50;
+
+const OPEN_AND_SHUT = LoopCurve.from_timeline(
+  new Sequential(
+    new ParamCurve(0, LIFT_HEIGHT, DURATION_OPEN, Ease.in_out_cubic),
+    new ParamCurve(LIFT_HEIGHT, 0, DURATION_OPEN, Ease.in_out_cubic)
+  )
+);
+
 class Door {
-  constructor(shut_offset) {
+  /**
+   * Constructor
+   * @param {Direction} shut_offset Shut offset
+   * @param {number} shut_time Time when the door should shut
+   */
+  constructor(shut_offset, shut_time) {
     this.shut_point = shut_offset;
+    this.shut_time = shut_time;
     this.lower_xform = new Transform(shut_offset);
     this.upper_xform = new Transform(shut_offset);
 
     this.primitive = group(
       xform(LOWER_DOOR, this.lower_xform),
       xform(UPPER_DOOR, this.upper_xform)
+    );
+  }
+
+  update(time) {
+    const height = OPEN_AND_SHUT.value(time - this.shut_time);
+    this.lower_xform.translation = this.shut_point.add(
+      Direction.DIR_Y.scale(height)
+    );
+    this.upper_xform.translation = this.shut_point.add(
+      Direction.DIR_Y.scale(-height)
     );
   }
 
@@ -108,10 +139,10 @@ class Door {
 class Doors {
   constructor() {
     this.doors = [
-      new Door(new Direction(0, 700)),
-      new Door(new Direction(75, 675)),
-      new Door(new Direction(150, 650)),
-      new Door(new Direction(225, 675)),
+      new Door(new Direction(0, 700), 0),
+      new Door(new Direction(75, 675), 0.5),
+      new Door(new Direction(150, 650), 1.0),
+      new Door(new Direction(225, 675), 1.5),
     ];
 
     this.primitive = group(BARBER_POLE, ...this.doors.map((x) => x.render()));
@@ -119,6 +150,7 @@ class Doors {
 
   update(time) {
     ANIMATED_STRIPES.update(time);
+    this.doors.forEach((x) => x.update(time));
   }
 
   render() {
