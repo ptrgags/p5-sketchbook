@@ -19,6 +19,7 @@ import { TRAFFIC } from "./patterns/traffic.js";
 import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { BRICKS } from "./patterns/brick_wall.js";
+import { DOORS } from "./patterns/doors.js";
 
 /**
  * Shorthand for making arrays of points
@@ -45,6 +46,10 @@ const PANEL_QUARTERS = new PolygonPrimitive(
 );
 const PANEL_CORAL = new PolygonPrimitive(
   make_points([0, 200], [0, 700], [200, 600], [300, 400], [200, 200]),
+  true
+);
+const PANEL_DOORS = new PolygonPrimitive(
+  make_points([0, 700], [300, 700], [200, 600]),
   true
 );
 const PANEL_GEODE = new PolygonPrimitive(
@@ -122,6 +127,7 @@ const TANGLE = new VectorTangle(
     [new Mask(PANEL_TRAFFIC), TRAFFIC.render()],
     [new Mask(PANEL_QUARTERS), QUARTERS],
     [new Mask(PANEL_CORAL), SWAYING_CORAL.render()],
+    [new Mask(PANEL_DOORS), DOORS.render()],
     [new Mask(PANEL_GEODE), GEODE.render()],
   ],
   PANELS
@@ -167,6 +173,7 @@ export const sketch = (p) => {
     CIRCLE_FAN.update(t_sec);
     GEODE.update(t_sec);
     BRICKS.update(t_sec);
+    DOORS.update(t_sec);
 
     BACKGROUND_STRIPES.draw(p);
     TANGLE.draw(p);
