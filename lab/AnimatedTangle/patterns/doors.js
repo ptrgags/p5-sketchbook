@@ -1,15 +1,15 @@
 import { Direction } from "../../../pga2d/Direction.js";
 import { Point } from "../../../pga2d/Point.js";
 import { GroupPrimitive } from "../../../sketchlib/primitives/GroupPrimitive.js";
-import { group, xform } from "../../../sketchlib/primitives/shorthand.js";
+import { group } from "../../../sketchlib/primitives/shorthand.js";
 import { Transform } from "../../../sketchlib/primitives/Transform.js";
 import { Style } from "../../../sketchlib/Style.js";
 import { PALETTE_CORAL, PALETTE_SKY, Values } from "../theme_colors.js";
-import { AnimatedStripes, make_stripes } from "./stripes.js";
+import { AnimatedStripes } from "./stripes.js";
 
 const STRIPE_CENTER = new Point(200, 650);
 const STRIPE_SPACING = 60;
-const STRIPE_DIRECTION = new Direction(1, 1).normalize();
+const STRIPE_DIRECTION = new Direction(-1, -1).normalize();
 const STRIPE_DIMENSIONS = new Direction(350, 300);
 const ANIMATED_STRIPES = new AnimatedStripes(
   STRIPE_CENTER,
