@@ -18,6 +18,7 @@ import { HITOMEZASHI } from "./patterns/hitomezashi.js";
 import { TRAFFIC } from "./patterns/traffic.js";
 import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
+import { BRICKS } from "./patterns/brick_wall.js";
 
 /**
  * Shorthand for making arrays of points
@@ -107,7 +108,7 @@ const QUARTERS = new VectorTangle(
   [
     [new Mask(QUARTER_HITOMEZASHI), HITOMEZASHI.render()],
     [new Mask(QUARTER_CIRCLE_FAN), CIRCLE_FAN.render()],
-    [new Mask(QUARTER_BRICK_WALL), GroupPrimitive.EMPTY],
+    [new Mask(QUARTER_BRICK_WALL), BRICKS.render()],
     [new Mask(QUARTER_PEEK), EYE.eye],
   ],
   QUARTER_DIVIDER
@@ -165,6 +166,7 @@ export const sketch = (p) => {
     EYE.update(t_sec);
     CIRCLE_FAN.update(t_sec);
     GEODE.update(t_sec);
+    BRICKS.update(t_sec);
 
     BACKGROUND_STRIPES.draw(p);
     TANGLE.draw(p);
