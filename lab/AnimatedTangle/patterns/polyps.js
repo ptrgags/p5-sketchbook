@@ -159,7 +159,6 @@ export class Polyps {
       new Polyp(new Point(10, 610)),
       new Polyp(new Point(55, 650)),
     ];
-    console.log(this.polyps.map((x) => x.dist_from_anchor));
 
     this.primitive = group(...this.polyps.map((x) => x.render()));
   }
