@@ -14,8 +14,7 @@ import { Rational } from "../../lablib/Rational.js";
 
 const TENTACLE_MIN = 10;
 const TENTACLE_MAX = 30;
-const TENTACLE_CIRCLE_RADIUS = 3;
-const TENTACLE_EXTEND_LENGTH = TENTACLE_MAX - TENTACLE_MIN;
+const TENTACLE_CIRCLE_RADIUS = 4;
 
 const MOUTH_MIN = 15;
 const MOUTH_MAX = 20;
@@ -35,9 +34,26 @@ const ANCHOR_POINT = new Point(0, 600);
 const MAX_DIST = 600;
 const CURVE_EXTEND_RADIUS = LoopCurve.from_timeline(
   new Sequential(
-    new ParamCurve(MAX_DIST, 0, new Rational(1, 2)),
+    new ParamCurve(MAX_DIST, 0, new Rational(1, 4)),
     new ParamCurve(0, MAX_DIST, new Rational(3, 2))
   )
+);
+
+const TENTACLE_EXTEND_LENGTH = 200;
+
+/**
+ * How to explain this...
+ * The signal to open/close the polyps eminates from the anchor point.
+ * When the wave hits the polyp's center, it starts to open up.
+ *
+ * wave_passage = (wave_r - polyp.dist_from_anchor)
+ * @type {Tween<number>}
+ */
+const WAVE_PASSAGE_TO_EXTEND_TIME = Tween.scalar(
+  0,
+  1,
+  0,
+  TENTACLE_EXTEND_LENGTH
 );
 
 class Polyp {
@@ -63,8 +79,6 @@ class Polyp {
       return new CirclePrimitive(position, TENTACLE_CIRCLE_RADIUS);
     });
 
-    this.extend_tween = Tween.scalar(0, 1, 0, TENTACLE_EXTEND_LENGTH);
-
     this.primitive = group(
       this.mouth_back,
       this.mouth_front,
@@ -77,14 +91,13 @@ class Polyp {
     // A wave passes from the anchor point outwards
     const extend_signal = CURVE_EXTEND_RADIUS.value(time);
 
-    const extend_t = this.extend_tween.get_value(
+    const extend_t = WAVE_PASSAGE_TO_EXTEND_TIME.get_value(
       extend_signal - this.dist_from_anchor
     );
-
     const tentacle_r = EXTEND_TENTACLES.get_value(extend_t);
 
     const loop_t = mod(time, 1.0);
-    const mouth_r = OPEN_MOUTH.get_value(loop_t);
+    const mouth_r = OPEN_MOUTH.get_value(extend_t);
     this.mouth_back.radius = mouth_r;
 
     SIXTH_ROOTS.forEach((dir, i) => {
@@ -125,6 +138,7 @@ export class Polyps {
       new Polyp(new Point(10, 610)),
       new Polyp(new Point(55, 650)),
     ];
+    console.log(this.polyps.map((x) => x.dist_from_anchor));
 
     this.primitive = group(...this.polyps.map((x) => x.render()));
   }
