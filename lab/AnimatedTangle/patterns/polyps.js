@@ -5,19 +5,21 @@ import { mod } from "../../../sketchlib/mod.js";
 import { CirclePrimitive } from "../../../sketchlib/primitives/CirclePrimitive.js";
 import { GroupPrimitive } from "../../../sketchlib/primitives/GroupPrimitive.js";
 import { LinePrimitive } from "../../../sketchlib/primitives/LinePrimitive.js";
-import { group } from "../../../sketchlib/primitives/shorthand.js";
+import { group, style } from "../../../sketchlib/primitives/shorthand.js";
+import { Style } from "../../../sketchlib/Style.js";
 import { Tween } from "../../../sketchlib/Tween.js";
 import { LoopCurve } from "../../lablib/animation/LoopCurve.js";
 import { ParamCurve } from "../../lablib/animation/ParamCurve.js";
 import { Sequential } from "../../lablib/music/Timeline.js";
 import { Rational } from "../../lablib/Rational.js";
+import { PALETTE_CORAL, Values } from "../theme_colors.js";
 
 const TENTACLE_MIN = 10;
 const TENTACLE_MAX = 30;
 const TENTACLE_CIRCLE_RADIUS = 4;
 
 const MOUTH_MIN = 15;
-const MOUTH_MAX = 20;
+const MOUTH_MAX = 22;
 const SIXTH_ROOTS = Direction.roots_of_unity(6);
 
 const EXTEND_TENTACLES = Tween.scalar(
@@ -34,8 +36,8 @@ const ANCHOR_POINT = new Point(0, 600);
 const MAX_DIST = 600;
 const CURVE_EXTEND_RADIUS = LoopCurve.from_timeline(
   new Sequential(
-    new ParamCurve(MAX_DIST, 0, new Rational(1, 4)),
-    new ParamCurve(0, MAX_DIST, new Rational(3, 2))
+    new ParamCurve(MAX_DIST, 0, new Rational(1, 3), Ease.in_cubic),
+    new ParamCurve(0, MAX_DIST, new Rational(3, 2), Ease.in_out_cubic)
   )
 );
 
@@ -55,6 +57,25 @@ const WAVE_PASSAGE_TO_EXTEND_TIME = Tween.scalar(
   0,
   TENTACLE_EXTEND_LENGTH
 );
+
+const STYLE_MOUTH_BACK = new Style({
+  stroke: PALETTE_CORAL[Values.Dark].to_srgb(),
+  fill: PALETTE_CORAL[Values.Light].to_srgb(),
+});
+
+const STYLE_MOUTH_FRONT = new Style({
+  fill: PALETTE_CORAL[Values.Dark].to_srgb(),
+});
+
+const STYLE_TENTACLE_LINES = new Style({
+  stroke: PALETTE_CORAL[Values.MedDark].to_srgb(),
+  width: 2,
+});
+
+const STYLE_TENTACLE_CIRCLES = new Style({
+  stroke: PALETTE_CORAL[Values.MedDark].to_srgb(),
+  fill: PALETTE_CORAL[Values.Light].to_srgb(),
+});
 
 class Polyp {
   /**
@@ -80,10 +101,10 @@ class Polyp {
     });
 
     this.primitive = group(
-      this.mouth_back,
-      this.mouth_front,
-      ...this.tentacle_lines,
-      ...this.tentacle_circles
+      style(this.mouth_back, STYLE_MOUTH_BACK),
+      style(this.mouth_front, STYLE_MOUTH_FRONT),
+      style(this.tentacle_lines, STYLE_TENTACLE_LINES),
+      style(this.tentacle_circles, STYLE_TENTACLE_CIRCLES)
     );
   }
 

@@ -15,8 +15,8 @@ const RADIUS_BIG = 25;
 const RADIUS_SMALL = RADIUS_BIG / 2;
 
 const STYLE_CORAL = new Style({
-  fill: PALETTE_CORAL[Values.Light].to_srgb(),
-  stroke: PALETTE_CORAL[Values.MedDark].to_srgb(),
+  fill: PALETTE_CORAL[Values.Medium].to_srgb(),
+  stroke: PALETTE_CORAL[Values.Dark].to_srgb(),
   width: 4,
 });
 
