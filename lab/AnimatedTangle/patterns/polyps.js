@@ -12,7 +12,7 @@ import { LoopCurve } from "../../lablib/animation/LoopCurve.js";
 import { ParamCurve } from "../../lablib/animation/ParamCurve.js";
 import { Sequential } from "../../lablib/music/Timeline.js";
 import { Rational } from "../../lablib/Rational.js";
-import { PALETTE_CORAL, Values } from "../theme_colors.js";
+import { PALETTE_CORAL, PALETTE_NAVY, Values } from "../theme_colors.js";
 
 const TENTACLE_MIN = 10;
 const TENTACLE_MAX = 30;
@@ -64,7 +64,7 @@ const STYLE_MOUTH_BACK = new Style({
 });
 
 const STYLE_MOUTH_FRONT = new Style({
-  fill: PALETTE_CORAL[Values.Dark].to_srgb(),
+  fill: PALETTE_NAVY[Values.Medium].to_srgb(),
 });
 
 const STYLE_TENTACLE_LINES = new Style({
