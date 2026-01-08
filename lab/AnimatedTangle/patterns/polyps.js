@@ -77,7 +77,29 @@ class Polyp {
 
 export class Polyps {
   constructor() {
-    this.polyps = [new Polyp(new Point(125, 500))];
+    this.polyps = [
+      new Polyp(new Point(85, 255)),
+      new Polyp(new Point(125, 275)),
+      new Polyp(new Point(110, 325)),
+      new Polyp(new Point(225, 330)),
+      new Polyp(new Point(140, 355)),
+      new Polyp(new Point(185, 360)),
+      new Polyp(new Point(35, 360)),
+      new Polyp(new Point(85, 380)),
+      new Polyp(new Point(140, 410)),
+      new Polyp(new Point(50, 410)),
+      new Polyp(new Point(100, 450)),
+      new Polyp(new Point(160, 460)),
+      new Polyp(new Point(30, 465)),
+      new Polyp(new Point(125, 500)),
+      new Polyp(new Point(35, 525)),
+      new Polyp(new Point(75, 545)),
+      new Polyp(new Point(145, 550)),
+      new Polyp(new Point(180, 580)),
+      new Polyp(new Point(60, 590)),
+      new Polyp(new Point(10, 610)),
+      new Polyp(new Point(55, 650)),
+    ];
 
     this.primitive = group(...this.polyps.map((x) => x.render()));
   }
