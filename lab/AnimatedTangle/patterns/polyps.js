@@ -7,10 +7,15 @@ import { GroupPrimitive } from "../../../sketchlib/primitives/GroupPrimitive.js"
 import { LinePrimitive } from "../../../sketchlib/primitives/LinePrimitive.js";
 import { group } from "../../../sketchlib/primitives/shorthand.js";
 import { Tween } from "../../../sketchlib/Tween.js";
+import { LoopCurve } from "../../lablib/animation/LoopCurve.js";
+import { ParamCurve } from "../../lablib/animation/ParamCurve.js";
+import { Sequential } from "../../lablib/music/Timeline.js";
+import { Rational } from "../../lablib/Rational.js";
 
 const TENTACLE_MIN = 10;
 const TENTACLE_MAX = 30;
 const TENTACLE_CIRCLE_RADIUS = 3;
+const TENTACLE_EXTEND_LENGTH = TENTACLE_MAX - TENTACLE_MIN;
 
 const MOUTH_MIN = 15;
 const MOUTH_MAX = 20;
@@ -25,6 +30,16 @@ const EXTEND_TENTACLES = Tween.scalar(
 );
 const OPEN_MOUTH = Tween.scalar(MOUTH_MIN, MOUTH_MAX, 0, 1, Ease.in_out_cubic);
 
+const ANCHOR_POINT = new Point(0, 600);
+
+const MAX_DIST = 600;
+const CURVE_EXTEND_RADIUS = LoopCurve.from_timeline(
+  new Sequential(
+    new ParamCurve(MAX_DIST, 0, new Rational(1, 2)),
+    new ParamCurve(0, MAX_DIST, new Rational(3, 2))
+  )
+);
+
 class Polyp {
   /**
    *
@@ -32,6 +47,7 @@ class Polyp {
    */
   constructor(position) {
     this.position = position;
+    this.dist_from_anchor = this.position.dist(ANCHOR_POINT);
 
     this.mouth_back = new CirclePrimitive(this.position, MOUTH_MAX);
     this.mouth_front = new CirclePrimitive(this.position, MOUTH_MIN);
@@ -47,6 +63,8 @@ class Polyp {
       return new CirclePrimitive(position, TENTACLE_CIRCLE_RADIUS);
     });
 
+    this.extend_tween = Tween.scalar(0, 1, 0, TENTACLE_EXTEND_LENGTH);
+
     this.primitive = group(
       this.mouth_back,
       this.mouth_front,
@@ -56,9 +74,16 @@ class Polyp {
   }
 
   update(time) {
-    const loop_t = mod(time, 1.0);
-    const tentacle_r = EXTEND_TENTACLES.get_value(loop_t);
+    // A wave passes from the anchor point outwards
+    const extend_signal = CURVE_EXTEND_RADIUS.value(time);
 
+    const extend_t = this.extend_tween.get_value(
+      extend_signal - this.dist_from_anchor
+    );
+
+    const tentacle_r = EXTEND_TENTACLES.get_value(extend_t);
+
+    const loop_t = mod(time, 1.0);
     const mouth_r = OPEN_MOUTH.get_value(loop_t);
     this.mouth_back.radius = mouth_r;
 
