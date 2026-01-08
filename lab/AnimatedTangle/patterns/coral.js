@@ -250,6 +250,8 @@ class SwayingCoral {
     const coral_shape = this.tree.render();
     this.coral_mask.primitives.splice(0, Infinity, coral_shape);
     this.coral_slot.splice(0, 1, coral_shape);
+
+    this.polyps.update(time);
   }
 
   render() {

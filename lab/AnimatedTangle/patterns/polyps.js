@@ -1,5 +1,7 @@
 import { Direction } from "../../../pga2d/Direction.js";
 import { Point } from "../../../pga2d/Point.js";
+import { Ease } from "../../../sketchlib/Ease.js";
+import { mod } from "../../../sketchlib/mod.js";
 import { CirclePrimitive } from "../../../sketchlib/primitives/CirclePrimitive.js";
 import { GroupPrimitive } from "../../../sketchlib/primitives/GroupPrimitive.js";
 import { LinePrimitive } from "../../../sketchlib/primitives/LinePrimitive.js";
@@ -9,12 +11,19 @@ import { Tween } from "../../../sketchlib/Tween.js";
 const TENTACLE_MIN = 10;
 const TENTACLE_MAX = 30;
 const TENTACLE_CIRCLE_RADIUS = 3;
+
 const MOUTH_MIN = 15;
 const MOUTH_MAX = 20;
 const SIXTH_ROOTS = Direction.roots_of_unity(6);
 
-const EXTEND_TENTACLES = Tween.scalar(TENTACLE_MIN, TENTACLE_MAX, 0, 1);
-const OPEN_MOUTH = Tween.scalar(MOUTH_MIN, MOUTH_MAX, 0, 1);
+const EXTEND_TENTACLES = Tween.scalar(
+  TENTACLE_MIN,
+  TENTACLE_MAX,
+  0,
+  1,
+  Ease.in_out_cubic
+);
+const OPEN_MOUTH = Tween.scalar(MOUTH_MIN, MOUTH_MAX, 0, 1, Ease.in_out_cubic);
 
 class Polyp {
   /**
@@ -40,13 +49,26 @@ class Polyp {
 
     this.primitive = group(
       this.mouth_back,
+      this.mouth_front,
       ...this.tentacle_lines,
-      ...this.tentacle_circles,
-      this.mouth_front
+      ...this.tentacle_circles
     );
   }
 
-  update(time) {}
+  update(time) {
+    const loop_t = mod(time, 1.0);
+    const tentacle_r = EXTEND_TENTACLES.get_value(loop_t);
+
+    const mouth_r = OPEN_MOUTH.get_value(loop_t);
+    this.mouth_back.radius = mouth_r;
+
+    SIXTH_ROOTS.forEach((dir, i) => {
+      const tentacle_end = this.position.add(dir.scale(tentacle_r));
+
+      this.tentacle_circles[i].position = tentacle_end;
+      this.tentacle_lines[i].b = tentacle_end;
+    });
+  }
 
   render() {
     return this.primitive;
