@@ -4,7 +4,7 @@ import { WIDTH, HEIGHT, SCREEN_CENTER } from "../../sketchlib/dimensions.js";
 import { Mask } from "../../sketchlib/primitives/ClipMask.js";
 import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
 import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
-import { group, style } from "../../sketchlib/primitives/shorthand.js";
+import { style } from "../../sketchlib/primitives/shorthand.js";
 import { VectorTangle } from "../../sketchlib/primitives/VectorTangle.js";
 import { Style } from "../../sketchlib/Style.js";
 import { CIRCLE_FAN } from "./patterns/circle_fan.js";
@@ -17,7 +17,6 @@ import { PALETTE_CORAL, PALETTE_NAVY, Values } from "./theme_colors.js";
 import { HITOMEZASHI } from "./patterns/hitomezashi.js";
 import { TRAFFIC } from "./patterns/traffic.js";
 import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
-import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { BRICKS } from "./patterns/brick_wall.js";
 import { DOORS } from "./patterns/doors.js";
 

@@ -7,6 +7,9 @@ import { CoralNode, CoralTree } from "../CoralTree.js";
 import { AnimatedStripes } from "./stripes.js";
 import { Hinge } from "../Hinge.js";
 import { PALETTE_CORAL, PALETTE_SKY, Values } from "../theme_colors.js";
+import { Polyps } from "./polyps.js";
+import { Mask } from "../../../sketchlib/primitives/ClipMask.js";
+import { ClipPrimitive } from "../../../sketchlib/primitives/ClipPrimitive.js";
 
 const RADIUS_BIG = 25;
 const RADIUS_SMALL = RADIUS_BIG / 2;
@@ -191,11 +194,9 @@ class SwayingCoral {
       )
     );
 
-    const colored_coral = style(this.tree.render(), STYLE_CORAL);
-    // Save a reference for modifying the group when the tree
-    // refreshes
-    this.coral_slot = colored_coral.primitives;
+    this.polyps = new Polyps();
 
+    // Make a set of animated stripes as a background
     this.stripes = new AnimatedStripes(
       new Point(150, 500),
       new Direction(-1, 2).normalize(),
@@ -204,7 +205,20 @@ class SwayingCoral {
     );
     const styled_stripes = style(this.stripes.render(), STYLE_STRIPES);
 
-    this.primitive = group(styled_stripes, colored_coral);
+    const coral_shape = this.tree.render();
+    this.coral_mask = new Mask(coral_shape);
+
+    const colored_coral = style(coral_shape, STYLE_CORAL);
+    // Save a reference for modifying the group when the tree
+    // refreshes
+    this.coral_slot = colored_coral.primitives;
+
+    const clipped_polyps = new ClipPrimitive(
+      this.coral_mask,
+      this.polyps.render()
+    );
+
+    this.primitive = group(styled_stripes, colored_coral, clipped_polyps);
   }
 
   /**
@@ -212,7 +226,7 @@ class SwayingCoral {
    * @param {number} time Animation time
    */
   update(time) {
-    this.stripes.update(10 * time);
+    this.stripes.update(2 * time);
 
     // Make the hinges sway
     this.hinge_c.update(time);
@@ -232,8 +246,10 @@ class SwayingCoral {
     this.node_n.circle.position = this.hinge_n.position;
     this.node_p.circle.position = this.hinge_p.position;
 
-    // re-draw the primitive
-    this.coral_slot[0] = this.tree.render();
+    // re-draw the clip mask
+    const coral_shape = this.tree.render();
+    this.coral_mask.primitives.splice(0, Infinity, coral_shape);
+    this.coral_slot.splice(0, 1, coral_shape);
   }
 
   render() {
