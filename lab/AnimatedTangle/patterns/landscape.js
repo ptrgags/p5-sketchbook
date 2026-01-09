@@ -2,21 +2,47 @@ import { Direction } from "../../../pga2d/Direction.js";
 import { Point } from "../../../pga2d/Point.js";
 import { WIDTH } from "../../../sketchlib/dimensions.js";
 import { PolygonPrimitive } from "../../../sketchlib/primitives/PolygonPrimitive.js";
-import { group } from "../../../sketchlib/primitives/shorthand.js";
+import { group, style } from "../../../sketchlib/primitives/shorthand.js";
 import { Transform } from "../../../sketchlib/primitives/Transform.js";
 import { Style } from "../../../sketchlib/Style.js";
-import { PALETTE_ROCK, Values } from "../theme_colors.js";
+import {
+  PALETTE_CORAL,
+  PALETTE_NAVY,
+  PALETTE_ROCK,
+  PALETTE_SKY,
+  Values,
+} from "../theme_colors.js";
 import { mod } from "../../../sketchlib/mod.js";
 import { GroupPrimitive } from "../../../sketchlib/primitives/GroupPrimitive.js";
 import { BeziergonPrimitive } from "../../../sketchlib/primitives/BeziergonPrimitive.js";
+import { RectPrimitive } from "../../../sketchlib/primitives/RectPrimitive.js";
+import { CirclePrimitive } from "../../../sketchlib/primitives/CirclePrimitive.js";
 
 const STYLE_MOUNTAINS = new Style({
-  fill: PALETTE_ROCK[Values.MedDark].to_srgb(),
+  fill: PALETTE_ROCK[Values.Medium].to_srgb(),
 });
 
 const NUM_HILL_LAYERS = 3;
 const MOUNTAIN_AMPLITUDE = 35;
 const MOUNTAIN_CENTER = 35;
+
+const HILL_FIRST_CENTER = 60;
+const HILL_Y_SPACING = 10;
+const HILL_AMPLITUDE = 20;
+const HILL_STYLES = [
+  new Style({
+    fill: PALETTE_NAVY[Values.Light].to_srgb(),
+  }),
+  new Style({
+    fill: PALETTE_NAVY[Values.MedLight].to_srgb(),
+  }),
+  new Style({
+    fill: PALETTE_NAVY[Values.Medium].to_srgb(),
+  }),
+];
+
+const DURATION_MOUNTAIN = 8;
+const PARALLAX_STEP = 1.5;
 
 /**
  *
@@ -41,6 +67,19 @@ function make_zigzag_points(n, amplitude, center_y) {
   return result;
 }
 
+const STYLE_SKY = new Style({
+  fill: PALETTE_SKY[Values.Medium].to_srgb(),
+});
+const BACKGROUND = style(
+  new RectPrimitive(Point.ORIGIN, new Direction(500, 100)),
+  STYLE_SKY
+);
+
+const STYLE_SUN = new Style({
+  fill: PALETTE_CORAL[Values.Light].to_srgb(),
+});
+const SUN = style(new CirclePrimitive(new Point(400, 25), 10), STYLE_SUN);
+
 class Landscape {
   /**
    * Constructor
@@ -59,11 +98,10 @@ class Landscape {
     this.hill_points = new Array(NUM_HILL_LAYERS);
     const num_hill_points = Math.floor(n / 2);
     for (let i = 0; i < NUM_HILL_LAYERS; i++) {
-      const amplitude = 10;
-      const center_y = (i + 1) * 25;
+      const center_y = HILL_FIRST_CENTER + i * HILL_Y_SPACING;
       this.hill_points[i] = make_zigzag_points(
         num_hill_points,
-        amplitude,
+        HILL_AMPLITUDE,
         center_y
       );
     }
@@ -102,18 +140,19 @@ class Landscape {
 
       const original = new GroupPrimitive(rolling_hills, {
         transform: transform_orig,
+        style: HILL_STYLES[i],
       });
       const copy = new GroupPrimitive(rolling_hills, {
         transform: transform_copy,
+        style: HILL_STYLES[i],
       });
       primitives.push(original, copy);
     });
 
-    this.primitive = group(...primitives);
+    this.primitive = group(BACKGROUND, SUN, ...primitives);
   }
 
   update(time) {
-    const DURATION_MOUNTAIN = 8;
     const t_mountain = mod(time, DURATION_MOUNTAIN) / DURATION_MOUNTAIN;
     const mountain_offset = WIDTH * t_mountain;
     this.transform_orig.translation = new Direction(mountain_offset, 0);
@@ -121,8 +160,10 @@ class Landscape {
 
     for (let i = 0; i < NUM_HILL_LAYERS; i++) {
       // Each layer is faster than the previous
-      const duration_hill = DURATION_MOUNTAIN - 2 * i;
-      const t_hill = mod(time, duration_hill) / duration_hill;
+      const duration_hill = DURATION_MOUNTAIN - PARALLAX_STEP * (i + 1);
+      const phase = i / (NUM_HILL_LAYERS - 1);
+      let t_hill = mod(time, duration_hill) / duration_hill;
+      t_hill = mod(t_hill + phase, 1.0);
       const hill_offset = WIDTH * t_hill;
       this.hill_transforms_orig[i].translation = new Direction(hill_offset, 0);
       this.hill_transforms_copy[i].translation = new Direction(
