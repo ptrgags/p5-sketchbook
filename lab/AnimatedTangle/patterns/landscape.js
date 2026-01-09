@@ -45,29 +45,6 @@ const HILL_STYLES = [
 const DURATION_MOUNTAIN = 8;
 const PARALLAX_STEP = 1.5;
 
-/**
- *
- * @param {number} n How many points to make across the width of the screen
- * @param {number} amplitude the amplitude of the wave in pixels
- * @param {number} center_y the center y value in pixels
- */
-function make_zigzag_points(n, amplitude, center_y) {
-  const spacing = WIDTH / (n - 1);
-
-  const result = new Array(n);
-  for (let i = 0; i < n; i++) {
-    const sign = (-1) ** i;
-    const height = amplitude * Math.random();
-
-    result[i] = new Point(i * spacing, center_y + sign * height);
-  }
-  // Make it loop
-  const last_point = result.at(-1);
-  result[0] = new Point(result[0].x, last_point.y);
-
-  return result;
-}
-
 const STYLE_SKY = new Style({
   fill: PALETTE_SKY[Values.Medium].to_srgb(),
 });
@@ -96,6 +73,75 @@ const STYLE_SUN = new Style({
 const SUN_RAYS = style(SUN_RAY_LINES, STYLE_SUN_LINES);
 const SUN_DISK = style(new CirclePrimitive(SUN_CENTER, SUN_RADIUS), STYLE_SUN);
 const SUN = group(SUN_DISK, SUN_RAYS);
+
+const STYLE_SNOWCAPS = new Style({
+  fill: PALETTE_SKY[Values.Light].to_srgb(),
+});
+
+// percentage of height from bottom to top
+const SNOW_LEVEL = 0.6;
+
+/**
+ *
+ * @param {number} n How many points to make across the width of the screen
+ * @param {number} amplitude the amplitude of the wave in pixels
+ * @param {number} center_y the center y value in pixels
+ */
+function make_zigzag_points(n, amplitude, center_y) {
+  const spacing = WIDTH / (n - 1);
+
+  const result = new Array(n);
+  for (let i = 0; i < n; i++) {
+    const sign = (-1) ** i;
+    const height = amplitude * Math.random();
+
+    result[i] = new Point(i * spacing, center_y + sign * height);
+  }
+  // Make it loop
+  const last_point = result.at(-1);
+  result[0] = new Point(result[0].x, last_point.y);
+
+  return result;
+}
+
+/**
+ *
+ * @param {Point[]} mountain_points Points from make_zigzag_points used for the mountain outline
+ * @returns {GroupPrimitive} parallelogram snow caps created from the zigzag vertices. This is already styled
+ */
+function make_snowcaps(mountain_points) {
+  // points are ordered down, up, down, up, down, up, and there are an odd
+  // number of them so it always starts and ends on down
+  //
+  // we want to take every down, up, and down and make a quadrilateral like
+  // the diagram
+  //
+  //      up
+  //     /  \
+  //    /\  /\
+  //   /  \/  \
+  //  /        \
+  // down       down
+
+  const snowcaps = [];
+  for (let i = 0; i < mountain_points.length - 1; i += 2) {
+    const down_left = mountain_points[i];
+    const up = mountain_points[i + 1];
+    const down_right = mountain_points[i + 2];
+
+    const snow_left = Point.lerp(down_left, up, SNOW_LEVEL);
+    const snow_right = Point.lerp(down_right, up, SNOW_LEVEL);
+
+    // For the bottom point of the parallelogram
+    const offset = snow_left.sub(up);
+    const snow_down = snow_right.add(offset);
+
+    snowcaps.push(
+      new PolygonPrimitive([snow_left, snow_down, snow_right, up], true)
+    );
+  }
+  return style(snowcaps, STYLE_SNOWCAPS);
+}
 
 class Landscape {
   /**
@@ -130,13 +176,15 @@ class Landscape {
       [...this.mountain_points, BOTTOM_RIGHT, BOTTOM_LEFT],
       true
     );
+    const snowcaps = make_snowcaps(this.mountain_points);
+
     this.transform_orig = new Transform(new Direction(0, 0));
     this.transform_copy = new Transform(new Direction(-WIDTH, 0));
-    const original = new GroupPrimitive(mountain_poly, {
+    const original = new GroupPrimitive([mountain_poly, snowcaps], {
       style: STYLE_MOUNTAINS,
       transform: this.transform_orig,
     });
-    const copy = new GroupPrimitive(mountain_poly, {
+    const copy = new GroupPrimitive([mountain_poly, snowcaps], {
       style: STYLE_MOUNTAINS,
       transform: this.transform_copy,
     });
