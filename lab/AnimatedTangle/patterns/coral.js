@@ -49,83 +49,78 @@ class SwayingCoral {
     // Unfortunately, to add the hinges, I need to create the tree
     // in a rather convoluted order
 
+
+    // C -- hinges about B
+    this.node_c = new CoralNode(CIRCLE_C);\
+    // E -- hinges about D
+    this.node_e = new CoralNode(CIRCLE_E);
     // H -- hinges about G
     this.node_h = new CoralNode(CIRCLE_H);
-    // G -- serves as anchor for H
-    this.node_g = new CoralNode(
-      CIRCLE_G,
-      [this.node_h],
-      // skip for G
-      { right: false }
-    );
-
-    // L -- Hinges about J
+    // Both L and K hinge around J. They use the same anchor point and sway
+    // at the same frequency so the shape doesn't distort in length, since
+    // K is a parent for L
     this.node_l = new CoralNode(CIRCLE_L);
-    // K -- hinges about J
     this.node_k = new CoralNode(
       CIRCLE_K,
       [this.node_l],
       // Skip for K
       { right: true }
     );
-    // J -- serves as the hinge point for both L and K
-    this.node_j = new CoralNode(CIRCLE_J, [this.node_k]);
-
     // N -- hinges about M
     this.node_n = new CoralNode(CIRCLE_N);
-    // M -- hinge for n
-    this.node_m = new CoralNode(CIRCLE_M, [this.node_n]);
-
     // P -- hinges about O
     this.node_p = new CoralNode(CIRCLE_P);
-    // O
-    this.node_o = new CoralNode(CIRCLE_O, [this.node_p]);
-
-    // E -- hinges about D
-    this.node_e = new CoralNode(CIRCLE_E);
-    // D
-    this.node_d = new CoralNode(
-      CIRCLE_D,
-      [
-        this.node_e,
-        // F
-        new CoralNode(
-          CIRCLE_F,
-          [
-            this.node_g,
-            // I
-            new CoralNode(
-              CIRCLE_I,
-              [this.node_j],
-              // skip for I
-              { left: true }
-            ),
-            // M
-            this.node_m,
-          ],
-          // Skip for F
-          { between: [true, true] }
-        ),
-      ],
-      // Skip for D
-      // Turns out I needed the left point else the curve is too
-      // broad
-      { between: [true] }
-    );
-
-    // C -- hinges about B
-    this.node_c = new CoralNode(CIRCLE_C);
-    // B -- hinge for C
-    this.node_b = new CoralNode(
-      CIRCLE_B,
-      [this.node_c, this.node_d, this.node_o],
-      // skip for B
-      { between: [false, true] }
-    );
-
+    
     this.tree = new CoralTree(
       // Node A in diagram on paper
-      new CoralNode(CIRCLE_A, [this.node_b])
+      new CoralNode(CIRCLE_A, [
+        // B -- hinge for C
+        new CoralNode(
+          CIRCLE_B,
+          [
+            this.node_c,
+            // D
+            new CoralNode(
+              CIRCLE_D,
+              [
+                this.node_e,
+                // F
+                new CoralNode(
+                  CIRCLE_F,
+                  [
+                    // G -- serves as anchor for H
+                    new CoralNode(
+                      CIRCLE_G,
+                      [this.node_h],
+                      // skip for G
+                      { right: false }
+                    ),
+                    // I
+                    new CoralNode(
+                      CIRCLE_I,
+                      [new CoralNode(CIRCLE_J, [this.node_k])],
+                      // skip for I
+                      { left: true }
+                    ),
+                    // M
+                    new CoralNode(CIRCLE_M, [this.node_n]),
+                  ],
+                  // Skip for F
+                  { between: [true, true] }
+                ),
+              ],
+              // Skip for D
+              // Turns out I needed the left point else the curve is too
+              // broad
+              { between: [true] }
+            ),
+            // O
+            new CoralNode(CIRCLE_O, [this.node_p]),
+          ],
+          // skip for B
+          { between: [false, true] }
+        ),
+      ])
     );
 
     //this.polyps = new Polyps();
