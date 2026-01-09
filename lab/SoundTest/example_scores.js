@@ -27,7 +27,7 @@ import {
   parse_melody,
   Rest,
 } from "../lablib/music/Music.js";
-import { Score } from "../lablib/music/Score.js";
+import { Part, Score } from "../lablib/music/Score.js";
 import { Gap } from "../lablib/music/Timeline.js";
 import { transpose_scale_degree } from "../lablib/music/transpose.js";
 import { Rational } from "../lablib/Rational.js";
@@ -115,13 +115,23 @@ export function layered_melody() {
     )
   );
 
-  return new Score({
-    parts: [
-      ["sine", sine_part],
-      ["square", square_part],
-      ["poly", poly_part],
-    ],
-  });
+  return new Score(
+    new Part("pedal", sine_part, {
+      instrument_id: "sine",
+      midi_instrument: 36 - 1, // fretless bass
+      midi_channel: 0,
+    }),
+    new Part("scale_arp", square_part, {
+      instrument_id: "square",
+      midi_instrument: 47 - 1, // orchestral harp
+      midi_channel: 0,
+    }),
+    new Part("poly_part", poly_part, {
+      instrument_id: "poly",
+      midi_instrument: 15 - 1, // tubular bells
+      midi_channel: 0,
+    })
+  );
 }
 
 export function phase_scale() {
@@ -142,9 +152,13 @@ export function phase_scale() {
   );
 
   const phase_part_midi = map_pitch(SCALE3, phase_part_scale);
-  return new Score({
-    parts: [["poly", phase_part_midi]],
-  });
+  return new Score(
+    new Part("phase", phase_part_midi, {
+      instrument_id: "poly",
+      midi_instrument: 10 - 1, // glockenspiel,
+      midi_channel: 0,
+    })
+  );
 }
 
 const MAJOR_SCALE_PITCHES = [C, D, E, F, G, A, B];
@@ -194,9 +208,13 @@ export function symmetry_melody() {
 
   const part_midi = map_pitch(MAJOR_SCALE, part_scale);
 
-  return new Score({
-    parts: [["supersaw", part_midi]],
-  });
+  return new Score(
+    new Part("symmetry", part_midi, {
+      instrument_id: "supersaw",
+      midi_instrument: 13 - 1, // marimba
+      midi_channel: 0,
+    })
+  );
 }
 
 /**
@@ -272,10 +290,16 @@ export function binary_chords() {
   const rhythm_bass = parse_cycle(N1, [C3, [C3, G3], C3, [C3, G3]]);
   const rhythm_loop = Melody.from_loop(rhythm_bass, full_progression.duration);
 
-  return new Score({
-    parts: [
-      ["supersaw", full_progression],
-      ["square", rhythm_loop],
-    ],
-  });
+  return new Score(
+    new Part("chords", full_progression, {
+      instrument_id: "supersaw",
+      midi_instrument: 90 - 1, // Pad 2
+      midi_channel: 0,
+    }),
+    new Part("rhythm", rhythm_loop, {
+      instrument_id: "square",
+      midi_instrument: 37 - 1, // slap bass 1,
+      midi_channel: 1,
+    })
+  );
 }

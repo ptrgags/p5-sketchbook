@@ -180,8 +180,12 @@ export function compile_music(tone, instrument, music) {
  */
 export function compile_score(tone, instruments, score) {
   const clips = [];
-  for (const [instrument_id, music] of score.parts) {
-    const clip = compile_music(tone, instruments[instrument_id], music);
+  for (const part of score.parts) {
+    const clip = compile_music(
+      tone,
+      instruments[part.instrument_id],
+      part.music
+    );
     clips.push(clip);
   }
 

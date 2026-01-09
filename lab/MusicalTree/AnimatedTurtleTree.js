@@ -253,26 +253,26 @@ class TreeMusicBuilder {
     const stack = map_pitch(SCALE, new Melody(...this.stack_notes));
     const turn = map_pitch(SCALE, new Melody(...this.turn_notes));
 
-    return new Score([
+    return new Score(
       new Part("draw", draw, {
-        instrument: new BasicSynth("triangle"),
+        instrument_id: "triangle",
         label: "Draw Operations",
         midi_channel: 0,
         midi_instrument: 76 - 1, // Pan flute
       }),
       new Part("stack", stack, {
-        instrument: new BasicSynth("square"),
+        instrument_id: "square",
         label: "Stack Operations",
         midi_channel: 1,
         midi_instrument: 11 - 1, // music box
       }),
       new Part("turn", turn, {
-        instrument: new BasicSynth("sine"),
+        instrument_id: "sine",
         label: "Turn Operations",
         midi_channel: 2,
         midi_instrument: 37 - 1, // slap bass 1
-      }),
-    ]);
+      })
+    );
   }
 }
 

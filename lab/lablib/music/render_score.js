@@ -180,13 +180,12 @@ export function render_music(
  */
 export function render_score(offset, score, measure_dimensions, styles) {
   const parts = [];
-  for (const [i, entry] of score.parts.entries()) {
-    const [, part] = entry;
+  for (const [i, part] of score.parts.entries()) {
     const child_offset = new Direction(0, measure_dimensions.y).scale(i);
 
     const rendered = render_music(
       offset.add(child_offset),
-      part,
+      part.music,
       measure_dimensions,
       styles[i],
       NOTE_STYLE

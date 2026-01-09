@@ -157,7 +157,7 @@ export class SoundManager {
     const score_events = [];
     for (const part of score.parts) {
       score_events.push({
-        instrument: part.instrument,
+        instrument_id: part.instrument_id,
         events: to_events(Rational.ZERO, part.music),
       });
     }
