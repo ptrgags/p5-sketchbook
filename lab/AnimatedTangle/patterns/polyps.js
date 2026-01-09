@@ -108,6 +108,16 @@ export class Polyp {
     );
   }
 
+  update_position(position) {
+    this.position = position;
+    this.mouth_back.position = position;
+    this.mouth_front.position = position;
+
+    SIXTH_ROOTS.forEach((dir, i) => {
+      this.tentacle_lines[i].a = position.add(dir.scale(MOUTH_MIN));
+    });
+  }
+
   update(time) {
     // A wave passes from the anchor point outwards
     const extend_signal = CURVE_EXTEND_RADIUS.value(time);
@@ -117,7 +127,6 @@ export class Polyp {
     );
     const tentacle_r = EXTEND_TENTACLES.get_value(extend_t);
 
-    const loop_t = mod(time, 1.0);
     const mouth_r = OPEN_MOUTH.get_value(extend_t);
     this.mouth_back.radius = mouth_r;
 

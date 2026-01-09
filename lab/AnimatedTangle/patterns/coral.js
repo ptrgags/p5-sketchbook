@@ -210,6 +210,12 @@ class SwayingCoral {
     ];
     this.polyps = ALL_CIRCLES.map((c) => new Polyp(c.position));
 
+    const CODE_POINT_A = 65;
+    this.dynamic_polyps = ["C", "E", "H", "K", "L", "N", "P"].map((c) => {
+      const index = c.codePointAt(0) - CODE_POINT_A;
+      return this.polyps[index];
+    });
+
     const polyp_primitives = group(...this.polyps.map((x) => x.render()));
     this.primitive = group(styled_stripes, colored_coral, polyp_primitives);
   }
@@ -227,7 +233,7 @@ class SwayingCoral {
 
       // Update the node and polyp position attached to the hinge
       this.dynamic_nodes[i].circle.position = hinge.position;
-      this.polyps[i].position = hinge.position;
+      this.dynamic_polyps[i].update_position(hinge.position);
     });
 
     this.polyps.forEach((x) => x.update(time));
