@@ -118,6 +118,15 @@ export class Point {
   }
 
   /**
+   * Compute distance to a point
+   * @param {Point} point another point
+   * @returns {number}
+   */
+  dist(point) {
+    return Math.sqrt(this.dist_sqr(point));
+  }
+
+  /**
    * Return a point of the same type
    * @returns {Point} The result of flipping the y-coordinate
    */

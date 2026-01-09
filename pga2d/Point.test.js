@@ -96,4 +96,28 @@ describe("Point", () => {
     const expected = new Point(3, -4);
     expect(result).toBePoint(expected);
   });
+
+  it("dist_sqr returns euclidean distance squared between two points", () => {
+    const a = new Point(-1, 2);
+    const b = new Point(3, -4);
+
+    const result = a.dist_sqr(b);
+
+    // (3 + 1)^2 + (-4 - 2)^2
+    // 4^2 + 6^2 = 52
+    const expected = 52;
+    expect(result).toBe(expected);
+  });
+
+  it("dist returns euclidean distance between two points", () => {
+    const a = new Point(-1, 2);
+    const b = new Point(3, -4);
+
+    const result = a.dist(b);
+
+    // sqrt((3 + 1)^2 + (-4 - 2)^2)
+    // sqrt(4^2 + 6^2) = sqrt(52)
+    const expected = Math.sqrt(52);
+    expect(result).toBe(expected);
+  });
 });

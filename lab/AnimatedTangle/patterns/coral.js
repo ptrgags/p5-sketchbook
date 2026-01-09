@@ -1,19 +1,36 @@
 import { Direction } from "../../../pga2d/Direction.js";
 import { Point } from "../../../pga2d/Point.js";
-import { CirclePrimitive } from "../../../sketchlib/primitives/CirclePrimitive.js";
 import { group, style } from "../../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../../sketchlib/Style.js";
 import { CoralNode, CoralTree } from "../CoralTree.js";
 import { AnimatedStripes } from "./stripes.js";
 import { Hinge } from "../Hinge.js";
 import { PALETTE_CORAL, PALETTE_SKY, Values } from "../theme_colors.js";
-
-const RADIUS_BIG = 25;
-const RADIUS_SMALL = RADIUS_BIG / 2;
+import { Polyp } from "./polyps.js";
+import { Mask } from "../../../sketchlib/primitives/ClipMask.js";
+import {
+  ALL_CIRCLES,
+  CIRCLE_A,
+  CIRCLE_B,
+  CIRCLE_C,
+  CIRCLE_D,
+  CIRCLE_E,
+  CIRCLE_F,
+  CIRCLE_G,
+  CIRCLE_H,
+  CIRCLE_I,
+  CIRCLE_J,
+  CIRCLE_K,
+  CIRCLE_L,
+  CIRCLE_M,
+  CIRCLE_N,
+  CIRCLE_O,
+  CIRCLE_P,
+} from "./coral_layout.js";
 
 const STYLE_CORAL = new Style({
-  fill: PALETTE_CORAL[Values.Light].to_srgb(),
-  stroke: PALETTE_CORAL[Values.MedDark].to_srgb(),
+  fill: PALETTE_CORAL[Values.Medium].to_srgb(),
+  stroke: PALETTE_CORAL[Values.Dark].to_srgb(),
   width: 4,
 });
 
@@ -26,176 +43,104 @@ const SWAY_AMPLITUDE = Math.PI / 12;
 const SWAY_FREQUENCY = 0.25;
 const PHASE_OFFSET = (2 * Math.PI) / 7;
 
+const CODE_POINT_A = 65;
+/**
+ * Take an ASCII value and convert it to an index relative to 'A'
+ * @param {string} letter A capital letter.
+ * @returns {number} array Index of letter in ASCIIbetical order
+ */
+function letter_to_index(letter) {
+  return letter.codePointAt(0) - CODE_POINT_A;
+}
+
 class SwayingCoral {
   constructor() {
-    // Node letter labels refer to the concept art diagram
     // Unfortunately, to add the hinges, I need to create the tree
     // in a rather convoluted order
 
+    // C -- hinges about B
+    const node_c = new CoralNode(CIRCLE_C);
+    // E -- hinges about D
+    const node_e = new CoralNode(CIRCLE_E);
     // H -- hinges about G
-    this.node_h = new CoralNode(
-      // Adjusted slightly from diagram
-      new CirclePrimitive(new Point(225, 325), RADIUS_BIG)
-    );
-    // G -- serves as anchor for H
-    this.node_g = new CoralNode(
-      new CirclePrimitive(new Point(175, 375), RADIUS_SMALL),
-      [this.node_h],
-      // skip for G
-      { right: false }
-    );
-    this.hinge_h = new Hinge(
-      this.node_g.circle.position,
-      this.node_h.circle.position,
-      SWAY_AMPLITUDE,
-      SWAY_FREQUENCY
-    );
-
-    // L -- Hinges about J
-    this.node_l = new CoralNode(
-      new CirclePrimitive(new Point(75, 250), RADIUS_BIG)
-    );
-    // K -- hinges about J
-    this.node_k = new CoralNode(
-      new CirclePrimitive(new Point(125, 275), RADIUS_BIG),
-      [this.node_l],
+    const node_h = new CoralNode(CIRCLE_H);
+    // Both L and K hinge around J. They use the same anchor point and sway
+    // at the same frequency so the shape doesn't distort in length, since
+    // K is a parent for L
+    const node_l = new CoralNode(CIRCLE_L);
+    const node_k = new CoralNode(
+      CIRCLE_K,
+      [node_l],
       // Skip for K
       { right: true }
     );
-    // J -- serves as the hinge point for both L and K
-    this.node_j = new CoralNode(
-      CirclePrimitive.from_two_points(new Point(125, 325), new Point(125, 350)),
-      [this.node_k]
-    );
-    this.hinge_l = new Hinge(
-      this.node_j.circle.position,
-      this.node_l.circle.position,
-      SWAY_AMPLITUDE,
-      SWAY_FREQUENCY,
-      PHASE_OFFSET
-    );
-    this.hinge_k = new Hinge(
-      this.node_j.circle.position,
-      this.node_k.circle.position,
-      SWAY_AMPLITUDE,
-      SWAY_FREQUENCY,
-      PHASE_OFFSET
-    );
-
     // N -- hinges about M
-    this.node_n = new CoralNode(
-      new CirclePrimitive(new Point(50, 350), RADIUS_BIG)
-    );
-    // M -- hinge for n
-    this.node_m = new CoralNode(
-      CirclePrimitive.from_two_points(new Point(75, 400), new Point(75, 425)),
-      [this.node_n]
-    );
-    this.hinge_n = new Hinge(
-      this.node_m.circle.position,
-      this.node_n.circle.position,
-      SWAY_AMPLITUDE,
-      SWAY_FREQUENCY,
-      2 * PHASE_OFFSET
-    );
-
+    const node_n = new CoralNode(CIRCLE_N);
     // P -- hinges about O
-    this.node_p = new CoralNode(
-      new CirclePrimitive(new Point(25, 425), RADIUS_BIG)
-    );
-    // O
-    this.node_o = new CoralNode(
-      CirclePrimitive.from_two_points(new Point(50, 525), new Point(50, 550)),
-      [this.node_p]
-    );
-    this.hinge_p = new Hinge(
-      this.node_o.circle.position,
-      this.node_p.circle.position,
-      0.5 * SWAY_AMPLITUDE,
-      SWAY_FREQUENCY,
-      3 * PHASE_OFFSET
-    );
-
-    // E -- hinges about D
-    this.node_e = new CoralNode(
-      CirclePrimitive.from_two_points(
-        // tweaked a bit from diagram
-        new Point(150, 600).add(new Direction(25, 0)),
-        new Point(175, 550).add(new Direction(25, 0))
-      )
-    );
-    // D
-    this.node_d = new CoralNode(
-      CirclePrimitive.from_two_points(new Point(100, 550), new Point(125, 550)),
-      [
-        this.node_e,
-        // F
-        new CoralNode(
-          CirclePrimitive.from_two_points(
-            new Point(150, 500),
-            new Point(100, 475)
-          ),
-          [
-            this.node_g,
-            // I
-            new CoralNode(
-              new CirclePrimitive(new Point(125, 400), RADIUS_SMALL),
-              [this.node_j],
-              // skip for I
-              { left: true }
-            ),
-            // M
-            this.node_m,
-          ],
-          // Skip for F
-          { between: [true, true] }
-        ),
-      ],
-      // Skip for D
-      // Turns out I needed the left point else the curve is too
-      // broad
-      { between: [true] }
-    );
-    this.hinge_e = new Hinge(
-      this.node_d.circle.position,
-      this.node_e.circle.position,
-      SWAY_AMPLITUDE,
-      SWAY_FREQUENCY,
-      4 * PHASE_OFFSET
-    );
-
-    // C -- hinges about B
-    this.node_c = new CoralNode(
-      CirclePrimitive.from_two_points(new Point(50, 675), new Point(75, 650))
-    );
-    // B -- hinge for C
-    this.node_b = new CoralNode(
-      new CirclePrimitive(new Point(50, 600), RADIUS_BIG),
-      [this.node_c, this.node_d, this.node_o],
-      // skip for B
-      { between: [false, true] }
-    );
-    this.hinge_c = new Hinge(
-      this.node_b.circle.position,
-      this.node_c.circle.position,
-      SWAY_AMPLITUDE,
-      SWAY_FREQUENCY,
-      5 * PHASE_OFFSET
-    );
+    const node_p = new CoralNode(CIRCLE_P);
+    this.dynamic_nodes = [
+      node_c,
+      node_e,
+      node_h,
+      node_k,
+      node_l,
+      node_n,
+      node_p,
+    ];
 
     this.tree = new CoralTree(
       // Node A in diagram on paper
-      new CoralNode(
-        CirclePrimitive.from_two_points(new Point(-75, 600), new Point(0, 600)),
-        [this.node_b]
-      )
+      new CoralNode(CIRCLE_A, [
+        // B -- hinge for C
+        new CoralNode(
+          CIRCLE_B,
+          [
+            node_c,
+            // D
+            new CoralNode(
+              CIRCLE_D,
+              [
+                node_e,
+                // F
+                new CoralNode(
+                  CIRCLE_F,
+                  [
+                    // G -- serves as anchor for H
+                    new CoralNode(
+                      CIRCLE_G,
+                      [node_h],
+                      // skip for G
+                      { right: false }
+                    ),
+                    // I
+                    new CoralNode(
+                      CIRCLE_I,
+                      [new CoralNode(CIRCLE_J, [node_k])],
+                      // skip for I
+                      { left: true }
+                    ),
+                    // M
+                    new CoralNode(CIRCLE_M, [node_n]),
+                  ],
+                  // Skip for F
+                  { between: [true, true] }
+                ),
+              ],
+              // Skip for D
+              // Turns out I needed the left point else the curve is too
+              // broad
+              { between: [true] }
+            ),
+            // O
+            new CoralNode(CIRCLE_O, [node_p]),
+          ],
+          // skip for B
+          { between: [false, true] }
+        ),
+      ])
     );
 
-    const colored_coral = style(this.tree.render(), STYLE_CORAL);
-    // Save a reference for modifying the group when the tree
-    // refreshes
-    this.coral_slot = colored_coral.primitives;
-
+    // Make a set of animated stripes as a background
     this.stripes = new AnimatedStripes(
       new Point(150, 500),
       new Direction(-1, 2).normalize(),
@@ -204,7 +149,79 @@ class SwayingCoral {
     );
     const styled_stripes = style(this.stripes.render(), STYLE_STRIPES);
 
-    this.primitive = group(styled_stripes, colored_coral);
+    // Save a reference for modifying the group when the tree
+    // refreshes
+    const colored_coral = style(this.tree.render(), STYLE_CORAL);
+    this.coral_slot = colored_coral.primitives;
+
+    // For coral nodes that sway, we need some hinges to help calculate the
+    // position over time
+    this.hinges = [
+      // Hinge for node C
+      new Hinge(
+        CIRCLE_B.position,
+        CIRCLE_C.position,
+        SWAY_AMPLITUDE,
+        SWAY_FREQUENCY,
+        5 * PHASE_OFFSET
+      ),
+      // Hinge for node E
+      new Hinge(
+        CIRCLE_D.position,
+        CIRCLE_E.position,
+        SWAY_AMPLITUDE,
+        SWAY_FREQUENCY,
+        4 * PHASE_OFFSET
+      ),
+      // Hinge for node H
+      new Hinge(
+        CIRCLE_G.position,
+        CIRCLE_H.position,
+        SWAY_AMPLITUDE,
+        SWAY_FREQUENCY
+      ),
+      // Hinge for node k
+      new Hinge(
+        CIRCLE_J.position,
+        CIRCLE_K.position,
+        SWAY_AMPLITUDE,
+        SWAY_FREQUENCY,
+        PHASE_OFFSET
+      ),
+      // Hinge for node L
+      new Hinge(
+        CIRCLE_J.position,
+        CIRCLE_L.position,
+        SWAY_AMPLITUDE,
+        SWAY_FREQUENCY,
+        PHASE_OFFSET
+      ),
+      // Hinge for node N
+      new Hinge(
+        CIRCLE_M.position,
+        CIRCLE_N.position,
+        SWAY_AMPLITUDE,
+        SWAY_FREQUENCY,
+        2 * PHASE_OFFSET
+      ),
+      // Hinge for node P
+      new Hinge(
+        CIRCLE_O.position,
+        CIRCLE_P.position,
+        0.5 * SWAY_AMPLITUDE,
+        SWAY_FREQUENCY,
+        3 * PHASE_OFFSET
+      ),
+    ];
+    this.polyps = ALL_CIRCLES.map((c) => new Polyp(c.position));
+
+    this.dynamic_polyps = ["C", "E", "H", "K", "L", "N", "P"].map((c) => {
+      const index = letter_to_index(c);
+      return this.polyps[index];
+    });
+
+    const polyp_primitives = group(...this.polyps.map((x) => x.render()));
+    this.primitive = group(styled_stripes, colored_coral, polyp_primitives);
   }
 
   /**
@@ -212,28 +229,21 @@ class SwayingCoral {
    * @param {number} time Animation time
    */
   update(time) {
-    this.stripes.update(10 * time);
+    this.stripes.update(2 * time);
 
-    // Make the hinges sway
-    this.hinge_c.update(time);
-    this.hinge_e.update(time);
-    this.hinge_h.update(time);
-    this.hinge_l.update(time);
-    this.hinge_k.update(time);
-    this.hinge_n.update(time);
-    this.hinge_p.update(time);
+    this.hinges.forEach((hinge, i) => {
+      // make the hinge sway
+      hinge.update(time);
 
-    // Update the nodes attached to the hinges
-    this.node_c.circle.position = this.hinge_c.position;
-    this.node_e.circle.position = this.hinge_e.position;
-    this.node_h.circle.position = this.hinge_h.position;
-    this.node_l.circle.position = this.hinge_l.position;
-    this.node_k.circle.position = this.hinge_k.position;
-    this.node_n.circle.position = this.hinge_n.position;
-    this.node_p.circle.position = this.hinge_p.position;
+      // Update the node and polyp position attached to the hinge
+      this.dynamic_nodes[i].circle.position = hinge.position;
+      this.dynamic_polyps[i].update_position(hinge.position);
+    });
 
-    // re-draw the primitive
-    this.coral_slot[0] = this.tree.render();
+    this.polyps.forEach((x) => x.update(time));
+
+    // Re-draw the coral
+    this.coral_slot.splice(0, Infinity, this.tree.render());
   }
 
   render() {
