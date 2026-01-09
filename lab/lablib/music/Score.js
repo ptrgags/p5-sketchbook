@@ -1,128 +1,31 @@
-import { Rational } from "../Rational.js";
-import { REST } from "./pitches.js";
-import { Gap, Parallel, Sequential, timeline_map } from "./Timeline.js";
+/**
+ * @typedef {Object} PartOptions
+ * @property {string} instrument_id ID of instrument from the SoundManager to use (Temporary)
+ * @property {string} [label] Human-readable label for the track name
+ * @property {number} [midi_channel=0] MIDI channel number. Defaults to 0 (Channel 1)
+ * @property {number} [midi_instrument=0] MIDI instrument number. Defaults to 0 (Program 1 = Grand Piano)
+ 
+ */
 
 /**
- * Pitched note. The choice of pitch space can vary
- * @template P The pitch type
+ * @template P
  */
-export class Note {
+export class Part {
   /**
-   * Constructor
-   * @param {P} pitch Pitch
-   * @param {Rational} duration The duration
+   * @param {string} id
+   * @param {import("./Music.js").Music<P>} music
+   * @param {PartOptions} options
    */
-  constructor(pitch, duration) {
-    this.pitch = pitch;
-    this.duration = duration;
-  }
+  constructor(id, music, options) {
+    this.id = id;
+    this.music = music;
+    this.instrument_id = options.instrument_id;
 
-  /**
-   * Map the pitch type to a new type
-   * @template Q The new pitch type
-   * @param {function(P): Q} convert_pitch Function to convert pitch types
-   * @return {Note<Q>} A new alternation with pitches of the destination type
-   */
-  map_pitch(convert_pitch) {
-    return new Note(convert_pitch(this.pitch), this.duration);
+    this.label = options.label ?? this.id;
+    this.midi_channel = options.midi_channel ?? 0;
+    this.midi_instrument = options.midi_instrument ?? 0;
   }
 }
-
-// Musical aliases.
-export const Rest = Gap;
-
-/**
- * @template P
- * @typedef {Sequential<Note<P>>} Melody<P>
- */
-export const Melody = Sequential;
-
-/**
- * Parse a melody from an array
- * @template P
- * @param  {...[P|undefined, Rational]} tuples either (pitch, duration) or (REST, duration)
- * @returns {Melody<P>} The parsed melody
- */
-export function parse_melody(...tuples) {
-  const children = [];
-  for (const tuple of tuples) {
-    const [pitch, duration] = tuple;
-    const note =
-      pitch === undefined ? new Rest(duration) : new Note(pitch, duration);
-    children.push(note);
-  }
-
-  return new Melody(...children);
-}
-
-/**
- * @template P
- * @typedef {Parallel<Note<P>>} Harmony<P>
- */
-export const Harmony = Parallel;
-
-/**
- * Parse a cycle from an array as in Tidal Cycles. Though the result is
- * turned into a Melody
- * @example
- * const cycle = parse_cycle(N1, [C4, D4, [E4, F4], G4]);
- * @template P
- * @param {Rational} cycle_length Length of one cycle
- * @param  {(P | P[])[]} notes List of pitch values or arrays thereof. Arrays are interpreted as nested cycles
- * @returns {Melody<P>} The cycle expanded as a melody
- */
-export function parse_cycle(cycle_length, notes) {
-  const children = [];
-  const subdivision = new Rational(1, notes.length);
-  const beat_length = cycle_length.mul(subdivision);
-  for (const note of notes) {
-    let child;
-    if (note === REST) {
-      child = new Rest(beat_length);
-    } else if (Array.isArray(note)) {
-      child = parse_cycle(beat_length, note);
-    } else {
-      child = new Note(note, beat_length);
-    }
-
-    children.push(child);
-  }
-
-  return new Melody(...children);
-}
-
-/**
- * @template P
- * @typedef {import("./Timeline.js").Timeline<Note<P>>} Music<P>
- */
-
-/**
- * Adjust pitches everywhere for the given musical material. This is handy
- * for tasks like converting pitch format (e.g. scale degree to absolute pitch)
- * or transposition.
- * @template P The old pitch type
- * @template Q The new pitch type
- * @param {function(P):Q} pitch_func A function to convert pitch formats
- * @param {Music<P>} music The musical material
- */
-export function map_pitch(pitch_func, music) {
-  return timeline_map(
-    (note) => new Note(pitch_func(note.pitch), note.duration),
-    music
-  );
-}
-
-/**
- * @typedef {string} Instrument
- * @typedef {string} ParamID
- */
-
-/**
- * @template P
- * @typedef {Object} ScoreOptions
- * @property {[Instrument, Music<P>][]} parts The musical parts
- * @property {AnimationCurves} [animation_curves] Animation curves to play in sync with the music
- */
 
 /**
  * A score is a container for music with instruments labeled.
@@ -131,13 +34,9 @@ export function map_pitch(pitch_func, music) {
 export class Score {
   /**
    * Constructor
-   * @param {ScoreOptions<P>} options
+   * @param {Part<P>[]} parts
    */
-  constructor(options) {
-    /**
-     * Music parts stored in score order
-     * @type {[Instrument, Music<P>][]}
-     */
-    this.parts = options.parts;
+  constructor(...parts) {
+    this.parts = parts;
   }
 }

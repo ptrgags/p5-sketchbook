@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Harmony, Melody, Note, Rest } from "./Score";
+import { Harmony, Melody, Note, Rest } from "./Music";
 import { N1, N2, N4 } from "./durations";
 import { C4, E4, G4 } from "./pitches";
 import { retrograde } from "./retrograde";

@@ -1,6 +1,7 @@
 import { Style } from "../../../sketchlib/Style.js";
 import { C4, C5 } from "./pitches.js";
-import { Harmony, Melody, Note, Rest, Score } from "./Score.js";
+import { Harmony, Melody, Note, Rest } from "./Music.js";
+import { Score } from "./Score.js";
 import { Color } from "../../../sketchlib/Color.js";
 import { Primitive } from "../../../sketchlib/primitives/Primitive.js";
 import { GroupPrimitive } from "../../../sketchlib/primitives/GroupPrimitive.js";
@@ -21,7 +22,7 @@ const MEASURE_LINE_STYLE = new Style({
 
 /**
  * Get the minimum and maximum MIDI notes
- * @param {import("./Score.js").Music<number>} music The musical timeline
+ * @param {import("./Music.js").Music<number>} music The musical timeline
  * @return {[number, number] | undefined} [min, max] pitch, or undefined if the music is silent
  */
 function get_pitch_range(music) {
@@ -54,7 +55,7 @@ function get_pitch_range(music) {
  * Its width is determined by the duration of the music. The range of pitches
  * is automatically scaled so only pitch_range is drawn.
  * @param {Point} offset Top left corner of the rectangle where the notes will be overlayed as a Point
- * @param {import("./Score.js").Music<number>} music Music as a timeline of MIDI notes
+ * @param {import("./Music.js").Music<number>} music Music as a timeline of MIDI notes
  * @param {Direction} measure_dimensions a Direction representing the size of 1 measure in pixels
  * @param {[number, number]} pitch_range (min_pitch, max_pitch) as MIDI notes for determining note placement
  * @returns {Primitive} A primitive containing all the notes (unstyled)
@@ -115,7 +116,7 @@ function render_notes(offset, music, measure_dimensions, pitch_range) {
 /**
  * Render a single Music timeline
  * @param {Point} offset Offset of the top left corner where the timeline should appear as a Point
- * @param {import("./Score.js").Music<number>} music
+ * @param {import("./Music.js").Music<number>} music
  * @param {Direction} measure_dimensions Dimensions of a rectangle representing one measure of music
  * @param {Style} background_style Style for the background rectangle
  * @param {Style} note_style Style for the smaller note rectangles
@@ -179,13 +180,12 @@ export function render_music(
  */
 export function render_score(offset, score, measure_dimensions, styles) {
   const parts = [];
-  for (const [i, entry] of score.parts.entries()) {
-    const [, part] = entry;
+  for (const [i, part] of score.parts.entries()) {
     const child_offset = new Direction(0, measure_dimensions.y).scale(i);
 
     const rendered = render_music(
       offset.add(child_offset),
-      part,
+      part.music,
       measure_dimensions,
       styles[i],
       NOTE_STYLE

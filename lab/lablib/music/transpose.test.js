@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Harmony, Melody, Note, Rest } from "./Score.js";
+import { Harmony, Melody, Note, Rest } from "./Music.js";
 import { N2, N4 } from "./durations.js";
 import { transpose_scale_degree } from "./transpose";
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Melody, Note, Rest, Harmony } from "../music/Score.js";
+import { Melody, Note, Rest, Harmony } from "../music/Music.js";
 import { N1, N2, N4 } from "../music/durations.js";
 import { C4, C5, CS5, E4, G4, REST } from "../music/pitches.js";
 import { precompile_music } from "./compile_music.js";
