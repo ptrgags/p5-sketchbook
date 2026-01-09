@@ -124,12 +124,12 @@ export function layered_melody() {
     new Part("scale_arp", square_part, {
       instrument_id: "square",
       midi_instrument: 47 - 1, // orchestral harp
-      midi_channel: 0,
+      midi_channel: 1,
     }),
     new Part("poly_part", poly_part, {
       instrument_id: "poly",
       midi_instrument: 15 - 1, // tubular bells
-      midi_channel: 0,
+      midi_channel: 2,
     })
   );
 }
@@ -211,7 +211,7 @@ export function symmetry_melody() {
   return new Score(
     new Part("symmetry", part_midi, {
       instrument_id: "supersaw",
-      midi_instrument: 13 - 1, // marimba
+      midi_instrument: 12 - 1, // vibraphone
       midi_channel: 0,
     })
   );
