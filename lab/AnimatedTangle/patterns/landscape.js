@@ -143,7 +143,7 @@ function make_snowcaps(mountain_points) {
   return style(snowcaps, STYLE_SNOWCAPS);
 }
 
-class Landscape {
+class Seascape {
   /**
    * Constructor
    * @param {number} n number of points across the screen for the mountains
@@ -243,4 +243,4 @@ class Landscape {
   }
 }
 
-export const LANDSCAPE = new Landscape(25);
+export const SEASCAPE = new Seascape(25);
