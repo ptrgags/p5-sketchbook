@@ -10,7 +10,7 @@ import { Style } from "../../sketchlib/Style.js";
 import { CIRCLE_FAN } from "./patterns/circle_fan.js";
 import { SWAYING_CORAL } from "./patterns/coral.js";
 import { GEODE } from "./patterns/geode.js";
-import { SEASCAPE } from "./patterns/landscape.js";
+import { SEASCAPE } from "./patterns/seascape.js";
 import { EYE } from "./patterns/peek.js";
 import { make_stripes } from "./patterns/stripes.js";
 import { PALETTE_CORAL, PALETTE_NAVY, Values } from "./theme_colors.js";
