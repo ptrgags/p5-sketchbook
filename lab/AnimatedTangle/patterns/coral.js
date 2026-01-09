@@ -11,6 +11,7 @@ import { Polyp } from "./polyps.js";
 import { Mask } from "../../../sketchlib/primitives/ClipMask.js";
 import { ClipPrimitive } from "../../../sketchlib/primitives/ClipPrimitive.js";
 import {
+  ALL_CIRCLES,
   CIRCLE_A,
   CIRCLE_B,
   CIRCLE_C,
@@ -49,9 +50,8 @@ class SwayingCoral {
     // Unfortunately, to add the hinges, I need to create the tree
     // in a rather convoluted order
 
-
     // C -- hinges about B
-    this.node_c = new CoralNode(CIRCLE_C);\
+    this.node_c = new CoralNode(CIRCLE_C);
     // E -- hinges about D
     this.node_e = new CoralNode(CIRCLE_E);
     // H -- hinges about G
@@ -70,7 +70,16 @@ class SwayingCoral {
     this.node_n = new CoralNode(CIRCLE_N);
     // P -- hinges about O
     this.node_p = new CoralNode(CIRCLE_P);
-    
+    this.dynamic_nodes = [
+      this.node_c,
+      this.node_e,
+      this.node_h,
+      this.node_k,
+      this.node_l,
+      this.node_n,
+      this.node_p,
+    ];
+
     this.tree = new CoralTree(
       // Node A in diagram on paper
       new CoralNode(CIRCLE_A, [
@@ -190,15 +199,19 @@ class SwayingCoral {
       SWAY_FREQUENCY,
       5 * PHASE_OFFSET
     );
+    this.hinges = [
+      this.hinge_c,
+      this.hinge_e,
+      this.hinge_h,
+      this.hinge_k,
+      this.hinge_l,
+      this.hinge_n,
+      this.hinge_p,
+    ];
+    this.polyps = ALL_CIRCLES.map((c) => new Polyp(c.position));
 
-    /*
-    const clipped_polyps = new ClipPrimitive(
-      this.coral_mask,
-      this.polyps.render()
-    );
-    */
-
-    this.primitive = group(styled_stripes, colored_coral /*clipped_polyps*/);
+    const polyp_primitives = group(...this.polyps.map((x) => x.render()));
+    this.primitive = group(styled_stripes, colored_coral, polyp_primitives);
   }
 
   /**
@@ -208,30 +221,21 @@ class SwayingCoral {
   update(time) {
     this.stripes.update(2 * time);
 
-    // Make the hinges sway
-    this.hinge_c.update(time);
-    this.hinge_e.update(time);
-    this.hinge_h.update(time);
-    this.hinge_l.update(time);
-    this.hinge_k.update(time);
-    this.hinge_n.update(time);
-    this.hinge_p.update(time);
+    this.hinges.forEach((hinge, i) => {
+      // make the hinge sway
+      hinge.update(time);
 
-    // Update the nodes attached to the hinges
-    this.node_c.circle.position = this.hinge_c.position;
-    this.node_e.circle.position = this.hinge_e.position;
-    this.node_h.circle.position = this.hinge_h.position;
-    this.node_l.circle.position = this.hinge_l.position;
-    this.node_k.circle.position = this.hinge_k.position;
-    this.node_n.circle.position = this.hinge_n.position;
-    this.node_p.circle.position = this.hinge_p.position;
+      // Update the node and polyp position attached to the hinge
+      this.dynamic_nodes[i].circle.position = hinge.position;
+      this.polyps[i].position = hinge.position;
+    });
+
+    this.polyps.forEach((x) => x.update(time));
 
     // re-draw the clip mask
     const coral_shape = this.tree.render();
     this.coral_mask.primitives.splice(0, Infinity, coral_shape);
     this.coral_slot.splice(0, 1, coral_shape);
-
-    //this.polyps.update(time);
   }
 
   render() {

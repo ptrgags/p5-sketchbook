@@ -48,3 +48,22 @@ export const CIRCLE_O = CirclePrimitive.from_two_points(
   new Point(50, 550)
 );
 export const CIRCLE_P = new CirclePrimitive(new Point(25, 425), RADIUS_BIG);
+
+export const ALL_CIRCLES = [
+  CIRCLE_A,
+  CIRCLE_B,
+  CIRCLE_C,
+  CIRCLE_D,
+  CIRCLE_E,
+  CIRCLE_F,
+  CIRCLE_G,
+  CIRCLE_H,
+  CIRCLE_I,
+  CIRCLE_J,
+  CIRCLE_K,
+  CIRCLE_L,
+  CIRCLE_M,
+  CIRCLE_N,
+  CIRCLE_O,
+  CIRCLE_P,
+];
