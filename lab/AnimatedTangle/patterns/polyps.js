@@ -36,8 +36,8 @@ const ANCHOR_POINT = new Point(0, 600);
 const MAX_DIST = 600;
 const CURVE_EXTEND_RADIUS = LoopCurve.from_timeline(
   new Sequential(
-    new ParamCurve(MAX_DIST, 0, new Rational(1, 3), Ease.in_cubic),
-    new ParamCurve(0, MAX_DIST, new Rational(3, 2), Ease.in_out_cubic)
+    new ParamCurve(MAX_DIST, 0, new Rational(2, 3), Ease.in_cubic),
+    new ParamCurve(0, MAX_DIST, new Rational(3), Ease.in_out_cubic)
   )
 );
 

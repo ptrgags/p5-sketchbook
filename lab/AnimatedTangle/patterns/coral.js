@@ -45,6 +45,16 @@ const SWAY_AMPLITUDE = Math.PI / 12;
 const SWAY_FREQUENCY = 0.25;
 const PHASE_OFFSET = (2 * Math.PI) / 7;
 
+const CODE_POINT_A = 65;
+/**
+ * Take an ASCII value and convert it to an index relative to 'A'
+ * @param {string} letter A capital letter.
+ * @returns {number} array Index of letter in ASCIIbetical order
+ */
+function letter_to_index(letter) {
+  return letter.codePointAt(0) - CODE_POINT_A;
+}
+
 class SwayingCoral {
   constructor() {
     // Unfortunately, to add the hinges, I need to create the tree
@@ -210,9 +220,8 @@ class SwayingCoral {
     ];
     this.polyps = ALL_CIRCLES.map((c) => new Polyp(c.position));
 
-    const CODE_POINT_A = 65;
     this.dynamic_polyps = ["C", "E", "H", "K", "L", "N", "P"].map((c) => {
-      const index = c.codePointAt(0) - CODE_POINT_A;
+      const index = letter_to_index(c);
       return this.polyps[index];
     });
 
