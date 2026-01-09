@@ -27,7 +27,7 @@ import {
   CIRCLE_N,
   CIRCLE_O,
   CIRCLE_P,
-} from "./coral_data.js";
+} from "./coral_layout.js";
 
 const STYLE_CORAL = new Style({
   fill: PALETTE_CORAL[Values.Medium].to_srgb(),
