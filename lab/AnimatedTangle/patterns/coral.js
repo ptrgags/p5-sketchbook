@@ -149,13 +149,9 @@ class SwayingCoral {
     );
     const styled_stripes = style(this.stripes.render(), STYLE_STRIPES);
 
-    const coral_shape = this.tree.render();
-    this.coral_mask = new Mask(coral_shape);
-
-    const colored_coral = style(coral_shape, STYLE_CORAL);
-
     // Save a reference for modifying the group when the tree
     // refreshes
+    const colored_coral = style(this.tree.render(), STYLE_CORAL);
     this.coral_slot = colored_coral.primitives;
 
     // For coral nodes that sway, we need some hinges to help calculate the
@@ -246,10 +242,8 @@ class SwayingCoral {
 
     this.polyps.forEach((x) => x.update(time));
 
-    // re-draw the clip mask
-    const coral_shape = this.tree.render();
-    this.coral_mask.primitives.splice(0, Infinity, coral_shape);
-    this.coral_slot.splice(0, 1, coral_shape);
+    // Re-draw the coral
+    this.coral_slot.splice(0, Infinity, this.tree.render());
   }
 
   render() {
