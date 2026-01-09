@@ -33,7 +33,8 @@ export class CirclePrimitive {
    */
   static from_two_points(a, b) {
     const midpoint = Point.lerp(a, b, 0.5);
-    const radius = Math.sqrt(a.dist_sqr(b)) / 2;
+    const diameter = a.dist(b);
+    const radius = diameter / 2;
 
     return new CirclePrimitive(midpoint, radius);
   }
