@@ -1,6 +1,5 @@
 import { Direction } from "../../../pga2d/Direction.js";
 import { Point } from "../../../pga2d/Point.js";
-import { CirclePrimitive } from "../../../sketchlib/primitives/CirclePrimitive.js";
 import { group, style } from "../../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../../sketchlib/Style.js";
 import { CoralNode, CoralTree } from "../CoralTree.js";
@@ -9,7 +8,6 @@ import { Hinge } from "../Hinge.js";
 import { PALETTE_CORAL, PALETTE_SKY, Values } from "../theme_colors.js";
 import { Polyp } from "./polyps.js";
 import { Mask } from "../../../sketchlib/primitives/ClipMask.js";
-import { ClipPrimitive } from "../../../sketchlib/primitives/ClipPrimitive.js";
 import {
   ALL_CIRCLES,
   CIRCLE_A,
