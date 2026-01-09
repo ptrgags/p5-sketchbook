@@ -58,12 +58,6 @@ class SwayingCoral {
       // skip for G
       { right: false }
     );
-    this.hinge_h = new Hinge(
-      this.node_g.circle.position,
-      this.node_h.circle.position,
-      SWAY_AMPLITUDE,
-      SWAY_FREQUENCY
-    );
 
     // L -- Hinges about J
     this.node_l = new CoralNode(CIRCLE_L);
@@ -76,44 +70,16 @@ class SwayingCoral {
     );
     // J -- serves as the hinge point for both L and K
     this.node_j = new CoralNode(CIRCLE_J, [this.node_k]);
-    this.hinge_l = new Hinge(
-      this.node_j.circle.position,
-      this.node_l.circle.position,
-      SWAY_AMPLITUDE,
-      SWAY_FREQUENCY,
-      PHASE_OFFSET
-    );
-    this.hinge_k = new Hinge(
-      this.node_j.circle.position,
-      this.node_k.circle.position,
-      SWAY_AMPLITUDE,
-      SWAY_FREQUENCY,
-      PHASE_OFFSET
-    );
 
     // N -- hinges about M
     this.node_n = new CoralNode(CIRCLE_N);
     // M -- hinge for n
     this.node_m = new CoralNode(CIRCLE_M, [this.node_n]);
-    this.hinge_n = new Hinge(
-      this.node_m.circle.position,
-      this.node_n.circle.position,
-      SWAY_AMPLITUDE,
-      SWAY_FREQUENCY,
-      2 * PHASE_OFFSET
-    );
 
     // P -- hinges about O
     this.node_p = new CoralNode(CIRCLE_P);
     // O
     this.node_o = new CoralNode(CIRCLE_O, [this.node_p]);
-    this.hinge_p = new Hinge(
-      this.node_o.circle.position,
-      this.node_p.circle.position,
-      0.5 * SWAY_AMPLITUDE,
-      SWAY_FREQUENCY,
-      3 * PHASE_OFFSET
-    );
 
     // E -- hinges about D
     this.node_e = new CoralNode(CIRCLE_E);
@@ -146,13 +112,6 @@ class SwayingCoral {
       // broad
       { between: [true] }
     );
-    this.hinge_e = new Hinge(
-      this.node_d.circle.position,
-      this.node_e.circle.position,
-      SWAY_AMPLITUDE,
-      SWAY_FREQUENCY,
-      4 * PHASE_OFFSET
-    );
 
     // C -- hinges about B
     this.node_c = new CoralNode(CIRCLE_C);
@@ -162,13 +121,6 @@ class SwayingCoral {
       [this.node_c, this.node_d, this.node_o],
       // skip for B
       { between: [false, true] }
-    );
-    this.hinge_c = new Hinge(
-      this.node_b.circle.position,
-      this.node_c.circle.position,
-      SWAY_AMPLITUDE,
-      SWAY_FREQUENCY,
-      5 * PHASE_OFFSET
     );
 
     this.tree = new CoralTree(
@@ -195,6 +147,56 @@ class SwayingCoral {
     // refreshes
     this.coral_slot = colored_coral.primitives;
 
+    this.hinge_h = new Hinge(
+      CIRCLE_G.position,
+      CIRCLE_H.position,
+      SWAY_AMPLITUDE,
+      SWAY_FREQUENCY
+    );
+    this.hinge_l = new Hinge(
+      CIRCLE_J.position,
+      CIRCLE_L.position,
+      SWAY_AMPLITUDE,
+      SWAY_FREQUENCY,
+      PHASE_OFFSET
+    );
+    this.hinge_k = new Hinge(
+      CIRCLE_J.position,
+      CIRCLE_K.position,
+      SWAY_AMPLITUDE,
+      SWAY_FREQUENCY,
+      PHASE_OFFSET
+    );
+    this.hinge_n = new Hinge(
+      CIRCLE_M.position,
+      CIRCLE_N.position,
+      SWAY_AMPLITUDE,
+      SWAY_FREQUENCY,
+      2 * PHASE_OFFSET
+    );
+    this.hinge_p = new Hinge(
+      CIRCLE_O.position,
+      CIRCLE_P.position,
+      0.5 * SWAY_AMPLITUDE,
+      SWAY_FREQUENCY,
+      3 * PHASE_OFFSET
+    );
+    this.hinge_e = new Hinge(
+      CIRCLE_D.position,
+      CIRCLE_E.position,
+      SWAY_AMPLITUDE,
+      SWAY_FREQUENCY,
+      4 * PHASE_OFFSET
+    );
+    this.hinge_c = new Hinge(
+      CIRCLE_B.position,
+      CIRCLE_C.position,
+      SWAY_AMPLITUDE,
+      SWAY_FREQUENCY,
+      5 * PHASE_OFFSET
+    );
+
+    /*
     const clipped_polyps = new ClipPrimitive(
       this.coral_mask,
       this.polyps.render()
