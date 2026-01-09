@@ -61,33 +61,33 @@ class SwayingCoral {
     // in a rather convoluted order
 
     // C -- hinges about B
-    this.node_c = new CoralNode(CIRCLE_C);
+    const node_c = new CoralNode(CIRCLE_C);
     // E -- hinges about D
-    this.node_e = new CoralNode(CIRCLE_E);
+    const node_e = new CoralNode(CIRCLE_E);
     // H -- hinges about G
-    this.node_h = new CoralNode(CIRCLE_H);
+    const node_h = new CoralNode(CIRCLE_H);
     // Both L and K hinge around J. They use the same anchor point and sway
     // at the same frequency so the shape doesn't distort in length, since
     // K is a parent for L
-    this.node_l = new CoralNode(CIRCLE_L);
-    this.node_k = new CoralNode(
+    const node_l = new CoralNode(CIRCLE_L);
+    const node_k = new CoralNode(
       CIRCLE_K,
-      [this.node_l],
+      [node_l],
       // Skip for K
       { right: true }
     );
     // N -- hinges about M
-    this.node_n = new CoralNode(CIRCLE_N);
+    const node_n = new CoralNode(CIRCLE_N);
     // P -- hinges about O
-    this.node_p = new CoralNode(CIRCLE_P);
+    const node_p = new CoralNode(CIRCLE_P);
     this.dynamic_nodes = [
-      this.node_c,
-      this.node_e,
-      this.node_h,
-      this.node_k,
-      this.node_l,
-      this.node_n,
-      this.node_p,
+      node_c,
+      node_e,
+      node_h,
+      node_k,
+      node_l,
+      node_n,
+      node_p,
     ];
 
     this.tree = new CoralTree(
@@ -97,12 +97,12 @@ class SwayingCoral {
         new CoralNode(
           CIRCLE_B,
           [
-            this.node_c,
+            node_c,
             // D
             new CoralNode(
               CIRCLE_D,
               [
-                this.node_e,
+                node_e,
                 // F
                 new CoralNode(
                   CIRCLE_F,
@@ -110,19 +110,19 @@ class SwayingCoral {
                     // G -- serves as anchor for H
                     new CoralNode(
                       CIRCLE_G,
-                      [this.node_h],
+                      [node_h],
                       // skip for G
                       { right: false }
                     ),
                     // I
                     new CoralNode(
                       CIRCLE_I,
-                      [new CoralNode(CIRCLE_J, [this.node_k])],
+                      [new CoralNode(CIRCLE_J, [node_k])],
                       // skip for I
                       { left: true }
                     ),
                     // M
-                    new CoralNode(CIRCLE_M, [this.node_n]),
+                    new CoralNode(CIRCLE_M, [node_n]),
                   ],
                   // Skip for F
                   { between: [true, true] }
@@ -134,7 +134,7 @@ class SwayingCoral {
               { between: [true] }
             ),
             // O
-            new CoralNode(CIRCLE_O, [this.node_p]),
+            new CoralNode(CIRCLE_O, [node_p]),
           ],
           // skip for B
           { between: [false, true] }
@@ -155,6 +155,7 @@ class SwayingCoral {
     this.coral_mask = new Mask(coral_shape);
 
     const colored_coral = style(coral_shape, STYLE_CORAL);
+
     // Save a reference for modifying the group when the tree
     // refreshes
     this.coral_slot = colored_coral.primitives;
