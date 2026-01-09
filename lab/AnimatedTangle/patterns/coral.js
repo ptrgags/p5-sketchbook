@@ -128,7 +128,7 @@ class SwayingCoral {
       new CoralNode(CIRCLE_A, [this.node_b])
     );
 
-    this.polyps = new Polyps();
+    //this.polyps = new Polyps();
 
     // Make a set of animated stripes as a background
     this.stripes = new AnimatedStripes(
@@ -201,8 +201,9 @@ class SwayingCoral {
       this.coral_mask,
       this.polyps.render()
     );
+    */
 
-    this.primitive = group(styled_stripes, colored_coral, clipped_polyps);
+    this.primitive = group(styled_stripes, colored_coral /*clipped_polyps*/);
   }
 
   /**
@@ -235,7 +236,7 @@ class SwayingCoral {
     this.coral_mask.primitives.splice(0, Infinity, coral_shape);
     this.coral_slot.splice(0, 1, coral_shape);
 
-    this.polyps.update(time);
+    //this.polyps.update(time);
   }
 
   render() {
