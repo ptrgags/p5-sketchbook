@@ -17,6 +17,7 @@ import { GroupPrimitive } from "../../../sketchlib/primitives/GroupPrimitive.js"
 import { BeziergonPrimitive } from "../../../sketchlib/primitives/BeziergonPrimitive.js";
 import { RectPrimitive } from "../../../sketchlib/primitives/RectPrimitive.js";
 import { CirclePrimitive } from "../../../sketchlib/primitives/CirclePrimitive.js";
+import { LinePrimitive } from "../../../sketchlib/primitives/LinePrimitive.js";
 
 const STYLE_MOUNTAINS = new Style({
   fill: PALETTE_ROCK[Values.Medium].to_srgb(),
@@ -75,10 +76,26 @@ const BACKGROUND = style(
   STYLE_SKY
 );
 
+const SUN_CENTER = new Point(400, 25);
+const SUN_RADIUS = 10;
+const SUN_RAYS_INNER_RADIUS = 15;
+const SUN_RAYS_OUTER_RADIUS = 20;
+
+const SUN_RAY_LINES = Direction.roots_of_unity(12).map((dir) => {
+  const start = SUN_CENTER.add(dir.scale(SUN_RAYS_INNER_RADIUS));
+  const end = SUN_CENTER.add(dir.scale(SUN_RAYS_OUTER_RADIUS));
+  return new LinePrimitive(start, end);
+});
+
+const STYLE_SUN_LINES = new Style({
+  stroke: PALETTE_CORAL[Values.Light].to_srgb(),
+});
 const STYLE_SUN = new Style({
   fill: PALETTE_CORAL[Values.Light].to_srgb(),
 });
-const SUN = style(new CirclePrimitive(new Point(400, 25), 10), STYLE_SUN);
+const SUN_RAYS = style(SUN_RAY_LINES, STYLE_SUN_LINES);
+const SUN_DISK = style(new CirclePrimitive(SUN_CENTER, SUN_RADIUS), STYLE_SUN);
+const SUN = group(SUN_DISK, SUN_RAYS);
 
 class Landscape {
   /**
