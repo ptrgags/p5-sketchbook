@@ -142,8 +142,6 @@ class SwayingCoral {
       ])
     );
 
-    //this.polyps = new Polyps();
-
     // Make a set of animated stripes as a background
     this.stripes = new AnimatedStripes(
       new Point(150, 500),
@@ -161,62 +159,64 @@ class SwayingCoral {
     // refreshes
     this.coral_slot = colored_coral.primitives;
 
-    this.hinge_h = new Hinge(
-      CIRCLE_G.position,
-      CIRCLE_H.position,
-      SWAY_AMPLITUDE,
-      SWAY_FREQUENCY
-    );
-    this.hinge_l = new Hinge(
-      CIRCLE_J.position,
-      CIRCLE_L.position,
-      SWAY_AMPLITUDE,
-      SWAY_FREQUENCY,
-      PHASE_OFFSET
-    );
-    this.hinge_k = new Hinge(
-      CIRCLE_J.position,
-      CIRCLE_K.position,
-      SWAY_AMPLITUDE,
-      SWAY_FREQUENCY,
-      PHASE_OFFSET
-    );
-    this.hinge_n = new Hinge(
-      CIRCLE_M.position,
-      CIRCLE_N.position,
-      SWAY_AMPLITUDE,
-      SWAY_FREQUENCY,
-      2 * PHASE_OFFSET
-    );
-    this.hinge_p = new Hinge(
-      CIRCLE_O.position,
-      CIRCLE_P.position,
-      0.5 * SWAY_AMPLITUDE,
-      SWAY_FREQUENCY,
-      3 * PHASE_OFFSET
-    );
-    this.hinge_e = new Hinge(
-      CIRCLE_D.position,
-      CIRCLE_E.position,
-      SWAY_AMPLITUDE,
-      SWAY_FREQUENCY,
-      4 * PHASE_OFFSET
-    );
-    this.hinge_c = new Hinge(
-      CIRCLE_B.position,
-      CIRCLE_C.position,
-      SWAY_AMPLITUDE,
-      SWAY_FREQUENCY,
-      5 * PHASE_OFFSET
-    );
+    // For coral nodes that sway, we need some hinges to help calculate the
+    // position over time
     this.hinges = [
-      this.hinge_c,
-      this.hinge_e,
-      this.hinge_h,
-      this.hinge_k,
-      this.hinge_l,
-      this.hinge_n,
-      this.hinge_p,
+      // Hinge for node C
+      new Hinge(
+        CIRCLE_B.position,
+        CIRCLE_C.position,
+        SWAY_AMPLITUDE,
+        SWAY_FREQUENCY,
+        5 * PHASE_OFFSET
+      ),
+      // Hinge for node E
+      new Hinge(
+        CIRCLE_D.position,
+        CIRCLE_E.position,
+        SWAY_AMPLITUDE,
+        SWAY_FREQUENCY,
+        4 * PHASE_OFFSET
+      ),
+      // Hinge for node H
+      new Hinge(
+        CIRCLE_G.position,
+        CIRCLE_H.position,
+        SWAY_AMPLITUDE,
+        SWAY_FREQUENCY
+      ),
+      // Hinge for node k
+      new Hinge(
+        CIRCLE_J.position,
+        CIRCLE_K.position,
+        SWAY_AMPLITUDE,
+        SWAY_FREQUENCY,
+        PHASE_OFFSET
+      ),
+      // Hinge for node L
+      new Hinge(
+        CIRCLE_J.position,
+        CIRCLE_L.position,
+        SWAY_AMPLITUDE,
+        SWAY_FREQUENCY,
+        PHASE_OFFSET
+      ),
+      // Hinge for node N
+      new Hinge(
+        CIRCLE_M.position,
+        CIRCLE_N.position,
+        SWAY_AMPLITUDE,
+        SWAY_FREQUENCY,
+        2 * PHASE_OFFSET
+      ),
+      // Hinge for node P
+      new Hinge(
+        CIRCLE_O.position,
+        CIRCLE_P.position,
+        0.5 * SWAY_AMPLITUDE,
+        SWAY_FREQUENCY,
+        3 * PHASE_OFFSET
+      ),
     ];
     this.polyps = ALL_CIRCLES.map((c) => new Polyp(c.position));
 
