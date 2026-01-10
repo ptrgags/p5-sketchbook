@@ -11,6 +11,7 @@ import {
 } from "../../../sketchlib/primitives/shorthand.js";
 import { Transform } from "../../../sketchlib/primitives/Transform.js";
 import { Style } from "../../../sketchlib/Style.js";
+import { Animated } from "../../lablib/animation/Animated.js";
 import { LoopCurve } from "../../lablib/animation/LoopCurve.js";
 import { ParamCurve } from "../../lablib/animation/ParamCurve.js";
 import { Sequential } from "../../lablib/music/Timeline.js";
@@ -57,7 +58,7 @@ const XFORMS = [
   new Transform(STRIPE_DIRECTION.scale((2 * STRIPE_SPACING) / 3)),
 ];
 
-const BASE_STRIPES = ANIMATED_STRIPES.render();
+const BASE_STRIPES = ANIMATED_STRIPES.primitive;
 
 const BARBER_POLE = group(
   ...STRIPE_STYLES.map((style, i) => {
@@ -133,6 +134,9 @@ const STYLE_DOOR = new Style({
   width: 2,
 });
 
+/**
+ * @implements {Animated}
+ */
 class Door {
   /**
    * Constructor
@@ -174,12 +178,11 @@ class Door {
       Direction.DIR_Y.scale(-height)
     );
   }
-
-  render() {
-    return this.primitive;
-  }
 }
 
+/**
+ * @implements {Animated}
+ */
 class Doors {
   constructor() {
     this.doors = [
@@ -189,16 +192,12 @@ class Doors {
       new Door(new Direction(225, 675), 1.5),
     ];
 
-    this.primitive = group(BARBER_POLE, ...this.doors.map((x) => x.render()));
+    this.primitive = group(BARBER_POLE, ...this.doors.map((x) => x.primitive));
   }
 
   update(time) {
     ANIMATED_STRIPES.update(time);
     this.doors.forEach((x) => x.update(time));
-  }
-
-  render() {
-    return this.primitive;
   }
 }
 

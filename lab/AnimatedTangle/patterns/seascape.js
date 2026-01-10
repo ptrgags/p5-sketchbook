@@ -18,6 +18,7 @@ import { BeziergonPrimitive } from "../../../sketchlib/primitives/BeziergonPrimi
 import { RectPrimitive } from "../../../sketchlib/primitives/RectPrimitive.js";
 import { CirclePrimitive } from "../../../sketchlib/primitives/CirclePrimitive.js";
 import { LinePrimitive } from "../../../sketchlib/primitives/LinePrimitive.js";
+import { Animated } from "../../lablib/animation/Animated.js";
 
 const STYLE_MOUNTAINS = new Style({
   fill: PALETTE_ROCK[Values.Medium].to_srgb(),
@@ -143,6 +144,9 @@ function make_snowcaps(mountain_points) {
   return style(snowcaps, STYLE_SNOWCAPS);
 }
 
+/**
+ * @implements {Animated}
+ */
 class Seascape {
   /**
    * Constructor
@@ -236,10 +240,6 @@ class Seascape {
         0
       );
     }
-  }
-
-  render() {
-    return this.primitive;
   }
 }
 

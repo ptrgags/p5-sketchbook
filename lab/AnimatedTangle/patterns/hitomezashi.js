@@ -5,6 +5,7 @@ import { LinePrimitive } from "../../../sketchlib/primitives/LinePrimitive.js";
 import { style } from "../../../sketchlib/primitives/shorthand.js";
 import { Random } from "../../../sketchlib/random.js";
 import { Style } from "../../../sketchlib/Style.js";
+import { Animated } from "../../lablib/animation/Animated.js";
 import { AnimatedPath } from "../../lablib/animation/AnimatedPath.js";
 import { LoopCurve } from "../../lablib/animation/LoopCurve.js";
 import { Hold, ParamCurve } from "../../lablib/animation/ParamCurve.js";
@@ -95,6 +96,9 @@ const STYLE_STITCHES = new Style({
   width: 2,
 });
 
+/**
+ * @implements {Animated}
+ */
 class Hitomezashi {
   constructor() {
     this.primitive = style(GroupPrimitive.EMPTY, STYLE_STITCHES);
@@ -116,10 +120,6 @@ class Hitomezashi {
     // Use render_between to slice out a portion of the path
     const prim = STITCH_PATH.render_between(start, end);
     primitive.primitives.push(prim);
-  }
-
-  render() {
-    return this.primitive;
   }
 }
 

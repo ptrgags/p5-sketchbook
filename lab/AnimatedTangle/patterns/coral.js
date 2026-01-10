@@ -7,7 +7,6 @@ import { AnimatedStripes } from "./stripes.js";
 import { Hinge } from "../Hinge.js";
 import { PALETTE_CORAL, PALETTE_SKY, Values } from "../theme_colors.js";
 import { Polyp } from "./polyps.js";
-import { Mask } from "../../../sketchlib/primitives/ClipMask.js";
 import {
   ALL_CIRCLES,
   CIRCLE_A,
@@ -27,6 +26,7 @@ import {
   CIRCLE_O,
   CIRCLE_P,
 } from "./coral_layout.js";
+import { Animated } from "../../lablib/animation/Animated.js";
 
 const STYLE_CORAL = new Style({
   fill: PALETTE_CORAL[Values.Medium].to_srgb(),
@@ -53,6 +53,9 @@ function letter_to_index(letter) {
   return letter.codePointAt(0) - CODE_POINT_A;
 }
 
+/**
+ * @implements {Animated}
+ */
 class SwayingCoral {
   constructor() {
     // Unfortunately, to add the hinges, I need to create the tree
@@ -147,7 +150,7 @@ class SwayingCoral {
       10,
       new Direction(550, 600)
     );
-    const styled_stripes = style(this.stripes.render(), STYLE_STRIPES);
+    const styled_stripes = style(this.stripes.primitive, STYLE_STRIPES);
 
     // Save a reference for modifying the group when the tree
     // refreshes
@@ -220,7 +223,7 @@ class SwayingCoral {
       return this.polyps[index];
     });
 
-    const polyp_primitives = group(...this.polyps.map((x) => x.render()));
+    const polyp_primitives = group(...this.polyps.map((x) => x.primitive));
     this.primitive = group(styled_stripes, colored_coral, polyp_primitives);
   }
 
@@ -244,10 +247,6 @@ class SwayingCoral {
 
     // Re-draw the coral
     this.coral_slot.splice(0, Infinity, this.tree.render());
-  }
-
-  render() {
-    return this.primitive;
   }
 }
 
