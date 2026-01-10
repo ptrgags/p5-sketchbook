@@ -1,13 +1,12 @@
 import { Direction } from "../../../pga2d/Direction.js";
 import { Point } from "../../../pga2d/Point.js";
 import { Ease } from "../../../sketchlib/Ease.js";
-import { mod } from "../../../sketchlib/mod.js";
 import { CirclePrimitive } from "../../../sketchlib/primitives/CirclePrimitive.js";
-import { GroupPrimitive } from "../../../sketchlib/primitives/GroupPrimitive.js";
 import { LinePrimitive } from "../../../sketchlib/primitives/LinePrimitive.js";
 import { group, style } from "../../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../../sketchlib/Style.js";
 import { Tween } from "../../../sketchlib/Tween.js";
+import { Animated } from "../../lablib/animation/Animated.js";
 import { LoopCurve } from "../../lablib/animation/LoopCurve.js";
 import { ParamCurve } from "../../lablib/animation/ParamCurve.js";
 import { Sequential } from "../../lablib/music/Timeline.js";
@@ -77,6 +76,9 @@ const STYLE_TENTACLE_CIRCLES = new Style({
   fill: PALETTE_CORAL[Values.Light].to_srgb(),
 });
 
+/**
+ * @implements {Animated}
+ */
 export class Polyp {
   /**
    *
@@ -136,9 +138,5 @@ export class Polyp {
       this.tentacle_circles[i].position = tentacle_end;
       this.tentacle_lines[i].b = tentacle_end;
     });
-  }
-
-  render() {
-    return this.primitive;
   }
 }

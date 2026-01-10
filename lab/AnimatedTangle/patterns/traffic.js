@@ -9,6 +9,8 @@ import {
 } from "../../../sketchlib/primitives/shorthand.js";
 import { Transform } from "../../../sketchlib/primitives/Transform.js";
 import { Style } from "../../../sketchlib/Style.js";
+import { Animated } from "../../lablib/animation/Animated.js";
+import { AnimationGroup } from "../../lablib/animation/AnimationGroup.js";
 import { LoopCurve } from "../../lablib/animation/LoopCurve.js";
 import { ParamCurve } from "../../lablib/animation/ParamCurve.js";
 import { Sequential } from "../../lablib/music/Timeline.js";
@@ -37,6 +39,9 @@ const PHASES = new Array(NUM_BOXES).fill(0).map((_, i) => {
   return i * t_step;
 });
 
+/**
+ * @implements {Animated}
+ */
 class TrafficLane {
   /**
    *
@@ -60,36 +65,13 @@ class TrafficLane {
       t.translation = this.center_offset.add(Direction.DIR_X.scale(dx));
     });
   }
-
-  render() {
-    return this.primitive;
-  }
 }
 
-class Traffic {
-  /**
-   *
-   * @param {Direction[]} center_offsets
-   */
-  constructor(...center_offsets) {
-    this.lanes = center_offsets.map((x) => new TrafficLane(x));
-    this.primitive = group(...this.lanes.map((x) => x.render()));
-  }
-
-  update(time) {
-    this.lanes.forEach((x) => {
-      x.update(time);
-    });
-  }
-
-  render() {
-    return this.primitive;
-  }
-}
-
-export const TRAFFIC = new Traffic(
+const LANES = [
   new Direction(250, 100),
   new Direction(200, 125),
   new Direction(150, 150),
-  new Direction(100, 175)
-);
+  new Direction(100, 175),
+].map((x) => new TrafficLane(x));
+
+export const TRAFFIC = new AnimationGroup(...LANES);

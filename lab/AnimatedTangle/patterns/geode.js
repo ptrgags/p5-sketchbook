@@ -15,7 +15,7 @@ import { PALETTE_CORAL, PALETTE_ROCK, Values } from "../theme_colors.js";
 import { Oklch } from "../../lablib/Oklch.js";
 import { Random } from "../../../sketchlib/random.js";
 import { LoopCurve } from "../../lablib/animation/LoopCurve.js";
-import { AnimationCurve } from "../../lablib/animation/AnimationCurve.js";
+import { Animated } from "../../lablib/animation/Animated.js";
 
 const STYLE_ROCK1 = new Style({
   stroke: PALETTE_ROCK[Values.MedDark].to_srgb(),
@@ -51,6 +51,9 @@ const STYLE_INSIDE_GEODE = new Style({
   fill: PALETTE_ROCK[Values.Dark].to_srgb(),
 });
 
+/**
+ * @implements {Animated}
+ */
 export class Geode {
   /**
    * Constructor
@@ -95,10 +98,6 @@ export class Geode {
     for (const [i, stripe_style] of this.stripe_styles.entries()) {
       stripe_style.stroke_width = Math.min(thickness, this.max_widths[i]);
     }
-  }
-
-  render() {
-    return this.primitive;
   }
 }
 

@@ -8,6 +8,7 @@ import { group, style } from "../../../sketchlib/primitives/shorthand.js";
 import { Transform } from "../../../sketchlib/primitives/Transform.js";
 import { Style } from "../../../sketchlib/Style.js";
 import { Tween } from "../../../sketchlib/Tween.js";
+import { Animated } from "../../lablib/animation/Animated.js";
 import { LoopCurve } from "../../lablib/animation/LoopCurve.js";
 import { ParamCurve } from "../../lablib/animation/ParamCurve.js";
 import { Sequential } from "../../lablib/music/Timeline.js";
@@ -67,7 +68,10 @@ const BRICK_PATTERN = group(BRICK_BACKGROUND, BRICK_STRIPES);
 
 const FALL_LENGTH = 300;
 
-// Single falling brick
+/**
+ * Single falling brick
+ * @implements {Animated}
+ */
 class Brick {
   /**
    * Constructor
@@ -99,10 +103,6 @@ class Brick {
     this.primitive.position = this.hit_position.add(
       Direction.DIR_Y.scale(this.height)
     );
-  }
-
-  render() {
-    return this.primitive;
   }
 }
 
@@ -136,6 +136,9 @@ const CURVE_TIMING = LoopCurve.from_timeline(
   )
 );
 
+/**
+ * @implements {Animated}
+ */
 class BrickWall {
   constructor() {
     this.bricks = BRICK_OFFSETS.map((offset, i) => {
@@ -153,7 +156,7 @@ class BrickWall {
     //     - parts of the striped brick pattern are shown through the clipping path
     // drop shadow (bricks offset down and right a bit)
     // ---BOTTOM---
-    const brick_shape = group(...this.bricks.map((x) => x.render()));
+    const brick_shape = group(...this.bricks.map((x) => x.primitive));
     const drop_shadow = new GroupPrimitive(brick_shape, {
       transform: new Transform(DROP_SHADOW_OFFSET),
       style: STYLE_DROP_SHADOW,
@@ -176,10 +179,6 @@ class BrickWall {
 
     // The warped time value is used to make the bricks fall/lift over time
     this.bricks.forEach((x) => x.update(brick_t));
-  }
-
-  render() {
-    return this.primitive;
   }
 }
 

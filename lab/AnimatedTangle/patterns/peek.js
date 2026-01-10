@@ -6,6 +6,7 @@ import { Point } from "../../../pga2d/Point.js";
 import { GooglyEye } from "../../../sketchlib/primitives/GooglyEye.js";
 import { AnimationCurve } from "../../lablib/animation/AnimationCurve.js";
 import { LoopCurve } from "../../lablib/animation/LoopCurve.js";
+import { Animated } from "../../lablib/animation/Animated.js";
 
 const SCLERA_RADIUS = 20;
 const PUPIL_RADIUS = 10;
@@ -40,6 +41,9 @@ const CURVE_ANGLE = LoopCurve.from_timeline(
   )
 );
 
+/**
+ * @implements {Animated}
+ */
 class PeekingEye {
   /**
    *
@@ -53,7 +57,7 @@ class PeekingEye {
     const direction = end_point.sub(this.start_point).normalize();
     this.start_angle = Math.atan2(direction.y, direction.x);
 
-    this.eye = new GooglyEye(
+    this.primitive = new GooglyEye(
       start_point,
       direction,
       SCLERA_RADIUS,
@@ -70,7 +74,7 @@ class PeekingEye {
     const position = Point.lerp(this.start_point, this.end_point, position_t);
 
     const angle = this.start_angle + CURVE_ANGLE.value(time);
-    this.eye.update(position, Direction.from_angle(angle));
+    this.primitive.update(position, Direction.from_angle(angle));
   }
 }
 
