@@ -1,3 +1,4 @@
+import { is_nearly } from "../is_nearly.js";
 import { Style } from "../Style.js";
 import { Primitive } from "./Primitive.js";
 import { TextStyle } from "./TextStyle.js";
@@ -9,16 +10,16 @@ import { Transform } from "./Transform.js";
  * @param {Style} style The style to use
  */
 function apply_style(p, style) {
-  if (style.stroke) {
-    const { r, g, b } = style.stroke;
-    p.stroke(r, g, b);
+  if (style.stroke && !is_nearly(style.stroke.a, 0)) {
+    const { r, g, b, a } = style.stroke;
+    p.stroke(r, g, b, a);
   } else {
     p.noStroke();
   }
 
-  if (style.fill) {
-    const { r, g, b } = style.fill;
-    p.fill(r, g, b);
+  if (style.fill && !is_nearly(style.fill.a, 0)) {
+    const { r, g, b, a } = style.fill;
+    p.fill(r, g, b, a);
   } else {
     p.noFill();
   }

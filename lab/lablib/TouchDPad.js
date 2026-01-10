@@ -13,6 +13,8 @@ import { Style } from "../../sketchlib/Style.js";
 import { DirectionInput } from "./DirectionInput.js";
 import { MouseInCanvas, MouseInput } from "./MouseInput.js";
 import { Rectangle } from "./Rectangle.js";
+import { Oklch } from "./Oklch.js";
+import { Color } from "../../sketchlib/Color.js";
 
 /**
  * A virtual pad of 4 directional buttons, modeled after the D-pad on
@@ -176,7 +178,12 @@ export class TouchDPad {
     }
 
     const STYLE_IDLE = Style.DEFAULT_STROKE.with_width(2);
-    const STYLE_PRESSED = Style.DEFAULT_STROKE_FILL.with_width(2);
+    const STYLE_PRESSED = new Style({
+      // light blue, half transparency
+      fill: new Oklch(0.7, 0.1, 215, 0.5).to_srgb(),
+      stroke: Color.WHITE,
+      width: 2,
+    });
 
     const idle_group = style(idle_buttons, STYLE_IDLE);
     const pressed_group = style(pressed_buttons, STYLE_PRESSED);
