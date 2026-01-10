@@ -76,7 +76,7 @@ export class SpiralBurst {
 
     const color = new Oklch(lightness, chroma, hue);
     const point_style = new Style({
-      fill: color.to_srgb(),
+      fill: color,
     });
 
     /**

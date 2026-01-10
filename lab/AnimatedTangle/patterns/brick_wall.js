@@ -40,7 +40,7 @@ const BRICK_DIMENSIONS = PANEL_DIMENSIONS.mul_components(
 );
 
 const STYLE_BACKGROUND = new Style({
-  fill: PALETTE_CORAL[Values.MedDark].to_srgb(),
+  fill: PALETTE_CORAL[Values.MedDark],
 });
 const BRICK_BACKGROUND = style(
   new RectPrimitive(PANEL_CORNER, PANEL_DIMENSIONS),
@@ -50,7 +50,7 @@ const BRICK_BACKGROUND = style(
 const STRIPE_SPACING = 20;
 
 const STYLE_STRIPES = new Style({
-  stroke: PALETTE_CORAL[Values.Dark].to_srgb(),
+  stroke: PALETTE_CORAL[Values.Dark],
   width: STRIPE_SPACING / 2,
 });
 const BRICK_STRIPES = style(
@@ -121,7 +121,7 @@ const BRICK_OFFSETS = [
 ];
 
 const STYLE_DROP_SHADOW = new Style({
-  fill: PALETTE_ROCK[Values.Dark].to_srgb(),
+  fill: PALETTE_ROCK[Values.Dark],
 });
 const DROP_SHADOW_OFFSET = new Direction(25, 25);
 

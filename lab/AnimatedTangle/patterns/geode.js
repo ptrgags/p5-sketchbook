@@ -18,11 +18,11 @@ import { LoopCurve } from "../../lablib/animation/LoopCurve.js";
 import { AnimationCurve } from "../../lablib/animation/AnimationCurve.js";
 
 const STYLE_ROCK1 = new Style({
-  stroke: PALETTE_ROCK[Values.MedDark].to_srgb(),
+  stroke: PALETTE_ROCK[Values.MedDark],
   width: 4,
 });
 const STYLE_ROCK2 = new Style({
-  stroke: PALETTE_ROCK[Values.Medium].to_srgb(),
+  stroke: PALETTE_ROCK[Values.Medium],
   width: 4,
 });
 
@@ -48,7 +48,7 @@ const ROCK_STRIPES2 = make_stripes(
 );
 
 const STYLE_INSIDE_GEODE = new Style({
-  fill: PALETTE_ROCK[Values.Dark].to_srgb(),
+  fill: PALETTE_ROCK[Values.Dark],
 });
 
 export class Geode {
@@ -129,7 +129,7 @@ const PALETTE_AGATE = Random.shuffle(
 const GEODE_STYLES = PALETTE_AGATE.map(
   (x, i) =>
     new Style({
-      stroke: x.to_srgb(),
+      stroke: x,
       width: WIDTHS[i],
     })
 );

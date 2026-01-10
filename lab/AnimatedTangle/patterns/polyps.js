@@ -59,22 +59,22 @@ const WAVE_PASSAGE_TO_EXTEND_TIME = Tween.scalar(
 );
 
 const STYLE_MOUTH_BACK = new Style({
-  stroke: PALETTE_CORAL[Values.Dark].to_srgb(),
-  fill: PALETTE_CORAL[Values.Light].to_srgb(),
+  stroke: PALETTE_CORAL[Values.Dark],
+  fill: PALETTE_CORAL[Values.Light],
 });
 
 const STYLE_MOUTH_FRONT = new Style({
-  fill: PALETTE_NAVY[Values.Medium].to_srgb(),
+  fill: PALETTE_NAVY[Values.Medium],
 });
 
 const STYLE_TENTACLE_LINES = new Style({
-  stroke: PALETTE_CORAL[Values.MedDark].to_srgb(),
+  stroke: PALETTE_CORAL[Values.MedDark],
   width: 2,
 });
 
 const STYLE_TENTACLE_CIRCLES = new Style({
-  stroke: PALETTE_CORAL[Values.MedDark].to_srgb(),
-  fill: PALETTE_CORAL[Values.Light].to_srgb(),
+  stroke: PALETTE_CORAL[Values.MedDark],
+  fill: PALETTE_CORAL[Values.Light],
 });
 
 export class Polyp {

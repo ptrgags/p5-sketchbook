@@ -61,7 +61,7 @@ const PANEL_STRIPES = new PolygonPrimitive(
 );
 
 const PANEL_STYLE = new Style({
-  stroke: PALETTE_NAVY[Values.Light].to_srgb(),
+  stroke: PALETTE_NAVY[Values.Light],
   width: 10,
 });
 
@@ -96,7 +96,7 @@ const QUARTER_PEEK = new RectPrimitive(
 );
 
 const STYLE_QUARTERS = new Style({
-  stroke: PALETTE_CORAL[Values.Light].to_srgb(),
+  stroke: PALETTE_CORAL[Values.Light],
   width: 4,
 });
 
@@ -134,7 +134,7 @@ const TANGLE = new VectorTangle(
 
 const STYLE_BACKGROUND_STRIPES = new Style({
   // navy blue
-  stroke: PALETTE_NAVY[Values.Dark].to_srgb(),
+  stroke: PALETTE_NAVY[Values.Dark],
   width: 15,
 });
 const BACKGROUND_STRIPES = style(
