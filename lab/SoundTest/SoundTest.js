@@ -51,8 +51,8 @@ const PART_STYLES = Oklch.gradient(
 ).map(
   (x) =>
     new Style({
-      stroke: x.adjust_lightness(-0.2).to_srgb(),
-      fill: x.to_srgb(),
+      stroke: x.adjust_lightness(-0.2),
+      fill: x,
     })
 );
 

@@ -27,7 +27,7 @@ const CURVE_POSITION = LoopCurve.from_timeline(TIMELINE_POSITION);
 
 const BOX = new RectPrimitive(Point.ORIGIN, new Direction(25, 25));
 const STYLE_BOX = new Style({
-  fill: PALETTE_CORAL[Values.MedLight].to_srgb(),
+  fill: PALETTE_CORAL[Values.MedLight],
 });
 
 // This should always be odd so one box sits exactly in the center
