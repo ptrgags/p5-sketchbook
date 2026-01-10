@@ -1,10 +1,11 @@
+import { Oklch } from "../lab/lablib/Oklch.js";
 import { Color } from "./Color.js";
 
 /**
  * @typedef {Object} StyleDescriptor
- * @property {Color} [stroke] The stroke color
+ * @property {Color | Oklch} [stroke] The stroke color. Oklch colors will be turned into srgb
  * @property {number} [width] The stroke width
- * @property {Color} [fill] The fill color
+ * @property {Color | Oklch} [fill] The fill color. Oklch colors will be turned into srgb
  */
 
 /**
@@ -16,8 +17,18 @@ export class Style {
    * @param {StyleDescriptor} options The options for the style
    */
   constructor(options) {
-    this.stroke = options.stroke;
-    this.fill = options.fill;
+    /**
+     * @type {Color}
+     */
+    this.stroke =
+      options.stroke instanceof Oklch
+        ? options.stroke.to_srgb()
+        : options.stroke;
+    /**
+     * @type {Color}
+     */
+    this.fill =
+      options.fill instanceof Oklch ? options.fill.to_srgb() : options.fill;
     this.stroke_width = options.width ?? 1;
   }
 
