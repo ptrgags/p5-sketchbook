@@ -5,7 +5,7 @@ import { N16, N32, N8 } from "../lablib/music/durations.js";
 import { A3, C4, D4, E4, G4 } from "../lablib/music/pitches.js";
 
 import { Melody, Note } from "../lablib/music/Music.js";
-import { Score } from "../lablib/music/Score.js";
+import { Part, Score } from "../lablib/music/Score.js";
 import { MuteButton } from "../lablib/MuteButton.js";
 import { PlayButtonScene } from "../lablib/PlayButtonScene.js";
 import { SoundManager } from "../lablib/SoundManager.js";
@@ -18,14 +18,18 @@ import {
 
 const MOUSE = new CanvasMouseHandler();
 
-const TICK_TOCK = new Score({
-  parts: [
-    [
-      "tick",
-      new Melody(new Note(A3, N8), new Note(C4, N16), new Note(C4, N16)),
-    ],
-  ],
-});
+const MELODY_TICK_TOCK = new Melody(
+  new Note(A3, N8),
+  new Note(C4, N16),
+  new Note(C4, N16)
+);
+const TICK_TOCK = new Score(
+  new Part("tick_tock", MELODY_TICK_TOCK, {
+    instrument_id: "tick",
+    midi_channel: 0,
+    midi_instrument: 81 - 1, // square lead
+  })
+);
 
 /** @type {import("../lablib/SoundManager.js").SoundManifest} */
 const SOUND_MANIFEST = {

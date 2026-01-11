@@ -255,7 +255,7 @@ class TreeMusicBuilder {
 
     return new Score(
       new Part("draw", draw, {
-        instrument_id: "triangle",
+        instrument_id: "poly",
         label: "Draw Operations",
         midi_channel: 0,
         midi_instrument: 76 - 1, // Pan flute
