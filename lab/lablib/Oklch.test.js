@@ -55,7 +55,7 @@ describe("Oklch", () => {
     it("oklch(0, 0, 0) = black", () => {
       const black = new Oklch(0, 0, 0);
 
-      const result = black;
+      const result = black.to_srgb();
 
       const expected = new Color(0, 0, 0);
       expect(result).toEqual(expected);
@@ -64,7 +64,7 @@ describe("Oklch", () => {
     it("oklch(1, 0, 0) = white", () => {
       const white = new Oklch(1, 0, 0);
 
-      const result = white;
+      const result = white.to_srgb();
 
       const expected = new Color(247, 247, 247);
       expect(result).toEqual(expected);
@@ -75,7 +75,7 @@ describe("Oklch", () => {
       // so the lightness here is > 0.5
       const medium_grey = new Oklch(0.6, 0, 0);
 
-      const result = medium_grey;
+      const result = medium_grey.to_srgb();
 
       const expected = new Color(124, 124, 124);
       expect(result).toEqual(expected);
@@ -85,7 +85,7 @@ describe("Oklch", () => {
       // Blue color picked via https://oklch.com/#0.75,0.1,220,100
       const color = new Oklch(0.75, 0.1, 220);
 
-      const result = color;
+      const result = color.to_srgb();
 
       const expected = new Color(88, 183, 211);
       expect(result).toEqual(expected);
@@ -95,7 +95,7 @@ describe("Oklch", () => {
       // desaturated maroon via https://oklch.com/#0.5,0.05,30,100
       const color = new Oklch(0.5, 0.05, 30);
 
-      const result = color;
+      const result = color.to_srgb();
 
       // Note: Oklch.com gives
       // #7d5952 is (125, 89, 82) which is slightly off
