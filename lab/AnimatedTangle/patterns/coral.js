@@ -29,13 +29,13 @@ import {
 import { Animated } from "../../lablib/animation/Animated.js";
 
 const STYLE_CORAL = new Style({
-  fill: PALETTE_CORAL[Values.Medium].to_srgb(),
-  stroke: PALETTE_CORAL[Values.Dark].to_srgb(),
+  fill: PALETTE_CORAL[Values.Medium],
+  stroke: PALETTE_CORAL[Values.Dark],
   width: 4,
 });
 
 const STYLE_STRIPES = new Style({
-  stroke: PALETTE_SKY[Values.MedLight].to_srgb(),
+  stroke: PALETTE_SKY[Values.MedLight],
   width: 4,
 });
 

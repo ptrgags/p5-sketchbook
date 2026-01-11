@@ -25,17 +25,15 @@ const DURATION_GROWTH = sec_to_frames(1);
 const MAX_SYMBOLS = 100;
 const MAX_SPEED = 10;
 
-// light blue
-const COLOR_CELL_S = Color.from_hex_code("#4cbac0");
-// dark sea green
-const COLOR_CELL_L = Color.from_hex_code("#419977");
 const CELL_THICKNESS = 20;
 const STYLE_CELL_S = new Style({
-  stroke: COLOR_CELL_S,
+  // light blue
+  stroke: "#4cbac0",
   width: CELL_THICKNESS,
 });
 const STYLE_CELL_L = new Style({
-  stroke: COLOR_CELL_L,
+  // dark sea green
+  stroke: "#419977",
   width: CELL_THICKNESS,
 });
 const STYLE_ARROW = new Style({

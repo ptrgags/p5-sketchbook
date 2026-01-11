@@ -53,7 +53,7 @@ const COLORS = [
 
 const N_STYLES = COLORS.map((x) => new Style({ stroke: x, width: 2 }));
 const GREY_LINES = new Style({
-  stroke: Color.from_hex_code("#777777"),
+  stroke: "#777777",
   width: 2,
 });
 const YELLOW_LINES = new Style({
@@ -63,8 +63,8 @@ const YELLOW_LINES = new Style({
 
 const SEA_GREEN = new Oklch(0.7, 0.1, 196);
 const POINT_STYLE = new Style({
-  stroke: SEA_GREEN.adjust_lightness(-0.15).to_srgb(),
-  fill: SEA_GREEN.to_srgb(),
+  stroke: SEA_GREEN.adjust_lightness(-0.15),
+  fill: SEA_GREEN,
   width: 2,
 });
 

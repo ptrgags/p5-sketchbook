@@ -1,10 +1,28 @@
+import { Oklch } from "../lab/lablib/Oklch.js";
 import { Color } from "./Color.js";
 
 /**
+ * Convert from a variety of color formats to a sRGB color
+ * @param {Color | Oklch | string} color A color, an Oklch color, or a string hex code
+ * @returns {Color}
+ */
+function to_srgb(color) {
+  if (color instanceof Oklch) {
+    return color.to_srgb();
+  }
+
+  if (color instanceof Color) {
+    return color;
+  }
+
+  return Color.from_hex_code(color);
+}
+
+/**
  * @typedef {Object} StyleDescriptor
- * @property {Color} [stroke] The stroke color
+ * @property {Color | Oklch | string | undefined} [stroke] The stroke color. Oklch colors will be turned into srgb
  * @property {number} [width] The stroke width
- * @property {Color} [fill] The fill color
+ * @property {Color | Oklch | string} [fill] The fill color. Oklch colors will be turned into srgb
  */
 
 /**
@@ -16,8 +34,8 @@ export class Style {
    * @param {StyleDescriptor} options The options for the style
    */
   constructor(options) {
-    this.stroke = options.stroke;
-    this.fill = options.fill;
+    this.stroke = options.stroke ? to_srgb(options.stroke) : undefined;
+    this.fill = options.fill ? to_srgb(options.fill) : undefined;
     this.stroke_width = options.width ?? 1;
   }
 
@@ -69,9 +87,7 @@ export class Style {
 
 Style.INVISIBLE = Object.freeze(new Style({}));
 Style.DEFAULT_STROKE = Object.freeze(new Style({ stroke: Color.WHITE }));
-Style.DEFAULT_FILL = Object.freeze(
-  new Style({ fill: Color.from_hex_code("#6eb2e8") })
-);
+Style.DEFAULT_FILL = Object.freeze(new Style({ fill: "#6eb2e8" }));
 Style.DEFAULT_STROKE_FILL = Object.freeze(
   Style.DEFAULT_FILL.with_stroke(Color.WHITE)
 );
