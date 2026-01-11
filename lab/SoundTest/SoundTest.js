@@ -31,6 +31,8 @@ import { Piano } from "./Piano.js";
 import { SpiralBurst } from "./SpiralBurst.js";
 import { expect_element } from "../../sketchlib/dom/expect_element.js";
 import { decode_midi } from "../lablib/midi/decode_midi.js";
+import { Score } from "../lablib/music/Score.js";
+import { MidiPitch } from "../lablib/music/pitch_conversions.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -194,6 +196,11 @@ async function import_midi_file(file_list) {
   return [fname, buffer];
 }
 
+const PIANO_BOUNDS = new Rectangle(
+  new Point(0, 300),
+  new Direction(500, 300 / 3)
+);
+
 class SoundScene {
   /**
    * Constructor
@@ -204,11 +211,7 @@ class SoundScene {
     this.sound = sound;
     this.mute_button = new MuteButton();
     this.events = new EventTarget();
-    this.piano = new Piano(
-      new Rectangle(new Point(0, 300), new Direction(500, 300 / 3)),
-      3,
-      4
-    );
+    this.piano = new Piano(PIANO_BOUNDS, 3, 4);
     this.spiral_burst = new SpiralBurst();
 
     this.mute_button.events.addEventListener(
@@ -263,11 +266,32 @@ class SoundScene {
       button.events.addEventListener("click", () => {
         this.selected_melody = descriptor.id;
         this.export_button.disabled = false;
-        this.piano.reset();
+        this.update_piano(SOUND_MANIFEST.scores[this.selected_melody]);
         this.sound.play_score(this.selected_melody);
       });
       return button;
     });
+  }
+
+  /**
+   *
+   * @param {Score<number>} score
+   */
+  update_piano(score) {
+    let min_note = 127;
+    let max_note = 0;
+    for (const note of score.iter_notes()) {
+      min_note = Math.min(min_note, note.pitch);
+      max_note = Math.max(max_note, note.pitch);
+    }
+
+    const min_octave = MidiPitch.get_octave(min_note);
+    const max_octave = MidiPitch.get_octave(max_note);
+    this.piano = new Piano(
+      PIANO_BOUNDS,
+      min_octave,
+      max_octave - min_octave + 1
+    );
   }
 
   export_selected() {

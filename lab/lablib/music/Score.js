@@ -1,6 +1,12 @@
 import { Rational } from "../Rational.js";
 import { REST } from "./pitches.js";
-import { Gap, Parallel, Sequential, timeline_map } from "./Timeline.js";
+import {
+  Gap,
+  iter_intervals,
+  Parallel,
+  Sequential,
+  timeline_map,
+} from "./Timeline.js";
 
 /**
  * Pitched note. The choice of pitch space can vary
@@ -121,7 +127,6 @@ export function map_pitch(pitch_func, music) {
  * @template P
  * @typedef {Object} ScoreOptions
  * @property {[Instrument, Music<P>][]} parts The musical parts
- * @property {AnimationCurves} [animation_curves] Animation curves to play in sync with the music
  */
 
 /**
@@ -139,5 +144,15 @@ export class Score {
      * @type {[Instrument, Music<P>][]}
      */
     this.parts = options.parts;
+  }
+
+  /**
+   * Iterate over all the notes in the score
+   * @returns {Generator<Note<P>>}
+   */
+  *iter_notes() {
+    for (const [_, music] of this.parts) {
+      yield* iter_intervals(music);
+    }
   }
 }
