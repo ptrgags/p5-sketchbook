@@ -123,7 +123,7 @@ const BRICK_OFFSETS = [
 const STYLE_DROP_SHADOW = new Style({
   fill: PALETTE_ROCK[Values.Dark],
 });
-const DROP_SHADOW_OFFSET = new Direction(25, 25);
+const DROP_SHADOW_OFFSET = new Direction(12, 12);
 
 const DURATION_FALL = new Rational(6);
 const DURATION_LIFT = new Rational(3);
