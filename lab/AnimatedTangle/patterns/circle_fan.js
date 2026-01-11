@@ -23,6 +23,7 @@ import {
 } from "../theme_colors.js";
 import { Ease } from "../../../sketchlib/Ease.js";
 import { LoopCurve } from "../../lablib/animation/LoopCurve.js";
+import { Animated } from "../../lablib/animation/Animated.js";
 
 const CENTER = new Point(500, 300);
 const BAND_THICKNESS = 50;
@@ -115,6 +116,9 @@ function make_diamond(angle) {
   );
 }
 
+/**
+ * @implements {Animated}
+ */
 class CircleFan {
   constructor() {
     /**
@@ -160,10 +164,6 @@ class CircleFan {
         x.transform.translation = Direction.from_angle(angle).scale(diamond_r);
       });
     }
-  }
-
-  render() {
-    return this.primitive;
   }
 }
 

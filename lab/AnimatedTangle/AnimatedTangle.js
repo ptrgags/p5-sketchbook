@@ -19,6 +19,7 @@ import { TRAFFIC } from "./patterns/traffic.js";
 import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
 import { BRICKS } from "./patterns/brick_wall.js";
 import { DOORS } from "./patterns/doors.js";
+import { AnimationGroup } from "../lablib/animation/AnimationGroup.js";
 
 /**
  * Shorthand for making arrays of points
@@ -110,10 +111,10 @@ const QUARTER_DIVIDER = style(
 
 const QUARTERS = new VectorTangle(
   [
-    [new Mask(QUARTER_HITOMEZASHI), HITOMEZASHI.render()],
-    [new Mask(QUARTER_CIRCLE_FAN), CIRCLE_FAN.render()],
-    [new Mask(QUARTER_BRICK_WALL), BRICKS.render()],
-    [new Mask(QUARTER_PEEK), EYE.eye],
+    [new Mask(QUARTER_HITOMEZASHI), HITOMEZASHI.primitive],
+    [new Mask(QUARTER_CIRCLE_FAN), CIRCLE_FAN.primitive],
+    [new Mask(QUARTER_BRICK_WALL), BRICKS.primitive],
+    [new Mask(QUARTER_PEEK), EYE.primitive],
   ],
   QUARTER_DIVIDER
 );
@@ -122,14 +123,26 @@ const QUARTERS = new VectorTangle(
 
 const TANGLE = new VectorTangle(
   [
-    [new Mask(PANEL_LANDSCAPE), SEASCAPE.render()],
-    [new Mask(PANEL_TRAFFIC), TRAFFIC.render()],
+    [new Mask(PANEL_LANDSCAPE), SEASCAPE.primitive],
+    [new Mask(PANEL_TRAFFIC), TRAFFIC.primitive],
     [new Mask(PANEL_QUARTERS), QUARTERS],
-    [new Mask(PANEL_CORAL), SWAYING_CORAL.render()],
-    [new Mask(PANEL_DOORS), DOORS.render()],
-    [new Mask(PANEL_GEODE), GEODE.render()],
+    [new Mask(PANEL_CORAL), SWAYING_CORAL.primitive],
+    [new Mask(PANEL_DOORS), DOORS.primitive],
+    [new Mask(PANEL_GEODE), GEODE.primitive],
   ],
   PANELS
+);
+
+const ANIMATIONS = new AnimationGroup(
+  SEASCAPE,
+  SWAYING_CORAL,
+  TRAFFIC,
+  HITOMEZASHI,
+  EYE,
+  CIRCLE_FAN,
+  GEODE,
+  BRICKS,
+  DOORS
 );
 
 const STYLE_BACKGROUND_STRIPES = new Style({
@@ -163,16 +176,7 @@ export const sketch = (p) => {
 
     const frame = p.frameCount;
     const t_sec = frame / 60;
-
-    SEASCAPE.update(t_sec);
-    SWAYING_CORAL.update(t_sec);
-    TRAFFIC.update(t_sec);
-    HITOMEZASHI.update(t_sec);
-    EYE.update(t_sec);
-    CIRCLE_FAN.update(t_sec);
-    GEODE.update(t_sec);
-    BRICKS.update(t_sec);
-    DOORS.update(t_sec);
+    ANIMATIONS.update(t_sec);
 
     BACKGROUND_STRIPES.draw(p);
     TANGLE.draw(p);

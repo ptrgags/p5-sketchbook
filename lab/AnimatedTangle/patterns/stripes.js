@@ -5,6 +5,7 @@ import { mod } from "../../../sketchlib/mod.js";
 import { GroupPrimitive } from "../../../sketchlib/primitives/GroupPrimitive.js";
 import { LinePrimitive } from "../../../sketchlib/primitives/LinePrimitive.js";
 import { group } from "../../../sketchlib/primitives/shorthand.js";
+import { Animated } from "../../lablib/animation/Animated.js";
 
 /**
  * Make a set of parallel stripes
@@ -39,6 +40,9 @@ export function make_stripes(center, dir_forward, spacing, dimensions, phase) {
   return group(...lines);
 }
 
+/**
+ * @implements {Animated}
+ */
 export class AnimatedStripes {
   /**
    * Constructor
@@ -74,9 +78,5 @@ export class AnimatedStripes {
     );
     this.lines_array.length = 0;
     this.lines_array.push(...new_stripes);
-  }
-
-  render() {
-    return this.primitive;
   }
 }
