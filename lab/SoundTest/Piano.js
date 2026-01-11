@@ -31,6 +31,9 @@ export class Piano {
     const octave_dimensions = new Direction(octave_width, height);
 
     // Create a number of single-octave pianos
+    /**
+     * @type {SingleOctavePiano[]}
+     */
     this.octave_pianos = new Array(this.num_octaves);
     for (let i = 0; i < num_octaves; i++) {
       const offset = bounding_rect.position.add(
@@ -101,7 +104,7 @@ export class Piano {
   }
 
   render() {
-    const octave_primitives = this.octave_pianos.map((x) => x.render());
+    const octave_primitives = this.octave_pianos.map((x) => x.primitive);
     return group(...octave_primitives);
   }
 }

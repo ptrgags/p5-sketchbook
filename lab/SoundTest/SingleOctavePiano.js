@@ -4,8 +4,10 @@ import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Rectangle } from "../lablib/Rectangle.js";
+import { ShowHidePrimitive } from "./ShowHidePrimitive.js";
 
 const NUM_WHITE_KEYS = 7;
+const NUM_BLACK_KEYS = 5;
 
 /**
  * Given a bounding rectangle, make 7 evenly-spaced rectangles for the
@@ -86,15 +88,27 @@ const STYLE_HIGHLIGHT = new Style({
  */
 export class SingleOctavePiano {
   constructor(bounding_rect) {
-    this.white_keys = make_white_keys(bounding_rect);
-    this.black_keys = make_black_keys(bounding_rect);
-    this.all_keys = [this.white_keys, this.black_keys];
+    const white_key_rects = make_white_keys(bounding_rect);
+    const black_key_rects = make_black_keys(bounding_rect);
 
-    /**
-     * Array of 12 booleans to determine which keys are pressed
-     * @type {boolean[]}
-     */
-    this.is_pressed = new Array(12).fill(false);
+    const white_keys = style(white_key_rects, STYLE_WHITE_KEYS);
+    const black_keys = style(black_key_rects, STYLE_BLACK_KEYS);
+
+    this.white_highlights = new ShowHidePrimitive(
+      white_key_rects,
+      new Array(NUM_WHITE_KEYS).fill(false)
+    );
+    this.black_highlights = new ShowHidePrimitive(
+      black_key_rects,
+      new Array(NUM_BLACK_KEYS).fill(false)
+    );
+
+    this.primitive = group(
+      white_keys,
+      style(this.white_highlights, STYLE_HIGHLIGHT),
+      black_keys,
+      style(this.black_highlights, STYLE_HIGHLIGHT)
+    );
   }
 
   /**
@@ -103,46 +117,17 @@ export class SingleOctavePiano {
    * @param {boolean} is_pressed If the key is pressed
    */
   set_key(key_index, is_pressed) {
-    this.is_pressed[key_index] = is_pressed;
+    const [color, index] = KEY_MAPPING[key_index];
+    const highlights =
+      color === BLACK ? this.black_highlights : this.white_highlights;
+    highlights.show_flags[index] = is_pressed;
   }
 
   /**
    * Release all keys
    */
   reset() {
-    this.is_pressed.fill(false);
-  }
-
-  /**
-   * Get the active white keys and active black keys as separate arrays
-   * for rendering. The result is returned as [active_white, active_black]
-   * as these are rendered in two separate layers
-   * @private
-   * @type {RectPrimitive[][]}
-   */
-  get active_keys() {
-    // [active_white, active_black]
-    const result = [[], []];
-    for (let i = 0; i < 12; i++) {
-      if (!this.is_pressed[i]) {
-        continue;
-      }
-
-      const [color, index] = KEY_MAPPING[i];
-      result[color].push(this.all_keys[color][index]);
-    }
-
-    return result;
-  }
-
-  render() {
-    const white_keys = style(this.white_keys, STYLE_WHITE_KEYS);
-    const black_keys = style(this.black_keys, STYLE_BLACK_KEYS);
-
-    const [active_white, active_black] = this.active_keys;
-    const white_highlights = style(active_white, STYLE_HIGHLIGHT);
-    const black_highlights = style(active_black, STYLE_HIGHLIGHT);
-
-    return group(white_keys, white_highlights, black_keys, black_highlights);
+    this.black_highlights.show_flags.fill(false);
+    this.white_highlights.show_flags.fill(false);
   }
 }
