@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { Style } from "./Style";
 import { Color } from "./Color";
-
+import { Oklch } from "../lab/lablib/Oklch.js";
 
 describe("Style", () => {
   it("constructor with empty object returns transparent style", () => {
@@ -22,6 +22,30 @@ describe("Style", () => {
     expect(style.stroke).toEqual(Color.RED);
     expect(style.fill).toEqual(Color.BLUE);
     expect(style.stroke_width).toBe(4);
+  });
+
+  it("constructor with hex code colors converts to Color objects", () => {
+    const style = new Style({
+      stroke: "#448822",
+      fill: "#aabbcc",
+    });
+
+    const expected_stroke = new Color(0x44, 0x88, 0x22);
+    const expected_fill = new Color(0xaa, 0xbb, 0xcc);
+    expect(style.stroke).toEqual(expected_stroke);
+    expect(style.fill).toEqual(expected_fill);
+  });
+
+  it("constructor with Oklch colors converts to Color objects", () => {
+    const style = new Style({
+      stroke: new Oklch(0.7, 0.1, 50),
+      fill: new Oklch(0.7, 0.1, 135),
+    });
+
+    const expected_stroke = new Color(202, 135, 97);
+    const expected_fill = new Color(127, 167, 105);
+    expect(style.stroke).toEqual(expected_stroke);
+    expect(style.fill).toEqual(expected_fill);
   });
 
   it("with_stroke creates a new style with a different stroke color", () => {
