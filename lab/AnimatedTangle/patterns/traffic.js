@@ -1,6 +1,7 @@
 import { Direction } from "../../../pga2d/Direction.js";
 import { Point } from "../../../pga2d/Point.js";
 import { Ease } from "../../../sketchlib/Ease.js";
+import { CirclePrimitive } from "../../../sketchlib/primitives/CirclePrimitive.js";
 import { RectPrimitive } from "../../../sketchlib/primitives/RectPrimitive.js";
 import {
   group,
@@ -15,7 +16,12 @@ import { LoopCurve } from "../../lablib/animation/LoopCurve.js";
 import { ParamCurve } from "../../lablib/animation/ParamCurve.js";
 import { Sequential } from "../../lablib/music/Timeline.js";
 import { Rational } from "../../lablib/Rational.js";
-import { PALETTE_CORAL, Values } from "../theme_colors.js";
+import {
+  PALETTE_CORAL,
+  PALETTE_NAVY,
+  PALETTE_SKY,
+  Values,
+} from "../theme_colors.js";
 
 const HALF_DIST = 300;
 const HALF_DURATION = new Rational(2);
@@ -27,10 +33,23 @@ const TIMELINE_POSITION = new Sequential(
 );
 const CURVE_POSITION = LoopCurve.from_timeline(TIMELINE_POSITION);
 
-const BOX = new RectPrimitive(Point.ORIGIN, new Direction(25, 25));
+const BOX_BACKGROUND = new RectPrimitive(Point.ORIGIN, new Direction(25, 25));
 const STYLE_BOX = new Style({
   fill: PALETTE_CORAL[Values.MedLight],
 });
+
+const STYLE_BOX_STRIPES = new Style({
+  fill: PALETTE_CORAL[Values.Dark],
+});
+const BOX_STRIPE = new RectPrimitive(
+  new Point(0, 25 / 2),
+  new Direction(25, 25 / 2)
+);
+
+const BOX = group(
+  style(BOX_BACKGROUND, STYLE_BOX),
+  style(BOX_STRIPE, STYLE_BOX_STRIPES)
+);
 
 // This should always be odd so one box sits exactly in the center
 const NUM_BOXES = 11;
@@ -55,8 +74,7 @@ class TrafficLane {
       return new Transform(center_offset.add(Direction.DIR_X.scale(dx)));
     });
 
-    const boxes = this.transforms.map((t) => xform(BOX, t));
-    this.primitive = style(boxes, STYLE_BOX);
+    this.primitive = group(...this.transforms.map((t) => xform(BOX, t)));
   }
 
   update(time) {
