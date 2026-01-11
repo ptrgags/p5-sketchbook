@@ -26,7 +26,7 @@ const CLOCK_HASHES = DIRS_12.map((dir) => {
   return new LinePrimitive(tail, head);
 });
 const STYLE_CLOCK = new Style({
-  stroke: Color.from_hex_code("#444444"),
+  stroke: "#444444",
   width: 5,
   fill: Color.WHITE,
 });
@@ -39,12 +39,12 @@ const LENGTH_HOUR_HAND = (OUTER_RADIUS * 5) / 10;
 const ARM_LENGTH = HEIGHT / 2;
 const BOB_RADIUS = OUTER_RADIUS / 3;
 const STYLE_ARM = new Style({
-  stroke: Color.from_hex_code("#555555"),
+  stroke: "#555555",
   width: 8,
 });
 const STYLE_BOB = new Style({
-  stroke: Color.from_hex_code("#666666"),
-  fill: Color.from_hex_code("#777777"),
+  stroke: "#666666",
+  fill: "#777777",
 });
 
 /**

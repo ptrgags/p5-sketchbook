@@ -16,7 +16,7 @@ const NOTE_STYLE = new Style({
 });
 
 const MEASURE_LINE_STYLE = new Style({
-  stroke: Color.from_hex_code("#777777"),
+  stroke: "#777777",
 });
 
 /**

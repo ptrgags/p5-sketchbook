@@ -53,7 +53,7 @@ const COLORS = [
 
 const N_STYLES = COLORS.map((x) => new Style({ stroke: x, width: 2 }));
 const GREY_LINES = new Style({
-  stroke: Color.from_hex_code("#777777"),
+  stroke: "#777777",
   width: 2,
 });
 const YELLOW_LINES = new Style({
