@@ -1,8 +1,12 @@
 import { Direction } from "../pga2d/Direction.js";
 import { Point } from "../pga2d/Point.js";
+import { Color } from "../sketchlib/Color.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { Grid, Index2D } from "../sketchlib/Grid.js";
+import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
+import { group, style } from "../sketchlib/primitives/shorthand.js";
+import { Style } from "../sketchlib/Style.js";
 import { IsoGrid } from "./IsoGrid.js";
 
 // See https://en.wikipedia.org/wiki/Ordered_dithering#Threshold_map
@@ -26,7 +30,7 @@ const BAYER_ISO = new IsoGrid(
   }
 );
 
-const THRESHOLD = 10;
+const THRESHOLD = 45;
 const DITHERED_ISO = new IsoGrid(
   new RectPrimitive(new Point(275, 50), new Direction(200, 200)),
   8,
@@ -41,6 +45,26 @@ const DITHERED_ISO = new IsoGrid(
 const BAYER_PRIM = BAYER_ISO.render();
 const DITHER_PRIM = DITHERED_ISO.render();
 
+const basis = BAYER_ISO.basis;
+const left = basis.position(8, 0, THRESHOLD / 63);
+const bottom = basis.position(8, 8, THRESHOLD / 63);
+const right = basis.position(0, 8, THRESHOLD / 63);
+const top = basis.position(0, 0, THRESHOLD / 63);
+
+const STYLE_THRESHOLD = new Style({
+  stroke: Color.RED,
+});
+
+const front_layer = style(
+  [new LinePrimitive(left, bottom), new LinePrimitive(bottom, right)],
+  STYLE_THRESHOLD
+);
+
+const back_layer = style(
+  [new LinePrimitive(right, top), new LinePrimitive(top, left)],
+  STYLE_THRESHOLD
+);
+
 export const sketch = (p) => {
   p.setup = () => {
     p.createCanvas(
@@ -54,7 +78,9 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
+    back_layer.draw(p);
     BAYER_PRIM.draw(p);
     DITHER_PRIM.draw(p);
+    front_layer.draw(p);
   };
 };
