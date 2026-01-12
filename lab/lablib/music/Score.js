@@ -2,6 +2,7 @@ import { Rational } from "../Rational.js";
 import { REST } from "./pitches.js";
 import {
   Gap,
+  intervals_at_time,
   iter_intervals,
   Parallel,
   Sequential,
@@ -154,5 +155,19 @@ export class Score {
     for (const [_, music] of this.parts) {
       yield* iter_intervals(music);
     }
+  }
+
+  /**
+   * Get all the notes at the given time on the timeline. This returns empty
+   * array for out of bounds times
+   * @param {number} time query time in measures
+   * @returns {Note<P>[]} The notes
+   */
+  notes_at_time(time) {
+    const notes = [];
+    for (const [_, music] of this.parts) {
+      intervals_at_time(music, time, notes);
+    }
+    return notes;
   }
 }
