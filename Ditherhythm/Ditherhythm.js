@@ -5,7 +5,7 @@ import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { IsoGrid } from "./IsoGrid.js";
 
 const ISO_GRID = new IsoGrid(
-  new RectPrimitive(new Point(50, 50), new Direction(400, 400)),
+  new RectPrimitive(new Point(50, 50), new Direction(200, 200)),
   8,
   8,
   (row, col) => {
