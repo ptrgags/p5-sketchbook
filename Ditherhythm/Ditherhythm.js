@@ -17,8 +17,8 @@ const BAYER8 = [
   [63, 31, 55, 23, 61, 29, 53, 21],
 ];
 
-const ISO_GRID = new IsoGrid(
-  new RectPrimitive(new Point(50, 50), new Direction(200, 200)),
+const BAYER_ISO = new IsoGrid(
+  new RectPrimitive(new Point(25, 50), new Direction(200, 200)),
   8,
   8,
   (row, col) => {
@@ -26,8 +26,20 @@ const ISO_GRID = new IsoGrid(
   }
 );
 
-const AXES = ISO_GRID.render_axes();
-const GRID_PRIM = ISO_GRID.render();
+const THRESHOLD = 10;
+const DITHERED_ISO = new IsoGrid(
+  new RectPrimitive(new Point(275, 50), new Direction(200, 200)),
+  8,
+  8,
+  (row, col) => {
+    const bayer = BAYER8[row][col];
+    // bandpass the bayer matrix
+    return Number(bayer < THRESHOLD);
+  }
+);
+
+const BAYER_PRIM = BAYER_ISO.render();
+const DITHER_PRIM = DITHERED_ISO.render();
 
 export const sketch = (p) => {
   p.setup = () => {
@@ -42,6 +54,7 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    GRID_PRIM.draw(p);
+    BAYER_PRIM.draw(p);
+    DITHER_PRIM.draw(p);
   };
 };
