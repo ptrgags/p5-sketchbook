@@ -10,9 +10,12 @@ const ISO_GRID = new IsoGrid(
   8,
   (row, col) => {
     const index = row * 8 + col;
-    return index / 15;
+    return (63 - index) / 63;
   }
 );
+
+const AXES = ISO_GRID.render_axes();
+const GRID_PRIM = ISO_GRID.render();
 
 export const sketch = (p) => {
   p.setup = () => {
@@ -27,6 +30,6 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    ISO_GRID.render_axes().draw(p);
+    GRID_PRIM.draw(p);
   };
 };
