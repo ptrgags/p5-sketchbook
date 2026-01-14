@@ -2,6 +2,7 @@ import { Direction } from "../../../pga2d/Direction.js";
 import { Point } from "../../../pga2d/Point.js";
 import { Ease } from "../../../sketchlib/Ease.js";
 import { CirclePrimitive } from "../../../sketchlib/primitives/CirclePrimitive.js";
+import { GroupPrimitive } from "../../../sketchlib/primitives/GroupPrimitive.js";
 import { RectPrimitive } from "../../../sketchlib/primitives/RectPrimitive.js";
 import {
   group,
@@ -33,28 +34,28 @@ const TIMELINE_POSITION = new Sequential(
 );
 const CURVE_POSITION = LoopCurve.from_timeline(TIMELINE_POSITION);
 
-const BOX_BACKGROUND = new RectPrimitive(Point.ORIGIN, new Direction(25, 25));
-const STYLE_BOX = new Style({
+const PLATFORM_WIDTH = 25;
+const PLATFORM_HEIGHT = 25;
+const TOP_HEIGHT = 15;
+const PLATFORM_TOP = new RectPrimitive(
+  Point.ORIGIN,
+  new Direction(PLATFORM_WIDTH, TOP_HEIGHT)
+);
+const PLATFORM_SHADOW = new RectPrimitive(
+  new Point(0, TOP_HEIGHT),
+  new Direction(PLATFORM_WIDTH, PLATFORM_HEIGHT - TOP_HEIGHT)
+);
+const STYLE_TOP = new Style({
   fill: PALETTE_CORAL[Values.MedLight],
 });
-
-const STYLE_BOX_STRIPES = new Style({
+const STYLE_SHADOW = new Style({
   fill: PALETTE_CORAL[Values.Dark],
 });
-const BOX_STRIPE = new RectPrimitive(
-  new Point(0, 25 / 2),
-  new Direction(25, 25 / 2)
-);
 
-const BOX = group(
-  style(BOX_BACKGROUND, STYLE_BOX),
-  style(BOX_STRIPE, STYLE_BOX_STRIPES)
-);
-
-// This should always be odd so one box sits exactly in the center
-const NUM_BOXES = 11;
-const PHASES = new Array(NUM_BOXES).fill(0).map((_, i) => {
-  const t_step = TIMELINE_POSITION.duration.real / (NUM_BOXES - 1);
+// This should always be odd so one platform always sits at the center
+const NUM_PLATFORMS = 11;
+const PHASES = new Array(NUM_PLATFORMS).fill(0).map((_, i) => {
+  const t_step = TIMELINE_POSITION.duration.real / (NUM_PLATFORMS - 1);
   return i * t_step;
 });
 
@@ -63,7 +64,7 @@ const PHASES = new Array(NUM_BOXES).fill(0).map((_, i) => {
  */
 class TrafficLane {
   /**
-   *
+   * Constructor
    * @param {Direction} center_offset
    */
   constructor(center_offset) {
@@ -74,9 +75,34 @@ class TrafficLane {
       return new Transform(center_offset.add(Direction.DIR_X.scale(dx)));
     });
 
-    this.primitive = group(...this.transforms.map((t) => xform(BOX, t)));
+    this.primitive = group(...this.style_primitives());
   }
 
+  *style_primitives() {
+    // We have n blocks and 2 styles to apply. Somewhat surprisingly,
+    // styling each layer individually requires the least amount of
+    // saving/restoring the graphics state. See
+    // https://github.com/ptrgags/p5-sketchbook/issues/149#issuecomment-3738218567
+
+    for (const transform of this.transforms) {
+      const background = new GroupPrimitive(PLATFORM_TOP, {
+        style: STYLE_TOP,
+        transform,
+      });
+
+      const foreground = new GroupPrimitive(PLATFORM_SHADOW, {
+        style: STYLE_SHADOW,
+        transform,
+      });
+      yield background;
+      yield foreground;
+    }
+  }
+
+  /**
+   *
+   * @param {number} time
+   */
   update(time) {
     this.transforms.forEach((t, i) => {
       const dx = CURVE_POSITION.value(time + PHASES[i]);
