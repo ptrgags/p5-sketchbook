@@ -1,9 +1,8 @@
 // Links for all of the sketches. Links are added to the page in this order
 export const LINKS = [
   {
-    link: "./lab/AnimatedTangle",
     title: "Animated Tangle",
-    year: "2025-12",
+    year: "2025-12/2026-01",
   },
   {
     link: "./lab/MusicalTree",
