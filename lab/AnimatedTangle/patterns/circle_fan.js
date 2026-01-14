@@ -54,14 +54,14 @@ const CURVE_RADIUS = LoopCurve.from_timeline(
 );
 
 const STYLE_CIRCLES = new Style({
-  fill: PALETTE_NAVY[Values.MedLight],
-  stroke: PALETTE_SKY[Values.Light],
+  fill: PALETTE_NAVY[Values.MED_LIGHT],
+  stroke: PALETTE_SKY[Values.LIGHT],
   width: 5,
 });
 
 const STYLE_DIAMONDS = new Style({
-  fill: PALETTE_CORAL[Values.MedLight],
-  stroke: PALETTE_NAVY[Values.Medium],
+  fill: PALETTE_CORAL[Values.MED_LIGHT],
+  stroke: PALETTE_NAVY[Values.MEDIUM],
   width: 2,
 });
 

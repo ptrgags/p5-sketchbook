@@ -64,7 +64,7 @@ const PANEL_STRIPES = new PolygonPrimitive(
 );
 
 const PANEL_STYLE = new Style({
-  stroke: PALETTE_NAVY[Values.Light],
+  stroke: PALETTE_NAVY[Values.LIGHT],
   width: 10,
 });
 
@@ -99,7 +99,7 @@ const QUARTER_PEEK = new RectPrimitive(
 );
 
 const STYLE_QUARTERS = new Style({
-  stroke: PALETTE_CORAL[Values.Light],
+  stroke: PALETTE_CORAL[Values.LIGHT],
   width: 6,
 });
 
@@ -149,7 +149,7 @@ const ANIMATIONS = new AnimationGroup(
 
 const STYLE_BACKGROUND_STRIPES = new Style({
   // navy blue
-  stroke: PALETTE_NAVY[Values.Dark],
+  stroke: PALETTE_NAVY[Values.DARK],
   width: 15,
 });
 const BACKGROUND_STRIPES = style(

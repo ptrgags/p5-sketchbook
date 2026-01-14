@@ -19,11 +19,11 @@ import { Animated } from "../../lablib/animation/Animated.js";
 import { lerp } from "../../../sketchlib/lerp.js";
 
 const STYLE_ROCK1 = new Style({
-  stroke: PALETTE_ROCK[Values.MedDark],
+  stroke: PALETTE_ROCK[Values.MED_DARK],
   width: 4,
 });
 const STYLE_ROCK2 = new Style({
-  stroke: PALETTE_ROCK[Values.Medium],
+  stroke: PALETTE_ROCK[Values.MEDIUM],
   width: 4,
 });
 
@@ -49,7 +49,7 @@ const ROCK_STRIPES2 = make_stripes(
 );
 
 const STYLE_INSIDE_GEODE = new Style({
-  fill: PALETTE_ROCK[Values.Dark],
+  fill: PALETTE_ROCK[Values.DARK],
 });
 
 /**
@@ -129,8 +129,8 @@ const WIDTHS = [8, 7, 6, 5, 4, 3, 2, 1].map((x) => {
 
 const PALETTE_AGATE = Random.shuffle(
   Oklch.gradient(
-    PALETTE_CORAL[Values.Dark],
-    PALETTE_CORAL[Values.Light],
+    PALETTE_CORAL[Values.DARK],
+    PALETTE_CORAL[Values.LIGHT],
     WIDTHS.length
   )
 );

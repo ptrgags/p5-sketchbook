@@ -58,22 +58,22 @@ const WAVE_PASSAGE_TO_EXTEND_TIME = Tween.scalar(
 );
 
 const STYLE_MOUTH_BACK = new Style({
-  stroke: PALETTE_CORAL[Values.Dark],
-  fill: PALETTE_CORAL[Values.Light],
+  stroke: PALETTE_CORAL[Values.DARK],
+  fill: PALETTE_CORAL[Values.LIGHT],
 });
 
 const STYLE_MOUTH_FRONT = new Style({
-  fill: PALETTE_NAVY[Values.Medium],
+  fill: PALETTE_NAVY[Values.MEDIUM],
 });
 
 const STYLE_TENTACLE_LINES = new Style({
-  stroke: PALETTE_CORAL[Values.MedDark],
+  stroke: PALETTE_CORAL[Values.MED_DARK],
   width: 2,
 });
 
 const STYLE_TENTACLE_CIRCLES = new Style({
-  stroke: PALETTE_CORAL[Values.MedDark],
-  fill: PALETTE_CORAL[Values.Light],
+  stroke: PALETTE_CORAL[Values.MED_DARK],
+  fill: PALETTE_CORAL[Values.LIGHT],
 });
 
 /**
