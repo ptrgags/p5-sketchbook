@@ -1,29 +1,25 @@
-import { Sequential } from "../../lablib/music/Timeline.js";
-import { Rational } from "../../lablib/Rational.js";
-import { Point } from "../../../pga2d/Point.js";
-import { CirclePrimitive } from "../../../sketchlib/primitives/CirclePrimitive.js";
-import {
-  group,
-  style,
-  xform,
-} from "../../../sketchlib/primitives/shorthand.js";
-import { Style } from "../../../sketchlib/Style.js";
-import { Hold, ParamCurve } from "../../lablib/animation/ParamCurve.js";
-import { lerp } from "../../../sketchlib/lerp.js";
-import { Direction } from "../../../pga2d/Direction.js";
-import { PolygonPrimitive } from "../../../sketchlib/primitives/PolygonPrimitive.js";
-import { Motor } from "../../../pga2d/versors.js";
-import { Transform } from "../../../sketchlib/primitives/Transform.js";
-import { GroupPrimitive } from "../../../sketchlib/primitives/GroupPrimitive.js";
+import { Sequential } from "../../lab/lablib/music/Timeline.js";
+import { Rational } from "../../lab/lablib/Rational.js";
+import { Point } from "../../pga2d/Point.js";
+import { CirclePrimitive } from "../../sketchlib/primitives/CirclePrimitive.js";
+import { group, style, xform } from "../../sketchlib/primitives/shorthand.js";
+import { Style } from "../../sketchlib/Style.js";
+import { Hold, ParamCurve } from "../../lab/lablib/animation/ParamCurve.js";
+import { lerp } from "../../sketchlib/lerp.js";
+import { Direction } from "../../pga2d/Direction.js";
+import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
+import { Motor } from "../../pga2d/versors.js";
+import { Transform } from "../../sketchlib/primitives/Transform.js";
+import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import {
   PALETTE_CORAL,
   PALETTE_NAVY,
   PALETTE_SKY,
   Values,
 } from "../theme_colors.js";
-import { Ease } from "../../../sketchlib/Ease.js";
-import { LoopCurve } from "../../lablib/animation/LoopCurve.js";
-import { Animated } from "../../lablib/animation/Animated.js";
+import { Ease } from "../../sketchlib/Ease.js";
+import { LoopCurve } from "../../lab/lablib/animation/LoopCurve.js";
+import { Animated } from "../../lab/lablib/animation/Animated.js";
 
 const CENTER = new Point(500, 300);
 const BAND_THICKNESS = 50;

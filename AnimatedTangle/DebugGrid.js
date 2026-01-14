@@ -1,5 +1,5 @@
-import { HEIGHT, WIDTH } from "../../sketchlib/dimensions.js";
-import { Primitive } from "../../sketchlib/primitives/Primitive.js";
+import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
+import { Primitive } from "../sketchlib/primitives/Primitive.js";
 
 function draw_grid(p, spacing) {
   for (let i = 0; i < WIDTH / spacing + 1; i++) {

@@ -1,12 +1,12 @@
-import { Direction } from "../../pga2d/Direction.js";
-import { Point } from "../../pga2d/Point.js";
-import { Motor } from "../../pga2d/versors.js";
-import { is_nearly } from "../../sketchlib/is_nearly.js";
-import { BeziergonPrimitive } from "../../sketchlib/primitives/BeziergonPrimitive.js";
-import { CirclePrimitive } from "../../sketchlib/primitives/CirclePrimitive.js";
-import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
-import { PointPrimitive } from "../../sketchlib/primitives/PointPrimitive.js";
-import { group } from "../../sketchlib/primitives/shorthand.js";
+import { Direction } from "../pga2d/Direction.js";
+import { Point } from "../pga2d/Point.js";
+import { Motor } from "../pga2d/versors.js";
+import { is_nearly } from "../sketchlib/is_nearly.js";
+import { BeziergonPrimitive } from "../sketchlib/primitives/BeziergonPrimitive.js";
+import { CirclePrimitive } from "../sketchlib/primitives/CirclePrimitive.js";
+import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
+import { PointPrimitive } from "../sketchlib/primitives/PointPrimitive.js";
+import { group } from "../sketchlib/primitives/shorthand.js";
 
 /**
  * Take two unit directions and compute the direction halfway between

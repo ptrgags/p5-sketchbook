@@ -1,4 +1,4 @@
-import { Oklch } from "../lablib/Oklch.js";
+import { Oklch } from "../lab/lablib/Oklch.js";
 
 export const PALETTE_NAVY = Oklch.gradient(
   new Oklch(0.1662, 0.1152, 264.05),
