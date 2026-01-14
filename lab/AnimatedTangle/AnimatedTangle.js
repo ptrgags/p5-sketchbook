@@ -98,7 +98,7 @@ const QUARTER_PEEK = new RectPrimitive(
 
 const STYLE_QUARTERS = new Style({
   stroke: PALETTE_CORAL[Values.Light],
-  width: 4,
+  width: 6,
 });
 
 const QUARTER_DIVIDER = style(

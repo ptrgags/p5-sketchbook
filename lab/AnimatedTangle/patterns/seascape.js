@@ -33,13 +33,13 @@ const HILL_Y_SPACING = 10;
 const HILL_AMPLITUDE = 20;
 const HILL_STYLES = [
   new Style({
-    fill: PALETTE_NAVY[Values.Light],
-  }),
-  new Style({
     fill: PALETTE_NAVY[Values.MedLight],
   }),
   new Style({
     fill: PALETTE_NAVY[Values.Medium],
+  }),
+  new Style({
+    fill: PALETTE_NAVY[Values.MedDark],
   }),
 ];
 

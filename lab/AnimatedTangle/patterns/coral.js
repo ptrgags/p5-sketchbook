@@ -35,7 +35,7 @@ const STYLE_CORAL = new Style({
 });
 
 const STYLE_STRIPES = new Style({
-  stroke: PALETTE_SKY[Values.MedLight],
+  stroke: PALETTE_SKY[Values.MedDark],
   width: 4,
 });
 
