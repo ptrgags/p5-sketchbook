@@ -3,7 +3,6 @@ export const LINKS = [
   {
     link: "./lab/AnimatedTangle",
     title: "Animated Tangle",
-    is_lab: true,
     year: "2025-12",
   },
   {
