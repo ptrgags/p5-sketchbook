@@ -1,6 +1,8 @@
 import { Primitive } from "../../sketchlib/primitives/Primitive.js";
 
 /**
+ * Draw the mouse coordinates on the canvas. This assumes the sketch is
+ * showing at full size on desktop
  * @implements {Primitive}
  */
 export class DebugCoordinates {

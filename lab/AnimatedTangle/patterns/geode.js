@@ -105,9 +105,15 @@ export class Geode {
 const GEODE_BOUNDARY = new PolygonPrimitive(
   [
     new Point(250, 625),
-    new Point(450, 650),
-    new Point(400, 500),
-    new Point(300, 525),
+    new Point(325, 700),
+    new Point(350, 650),
+    new Point(375, 650),
+    new Point(425, 675),
+    new Point(475, 625),
+    new Point(450, 525),
+    new Point(375, 475),
+    new Point(275, 500),
+    new Point(250, 550),
   ],
   true
 );
