@@ -187,7 +187,9 @@ export const sketch = (p) => {
     TANGLE.draw(p);
 
     // debug overlay
+    /*
     DEBUG_GRID.draw(p);
     COORDS.draw(p);
+    */
   };
 };

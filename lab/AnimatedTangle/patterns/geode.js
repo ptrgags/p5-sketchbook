@@ -16,6 +16,7 @@ import { Oklch } from "../../lablib/Oklch.js";
 import { Random } from "../../../sketchlib/random.js";
 import { LoopCurve } from "../../lablib/animation/LoopCurve.js";
 import { Animated } from "../../lablib/animation/Animated.js";
+import { lerp } from "../../../sketchlib/lerp.js";
 
 const STYLE_ROCK1 = new Style({
   stroke: PALETTE_ROCK[Values.MedDark],
@@ -118,7 +119,13 @@ const GEODE_BOUNDARY = new PolygonPrimitive(
   true
 );
 
-const WIDTHS = [8, 7, 6, 5, 4, 3, 2, 1].map((x) => 8 * x);
+const MAX_THICKNESS = 16;
+
+const WIDTHS = [8, 7, 6, 5, 4, 3, 2, 1].map((x) => {
+  const max_width = x * MAX_THICKNESS;
+  const min_width = max_width - 0.75 * MAX_THICKNESS;
+  return lerp(min_width, max_width, Math.random());
+});
 
 const PALETTE_AGATE = Random.shuffle(
   Oklch.gradient(
