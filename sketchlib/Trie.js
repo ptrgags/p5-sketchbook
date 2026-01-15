@@ -22,18 +22,18 @@ export class Trie {
   insert(symbols, value) {
     if (symbols.length === 0) {
       this.value = value;
+      return;
     }
 
-    const [first, ...rest] = symbols;
-    const child = this.children.find((x) => x.symbol === first);
+    const child = this.children.find((x) => x.symbol === symbols[0]);
     if (child) {
-      child.insert(rest, value);
+      child.insert(symbols.slice(1), value);
     } else {
       // we're starting a new branch in the tree, so make a chain of
       // nodes
-      let branch = new Trie(rest.at(-1), value);
-      for (let i = 0; i < rest.length - 1; i++) {
-        branch = new Trie(rest.at(-2 - i), undefined, [branch]);
+      let branch = new Trie(symbols.at(-1), value);
+      for (let i = 0; i < symbols.length - 1; i++) {
+        branch = new Trie(symbols.at(-2 - i), undefined, [branch]);
       }
       this.children.push(branch);
     }
