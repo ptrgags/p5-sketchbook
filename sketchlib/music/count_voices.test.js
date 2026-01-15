@@ -3,7 +3,7 @@ import { count_voices } from "./count_voices";
 import { Gap, Parallel, Sequential } from "./Timeline";
 import { N1, N2, N4, N8 } from "./durations";
 import { C3, C4, E3, G3, G4 } from "./pitches";
-import { Note } from "./Score";
+import { Note } from "./Music";
 
 describe("count_voices", () => {
   it("with gap returns 1", () => {

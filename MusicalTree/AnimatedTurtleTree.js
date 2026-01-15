@@ -1,12 +1,6 @@
 import { LSystem } from "../sketchlib/LSystem.js";
 import { N16 } from "../sketchlib/music/durations.js";
-import {
-  map_pitch,
-  Melody,
-  Note,
-  Rest,
-  Score,
-} from "../sketchlib/music/Score.js";
+import { Part, Score } from "../sketchlib/music/Score.js";
 import { Rational } from "../sketchlib/Rational.js";
 import { MAJOR_PENTATONIC, make_scale } from "../sketchlib/music/scales.js";
 import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
@@ -25,6 +19,7 @@ import { Direction } from "../pga2d/Direction.js";
 import { ParamCurve } from "../sketchlib/animation/ParamCurve.js";
 import { AnimationCurve } from "../sketchlib/animation/AnimationCurve.js";
 import { whole_fract } from "../sketchlib/whole_fract.js";
+import { map_pitch, Melody, Note, Rest } from "../sketchlib/music/Music.js";
 
 const TREE_LSYSTEM = new LSystem("Fa", {
   a: "[+Fa][-Fa]",
@@ -249,19 +244,34 @@ class TreeMusicBuilder {
 
   /**
    * Build a Score from the various parts. Call this once at the very end.
-   * @returns {[string, import("../sketchlib/music/Score.js").Music<number>][]} THe musical part of the score
+   * @returns {Score<number>}
    */
   build() {
     // Convert from scale degrees to MIDI pitch
-    const draw_part = map_pitch(SCALE, new Melody(...this.draw_notes));
-    const stack_part = map_pitch(SCALE, new Melody(...this.stack_notes));
-    const turn_part = map_pitch(SCALE, new Melody(...this.turn_notes));
+    const draw = map_pitch(SCALE, new Melody(...this.draw_notes));
+    const stack = map_pitch(SCALE, new Melody(...this.stack_notes));
+    const turn = map_pitch(SCALE, new Melody(...this.turn_notes));
 
-    return [
-      ["poly", draw_part],
-      ["square", stack_part],
-      ["sine", turn_part],
-    ];
+    return new Score(
+      new Part("draw", draw, {
+        instrument_id: "poly",
+        label: "Draw Operations",
+        midi_channel: 0,
+        midi_instrument: 76 - 1, // Pan flute
+      }),
+      new Part("stack", stack, {
+        instrument_id: "square",
+        label: "Stack Operations",
+        midi_channel: 1,
+        midi_instrument: 11 - 1, // music box
+      }),
+      new Part("turn", turn, {
+        instrument_id: "sine",
+        label: "Turn Operations",
+        midi_channel: 2,
+        midi_instrument: 37 - 1, // slap bass 1
+      })
+    );
   }
 }
 
@@ -443,9 +453,7 @@ export class AnimatedTurtleTree {
       }
     }
 
-    this.score = new Score({
-      parts: music_builder.build(),
-    });
+    this.score = music_builder.build();
     this.curves = animation_builder.build();
     [this.lines, this.states] = primitive_builder.build();
   }

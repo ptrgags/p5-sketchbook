@@ -1,10 +1,10 @@
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { group } from "../sketchlib/primitives/shorthand.js";
 import { CanvasMouseHandler } from "../sketchlib/CanvasMouseHandler.js";
-import { N16, N32, N8 } from "../sketchlib/music/durations.js";
-import { A3, C4, D4, E4, G4 } from "../sketchlib/music/pitches.js";
+import { N16, N8 } from "../sketchlib/music/durations.js";
+import { A3, C4 } from "../sketchlib/music/pitches.js";
 
-import { Melody, Note, Rest, Score } from "../sketchlib/music/Score.js";
+import { Melody, Note } from "../sketchlib/music/Music.js";
 import { MuteButton } from "../sketchlib/MuteButton.js";
 import { PlayButtonScene } from "../sketchlib/PlayButtonScene.js";
 import { SoundManager } from "../sketchlib/SoundManager.js";
@@ -14,17 +14,22 @@ import {
   WESTMINSTER_QUARTERS_SCORES,
   WESTMINSTER_SCORE_LENGTHS,
 } from "./westminster_quarters.js";
+import { Part, Score } from "../sketchlib/music/Score.js";
 
 const MOUSE = new CanvasMouseHandler();
 
-const TICK_TOCK = new Score({
-  parts: [
-    [
-      "tick",
-      new Melody(new Note(A3, N8), new Note(C4, N16), new Note(C4, N16)),
-    ],
-  ],
-});
+const MELODY_TICK_TOCK = new Melody(
+  new Note(A3, N8),
+  new Note(C4, N16),
+  new Note(C4, N16)
+);
+const TICK_TOCK = new Score(
+  new Part("tick_tock", MELODY_TICK_TOCK, {
+    instrument_id: "tick",
+    midi_channel: 0,
+    midi_instrument: 81 - 1, // square lead
+  })
+);
 
 /** @type {import("../sketchlib/SoundManager.js").SoundManifest} */
 const SOUND_MANIFEST = {

@@ -1,11 +1,11 @@
-import { Harmony, Melody, Note, Rest } from "./Score.js";
+import { Harmony, Melody, Note, Rest } from "./Music.js";
 import { Gap } from "./Timeline.js";
 
 /**
  * sdrawkcab cisum eht yalP
  * @template P
- * @param {import("./Score.js").Music<P>} music The music material
- * @return {import("./Score.js").Music<P>} The music reversed
+ * @param {import("./Music.js").Music<P>} music The music material
+ * @return {import("./Music.js").Music<P>} The music reversed
  */
 export function retrograde(music) {
   if (music instanceof Note || music instanceof Gap) {

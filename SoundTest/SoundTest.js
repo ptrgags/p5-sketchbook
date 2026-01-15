@@ -12,7 +12,10 @@ import { Transform } from "../sketchlib/primitives/Transform.js";
 import { Style } from "../sketchlib/Style.js";
 import { CanvasMouseHandler } from "../sketchlib/CanvasMouseHandler.js";
 import { encode_midi_file } from "../sketchlib/midi/encode_midi.js";
-import { score_to_midi } from "../sketchlib/midi/score_to_midi.js";
+import {
+  MIDIExportFormat,
+  score_to_midi,
+} from "../sketchlib/midi/score_to_midi.js";
 import { MouseInput } from "../sketchlib/MouseInput.js";
 import { render_score } from "../sketchlib/music/render_score.js";
 import { MuteButton } from "../sketchlib/MuteButton.js";
@@ -194,6 +197,11 @@ async function import_midi_file(file_list) {
   return [fname, buffer];
 }
 
+const PIANO_BOUNDS = new Rectangle(
+  new Point(0, 300),
+  new Direction(500, 300 / 3)
+);
+
 class SoundScene {
   /**
    * Constructor
@@ -204,11 +212,7 @@ class SoundScene {
     this.sound = sound;
     this.mute_button = new MuteButton();
     this.events = new EventTarget();
-    this.piano = new Piano(
-      new Rectangle(new Point(0, 300), new Direction(500, 300 / 3)),
-      3,
-      4
-    );
+    this.piano = new Piano(PIANO_BOUNDS, 3, 4);
     this.spiral_burst = new SpiralBurst();
 
     this.mute_button.events.addEventListener(
@@ -219,8 +223,15 @@ class SoundScene {
     );
 
     // This button is disabled until a score is selected.
-    this.export_button = expect_element("export", HTMLButtonElement);
-    this.export_button.addEventListener("click", () => this.export_selected());
+    this.export_button = expect_element("export_clips", HTMLButtonElement);
+    this.export_button.addEventListener("click", () =>
+      this.export_selected(MIDIExportFormat.CLIPS)
+    );
+
+    this.export_gm_button = expect_element("export_gm", HTMLButtonElement);
+    this.export_gm_button.addEventListener("click", () =>
+      this.export_selected(MIDIExportFormat.GENERAL_MIDI)
+    );
 
     this.import_input = expect_element("import", HTMLInputElement);
     this.import_input.addEventListener("input", async (e) => {
@@ -263,6 +274,7 @@ class SoundScene {
       button.events.addEventListener("click", () => {
         this.selected_melody = descriptor.id;
         this.export_button.disabled = false;
+        this.export_gm_button.disabled = false;
         this.piano.reset();
         this.sound.play_score(this.selected_melody);
       });
@@ -270,13 +282,27 @@ class SoundScene {
     });
   }
 
-  export_selected() {
+  /**
+   *
+   * @param {MIDIExportFormat} export_format
+   * @returns
+   */
+  export_selected(export_format) {
     if (!this.selected_melody) {
       return;
     }
 
-    const midi = score_to_midi(SOUND_MANIFEST.scores[this.selected_melody]);
-    const file = encode_midi_file(midi, `${this.selected_melody}.mid`);
+    const midi = score_to_midi(
+      SOUND_MANIFEST.scores[this.selected_melody],
+      export_format
+    );
+
+    const suffix = export_format === MIDIExportFormat.CLIPS ? "clips" : "gm";
+
+    const file = encode_midi_file(
+      midi,
+      `${this.selected_melody}-${suffix}.mid`
+    );
     download_file(file);
   }
 
