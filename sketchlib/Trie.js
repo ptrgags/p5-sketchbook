@@ -20,6 +20,22 @@ export class Trie {
    * @param {T} value The value to store
    */
   insert(symbols, value) {
-    throw new Error("not implemented");
+    if (symbols.length === 0) {
+      this.value = value;
+    }
+
+    const [first, ...rest] = symbols;
+    const child = this.children.find((x) => x.symbol === first);
+    if (child) {
+      child.insert(rest, value);
+    } else {
+      // we're starting a new branch in the tree, so make a chain of
+      // nodes
+      let branch = new Trie(rest.at(-1), value);
+      for (let i = 0; i < rest.length - 1; i++) {
+        branch = new Trie(rest.at(-2 - i), undefined, [branch]);
+      }
+      this.children.push(branch);
+    }
   }
 }
