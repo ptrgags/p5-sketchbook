@@ -1,10 +1,10 @@
-import { Direction } from "../../../pga2d/Direction.js";
-import { Point } from "../../../pga2d/Point.js";
-import { WIDTH } from "../../../sketchlib/dimensions.js";
-import { PolygonPrimitive } from "../../../sketchlib/primitives/PolygonPrimitive.js";
-import { group, style } from "../../../sketchlib/primitives/shorthand.js";
-import { Transform } from "../../../sketchlib/primitives/Transform.js";
-import { Style } from "../../../sketchlib/Style.js";
+import { Direction } from "../../pga2d/Direction.js";
+import { Point } from "../../pga2d/Point.js";
+import { WIDTH } from "../../sketchlib/dimensions.js";
+import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
+import { group, style } from "../../sketchlib/primitives/shorthand.js";
+import { Transform } from "../../sketchlib/primitives/Transform.js";
+import { Style } from "../../sketchlib/Style.js";
 import {
   PALETTE_CORAL,
   PALETTE_NAVY,
@@ -12,13 +12,13 @@ import {
   PALETTE_SKY,
   Values,
 } from "../theme_colors.js";
-import { mod } from "../../../sketchlib/mod.js";
-import { GroupPrimitive } from "../../../sketchlib/primitives/GroupPrimitive.js";
-import { BeziergonPrimitive } from "../../../sketchlib/primitives/BeziergonPrimitive.js";
-import { RectPrimitive } from "../../../sketchlib/primitives/RectPrimitive.js";
-import { CirclePrimitive } from "../../../sketchlib/primitives/CirclePrimitive.js";
-import { LinePrimitive } from "../../../sketchlib/primitives/LinePrimitive.js";
-import { Animated } from "../../lablib/animation/Animated.js";
+import { mod } from "../../sketchlib/mod.js";
+import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
+import { BeziergonPrimitive } from "../../sketchlib/primitives/BeziergonPrimitive.js";
+import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
+import { CirclePrimitive } from "../../sketchlib/primitives/CirclePrimitive.js";
+import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
+import { Animated } from "../../lab/lablib/animation/Animated.js";
 
 const STYLE_MOUNTAINS = new Style({
   fill: PALETTE_ROCK[Values.Medium],

@@ -1,7 +1,7 @@
-import { Direction } from "../../../pga2d/Direction.js";
-import { Point } from "../../../pga2d/Point.js";
-import { group, style } from "../../../sketchlib/primitives/shorthand.js";
-import { Style } from "../../../sketchlib/Style.js";
+import { Direction } from "../../pga2d/Direction.js";
+import { Point } from "../../pga2d/Point.js";
+import { group, style } from "../../sketchlib/primitives/shorthand.js";
+import { Style } from "../../sketchlib/Style.js";
 import { CoralNode, CoralTree } from "../CoralTree.js";
 import { AnimatedStripes } from "./stripes.js";
 import { Hinge } from "../Hinge.js";
@@ -26,7 +26,7 @@ import {
   CIRCLE_O,
   CIRCLE_P,
 } from "./coral_layout.js";
-import { Animated } from "../../lablib/animation/Animated.js";
+import { Animated } from "../../lab/lablib/animation/Animated.js";
 
 const STYLE_CORAL = new Style({
   fill: PALETTE_CORAL[Values.Medium],

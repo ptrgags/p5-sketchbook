@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../libraries/p5.min.js"
+    ></script>
+    <script type="module">
+      import { sketch } from "./AnimatedTangle.js";
+      import "../sketchlib/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../styles/layout.css" />
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>Animated Tangle (2025-12/2026-01)</h1>
+      <div class="sketch">
+        <canvas id="sketch-canvas" width="500" height="700"></canvas>
+      </div>
+      <div class="description">
+        <p>
+          This sketch is a doodle in the same style as how I draw on paper.
+          However, here I can animate the patterns!
+        </p>
+        <h2>Animation Breakdown</h2>
+        <p>
+          The following is a short description of each animation in the doodle.
+          For further details, trivia and concept art, see the
+          <a href="./README.md">README</a>.
+        </p>
+        <p>IMG: Diagram of the tangle with panels labeled</p>
+        <ul>
+          <li>
+            <b>Top Level: Animated Tangle</b>
+            <ul>
+              <li>
+                <b>Panel 1: Seascape</b> A scene of mountains and ocean waves
+                scan across the scene.
+              </li>
+              <li>
+                <b>Panel 2: Traffic</b> Platforms scroll across the screen, but
+                get bunched up like a traffic jam.
+              </li>
+              <li>
+                <b>Panel 3: Quadrants</b>
+                <ul>
+                  <li>
+                    <b>Panel 3A: Hitomezashi</b> A sashiko embroidery pattern
+                    with animated stitches.
+                  </li>
+                  <li>
+                    <b>Panel 3B: Circle Fan</b> Circles that fan out from the
+                    corner of the panel.
+                  </li>
+                  <li>
+                    <b>Panel 3C: Peek</b> Everything is better with googly eyes.
+                  </li>
+                  <li>
+                    <b>Panel 3D: Brick Wall</b> A wall, built brick by brick.
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <b>Panel 4: Swaying Coral</b> A coral, gently swaying in the
+                current.
+                <ul>
+                  <li>
+                    <b>Panel 4A: Coral Polyps</b> A stylized representation of
+                    the coral polyps. The tentacles retract quickly as if in
+                    response to danger, and cautiously open again.
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <b>Panel 5: Geode</b> An agate geode growing layer by layer.
+              </li>
+              <li>
+                <b>Panel 6: Barber Pole and Doors</b>
+                <ul>
+                  <li>
+                    <b>Panel 6A: Barber Pole</b> Moving stripes like on the pole
+                    of a barber shop.
+                  </li>
+                  <li>
+                    <b>Panel 6B: Doors</b> A set of doors that open and shut
+                    like jaws.
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

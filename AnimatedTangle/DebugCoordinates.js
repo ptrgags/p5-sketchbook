@@ -1,4 +1,4 @@
-import { Primitive } from "../../sketchlib/primitives/Primitive.js";
+import { Primitive } from "../sketchlib/primitives/Primitive.js";
 
 /**
  * Draw the mouse coordinates on the canvas. This assumes the sketch is
