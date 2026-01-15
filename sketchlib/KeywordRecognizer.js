@@ -1,3 +1,4 @@
+import { xform } from "./primitives/shorthand.js";
 import { Trie } from "./Trie.js";
 
 export class KeywordRecognizer {
@@ -15,7 +16,7 @@ export class KeywordRecognizer {
    * @param {function(): void} callback Function to call every time the keyword is recognized
    */
   register(keyword, callback) {
-    throw new Error("not implemented");
+    this.trie.insert(keyword, callback);
   }
 
   /**
@@ -23,6 +24,20 @@ export class KeywordRecognizer {
    * @param {string} symbol Next input symbol (e.g. a keyboard code)
    */
   input(symbol) {
-    throw new Error("not implemented");
+    const next_node = this.cursor.children.find((x) => x.symbol === symbol);
+    if (next_node) {
+      // advance the cursor, triggering a callback if needed
+      this.cursor = next_node;
+      if (this.cursor.value) {
+        this.cursor.value();
+      }
+    } else if (this.cursor !== this.trie) {
+      // We diverged from the path.
+      // Go back to the beginning and retry once
+      this.cursor = this.trie;
+      this.input(symbol);
+    }
+
+    // bad symbol at the root, just ignore it
   }
 }
