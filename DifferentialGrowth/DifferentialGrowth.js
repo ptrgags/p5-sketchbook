@@ -5,6 +5,7 @@ import { Style } from "../sketchlib/Style.js";
 import { Vector2 } from "./Vector2.js";
 import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
 import { Color } from "../sketchlib/Color.js";
+import { KeywordRecognizer } from "../sketchlib/KeywordRecognizer.js";
 
 const BOUNDS = new Rectangle(0, 0, WIDTH, HEIGHT);
 const QUADTREE = new Quadtree(BOUNDS);
@@ -42,6 +43,7 @@ const GROWTH_PERIOD = 200;
 
 // How many time steps between adding points where the curve has become too sharp
 const SPLIT_PINCHED_PERIOD = 1000;
+const SLASH = new KeywordRecognizer();
 
 export const sketch = (p) => {
   let show_ref_geometry = false;
@@ -51,6 +53,9 @@ export const sketch = (p) => {
     p.background(128);
 
     document.getElementById("toggle-ref-geom").addEventListener("click", () => {
+      show_ref_geometry = !show_ref_geometry;
+    });
+    SLASH.register(["Slash", "KeyR", "KeyE", "KeyF"], () => {
       show_ref_geometry = !show_ref_geometry;
     });
   };
@@ -107,5 +112,9 @@ export const sketch = (p) => {
     for (let i = 0; i < UPDATES_PER_FRAME; i++) {
       update();
     }
+  };
+
+  p.keyReleased = (/** @type {KeyboardEvent} */ e) => {
+    SLASH.input(e.code);
   };
 };
