@@ -2,6 +2,7 @@ import { ADSR } from "./instruments/ADSR.js";
 import { BasicSynth } from "./instruments/BasicSynth.js";
 import { FMSynth } from "./instruments/FMSynth.js";
 import { WaveStack } from "./instruments/Wavestack.js";
+import { Note } from "./music/Music.js";
 import { Score } from "./music/Score.js";
 import { to_events } from "./music/Timeline.js";
 import { Rational } from "./Rational.js";
@@ -21,6 +22,25 @@ import { schedule_clips } from "./tone_helpers/schedule_music.js";
 
 const DEFAULT_BPM = 128;
 
+/**
+ * @typedef {{
+ * instrument_id: string,
+ * events: [Note<number>, Rational, Rational][]
+ * }} CompiledPart
+ *
+ * @typedef {{[score_id: string]: CompiledPart[]}} CompiledScore
+ *
+ * @typedef {{
+ *  instrument_id: string,
+ *  note: Note<number>,
+ *  start_time: Rational,
+ *  end_time: Rational
+ * }} NoteEventDetail
+ */
+
+/**
+ * Class to manage playing sounds through Tone.js
+ */
 export class SoundManager {
   /**
    * Constructor
@@ -42,6 +62,9 @@ export class SoundManager {
 
     this.current_score = undefined;
     this.scores = {};
+    /**
+     * @type {CompiledScore}
+     */
     this.score_note_events = {};
     this.sfx = {};
 
@@ -204,10 +227,12 @@ export class SoundManager {
     // Schedule note on/off events for animations
     const note_events = this.score_note_events[score_id];
     for (const part of note_events) {
-      const { instrument_index, instrument_id, events } = part;
+      const { instrument_id, events } = part;
       for (const [note, start_time, end_time] of events) {
+        /**
+         * @type {NoteEventDetail}
+         */
         const detail = {
-          instrument_index,
           instrument_id,
           note,
           start_time,
