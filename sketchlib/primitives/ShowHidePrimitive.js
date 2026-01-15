@@ -1,4 +1,4 @@
-import { Primitive } from "../../sketchlib/primitives/Primitive.js";
+import { Primitive } from "./Primitive.js";
 
 /**
  * A collection of primitives where some can be shown/hidden

@@ -4,7 +4,7 @@ import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Rectangle } from "../lablib/Rectangle.js";
-import { ShowHidePrimitive } from "./ShowHidePrimitive.js";
+import { ShowHidePrimitive } from "../../sketchlib/primitives/ShowHidePrimitive.js";
 
 const NUM_WHITE_KEYS = 7;
 const NUM_BLACK_KEYS = 5;
