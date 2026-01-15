@@ -55,6 +55,9 @@ export const sketch = (p) => {
     document.getElementById("toggle-ref-geom").addEventListener("click", () => {
       show_ref_geometry = !show_ref_geometry;
     });
+
+    // Typing /ref toggles the reference geometry as well. This is
+    // an initial test of KeywordRecognizer for debug tools
     SLASH.register(["Slash", "KeyR", "KeyE", "KeyF"], () => {
       show_ref_geometry = !show_ref_geometry;
     });
