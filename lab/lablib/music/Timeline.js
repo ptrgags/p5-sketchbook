@@ -164,28 +164,6 @@ export function timeline_map(f, timeline) {
 }
 
 /**
- * Generator for iterating over interval gaps (not values)
- * @template {TimeInterval} T
- * @param {Timeline<T>} timeline
- * @returns {Generator<T>}
- */
-export function* iter_intervals(timeline) {
-  if (timeline instanceof Gap) {
-    return;
-  }
-
-  if (timeline instanceof Sequential || timeline instanceof Parallel) {
-    for (const child of timeline.children) {
-      yield* iter_intervals(child);
-    }
-    return;
-  }
-
-  // Yield single interval
-  yield timeline;
-}
-
-/**
  * Take a timeline and return a list of events with absolute start/end times.
  * @template {TimeInterval} T
  * @param {Rational} offset Offset for the first event
