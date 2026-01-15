@@ -1,4 +1,5 @@
-import { Melody, Note, Rest, Harmony, Score } from "../music/Score.js";
+import { Melody, Note, Rest, Harmony } from "../music/Music.js";
+import { Score } from "../music/Score.js";
 import { Gap, Parallel, Sequential, timeline_map } from "../music/Timeline.js";
 import { Rational } from "../Rational.js";
 import { to_tone_time } from "./measure_notation.js";
@@ -133,7 +134,7 @@ function precompile_harmony(midi_harmony) {
  * opaque due to the callback functions.
  * Exported only for testing
  * @private
- * @param {import("../music/Score.js").Music<number>} music
+ * @param {import("../music/Music.js").Music<number>} music
  * @return {import("../music/Timeline.js").Timeline<PartDescriptor>} The precompiled clips
  */
 export function precompile_music(music) {
@@ -159,7 +160,7 @@ export function precompile_music(music) {
  * Compile the music to a set of ToneJS-compatible clips ready for scheduling.
  * @param {import("tone")} tone The Tone.js library
  * @param {import("tone").Synth} instrument The instrument that will play the material
- * @param {import("../music/Score.js").Music<number>} music The musical material
+ * @param {import("../music/Music.js").Music<number>} music The musical material
  * @return {import("../music/Timeline.js").Timeline<ToneClip>} The compiled music clips
  */
 export function compile_music(tone, instrument, music) {
@@ -179,8 +180,12 @@ export function compile_music(tone, instrument, music) {
  */
 export function compile_score(tone, instruments, score) {
   const clips = [];
-  for (const [instrument_id, music] of score.parts) {
-    const clip = compile_music(tone, instruments[instrument_id], music);
+  for (const part of score.parts) {
+    const clip = compile_music(
+      tone,
+      instruments[part.instrument_id],
+      part.music
+    );
     clips.push(clip);
   }
 

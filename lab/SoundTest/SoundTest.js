@@ -12,7 +12,10 @@ import { Transform } from "../../sketchlib/primitives/Transform.js";
 import { Style } from "../../sketchlib/Style.js";
 import { CanvasMouseHandler } from "../lablib/CanvasMouseHandler.js";
 import { encode_midi_file } from "../lablib/midi/encode_midi.js";
-import { score_to_midi } from "../lablib/midi/score_to_midi.js";
+import {
+  MIDIExportFormat,
+  score_to_midi,
+} from "../lablib/midi/score_to_midi.js";
 import { MouseInput } from "../lablib/MouseInput.js";
 import { render_score } from "../lablib/music/render_score.js";
 import { MuteButton } from "../lablib/MuteButton.js";
@@ -222,8 +225,15 @@ class SoundScene {
     );
 
     // This button is disabled until a score is selected.
-    this.export_button = expect_element("export", HTMLButtonElement);
-    this.export_button.addEventListener("click", () => this.export_selected());
+    this.export_button = expect_element("export_clips", HTMLButtonElement);
+    this.export_button.addEventListener("click", () =>
+      this.export_selected(MIDIExportFormat.CLIPS)
+    );
+
+    this.export_gm_button = expect_element("export_gm", HTMLButtonElement);
+    this.export_gm_button.addEventListener("click", () =>
+      this.export_selected(MIDIExportFormat.GENERAL_MIDI)
+    );
 
     this.import_input = expect_element("import", HTMLInputElement);
     this.import_input.addEventListener("input", async (e) => {
@@ -266,7 +276,8 @@ class SoundScene {
       button.events.addEventListener("click", () => {
         this.selected_melody = descriptor.id;
         this.export_button.disabled = false;
-        this.update_piano(SOUND_MANIFEST.scores[this.selected_melody]);
+        this.export_gm_button.disabled = false;
+        this.piano.reset();
         this.sound.play_score(this.selected_melody);
       });
       return button;
@@ -275,32 +286,25 @@ class SoundScene {
 
   /**
    *
-   * @param {Score<number>} score
+   * @param {MIDIExportFormat} export_format
+   * @returns
    */
-  update_piano(score) {
-    let min_note = 127;
-    let max_note = 0;
-    for (const note of score.iter_notes()) {
-      min_note = Math.min(min_note, note.pitch);
-      max_note = Math.max(max_note, note.pitch);
-    }
-
-    const min_octave = MidiPitch.get_octave(min_note);
-    const max_octave = MidiPitch.get_octave(max_note);
-    this.piano = new Piano(
-      PIANO_BOUNDS,
-      min_octave,
-      max_octave - min_octave + 1
-    );
-  }
-
-  export_selected() {
+  export_selected(export_format) {
     if (!this.selected_melody) {
       return;
     }
 
-    const midi = score_to_midi(SOUND_MANIFEST.scores[this.selected_melody]);
-    const file = encode_midi_file(midi, `${this.selected_melody}.mid`);
+    const midi = score_to_midi(
+      SOUND_MANIFEST.scores[this.selected_melody],
+      export_format
+    );
+
+    const suffix = export_format === MIDIExportFormat.CLIPS ? "clips" : "gm";
+
+    const file = encode_midi_file(
+      midi,
+      `${this.selected_melody}-${suffix}.mid`
+    );
     download_file(file);
   }
 

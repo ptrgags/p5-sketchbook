@@ -1,5 +1,5 @@
-import { Rational } from "../lablib/Rational.js";
-import { Melody, Note, parse_melody, Score } from "../lablib/music/Score.js";
+import { Melody, Note, parse_melody } from "../lablib/music/Music.js";
+import { Part, Score } from "../lablib/music/Score.js";
 import { N1, N2, N4, N8 } from "../lablib/music/durations.js";
 import { B3, E3, E4, FS4, GS4 } from "../lablib/music/pitches.js";
 
@@ -27,6 +27,20 @@ const FOURTH_QUARTER = new Melody(
 const HOUR_BELL = new Note(E3, N2);
 
 /**
+ *
+ * @param {string} id
+ * @param {import("../lablib/music/Music.js").Music<number>} music Music in terms of MIDI pitches
+ * @returns {Part}
+ */
+function make_bell_part(id, music) {
+  return new Part(id, music, {
+    instrument_id: "bell",
+    midi_channel: 1,
+    midi_instrument: 15 - 1, // tubular bells
+  });
+}
+
+/**
  * Make a score for the chimes at the selected hour. This is four quarters
  * plus n rings of the main bell
  * @param {number} hour hour number
@@ -36,16 +50,16 @@ function make_hour_score(hour) {
   // Every hour the hour bell rings n times, for a half note each.
   const hour_chimes = Melody.from_repeat(HOUR_BELL, hour);
   const hour_part = new Melody(FOURTH_QUARTER, hour_chimes);
-  return new Score({ parts: [["bell", hour_part]] });
+  return new Score(make_bell_part(`hour-${hour}`, hour_part));
 }
 
 /**
  * @type {{[key: string]: Score}}
  */
 export const WESTMINSTER_QUARTERS_SCORES = {
-  quarter1: new Score({ parts: [["bell", FIRST_QUARTER]] }),
-  quarter2: new Score({ parts: [["bell", SECOND_QUARTER]] }),
-  quarter3: new Score({ parts: [["bell", THIRD_QUARTER]] }),
+  quarter1: new Score(make_bell_part("quarter1", FIRST_QUARTER)),
+  quarter2: new Score(make_bell_part("quarter2", SECOND_QUARTER)),
+  quarter3: new Score(make_bell_part("quarter3", THIRD_QUARTER)),
   hour1: make_hour_score(1),
   hour2: make_hour_score(2),
   hour3: make_hour_score(3),

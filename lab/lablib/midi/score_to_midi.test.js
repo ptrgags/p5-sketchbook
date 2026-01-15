@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { Harmony, Melody, Note, Rest, Score } from "../music/Score.js";
+import { Harmony, Melody, Note, Rest } from "../music/Music.js";
+import { Part, Score } from "../music/Score.js";
 import { MIDIHeader } from "./MIDIFile.js";
-import { score_to_midi } from "./score_to_midi.js";
+import { MIDIExportFormat, score_to_midi } from "./score_to_midi.js";
 import { C3, C4, D4, E4, F4, G4 } from "../music/pitches.js";
 import { N1, N2, N4 } from "../music/durations.js";
 import { MIDIMessage } from "./MIDIEvent.js";
@@ -11,20 +12,24 @@ const QN = MIDIHeader.DEFAULT_TICKS_PER_QUARTER;
 
 /**
  * Shorthand to make a score with a single part
- * @param {import("../music/Score.js").Music<number>} music
+ * @param {import("../music/Music.js").Music<number>[]} music
  * @returns {Score<number>}
  */
-function make_score(music) {
-  return new Score({
-    parts: [["channel0", music]],
+function make_score(...music) {
+  const parts = music.map((x, i) => {
+    return new Part(`channel${i}`, x, {
+      midi_channel: i,
+      instrument_id: "sine",
+    });
   });
+  return new Score(...parts);
 }
 
 describe("score_to_midi", () => {
   it("Sets the default format0 header", () => {
     const score = make_score(new Note(C4, N1));
 
-    const result = score_to_midi(score);
+    const result = score_to_midi(score, MIDIExportFormat.CLIPS);
 
     expect(result.header).toEqual(MIDIHeader.DEFAULT_FORMAT0);
   });
@@ -32,7 +37,7 @@ describe("score_to_midi", () => {
   it("With empty score produces empty MIDI file", () => {
     const empty = make_score(Rest.ZERO);
 
-    const result = score_to_midi(empty).to_testable();
+    const result = score_to_midi(empty, MIDIExportFormat.CLIPS).to_testable();
 
     const expected = [[]];
     expect(result).toEqual(expected);
@@ -41,7 +46,7 @@ describe("score_to_midi", () => {
   it("with single note produces correct MIDI messages", () => {
     const single = make_score(new Note(C4, N1));
 
-    const result = score_to_midi(single).to_testable();
+    const result = score_to_midi(single, MIDIExportFormat.CLIPS).to_testable();
 
     const expected = [
       [
@@ -62,7 +67,7 @@ describe("score_to_midi", () => {
       )
     );
 
-    const result = score_to_midi(single).to_testable();
+    const result = score_to_midi(single, MIDIExportFormat.CLIPS).to_testable();
 
     // times are absolute in testable form
     const expected = [
@@ -90,7 +95,7 @@ describe("score_to_midi", () => {
       )
     );
 
-    const result = score_to_midi(single).to_testable();
+    const result = score_to_midi(single, MIDIExportFormat.CLIPS).to_testable();
 
     const expected = [
       [
@@ -110,7 +115,7 @@ describe("score_to_midi", () => {
       new Harmony(new Note(G4, N4), new Note(E4, N4), new Note(C4, N4))
     );
 
-    const result = score_to_midi(single).to_testable();
+    const result = score_to_midi(single, MIDIExportFormat.CLIPS).to_testable();
 
     const expected = [
       [
@@ -133,7 +138,7 @@ describe("score_to_midi", () => {
       )
     );
 
-    const result = score_to_midi(score).to_testable();
+    const result = score_to_midi(score, MIDIExportFormat.CLIPS).to_testable();
 
     const expected = [
       [
@@ -160,7 +165,7 @@ describe("score_to_midi", () => {
       )
     );
 
-    const result = score_to_midi(score).to_testable();
+    const result = score_to_midi(score, MIDIExportFormat.CLIPS).to_testable();
 
     const expected = [
       [
@@ -179,17 +184,15 @@ describe("score_to_midi", () => {
 
   it("with multiple parts produces a format 1 MIDI file", () => {
     // same material as in the harmony test, but now expressed as multiple parts
-    const score = new Score({
-      parts: [
-        [
-          "channel0",
-          new Melody(new Note(C4, N4), new Note(E4, N4), new Note(G4, N2)),
-        ],
-        ["channel1", new Note(C3, N1)],
-      ],
-    });
+    const music1 = new Melody(
+      new Note(C4, N4),
+      new Note(E4, N4),
+      new Note(G4, N2)
+    );
+    const music2 = new Note(C3, N1);
+    const score = make_score(music1, music2);
 
-    const result = score_to_midi(score);
+    const result = score_to_midi(score, MIDIExportFormat.CLIPS);
 
     const expected_tracks = 2;
     const expected_header = MIDIHeader.format1(expected_tracks);
@@ -199,17 +202,15 @@ describe("score_to_midi", () => {
 
   it("with multiple parts produces MIDI notes on different tracks by channel", () => {
     // same material as in the harmony test, but now expressed as multiple parts
-    const score = new Score({
-      parts: [
-        [
-          "channel0",
-          new Melody(new Note(C4, N4), new Note(E4, N4), new Note(G4, N2)),
-        ],
-        ["channel1", new Note(C3, N1)],
-      ],
-    });
+    const music1 = new Melody(
+      new Note(C4, N4),
+      new Note(E4, N4),
+      new Note(G4, N2)
+    );
+    const music2 = new Note(C3, N1);
+    const score = make_score(music1, music2);
 
-    const result = score_to_midi(score).to_testable();
+    const result = score_to_midi(score, MIDIExportFormat.CLIPS).to_testable();
 
     const expected = [
       [
@@ -230,19 +231,13 @@ describe("score_to_midi", () => {
 
   it("with too many parts throws", () => {
     const music = new Note(C4, N1);
-    /**
-     * @type {[string, import("../music/Score.js").Music<number>][]}
-     */
-    const parts = new Array(20).fill(0).map((x, i) => {
-      /** @type {[string, import("../music/Score.js").Music<number>]}*/
-      return [`channel${x}`, music];
+    const parts = new Array(20).fill(0).map((_, i) => {
+      return new Part(`channel${i}`, music, { instrument_id: "sine" });
     });
-    const sick_unison = new Score({
-      parts,
-    });
+    const sick_unison = new Score(...parts);
 
     expect(() => {
-      return score_to_midi(sick_unison);
+      return score_to_midi(sick_unison, MIDIExportFormat.CLIPS);
     }).toThrowError("scores with more than 16 parts not supported!");
   });
 });

@@ -20,6 +20,8 @@ import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
 import { BRICKS } from "./patterns/brick_wall.js";
 import { DOORS } from "./patterns/doors.js";
 import { AnimationGroup } from "../lablib/animation/AnimationGroup.js";
+import { DebugCoordinates } from "./DebugCoordinates.js";
+import { DebugGrid } from "./DebugGrid.js";
 
 /**
  * Shorthand for making arrays of points
@@ -98,7 +100,7 @@ const QUARTER_PEEK = new RectPrimitive(
 
 const STYLE_QUARTERS = new Style({
   stroke: PALETTE_CORAL[Values.Light],
-  width: 4,
+  width: 6,
 });
 
 const QUARTER_DIVIDER = style(
@@ -161,6 +163,9 @@ const BACKGROUND_STRIPES = style(
   STYLE_BACKGROUND_STRIPES
 );
 
+const COORDS = new DebugCoordinates();
+const DEBUG_GRID = new DebugGrid(100, 25);
+
 export const sketch = (p) => {
   p.setup = () => {
     p.createCanvas(
@@ -180,5 +185,11 @@ export const sketch = (p) => {
 
     BACKGROUND_STRIPES.draw(p);
     TANGLE.draw(p);
+
+    // debug overlay
+    /*
+    DEBUG_GRID.draw(p);
+    COORDS.draw(p);
+    */
   };
 };
