@@ -6,17 +6,56 @@ IMG: labeled panels
 
 ## Panel 1: Seascape
 
+IMG: close-up of Seascape
+
+This animation is a view of mountains and ocean waves. I use the <a href="https://en.wikipedia.org/wiki/Parallax">parallax effect</a> to give it a sense of depth.
+
+Fun fact: Originally the "waves" were supposed to be rolling hills. However, since my color palette used blue rather than green, it looked more like water.
+
 ## Panel 2: Traffic
 
 ## Panel 3: Quadrants
 
+IMG: close up of Quadrants
+
+I subdivided panel 3 into 4 quadrants to make several animations
+
 ### Panel 3A: Hitomezashi
+
+IMG: Close up of Hitomezashi pattern
+
+This panel features a hitomezashi stitching pattern with animated stitches.
+
+I first learned about this Japanese sashiko embroidery technique from [this Numberphile video](https://www.youtube.com/watch?v=JbfhzlMk2eY). I've used this pattern before in my [`paper-toaster` project](https://github.com/ptrgags/paper-toaster?tab=readme-ov-file#hitomezashi-2022-06-17).
 
 ### Panel 3B: Circle Fan
 
+IMG: Close up of Circle Fan fully extended
+
+In my traditional art doodles, I often use a motif of circular arcs fanning out from the corner of a shape. To make an animated version, I imagined a somewhat mechanical motion. I wanted the circles to expand one step at a time.
+
+For the diamond shapes, I arranged them by bisecting angles of key points in the previous row (including the sides). See the diagram below:
+
+IMG: diagram of spacing pattern
+
 ### Panel 3C: Peek
 
+IMG: Close up of Peek
+
+When planning out this animation, I saw that I had a small triangle of space to work with. What could I tuck in there? A googly eye, obviously! 👀
+
 ### Panel 3D: Brick Wall
+
+IMG: Close-up of Brick Wall in motion
+
+This panel is an animation of a wall being built brick by brick. To make it more interesting, I use the bricks as a clip mask that reveals a striped pattern.
+
+The striped pattern is based on [Stripey Ring](https://ptrgags.dev/webgpu-sketchbook/#/sketch/stripey-ring) from my other repo, `webgpu-sketchbook`.
+
+There's a certain rhythm to when the bricks snap into place.
+I alternate between quarter notes and triplets. This way, every row of the wall takes the same time to build.
+
+IMG: Diagram of rhythm `1 2|3 4 5|6 7|8 9 10`
 
 ## Panel 4: Coral
 
