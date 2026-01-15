@@ -3,8 +3,8 @@ import { Color } from "../sketchlib/Color.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
-import { MidiPitch } from "../lab/lablib/music/pitch_conversions.js";
-import { Rectangle } from "../lab/lablib/Rectangle.js";
+import { MidiPitch } from "../sketchlib/music/pitch_conversions.js";
+import { Rectangle } from "../sketchlib/Rectangle.js";
 
 const NUM_WHITE_KEYS = 7;
 

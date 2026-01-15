@@ -6,7 +6,7 @@ import {
 import { Index2D } from "../sketchlib/Grid.js";
 import { Tiles } from "./make_maze.js";
 import { Tilemap } from "./Tilemap.js";
-import { DirectionInput } from "../lab/lablib/DirectionInput.js";
+import { DirectionInput } from "../sketchlib/DirectionInput.js";
 import { Point } from "../pga2d/Point.js";
 
 const TILE_SIZE = 16;

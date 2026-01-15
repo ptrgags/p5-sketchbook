@@ -1,8 +1,8 @@
-import { RungeKuttaIntegrator } from "../lab/lablib/RungeKuttaIntegrator.js";
+import { RungeKuttaIntegrator } from "../sketchlib/RungeKuttaIntegrator.js";
 import { Style } from "../sketchlib/Style.js";
-import { RingBuffer } from "../lab/lablib/RingBuffer.js";
-import { GeneralizedCoordinates } from "../lab/lablib/VectorSpace.js";
-import { Oklch } from "../lab/lablib/Oklch.js";
+import { RingBuffer } from "../sketchlib/RingBuffer.js";
+import { GeneralizedCoordinates } from "../sketchlib/VectorSpace.js";
+import { Oklch } from "../sketchlib/Oklch.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";

@@ -1,12 +1,12 @@
-import { Hold, ParamCurve } from "../../lab/lablib/animation/ParamCurve.js";
-import { Sequential } from "../../lab/lablib/music/Timeline.js";
-import { Rational } from "../../lab/lablib/Rational.js";
+import { Hold, ParamCurve } from "../../sketchlib/animation/ParamCurve.js";
+import { Sequential } from "../../sketchlib/music/Timeline.js";
+import { Rational } from "../../sketchlib/Rational.js";
 import { Direction } from "../../pga2d/Direction.js";
 import { Point } from "../../pga2d/Point.js";
 import { GooglyEye } from "../../sketchlib/primitives/GooglyEye.js";
-import { AnimationCurve } from "../../lab/lablib/animation/AnimationCurve.js";
-import { LoopCurve } from "../../lab/lablib/animation/LoopCurve.js";
-import { Animated } from "../../lab/lablib/animation/Animated.js";
+import { AnimationCurve } from "../../sketchlib/animation/AnimationCurve.js";
+import { LoopCurve } from "../../sketchlib/animation/LoopCurve.js";
+import { Animated } from "../../sketchlib/animation/Animated.js";
 
 const SCLERA_RADIUS = 20;
 const PUPIL_RADIUS = 10;

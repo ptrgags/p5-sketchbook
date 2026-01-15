@@ -1,7 +1,7 @@
-import { RungeKuttaIntegrator } from "../lab/lablib/RungeKuttaIntegrator.js";
+import { RungeKuttaIntegrator } from "../sketchlib/RungeKuttaIntegrator.js";
 import { Style } from "../sketchlib/Style.js";
-import { RingBuffer } from "../lab/lablib/RingBuffer.js";
-import { GeneralizedCoordinates } from "../lab/lablib/VectorSpace.js";
+import { RingBuffer } from "../sketchlib/RingBuffer.js";
+import { GeneralizedCoordinates } from "../sketchlib/VectorSpace.js";
 import { PI, TAU } from "../sketchlib/math_consts.js";
 import { mod } from "../sketchlib/mod.js";
 import { Color } from "../sketchlib/Color.js";

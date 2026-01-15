@@ -1,10 +1,10 @@
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { group } from "../sketchlib/primitives/shorthand.js";
-import { CanvasMouseHandler } from "../lab/lablib/CanvasMouseHandler.js";
-import { MouseInput } from "../lab/lablib/MouseInput.js";
-import { MuteButton } from "../lab/lablib/MuteButton.js";
-import { PlayButtonScene } from "../lab/lablib/PlayButtonScene.js";
-import { SoundManager } from "../lab/lablib/SoundManager.js";
+import { CanvasMouseHandler } from "../sketchlib/CanvasMouseHandler.js";
+import { MouseInput } from "../sketchlib/MouseInput.js";
+import { MuteButton } from "../sketchlib/MuteButton.js";
+import { PlayButtonScene } from "../sketchlib/PlayButtonScene.js";
+import { SoundManager } from "../sketchlib/SoundManager.js";
 import { AnimatedTurtleTree } from "./AnimatedTurtleTree.js";
 
 const MOUSE = new CanvasMouseHandler();
@@ -12,7 +12,7 @@ const MOUSE = new CanvasMouseHandler();
 const ANIMATION = new AnimatedTurtleTree(7);
 
 // Add scores here
-/**@type {import("../lab/lablib/SoundManager.js").SoundManifest} */
+/**@type {import("../sketchlib/SoundManager.js").SoundManifest} */
 const SOUND_MANIFEST = {
   scores: {
     tree: ANIMATION.score,

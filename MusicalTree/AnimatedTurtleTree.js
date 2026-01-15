@@ -1,18 +1,18 @@
 import { LSystem } from "../sketchlib/LSystem.js";
-import { N16 } from "../lab/lablib/music/durations.js";
+import { N16 } from "../sketchlib/music/durations.js";
 import {
   map_pitch,
   Melody,
   Note,
   Rest,
   Score,
-} from "../lab/lablib/music/Score.js";
-import { Rational } from "../lab/lablib/Rational.js";
-import { MAJOR_PENTATONIC, make_scale } from "../lab/lablib/music/scales.js";
+} from "../sketchlib/music/Score.js";
+import { Rational } from "../sketchlib/Rational.js";
+import { MAJOR_PENTATONIC, make_scale } from "../sketchlib/music/scales.js";
 import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
 import { Style } from "../sketchlib/Style.js";
 import { Color } from "../sketchlib/Color.js";
-import { Gap, Sequential } from "../lab/lablib/music/Timeline.js";
+import { Gap, Sequential } from "../sketchlib/music/Timeline.js";
 import { is_nearly } from "../sketchlib/is_nearly.js";
 import { lerp } from "../sketchlib/lerp.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
@@ -22,8 +22,8 @@ import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { Point } from "../pga2d/Point.js";
 import { Direction } from "../pga2d/Direction.js";
-import { ParamCurve } from "../lab/lablib/animation/ParamCurve.js";
-import { AnimationCurve } from "../lab/lablib/animation/AnimationCurve.js";
+import { ParamCurve } from "../sketchlib/animation/ParamCurve.js";
+import { AnimationCurve } from "../sketchlib/animation/AnimationCurve.js";
 import { whole_fract } from "../sketchlib/whole_fract.js";
 
 const TREE_LSYSTEM = new LSystem("Fa", {
@@ -249,7 +249,7 @@ class TreeMusicBuilder {
 
   /**
    * Build a Score from the various parts. Call this once at the very end.
-   * @returns {[string, import("../lab/lablib/music/Score.js").Music<number>][]} THe musical part of the score
+   * @returns {[string, import("../sketchlib/music/Score.js").Music<number>][]} THe musical part of the score
    */
   build() {
     // Convert from scale degrees to MIDI pitch

@@ -1,7 +1,7 @@
 import { Point } from "../pga2d/Point.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { group } from "../sketchlib/primitives/shorthand.js";
-import { Oklch } from "../lab/lablib/Oklch.js";
+import { Oklch } from "../sketchlib/Oklch.js";
 import { DoubleSpringSystem, Spring } from "./DoubleSpringSystem.js";
 
 const N = 5;

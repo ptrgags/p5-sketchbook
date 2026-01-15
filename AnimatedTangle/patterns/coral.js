@@ -26,7 +26,7 @@ import {
   CIRCLE_O,
   CIRCLE_P,
 } from "./coral_layout.js";
-import { Animated } from "../../lab/lablib/animation/Animated.js";
+import { Animated } from "../../sketchlib/animation/Animated.js";
 
 const STYLE_CORAL = new Style({
   fill: PALETTE_CORAL[Values.Medium],

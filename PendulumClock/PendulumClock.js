@@ -1,13 +1,13 @@
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { group } from "../sketchlib/primitives/shorthand.js";
-import { CanvasMouseHandler } from "../lab/lablib/CanvasMouseHandler.js";
-import { N16, N32, N8 } from "../lab/lablib/music/durations.js";
-import { A3, C4, D4, E4, G4 } from "../lab/lablib/music/pitches.js";
+import { CanvasMouseHandler } from "../sketchlib/CanvasMouseHandler.js";
+import { N16, N32, N8 } from "../sketchlib/music/durations.js";
+import { A3, C4, D4, E4, G4 } from "../sketchlib/music/pitches.js";
 
-import { Melody, Note, Rest, Score } from "../lab/lablib/music/Score.js";
-import { MuteButton } from "../lab/lablib/MuteButton.js";
-import { PlayButtonScene } from "../lab/lablib/PlayButtonScene.js";
-import { SoundManager } from "../lab/lablib/SoundManager.js";
+import { Melody, Note, Rest, Score } from "../sketchlib/music/Score.js";
+import { MuteButton } from "../sketchlib/MuteButton.js";
+import { PlayButtonScene } from "../sketchlib/PlayButtonScene.js";
+import { SoundManager } from "../sketchlib/SoundManager.js";
 import { Clock } from "./Clock.js";
 import { ClockTime } from "./ClockTime.js";
 import {
@@ -26,7 +26,7 @@ const TICK_TOCK = new Score({
   ],
 });
 
-/** @type {import("../lab/lablib/SoundManager.js").SoundManifest} */
+/** @type {import("../sketchlib/SoundManager.js").SoundManifest} */
 const SOUND_MANIFEST = {
   bpm: 60,
   sfx: {

@@ -1,12 +1,7 @@
-import { Rational } from "../lab/lablib/Rational.js";
-import {
-  Melody,
-  Note,
-  parse_melody,
-  Score,
-} from "../lab/lablib/music/Score.js";
-import { N1, N2, N4, N8 } from "../lab/lablib/music/durations.js";
-import { B3, E3, E4, FS4, GS4 } from "../lab/lablib/music/pitches.js";
+import { Rational } from "../sketchlib/Rational.js";
+import { Melody, Note, parse_melody, Score } from "../sketchlib/music/Score.js";
+import { N1, N2, N4, N8 } from "../sketchlib/music/durations.js";
+import { B3, E3, E4, FS4, GS4 } from "../sketchlib/music/pitches.js";
 
 // Bell changes for the Westminster Quarters
 // See https://en.wikipedia.org/wiki/Westminster_Quarters#Description

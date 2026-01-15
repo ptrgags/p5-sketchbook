@@ -5,12 +5,12 @@ import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { PointPrimitive } from "../sketchlib/primitives/PointPrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
-import { LoopCurve } from "../lab/lablib/animation/LoopCurve.js";
-import { Hold, ParamCurve } from "../lab/lablib/animation/ParamCurve.js";
-import { N1, N4 } from "../lab/lablib/music/durations.js";
-import { Sequential } from "../lab/lablib/music/Timeline.js";
-import { Oklch } from "../lab/lablib/Oklch.js";
-import { Rational } from "../lab/lablib/Rational.js";
+import { LoopCurve } from "../sketchlib/animation/LoopCurve.js";
+import { Hold, ParamCurve } from "../sketchlib/animation/ParamCurve.js";
+import { N1, N4 } from "../sketchlib/music/durations.js";
+import { Sequential } from "../sketchlib/music/Timeline.js";
+import { Oklch } from "../sketchlib/Oklch.js";
+import { Rational } from "../sketchlib/Rational.js";
 
 const N = 10;
 const CENTER = new Point(WIDTH / 2, (3 * HEIGHT) / 4);

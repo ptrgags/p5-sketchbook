@@ -1,5 +1,5 @@
-import { N1, N2, N4, N8 } from "../lab/lablib/music/durations.js";
-import { MidiPitch } from "../lab/lablib/music/pitch_conversions.js";
+import { N1, N2, N4, N8 } from "../sketchlib/music/durations.js";
+import { MidiPitch } from "../sketchlib/music/pitch_conversions.js";
 import {
   A,
   B,
@@ -16,8 +16,8 @@ import {
   G4,
   GS,
   REST,
-} from "../lab/lablib/music/pitches.js";
-import { retrograde } from "../lab/lablib/music/retrograde.js";
+} from "../sketchlib/music/pitches.js";
+import { retrograde } from "../sketchlib/music/retrograde.js";
 import {
   Harmony,
   map_pitch,
@@ -27,10 +27,10 @@ import {
   parse_melody,
   Rest,
   Score,
-} from "../lab/lablib/music/Score.js";
-import { Gap } from "../lab/lablib/music/Timeline.js";
-import { transpose_scale_degree } from "../lab/lablib/music/transpose.js";
-import { Rational } from "../lab/lablib/Rational.js";
+} from "../sketchlib/music/Score.js";
+import { Gap } from "../sketchlib/music/Timeline.js";
+import { transpose_scale_degree } from "../sketchlib/music/transpose.js";
+import { Rational } from "../sketchlib/Rational.js";
 import { SpiralBurst } from "./SpiralBurst.js";
 
 /**

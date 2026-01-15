@@ -7,12 +7,12 @@ import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
 import { group, style, xform } from "../../sketchlib/primitives/shorthand.js";
 import { Transform } from "../../sketchlib/primitives/Transform.js";
 import { Style } from "../../sketchlib/Style.js";
-import { Animated } from "../../lab/lablib/animation/Animated.js";
-import { AnimationGroup } from "../../lab/lablib/animation/AnimationGroup.js";
-import { LoopCurve } from "../../lab/lablib/animation/LoopCurve.js";
-import { ParamCurve } from "../../lab/lablib/animation/ParamCurve.js";
-import { Sequential } from "../../lab/lablib/music/Timeline.js";
-import { Rational } from "../../lab/lablib/Rational.js";
+import { Animated } from "../../sketchlib/animation/Animated.js";
+import { AnimationGroup } from "../../sketchlib/animation/AnimationGroup.js";
+import { LoopCurve } from "../../sketchlib/animation/LoopCurve.js";
+import { ParamCurve } from "../../sketchlib/animation/ParamCurve.js";
+import { Sequential } from "../../sketchlib/music/Timeline.js";
+import { Rational } from "../../sketchlib/Rational.js";
 import {
   PALETTE_CORAL,
   PALETTE_NAVY,

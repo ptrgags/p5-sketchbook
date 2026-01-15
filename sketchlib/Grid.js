@@ -1,4 +1,4 @@
-import { Rectangle } from "../lab/lablib/Rectangle.js";
+import { Rectangle } from "./Rectangle.js";
 import { Direction } from "../pga2d/Direction.js";
 import { Point } from "../pga2d/Point.js";
 import { CardinalDirection } from "./CardinalDirection.js";

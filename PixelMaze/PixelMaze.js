@@ -1,10 +1,7 @@
 import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
 import { CardinalDirection } from "../sketchlib/CardinalDirection.js";
-import { CanvasMouseHandler } from "../lab/lablib/CanvasMouseHandler.js";
-import {
-  DirectionalPad,
-  DirectionInput,
-} from "../lab/lablib/DirectionalPad.js";
+import { CanvasMouseHandler } from "../sketchlib/CanvasMouseHandler.js";
+import { DirectionalPad, DirectionInput } from "../sketchlib/DirectionalPad.js";
 import { blit_sprite, blit_tilemap, P5Sprite, P5Tilemap } from "./blit.js";
 import { make_maze } from "./make_maze.js";
 import { parse_resources } from "./parse_resources.js";

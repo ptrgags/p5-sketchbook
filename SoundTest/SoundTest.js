@@ -10,17 +10,17 @@ import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
 import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
 import { Transform } from "../sketchlib/primitives/Transform.js";
 import { Style } from "../sketchlib/Style.js";
-import { CanvasMouseHandler } from "../lab/lablib/CanvasMouseHandler.js";
-import { encode_midi_file } from "../lab/lablib/midi/encode_midi.js";
-import { score_to_midi } from "../lab/lablib/midi/score_to_midi.js";
-import { MouseInput } from "../lab/lablib/MouseInput.js";
-import { render_score } from "../lab/lablib/music/render_score.js";
-import { MuteButton } from "../lab/lablib/MuteButton.js";
-import { Oklch } from "../lab/lablib/Oklch.js";
-import { PlayButtonScene } from "../lab/lablib/PlayButtonScene.js";
-import { Rectangle } from "../lab/lablib/Rectangle.js";
-import { SoundManager } from "../lab/lablib/SoundManager.js";
-import { TouchButton } from "../lab/lablib/TouchButton.js";
+import { CanvasMouseHandler } from "../sketchlib/CanvasMouseHandler.js";
+import { encode_midi_file } from "../sketchlib/midi/encode_midi.js";
+import { score_to_midi } from "../sketchlib/midi/score_to_midi.js";
+import { MouseInput } from "../sketchlib/MouseInput.js";
+import { render_score } from "../sketchlib/music/render_score.js";
+import { MuteButton } from "../sketchlib/MuteButton.js";
+import { Oklch } from "../sketchlib/Oklch.js";
+import { PlayButtonScene } from "../sketchlib/PlayButtonScene.js";
+import { Rectangle } from "../sketchlib/Rectangle.js";
+import { SoundManager } from "../sketchlib/SoundManager.js";
+import { TouchButton } from "../sketchlib/TouchButton.js";
 import {
   binary_chords,
   layered_melody,
@@ -30,11 +30,11 @@ import {
 import { Piano } from "./Piano.js";
 import { SpiralBurst } from "./SpiralBurst.js";
 import { expect_element } from "../sketchlib/dom/expect_element.js";
-import { decode_midi } from "../lab/lablib/midi/decode_midi.js";
+import { decode_midi } from "../sketchlib/midi/decode_midi.js";
 
 const MOUSE = new CanvasMouseHandler();
 
-/**@type {import("../lab/lablib/SoundManager.js").SoundManifest} */
+/**@type {import("../sketchlib/SoundManager.js").SoundManifest} */
 const SOUND_MANIFEST = {
   scores: {
     layered_melody: layered_melody(),
