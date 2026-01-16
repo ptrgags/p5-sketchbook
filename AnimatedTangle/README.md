@@ -135,3 +135,10 @@ To make the barber poles, I just used a set of stripes that scroll across the pa
 ### Panel 6B: Doors
 
 This panel features doors that open and close, somewhat like jaws. I chose the timing carefully so the doors close one after another with a steady rhythm.
+
+
+## Original Concept Art
+
+Like most of my creations, this animation began with a sketch on paper. Here's a scan of the main concept art diagram I was using for reference.
+
+![concept art](./figures/concept-art.jpg)

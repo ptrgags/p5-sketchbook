@@ -92,7 +92,7 @@ class SwayingCoral {
     ];
 
     this.tree = new CoralTree(
-      // Node A in diagram on paper
+      // Node A in diagram on paper (see figures/concept-art.jpg)
       new CoralNode(CIRCLE_A, [
         // B -- hinge for C
         new CoralNode(
