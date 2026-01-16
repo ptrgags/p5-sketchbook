@@ -13,6 +13,7 @@ This animation is a view of mountains and ocean waves. I use the <a href="https:
 Fun fact: Originally the "waves" were supposed to be rolling hills. However, since my color palette used blue rather than green, it looked more like water.
 
 ## Panel 2: Traffic
+![close-up of traffic](./figures/traffic.png)
 
 ## Panel 3: Quadrants
 
@@ -30,13 +31,13 @@ I first learned about this Japanese sashiko embroidery technique from [this Numb
 
 ### Panel 3B: Circle Fan
 
-IMG: Close up of Circle Fan fully extended
+![close-up of circle-fan](./figures/circle-fan.png)
 
 In my traditional art doodles, I often use a motif of circular arcs fanning out from the corner of a shape. To make an animated version, I imagined a somewhat mechanical motion. I wanted the circles to expand one step at a time.
 
 For the diamond shapes, I arranged them by bisecting angles of key points in the previous row (including the sides). See the diagram below:
 
-IMG: diagram of spacing pattern
+![diagram of diamond spacing](./figures/diamond-arrangement.png)
 
 ### Panel 3C: Peek
 
@@ -79,20 +80,13 @@ In real life, agates form when silica-rich water fills a crack in a rock and dep
 
 I figured out a way to render such banding patterns. I take the boundary polygon and render it many times with different stroke widths.
 
-I render the innermost color band first by using a very thick outline. Then, I render the second innermost band with a slightly thinner line, and so on.
+I render the innermost color band first by using a very thick outline. Then, I render the second innermost band with a slightly thinner line, and so on. This produces lines both inside and outside the polygon. However, if we use the boundary polygon as a clip mask, we can crop out the outside portion.
 
-| First Band                         | Second Band                       | Many Bands                         |
-| ---------------------------------- | --------------------------------- | ---------------------------------- |
-| IMG: Polygon with first band drawn | IMG: Polygon with two bands drawn | IMG: polygon with many bands drawn |
+![illustration of geode rendering as described above](./figures/geode-trick.png)
 
-This produces lines both inside and outside the polygon. However, if we use the boundary polygon as a clip mask, we
-can crop out the outside portion.
-
-IMG: Cropped version - now it looks like a geode.
-
-This geode rendering is very similar to what I did with
-the Circulal Fan animation. The only difference is in the
-timing. Circular Fan moves in steps for a mechanical feel,
+This geode rendering is very similar to the
+the Circle Fan animation, in that it stacks layers from thickest to thinnest.
+However, there is a notable difference in animation timing. Circular Fan moves in steps for a mechanical feel,
 but Geode grows continuously.
 
 ## Panel 6: Barber Pole and Doors
@@ -101,14 +95,8 @@ but Geode grows continuously.
 
 ### Panel 6A: Barber Pole
 
-IMG: The stripes with an arrow to show motion
-
 To make the barber poles, I just used a set of stripes that scroll across the panel.
 
 ### Panel 6B: Doors
 
-IMG: close up of the doors
-
 This panel features doors that open and close, somewhat like jaws. I chose the timing carefully so the doors close one after another with a steady rhythm.
-
-IMG: Rhythm
