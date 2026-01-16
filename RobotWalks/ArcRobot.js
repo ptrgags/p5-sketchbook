@@ -3,7 +3,7 @@ import { Color } from "../sketchlib/Color.js";
 import { SCREEN_CENTER } from "../sketchlib/dimensions.js";
 import { CardinalDirection } from "../sketchlib/CardinalDirection.js";
 import { Style } from "../sketchlib/Style.js";
-import { Oklch } from "../lab/lablib/Oklch.js";
+import { Oklch } from "../sketchlib/Oklch.js";
 import { AnimatedArc } from "./AnimatedArc.js";
 import { RobotCommand, ROOTS_OF_UNITY } from "./RobotCommand.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";

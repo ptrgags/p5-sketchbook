@@ -5,7 +5,6 @@ export const LINKS = [
     year: "2025-12/2026-01",
   },
   {
-    link: "./lab/MusicalTree",
     title: "Musical Tree",
     is_lab: true,
     year: "2025-12",
@@ -15,34 +14,34 @@ export const LINKS = [
     year: "2025-11",
   },
   {
-    link: "./lab/SoundTest",
     title: "Sound Test",
     is_lab: true,
     year: "2025-05, 2025-07, 2025-11",
   },
   {
-    link: "./lab/PendulumClock",
     title: "Pendulum Clock",
     is_lab: true,
     year: "2025-05",
   },
   {
-    link: "./lab/DoubleSpring",
     title: "Double Spring",
     is_lab: true,
     year: "2016, 2025-04",
   },
   {
-    link: "./lab/DoublePendulum",
     title: "Double Pendulum",
     is_lab: true,
     year: "2016, 2025-04",
   },
   {
-    link: "./lab/PixelMaze",
     title: "Pixel Maze",
     is_lab: true,
     year: "2025-04",
+  },
+  {
+    title: "Planar Curves",
+    is_lab: true,
+    year: "2025-05",
   },
   {
     title: "Anabaena",

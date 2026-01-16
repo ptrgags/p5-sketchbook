@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { Style } from "./Style";
 import { Color } from "./Color";
-import { Oklch } from "../lab/lablib/Oklch.js";
+import { Oklch } from "./Oklch.js";
 
 describe("Style", () => {
   it("constructor with empty object returns transparent style", () => {

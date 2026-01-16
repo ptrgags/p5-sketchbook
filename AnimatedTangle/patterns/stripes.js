@@ -5,7 +5,7 @@ import { mod } from "../../sketchlib/mod.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
 import { group } from "../../sketchlib/primitives/shorthand.js";
-import { Animated } from "../../lab/lablib/animation/Animated.js";
+import { Animated } from "../../sketchlib/animation/Animated.js";
 
 /**
  * Make a set of parallel stripes

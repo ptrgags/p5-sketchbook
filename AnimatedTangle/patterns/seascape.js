@@ -18,7 +18,7 @@ import { BeziergonPrimitive } from "../../sketchlib/primitives/BeziergonPrimitiv
 import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
 import { CirclePrimitive } from "../../sketchlib/primitives/CirclePrimitive.js";
 import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
-import { Animated } from "../../lab/lablib/animation/Animated.js";
+import { Animated } from "../../sketchlib/animation/Animated.js";
 
 const STYLE_MOUNTAINS = new Style({
   fill: PALETTE_ROCK[Values.Medium],

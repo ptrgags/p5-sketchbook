@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../libraries/p5.min.js"
+    ></script>
+    <script src="https://unpkg.com/tone@15.0.4/build/Tone.js"></script>
+    <script type="module">
+      import { sketch } from "./MusicalTree.js";
+      import "../sketchlib/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../styles/layout.css" />
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>🧪 Musical Tree (2025)</h1>
+      <div class="sketch">
+        <canvas id="sketch-canvas" width="500" height="700"></canvas>
+      </div>
+      <div class="description">
+        <p>
+          Musical animation of an
+          <a href="https://en.wikipedia.org/wiki/L-system">L-System</a> tree.
+        </p>
+        <p>
+          using
+          <a href="https://en.wikipedia.org/wiki/Turtle_graphics"
+            >turtle graphics</a
+          >, each command corresponds to a different animation and musical
+          motif:
+        </p>
+        <ul>
+          <li>
+            <b>F</b> - Draw forwards. The turtle moves forward in the current
+            direction, and a single note is played. As you move from the trunk
+            of the tree towards the leaves, the note and line both get shorter.
+          </li>
+          <li>
+            <b>+, -</b> - Turn in place. (+ is CCW, - is CW) The turtle turns to
+            the side. A single note is played. The left turn is a higher note
+            than the right turn.
+          </li>
+          <li>
+            <b>[</b> - Push the current state on the stack. Every time the tree
+            branches, you need to save the current position and angle so we can
+            return to this spot later for the other branch. There's an animation
+            of the stack next to the turtle. The musical motif is a hi-lo
+            pattern. I was inspired by clicking a button (like on a cassette
+            player or a retractible pen).
+          </li>
+          <li>
+            <b>]</b> - Pop the top entry from the stack. This restores a
+            previous position/angle of the turtle. The stack pop is animated. In
+            addition, the turtle glides directly to the previous position (which
+            looks like retracing past branches in practice). The musical motif
+            is a lo-hi pattern to represent the opposite of the push motif.
+          </li>
+        </ul>
+        <details>
+          <summary>Changelog</summary>
+          <dl>
+            <dt>2025-12-02</dt>
+            <dd>Initial proof of concept.</dd>
+          </dl>
+        </details>
+      </div>
+    </div>
+  </body>
+</html>

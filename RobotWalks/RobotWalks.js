@@ -1,9 +1,9 @@
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
-import { DirectionalPad } from "../lab/lablib/DirectionalPad.js";
+import { DirectionalPad } from "../sketchlib/DirectionalPad.js";
 import { ArcRobot, N_VALUES } from "./ArcRobot.js";
-import { TouchButton } from "../lab/lablib/TouchButton.js";
-import { Rectangle } from "../lab/lablib/Rectangle.js";
-import { CanvasMouseHandler } from "../lab/lablib/CanvasMouseHandler.js";
+import { TouchButton } from "../sketchlib/TouchButton.js";
+import { Rectangle } from "../sketchlib/Rectangle.js";
+import { CanvasMouseHandler } from "../sketchlib/CanvasMouseHandler.js";
 import { Direction } from "../pga2d/Direction.js";
 import { Point } from "../pga2d/Point.js";
 
