@@ -89,7 +89,9 @@ Special thanks to Przemysław Prusinkiewicz (co-author of [_The Algorithmic Beau
 
 My other attempts, like this [tile based approach](https://ptrgags.dev/p5-sketchbook/Coral/Maze/) were more complex and fizzled out. Going back to basics helped here.
 
-I also made the coral sway a bit in the current - I did this by 
+I also made the coral sway a bit in the current - I did this by rotating some of the leaf nodes around their parent, as if on a hinge:
+
+![diagram of how the hinge works](./figures/hinge.png)
 
 ### Panel 4A: Coral Polyps
 
@@ -99,7 +101,7 @@ I also made the coral sway a bit in the current - I did this by
 
 A coral isn't one creature, but rather a colony of many small polyps (basically a mouth with tentacles). This animation is a stylized representation of the polyps. The tentacles retract quickly, as if in response to a threat, and cautiously open.
 
-Here's a photo I took of a coral at the Adventure Aquarium in New Jersey that shows some real-life polyps:
+Here's a photo I took of a coral colony at the Adventure Aquarium in New Jersey that shows some real-life polyps:
 
 ![photo of a coral from Adventure Aquarium](./figures/polyps.jpg)
 
@@ -114,7 +116,6 @@ I love the look of geodes, especially the banding patterns of agate.
 In real life, agates form when silica-rich water fills a crack in a rock and deposits a layer of crystal on the walls. When this happens repeatedly over time, you get bands of color growing inwards from the walls. See [This article from Geology In](https://www.geologyin.com/2016/02/how-do-agates-form.html) for more information.
 
 I figured out a way to render such banding patterns. I take the boundary polygon and render it many times with different stroke widths.
-
 I render the innermost color band first by using a very thick outline. Then, I render the second innermost band with a slightly thinner line, and so on. This produces lines both inside and outside the polygon. However, if we use the boundary polygon as a clip mask, we can crop out the outside portion.
 
 ![illustration of geode rendering as described above](./figures/geode-trick.png)
