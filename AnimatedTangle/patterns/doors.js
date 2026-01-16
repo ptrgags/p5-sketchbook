@@ -34,15 +34,15 @@ const ANIMATED_STRIPES = new AnimatedStripes(
 
 const STRIPE_STYLES = [
   new Style({
-    stroke: PALETTE_SKY[Values.Light],
+    stroke: PALETTE_SKY[Values.LIGHT],
     width: STRIPE_SPACING / 3,
   }),
   new Style({
-    stroke: PALETTE_CORAL[Values.MedDark],
+    stroke: PALETTE_CORAL[Values.MED_DARK],
     width: STRIPE_SPACING / 3,
   }),
   new Style({
-    stroke: PALETTE_SKY[Values.MedDark],
+    stroke: PALETTE_SKY[Values.MED_DARK],
     width: STRIPE_SPACING / 3,
   }),
 ];
@@ -119,14 +119,14 @@ const OPEN_AND_SHUT = LoopCurve.from_timeline(
 );
 
 const STYLE_DOOR_BACKGROUND = new Style({
-  stroke: PALETTE_NAVY[Values.Dark],
-  fill: PALETTE_NAVY[Values.Medium],
+  stroke: PALETTE_NAVY[Values.DARK],
+  fill: PALETTE_NAVY[Values.MEDIUM],
   width: 2,
 });
 
 const STYLE_DOOR = new Style({
-  stroke: PALETTE_ROCK[Values.MedDark],
-  fill: PALETTE_ROCK[Values.MedLight],
+  stroke: PALETTE_ROCK[Values.MED_DARK],
+  fill: PALETTE_ROCK[Values.MED_LIGHT],
   width: 2,
 });
 

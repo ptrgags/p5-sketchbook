@@ -92,7 +92,7 @@ const CURVE_END = LoopCurve.from_timeline(
 );
 
 const STYLE_STITCHES = new Style({
-  stroke: PALETTE_CORAL[Values.Medium],
+  stroke: PALETTE_CORAL[Values.MEDIUM],
   width: 4,
 });
 
