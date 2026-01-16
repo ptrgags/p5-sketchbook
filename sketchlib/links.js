@@ -39,11 +39,6 @@ export const LINKS = [
     year: "2025-04",
   },
   {
-    title: "Planar Curves",
-    is_lab: true,
-    year: "2025-05",
-  },
-  {
     title: "Anabaena",
     year: "2025-04",
   },
@@ -116,6 +111,11 @@ export const LINKS = [
     link: "./RasterTangles",
     thumbnail: "thumbnails/raster-tangles.png",
     year: "2022",
+  },
+  {
+    title: "Planar Curves",
+    is_lab: true,
+    year: "2021",
   },
   {
     title: "Origami Tiles",
