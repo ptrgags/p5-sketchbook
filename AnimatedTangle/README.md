@@ -158,3 +158,10 @@ This animation is a culmination of many ideas I explored in 2025:
   - I added [easing curves](https://easings.net/) for smoother animations in a few places
 - Using clipping masks to nest patterns within each other
 - Using `Primitive`s that can be composed into a scene graph of sorts.
+- Making use of what I've learned from color theory[^1]
+  - When picking colors, I used a relatively limited color palette. I only use a few hues (two blues and one coral) and limit myself to 5 lightness values.
+  - I've been continuing to use the [Oklch](https://oklch.com/) perceptual color space. It makes it a lot easier to choose colors and create gradients.
+
+## Footnotes
+
+[^1]: I highly recommend _Artists' Master Series: Color & Light_ by Pickard et al. It gives a thourough look at color theory and other related concepts.
