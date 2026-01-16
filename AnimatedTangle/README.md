@@ -1,8 +1,16 @@
 # Animated Tangle: Animation Breakdown
 
-![labeled panels](./figures/animation-breakdown.png)
+| Screenshot | Labeled Panels |
+|---|---|
+| <img width="500" src="../thumbnails/animated-tangle.png" alt="screenshot of animation"/>|<img width="500" src="./figures/animation-breakdown.png" alt="diagram of animation with panels labeled" />|
 
 ## Top Level: Animated Tangle
+
+I subidided the canvas into several polygonal shapes. I found myself referring
+to them as "panels", like in a comic book.
+
+I refer to using clipping masks to subdivide a region of the canvas as Vector Tangles.
+This is because it's the vector art counterpart to [Raster Tangles](https://github.com/ptrgags/raster-tangles/tree/main). The latter operates on pixel art images.
 
 ## Panel 1: Seascape
 
@@ -13,13 +21,18 @@ This animation is a view of mountains and ocean waves. I use the <a href="https:
 Fun fact: Originally the "waves" were supposed to be rolling hills. However, since my color palette used blue rather than green, it looked more like water.
 
 ## Panel 2: Traffic
+
 ![close-up of traffic](./figures/traffic.png)
+
+This animation started with an idea for the motion. The blocks move quickly, but slow down and get bunched up near the middle of the screen. After clearing the "traffic jam", the blocks speed up again.
+
+The shading was a last minute addition, and gives me the impression of platforms floating on water.
 
 ## Panel 3: Quadrants
 
 ![close-up of quadrants](./figures/quadrants.png)
 
-I subdivided panel 3 into 4 quadrants to make several animations
+I subdivided panel 3 into 4 quadrants to make several small animations.
 
 ### Panel 3A: Hitomezashi
 
@@ -64,11 +77,33 @@ I alternate between quarter notes and triplets. This way, every row of the wall 
 
 ![close-up of coral panel](./figures/coral.png)
 
+Coral shapes are common motif in my artwork. In 2025, I was exploring different techniques to mimic the shape.
+This technique is the best I've found so far! I create a tree structure, then trace a B-spline around the nodes.
+I can set the radius of each node, and skip some points to help adjust the shape. Here is a diagram of the shape I'm trying to mimic, and a diagram of how the spline is constructed.
+
+| Hand-drawn coral | Coral spline technique |
+| --- | --- |
+| ![coral shape drawn by hand](./figures/coral-example.png) | ![diagram of coral spline techniuqe](./figures/coral-spline.png) | 
+
+Special thanks to Przemysław Prusinkiewicz (co-author of [_The Algorithmic Beauty of Plants_](https://algorithmicbotany.org/papers/#abop) and many other papers on algorithmic botany and L-systems). In an email thread with him about coral patterns, he suggested drawing a B-spline around a tree. In the end, that was a key insight. I only had to add a couple of details (adding the radii and skip points) to get it where I wanted.
+
+My other attempts, like this [tile based approach](https://ptrgags.dev/p5-sketchbook/Coral/Maze/) were more complex and fizzled out. Going back to basics helped here.
+
+I also made the coral sway a bit in the current - I did this by 
+
 ### Panel 4A: Coral Polyps
 
 | Closed | Open |
 |---|---|
 | ![close-up of closed polyp](./figures/polyp-closed.png) | ![close-up of open polyp](./figures/polyp-open.png) |
+
+A coral isn't one creature, but rather a colony of many small polyps (basically a mouth with tentacles). This animation is a stylized representation of the polyps. The tentacles retract quickly, as if in response to a threat, and cautiously open.
+
+Here's a photo I took of a coral at the Adventure Aquarium in New Jersey that shows some real-life polyps:
+
+![photo of a coral from Adventure Aquarium](./figures/polyps.jpg)
+
+I also have a [3D version](https://ptrgags.dev/#/stereo-pair/undersea-3d/2025-04-16_FluorescentCoral) of this photo on my main website.
 
 ## Panel 5: Geode
 
@@ -95,7 +130,7 @@ but Geode grows continuously.
 
 ### Panel 6A: Barber Pole
 
-To make the barber poles, I just used a set of stripes that scroll across the panel.
+To make the barber poles, I just used a set of stripes that scroll across the panel as an animated background. Only small strips are visible, so it looks like the [barber pole illusion](https://en.wikipedia.org/wiki/Barberpole_illusion).
 
 ### Panel 6B: Doors
 
