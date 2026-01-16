@@ -142,3 +142,18 @@ This panel features doors that open and close, somewhat like jaws. I chose the t
 Like most of my creations, this animation began with a sketch on paper. Here's a scan of the main concept art diagram I was using for reference.
 
 ![concept art](./figures/concept-art.jpg)
+
+## A Year in Review
+
+This animation is a culmination of many ideas I explored in 2025:
+
+- Creating an algorithm to mimic the coral shapes I draw on paper
+- Creating patterns inspired by nature
+  - Coral
+  - Geodes
+  - Mountain/ocean view
+- Animation via piecewise timing curves
+  - My `AnimationCurve` class was inspired by my [musical experiments](https://ptrgags.dev/p5-sketchbook/SoundTest/) earlier this year.
+  - I added [easing curves](https://easings.net/) for smoother animations in a few places
+- Using clipping masks to nest patterns within each other
+- Using `Primitive`s that can be composed into a scene graph of sorts.
