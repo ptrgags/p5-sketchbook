@@ -33,11 +33,14 @@ function make_thumbnail(sketch_url, title, thumbnail) {
   return img_link;
 }
 
-function make_test_tube(sketch_url) {
+/**
+ *
+ * @returns {HTMLSpanElement}
+ */
+function make_test_tube() {
   const tube = document.createElement("span");
   tube.innerText = "🧪";
   tube.style.setProperty("font-size", "50px");
-
   return tube;
 }
 
@@ -49,7 +52,7 @@ function make_test_tube(sketch_url) {
 export function make_sketch_link(link_info) {
   const is_lab = link_info.is_lab ?? false;
   const title = is_lab ? `WIP: ${link_info.title}` : link_info.title;
-  const sketch_url = link_info.link ?? get_sketch_url(title);
+  const sketch_url = link_info.link ?? get_sketch_url(link_info.title);
 
   // Make the title clickable too
   const text_link = document.createElement("a");
@@ -59,8 +62,8 @@ export function make_sketch_link(link_info) {
   const date = document.createTextNode(` (${link_info.year})`);
 
   const thumbnail = is_lab
-    ? make_test_tube(sketch_url)
-    : make_thumbnail(sketch_url, title, link_info.thumbnail);
+    ? make_test_tube()
+    : make_thumbnail(sketch_url, link_info.title, link_info.thumbnail);
 
   const link = document.createElement("div");
   link.classList.add("link");
