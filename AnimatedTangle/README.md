@@ -1,12 +1,12 @@
 # Animated Tangle: Animation Breakdown
 
-IMG: labeled panels
+![labeled panels](./figures/animation-breakdown.png)
 
 ## Top Level: Animated Tangle
 
 ## Panel 1: Seascape
 
-IMG: close-up of Seascape
+![close-up of seascape panel](./figures/seascape.png)
 
 This animation is a view of mountains and ocean waves. I use the <a href="https://en.wikipedia.org/wiki/Parallax">parallax effect</a> to give it a sense of depth.
 
@@ -16,13 +16,13 @@ Fun fact: Originally the "waves" were supposed to be rolling hills. However, sin
 
 ## Panel 3: Quadrants
 
-IMG: close up of Quadrants
+![close-up of quadrants](./figures/quadrants.png)
 
 I subdivided panel 3 into 4 quadrants to make several animations
 
 ### Panel 3A: Hitomezashi
 
-IMG: Close up of Hitomezashi pattern
+![close-up of hitomezashi pattern](./figures/hitomezashi.png)
 
 This panel features a hitomezashi stitching pattern with animated stitches.
 
@@ -40,13 +40,13 @@ IMG: diagram of spacing pattern
 
 ### Panel 3C: Peek
 
-IMG: Close up of Peek
+![close-up of peek panel](./figures/peek.png)
 
 When planning out this animation, I saw that I had a small triangle of space to work with. What could I tuck in there? A googly eye, obviously! 👀
 
 ### Panel 3D: Brick Wall
 
-IMG: Close-up of Brick Wall in motion
+![close-up of brick-wall in motion](./figures/brick-wall.png)
 
 This panel is an animation of a wall being built brick by brick. To make it more interesting, I use the bricks as a clip mask that reveals a striped pattern.
 
@@ -59,11 +59,17 @@ IMG: Diagram of rhythm `1 2|3 4 5|6 7|8 9 10`
 
 ## Panel 4: Coral
 
+![close-up of coral panel](./figures/coral.png)
+
 ### Panel 4A: Coral Polyps
+
+| Closed | Open |
+|---|---|
+| ![close-up of closed polyp](./figures/polyp-closed.png) | ![close-up of open polyp](./figures/polyp-open.png) |
 
 ## Panel 5: Geode
 
-IMG: close up of the geode
+![close-up of geode](./figures/geode.png)
 
 I love the look of geodes, especially the banding patterns of agate.
 
@@ -89,6 +95,8 @@ but Geode grows continuously.
 
 ## Panel 6: Barber Pole and Doors
 
+![close-up of bottom panel](./figures/barber-doors.png)
+
 ### Panel 6A: Barber Pole
 
 IMG: The stripes with an arrow to show motion
@@ -100,3 +108,5 @@ To make the barber poles, I just used a set of stripes that scroll across the pa
 IMG: close up of the doors
 
 This panel features doors that open and close, somewhat like jaws. I chose the timing carefully so the doors close one after another with a steady rhythm.
+
+IMG: Rhythm
