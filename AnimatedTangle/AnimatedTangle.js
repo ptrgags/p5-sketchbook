@@ -19,7 +19,7 @@ import { TRAFFIC } from "./patterns/traffic.js";
 import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
 import { BRICKS } from "./patterns/brick_wall.js";
 import { DOORS } from "./patterns/doors.js";
-import { AnimationGroup } from "../lab/lablib/animation/AnimationGroup.js";
+import { AnimationGroup } from "../sketchlib/animation/AnimationGroup.js";
 import { DebugCoordinates } from "./DebugCoordinates.js";
 import { DebugGrid } from "./DebugGrid.js";
 

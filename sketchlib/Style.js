@@ -1,4 +1,4 @@
-import { Oklch } from "../lab/lablib/Oklch.js";
+import { Oklch } from "./Oklch.js";
 import { Color } from "./Color.js";
 
 /**

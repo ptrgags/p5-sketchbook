@@ -6,11 +6,11 @@ import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Tween } from "../../sketchlib/Tween.js";
-import { Animated } from "../../lab/lablib/animation/Animated.js";
-import { LoopCurve } from "../../lab/lablib/animation/LoopCurve.js";
-import { ParamCurve } from "../../lab/lablib/animation/ParamCurve.js";
-import { Sequential } from "../../lab/lablib/music/Timeline.js";
-import { Rational } from "../../lab/lablib/Rational.js";
+import { Animated } from "../../sketchlib/animation/Animated.js";
+import { LoopCurve } from "../../sketchlib/animation/LoopCurve.js";
+import { ParamCurve } from "../../sketchlib/animation/ParamCurve.js";
+import { Sequential } from "../../sketchlib/music/Timeline.js";
+import { Rational } from "../../sketchlib/Rational.js";
 import { PALETTE_CORAL, PALETTE_NAVY, Values } from "../theme_colors.js";
 
 const TENTACLE_MIN = 10;

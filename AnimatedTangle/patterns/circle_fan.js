@@ -1,10 +1,10 @@
-import { Sequential } from "../../lab/lablib/music/Timeline.js";
-import { Rational } from "../../lab/lablib/Rational.js";
+import { Sequential } from "../../sketchlib/music/Timeline.js";
+import { Rational } from "../../sketchlib/Rational.js";
 import { Point } from "../../pga2d/Point.js";
 import { CirclePrimitive } from "../../sketchlib/primitives/CirclePrimitive.js";
 import { group, style, xform } from "../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
-import { Hold, ParamCurve } from "../../lab/lablib/animation/ParamCurve.js";
+import { Hold, ParamCurve } from "../../sketchlib/animation/ParamCurve.js";
 import { lerp } from "../../sketchlib/lerp.js";
 import { Direction } from "../../pga2d/Direction.js";
 import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
@@ -18,8 +18,8 @@ import {
   Values,
 } from "../theme_colors.js";
 import { Ease } from "../../sketchlib/Ease.js";
-import { LoopCurve } from "../../lab/lablib/animation/LoopCurve.js";
-import { Animated } from "../../lab/lablib/animation/Animated.js";
+import { LoopCurve } from "../../sketchlib/animation/LoopCurve.js";
+import { Animated } from "../../sketchlib/animation/Animated.js";
 
 const CENTER = new Point(500, 300);
 const BAND_THICKNESS = 50;
