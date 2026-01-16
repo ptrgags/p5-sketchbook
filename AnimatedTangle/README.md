@@ -55,7 +55,9 @@ The striped pattern is based on [Stripey Ring](https://ptrgags.dev/webgpu-sketch
 There's a certain rhythm to when the bricks snap into place.
 I alternate between quarter notes and triplets. This way, every row of the wall takes the same time to build.
 
-IMG: Diagram of rhythm `1 2|3 4 5|6 7|8 9 10`
+| Brick Layout | Rhythm |
+|---|---|
+| ![diagram of brick layout](./figures/brick-layout.png) | ![diagram of rhythm](./figures/brick-timing.png) |
 
 ## Panel 4: Coral
 
