@@ -42,10 +42,10 @@ const PLATFORM_SHADOW = new RectPrimitive(
   new Direction(PLATFORM_WIDTH, PLATFORM_HEIGHT - TOP_HEIGHT)
 );
 const STYLE_TOP = new Style({
-  fill: PALETTE_CORAL[Values.MedLight],
+  fill: PALETTE_CORAL[Values.MED_LIGHT],
 });
 const STYLE_SHADOW = new Style({
-  fill: PALETTE_CORAL[Values.Dark],
+  fill: PALETTE_CORAL[Values.DARK],
 });
 
 // This should always be odd so one platform always sits at the center

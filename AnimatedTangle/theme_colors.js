@@ -29,9 +29,9 @@ export const PALETTE_ROCK = Oklch.gradient(
  * @enum {number}
  */
 export const Values = {
-  Dark: 0,
-  MedDark: 1,
-  Medium: 2,
-  MedLight: 3,
-  Light: 4,
+  DARK: 0,
+  MED_DARK: 1,
+  MEDIUM: 2,
+  MED_LIGHT: 3,
+  LIGHT: 4,
 };
