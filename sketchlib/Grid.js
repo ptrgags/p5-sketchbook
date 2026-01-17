@@ -136,6 +136,11 @@ export class Index2D {
  * @template T
  */
 export class Grid {
+  /**
+   * Constructor
+   * @param {number} rows
+   * @param {number} cols
+   */
   constructor(rows, cols) {
     this.rows = rows;
     this.cols = cols;
