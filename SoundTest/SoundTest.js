@@ -106,7 +106,7 @@ MELODY_BUTTONS.set(
   new MelodyButtonDescriptor("binary_progression", "4-bit Chords")
 );
 MELODY_BUTTONS.set(
-  new Index2D(2, 1),
+  new Index2D(2, 0),
   new MelodyButtonDescriptor("organ_chords", "Organ Test Chords")
 );
 
