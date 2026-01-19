@@ -4,7 +4,9 @@ import {
   A,
   A4,
   B,
+  B3,
   B4,
+  B5,
   C,
   C3,
   C4,
@@ -322,8 +324,23 @@ export function organ_chords() {
     new Note(F4, N1),
     new Note(D4, N1)
   );
+  const c_maj_7 = new Harmony(
+    new Note(B4, N1),
+    new Note(G4, N1),
+    new Note(E4, N1),
+    new Note(C4, N1)
+  );
+  const b_half_dim = new Harmony(
+    new Note(A4, N1),
+    new Note(F4, N1),
+    new Note(D4, N1),
+    new Note(B3, N1)
+  );
 
-  const chords = new Melody(e_min_7, d_min_7);
+  const chords = Melody.from_repeat(
+    new Melody(e_min_7, d_min_7, c_maj_7, b_half_dim),
+    4
+  );
 
   return new Score(
     new Part("chords", chords, {
