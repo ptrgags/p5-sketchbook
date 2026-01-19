@@ -224,36 +224,6 @@ export class SoundManager {
       clip.material.start(start_time).stop(end_time);
     }
 
-    // Schedule note on/off events for animations
-    const note_events = this.score_note_events[score_id];
-    for (const part of note_events) {
-      const { instrument_id, events } = part;
-      for (const [note, start_time, end_time] of events) {
-        /**
-         * @type {NoteEventDetail}
-         */
-        const detail = {
-          instrument_id,
-          note,
-          start_time,
-          end_time,
-        };
-
-        transport.schedule((time) => {
-          draw.schedule(() => {
-            const note_on = new CustomEvent("note-on", { detail });
-            this.events.dispatchEvent(note_on);
-          }, time);
-        }, to_tone_time(start_time));
-        transport.schedule((time) => {
-          draw.schedule(() => {
-            const note_off = new CustomEvent("note-off", { detail });
-            this.events.dispatchEvent(note_off);
-          }, time);
-        }, to_tone_time(end_time));
-      }
-    }
-
     transport.position = 0;
     transport.start("+0.1", "0:0");
     this.current_score = score_id;
@@ -283,26 +253,6 @@ export class SoundManager {
       const transport = this.tone.getTransport();
       transport.start(this.tone.now());
       this.transport_playing = true;
-    }
-  }
-
-  /**
-   * Prototype of animations based on note events.
-   * @template T
-   * @param {[T, Rational, Rational][]} events
-   * @param {function(T): void} on_start function to call at the start of a note.
-   * @param {function(T): void} on_end function to call at the end of each note.
-   */
-  schedule_cues(events, on_start, on_end) {
-    const transport = this.tone.getTransport();
-    const tone_draw = this.tone.getDraw();
-    for (const [data, start_time, end_time] of events) {
-      transport.schedule((time) => {
-        tone_draw.schedule(() => on_start(data), time);
-      }, to_tone_time(start_time));
-      transport.schedule((time) => {
-        tone_draw.schedule(() => on_end(data), time);
-      }, to_tone_time(end_time));
     }
   }
 }
