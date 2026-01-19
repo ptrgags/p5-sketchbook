@@ -144,7 +144,7 @@ export class SoundManager {
     tick.init_mono(this.tone);
     tick.volume = -2;
 
-    const organ = new DrawbarOrgan(new Drawbars("33 3300 000"));
+    const organ = new DrawbarOrgan(new Drawbars("00 8060 400"));
     organ.init_poly(this.tone);
     organ.volume = -18;
 

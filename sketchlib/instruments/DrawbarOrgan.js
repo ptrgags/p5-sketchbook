@@ -72,6 +72,7 @@ export class DrawbarOrgan {
     this.synth = new tone.DuoSynth({
       voice0: {
         oscillator: {
+          type: "custom",
           partials: this.drawbars.main_partials,
         },
         // Tone.js typechecks that envelope is an object
@@ -83,6 +84,7 @@ export class DrawbarOrgan {
       harmonicity: 0.5,
       voice1: {
         oscillator: {
+          type: "custom",
           partials: this.drawbars.sub_partials,
         },
         envelope: { ...this.envelope },
@@ -98,6 +100,7 @@ export class DrawbarOrgan {
     this.synth = new tone.PolySynth(tone.DuoSynth, {
       voice0: {
         oscillator: {
+          type: "custom",
           partials: this.drawbars.main_partials,
         },
         envelope: { ...this.envelope },
@@ -107,6 +110,7 @@ export class DrawbarOrgan {
       harmonicity: 0.5,
       voice1: {
         oscillator: {
+          type: "custom",
           partials: this.drawbars.sub_partials,
         },
         envelope: { ...this.envelope },
