@@ -276,7 +276,9 @@ class SoundScene {
 
         this.sound.play_score(this.selected_melody);
 
-        // This only works after play_score... why?
+        // This only works after play_score because SoundManager clears
+        // the _entire_ timeline. The next version should keep track of
+        // scheduled IDs and only clear ones pertaining to music.
         const score = SOUND_MANIFEST.scores[this.selected_melody];
         CUES.unschedule_all();
         CUES.schedule_notes(score);
