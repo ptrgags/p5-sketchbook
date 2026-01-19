@@ -148,6 +148,23 @@ export class SoundManager {
     organ.init_poly(this.tone);
     organ.volume = -18;
 
+    this.tone.getDestination();
+
+    // TEMP: Trying out a send track on the organ to get some reverb
+    // this reconnects things so we have
+    // organ --> organ channel --> destination
+    //                |
+    //                v send to reverb
+    //          reverb_channel --> reverb --> destination
+    organ.synth.disconnect();
+    const reverb = new this.tone.Reverb(2).toDestination();
+    const reverb_channel = new this.tone.Channel().connect(reverb);
+    reverb_channel.receive("reverb");
+
+    const organ_channel = new this.tone.Channel(-12).toDestination();
+    organ.synth.connect(organ_channel);
+    organ_channel.send("reverb");
+
     this.synths.sine = sine.synth;
     this.synths.square = square.synth;
     this.synths.poly = poly.synth;
