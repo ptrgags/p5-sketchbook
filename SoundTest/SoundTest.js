@@ -29,6 +29,7 @@ import {
   layered_melody,
   phase_scale,
   symmetry_melody,
+  organ_chords,
 } from "./example_scores.js";
 import { Piano } from "./Piano.js";
 import { SpiralBurst } from "./SpiralBurst.js";
@@ -44,6 +45,7 @@ const SOUND_MANIFEST = {
     phase_scale: phase_scale(),
     symmetry_melody: symmetry_melody(),
     binary_progression: binary_chords(),
+    organ_chords: organ_chords(),
   },
 };
 

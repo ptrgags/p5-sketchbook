@@ -2,18 +2,24 @@ import { N1, N2, N4, N8 } from "../sketchlib/music/durations.js";
 import { MidiPitch } from "../sketchlib/music/pitch_conversions.js";
 import {
   A,
+  A4,
   B,
   B4,
   C,
   C3,
   C4,
+  C5,
   D,
+  D4,
+  D5,
   E,
   E4,
   F,
+  F4,
   G,
   G3,
   G4,
+  G5,
   GS,
   REST,
 } from "../sketchlib/music/pitches.js";
@@ -298,6 +304,31 @@ export function binary_chords() {
     new Part("rhythm", rhythm_loop, {
       instrument_id: "square",
       midi_instrument: 37 - 1, // slap bass 1,
+      midi_channel: 1,
+    })
+  );
+}
+
+export function organ_chords() {
+  const e_min_7 = new Harmony(
+    new Note(D5, N1),
+    new Note(B4, N1),
+    new Note(G4, N1),
+    new Note(E4, N1)
+  );
+  const d_min_7 = new Harmony(
+    new Note(C5, N1),
+    new Note(A4, N1),
+    new Note(F4, N1),
+    new Note(D4, N1)
+  );
+
+  const chords = new Melody(e_min_7, d_min_7);
+
+  return new Score(
+    new Part("chords", chords, {
+      instrument_id: "organ",
+      midi_instrument: 17 - 1,
       midi_channel: 1,
     })
   );
