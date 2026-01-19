@@ -86,7 +86,7 @@ class MelodyButtonDescriptor {
   }
 }
 
-const MELODY_BUTTONS = new Grid(2, 2);
+const MELODY_BUTTONS = new Grid(3, 2);
 MELODY_BUTTONS.set(
   new Index2D(0, 0),
   new MelodyButtonDescriptor("layered_melody", "Layered Melody")
@@ -102,6 +102,10 @@ MELODY_BUTTONS.set(
 MELODY_BUTTONS.set(
   new Index2D(1, 1),
   new MelodyButtonDescriptor("binary_progression", "4-bit Chords")
+);
+MELODY_BUTTONS.set(
+  new Index2D(2, 1),
+  new MelodyButtonDescriptor("organ_chords", "Organ Test Chords")
 );
 
 const MELODY_BUTTON_SIZE = 150;
@@ -133,6 +137,9 @@ const [FIRST_BUTTON_POSITION, BUTTON_STRIDE] = MELODY_BUTTONS.compute_layout(
  */
 function make_button_labels(buttons) {
   const primitives = buttons.map_array((index, descriptor) => {
+    if (!descriptor) {
+      return GroupPrimitive.EMPTY;
+    }
     const offset = FIRST_BUTTON_POSITION.add(MELODY_BUTTON_CENTER_OFFSET);
     const position_world = index.to_world(offset, BUTTON_STRIDE);
     return new TextPrimitive(descriptor.label, position_world);

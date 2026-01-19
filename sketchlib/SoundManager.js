@@ -1,5 +1,6 @@
 import { ADSR } from "./instruments/ADSR.js";
 import { BasicSynth } from "./instruments/BasicSynth.js";
+import { DrawbarOrgan, Drawbars } from "./instruments/DrawbarOrgan.js";
 import { FMSynth } from "./instruments/FMSynth.js";
 import { WaveStack } from "./instruments/Wavestack.js";
 import { Note } from "./music/Music.js";
@@ -143,12 +144,17 @@ export class SoundManager {
     tick.init_mono(this.tone);
     tick.volume = -2;
 
+    const organ = new DrawbarOrgan(new Drawbars("33 3300 000"));
+    organ.init_poly(this.tone);
+    organ.volume = -18;
+
     this.synths.sine = sine.synth;
     this.synths.square = square.synth;
     this.synths.poly = poly.synth;
     this.synths.supersaw = supersaw.synth;
     this.synths.bell = bell.synth;
     this.synths.tick = tick.synth;
+    this.synths.organ = organ.synth;
   }
 
   /**

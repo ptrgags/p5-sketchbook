@@ -74,7 +74,9 @@ export class DrawbarOrgan {
         oscillator: {
           partials: this.drawbars.main_partials,
         },
-        envelope: this.envelope,
+        // Tone.js typechecks that envelope is an object
+        // literal... so force this to be an object.
+        envelope: { ...this.envelope },
       },
       // Set the harmonicity to 1/2 so voice1 is a sub oscillator
       // one octave lower
@@ -83,7 +85,7 @@ export class DrawbarOrgan {
         oscillator: {
           partials: this.drawbars.sub_partials,
         },
-        envelope: this.envelope,
+        envelope: { ...this.envelope },
       },
     }).toDestination();
   }
@@ -98,7 +100,7 @@ export class DrawbarOrgan {
         oscillator: {
           partials: this.drawbars.main_partials,
         },
-        envelope: this.envelope,
+        envelope: { ...this.envelope },
       },
       // Set the harmonicity to 1/2 so voice1 is a sub oscillator
       // one octave lower
@@ -107,7 +109,7 @@ export class DrawbarOrgan {
         oscillator: {
           partials: this.drawbars.sub_partials,
         },
-        envelope: this.envelope,
+        envelope: { ...this.envelope },
       },
     }).toDestination();
   }
