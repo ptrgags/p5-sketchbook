@@ -4,7 +4,7 @@
  */
 export class Instrument {
   /**
-   * @param number
+   * @param {number} value volume in dBFS
    */
   set volume(value) {
     throw new Error("not implemented");
