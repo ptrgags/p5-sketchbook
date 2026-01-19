@@ -1,5 +1,7 @@
 import { Rational } from "../Rational.js";
 import { to_tone_time } from "../tone_helpers/measure_notation.js";
+import { Score } from "./Score.js";
+import { to_events } from "./Timeline.js";
 
 export class Cue {
   /**
@@ -9,6 +11,35 @@ export class Cue {
   constructor(time, data) {
     this.time = time;
     this.data = data;
+  }
+
+  /**
+   *
+   * @param {Score<number>} score
+   * @returns {{
+   *    note_on: Cue[],
+   *    note_off: Cue[]
+   * }}
+   */
+  static make_note_cues(score) {
+    const note_on = [];
+    const note_off = [];
+    for (const part of score.parts) {
+      for (const [note, start_time, end_time] of to_events(
+        Rational.ZERO,
+        part.music
+      )) {
+        const note_on_cue = new Cue(start_time, note);
+        const note_off_cue = new Cue(end_time, note);
+        note_on.push(note_on_cue);
+        note_off.push(note_off_cue);
+      }
+    }
+
+    return {
+      note_on,
+      note_off,
+    };
   }
 }
 
@@ -51,5 +82,6 @@ export class MusicalCues {
     for (const event_id of this.event_ids) {
       transport.clear(event_id);
     }
+    this.event_ids = [];
   }
 }
