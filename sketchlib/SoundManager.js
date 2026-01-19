@@ -67,13 +67,6 @@ export class SoundManager {
      */
     this.score_note_events = {};
     this.sfx = {};
-
-    /**
-     * Event target for listening to events
-     * @readonly
-     * @type {EventTarget}
-     */
-    this.events = new EventTarget();
   }
 
   async init() {

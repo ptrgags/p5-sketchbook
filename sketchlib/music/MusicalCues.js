@@ -14,7 +14,7 @@ export class Cue {
   }
 
   /**
-   *
+   * Generate cues for note on/note off events from a score.
    * @param {Score<number>} score
    * @returns {{
    *    note_on: Cue[],
