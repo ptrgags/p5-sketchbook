@@ -34,7 +34,7 @@ import { Piano } from "./Piano.js";
 import { SpiralBurst } from "./SpiralBurst.js";
 import { expect_element } from "../sketchlib/dom/expect_element.js";
 import { decode_midi } from "../sketchlib/midi/decode_midi.js";
-import { MusicalCues } from "../sketchlib/music/MusicalCues.js";
+import { Cue, MusicalCues } from "../sketchlib/music/MusicalCues.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -273,7 +273,13 @@ class SoundScene {
         this.export_button.disabled = false;
         this.export_gm_button.disabled = false;
         this.piano.reset();
+
         this.sound.play_score(this.selected_melody);
+
+        // This only works after play_score... why?
+        const score = SOUND_MANIFEST.scores[this.selected_melody];
+        CUES.unschedule_all();
+        CUES.schedule_notes(score);
       });
       return button;
     });

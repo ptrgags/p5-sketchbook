@@ -210,7 +210,6 @@ export class SoundManager {
     this.stop_the_music();
 
     const transport = this.tone.getTransport();
-    const draw = this.tone.getDraw();
 
     const schedule = schedule_clips(Rational.ZERO, score);
     for (const [clip, start_time, end_time] of schedule) {

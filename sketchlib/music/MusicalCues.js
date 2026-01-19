@@ -77,7 +77,17 @@ export class MusicalCues {
     }
   }
 
-  unschedule() {
+  /**
+   * Schedule note on and note off events from a score
+   * @param {Score<number>} score The score to schedule
+   */
+  schedule_notes(score) {
+    const { note_on, note_off } = Cue.make_note_cues(score);
+    this.schedule("note-on", note_on);
+    this.schedule("note-off", note_off);
+  }
+
+  unschedule_all() {
     const transport = this.tone.getTransport();
     for (const event_id of this.event_ids) {
       transport.clear(event_id);
