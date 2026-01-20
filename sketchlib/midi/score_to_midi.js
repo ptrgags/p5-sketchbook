@@ -1,5 +1,5 @@
+import { AbsTimelineOps } from "../music/AbsTimeline.js";
 import { Score } from "../music/Score.js";
-import { to_events } from "../music/Timeline.js";
 import { Rational } from "../Rational.js";
 import { MIDIEvent, MIDIMessage } from "./MIDIEvent.js";
 import { MIDIFile, MIDIHeader } from "./MIDIFile.js";
@@ -42,19 +42,18 @@ function to_ticks(time_measures) {
  * @returns {RelativeTimingTrack} The track, converted to use relative tick deltas as this is required by MIDI
  */
 function make_track(channel, music, midi_instrument) {
+  const abs_music = AbsTimelineOps.from_relative(music);
   /**
    * @type {[number, MIDIEvent][]}
    */
-  const events = to_events(Rational.ZERO, music).flatMap(
-    ([note, start, end]) => {
-      const note_on = MIDIMessage.note_on(channel, note.pitch);
-      const note_off = MIDIMessage.note_off(channel, note.pitch);
-      return [
-        [to_ticks(start), note_on],
-        [to_ticks(end), note_off],
-      ];
-    }
-  );
+  const events = [...abs_music].flatMap((note) => {
+    const note_on = MIDIMessage.note_on(channel, note.value.pitch);
+    const note_off = MIDIMessage.note_off(channel, note.value.pitch);
+    return [
+      [to_ticks(note.start_time), note_on],
+      [to_ticks(note.end_time), note_off],
+    ];
+  });
 
   if (midi_instrument === undefined) {
     return new AbsoluteTimingTrack(events).to_relative();
