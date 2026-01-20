@@ -1,3 +1,4 @@
+import { Velocity } from "../music/Velocity.js";
 import { decode_variable_length } from "./variable_length.js";
 
 /**
@@ -132,7 +133,7 @@ export class MIDIMessage {
     return new MIDIMessage(
       message_type,
       channel,
-      new Uint8Array([pitch, velocity])
+      new Uint8Array([pitch, velocity]),
     );
   }
 
@@ -147,7 +148,7 @@ export class MIDIMessage {
     return new MIDIMessage(
       MIDIMessageType.NOTE_OFF,
       channel,
-      new Uint8Array([pitch, velocity])
+      new Uint8Array([pitch, velocity]),
     );
   }
 
@@ -160,7 +161,7 @@ export class MIDIMessage {
     return new MIDIMessage(
       MIDIMessageType.PROGRAM_CHANGE,
       channel,
-      new Uint8Array([instrument])
+      new Uint8Array([instrument]),
     );
   }
 
@@ -179,7 +180,7 @@ export class MIDIMessage {
     const data = new Uint8Array(
       data_view.buffer,
       data_view.byteOffset + offset,
-      data_length
+      data_length,
     );
 
     const msg = new MIDIMessage(message_type, channel, data);
@@ -187,7 +188,7 @@ export class MIDIMessage {
     return [msg, after_offset];
   }
 }
-MIDIMessage.DEFAULT_VELOCITY = 127;
+MIDIMessage.DEFAULT_VELOCITY = Velocity.MF;
 
 /**
  * @enum {number}
@@ -288,7 +289,7 @@ export class MIDIMetaEvent {
     const body = new Uint8Array(
       data_view.buffer,
       data_view.byteOffset + offset + 1 + length_length,
-      length
+      length,
     );
 
     const message = new MIDIMetaEvent(meta_type, body);
@@ -298,7 +299,7 @@ export class MIDIMetaEvent {
 }
 MIDIMetaEvent.MAGIC = 0xff;
 MIDIMetaEvent.END_OF_TRACK = Object.freeze(
-  new MIDIMetaEvent(MIDIMetaType.END_OF_TRACK, new Uint8Array(0))
+  new MIDIMetaEvent(MIDIMetaType.END_OF_TRACK, new Uint8Array(0)),
 );
 
 /**
@@ -362,7 +363,7 @@ export class MIDISysex {
       data_view.buffer,
       data_view.byteOffset + offset + length_length,
       // length includes the end of sysex byte
-      length - 1
+      length - 1,
     );
 
     const message = new MIDISysex(data);

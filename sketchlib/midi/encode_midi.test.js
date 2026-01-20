@@ -9,6 +9,7 @@ import {
 import { C3, C4, E5, G4 } from "../music/pitches.js";
 import { RelativeTimingTrack } from "./MIDITrack.js";
 import { MIDIMessage, MIDIMetaEvent, MIDIMetaType } from "./MIDIEvent.js";
+import { Velocity } from "../music/Velocity.js";
 
 // This will get used a lot, so use the abbreviation parts per quarter
 const PPQ = MIDIHeader.DEFAULT_TICKS_PER_QUARTER;
@@ -65,7 +66,7 @@ describe("encode_midi", () => {
   it("with single note encodes correctly", () => {
     const midi = new MIDIFile(MIDIHeader.DEFAULT_FORMAT0, [
       new RelativeTimingTrack([
-        [0, MIDIMessage.note_on(0, C4)],
+        [0, MIDIMessage.note_on(0, C4, Velocity.FFF)],
         [PPQ, MIDIMessage.note_off(0, C4)],
       ]),
     ]);
@@ -84,7 +85,7 @@ describe("encode_midi", () => {
       expected_length,
       // dt
       0,
-      // Channel 0: note on C4, velocity 127
+      // Channel 0: note on C4, fff
       0x90,
       C4,
       127,
@@ -115,14 +116,14 @@ describe("encode_midi", () => {
         0,
         new MIDIMetaEvent(
           MIDIMetaType.TIME_SIGNATURE,
-          new Uint8Array([0x04, 0x02, 0x18, 0x08])
+          new Uint8Array([0x04, 0x02, 0x18, 0x08]),
         ),
       ],
       [
         0,
         new MIDIMetaEvent(
           MIDIMetaType.SET_TEMPO,
-          new Uint8Array([0x07, 0xa1, 0x20])
+          new Uint8Array([0x07, 0xa1, 0x20]),
         ),
       ],
       [0, MIDIMessage.program_change(0, 5)],
@@ -258,14 +259,14 @@ describe("encode_midi", () => {
         0,
         new MIDIMetaEvent(
           MIDIMetaType.TIME_SIGNATURE,
-          new Uint8Array([0x04, 0x02, 0x18, 0x08])
+          new Uint8Array([0x04, 0x02, 0x18, 0x08]),
         ),
       ],
       [
         0,
         new MIDIMetaEvent(
           MIDIMetaType.SET_TEMPO,
-          new Uint8Array([0x07, 0xa1, 0x20])
+          new Uint8Array([0x07, 0xa1, 0x20]),
         ),
       ],
     ]);
@@ -449,14 +450,14 @@ describe("encode_midi", () => {
         0,
         new MIDIMetaEvent(
           MIDIMetaType.TIME_SIGNATURE,
-          new Uint8Array([0x04, 0x02, 0x24, 0x08])
+          new Uint8Array([0x04, 0x02, 0x24, 0x08]),
         ),
       ],
       [
         0,
         new MIDIMetaEvent(
           MIDIMetaType.TIME_SIGNATURE,
-          new Uint8Array([0x04, 0x02, 0x24, 0x08])
+          new Uint8Array([0x04, 0x02, 0x24, 0x08]),
         ),
       ],
     ]);
