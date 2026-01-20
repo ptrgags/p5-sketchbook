@@ -1,5 +1,5 @@
 import { Rational } from "../Rational.js";
-import { to_tone_time } from "./measure_notation.js";
+import { to_tone_time } from "./to_tone_time.js";
 
 export class PartDescriptor {
   /**

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { to_tone_time } from "./measure_notation";
+import { to_tone_time } from "./to_tone_time";
 import { Rational } from "../Rational";
 
 describe("to_tone_time", () => {

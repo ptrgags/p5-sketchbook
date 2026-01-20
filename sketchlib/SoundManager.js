@@ -8,7 +8,7 @@ import { Score } from "./music/Score.js";
 import { to_events } from "./music/Timeline.js";
 import { Rational } from "./Rational.js";
 import { compile_score } from "./tone_helpers/compile_music.js";
-import { to_tone_time } from "./tone_helpers/measure_notation.js";
+import { to_tone_time } from "./tone_helpers/to_tone_time.js";
 import { schedule_clips } from "./tone_helpers/schedule_music.js";
 
 /**
