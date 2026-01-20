@@ -7,6 +7,14 @@ import { mod } from "./mod.js";
  * @returns {number} The greatest common divisor
  */
 function gcd(a, b) {
+  if (a < 0 || !isFinite(a)) {
+    throw new Error("a must be non-negative integer");
+  }
+
+  if (b < 0 || !isFinite(b)) {
+    throw new Error("b must be non-negative integer");
+  }
+
   if (b > a) {
     return gcd(b, a);
   }

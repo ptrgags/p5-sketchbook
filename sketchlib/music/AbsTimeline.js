@@ -95,7 +95,7 @@ export class AbsParallel {
     // TODO: check that children all have the same start time?
 
     if (this.children.length > 0) {
-      this.start_time = this.children[0];
+      this.start_time = this.children[0].start_time;
       this.end_time = this.children.reduce(
         (accum, x) => accum.max(x.duration),
         Rational.ZERO,
