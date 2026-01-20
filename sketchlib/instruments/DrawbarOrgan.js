@@ -29,6 +29,15 @@ export class Drawbars {
 }
 
 /**
+ * @typedef {import('tone').DuoSynthOptions} DuoSynthOptions
+ **/
+
+/**
+ * @template T
+ * @typedef {import("tone/build/esm/core/util/Interface.js").RecursivePartial<T>} RecursivePartial<T>
+ */
+
+/**
  * @implements {Instrument}
  */
 export class DrawbarOrgan {
@@ -46,6 +55,32 @@ export class DrawbarOrgan {
     this.synth = undefined;
 
     this.envelope = ADSR.organ(release_time);
+
+    /**
+     * @type {RecursivePartial<DuoSynthOptions>}
+     */
+    this.synth_options = {
+      voice0: {
+        oscillator: {
+          type: "custom",
+          partials: this.drawbars.main_partials,
+        },
+        // Tone.js typechecks that envelope is an object
+        // literal... so force this to be an object.
+        envelope: { ...this.envelope },
+      },
+      // Set the harmonicity to 1/2 so voice1 is a sub oscillator
+      // one octave lower
+      harmonicity: 0.5,
+      voice1: {
+        oscillator: {
+          type: "custom",
+          partials: this.drawbars.sub_partials,
+        },
+        envelope: { ...this.envelope },
+      },
+      vibratoAmount: 0,
+    };
   }
 
   /**
@@ -69,27 +104,7 @@ export class DrawbarOrgan {
    * @param {import('tone')} tone
    */
   init_mono(tone) {
-    this.synth = new tone.DuoSynth({
-      voice0: {
-        oscillator: {
-          type: "custom",
-          partials: this.drawbars.main_partials,
-        },
-        // Tone.js typechecks that envelope is an object
-        // literal... so force this to be an object.
-        envelope: { ...this.envelope },
-      },
-      // Set the harmonicity to 1/2 so voice1 is a sub oscillator
-      // one octave lower
-      harmonicity: 0.5,
-      voice1: {
-        oscillator: {
-          type: "custom",
-          partials: this.drawbars.sub_partials,
-        },
-        envelope: { ...this.envelope },
-      },
-    }).toDestination();
+    this.synth = new tone.DuoSynth(this.synth_options).toDestination();
   }
 
   /**
@@ -97,25 +112,10 @@ export class DrawbarOrgan {
    * @param {import('tone')} tone
    */
   init_poly(tone) {
-    this.synth = new tone.PolySynth(tone.DuoSynth, {
-      voice0: {
-        oscillator: {
-          type: "custom",
-          partials: this.drawbars.main_partials,
-        },
-        envelope: { ...this.envelope },
-      },
-      // Set the harmonicity to 1/2 so voice1 is a sub oscillator
-      // one octave lower
-      harmonicity: 0.5,
-      voice1: {
-        oscillator: {
-          type: "custom",
-          partials: this.drawbars.sub_partials,
-        },
-        envelope: { ...this.envelope },
-      },
-    }).toDestination();
+    this.synth = new tone.PolySynth(
+      tone.DuoSynth,
+      this.synth_options,
+    ).toDestination();
   }
 
   destroy() {
