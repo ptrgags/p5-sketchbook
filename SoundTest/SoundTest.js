@@ -35,6 +35,7 @@ import { Piano } from "./Piano.js";
 import { SpiralBurst } from "./SpiralBurst.js";
 import { expect_element } from "../sketchlib/dom/expect_element.js";
 import { decode_midi } from "../sketchlib/midi/decode_midi.js";
+import { Cue, MusicalCues } from "../sketchlib/music/MusicalCues.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -75,6 +76,8 @@ for (const [key, score] of Object.entries(SOUND_MANIFEST.scores)) {
 
 //@ts-ignore
 const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
+//@ts-ignore
+const CUES = new MusicalCues(Tone);
 
 class MelodyButtonDescriptor {
   /**
@@ -263,18 +266,12 @@ class SoundScene {
      */
     this.selected_melody = undefined;
 
-    this.sound.events.addEventListener(
-      "note-on",
-      (/** @type {CustomEvent} */ e) => {
-        this.piano.trigger(e.detail.note.pitch);
-      }
-    );
-    this.sound.events.addEventListener(
-      "note-off",
-      (/** @type {CustomEvent} */ e) => {
-        this.piano.release(e.detail.note.pitch);
-      }
-    );
+    CUES.events.addEventListener("note-on", (/** @type {CustomEvent} */ e) => {
+      this.piano.trigger(e.detail.pitch);
+    });
+    CUES.events.addEventListener("note-off", (/** @type {CustomEvent} */ e) => {
+      this.piano.release(e.detail.pitch);
+    });
 
     this.melody_buttons = melodies.map_array((index, descriptor) => {
       const corner = index.to_world(FIRST_BUTTON_POSITION, BUTTON_STRIDE);
@@ -285,7 +282,15 @@ class SoundScene {
         this.export_button.disabled = false;
         this.export_gm_button.disabled = false;
         this.piano.reset();
+
         this.sound.play_score(this.selected_melody);
+
+        // This only works after play_score because SoundManager clears
+        // the _entire_ timeline. The next version should keep track of
+        // scheduled IDs and only clear ones pertaining to music.
+        const score = SOUND_MANIFEST.scores[this.selected_melody];
+        CUES.unschedule_all();
+        CUES.schedule_notes(score);
       });
       return button;
     });
