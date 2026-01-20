@@ -25,9 +25,20 @@ describe("NoteStream", () => {
     it("with no notes returns empty array", () => {
       const stream = new NoteStream();
 
-      const result = stream.build();
+      const result = stream.build(0);
 
       expect(result).toEqual([]);
+    });
+
+    it("with no note end gracefully closes note at end of track", () => {
+      const stream = new NoteStream();
+      const velocity = Velocity.MF;
+
+      stream.process_message(0, MIDIMessage.note_on(0, C4, velocity));
+      const result = stream.build(4 * PPQ);
+
+      const expected = [[new Note(C4, N1), Rational.ZERO, N1]];
+      expect(result).toEqual(expected);
     });
 
     it("with four quarter notes returns four notes correctly", () => {
@@ -42,7 +53,7 @@ describe("NoteStream", () => {
       stream.process_message(3 * PPQ, MIDIMessage.note_off(0, C4));
       stream.process_message(3 * PPQ, MIDIMessage.note_on(0, C4, velocity));
       stream.process_message(4 * PPQ, MIDIMessage.note_off(0, C4));
-      const result = stream.build();
+      const result = stream.build(4 * PPQ);
 
       const expected = [
         [new Note(C4, N4), Rational.ZERO, N4],
@@ -61,7 +72,7 @@ describe("NoteStream", () => {
       stream.process_message(PPQ, MIDIMessage.note_on(0, C4, velocity));
       stream.process_message(2 * PPQ, MIDIMessage.note_off(0, C4, velocity));
       stream.process_message(3 * PPQ, MIDIMessage.note_off(0, C4, velocity));
-      const result = stream.build();
+      const result = stream.build(3 * PPQ);
 
       const expected = [
         [new Note(C4, N4), Rational.ZERO, N4],
@@ -78,7 +89,7 @@ describe("NoteStream", () => {
       stream.process_message(PPQ, MIDIMessage.note_off(0, C4));
       stream.process_message(2 * PPQ, MIDIMessage.note_on(0, C4, velocity));
       stream.process_message(3 * PPQ, MIDIMessage.note_off(0, C4));
-      const result = stream.build();
+      const result = stream.build(3 * PPQ);
 
       const expected = [
         [new Note(C4, N4), Rational.ZERO, N4],
