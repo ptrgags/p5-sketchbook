@@ -126,7 +126,7 @@ export class Parallel {
   get duration() {
     return this.children.reduce(
       (accum, x) => accum.max(x.duration),
-      Rational.ZERO
+      Rational.ZERO,
     );
   }
 }
