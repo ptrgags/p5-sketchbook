@@ -1,5 +1,5 @@
 import { Rational } from "../Rational.js";
-import { Gap, Parallel, Sequential, timeline_map } from "./Timeline.js";
+import { Gap, Parallel, Sequential } from "./Timeline.js";
 
 /**
  * @template T
@@ -17,8 +17,18 @@ export class AbsInterval {
     this.end_time = end_time;
     this.duration = end_time.sub(start_time);
   }
+
+  /**
+   * @returns {Generator<AbsInterval<T>>}
+   */
+  *[Symbol.iterator]() {
+    yield this;
+  }
 }
 
+/**
+ * @template T
+ */
 export class AbsGap {
   /**
    * A gap in the timeline.
@@ -29,6 +39,13 @@ export class AbsGap {
     this.start_time = start_time;
     this.end_time = end_time;
     this.duration = end_time.sub(start_time);
+  }
+
+  /**
+   * @returns {Generator<AbsInterval<T>>}
+   */
+  *[Symbol.iterator]() {
+    return;
   }
 }
 
@@ -52,6 +69,15 @@ export class AbsSequential {
     }
 
     this.duration = this.end_time.sub(this.start_time);
+  }
+
+  /**
+   * @returns {Generator<AbsInterval<T>>}
+   */
+  *[Symbol.iterator]() {
+    for (const child of this.children) {
+      yield* child;
+    }
   }
 }
 
@@ -80,6 +106,15 @@ export class AbsParallel {
     }
 
     this.duration = this.end_time.sub(this.start_time);
+  }
+
+  /**
+   * @returns {Generator<AbsInterval<T>>}
+   */
+  *[Symbol.iterator]() {
+    for (const child of this.children) {
+      yield* child;
+    }
   }
 }
 

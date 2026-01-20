@@ -162,32 +162,3 @@ export function timeline_map(f, timeline) {
   // if it's none of the above, then it's a plain T
   return f(timeline);
 }
-
-/**
- * Take a timeline and return a list of events with absolute start/end times.
- * @template {TimeInterval} T
- * @param {Rational} offset Offset for the first event
- * @param {Timeline<T>} timeline
- * @returns {[T, Rational, Rational][]}
- */
-export function to_events(offset, timeline) {
-  if (timeline instanceof Gap) {
-    return [];
-  } else if (timeline instanceof Sequential) {
-    let start = offset;
-    const results = [];
-    for (const child of timeline.children) {
-      const events = to_events(start, child);
-      results.push(...events);
-      start = start.add(child.duration);
-    }
-    return results;
-  } else if (timeline instanceof Parallel) {
-    return timeline.children.flatMap((x) => to_events(offset, x));
-  } else {
-    // Plain interval
-    const start = offset;
-    const end = start.add(timeline.duration);
-    return [[timeline, start, end]];
-  }
-}
