@@ -1,6 +1,7 @@
 import { Rational } from "../Rational.js";
 import { REST } from "./pitches.js";
 import { Gap, Parallel, Sequential, timeline_map } from "./Timeline.js";
+import { Velocity } from "./Velocity.js";
 
 /**
  * Pitched note. The choice of pitch space can vary
@@ -11,10 +12,12 @@ export class Note {
    * Constructor
    * @param {P} pitch Pitch
    * @param {Rational} duration The duration
+   * @param {number} [velocity=Velocity.MF] Note velocity in [0, 127]
    */
-  constructor(pitch, duration) {
+  constructor(pitch, duration, velocity = Velocity.MF) {
     this.pitch = pitch;
     this.duration = duration;
+    this.velocity = velocity;
   }
 
   /**
@@ -108,6 +111,6 @@ export function parse_cycle(cycle_length, notes) {
 export function map_pitch(pitch_func, music) {
   return timeline_map(
     (note) => new Note(pitch_func(note.pitch), note.duration),
-    music
+    music,
   );
 }
