@@ -59,6 +59,5 @@ export class BasicSynth {
     if (this.synth) {
       this.synth.dispose();
     }
-    throw new Error("Method not implemented.");
   }
 }

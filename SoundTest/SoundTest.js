@@ -29,6 +29,7 @@ import {
   layered_melody,
   phase_scale,
   symmetry_melody,
+  organ_chords,
 } from "./example_scores.js";
 import { Piano } from "./Piano.js";
 import { SpiralBurst } from "./SpiralBurst.js";
@@ -44,6 +45,7 @@ const SOUND_MANIFEST = {
     phase_scale: phase_scale(),
     symmetry_melody: symmetry_melody(),
     binary_progression: binary_chords(),
+    organ_chords: organ_chords(),
   },
 };
 
@@ -86,7 +88,7 @@ class MelodyButtonDescriptor {
   }
 }
 
-const MELODY_BUTTONS = new Grid(2, 2);
+const MELODY_BUTTONS = new Grid(3, 2);
 MELODY_BUTTONS.set(
   new Index2D(0, 0),
   new MelodyButtonDescriptor("layered_melody", "Layered Melody")
@@ -103,11 +105,15 @@ MELODY_BUTTONS.set(
   new Index2D(1, 1),
   new MelodyButtonDescriptor("binary_progression", "4-bit Chords")
 );
+MELODY_BUTTONS.set(
+  new Index2D(2, 0),
+  new MelodyButtonDescriptor("organ_chords", "Organ Test Chords")
+);
 
 const MELODY_BUTTON_SIZE = 150;
 const MELODY_BUTTON_DIMENSIONS = new Direction(
   MELODY_BUTTON_SIZE,
-  MELODY_BUTTON_SIZE / 2
+  MELODY_BUTTON_SIZE / 3
 );
 const MELODY_BUTTON_CENTER_OFFSET = MELODY_BUTTON_DIMENSIONS.scale(0.5);
 const TEXT_STYLE = new TextStyle(16, "center", "center");
@@ -133,6 +139,9 @@ const [FIRST_BUTTON_POSITION, BUTTON_STRIDE] = MELODY_BUTTONS.compute_layout(
  */
 function make_button_labels(buttons) {
   const primitives = buttons.map_array((index, descriptor) => {
+    if (!descriptor) {
+      return GroupPrimitive.EMPTY;
+    }
     const offset = FIRST_BUTTON_POSITION.add(MELODY_BUTTON_CENTER_OFFSET);
     const position_world = index.to_world(offset, BUTTON_STRIDE);
     return new TextPrimitive(descriptor.label, position_world);
