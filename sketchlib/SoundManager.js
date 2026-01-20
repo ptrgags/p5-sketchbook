@@ -3,10 +3,13 @@ import { BasicSynth } from "./instruments/BasicSynth.js";
 import { DrawbarOrgan, Drawbars } from "./instruments/DrawbarOrgan.js";
 import { FMSynth } from "./instruments/FMSynth.js";
 import { WaveStack } from "./instruments/Wavestack.js";
+import { AbsTimelineOps } from "./music/AbsTimeline.js";
 import { Note } from "./music/Music.js";
 import { Score } from "./music/Score.js";
 import { Rational } from "./Rational.js";
 import { compile_score } from "./tone_helpers/compile_music.js";
+import { to_tone_time } from "./tone_helpers/to_tone_time.js";
+import { ToneClip } from "./tone_helpers/tone_clips.js";
 
 /**
  * @typedef {{[id: string]: Score}} ScoreDeclarations
@@ -57,16 +60,16 @@ export class SoundManager {
     this.current_bg_score = undefined;
     /**
      * Compiled background scores
-     * @type {{[score_id: string]: CompiledScore}}
+     * @type {{[score_id: string]: import("./music/AbsTimeline.js").AbsTimeline<ToneClip>}}
      */
     this.bg_scores = {};
 
     // SFX management =================================================
 
     /**
-     * @type {{[sfx_id: string]: CompiledScore}}
+     * @type {{[sfx_id: string]: import("./music/AbsTimeline.js").AbsTimeline<ToneClip>}}
      */
-    this.sfx = {};
+    this.sfx_scores = {};
   }
 
   async init() {
@@ -190,7 +193,7 @@ export class SoundManager {
    */
   register_score(score_id, score) {
     const compiled = compile_score(this.tone, this.synths, score);
-    this.scores[score_id] = compiled;
+    this.bg_scores[score_id] = AbsTimelineOps.from_relative(compiled);
   }
 
   /**
@@ -201,7 +204,7 @@ export class SoundManager {
    */
   register_sfx(sfx_id, score) {
     const compiled = compile_score(this.tone, this.synths, score);
-    this.sfx[sfx_id] = compiled;
+    this.sfx_scores[sfx_id] = AbsTimelineOps.from_relative(compiled);
   }
 
   stop_the_music() {
@@ -214,7 +217,7 @@ export class SoundManager {
    * @param {string} score_id ID of a score registered when initializing the sound system.
    */
   play_score(score_id) {
-    const score = this.scores[score_id];
+    const score = this.bg_scores[score_id];
     if (score === undefined) {
       throw new Error(`can't play unregistered score ${score_id}`);
     }
@@ -224,9 +227,8 @@ export class SoundManager {
 
     const transport = this.tone.getTransport();
 
-    const schedule = schedule_clips(Rational.ZERO, score);
-    for (const [clip, start_time, end_time] of schedule) {
-      clip.material.start(start_time).stop(end_time);
+    for (const clip of score) {
+      clip.value.material.start(clip.start_time).stop(clip.end_time);
     }
 
     transport.position = 0;
@@ -235,20 +237,25 @@ export class SoundManager {
     this.transport_playing = true;
   }
 
+  /**
+   *
+   * @param {string} sfx_id ID of the SFX
+   */
   play_sfx(sfx_id) {
-    const sfx_score = this.sfx[sfx_id];
+    const sfx_score = this.sfx_scores[sfx_id];
     if (sfx_score === undefined) {
       throw new Error(`can't play unregistered SFX ${sfx_id}`);
     }
 
-    const schedule = schedule_clips(Rational.ZERO, sfx_score);
     const A_LITTLE_BIT = 0; //0.05;
     const now = this.tone.now() + A_LITTLE_BIT;
-    for (const [clip, start_time, end_time] of schedule) {
-      const start = this.tone.Time(start_time).toSeconds();
-      const end = this.tone.Time(end_time).toSeconds();
+    for (const clip of sfx_score) {
+      const start_time = to_tone_time(clip.start_time);
+      const end_time = to_tone_time(clip.end_time);
+      const start_sec = now + this.tone.Time(start_time).toSeconds();
+      const end_sec = now + this.tone.Time(end_time).toSeconds();
       try {
-        clip.material.start(now + start).stop(now + end);
+        clip.value.material.start(start_sec).stop(end_sec);
       } catch (e) {
         console.error("scheduling error", e);
       }
