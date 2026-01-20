@@ -5,11 +5,8 @@ import { FMSynth } from "./instruments/FMSynth.js";
 import { WaveStack } from "./instruments/Wavestack.js";
 import { Note } from "./music/Music.js";
 import { Score } from "./music/Score.js";
-import { to_events } from "./music/Timeline.js";
 import { Rational } from "./Rational.js";
 import { compile_score } from "./tone_helpers/compile_music.js";
-import { to_tone_time } from "./tone_helpers/to_tone_time.js";
-import { schedule_clips } from "./tone_helpers/schedule_music.js";
 
 /**
  * @typedef {{[id: string]: Score}} ScoreDeclarations
@@ -30,13 +27,6 @@ const DEFAULT_BPM = 128;
  * }} CompiledPart
  *
  * @typedef {{[score_id: string]: CompiledPart[]}} CompiledScore
- *
- * @typedef {{
- *  instrument_id: string,
- *  note: Note<number>,
- *  start_time: Rational,
- *  end_time: Rational
- * }} NoteEventDetail
  */
 
 /**
@@ -50,23 +40,32 @@ export class SoundManager {
    */
   constructor(tone_module, manifest) {
     this.tone = tone_module;
-
     this.manifest = manifest;
 
     this.init_requested = false;
     this.audio_ready = false;
     this.transport_playing = false;
 
-    // these may be stored a different way
-    this.synths = {};
-    this.patterns = {};
+    // Instrument management ===========================================
 
-    this.current_score = undefined;
-    this.scores = {};
+    // Map of instrument id -> Tone instrument. This will change a bit
+    // soon.
+    this.synths = {};
+
+    // Background music management ====================================
+
+    this.current_bg_score = undefined;
     /**
-     * @type {CompiledScore}
+     * Compiled background scores
+     * @type {{[score_id: string]: CompiledScore}}
      */
-    this.score_note_events = {};
+    this.bg_scores = {};
+
+    // SFX management =================================================
+
+    /**
+     * @type {{[sfx_id: string]: CompiledScore}}
+     */
     this.sfx = {};
   }
 
@@ -192,15 +191,6 @@ export class SoundManager {
   register_score(score_id, score) {
     const compiled = compile_score(this.tone, this.synths, score);
     this.scores[score_id] = compiled;
-
-    const score_events = [];
-    for (const part of score.parts) {
-      score_events.push({
-        instrument_id: part.instrument_id,
-        events: to_events(Rational.ZERO, part.music),
-      });
-    }
-    this.score_note_events[score_id] = score_events;
   }
 
   /**
