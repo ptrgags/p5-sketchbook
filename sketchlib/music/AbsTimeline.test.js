@@ -22,6 +22,62 @@ function stub_interval(duration, value) {
   };
 }
 
+describe("AbsParallel", () => {
+  it("constructor with intervals with different start times throws error", () => {
+    expect(() => {
+      return new AbsParallel(
+        new AbsInterval(1, Rational.ZERO, Rational.ONE),
+        new AbsInterval(2, Rational.ONE, new Rational(2)),
+      );
+    }).toThrowError("children must all start at the same time");
+  });
+
+  it("start_time returns the start time of the children", () => {
+    const timeline = new AbsParallel(
+      new AbsInterval(1, new Rational(1, 2), Rational.ONE),
+      new AbsInterval(2, new Rational(1, 2), new Rational(2)),
+    );
+
+    expect(timeline.start_time).toBe(new Rational(1, 2));
+  });
+
+  it("end_time returns the max end time of the children", () => {
+    const timeline = new AbsParallel(
+      new AbsInterval(1, Rational.ZERO, Rational.ONE),
+      new AbsInterval(2, Rational.ZERO, new Rational(2)),
+    );
+
+    expect(timeline.end_time).toBe(new Rational(2));
+  });
+
+  it("duration is the duration of the longest child", () => {
+    const timeline = new AbsParallel(
+      new AbsInterval(1, Rational.ZERO, Rational.ONE),
+      new AbsInterval(2, Rational.ZERO, new Rational(2)),
+    );
+
+    expect(timeline.duration).toBe(new Rational(2));
+  });
+
+  it("iterator returns inner children in sorted order by start time", () => {
+    const timeline = new AbsParallel(
+      new AbsSequential(
+        new AbsGap(Rational.ZERO, new Rational(1, 2)),
+        new AbsInterval(2, new Rational(1, 2), Rational.ONE),
+      ),
+      new AbsInterval(1, Rational.ZERO, Rational.ONE),
+    );
+
+    const result = [...timeline];
+
+    const expected = [
+      new AbsInterval(1, Rational.ZERO, Rational.ONE),
+      new AbsInterval(2, new Rational(1, 2), Rational.ONE),
+    ];
+    expect(result).toEqual(expected);
+  });
+});
+
 describe("AbsTimelineOps", () => {
   describe("from_relative", () => {
     it("with Gap gives AbsGap", () => {

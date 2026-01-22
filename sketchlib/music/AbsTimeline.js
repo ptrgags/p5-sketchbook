@@ -92,7 +92,14 @@ export class AbsParallel {
   constructor(...children) {
     this.children = children;
 
-    // TODO: check that children all have the same start time?
+    if (
+      children.length > 0 &&
+      !children.every((x) => x.start_time.equals(children[0].start_time))
+    ) {
+      throw new Error(
+        "children of AbsParallel must all start at the same time",
+      );
+    }
 
     if (this.children.length > 0) {
       this.start_time = this.children[0].start_time;
