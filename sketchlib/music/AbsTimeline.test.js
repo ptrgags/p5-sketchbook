@@ -130,8 +130,8 @@ describe("AbsParallel", () => {
 
   it("end_time returns the max end time of the children", () => {
     const timeline = new AbsParallel(
-      new AbsInterval(1, Rational.ZERO, Rational.ONE),
-      new AbsInterval(2, Rational.ZERO, new Rational(2)),
+      new AbsInterval(1, Rational.ONE, new Rational(2)),
+      new AbsInterval(2, Rational.ONE, new Rational(2)),
     );
 
     expect(timeline.end_time).toEqual(new Rational(2));

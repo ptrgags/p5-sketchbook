@@ -124,7 +124,7 @@ export class AbsParallel {
     if (this.children.length > 0) {
       this.start_time = this.children[0].start_time;
       this.end_time = this.children.reduce(
-        (accum, x) => accum.max(x.duration),
+        (accum, x) => accum.max(x.end_time),
         Rational.ZERO,
       );
     } else {
