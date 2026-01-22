@@ -53,13 +53,13 @@ const SOUND_MANIFEST = {
 const PART_STYLES = Oklch.gradient(
   new Oklch(0.7, 0.1, 0),
   new Oklch(0.7, 0.1, 350),
-  5
+  5,
 ).map(
   (x) =>
     new Style({
       stroke: x.adjust_lightness(-0.2),
       fill: x,
-    })
+    }),
 );
 
 const RENDERED_TIMELINES = {};
@@ -70,7 +70,7 @@ for (const [key, score] of Object.entries(SOUND_MANIFEST.scores)) {
     Point.ORIGIN,
     score,
     MEASURE_DIMENSIONS,
-    PART_STYLES
+    PART_STYLES,
   );
 }
 
@@ -94,29 +94,29 @@ class MelodyButtonDescriptor {
 const MELODY_BUTTONS = new Grid(3, 2);
 MELODY_BUTTONS.set(
   new Index2D(0, 0),
-  new MelodyButtonDescriptor("layered_melody", "Layered Melody")
+  new MelodyButtonDescriptor("layered_melody", "Layered Melody"),
 );
 MELODY_BUTTONS.set(
   new Index2D(0, 1),
-  new MelodyButtonDescriptor("phase_scale", "Phase Scale")
+  new MelodyButtonDescriptor("phase_scale", "Phase Scale"),
 );
 MELODY_BUTTONS.set(
   new Index2D(1, 0),
-  new MelodyButtonDescriptor("symmetry_melody", "Symmetry Melody")
+  new MelodyButtonDescriptor("symmetry_melody", "Symmetry Melody"),
 );
 MELODY_BUTTONS.set(
   new Index2D(1, 1),
-  new MelodyButtonDescriptor("binary_progression", "4-bit Chords")
+  new MelodyButtonDescriptor("binary_progression", "4-bit Chords"),
 );
 MELODY_BUTTONS.set(
   new Index2D(2, 0),
-  new MelodyButtonDescriptor("organ_chords", "Organ Test Chords")
+  new MelodyButtonDescriptor("organ_chords", "Organ Test Chords"),
 );
 
 const MELODY_BUTTON_SIZE = 150;
 const MELODY_BUTTON_DIMENSIONS = new Direction(
   MELODY_BUTTON_SIZE,
-  MELODY_BUTTON_SIZE / 3
+  MELODY_BUTTON_SIZE / 3,
 );
 const MELODY_BUTTON_CENTER_OFFSET = MELODY_BUTTON_DIMENSIONS.scale(0.5);
 const TEXT_STYLE = new TextStyle(16, "center", "center");
@@ -126,13 +126,13 @@ const TEXT_COLOR = new Style({
 
 const GRID_BOUNDARY = new Rectangle(
   new Point(0, HEIGHT / 2),
-  new Direction(WIDTH, HEIGHT / 2)
+  new Direction(WIDTH, HEIGHT / 2),
 );
 const GRID_MARGIN = new Direction(75, 80);
 const [FIRST_BUTTON_POSITION, BUTTON_STRIDE] = MELODY_BUTTONS.compute_layout(
   GRID_BOUNDARY,
   MELODY_BUTTON_DIMENSIONS,
-  GRID_MARGIN
+  GRID_MARGIN,
 );
 
 /**
@@ -163,9 +163,9 @@ const TIMELINE_TOP = HEIGHT / 8;
 const CURSOR = style(
   new LinePrimitive(
     new Point(WIDTH / 2, TIMELINE_TOP),
-    new Point(WIDTH / 2, TIMELINE_TOP + HEIGHT / 4)
+    new Point(WIDTH / 2, TIMELINE_TOP + HEIGHT / 4),
   ),
-  Style.DEFAULT_STROKE
+  Style.DEFAULT_STROKE,
 );
 
 /**
@@ -211,7 +211,7 @@ async function import_midi_file(file_list) {
 
 const PIANO_BOUNDS = new Rectangle(
   new Point(0, 300),
-  new Direction(500, 300 / 3)
+  new Direction(500, 300 / 3),
 );
 
 class SoundScene {
@@ -231,18 +231,18 @@ class SoundScene {
       "change",
       (/** @type {CustomEvent}*/ e) => {
         this.sound.toggle_sound(e.detail.sound_on);
-      }
+      },
     );
 
     // This button is disabled until a score is selected.
     this.export_button = expect_element("export_clips", HTMLButtonElement);
     this.export_button.addEventListener("click", () =>
-      this.export_selected(MIDIExportFormat.CLIPS)
+      this.export_selected(MIDIExportFormat.CLIPS),
     );
 
     this.export_gm_button = expect_element("export_gm", HTMLButtonElement);
     this.export_gm_button.addEventListener("click", () =>
-      this.export_selected(MIDIExportFormat.GENERAL_MIDI)
+      this.export_selected(MIDIExportFormat.GENERAL_MIDI),
     );
 
     this.import_input = expect_element("import", HTMLInputElement);
@@ -267,10 +267,10 @@ class SoundScene {
     this.selected_melody = undefined;
 
     CUES.events.addEventListener("note-on", (/** @type {CustomEvent} */ e) => {
-      this.piano.trigger(e.detail.pitch);
+      this.piano.trigger(e.detail.value.pitch);
     });
     CUES.events.addEventListener("note-off", (/** @type {CustomEvent} */ e) => {
-      this.piano.release(e.detail.pitch);
+      this.piano.release(e.detail.value.pitch);
     });
 
     this.melody_buttons = melodies.map_array((index, descriptor) => {
@@ -308,14 +308,14 @@ class SoundScene {
 
     const midi = score_to_midi(
       SOUND_MANIFEST.scores[this.selected_melody],
-      export_format
+      export_format,
     );
 
     const suffix = export_format === MIDIExportFormat.CLIPS ? "clips" : "gm";
 
     const file = encode_midi_file(
       midi,
-      `${this.selected_melody}-${suffix}.mid`
+      `${this.selected_melody}-${suffix}.mid`,
     );
     download_file(file);
   }
@@ -347,7 +347,7 @@ class SoundScene {
       piano,
       timeline,
       CURSOR,
-      burst
+      burst,
     );
   }
 
@@ -403,7 +403,7 @@ export const sketch = (p) => {
       HEIGHT,
       undefined,
       // @ts-ignore
-      document.getElementById("sketch-canvas")
+      document.getElementById("sketch-canvas"),
     ).elt;
 
     MOUSE.setup(canvas);

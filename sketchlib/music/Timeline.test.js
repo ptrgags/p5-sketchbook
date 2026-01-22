@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { Rational } from "../Rational";
-import { Gap, Parallel, Sequential, timeline_map, to_events } from "./Timeline";
+import { Gap, Parallel, Sequential, timeline_map } from "./Timeline";
 
 /**
  * Make an interval object for use in tests below
@@ -19,7 +19,7 @@ describe("Sequential", () => {
   it("duration computes sum of simple intervals", () => {
     const seq = new Sequential(
       stub_interval(new Rational(1, 1), 1),
-      stub_interval(new Rational(1, 2), 1)
+      stub_interval(new Rational(1, 2), 1),
     );
 
     const result = seq.duration;
@@ -34,9 +34,9 @@ describe("Sequential", () => {
       stub_interval(new Rational(1, 1), 1),
       new Sequential(
         stub_interval(new Rational(1, 2), 1),
-        stub_interval(new Rational(2, 1), 1)
+        stub_interval(new Rational(2, 1), 1),
       ),
-      stub_interval(new Rational(1, 2), 1)
+      stub_interval(new Rational(1, 2), 1),
     );
 
     const result = seq.duration;
@@ -114,7 +114,7 @@ describe("Parallel", () => {
   it("duration computes max of simple intervals", () => {
     const seq = new Parallel(
       stub_interval(new Rational(1, 1), 1),
-      stub_interval(new Rational(1, 2), 1)
+      stub_interval(new Rational(1, 2), 1),
     );
 
     const result = seq.duration;
@@ -128,9 +128,9 @@ describe("Parallel", () => {
       stub_interval(new Rational(1, 1), 1),
       new Parallel(
         stub_interval(new Rational(1, 2), 1),
-        stub_interval(new Rational(2, 1), 1)
+        stub_interval(new Rational(2, 1), 1),
       ),
-      stub_interval(new Rational(1, 2), 1)
+      stub_interval(new Rational(1, 2), 1),
     );
 
     const result = seq.duration;
@@ -146,12 +146,12 @@ describe("timeline_map", () => {
       new Sequential(
         stub_interval(new Rational(1, 2), 1),
         new Gap(new Rational(1, 4)),
-        stub_interval(new Rational(3, 1), 2)
+        stub_interval(new Rational(3, 1), 2),
       ),
       new Sequential(
         stub_interval(new Rational(4, 5), 3),
-        stub_interval(new Rational(1, 2), 4)
-      )
+        stub_interval(new Rational(1, 2), 4),
+      ),
     );
 
     const result = timeline_map((interval) => {
@@ -162,87 +162,13 @@ describe("timeline_map", () => {
       new Sequential(
         stub_interval(new Rational(1, 2), 11),
         new Gap(new Rational(1, 4)),
-        stub_interval(new Rational(3, 1), 12)
+        stub_interval(new Rational(3, 1), 12),
       ),
       new Sequential(
         stub_interval(new Rational(4, 5), 13),
-        stub_interval(new Rational(1, 2), 14)
-      )
+        stub_interval(new Rational(1, 2), 14),
+      ),
     );
-    expect(result).toEqual(expected);
-  });
-});
-
-describe("to_events", () => {
-  it("with Gap gives empty list", () => {
-    const result = to_events(Rational.ZERO, new Gap(Rational.ONE));
-
-    expect(result).toEqual([]);
-  });
-
-  it("With single interval gives single event", () => {
-    const duration = new Rational(1, 2);
-    const timeline = stub_interval(duration, 3);
-
-    const result = to_events(Rational.ZERO, timeline);
-
-    const expected = [[timeline, Rational.ZERO, duration]];
-    expect(result).toEqual(expected);
-  });
-
-  it("with offset schedules event with times offset", () => {
-    const timeline = stub_interval(Rational.ONE, 3);
-    const offset = new Rational(1, 4);
-
-    const result = to_events(offset, timeline);
-
-    const expected = [[timeline, offset, new Rational(5, 4)]];
-    expect(result).toEqual(expected);
-  });
-
-  it("schedules sequential timeline with correct timing", () => {
-    const timeline1 = stub_interval(Rational.ONE, 1);
-    const timeline2 = stub_interval(new Rational(1, 2), 2);
-    const timeline = new Sequential(timeline2, timeline1, timeline2);
-
-    const result = to_events(Rational.ZERO, timeline);
-
-    const expected = [
-      [timeline2, Rational.ZERO, new Rational(1, 2)],
-      [timeline1, new Rational(1, 2), new Rational(3, 2)],
-      [timeline2, new Rational(3, 2), new Rational(2)],
-    ];
-    expect(result).toEqual(expected);
-  });
-
-  it("with sequential timeline produces one event per child", () => {
-    const timeline1 = stub_interval(Rational.ONE, 1);
-    const timeline2 = stub_interval(new Rational(1, 2), 2);
-    const timeline = new Sequential(timeline2, timeline1, timeline2);
-    const offset = new Rational(1, 2);
-
-    const result = to_events(offset, timeline);
-
-    const expected = [
-      [timeline2, offset, Rational.ONE],
-      [timeline1, Rational.ONE, new Rational(2)],
-      [timeline2, new Rational(2), new Rational(5, 2)],
-    ];
-    expect(result).toEqual(expected);
-  });
-
-  it("with parallel timeline produces one event per child", () => {
-    const timeline1 = stub_interval(Rational.ONE, 1);
-    const timeline2 = stub_interval(new Rational(1, 2), 2);
-    const timeline = new Parallel(timeline1, timeline2, timeline2);
-
-    const result = to_events(Rational.ZERO, timeline);
-
-    const expected = [
-      [timeline1, Rational.ZERO, Rational.ONE],
-      [timeline2, Rational.ZERO, new Rational(1, 2)],
-      [timeline2, Rational.ZERO, new Rational(1, 2)],
-    ];
     expect(result).toEqual(expected);
   });
 });

@@ -1,7 +1,7 @@
 import { Rational } from "../Rational.js";
-import { to_tone_time } from "../tone_helpers/measure_notation.js";
+import { to_tone_time } from "../tone_helpers/to_tone_time.js";
+import { AbsTimelineOps } from "./AbsTimeline.js";
 import { Score } from "./Score.js";
-import { to_events } from "./Timeline.js";
 
 export class Cue {
   /**
@@ -25,12 +25,10 @@ export class Cue {
     const note_on = [];
     const note_off = [];
     for (const part of score.parts) {
-      for (const [note, start_time, end_time] of to_events(
-        Rational.ZERO,
-        part.music
-      )) {
-        const note_on_cue = new Cue(start_time, note);
-        const note_off_cue = new Cue(end_time, note);
+      const abs_part = AbsTimelineOps.from_relative(part.music);
+      for (const note of abs_part) {
+        const note_on_cue = new Cue(note.start_time, note);
+        const note_off_cue = new Cue(note.end_time, note);
         note_on.push(note_on_cue);
         note_off.push(note_off_cue);
       }
@@ -69,7 +67,7 @@ export class MusicalCues {
       const event_id = transport.schedule((time) => {
         draw.schedule(() => {
           this.events.dispatchEvent(
-            new CustomEvent(cue_id, { detail: cue.data })
+            new CustomEvent(cue_id, { detail: cue.data }),
           );
         }, time);
       }, to_tone_time(cue.time));

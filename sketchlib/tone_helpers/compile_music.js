@@ -2,7 +2,7 @@ import { Melody, Note, Rest, Harmony } from "../music/Music.js";
 import { Score } from "../music/Score.js";
 import { Gap, Parallel, Sequential, timeline_map } from "../music/Timeline.js";
 import { Rational } from "../Rational.js";
-import { to_tone_time } from "./measure_notation.js";
+import { to_tone_time } from "./to_tone_time.js";
 import { to_tone_pitch } from "./to_tone_pitch.js";
 import { make_part_clip, PartDescriptor, ToneClip } from "./tone_clips.js";
 
@@ -184,7 +184,7 @@ export function compile_score(tone, instruments, score) {
     const clip = compile_music(
       tone,
       instruments[part.instrument_id],
-      part.music
+      part.music,
     );
     clips.push(clip);
   }
