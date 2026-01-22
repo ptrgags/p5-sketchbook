@@ -8,7 +8,6 @@ import {
   AbsSequential,
   AbsTimelineOps,
 } from "./AbsTimeline.js";
-import { Zero } from "tone";
 
 /**
  * Make an interval object for use in tests below
@@ -38,7 +37,9 @@ describe("AbsSequential", () => {
         new AbsInterval(1, Rational.ZERO, Rational.ONE),
         new AbsInterval(2, new Rational(2), new Rational(3)),
       );
-    }).toThrowError("children intervals must not have gaps in between");
+    }).toThrowError(
+      "children of AbsSequential must not have any implicit gaps",
+    );
   });
 
   it("constructor with intervals listed out of order throws", () => {
@@ -47,7 +48,9 @@ describe("AbsSequential", () => {
         new AbsInterval(2, Rational.ONE, new Rational(2)),
         new AbsInterval(1, Rational.ZERO, Rational.ONE),
       );
-    }).toThrowError("children intervals must not have gaps in between");
+    }).toThrowError(
+      "children of AbsSequential must not have any implicit gaps",
+    );
   });
 
   it("start_time returns start time of first child", () => {
@@ -113,7 +116,7 @@ describe("AbsParallel", () => {
         new AbsInterval(1, Rational.ZERO, Rational.ONE),
         new AbsInterval(2, Rational.ONE, new Rational(2)),
       );
-    }).toThrowError("children must all start at the same time");
+    }).toThrowError("children of AbsParallel must all start at the same time");
   });
 
   it("start_time returns the start time of the children", () => {
@@ -122,7 +125,7 @@ describe("AbsParallel", () => {
       new AbsInterval(2, new Rational(1, 2), new Rational(2)),
     );
 
-    expect(timeline.start_time).toBe(new Rational(1, 2));
+    expect(timeline.start_time).toEqual(new Rational(1, 2));
   });
 
   it("end_time returns the max end time of the children", () => {
@@ -131,7 +134,7 @@ describe("AbsParallel", () => {
       new AbsInterval(2, Rational.ZERO, new Rational(2)),
     );
 
-    expect(timeline.end_time).toBe(new Rational(2));
+    expect(timeline.end_time).toEqual(new Rational(2));
   });
 
   it("duration is the duration of the longest child", () => {
@@ -140,7 +143,7 @@ describe("AbsParallel", () => {
       new AbsInterval(2, Rational.ZERO, new Rational(2)),
     );
 
-    expect(timeline.duration).toBe(new Rational(2));
+    expect(timeline.duration).toEqual(new Rational(2));
   });
 
   it("iterator returns inner children in sorted order by start time", () => {

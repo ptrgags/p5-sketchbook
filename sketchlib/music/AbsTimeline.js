@@ -50,6 +50,24 @@ export class AbsGap {
 }
 
 /**
+ * Check that each interval in a sequential timeline
+ * ends exactly when the next one begins.
+ * @template T
+ * @param {AbsTimeline<T>[]} timelines
+ */
+function assert_no_gaps(timelines) {
+  for (let i = 0; i < timelines.length - 1; i++) {
+    const current = timelines[i];
+    const next = timelines[i + 1];
+    if (!current.end_time.equals(next.start_time)) {
+      throw new Error(
+        "children of AbsSequential must not have any implicit gaps",
+      );
+    }
+  }
+}
+
+/**
  * @template T
  */
 export class AbsSequential {
@@ -59,6 +77,8 @@ export class AbsSequential {
    */
   constructor(...children) {
     this.children = children;
+
+    assert_no_gaps(children);
 
     if (this.children.length > 0) {
       this.start_time = this.children[0].start_time;
@@ -119,9 +139,12 @@ export class AbsParallel {
    * @returns {Generator<AbsInterval<T>>}
    */
   *[Symbol.iterator]() {
-    for (const child of this.children) {
-      yield* child;
-    }
+    const sorted_intervals = this.children
+      .flatMap((child) => {
+        return [...child];
+      })
+      .sort((a, b) => a.start_time.real - b.start_time.real);
+    yield* sorted_intervals;
   }
 }
 
