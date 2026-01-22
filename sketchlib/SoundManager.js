@@ -228,7 +228,9 @@ export class SoundManager {
     const transport = this.tone.getTransport();
 
     for (const clip of score) {
-      clip.value.material.start(clip.start_time).stop(clip.end_time);
+      const start = to_tone_time(clip.start_time);
+      const end = to_tone_time(clip.end_time);
+      clip.value.material.start(start).stop(end);
     }
 
     transport.position = 0;
