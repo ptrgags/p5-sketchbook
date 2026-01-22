@@ -61,17 +61,14 @@ describe("AbsTimelineOps", () => {
     it("schedules sequential timeline with correct timing", () => {
       const timeline1 = stub_interval(Rational.ONE, 1);
       const timeline2 = stub_interval(new Rational(1, 2), 2);
-      const timeline = new Sequential(timeline2, timeline1);
+      const timeline = new Sequential(timeline2, timeline1, timeline2);
 
       const result = AbsTimelineOps.from_relative(timeline, Rational.ZERO);
 
       const expected = new AbsSequential(
         new AbsInterval(timeline2, Rational.ZERO, new Rational(1, 2)),
         new AbsInterval(timeline1, new Rational(1, 2), new Rational(3, 2)),
-        new AbsSequential(
-          new AbsInterval(timeline2, new Rational(3, 2), new Rational(2)),
-          new AbsInterval(timeline1, new Rational(2), new Rational(3)),
-        ),
+        new AbsInterval(timeline2, new Rational(3, 2), new Rational(2)),
       );
       expect(result).toEqual(expected);
     });
@@ -84,7 +81,7 @@ describe("AbsTimelineOps", () => {
 
       const result = AbsTimelineOps.from_relative(timeline, offset);
 
-      const expected = new AbsParallel(
+      const expected = new AbsSequential(
         new AbsInterval(timeline2, offset, Rational.ONE),
         new AbsInterval(timeline1, Rational.ONE, new Rational(2)),
         new AbsInterval(timeline2, new Rational(2), new Rational(5, 2)),
@@ -92,16 +89,15 @@ describe("AbsTimelineOps", () => {
       expect(result).toEqual(expected);
     });
 
-    it("with parallel timeline produces one event per child", () => {
+    it("with parallel timeline produces AbsParallel with correct timing", () => {
       const timeline1 = stub_interval(Rational.ONE, 1);
       const timeline2 = stub_interval(new Rational(1, 2), 2);
-      const timeline = new Parallel(timeline1, timeline2, timeline2);
+      const timeline = new Parallel(timeline1, timeline2);
 
       const result = AbsTimelineOps.from_relative(timeline, Rational.ZERO);
 
       const expected = new AbsParallel(
         new AbsInterval(timeline1, Rational.ZERO, Rational.ONE),
-        new AbsInterval(timeline2, Rational.ZERO, new Rational(1, 2)),
         new AbsInterval(timeline2, Rational.ZERO, new Rational(1, 2)),
       );
       expect(result).toEqual(expected);
