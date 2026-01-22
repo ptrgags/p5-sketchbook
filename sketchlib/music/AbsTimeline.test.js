@@ -8,6 +8,7 @@ import {
   AbsSequential,
   AbsTimelineOps,
 } from "./AbsTimeline.js";
+import { Zero } from "tone";
 
 /**
  * Make an interval object for use in tests below
@@ -22,7 +23,90 @@ function stub_interval(duration, value) {
   };
 }
 
+describe("AbsSequential", () => {
+  it("constructor with no children sets start/end/duration to zero", () => {
+    const timeline = new AbsSequential();
+
+    expect(timeline.start_time).toEqual(Rational.ZERO);
+    expect(timeline.end_time).toEqual(Rational.ZERO);
+    expect(timeline.duration).toEqual(Rational.ZERO);
+  });
+
+  it("constructor with intervals with gaps throws", () => {
+    expect(() => {
+      return new AbsSequential(
+        new AbsInterval(1, Rational.ZERO, Rational.ONE),
+        new AbsInterval(2, new Rational(2), new Rational(3)),
+      );
+    }).toThrowError("children intervals must not have gaps in between");
+  });
+
+  it("constructor with intervals listed out of order throws", () => {
+    expect(() => {
+      return new AbsSequential(
+        new AbsInterval(2, Rational.ONE, new Rational(2)),
+        new AbsInterval(1, Rational.ZERO, Rational.ONE),
+      );
+    }).toThrowError("children intervals must not have gaps in between");
+  });
+
+  it("start_time returns start time of first child", () => {
+    const timeline = new AbsSequential(
+      new AbsInterval(1, Rational.ZERO, Rational.ONE),
+      new AbsInterval(2, Rational.ONE, new Rational(2)),
+      new AbsInterval(3, new Rational(2), new Rational(3)),
+    );
+
+    expect(timeline.start_time).toEqual(Rational.ZERO);
+  });
+
+  it("end_time returns end time of last child", () => {
+    const timeline = new AbsSequential(
+      new AbsInterval(1, Rational.ZERO, Rational.ONE),
+      new AbsInterval(2, Rational.ONE, new Rational(2)),
+      new AbsInterval(3, new Rational(2), new Rational(3)),
+    );
+
+    expect(timeline.end_time).toEqual(new Rational(3));
+  });
+
+  it("duration returns difference between end and start time", () => {
+    const timeline = new AbsSequential(
+      new AbsInterval(1, new Rational(1, 2), Rational.ONE),
+      new AbsInterval(2, Rational.ONE, new Rational(2)),
+      new AbsInterval(3, new Rational(2), new Rational(3)),
+    );
+
+    // 3 - 1/2 = 5/2
+    expect(timeline.duration).toEqual(new Rational(5, 2));
+  });
+
+  it("iterator returns inner intervals", () => {
+    const timeline = new AbsSequential(
+      new AbsInterval(1, new Rational(1, 2), Rational.ONE),
+      new AbsGap(Rational.ONE, new Rational(2)),
+      new AbsInterval(3, new Rational(2), new Rational(3)),
+    );
+
+    const result = [...timeline];
+
+    const expected = [
+      new AbsInterval(1, new Rational(1, 2), Rational.ONE),
+      new AbsInterval(3, new Rational(2), new Rational(3)),
+    ];
+    expect(result).toEqual(expected);
+  });
+});
+
 describe("AbsParallel", () => {
+  it("constructor with no children sets start/end/duration to zero", () => {
+    const timeline = new AbsParallel();
+
+    expect(timeline.start_time).toEqual(Rational.ZERO);
+    expect(timeline.end_time).toEqual(Rational.ZERO);
+    expect(timeline.duration).toEqual(Rational.ZERO);
+  });
+
   it("constructor with intervals with different start times throws error", () => {
     expect(() => {
       return new AbsParallel(
