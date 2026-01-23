@@ -238,7 +238,9 @@ export class AbsTimelineOps {
       return intervals[0];
     }
 
-    const sorted_intervals = intervals.slice().sort();
+    const sorted_intervals = intervals
+      .slice()
+      .sort((a, b) => a.start_time.real - b.start_time.real);
 
     return sorted_intervals.reduce(
       (acc, interval) => merge_interval(acc, interval),
