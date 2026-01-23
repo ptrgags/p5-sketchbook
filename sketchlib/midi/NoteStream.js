@@ -21,7 +21,7 @@ export class NoteStream {
     this.partial_message = undefined;
 
     /**
-     * @type {[Note, Rational, Rational][]}
+     * @type {AbsInterval<Note<number>>[]}
      */
     this.notes = [];
   }
@@ -59,11 +59,13 @@ export class NoteStream {
     const [start_ticks, pitch, velocity] = this.partial_message;
     const duration_ticks = abs_ticks - start_ticks;
     const note = new Note(pitch, this.to_measures(duration_ticks), velocity);
-    this.notes.push([
-      note,
-      this.to_measures(start_ticks),
-      this.to_measures(abs_ticks),
-    ]);
+    this.notes.push(
+      new AbsInterval(
+        note,
+        this.to_measures(start_ticks),
+        this.to_measures(abs_ticks),
+      ),
+    );
     this.partial_message = undefined;
   }
 

@@ -11,9 +11,8 @@ import { MIDIEvent, MIDIMessage, MIDIMessageType } from "./MIDIEvent.js";
 import { NoteStream } from "./NoteStream.js";
 
 /**
- * @template P
- * @param {import("../music/AbsTimeline.js").AbsTimeline<Note<P>>} abs_music
- * @returns {import("../music/Timeline.js").Timeline<Note<P>>}
+ * @param {import("../music/AbsTimeline.js").AbsTimeline<Note<number>>} abs_music
+ * @returns {import("../music/Timeline.js").Timeline<Note<number>>}
  */
 function timeline_to_music(abs_music) {
   if (abs_music instanceof AbsInterval) {
