@@ -3,7 +3,7 @@ import { BasicSynth } from "./instruments/BasicSynth.js";
 import { DrawbarOrgan, Drawbars } from "./instruments/DrawbarOrgan.js";
 import { FMSynth } from "./instruments/FMSynth.js";
 import { WaveStack } from "./instruments/Wavestack.js";
-import { AbsTimelineOps } from "./music/AbsTimeline.js";
+import { AbsTimelineOps } from "./music/AbsTimelineOps.js";
 import { Note } from "./music/Music.js";
 import { Score } from "./music/Score.js";
 import { Rational } from "./Rational.js";

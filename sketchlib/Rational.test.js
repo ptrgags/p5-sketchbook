@@ -272,4 +272,106 @@ describe("Rational", () => {
       expect(result).toBe(true);
     });
   });
+
+  describe("lt", () => {
+    it("with equal fractions returns false", () => {
+      const a = new Rational(3, 4);
+
+      const result = a.lt(a);
+
+      expect(result).toBe(false);
+    });
+
+    it("with a negative fraction and zero returns correct ordering", () => {
+      const a = new Rational(-3, 4);
+      const zero = Rational.ZERO;
+
+      const a_lt_zero = a.lt(zero);
+      const zero_lt_a = zero.lt(a);
+
+      expect(a_lt_zero).toBe(true);
+      expect(zero_lt_a).toBe(false);
+    });
+
+    it("with two positive fractions returns correct ordering", () => {
+      const a = new Rational(3);
+      const b = new Rational(3, 4);
+
+      const a_lt_b = a.lt(b);
+      const b_lt_a = b.lt(a);
+
+      expect(a_lt_b).toBe(false);
+      expect(b_lt_a).toBe(true);
+    });
+
+    it("with two negative fractions returns correct ordering", () => {
+      const a = new Rational(-1);
+      const b = new Rational(4, -3);
+
+      const a_lt_b = a.lt(b);
+      const b_lt_a = b.lt(a);
+
+      expect(a_lt_b).toBe(false);
+      expect(b_lt_a).toBe(true);
+    });
+  });
+
+  describe("other comparisons", () => {
+    it("gt with the same value returns false", () => {
+      const a = new Rational(1, 2);
+
+      const result = a.gt(a);
+
+      expect(result).toBe(false);
+    });
+
+    it("gt gives the same result as lt with args swapped", () => {
+      const a = new Rational(1, 2);
+      const b = new Rational(-3, 4);
+
+      const a_gt_b = a.gt(b);
+      const b_lt_a = b.lt(a);
+
+      expect(a_gt_b).toBe(true);
+      expect(b_lt_a).toBe(true);
+    });
+
+    it("ge with the same value returns true", () => {
+      const a = new Rational(1, 2);
+
+      const result = a.gt(a);
+
+      expect(result).toBe(false);
+    });
+
+    it("le with the same value returns true", () => {
+      const a = new Rational(1, 2);
+
+      const result = a.gt(a);
+
+      expect(result).toBe(false);
+    });
+
+    it("le is the negation of gt", () => {
+      const a = new Rational(1, 2);
+      const b = new Rational(-3, 4);
+
+      const a_le_b = a.le(b);
+      const a_gt_b = a.gt(b);
+
+      expect(a_le_b).toBe(false);
+      expect(a_gt_b).toBe(true);
+    });
+
+    it("ge is le with the arguments swapped", () => {
+      const a = new Rational(1, 2);
+      const b = new Rational(-3, 4);
+
+      const a_gt_b = a.gt(b);
+      const b_lt_a = b.lt(a);
+
+      expect(a_gt_b).toBe(true);
+      expect(b_lt_a).toBe(true);
+    });
+  });
 });

@@ -174,6 +174,49 @@ export class Rational {
     // simple equality test
     return a === c && b === d;
   }
+
+  /**
+   * Check if this is strictly less than other. All the other
+   * comparisons are defined in terms of this one.
+   * @param {Rational} other The other rational number to check
+   * @returns {boolean} true if this < other
+   */
+  lt(other) {
+    const { numerator: a, denominator: b } = this;
+    const { numerator: c, denominator: d } = other;
+
+    // a/b < c/d is the same as saying
+    // ad < cb, so long as the denominators are nonnegative
+    // which is enforced by the constructor.
+    return a * d < c * b;
+  }
+
+  /**
+   * Greater than
+   * @param {Rational} other
+   * @returns {boolean}
+   */
+  gt(other) {
+    return other.lt(this);
+  }
+
+  /**
+   * Less than or equal
+   * @param {Rational} other
+   * @returns {boolean}
+   */
+  le(other) {
+    return !this.gt(other);
+  }
+
+  /**
+   * Greater than or equal to
+   * @param {Rational} other
+   * @returns {boolean}
+   */
+  ge(other) {
+    return !this.lt(other);
+  }
 }
 
 Rational.ZERO = Object.freeze(new Rational(0, 1));
