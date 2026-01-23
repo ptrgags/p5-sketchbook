@@ -119,16 +119,16 @@ function flatten_sequential(seq) {
 
   for (const child of seq.children) {
     let flat_child = child;
-    if (child instanceof Sequential) {
+    if (child instanceof AbsSequential) {
       flat_child = flatten_sequential(child);
-    } else if (child instanceof Parallel) {
+    } else if (child instanceof AbsParallel) {
       flat_child = flatten_parallel(child);
     }
 
-    if (flat_child instanceof Gap && flat_child.is_empty) {
+    if (flat_child instanceof AbsGap && flat_child.is_empty) {
       // filter out zero gaps
       continue;
-    } else if (flat_child instanceof Sequential) {
+    } else if (flat_child instanceof AbsSequential) {
       flattened.push(...flat_child.children);
     } else {
       flattened.push(flat_child);
@@ -160,9 +160,9 @@ function flatten_parallel(par) {
   for (const child of par.children) {
     let flat_child = child;
 
-    if (child instanceof Parallel) {
+    if (child instanceof AbsParallel) {
       flat_child = flatten_parallel(child);
-    } else if (child instanceof Sequential) {
+    } else if (child instanceof AbsSequential) {
       flat_child = flatten_sequential(child);
     }
 

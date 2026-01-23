@@ -310,7 +310,7 @@ describe("AbsTimelineOps", () => {
 
       const result = AbsTimelineOps.flatten(seq);
 
-      expect(result).toBe(Gap.ZERO);
+      expect(result).toBe(AbsGap.ZERO);
     });
 
     it("with AbsSequential with zero gaps filters out gaps", () => {
@@ -408,7 +408,7 @@ describe("AbsTimelineOps", () => {
 
       const result = AbsTimelineOps.flatten(seq);
 
-      expect(result).toBe(Gap.ZERO);
+      expect(result).toBe(AbsGap.ZERO);
     });
 
     it("with Parallel with zero gaps filters out gaps", () => {
