@@ -1,3 +1,4 @@
+import { AbsInterval } from "../music/AbsTimeline.js";
 import { Note } from "../music/Music.js";
 import { Rational } from "../Rational.js";
 import { MIDIMessage, MIDIMessageType } from "./MIDIEvent.js";
@@ -83,9 +84,9 @@ export class NoteStream {
   }
 
   /**
-   * Flush
+   * Complete the
    * @param {number} end_time Time of end of track message
-   * @returns {[Note, Rational, Rational][]} Sequence of absolute note events
+   * @returns {AbsInterval<Note<number>>[]} Sequence of absolute note events
    */
   build(end_time) {
     // Flush the note stream before returning the array
