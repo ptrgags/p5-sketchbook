@@ -176,12 +176,18 @@ export class Rational {
   }
 
   /**
-   * Check if this < other
+   * Check if this is strictly less than other
    * @param {Rational} other The other rational number to check
    * @returns {boolean} true if this < other
    */
   is_less_than(other) {
-    return false;
+    const { numerator: a, denominator: b } = this;
+    const { numerator: c, denominator: d } = other;
+
+    // a/b < c/d is the same as saying
+    // ad < cb, so long as the denominators are nonnegative
+    // which is enforced by the constructor.
+    return a * d < c * b;
   }
 }
 
