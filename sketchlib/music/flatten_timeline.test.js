@@ -67,7 +67,7 @@ describe("flatten_timeline", () => {
       Gap.ZERO,
       interval,
       interval,
-      Gap.ZERO
+      Gap.ZERO,
     );
 
     const result = flatten_timeline(seq);
@@ -84,7 +84,7 @@ describe("flatten_timeline", () => {
       interval2,
       new Sequential(interval1),
       new Sequential(interval2, interval2),
-      interval1
+      interval1,
     );
 
     const result = flatten_timeline(nested);
@@ -97,7 +97,7 @@ describe("flatten_timeline", () => {
       interval1,
       interval2,
       interval2,
-      interval1
+      interval1,
     );
 
     expect(result).toStrictEqual(expected);
@@ -120,7 +120,7 @@ describe("flatten_timeline", () => {
     expect(result).toBe(interval);
   });
 
-  it("with Parallel with single child returns child", () => {
+  it("flattens nested Absparallel", () => {
     const interval1 = stub_interval(1, N4);
     const interval2 = stub_interval(2, N2);
     const nested = new Parallel(
@@ -128,7 +128,7 @@ describe("flatten_timeline", () => {
       interval2,
       new Parallel(interval1),
       new Parallel(interval2, interval2),
-      interval1
+      interval1,
     );
 
     const result = flatten_timeline(nested);
@@ -141,7 +141,7 @@ describe("flatten_timeline", () => {
       interval1,
       interval2,
       interval2,
-      interval1
+      interval1,
     );
 
     expect(result).toStrictEqual(expected);
@@ -172,16 +172,16 @@ describe("flatten_timeline", () => {
       new Sequential(
         interval1,
         new Sequential(interval2, interval1),
-        interval1
+        interval1,
       ),
-      interval1
+      interval1,
     );
 
     const result = flatten_timeline(nested);
 
     const expected = new Parallel(
       new Sequential(interval1, interval2, interval1, interval1),
-      interval1
+      interval1,
     );
     expect(result).toStrictEqual(expected);
   });
@@ -191,14 +191,14 @@ describe("flatten_timeline", () => {
     const interval2 = stub_interval(2, N2);
     const nested = new Sequential(
       new Parallel(interval1, new Parallel(interval2, interval1), interval1),
-      interval1
+      interval1,
     );
 
     const result = flatten_timeline(nested);
 
     const expected = new Sequential(
       new Parallel(interval1, interval2, interval1, interval1),
-      interval1
+      interval1,
     );
     expect(result).toStrictEqual(expected);
   });
@@ -212,7 +212,7 @@ describe("flatten_timeline", () => {
       // The parallel is redundant, but puts a layer between the
       // sequentials
       new Parallel(new Sequential(interval2, interval2)),
-      new Sequential(interval1, interval1)
+      new Sequential(interval1, interval1),
     );
 
     const result = flatten_timeline(nested);
@@ -222,7 +222,7 @@ describe("flatten_timeline", () => {
       interval2,
       interval2,
       interval1,
-      interval1
+      interval1,
     );
     expect(result).toStrictEqual(expected);
   });
@@ -234,7 +234,7 @@ describe("flatten_timeline", () => {
     const nested = new Parallel(
       interval1,
       new Sequential(new Parallel(interval2, interval2)),
-      new Parallel(interval1, interval1)
+      new Parallel(interval1, interval1),
     );
 
     const result = flatten_timeline(nested);
@@ -244,7 +244,7 @@ describe("flatten_timeline", () => {
       interval2,
       interval2,
       interval1,
-      interval1
+      interval1,
     );
     expect(result).toStrictEqual(expected);
   });
@@ -256,7 +256,7 @@ describe("flatten_timeline", () => {
       Gap.ZERO,
       new Sequential(new Sequential()),
       new Parallel(new Sequential(), Gap.ZERO),
-      Gap.ZERO
+      Gap.ZERO,
     );
 
     const result = flatten_timeline(whole_lot_of_nothing);
