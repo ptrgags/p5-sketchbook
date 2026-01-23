@@ -1,6 +1,4 @@
-import { Abs } from "tone";
 import { Rational } from "../Rational.js";
-import { Gap, Parallel, Sequential } from "./Timeline.js";
 
 /**
  * @template T
