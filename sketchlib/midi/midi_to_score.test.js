@@ -44,6 +44,7 @@ describe("midi_to_score", () => {
 
     const expected_score = new Score(
       new Part("channel0", new Note(C4, N4), {
+        midi_channel: 0,
         instrument_id: "channel0",
       }),
     );
