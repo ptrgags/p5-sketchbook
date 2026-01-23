@@ -7,6 +7,7 @@ export class PartBuilder {
   /**
    * Part Builder
    * @param {number} channel MIDI channel number for this part
+   * @param {number} ticks_per_quarter number of MIDI ticks per quarter note
    */
   constructor(channel, ticks_per_quarter) {
     this.channel = channel;
@@ -39,6 +40,7 @@ export class PartBuilder {
    * Process a single message
    * @param {number} abs_tick
    * @param {MIDIMessage} message
+   * @returns {boolean} True if the message was processed. If false, the message was ignored.
    */
   process_message(abs_tick, message) {
     const { message_type, channel, data } = message;
@@ -50,7 +52,7 @@ export class PartBuilder {
         "program",
         ...data,
       );
-      return;
+      return false;
     }
 
     if (
@@ -58,10 +60,10 @@ export class PartBuilder {
       message_type === MIDIMessageType.NOTE_OFF
     ) {
       this.process_note(abs_tick, message);
-      return;
+      return true;
     }
 
-    console.log("ignoring channel message", abs_tick, message);
+    return false;
   }
 
   build() {
@@ -112,7 +114,10 @@ export class ScoreBuilder {
       );
     }
     const builder = this.part_builders.get(channel);
-    builder.process_message(abs_tick, message);
+    const processed = builder.process_message(abs_tick, message);
+    if (!processed) {
+      this.ignore(abs_tick, message);
+    }
   }
 
   /**
@@ -133,9 +138,17 @@ export class ScoreBuilder {
    * @returns {Score<number>}
    */
   build() {
-    if (this.ignored.length === 0) {
+    if (this.ignored.length > 0) {
       console.log("ignored:", this.ignored);
     }
-    return new Score();
+
+    const channels = [...this.part_builders.keys()].sort();
+    console.log("channels used:", channels);
+
+    return new Score(
+      ...channels.map((x) => {
+        return this.part_builders.get(x).build();
+      }),
+    );
   }
 }
