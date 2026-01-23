@@ -246,4 +246,160 @@ describe("AbsTimelineOps", () => {
       expect(result).toEqual(expected);
     });
   });
+
+  describe("from_intervals", () => {
+    it("with no intervals returns empty timeline", () => {
+      const result = AbsTimelineOps.from_intervals([]);
+
+      expect(result).toEqual(AbsGap.ZERO);
+    });
+
+    it("with single interval returns interval", () => {
+      const interval = new AbsInterval(1, Rational.ZERO, Rational.ONE);
+
+      const result = AbsTimelineOps.from_intervals([interval]);
+
+      expect(result).toBe(interval);
+    });
+
+    it("with two intervals that meet exactly returns AbsSequential", () => {
+      const intervals = [
+        new AbsInterval(1, Rational.ONE, new Rational(2)),
+        new AbsInterval(2, new Rational(2), new Rational(3)),
+      ];
+
+      const result = AbsTimelineOps.from_intervals(intervals);
+
+      const expected = new AbsSequential(
+        new AbsInterval(1, Rational.ONE, new Rational(2)),
+        new AbsInterval(2, new Rational(2), new Rational(3)),
+      );
+      expect(result).toEqual(expected);
+    });
+
+    it("with two intervals that are out of order returns AbsSequential in sorted order", () => {
+      const intervals = [
+        new AbsInterval(2, new Rational(2), new Rational(3)),
+        new AbsInterval(1, Rational.ONE, new Rational(2)),
+      ];
+
+      const result = AbsTimelineOps.from_intervals(intervals);
+
+      const expected = new AbsSequential(
+        new AbsInterval(1, Rational.ONE, new Rational(2)),
+        new AbsInterval(2, new Rational(2), new Rational(3)),
+      );
+      expect(result).toEqual(expected);
+    });
+
+    it("with two intervals with gap in between returns AbsSequential including gap", () => {
+      const intervals = [
+        new AbsInterval(1, Rational.ONE, new Rational(2)),
+        new AbsInterval(2, new Rational(3), new Rational(4)),
+      ];
+
+      const result = AbsTimelineOps.from_intervals(intervals);
+
+      const expected = new AbsSequential(
+        new AbsInterval(1, Rational.ONE, new Rational(2)),
+        new AbsGap(new Rational(2), new Rational(3)),
+        new AbsInterval(2, new Rational(3), new Rational(4)),
+      );
+      expect(result).toEqual(expected);
+    });
+
+    it("with two simultaneous intervals returns AbsParallel", () => {
+      const intervals = [
+        new AbsInterval(1, Rational.ONE, new Rational(2)),
+        new AbsInterval(2, Rational.ONE, new Rational(2)),
+      ];
+
+      const result = AbsTimelineOps.from_intervals(intervals);
+
+      const expected = new AbsParallel(
+        new AbsInterval(1, Rational.ONE, new Rational(2)),
+        new AbsInterval(2, Rational.ONE, new Rational(2)),
+      );
+      expect(result).toEqual(expected);
+    });
+
+    it("with partially overlapping intervals returns AbsParallel including explicit gap", () => {
+      const intervals = [
+        new AbsInterval(1, Rational.ONE, new Rational(2)),
+        new AbsInterval(2, new Rational(3, 2), new Rational(2)),
+      ];
+
+      const result = AbsTimelineOps.from_intervals(intervals);
+
+      const expected = new AbsParallel(
+        new AbsInterval(1, Rational.ONE, new Rational(2)),
+        new AbsSequential(
+          new AbsGap(Rational.ONE, new Rational(3, 2)),
+          new AbsInterval(2, new Rational(3, 2), new Rational(2)),
+        ),
+      );
+      expect(result).toEqual(expected);
+    });
+
+    it("with brick wall overlap returns AbsParallel with two lanes", () => {
+      // |   |   |   |   |
+      // 1-------
+      //     2-------
+      //         3-------
+      const intervals = [
+        new AbsInterval(1, Rational.ZERO, new Rational(2)),
+        new AbsInterval(2, Rational.ONE, new Rational(3)),
+        new AbsInterval(3, new Rational(2), new Rational(4)),
+      ];
+
+      const result = AbsTimelineOps.from_intervals(intervals);
+
+      // The third interval should slot in like this:
+      // |   |   |   |   |
+      // 1-------3-------
+      // ~~~~2-------
+      const expected = new AbsParallel(
+        new AbsSequential(
+          new AbsInterval(1, Rational.ZERO, new Rational(2)),
+          new AbsInterval(3, new Rational(2), new Rational(4)),
+        ),
+        new AbsSequential(
+          new AbsGap(Rational.ZERO, Rational.ONE),
+          new AbsInterval(2, Rational.ONE, new Rational(3)),
+        ),
+      );
+      expect(result).toEqual(expected);
+    });
+
+    it("with three overlapping intervals returns AbsParallel with three lanes", () => {
+      // |   |   |   |   |
+      // 1-----------
+      //     2-------
+      //         3-------
+      const intervals = [
+        new AbsInterval(1, Rational.ZERO, new Rational(3)),
+        new AbsInterval(2, Rational.ONE, new Rational(3)),
+        new AbsInterval(3, new Rational(2), new Rational(4)),
+      ];
+
+      const result = AbsTimelineOps.from_intervals(intervals);
+
+      // |   |   |   |   |
+      // 1-----------
+      // ~~~~2-------
+      // ~~~~~~~~3-------
+      const expected = new AbsParallel(
+        new AbsInterval(1, Rational.ZERO, new Rational(3)),
+        new AbsSequential(
+          new AbsGap(Rational.ZERO, Rational.ONE),
+          new AbsInterval(2, Rational.ONE, new Rational(3)),
+        ),
+        new AbsSequential(
+          new AbsGap(Rational.ZERO, new Rational(2)),
+          new AbsInterval(3, new Rational(2), new Rational(4)),
+        ),
+      );
+      expected(result).toEqual(expected);
+    });
+  });
 });

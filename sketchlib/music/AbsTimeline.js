@@ -48,6 +48,7 @@ export class AbsGap {
     return;
   }
 }
+AbsGap.ZERO = Object.freeze(new AbsGap(Rational.ZERO, Rational.ZERO));
 
 /**
  * Check that each interval in a sequential timeline
@@ -153,6 +154,19 @@ export class AbsParallel {
  * @typedef {AbsInterval<T> | AbsGap | AbsSequential<T> | AbsParallel<T>} AbsTimeline<T>
  */
 
+/**
+ * Merge an interval into a timeline, fitting it in as
+ * tightly as possible. This is intended to be used with
+ * a reduce call
+ * @template T
+ * @param {AbsTimeline<T>} timeline The accumulated timeline
+ * @param {AbsInterval<T>} interval The interval to merge in
+ * @returns {AbsTimeline<T>} The merged timeline
+ */
+function merge_interval(timeline, interval) {
+  return new AbsSequential(timeline, interval);
+}
+
 export class AbsTimelineOps {
   /**
    * @template {import("./Timeline.js").TimeInterval} T
@@ -186,5 +200,16 @@ export class AbsTimelineOps {
         start_time.add(rel_timeline.duration),
       );
     }
+  }
+
+  /**
+   * Take a list of intervals, and merge them into a single timeline.
+   * This is used e.g. for
+   * @template T
+   * @param {AbsInterval<T>[]} intervals Intervals to merge
+   * @return {AbsTimeline<T>}
+   */
+  static from_intervals(intervals) {
+    return AbsGap.ZERO;
   }
 }
