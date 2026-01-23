@@ -1,6 +1,6 @@
 import { Rational } from "../Rational.js";
 import { to_tone_time } from "../tone_helpers/to_tone_time.js";
-import { AbsTimelineOps } from "./AbsTimeline.js";
+import { AbsTimelineOps } from "./AbsTimelineOps.js";
 import { Score } from "./Score.js";
 
 export class Cue {

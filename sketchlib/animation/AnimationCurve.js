@@ -3,7 +3,7 @@ import { whole_fract } from "../whole_fract.js";
 import { Rational } from "../Rational.js";
 import { ParamCurve } from "./ParamCurve.js";
 import { PiecewiseLinear } from "./PiecewiseLinear.js";
-import { AbsTimelineOps } from "../music/AbsTimeline.js";
+import { AbsTimelineOps } from "../music/AbsTimelineOps.js";
 
 /**
  * Iterate over a collection of tweens, filling gaps with
