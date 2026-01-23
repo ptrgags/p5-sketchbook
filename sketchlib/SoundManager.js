@@ -167,6 +167,14 @@ export class SoundManager {
     this.synths.bell = bell.synth;
     this.synths.tick = tick.synth;
     this.synths.organ = organ.synth;
+
+    // TEMP: This should be an InstrumentMap in time
+    for (let i = 0; i < 16; i++) {
+      const midi_organ = new DrawbarOrgan(new Drawbars("00 8000 000"));
+      midi_organ.init_poly(this.tone);
+      midi_organ.volume = -18;
+      this.synths[`channel${i}`] = midi_organ.synth;
+    }
   }
 
   /**

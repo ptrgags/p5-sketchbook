@@ -252,9 +252,25 @@ class SoundScene {
         //@ts-ignore
         const [fname, midi_data] = await import_midi_file(e.target.files);
         const midi = decode_midi(midi_data);
+        console.log(midi.header);
         const score = midi_to_score(midi);
         console.log(midi);
         console.log(score);
+
+        const basename = fname.replace(/\.mid$/i, "");
+        const score_id = `imported_${basename}`;
+
+        // Tuck this away here for now...
+        SOUND_MANIFEST.scores[score_id] = score;
+
+        this.sound.register_score(score_id, score);
+        RENDERED_TIMELINES[score_id] = render_score(
+          Point.ORIGIN,
+          score,
+          MEASURE_DIMENSIONS,
+          PART_STYLES,
+        );
+        this.change_score(score_id);
       } catch (err) {
         console.error(err);
         show_error(err);
@@ -280,22 +296,25 @@ class SoundScene {
       const rectangle = new Rectangle(corner, MELODY_BUTTON_DIMENSIONS);
       const button = new TouchButton(rectangle);
       button.events.addEventListener("click", () => {
-        this.selected_melody = descriptor.id;
-        this.export_button.disabled = false;
-        this.export_gm_button.disabled = false;
-        this.piano.reset();
-
-        this.sound.play_score(this.selected_melody);
-
-        // This only works after play_score because SoundManager clears
-        // the _entire_ timeline. The next version should keep track of
-        // scheduled IDs and only clear ones pertaining to music.
-        const score = SOUND_MANIFEST.scores[this.selected_melody];
-        CUES.unschedule_all();
-        CUES.schedule_notes(score);
+        this.change_score(descriptor.id);
       });
       return button;
     });
+  }
+
+  change_score(score_id) {
+    this.selected_melody = score_id;
+    this.piano.reset();
+    this.sound.play_score(score_id);
+    this.export_button.disabled = false;
+    this.export_gm_button.disabled = false;
+
+    // TEMP: This only works after play_score because SoundManager clears
+    // the _entire_ timeline. The next version should keep track of
+    // scheduled IDs and only clear ones pertaining to music.
+    const score = SOUND_MANIFEST.scores[score_id];
+    CUES.unschedule_all();
+    CUES.schedule_notes(score);
   }
 
   /**
