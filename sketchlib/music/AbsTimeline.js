@@ -1,3 +1,4 @@
+import { Abs } from "tone";
 import { Rational } from "../Rational.js";
 import { Gap, Parallel, Sequential } from "./Timeline.js";
 
@@ -81,12 +82,17 @@ export class AbsSequential {
 
     assert_no_gaps(children);
 
+    /**
+     * @type {Rational}
+     */
+    this.start_time = Rational.ZERO;
+    /**
+     * @type {Rational}
+     */
+    this.end_time = Rational.ZERO;
     if (this.children.length > 0) {
       this.start_time = this.children[0].start_time;
       this.end_time = this.children.at(-1).end_time;
-    } else {
-      this.start_time = Rational.ZERO;
-      this.end_time = Rational.ZERO;
     }
 
     this.duration = this.end_time.sub(this.start_time);
@@ -122,15 +128,20 @@ export class AbsParallel {
       );
     }
 
+    /**
+     * @type {Rational}
+     */
+    this.start_time = Rational.ZERO;
+    /**
+     * @type {Rational}
+     */
+    this.end_time = Rational.ZERO;
     if (this.children.length > 0) {
       this.start_time = this.children[0].start_time;
       this.end_time = this.children.reduce(
         (accum, x) => accum.max(x.end_time),
         Rational.ZERO,
       );
-    } else {
-      this.start_time = Rational.ZERO;
-      this.end_time = Rational.ZERO;
     }
 
     this.duration = this.end_time.sub(this.start_time);
@@ -155,16 +166,86 @@ export class AbsParallel {
  */
 
 /**
+ * Concat timelines, adding an AbsGap in between if needed
+ * @template T
+ * @param {AbsTimeline<T>} a First timeline
+ * @param {AbsTimeline<T>} b second timeline
+ * @returns {AbsSequential<T>} The concatenated timeline
+ */
+function concat_timelines(a, b) {
+  if (a.end_time.equals(b.start_time)) {
+    return new AbsSequential(a, b);
+  }
+
+  const gap = new AbsGap(a.end_time, b.start_time);
+  return new AbsSequential(a, gap, b);
+}
+
+/**
+ * Fit an interval inside a parallel, in the first channel that fits.
+ * @template T
+ * @param {AbsParallel<T>} parallel The accumulator
+ * @param {AbsInterval<T>} interval The interval to add
+ */
+function fit_parallel(parallel, interval) {
+  for (const [i, child] of parallel.children.entries()) {
+    if (child.end_time.is_less_than(interval.start_time)) {
+      return new AbsParallel(
+        ...parallel.children.slice(0, i),
+        concat_timelines(child, interval),
+        ...parallel.children.slice(i + 1),
+      );
+    }
+  }
+
+  // There wasn't a free space, so add a new channel
+  return new AbsParallel(...parallel.children, interval);
+}
+
+/**
  * Merge an interval into a timeline, fitting it in as
  * tightly as possible. This is intended to be used with
- * a reduce call
+ * a reduce call.
+ *
+ * This assumes that the intervals are passed in sorted
+ * by start time
  * @template T
  * @param {AbsTimeline<T>} timeline The accumulated timeline
- * @param {AbsInterval<T>} interval The interval to merge in
+ * @param {AbsInterval<T>} interval The interval to merge in.
  * @returns {AbsTimeline<T>} The merged timeline
  */
 function merge_interval(timeline, interval) {
-  return new AbsSequential(timeline, interval);
+  // The calling function passes in AbsGap.ZERO to start
+  // the accumulator so the correct type is reduced
+  if (timeline.duration.equals(Rational.ZERO)) {
+    return interval;
+  }
+
+  // If there's no overlap, concatenate the timelines
+  // in an AbsSequential
+  if (!interval.start_time.is_less_than(timeline.end_time)) {
+    return concat_timelines(timeline, interval);
+  }
+
+  // If we got here, interval overlaps the timeline. We need
+  // to make the parallel, but the algorithm is different if
+  // we already had a parallel.
+  if (timeline instanceof AbsParallel) {
+    return fit_parallel(timeline, interval);
+  }
+
+  /**
+   * @type {AbsTimeline<T>}
+   */
+  let padded = interval;
+  if (!timeline.start_time.equals(interval.start_time)) {
+    padded = new AbsSequential(
+      new AbsGap(timeline.start_time, interval.start_time),
+      interval,
+    );
+  }
+
+  return new AbsParallel(timeline, padded);
 }
 
 export class AbsTimelineOps {
@@ -210,6 +291,17 @@ export class AbsTimelineOps {
    * @return {AbsTimeline<T>}
    */
   static from_intervals(intervals) {
-    return AbsGap.ZERO;
+    if (intervals.length === 0) {
+      return AbsGap.ZERO;
+    }
+
+    if (intervals.length === 1) {
+      return intervals[0];
+    }
+
+    return intervals.reduce(
+      (acc, interval) => merge_interval(acc, interval),
+      AbsGap.ZERO,
+    );
   }
 }

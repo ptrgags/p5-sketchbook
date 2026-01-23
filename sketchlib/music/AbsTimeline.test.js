@@ -399,7 +399,7 @@ describe("AbsTimelineOps", () => {
           new AbsInterval(3, new Rational(2), new Rational(4)),
         ),
       );
-      expected(result).toEqual(expected);
+      expect(result).toEqual(expected);
     });
   });
 });

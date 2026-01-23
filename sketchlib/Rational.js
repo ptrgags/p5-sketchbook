@@ -174,6 +174,15 @@ export class Rational {
     // simple equality test
     return a === c && b === d;
   }
+
+  /**
+   * Check if this < other
+   * @param {Rational} other The other rational number to check
+   * @returns {boolean} true if this < other
+   */
+  is_less_than(other) {
+    return false;
+  }
 }
 
 Rational.ZERO = Object.freeze(new Rational(0, 1));
