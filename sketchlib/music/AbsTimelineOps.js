@@ -46,7 +46,17 @@ function fit_parallel(parallel, interval) {
   }
 
   // There wasn't a free space, so add a new channel
-  return new AbsParallel(...parallel.children, interval);
+  if (parallel.start_time.equals(interval.start_time)) {
+    return new AbsParallel(...parallel.children, interval);
+  }
+
+  // The interval starts later than the start, so insert
+  // a gap in the start
+  const padded = new AbsSequential(
+    new AbsGap(parallel.start_time, interval.start_time),
+    interval,
+  );
+  return new AbsParallel(...parallel.children, padded);
 }
 
 /**
