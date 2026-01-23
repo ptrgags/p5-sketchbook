@@ -273,11 +273,11 @@ describe("Rational", () => {
     });
   });
 
-  describe("is_less_than", () => {
+  describe("lt", () => {
     it("with equal fractions returns false", () => {
       const a = new Rational(3, 4);
 
-      const result = a.is_less_than(a);
+      const result = a.lt(a);
 
       expect(result).toBe(false);
     });
@@ -286,8 +286,8 @@ describe("Rational", () => {
       const a = new Rational(-3, 4);
       const zero = Rational.ZERO;
 
-      const a_lt_zero = a.is_less_than(zero);
-      const zero_lt_a = zero.is_less_than(a);
+      const a_lt_zero = a.lt(zero);
+      const zero_lt_a = zero.lt(a);
 
       expect(a_lt_zero).toBe(true);
       expect(zero_lt_a).toBe(false);
@@ -297,8 +297,8 @@ describe("Rational", () => {
       const a = new Rational(3);
       const b = new Rational(3, 4);
 
-      const a_lt_b = a.is_less_than(b);
-      const b_lt_a = b.is_less_than(a);
+      const a_lt_b = a.lt(b);
+      const b_lt_a = b.lt(a);
 
       expect(a_lt_b).toBe(false);
       expect(b_lt_a).toBe(true);
@@ -308,8 +308,8 @@ describe("Rational", () => {
       const a = new Rational(-1);
       const b = new Rational(4, -3);
 
-      const a_lt_b = a.is_less_than(b);
-      const b_lt_a = b.is_less_than(a);
+      const a_lt_b = a.lt(b);
+      const b_lt_a = b.lt(a);
 
       expect(a_lt_b).toBe(false);
       expect(b_lt_a).toBe(true);
