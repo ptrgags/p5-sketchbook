@@ -36,6 +36,7 @@ import { SpiralBurst } from "./SpiralBurst.js";
 import { expect_element } from "../sketchlib/dom/expect_element.js";
 import { decode_midi } from "../sketchlib/midi/decode_midi.js";
 import { Cue, MusicalCues } from "../sketchlib/music/MusicalCues.js";
+import { midi_to_score } from "../sketchlib/midi/midi_to_score.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -205,7 +206,6 @@ async function import_midi_file(file_list) {
   const file = file_list[0];
   const fname = file.name;
   const buffer = await file.arrayBuffer();
-
   return [fname, buffer];
 }
 
@@ -252,7 +252,9 @@ class SoundScene {
         //@ts-ignore
         const [fname, midi_data] = await import_midi_file(e.target.files);
         const midi = decode_midi(midi_data);
+        const score = midi_to_score(midi);
         console.log(midi);
+        console.log(score);
       } catch (err) {
         console.error(err);
         show_error(err);
