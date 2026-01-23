@@ -1,4 +1,4 @@
-import { it, expect } from "vitest";
+import { describe, it, expect } from "vitest";
 import { Rational } from "../Rational.js";
 import {
   AbsGap,

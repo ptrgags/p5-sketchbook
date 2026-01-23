@@ -228,7 +228,9 @@ export class AbsTimelineOps {
       return intervals[0];
     }
 
-    return intervals.reduce(
+    const sorted_intervals = intervals.slice().sort();
+
+    return sorted_intervals.reduce(
       (acc, interval) => merge_interval(acc, interval),
       AbsGap.ZERO,
     );
