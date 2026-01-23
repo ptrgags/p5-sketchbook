@@ -44,7 +44,7 @@ function parse_midi_chunks(midi_buffer) {
       payload: new DataView(
         midi_buffer,
         offset + CHUNK_HEADER_LENGTH,
-        chunk_length
+        chunk_length,
       ),
     };
     chunks.push(chunk);
@@ -89,7 +89,7 @@ function parse_midi_header(chunk) {
 
   if (((ticks_per_quarter >> 7) & 1) !== 0) {
     throw new Error(
-      "SMTPE time codes are not supported. Please try a different file"
+      "SMTPE time codes are not supported. Please try a different file",
     );
   }
 
@@ -143,7 +143,7 @@ function parse_midi_track(chunk) {
 
     if (!is_status_byte && running_status === undefined) {
       throw new Error(
-        "Invalid MIDI message: first message does not have a status byte"
+        "Invalid MIDI message: first message does not have a status byte",
       );
     }
 
@@ -160,7 +160,7 @@ function parse_midi_track(chunk) {
     const [message, after_offset] = parse_midi_message(
       running_status,
       payload,
-      offset
+      offset,
     );
     offset = after_offset;
 
@@ -181,7 +181,7 @@ function parse_midi_track(chunk) {
 /**
  * Decode a MIDIFile from binary data
  * @param {ArrayBuffer} midi_buffer
- * @return {MIDIFile}
+ * @return {MIDIFile<RelativeTimingTrack>}
  */
 export function decode_midi(midi_buffer) {
   const [header_chunk, ...track_chunks] = parse_midi_chunks(midi_buffer);
