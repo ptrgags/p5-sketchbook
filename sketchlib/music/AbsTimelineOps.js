@@ -95,6 +95,88 @@ function merge_interval(timeline, interval) {
   return new AbsParallel(timeline, padded);
 }
 
+// helper functions for flatten --------------------------
+
+/**
+ * Flatten a sequential recursively, combining nested sequentials together.
+ * Mutually recursive with flatten_parallel
+ * @template T
+ * @param {AbsSequential<T>} seq Sequential timeline
+ * @returns {AbsTimeline<T>} The flattened timeline.
+ */
+function flatten_sequential(seq) {
+  const flattened = [];
+
+  for (const child of seq.children) {
+    let flat_child = child;
+    if (child instanceof Sequential) {
+      flat_child = flatten_sequential(child);
+    } else if (child instanceof Parallel) {
+      flat_child = flatten_parallel(child);
+    }
+
+    if (flat_child instanceof Gap && flat_child.is_empty) {
+      // filter out zero gaps
+      continue;
+    } else if (flat_child instanceof Sequential) {
+      flattened.push(...flat_child.children);
+    } else {
+      flattened.push(flat_child);
+    }
+  }
+
+  // Empty timeline, so return a zero gap
+  if (flattened.length === 0) {
+    return AbsGap.ZERO;
+  }
+
+  // If there's only one child, no need to wrap it in a Sequential
+  if (flattened.length === 1) {
+    return flattened[0];
+  }
+
+  return new AbsSequential(...flattened);
+}
+
+/**
+ * Flatten a parallel timeline, combining nested parallel timelines into
+ * a single Parallel. Mutually recursive with flatten_sequential
+ * @template T
+ * @param {AbsParallel<T>} par A parallel timeline
+ * @returns {AbsTimeline<T>} The flattened timeline
+ */
+function flatten_parallel(par) {
+  const flattened = [];
+  for (const child of par.children) {
+    let flat_child = child;
+
+    if (child instanceof Parallel) {
+      flat_child = flatten_parallel(child);
+    } else if (child instanceof Sequential) {
+      flat_child = flatten_sequential(child);
+    }
+
+    if (flat_child instanceof AbsGap && flat_child.is_empty) {
+      // Filter out zero gaps
+      continue;
+    } else if (flat_child instanceof AbsParallel) {
+      flattened.push(...flat_child.children);
+    } else {
+      flattened.push(flat_child);
+    }
+  }
+
+  if (flattened.length === 0) {
+    return AbsGap.ZERO;
+  }
+
+  if (flattened.length === 1) {
+    return flattened[0];
+  }
+
+  return new AbsParallel(...flattened);
+}
+
 export class AbsTimelineOps {
   /**
    * @template {import("./Timeline.js").TimeInterval} T
@@ -150,5 +232,23 @@ export class AbsTimelineOps {
       (acc, interval) => merge_interval(acc, interval),
       AbsGap.ZERO,
     );
+  }
+
+  /**
+   * Flatten a timeline, removing redundant uses of AbsSequential or AbsParallel
+   * @template T
+   * @param {AbsTimeline<T>} timeline The original timeline
+   * @returns {AbsTimeline<T>} The flattened timeline
+   */
+  static flatten(timeline) {
+    if (timeline instanceof AbsSequential) {
+      return flatten_sequential(timeline);
+    }
+
+    if (timeline instanceof AbsParallel) {
+      return flatten_parallel(timeline);
+    }
+
+    return timeline;
   }
 }
