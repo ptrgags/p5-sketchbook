@@ -1,4 +1,3 @@
-import { AbsInterval } from "../music/AbsTimeline.js";
 import { Note } from "../music/Music.js";
 import { Rational } from "../Rational.js";
 import { MIDIMessage, MIDIMessageType } from "./MIDIEvent.js";
@@ -21,7 +20,7 @@ export class NoteStream {
     this.partial_message = undefined;
 
     /**
-     * @type {AbsInterval<Note>[]}
+     * @type {[Note, Rational, Rational][]}
      */
     this.notes = [];
   }
@@ -59,13 +58,11 @@ export class NoteStream {
     const [start_ticks, pitch, velocity] = this.partial_message;
     const duration_ticks = abs_ticks - start_ticks;
     const note = new Note(pitch, this.to_measures(duration_ticks), velocity);
-    this.notes.push(
-      new AbsInterval(
-        note,
-        this.to_measures(start_ticks),
-        this.to_measures(abs_ticks),
-      ),
-    );
+    this.notes.push([
+      note,
+      this.to_measures(start_ticks),
+      this.to_measures(abs_ticks),
+    ]);
     this.partial_message = undefined;
   }
 
@@ -88,7 +85,7 @@ export class NoteStream {
   /**
    * Flush
    * @param {number} end_time Time of end of track message
-   * @returns {AbsInterval<Note>[]} Sequence of absolute note events
+   * @returns {[Note, Rational, Rational][]} Sequence of absolute note events
    */
   build(end_time) {
     // Flush the note stream before returning the array
