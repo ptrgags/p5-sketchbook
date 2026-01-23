@@ -36,7 +36,7 @@ function concat_timelines(a, b) {
  */
 function fit_parallel(parallel, interval) {
   for (const [i, child] of parallel.children.entries()) {
-    if (child.end_time.is_less_than(interval.start_time)) {
+    if (child.end_time.le(interval.start_time)) {
       return new AbsParallel(
         ...parallel.children.slice(0, i),
         concat_timelines(child, interval),
@@ -80,7 +80,7 @@ function merge_interval(timeline, interval) {
 
   // If there's no overlap, concatenate the timelines
   // in an AbsSequential
-  if (!interval.start_time.is_less_than(timeline.end_time)) {
+  if (!interval.start_time.lt(timeline.end_time)) {
     return concat_timelines(timeline, interval);
   }
 

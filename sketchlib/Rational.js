@@ -176,7 +176,8 @@ export class Rational {
   }
 
   /**
-   * Check if this is strictly less than other
+   * Check if this is strictly less than other. All the other
+   * comparisons are defined in terms of this one.
    * @param {Rational} other The other rational number to check
    * @returns {boolean} true if this < other
    */
@@ -193,7 +194,7 @@ export class Rational {
   /**
    * Greater than
    * @param {Rational} other
-   * @returns
+   * @returns {boolean}
    */
   gt(other) {
     return other.lt(this);
@@ -202,7 +203,7 @@ export class Rational {
   /**
    * Less than or equal
    * @param {Rational} other
-   * @returns
+   * @returns {boolean}
    */
   le(other) {
     return !this.gt(other);
@@ -211,7 +212,7 @@ export class Rational {
   /**
    * Greater than or equal to
    * @param {Rational} other
-   * @returns
+   * @returns {boolean}
    */
   ge(other) {
     return !this.lt(other);
