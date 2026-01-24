@@ -12,7 +12,7 @@ import { ScoreBuilder } from "./ScoreBuilder.js";
  * @returns {Score<number>}
  */
 export function midi_to_score(midi) {
-  const builder = new ScoreBuilder();
+  const builder = new ScoreBuilder(midi.header.ticks_per_quarter);
 
   if (midi.header.format !== MIDIFormat.SINGLE_TRACK) {
     throw new Error(

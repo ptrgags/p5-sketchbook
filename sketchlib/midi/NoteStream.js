@@ -6,10 +6,10 @@ import { MIDIHeader } from "./MIDIFile.js";
 
 export class NoteStream {
   /**
-   *
+   * Constructor
    * @param {number} ticks_per_quarter ticks per quarter for computing note durations
    */
-  constructor(ticks_per_quarter = MIDIHeader.DEFAULT_TICKS_PER_QUARTER) {
+  constructor(ticks_per_quarter) {
     this.ticks_per_quarter = ticks_per_quarter;
 
     /**

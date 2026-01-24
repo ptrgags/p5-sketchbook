@@ -128,6 +128,10 @@ export class PartBuilder {
 }
 
 export class ScoreBuilder {
+  /**
+   *
+   * @param {number} ticks_per_quarter Ticks per quarter in the file
+   */
   constructor(ticks_per_quarter) {
     this.ticks_per_quarter = ticks_per_quarter;
 
