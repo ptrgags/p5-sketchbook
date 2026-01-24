@@ -7,7 +7,13 @@ import { AbsTimelineOps } from "../music/AbsTimelineOps.js";
 import { Harmony, Melody, Note } from "../music/Music.js";
 import { Part, Score } from "../music/Score.js";
 import { Gap } from "../music/Timeline.js";
-import { MIDIEvent, MIDIMessage, MIDIMessageType } from "./MIDIEvent.js";
+import {
+  MIDIEvent,
+  MIDIMessage,
+  MIDIMessageType,
+  MIDIMetaEvent,
+  MIDIMetaType,
+} from "./MIDIEvent.js";
 import { NoteStream } from "./NoteStream.js";
 
 /**
@@ -168,6 +174,38 @@ export class ScoreBuilder {
   }
 
   /**
+   * Log some of the meta messages to learn about timing
+   * @param {number} abs_tick
+   * @param {MIDIMetaEvent} event
+   */
+  process_meta_message(abs_tick, event) {
+    const meta_type = event.meta_type;
+
+    if (meta_type === MIDIMetaType.SET_TEMPO) {
+      const [t0, t1, t2] = event.data;
+      const microsec_per_quarter = (t0 << 16) | (t1 << 8) | t2;
+      const MICROSEC_PER_MIN = 60e6;
+      const bpm = (1 / microsec_per_quarter) * MICROSEC_PER_MIN;
+      console.log(
+        "New Tempo:",
+        microsec_per_quarter,
+        " usec/quarter =",
+        bpm,
+        " bpm",
+      );
+    } else if (meta_type === MIDIMetaType.TIME_SIGNATURE) {
+      const [numerator, denominator_power, clocks_per_click, n32_per_quarter] =
+        event.data;
+      const denominator = 1 << denominator_power;
+      console.log(
+        `New Time Signature: ${numerator}/${denominator}, metronome click = ${clocks_per_click} clocks, 32nd notes per quarter: ${n32_per_quarter}`,
+      );
+    }
+
+    this.ignore(abs_tick, event);
+  }
+
+  /**
    * Process a single MIDI message
    * @param {number} abs_tick
    * @param {MIDIEvent} event
@@ -175,7 +213,10 @@ export class ScoreBuilder {
   process_event(abs_tick, event) {
     if (event instanceof MIDIMessage) {
       this.process_channel_message(event.channel, abs_tick, event);
+    } else if (event instanceof MIDIMetaEvent) {
+      this.process_meta_message(abs_tick, event);
     } else {
+      // sysex
       this.ignore(abs_tick, event);
     }
   }

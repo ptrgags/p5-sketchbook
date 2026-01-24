@@ -257,12 +257,14 @@ class SoundScene {
         console.log(midi);
         console.log(score);
 
+        /*
         const basename = fname.replace(/\.mid$/i, "");
         const score_id = `imported_${basename}`;
 
         // Tuck this away here for now...
         SOUND_MANIFEST.scores[score_id] = score;
 
+      
         this.sound.register_score(score_id, score);
         RENDERED_TIMELINES[score_id] = render_score(
           Point.ORIGIN,
@@ -271,6 +273,7 @@ class SoundScene {
           PART_STYLES,
         );
         this.change_score(score_id);
+        */
       } catch (err) {
         console.error(err);
         show_error(err);
