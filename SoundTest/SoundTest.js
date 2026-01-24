@@ -252,9 +252,8 @@ class SoundScene {
         //@ts-ignore
         const [fname, midi_data] = await import_midi_file(e.target.files);
         const midi = decode_midi(midi_data);
-        console.log(midi.header);
-        const score = midi_to_score(midi);
         console.log(midi);
+        const score = midi_to_score(midi);
         console.log(score);
 
         const basename = fname.replace(/\.mid$/i, "");
