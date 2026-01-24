@@ -170,10 +170,10 @@ export class SoundManager {
 
     // TEMP: This should be an InstrumentMap in time
     for (let i = 0; i < 16; i++) {
-      const midi_organ = new DrawbarOrgan(new Drawbars("00 8000 000"));
-      midi_organ.init_poly(this.tone);
-      midi_organ.volume = -18;
-      this.synths[`channel${i}`] = midi_organ.synth;
+      const tri = new BasicSynth("triangle");
+      tri.init_poly(this.tone);
+      tri.volume = -24;
+      this.synths[`channel${i}`] = tri.synth;
     }
   }
 
