@@ -87,9 +87,16 @@ function parse_midi_header(chunk) {
 
   console.info("MIDI format", format, "detected");
 
-  if (((ticks_per_quarter >> 7) & 1) !== 0) {
+  if (((ticks_per_quarter >> 15) & 1) !== 0) {
+    const smpte_format = ticks_per_quarter >> 8;
+    const ticks_per_frame = ticks_per_quarter & 0xff;
+    console.log(
+      ticks_per_quarter.toString(2),
+      `SMPTE format ${smpte_format}, ticks_per_frame = ${ticks_per_frame}`,
+    );
+
     throw new Error(
-      "SMTPE time codes are not supported. Please try a different file",
+      "SMPTE time codes are not supported. Please try a different file",
     );
   }
 
