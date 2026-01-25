@@ -12,6 +12,21 @@ export const A = 9;
 export const AS = 10;
 export const B = 11;
 
+export const PITCH_CLASS_NAMES = [
+  "C",
+  "C#",
+  "D",
+  "D#",
+  "E",
+  "F",
+  "F#",
+  "G",
+  "G#",
+  "A",
+  "A#",
+  "B",
+];
+
 // Undefined means rest
 export const REST = undefined;
 

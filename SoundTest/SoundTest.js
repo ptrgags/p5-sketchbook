@@ -41,6 +41,8 @@ import { Score } from "../sketchlib/music/Score.js";
 import { AbsTimelineOps } from "../sketchlib/music/AbsTimelineOps.js";
 import { Note } from "../sketchlib/music/Music.js";
 import { get_drum_name, MIDIDrum } from "../sketchlib/midi/MIDIDrum.js";
+import { PITCH_CLASS_NAMES } from "../sketchlib/music/pitches.js";
+import { MidiPitch } from "../sketchlib/music/pitch_conversions.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -219,6 +221,46 @@ const PIANO_BOUNDS = new Rectangle(
 );
 
 /**
+ *
+ * @param {import("../sketchlib/music/Music.js").Music<number>} music
+ */
+function gather_drums(music) {
+  const abs = AbsTimelineOps.from_relative(music);
+
+  const drums = new Set();
+  for (const interval of abs) {
+    /**
+     * @type {Note<number>}
+     */
+    const note = interval.value;
+    drums.add(note.pitch);
+  }
+
+  const names = [...drums].map(get_drum_name);
+  return names;
+}
+
+/**
+ *
+ * @param {import("../sketchlib/music/Music.js").Music<number>} music
+ */
+function gather_pitch_classes(music) {
+  const abs = AbsTimelineOps.from_relative(music);
+
+  const pitches = new Set();
+  for (const interval of abs) {
+    /**
+     * @type {Note<number>}
+     */
+    const note = interval.value;
+    pitches.add(MidiPitch.get_pitch_class(note.pitch));
+  }
+
+  const pitch_classes = [...pitches].map((x) => PITCH_CLASS_NAMES[x]);
+  return pitch_classes.sort();
+}
+
+/**
  * @param {Score<number>} score
  */
 function analyze_score(score) {
@@ -227,19 +269,12 @@ function analyze_score(score) {
   console.log("has drums:", has_drums);
 
   for (const part of score.parts) {
-    const abs = AbsTimelineOps.from_relative(part.music);
-
     if (part.midi_channel === 9) {
-      const drums_used = new Set();
-      for (const interval of abs) {
-        /**
-         * @type {Note<number>}
-         */
-        const drum_note = interval.value;
-        drums_used.add(drum_note.pitch);
-      }
-      const names = [...drums_used].map((x) => get_drum_name(x));
-      console.log("drums used:", names);
+      const drum_names = gather_drums(part.music);
+      console.log("drum names:", drum_names);
+    } else {
+      const pitch_classes = gather_pitch_classes(part.music);
+      console.log("channel", part.midi_channel, "pitches", pitch_classes);
     }
   }
 }
