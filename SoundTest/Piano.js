@@ -37,10 +37,10 @@ export class Piano {
     this.octave_pianos = new Array(this.num_octaves);
     for (let i = 0; i < num_octaves; i++) {
       const offset = bounding_rect.position.add(
-        Direction.DIR_X.scale(i * octave_width)
+        Direction.DIR_X.scale(i * octave_width),
       );
       this.octave_pianos[i] = new SingleOctavePiano(
-        new Rectangle(offset, octave_dimensions)
+        new Rectangle(offset, octave_dimensions),
       );
     }
   }
@@ -58,7 +58,7 @@ export class Piano {
       octave < this.octave_start ||
       octave >= this.octave_start + this.num_octaves
     ) {
-      console.warn("Triggering out-of-range note", octave);
+      //console.warn("Triggering out-of-range note", octave);
       return;
     }
 
@@ -80,7 +80,7 @@ export class Piano {
       octave < this.octave_start ||
       octave >= this.octave_start + this.num_octaves
     ) {
-      console.warn("Releasing out-of-range note", midi_note);
+      //console.warn("Releasing out-of-range note", midi_note);
       return;
     }
 
@@ -88,7 +88,7 @@ export class Piano {
     this.key_presses[midi_note]--;
 
     if (this.key_presses[midi_note] < 0) {
-      console.warn("more releases than triggers for note", midi_note);
+      //console.warn("more releases than triggers for note", midi_note);
     }
 
     if (this.key_presses[midi_note] <= 0) {

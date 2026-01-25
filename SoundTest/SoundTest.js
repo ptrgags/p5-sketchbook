@@ -36,6 +36,13 @@ import { SpiralBurst } from "./SpiralBurst.js";
 import { expect_element } from "../sketchlib/dom/expect_element.js";
 import { decode_midi } from "../sketchlib/midi/decode_midi.js";
 import { Cue, MusicalCues } from "../sketchlib/music/MusicalCues.js";
+import { midi_to_score } from "../sketchlib/midi/midi_to_score.js";
+import { Score } from "../sketchlib/music/Score.js";
+import { AbsTimelineOps } from "../sketchlib/music/AbsTimelineOps.js";
+import { Note } from "../sketchlib/music/Music.js";
+import { get_drum_name, MIDIDrum } from "../sketchlib/midi/MIDIDrum.js";
+import { PITCH_CLASS_NAMES } from "../sketchlib/music/pitches.js";
+import { MidiPitch } from "../sketchlib/music/pitch_conversions.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -53,7 +60,7 @@ const SOUND_MANIFEST = {
 const PART_STYLES = Oklch.gradient(
   new Oklch(0.7, 0.1, 0),
   new Oklch(0.7, 0.1, 350),
-  5,
+  16,
 ).map(
   (x) =>
     new Style({
@@ -205,7 +212,6 @@ async function import_midi_file(file_list) {
   const file = file_list[0];
   const fname = file.name;
   const buffer = await file.arrayBuffer();
-
   return [fname, buffer];
 }
 
@@ -213,6 +219,92 @@ const PIANO_BOUNDS = new Rectangle(
   new Point(0, 300),
   new Direction(500, 300 / 3),
 );
+
+/**
+ *
+ * @param {import("../sketchlib/music/Music.js").Music<number>} music
+ */
+function gather_drums(music) {
+  const abs = AbsTimelineOps.from_relative(music);
+
+  const drums = new Set();
+  for (const interval of abs) {
+    /**
+     * @type {Note<number>}
+     */
+    const note = interval.value;
+    drums.add(note.pitch);
+  }
+
+  const names = [...drums].map(get_drum_name);
+  return names;
+}
+
+class Histogram {
+  constructor() {
+    this.counts = new Map();
+  }
+
+  insert(key) {
+    if (!this.counts.has(key)) {
+      this.counts.set(key, 1);
+    } else {
+      this.counts.set(key, this.counts.get(key) + 1);
+    }
+  }
+}
+
+/**
+ *
+ * @param {import("../sketchlib/music/Music.js").Music<number>} music
+ */
+function gather_pitch_classes(music) {
+  const abs = AbsTimelineOps.from_relative(music);
+
+  const pitches = new Histogram();
+  for (const interval of abs) {
+    /**
+     * @type {Note<number>}
+     */
+    const note = interval.value;
+    pitches.insert(MidiPitch.get_pitch_class(note.pitch));
+  }
+
+  const result = {};
+  for (const [pitch, count] of pitches.counts.entries()) {
+    result[PITCH_CLASS_NAMES[pitch]] = count;
+  }
+
+  return result;
+}
+
+/**
+ * @param {Score<number>} score
+ */
+function analyze_score(score) {
+  // first of all, does it use drums?
+  const has_drums = score.parts.some((x) => x.midi_channel === 9);
+  console.log("has drums:", has_drums);
+
+  for (const part of score.parts) {
+    if (part.midi_channel === 9) {
+      const drum_names = gather_drums(part.music);
+      console.log("drum names:", drum_names);
+    } else {
+      const pitch_classes = gather_pitch_classes(part.music);
+      console.log("channel", part.midi_channel, "pitches", pitch_classes);
+    }
+  }
+
+  let max_denom = 1;
+  for (const part of score.parts) {
+    const abs = AbsTimelineOps.from_relative(part.music);
+    for (const interval of abs) {
+      max_denom = Math.max(max_denom, interval.duration.denominator);
+    }
+  }
+  console.log("fastest_subdivision", max_denom);
+}
 
 class SoundScene {
   /**
@@ -253,6 +345,27 @@ class SoundScene {
         const [fname, midi_data] = await import_midi_file(e.target.files);
         const midi = decode_midi(midi_data);
         console.log(midi);
+        const [score, tempos] = midi_to_score(midi);
+        console.log(score);
+        analyze_score(score);
+
+        const basename = fname.replace(/\.mid$/i, "");
+        const score_id = `imported_${basename}`;
+
+        // Tuck this away here for now...
+        SOUND_MANIFEST.scores[score_id] = score;
+
+        this.sound.register_score(score_id, score);
+        RENDERED_TIMELINES[score_id] = render_score(
+          Point.ORIGIN,
+          score,
+          MEASURE_DIMENSIONS,
+          PART_STYLES,
+        );
+        this.change_score(score_id);
+
+        const bpm = tempos[0] ?? 120;
+        SOUND.set_tempo(bpm);
       } catch (err) {
         console.error(err);
         show_error(err);
@@ -278,22 +391,25 @@ class SoundScene {
       const rectangle = new Rectangle(corner, MELODY_BUTTON_DIMENSIONS);
       const button = new TouchButton(rectangle);
       button.events.addEventListener("click", () => {
-        this.selected_melody = descriptor.id;
-        this.export_button.disabled = false;
-        this.export_gm_button.disabled = false;
-        this.piano.reset();
-
-        this.sound.play_score(this.selected_melody);
-
-        // This only works after play_score because SoundManager clears
-        // the _entire_ timeline. The next version should keep track of
-        // scheduled IDs and only clear ones pertaining to music.
-        const score = SOUND_MANIFEST.scores[this.selected_melody];
-        CUES.unschedule_all();
-        CUES.schedule_notes(score);
+        this.change_score(descriptor.id);
       });
       return button;
     });
+  }
+
+  change_score(score_id) {
+    this.selected_melody = score_id;
+    this.piano.reset();
+    this.sound.play_score(score_id);
+    this.export_button.disabled = false;
+    this.export_gm_button.disabled = false;
+
+    // TEMP: This only works after play_score because SoundManager clears
+    // the _entire_ timeline. The next version should keep track of
+    // scheduled IDs and only clear ones pertaining to music.
+    const score = SOUND_MANIFEST.scores[score_id];
+    CUES.unschedule_all();
+    CUES.schedule_notes(score);
   }
 
   /**

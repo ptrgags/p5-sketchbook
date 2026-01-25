@@ -1,0 +1,57 @@
+import { reverse_lookup } from "../reverse_lookup.js";
+
+/**
+ * MIDI note numbers for the MIDI drums, according to the General MIDI spec.
+ * @enum {number}
+ */
+export const MIDIDrum = {
+  ACOUSTIC_BD: 35,
+  ELECTRIC_BD: 36,
+  SIDE_STICK: 37,
+  ACOUSTIC_SNARE: 38,
+  HAND_CLAP: 39,
+  RIMSHOT: 40,
+  LOW_FLOOR_TOM: 41,
+  CLOSED_HI_HAT: 42,
+  HIGH_FLOOR_TOM: 43,
+  PEDAL_HI_HAT: 44,
+  LOW_TOM: 45,
+  OPEN_HI_HAT: 46,
+  LOW_MID_TOM: 47,
+  HIGH_MID_TOM: 48,
+  CRASH_CYMBAL1: 49,
+  HIGH_TOM: 50,
+  RIDE_CYMBAL1: 51,
+  CHINESE_CYMBAL: 52,
+  RIDE_BELL: 53,
+  TAMBOURINE: 54,
+  SPLASH_CYMBAL: 55,
+  COWBELL: 56,
+  CRASH_CYMBAL2: 57,
+  VIBRASLAP: 58,
+  RIDE_CYMBAL2: 59,
+  HIGH_BONGO: 60,
+  LOW_BONGO: 61,
+  MUTE_HIGH_CONGA: 62,
+  OPEN_HIGH_CONGA: 63,
+  LOW_CONGA: 64,
+  HIGH_TIMBALE: 65,
+  LOW_TIMBALE: 66,
+  HIGH_AGOGO: 67,
+  LOW_AGOGO: 68,
+  CABASA: 69,
+  MARACAS: 70,
+  SHORT_WHISTLE: 71,
+  LONG_WHISTLE: 72,
+  SHORT_GUIRO: 73,
+  LONG_GUIRO: 74,
+  CLAVES: 75,
+  HIGH_WOODBLOCK: 76,
+  LOW_WOODBLOCK: 77,
+  MUTE_CUICA: 78,
+  OPEN_CUICA: 79,
+  MUTE_TRIANGLE: 80,
+  OPEN_TRIANGLE: 81,
+};
+
+export const get_drum_name = reverse_lookup(MIDIDrum);

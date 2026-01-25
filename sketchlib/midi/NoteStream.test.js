@@ -13,7 +13,7 @@ const PPQ = MIDIHeader.DEFAULT_TICKS_PER_QUARTER;
 describe("NoteStream", () => {
   describe("process_message", () => {
     it("with non note message type throws error", () => {
-      const stream = new NoteStream();
+      const stream = new NoteStream(PPQ);
 
       expect(() => {
         stream.process_message(0, MIDIMessage.program_change(0, 32));
@@ -23,7 +23,7 @@ describe("NoteStream", () => {
 
   describe("build", () => {
     it("with no notes returns empty array", () => {
-      const stream = new NoteStream();
+      const stream = new NoteStream(PPQ);
 
       const result = stream.build(0);
 
@@ -31,7 +31,7 @@ describe("NoteStream", () => {
     });
 
     it("with no note end gracefully closes note at end of track", () => {
-      const stream = new NoteStream();
+      const stream = new NoteStream(PPQ);
       const velocity = Velocity.MF;
 
       stream.process_message(0, MIDIMessage.note_on(0, C4, velocity));
@@ -42,7 +42,7 @@ describe("NoteStream", () => {
     });
 
     it("with four quarter notes returns four notes correctly", () => {
-      const stream = new NoteStream();
+      const stream = new NoteStream(PPQ);
       const velocity = Velocity.MF;
 
       stream.process_message(0, MIDIMessage.note_on(0, C4, velocity));
@@ -65,7 +65,7 @@ describe("NoteStream", () => {
     });
 
     it("with second note on before note off creats two notes", () => {
-      const stream = new NoteStream();
+      const stream = new NoteStream(PPQ);
       const velocity = Velocity.MF;
 
       stream.process_message(0, MIDIMessage.note_on(0, C4, velocity));
@@ -82,7 +82,7 @@ describe("NoteStream", () => {
     });
 
     it("with notes with gap in betwen correctly computes timing", () => {
-      const stream = new NoteStream();
+      const stream = new NoteStream(PPQ);
       const velocity = Velocity.MF;
 
       stream.process_message(0, MIDIMessage.note_on(0, C4, velocity));
