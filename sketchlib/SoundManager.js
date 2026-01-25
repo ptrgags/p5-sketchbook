@@ -84,10 +84,17 @@ export class SoundManager {
     this.init_synths();
     this.process_manifest();
 
-    const transport = this.tone.getTransport();
-    transport.bpm.value = this.manifest.bpm ?? DEFAULT_BPM;
-
+    this.set_tempo(this.manifest.bpm ?? DEFAULT_BPM);
     this.audio_ready = true;
+  }
+
+  /**
+   * Set a new tempo
+   * @param {number} bpm Beats per minute
+   */
+  set_tempo(bpm) {
+    const transport = this.tone.getTransport();
+    transport.bpm.value = bpm;
   }
 
   /**

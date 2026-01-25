@@ -253,7 +253,7 @@ class SoundScene {
         const [fname, midi_data] = await import_midi_file(e.target.files);
         const midi = decode_midi(midi_data);
         console.log(midi);
-        const score = midi_to_score(midi);
+        const [score, tempos] = midi_to_score(midi);
         console.log(score);
 
         const basename = fname.replace(/\.mid$/i, "");
@@ -270,6 +270,9 @@ class SoundScene {
           PART_STYLES,
         );
         this.change_score(score_id);
+
+        const bpm = tempos[0] ?? 120;
+        SOUND.set_tempo(bpm);
       } catch (err) {
         console.error(err);
         show_error(err);

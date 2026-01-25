@@ -146,6 +146,12 @@ export class ScoreBuilder {
      * @type {Map<number, PartBuilder>}
      */
     this.part_builders = new Map();
+
+    /**
+     * Array of bpm
+     * @type {number[]}
+     */
+    this.tempo_markings = [];
   }
 
   /**
@@ -190,13 +196,7 @@ export class ScoreBuilder {
       const microsec_per_quarter = (t0 << 16) | (t1 << 8) | t2;
       const MICROSEC_PER_MIN = 60e6;
       const bpm = (1 / microsec_per_quarter) * MICROSEC_PER_MIN;
-      console.log(
-        "New Tempo:",
-        microsec_per_quarter,
-        " usec/quarter =",
-        bpm,
-        " bpm",
-      );
+      this.tempo_markings.push(bpm);
     } else if (meta_type === MIDIMetaType.TIME_SIGNATURE) {
       const [numerator, denominator_power, clocks_per_click, n32_per_quarter] =
         event.data;

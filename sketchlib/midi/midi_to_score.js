@@ -9,7 +9,7 @@ import { ScoreBuilder } from "./ScoreBuilder.js";
  * to the console.
  *
  * @param {MIDIFile<RelativeTimingTrack>} midi Decoded MIDI file
- * @returns {Score<number>}
+ * @returns {[Score<number>, number[]]}
  */
 export function midi_to_score(midi) {
   const builder = new ScoreBuilder(midi.header.ticks_per_quarter);
@@ -27,5 +27,5 @@ export function midi_to_score(midi) {
     }
   }
 
-  return builder.build();
+  return [builder.build(), builder.tempo_markings];
 }
