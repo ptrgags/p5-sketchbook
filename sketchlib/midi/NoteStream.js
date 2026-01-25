@@ -38,7 +38,7 @@ export class NoteStream {
   }
 
   /**
-   *
+   * Process note on events
    * @param {number} abs_ticks Absolute time in ticks
    * @param {number} pitch MIDI pitch value 0-127
    * @param {number} velocity MIDI velocity value 0-127
@@ -47,6 +47,11 @@ export class NoteStream {
     // If we had a previous note, this flushes it to the array of
     // parsed notes
     this.note_off(abs_ticks);
+
+    // If velocity was 0, this was a note off event, not a note on event
+    if (velocity === 0) {
+      return;
+    }
 
     this.partial_message = [abs_ticks, pitch, velocity];
   }
