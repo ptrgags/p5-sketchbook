@@ -54,7 +54,7 @@ const SOUND_MANIFEST = {
 const PART_STYLES = Oklch.gradient(
   new Oklch(0.7, 0.1, 0),
   new Oklch(0.7, 0.1, 350),
-  5,
+  16,
 ).map(
   (x) =>
     new Style({
