@@ -38,6 +38,9 @@ import { decode_midi } from "../sketchlib/midi/decode_midi.js";
 import { Cue, MusicalCues } from "../sketchlib/music/MusicalCues.js";
 import { midi_to_score } from "../sketchlib/midi/midi_to_score.js";
 import { Score } from "../sketchlib/music/Score.js";
+import { AbsTimelineOps } from "../sketchlib/music/AbsTimelineOps.js";
+import { Note } from "../sketchlib/music/Music.js";
+import { get_drum_name, MIDIDrum } from "../sketchlib/midi/MIDIDrum.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -216,13 +219,29 @@ const PIANO_BOUNDS = new Rectangle(
 );
 
 /**
- *
  * @param {Score<number>} score
  */
 function analyze_score(score) {
   // first of all, does it use drums?
   const has_drums = score.parts.some((x) => x.midi_channel === 9);
   console.log("has drums:", has_drums);
+
+  for (const part of score.parts) {
+    const abs = AbsTimelineOps.from_relative(part.music);
+
+    if (part.midi_channel === 9) {
+      const drums_used = new Set();
+      for (const interval of abs) {
+        /**
+         * @type {Note<number>}
+         */
+        const drum_note = interval.value;
+        drums_used.add(drum_note.pitch);
+      }
+      const names = [...drums_used].map((x) => get_drum_name(x));
+      console.log("drums used:", names);
+    }
+  }
 }
 
 class SoundScene {
