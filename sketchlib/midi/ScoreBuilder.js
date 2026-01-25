@@ -58,6 +58,11 @@ export class PartBuilder {
      * finalize the NoteStreams
      */
     this.last_tick = 0;
+
+    /**
+     * @type {number[]}
+     */
+    this.midi_instruments = [];
   }
 
   /**
@@ -88,12 +93,7 @@ export class PartBuilder {
     const { message_type, channel, data } = message;
 
     if (message_type === MIDIMessageType.PROGRAM_CHANGE) {
-      console.log(
-        "Ignoring program change: channel",
-        channel,
-        "program",
-        ...data,
-      );
+      this.midi_instruments.push(data[0]);
       return false;
     }
 
@@ -120,9 +120,11 @@ export class PartBuilder {
     });
     const abs_music = AbsTimelineOps.from_intervals(intervals);
     const music = timeline_to_music(abs_music);
+
     return new Part(`channel${this.channel}`, music, {
       instrument_id: `channel${this.channel}`,
       midi_channel: this.channel,
+      midi_instrument: this.midi_instruments[0],
     });
   }
 }

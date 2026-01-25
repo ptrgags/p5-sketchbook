@@ -37,6 +37,7 @@ import { expect_element } from "../sketchlib/dom/expect_element.js";
 import { decode_midi } from "../sketchlib/midi/decode_midi.js";
 import { Cue, MusicalCues } from "../sketchlib/music/MusicalCues.js";
 import { midi_to_score } from "../sketchlib/midi/midi_to_score.js";
+import { Score } from "../sketchlib/music/Score.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -214,6 +215,16 @@ const PIANO_BOUNDS = new Rectangle(
   new Direction(500, 300 / 3),
 );
 
+/**
+ *
+ * @param {Score<number>} score
+ */
+function analyze_score(score) {
+  // first of all, does it use drums?
+  const has_drums = score.parts.some((x) => x.midi_channel === 9);
+  console.log("has drums:", has_drums);
+}
+
 class SoundScene {
   /**
    * Constructor
@@ -255,6 +266,7 @@ class SoundScene {
         console.log(midi);
         const [score, tempos] = midi_to_score(midi);
         console.log(score);
+        analyze_score(score);
 
         const basename = fname.replace(/\.mid$/i, "");
         const score_id = `imported_${basename}`;
