@@ -295,6 +295,15 @@ function analyze_score(score) {
       console.log("channel", part.midi_channel, "pitches", pitch_classes);
     }
   }
+
+  let max_denom = 1;
+  for (const part of score.parts) {
+    const abs = AbsTimelineOps.from_relative(part.music);
+    for (const interval of abs) {
+      max_denom = Math.max(max_denom, interval.duration.denominator);
+    }
+  }
+  console.log("fastest_subdivision", max_denom);
 }
 
 class SoundScene {
