@@ -240,6 +240,20 @@ function gather_drums(music) {
   return names;
 }
 
+class Histogram {
+  constructor() {
+    this.counts = new Map();
+  }
+
+  insert(key) {
+    if (!this.counts.has(key)) {
+      this.counts.set(key, 1);
+    } else {
+      this.counts.set(key, this.counts.get(key) + 1);
+    }
+  }
+}
+
 /**
  *
  * @param {import("../sketchlib/music/Music.js").Music<number>} music
@@ -247,17 +261,21 @@ function gather_drums(music) {
 function gather_pitch_classes(music) {
   const abs = AbsTimelineOps.from_relative(music);
 
-  const pitches = new Set();
+  const pitches = new Histogram();
   for (const interval of abs) {
     /**
      * @type {Note<number>}
      */
     const note = interval.value;
-    pitches.add(MidiPitch.get_pitch_class(note.pitch));
+    pitches.insert(MidiPitch.get_pitch_class(note.pitch));
   }
 
-  const pitch_classes = [...pitches].map((x) => PITCH_CLASS_NAMES[x]);
-  return pitch_classes.sort();
+  const result = {};
+  for (const [pitch, count] of pitches.counts.entries()) {
+    result[PITCH_CLASS_NAMES[pitch]] = count;
+  }
+
+  return result;
 }
 
 /**
