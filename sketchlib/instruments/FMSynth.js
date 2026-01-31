@@ -18,7 +18,7 @@ export class FMSynth {
     cm_ratio,
     mod_index,
     envelope = ADSR.DEFAULT,
-    mod_envelope = ADSR.DIGITAL
+    mod_envelope = ADSR.DIGITAL,
   ) {
     this.cm_ratio = cm_ratio;
     this.mod_index = mod_index;
@@ -83,6 +83,17 @@ export class FMSynth {
       envelope: this.envelope,
       modulationEnvelope: this.mod_envelope,
     }).toDestination();
+  }
+
+  /**
+   * Play a note
+   * @param {string} pitch
+   * @param {string} duration
+   * @param {number} time
+   * @param {number} velocity
+   */
+  play_note(pitch, duration, time, velocity) {
+    this.synth.triggerAttackRelease(pitch, duration, time, velocity);
   }
 
   destroy() {
