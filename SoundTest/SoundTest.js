@@ -42,6 +42,7 @@ import {
   Drawbars,
 } from "../sketchlib/instruments/DrawbarOrgan.js";
 import { InstrumentMap } from "../sketchlib/instruments/InstrumentMap.js";
+import { WaveStack } from "../sketchlib/instruments/Wavestack.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -49,7 +50,7 @@ const INSTRUMENTS_ORIGINAL = new InstrumentMap({
   sine: new BasicSynth("sine"),
   square: new BasicSynth("square"),
   poly: new BasicSynth("triangle"),
-  supersaw: new BasicSynth("sawtooth"),
+  supersaw: new WaveStack("sawtooth", 3, 20),
   organ: new DrawbarOrgan(new Drawbars("88 8800 000")),
 });
 
