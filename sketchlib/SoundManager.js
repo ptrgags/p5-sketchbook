@@ -59,7 +59,7 @@ function get_max_polyphony(music) {
 
 /**
  * @typedef {Object} InstrumentSettings
- * @property {number} num_voices Number of voices to allocate
+ * @property {number} voices Number of voices to allocate
  * @property {number} volume Volume in decibels
  */
 
@@ -76,17 +76,13 @@ function get_instrument_settings(score) {
   for (const part of score.parts) {
     let voices = get_max_polyphony(part.music);
 
-    // Allow extra voices so we don't end up with voice stealing
-    voices *= 2;
-    voices = Math.min(voices, 12);
-
     result[part.instrument_id] = {
-      num_voices: voices,
+      voices,
       // we want to scale the amplitude by 1/voices,
       // but we need to express this in decibels, i.e.
       // 20log10(1/voices)
       // = -20log10(voices)
-      volume: -20 * Math.log10(voices),
+      volume: -20 * Math.log10(voices * 16),
     };
   }
   return result;
@@ -350,7 +346,7 @@ export class SoundManager {
       instrument_settings,
     )) {
       const instrument = this.instrument_map.get_instrument(instrument_id);
-      instrument.init(this.tone, destination, settings.voices);
+      instrument.init(this.tone, destination, 32);
       instrument.volume = settings.volume;
     }
   }
