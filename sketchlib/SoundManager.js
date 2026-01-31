@@ -2,6 +2,7 @@ import { ADSR } from "./instruments/ADSR.js";
 import { BasicSynth } from "./instruments/BasicSynth.js";
 import { DrawbarOrgan, Drawbars } from "./instruments/DrawbarOrgan.js";
 import { FMSynth } from "./instruments/FMSynth.js";
+import { InstrumentMap } from "./instruments/InstrumentMap.js";
 import { WaveStack } from "./instruments/Wavestack.js";
 import { AbsTimelineOps } from "./music/AbsTimelineOps.js";
 import { Note } from "./music/Music.js";
@@ -13,11 +14,13 @@ import { ToneClip } from "./tone_helpers/tone_clips.js";
 
 /**
  * @typedef {{[id: string]: Score}} ScoreDeclarations
+ * @typedef {{[id: string]: InstrumentMap}} InstrumentDeclarations
  *
  * @typedef {{
  *  bpm?: number,
  *  scores?: ScoreDeclarations,
  *  sfx?: ScoreDeclarations,
+ *  instruments: InstrumentDeclarations,
  * }} SoundManifest
  */
 
@@ -51,13 +54,13 @@ export class SoundManager {
 
     // Instrument management ===========================================
 
-    // Map of instrument id -> Tone instrument. This will change a bit
-    // soon.
-    this.synths = {};
+    /**
+     * @type {InstrumentMap | undefined}
+     */
+    this.instrument_map = undefined;
 
     // Background music management ====================================
 
-    this.current_bg_score = undefined;
     /**
      * Compiled background scores
      * @type {{[score_id: string]: import("./music/AbsTimeline.js").AbsTimeline<ToneClip>}}
@@ -81,7 +84,7 @@ export class SoundManager {
 
     await this.tone.start();
 
-    this.init_synths();
+    //this.init_synths();
     this.process_manifest();
 
     const transport = this.tone.getTransport();
@@ -114,6 +117,7 @@ export class SoundManager {
     }
   }
 
+  /*
   init_synths() {
     const sine = new BasicSynth("sine");
     sine.init_mono(this.tone);
@@ -168,6 +172,7 @@ export class SoundManager {
     this.synths.tick = tick.synth;
     this.synths.organ = organ.synth;
   }
+  */
 
   /**
    * Get the current transport time as a float, as this is helpful for
@@ -192,7 +197,7 @@ export class SoundManager {
    * @param {Score<number>} score Score expressed in MIDI note numbers
    */
   register_score(score_id, score) {
-    const compiled = compile_score(this.tone, this.synths, score);
+    const compiled = compile_score(this.tone, this, score);
     this.bg_scores[score_id] = AbsTimelineOps.from_relative(compiled);
   }
 
@@ -203,7 +208,7 @@ export class SoundManager {
    * @param {Score<number>} score Score expressed in MIDI note numbers
    */
   register_sfx(sfx_id, score) {
-    const compiled = compile_score(this.tone, this.synths, score);
+    const compiled = compile_score(this.tone, this, score);
     this.sfx_scores[sfx_id] = AbsTimelineOps.from_relative(compiled);
   }
 

@@ -4,7 +4,14 @@ import { Gap, Parallel, Sequential, timeline_map } from "../music/Timeline.js";
 import { Rational } from "../Rational.js";
 import { to_tone_time } from "./to_tone_time.js";
 import { to_tone_pitch } from "./to_tone_pitch.js";
-import { make_part_clip, PartDescriptor, ToneClip } from "./tone_clips.js";
+import {
+  make_part_clip,
+  PartDescriptor,
+  ToneClip,
+  ToneNote,
+} from "./tone_clips.js";
+import { InstrumentMap } from "../instruments/InstrumentMap.js";
+import { Instrument } from "../instruments/Instrument.js";
 
 /**
  * Precompile a lone note to a part. Usually overkill, but it makes scheduling
@@ -13,16 +20,14 @@ import { make_part_clip, PartDescriptor, ToneClip } from "./tone_clips.js";
  * @returns {PartDescriptor} A part for the single note.
  */
 function precompile_note(note) {
-  return new PartDescriptor(note.duration, [
-    ["0:0", [to_tone_pitch(note.pitch), to_tone_time(note.duration)]],
-  ]);
+  return new PartDescriptor(note.duration, [["0:0", new ToneNote(note)]]);
 }
 
 /**
  * Compile a Melody to the events to pass into Tone.Part Exposed as this method
  * can be tested without needing dependencies on Tone.js
  * @param {(Gap | Note<number>)[]} midi_notes Melody in MIDI note values
- * @returns {[string, [string, string]][]} Array of (start_time, (pitch, duration))
+ * @returns {[string, ToneNote][]} Array of (start_time, (pitch, duration))
  * events to pass into the Tone.Part constructor
  */
 function make_part_events(midi_notes) {
@@ -33,13 +38,11 @@ function make_part_events(midi_notes) {
       offset = offset.add(note.duration);
     } else if (note instanceof Note) {
       const start = to_tone_time(offset);
-      const pitch = to_tone_pitch(note.pitch);
-      const dur = to_tone_time(note.duration);
 
       /**
-       * @type {[string, [string, string]]}
+       * @type {[string, ToneNote]}
        */
-      const event = [start, [pitch, dur]];
+      const event = [start, new ToneNote(note)];
 
       events.push(event);
       offset = offset.add(note.duration);
@@ -159,14 +162,14 @@ export function precompile_music(music) {
 /**
  * Compile the music to a set of ToneJS-compatible clips ready for scheduling.
  * @param {import("tone")} tone The Tone.js library
- * @param {import("tone").Synth} instrument The instrument that will play the material
+ * @param {function():Instrument} get_instrument Callback to get the instrument for this clip. This is to allow dynamic instrument changes
  * @param {import("../music/Music.js").Music<number>} music The musical material
  * @return {import("../music/Timeline.js").Timeline<ToneClip>} The compiled music clips
  */
-export function compile_music(tone, instrument, music) {
+export function compile_music(tone, get_instrument, music) {
   const precompiled = precompile_music(music);
   return timeline_map((x) => {
-    return make_part_clip(tone, instrument, x);
+    return make_part_clip(tone, get_instrument, x);
   }, precompiled);
 }
 
@@ -174,18 +177,17 @@ export function compile_music(tone, instrument, music) {
  * Compile a score to a set of ToneJS compatible clips ready for scheduling. This
  * bakes the instruments into the callbacks
  * @param {import("tone")} tone the Tone.js library
- * @param {{[id: string]: import("tone").Synth}} instruments The set of available instruments
+ * @param {{instrument_map: InstrumentMap}} instrument_owner The object that owns the instrument map (this allows hot-swapping instruments)
  * @param {Score<number>} score The score of music
  * @returns {import("../music/Timeline.js").Timeline<ToneClip>} A timeline of music clips ready for scheduling.
  */
-export function compile_score(tone, instruments, score) {
+export function compile_score(tone, instrument_owner, score) {
   const clips = [];
   for (const part of score.parts) {
-    const clip = compile_music(
-      tone,
-      instruments[part.instrument_id],
-      part.music,
-    );
+    const get_instrument = () => {
+      return instrument_owner.instrument_map.get_instrument(part.instrument_id);
+    };
+    const clip = compile_music(tone, get_instrument, part.music);
     clips.push(clip);
   }
 

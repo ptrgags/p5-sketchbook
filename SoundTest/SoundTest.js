@@ -36,8 +36,30 @@ import { SpiralBurst } from "./SpiralBurst.js";
 import { expect_element } from "../sketchlib/dom/expect_element.js";
 import { decode_midi } from "../sketchlib/midi/decode_midi.js";
 import { Cue, MusicalCues } from "../sketchlib/music/MusicalCues.js";
+import { BasicSynth } from "../sketchlib/instruments/BasicSynth.js";
+import {
+  DrawbarOrgan,
+  Drawbars,
+} from "../sketchlib/instruments/DrawbarOrgan.js";
+import { InstrumentMap } from "../sketchlib/instruments/InstrumentMap.js";
 
 const MOUSE = new CanvasMouseHandler();
+
+const INSTRUMENTS_ORIGINAL = new InstrumentMap({
+  sine: new BasicSynth("sine"),
+  square: new BasicSynth("square"),
+  poly: new BasicSynth("triangle"),
+  supersaw: new BasicSynth("sawtooth"),
+  organ: new DrawbarOrgan(new Drawbars("88 8800 000")),
+});
+
+const INSTRUMENTS_ORGAN = new InstrumentMap({
+  sine: new DrawbarOrgan(new Drawbars("00 8000 000")),
+  square: new DrawbarOrgan(new Drawbars("00 8060 400")),
+  poly: new DrawbarOrgan(new Drawbars("00 8030 100")),
+  supersaw: new DrawbarOrgan(new Drawbars("00 8765 432")),
+  organ: new DrawbarOrgan(new Drawbars("88 8800 000")),
+});
 
 /**@type {import("../sketchlib/SoundManager.js").SoundManifest} */
 const SOUND_MANIFEST = {
@@ -47,6 +69,10 @@ const SOUND_MANIFEST = {
     symmetry_melody: symmetry_melody(),
     binary_progression: binary_chords(),
     organ_chords: organ_chords(),
+  },
+  instruments: {
+    original: INSTRUMENTS_ORIGINAL,
+    organ: INSTRUMENTS_ORGAN,
   },
 };
 
