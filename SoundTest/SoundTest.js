@@ -253,6 +253,8 @@ class SoundScene {
     this.piano = new Piano(PIANO_BOUNDS, 3, 4);
     this.spiral_burst = new SpiralBurst();
 
+    this.sound.select_instrument_map("organ");
+
     this.mute_button.events.addEventListener(
       "change",
       (/** @type {CustomEvent}*/ e) => {

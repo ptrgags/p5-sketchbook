@@ -11,19 +11,13 @@ export class Instrument {
   }
 
   /**
-   * Allocate a monophonic synth
-   * @param {import("tone")} tone The Tone.js library
+   * Allocate Tone.js resources for this instrument
+   * @param {import('tone')} tone Tone module
+   * @param {import('tone').InputNode} destination Destination to connect to
+   * @param {number} voices Number of voices to allocate
    */
-  init_mono(tone) {
-    throw new Error("not implemented");
-  }
-
-  /**
-   * Allocate a polyphonic synth
-   * @param {import("tone")} tone The Tone.js library
-   */
-  init_poly(tone) {
-    throw new Error("not implemented");
+  init(tone, destination, voices) {
+    throw new Error("Method not implemented.");
   }
 
   /**

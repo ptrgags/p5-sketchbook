@@ -5,8 +5,9 @@ import { FMSynth } from "./instruments/FMSynth.js";
 import { InstrumentMap } from "./instruments/InstrumentMap.js";
 import { WaveStack } from "./instruments/Wavestack.js";
 import { AbsTimelineOps } from "./music/AbsTimelineOps.js";
-import { Note } from "./music/Music.js";
+import { Harmony, Melody, Note } from "./music/Music.js";
 import { Score } from "./music/Score.js";
+import { Gap, Sequential } from "./music/Timeline.js";
 import { Rational } from "./Rational.js";
 import { compile_score } from "./tone_helpers/compile_music.js";
 import { to_tone_time } from "./tone_helpers/to_tone_time.js";
@@ -27,13 +28,83 @@ import { ToneClip } from "./tone_helpers/tone_clips.js";
 const DEFAULT_BPM = 128;
 
 /**
- * @typedef {{
- * instrument_id: string,
- * events: [Note<number>, Rational, Rational][]
- * }} CompiledPart
  *
- * @typedef {{[score_id: string]: CompiledPart[]}} CompiledScore
+ * @param {import("./music/Music.js").Music<number>} music
+ * @return {number}
  */
+function get_max_polyphony(music) {
+  if (music instanceof Gap) {
+    return 0;
+  }
+
+  // For melodies, we take the maximum number voices of the children
+  if (music instanceof Melody) {
+    return music.children.reduce(
+      (acc, child) => Math.max(acc, get_max_polyphony(child)),
+      0,
+    );
+  }
+
+  // For harmonies, we add the voices found across the children
+  if (music instanceof Harmony) {
+    return music.children.reduce(
+      (acc, child) => acc + get_max_polyphony(child),
+      0,
+    );
+  }
+
+  // regular note = 1 voice
+  return 1;
+}
+
+/**
+ * @typedef {Object} InstrumentSettings
+ * @property {number} num_voices Number of voices to allocate
+ * @property {number} volume Volume in decibels
+ */
+
+/**
+ *
+ * @param {Score<number>} score
+ * @return {{[instrument_id: string]: InstrumentSettings}}
+ */
+function get_instrument_settings(score) {
+  /**
+   * @type {{[instrument_id: string]: InstrumentSettings}}
+   */
+  const result = {};
+  for (const part of score.parts) {
+    let voices = get_max_polyphony(part.music);
+
+    // Allow extra voices so we don't end up with voice stealing
+    voices *= 2;
+    voices = Math.min(voices, 12);
+
+    result[part.instrument_id] = {
+      num_voices: voices,
+      // we want to scale the amplitude by 1/voices,
+      // but we need to express this in decibels, i.e.
+      // 20log10(1/voices)
+      // = -20log10(voices)
+      volume: -20 * Math.log10(voices),
+    };
+  }
+  return result;
+}
+
+class CompiledScore {
+  /**
+   * Constructor
+   * @param {Score<number>} score
+   * @param {import("./music/AbsTimeline.js").AbsTimeline<ToneClip>} compiled_clips
+   */
+  constructor(score, compiled_clips) {
+    this.score = score;
+    this.compiled_clips = compiled_clips;
+
+    this.instrument_settings = get_instrument_settings(score);
+  }
+}
 
 /**
  * Class to manage playing sounds through Tone.js
@@ -63,14 +134,14 @@ export class SoundManager {
 
     /**
      * Compiled background scores
-     * @type {{[score_id: string]: import("./music/AbsTimeline.js").AbsTimeline<ToneClip>}}
+     * @type {{[score_id: string]: CompiledScore}}
      */
     this.bg_scores = {};
 
     // SFX management =================================================
 
     /**
-     * @type {{[sfx_id: string]: import("./music/AbsTimeline.js").AbsTimeline<ToneClip>}}
+     * @type {{[sfx_id: string]: CompiledScore}}
      */
     this.sfx_scores = {};
   }
@@ -190,6 +261,14 @@ export class SoundManager {
     );
   }
 
+  select_instrument_map(map_id) {
+    if (!this.manifest.instruments.hasOwnProperty(map_id)) {
+      throw new Error(`unknown instrument map ${map_id}`);
+    }
+
+    this.instrument_map = this.manifest.instruments[map_id];
+  }
+
   /**
    * Compile and save a score
    * @param {string} score_id The score ID to use. This must be the same as
@@ -198,7 +277,10 @@ export class SoundManager {
    */
   register_score(score_id, score) {
     const compiled = compile_score(this.tone, this, score);
-    this.bg_scores[score_id] = AbsTimelineOps.from_relative(compiled);
+    this.bg_scores[score_id] = new CompiledScore(
+      score,
+      AbsTimelineOps.from_relative(compiled),
+    );
   }
 
   /**
@@ -209,7 +291,10 @@ export class SoundManager {
    */
   register_sfx(sfx_id, score) {
     const compiled = compile_score(this.tone, this, score);
-    this.sfx_scores[sfx_id] = AbsTimelineOps.from_relative(compiled);
+    this.sfx_scores[sfx_id] = new CompiledScore(
+      score,
+      AbsTimelineOps.from_relative(compiled),
+    );
   }
 
   stop_the_music() {
@@ -230,9 +315,12 @@ export class SoundManager {
     // Clear the timeline so we can continue
     this.stop_the_music();
 
+    // Initialize instruments to match the new score
+    this.init_instruments(score.instrument_settings);
+
     const transport = this.tone.getTransport();
 
-    for (const clip of score) {
+    for (const clip of score.compiled_clips) {
       const start = to_tone_time(clip.start_time);
       const end = to_tone_time(clip.end_time);
       clip.value.material.start(start).stop(end);
@@ -242,6 +330,29 @@ export class SoundManager {
     transport.start("+0.1", "0:0");
     this.current_score = score_id;
     this.transport_playing = true;
+  }
+
+  init_instruments(instrument_settings) {
+    if (!this.instrument_map) {
+      throw new Error(
+        "can't initialize instruments without an instrument map! did you forget to call select_instrument_map?",
+      );
+    }
+
+    // Clean up the old instruments
+    this.instrument_map.destroy();
+
+    const destination = this.tone.getDestination();
+
+    console.log(instrument_settings);
+
+    for (const [instrument_id, settings] of Object.entries(
+      instrument_settings,
+    )) {
+      const instrument = this.instrument_map.get_instrument(instrument_id);
+      instrument.init(this.tone, destination, settings.voices);
+      instrument.volume = settings.volume;
+    }
   }
 
   /**
@@ -256,7 +367,7 @@ export class SoundManager {
 
     const A_LITTLE_BIT = 0; //0.05;
     const now = this.tone.now() + A_LITTLE_BIT;
-    for (const clip of sfx_score) {
+    for (const clip of sfx_score.compiled_clips) {
       const start_time = to_tone_time(clip.start_time);
       const end_time = to_tone_time(clip.end_time);
       const start_sec = now + this.tone.Time(start_time).toSeconds();

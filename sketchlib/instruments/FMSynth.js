@@ -93,6 +93,9 @@ export class FMSynth {
    * @param {number} velocity
    */
   play_note(pitch, duration, time, velocity) {
+    if (!this.synth) {
+      throw new Error("play_note before initialization");
+    }
     this.synth.triggerAttackRelease(pitch, duration, time, velocity);
   }
 

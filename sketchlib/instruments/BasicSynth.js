@@ -37,22 +37,31 @@ export class BasicSynth {
     }
   }
 
-  init_mono(tone) {
-    this.synth = new tone.Synth({
+  /**
+   * Allocate Tone.js resources for this instrument
+   * @param {import('tone')} tone Tone module
+   * @param {import('tone').InputNode} destination Destination to connect to
+   * @param {number} voices Number of voices to allocate
+   */
+  init(tone, destination, voices) {
+    const options = {
       oscillator: {
         type: this.waveform,
       },
       envelope: this.envelope,
-    }).toDestination();
-  }
+    };
 
-  init_poly(tone) {
-    this.synth = new tone.PolySynth(tone.Synth, {
-      oscillator: {
-        type: this.waveform,
-      },
-      envelope: this.envelope,
-    }).toDestination();
+    if (voices > 1) {
+      this.synth = new tone.PolySynth({
+        options,
+        voice: tone.Synth,
+        maxPolyphony: voices,
+      });
+    } else {
+      this.synth = new tone.Synth(options);
+    }
+
+    this.synth.connect(destination);
   }
 
   /**
@@ -63,6 +72,10 @@ export class BasicSynth {
    * @param {number} velocity
    */
   play_note(pitch, duration, time, velocity) {
+    if (!this.synth) {
+      throw new Error("play_note before initialization");
+    }
+
     this.synth.triggerAttackRelease(pitch, duration, time, velocity);
   }
 

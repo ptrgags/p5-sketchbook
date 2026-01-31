@@ -17,4 +17,10 @@ export class InstrumentMap {
   get_instrument(instrument_id) {
     return this.instruments.get(instrument_id);
   }
+
+  destroy() {
+    for (const instrument of this.instruments.values()) {
+      instrument.destroy();
+    }
+  }
 }
