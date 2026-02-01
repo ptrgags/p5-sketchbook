@@ -1,4 +1,5 @@
 import {
+  AbsGap,
   AbsInterval,
   AbsParallel,
   AbsSequential,
@@ -7,6 +8,7 @@ import { AbsTimelineOps } from "../music/AbsTimelineOps.js";
 import { Harmony, Melody, Note } from "../music/Music.js";
 import { Part, Score } from "../music/Score.js";
 import { Gap } from "../music/Timeline.js";
+import { Rational } from "../Rational.js";
 import {
   MIDIEvent,
   MIDIMessage,
@@ -54,8 +56,16 @@ export class PartBuilder {
     this.note_streams = new Map();
 
     /**
+     * The first tick encountered. If this is nonzero, the result will
+     * need an initial rest
+     * @type {number}
+     */
+    this.start_tick = undefined;
+
+    /**
      * keep track of the maximum tick encountered, as this is needed to
      * finalize the NoteStreams
+     * @type {number}
      */
     this.last_tick = 0;
 
@@ -72,6 +82,10 @@ export class PartBuilder {
    * @param {MIDIMessage} note_message
    */
   process_note(abs_tick, note_message) {
+    if (this.start_tick === undefined) {
+      this.start_tick = abs_tick;
+    }
+
     this.last_tick = Math.max(this.last_tick, abs_tick);
 
     const pitch = note_message.data[0];
@@ -118,7 +132,14 @@ export class PartBuilder {
     const intervals = pitches_hi_to_low.flatMap((x) => {
       return this.note_streams.get(x).build(this.last_tick);
     });
-    const abs_music = AbsTimelineOps.from_intervals(intervals);
+    let abs_music = AbsTimelineOps.from_intervals(intervals);
+    if (this.start_tick > 0) {
+      abs_music = new AbsSequential(
+        new AbsGap(Rational.ZERO, abs_music.start_time),
+        abs_music,
+      );
+    }
+    abs_music = AbsTimelineOps.flatten(abs_music);
     const music = timeline_to_music(abs_music);
 
     return new Part(`channel${this.channel}`, music, {
