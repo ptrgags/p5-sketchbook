@@ -55,11 +55,35 @@ export class DrawbarOrgan {
     this.synth = undefined;
 
     this.envelope = ADSR.organ(release_time);
+  }
 
+  /**
+   * @type {number | undefined}
+   */
+  get volume() {
+    return this.synth?.volume.value;
+  }
+
+  /**
+   * @param {number} value
+   */
+  set volume(value) {
+    if (this.synth) {
+      this.synth.volume.value = value;
+    }
+  }
+
+  /**
+   * Allocate Tone.js resources for this instrument
+   * @param {import('tone')} tone Tone module
+   * @param {import('tone').InputNode} destination Destination to connect to
+   * @param {number} voices Number of voices to allocate
+   */
+  init(tone, destination, voices) {
     /**
      * @type {RecursivePartial<DuoSynthOptions>}
      */
-    this.synth_options = {
+    const options = {
       voice0: {
         oscillator: {
           type: "custom",
@@ -81,41 +105,33 @@ export class DrawbarOrgan {
       },
       vibratoAmount: 0,
     };
-  }
 
-  /**
-   * @type {number | undefined}
-   */
-  get volume() {
-    return this.synth?.volume.value;
-  }
-
-  /**
-   * @param {number} value
-   */
-  set volume(value) {
-    if (this.synth) {
-      this.synth.volume.value = value;
+    if (voices > 1) {
+      this.synth = new tone.PolySynth({
+        options,
+        voice: tone.DuoSynth,
+        maxPolyphony: voices,
+      });
+    } else {
+      this.synth = new tone.DuoSynth(options).toDestination();
     }
+
+    this.synth.connect(destination);
   }
 
   /**
-   *
-   * @param {import('tone')} tone
+   * Play a note
+   * @param {string} pitch
+   * @param {string} duration
+   * @param {number} time
+   * @param {number} velocity
    */
-  init_mono(tone) {
-    this.synth = new tone.DuoSynth(this.synth_options).toDestination();
-  }
+  play_note(pitch, duration, time, velocity) {
+    if (!this.synth) {
+      throw new Error("play_note before initialization");
+    }
 
-  /**
-   *
-   * @param {import('tone')} tone
-   */
-  init_poly(tone) {
-    this.synth = new tone.PolySynth(
-      tone.DuoSynth,
-      this.synth_options,
-    ).toDestination();
+    this.synth.triggerAttackRelease(pitch, duration, time, velocity);
   }
 
   destroy() {

@@ -1,11 +1,27 @@
+import { Instrument } from "../instruments/Instrument.js";
+import { InstrumentMap } from "../instruments/InstrumentMap.js";
+import { Note } from "../music/Music.js";
 import { Rational } from "../Rational.js";
+import { to_tone_pitch } from "./to_tone_pitch.js";
 import { to_tone_time } from "./to_tone_time.js";
+
+export class ToneNote {
+  /**
+   * Constructor
+   * @param {Note<number>} note The note
+   */
+  constructor(note) {
+    this.pitch = to_tone_pitch(note.pitch);
+    this.duration = to_tone_time(note.duration);
+    this.velocity = note.velocity / 127;
+  }
+}
 
 export class PartDescriptor {
   /**
    * Constructor
    * @param {Rational} duration duration of the whole part
-   * @param {[string, [string, string]][]} events
+   * @param {[string, ToneNote][]} events
    */
   constructor(duration, events) {
     this.duration = duration;
@@ -28,14 +44,14 @@ export class ToneClip {
 /**
  * Make a Tone.Part from a descriptor and an instrument
  * @param {import("tone")} tone the Tone.js library
- * @param {import("tone").Synth} instrument the instrument to play
+ * @param {function():Instrument} get_instrument Callback to get the instrument for this clip. This is to allow hot-swapping instruments
  * @param {PartDescriptor} descriptor The description of the notes to play
  * @returns {ToneClip} The computed Part wrapped in a ToneClip
  */
-export function make_part_clip(tone, instrument, descriptor) {
+export function make_part_clip(tone, get_instrument, descriptor) {
   const part = new tone.Part((time, note) => {
-    const [pitch, duration] = note;
-    instrument.triggerAttackRelease(pitch, duration, time);
+    const instrument = get_instrument();
+    instrument.play_note(note.pitch, note.duration, time, note.velocity);
   }, descriptor.events);
 
   part.loop = true;

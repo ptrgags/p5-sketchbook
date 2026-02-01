@@ -15,20 +15,23 @@ import {
   WESTMINSTER_SCORE_LENGTHS,
 } from "./westminster_quarters.js";
 import { Part, Score } from "../sketchlib/music/Score.js";
+import { ADSR } from "../sketchlib/instruments/ADSR.js";
+import { FMSynth } from "../sketchlib/instruments/FMSynth.js";
+import { InstrumentMap } from "../sketchlib/instruments/InstrumentMap.js";
 
 const MOUSE = new CanvasMouseHandler();
 
 const MELODY_TICK_TOCK = new Melody(
   new Note(A3, N8),
   new Note(C4, N16),
-  new Note(C4, N16)
+  new Note(C4, N16),
 );
 const TICK_TOCK = new Score(
   new Part("tick_tock", MELODY_TICK_TOCK, {
     instrument_id: "tick",
     midi_channel: 0,
     midi_instrument: 81 - 1, // square lead
-  })
+  }),
 );
 
 /** @type {import("../sketchlib/SoundManager.js").SoundManifest} */
@@ -37,6 +40,12 @@ const SOUND_MANIFEST = {
   sfx: {
     tick_tock: TICK_TOCK,
     ...WESTMINSTER_QUARTERS_SCORES,
+  },
+  instruments: {
+    clock: new InstrumentMap({
+      tick: new FMSynth(2, 25, ADSR.pluck(0.05)),
+      bell: new FMSynth(3, 12, ADSR.pluck(2.0)),
+    }),
   },
 };
 
@@ -54,7 +63,7 @@ class PendulumClockScene {
       "change",
       (/** @type {CustomEvent}*/ e) => {
         this.sound.toggle_sound(e.detail.sound_on);
-      }
+      },
     );
 
     this.next_available_second = -1;
@@ -129,7 +138,7 @@ export const sketch = (p) => {
       WIDTH,
       HEIGHT,
       undefined,
-      document.getElementById("sketch-canvas")
+      document.getElementById("sketch-canvas"),
     ).elt;
 
     MOUSE.setup(canvas);
