@@ -1,12 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { NoteStream } from "./NoteStream.js";
-import { MIDIFile, MIDIHeader } from "./MIDIFile.js";
+import { MIDIHeader } from "./MIDIFile.js";
 import { MIDIMessage } from "./MIDIEvent.js";
 import { C4 } from "../music/pitches.js";
 import { Note } from "../music/Music.js";
 import { Velocity } from "../music/Velocity.js";
 import { N1, N2, N4 } from "../music/durations.js";
 import { Rational } from "../Rational.js";
+import { AbsInterval } from "../music/AbsTimeline.js";
 
 const PPQ = MIDIHeader.DEFAULT_TICKS_PER_QUARTER;
 
@@ -37,7 +38,7 @@ describe("NoteStream", () => {
       stream.process_message(0, MIDIMessage.note_on(0, C4, velocity));
       const result = stream.build(4 * PPQ);
 
-      const expected = [[new Note(C4, N1), Rational.ZERO, N1]];
+      const expected = [new AbsInterval(new Note(C4, N1), Rational.ZERO, N1)];
       expect(result).toEqual(expected);
     });
 
@@ -56,10 +57,10 @@ describe("NoteStream", () => {
       const result = stream.build(4 * PPQ);
 
       const expected = [
-        [new Note(C4, N4), Rational.ZERO, N4],
-        [new Note(C4, N4), N4, N2],
-        [new Note(C4, N4), N2, N2.add(N4)],
-        [new Note(C4, N4), N2.add(N4), N1],
+        new AbsInterval(new Note(C4, N4), Rational.ZERO, N4),
+        new AbsInterval(new Note(C4, N4), N4, N2),
+        new AbsInterval(new Note(C4, N4), N2, N2.add(N4)),
+        new AbsInterval(new Note(C4, N4), N2.add(N4), N1),
       ];
       expect(result).toEqual(expected);
     });
@@ -75,8 +76,8 @@ describe("NoteStream", () => {
       const result = stream.build(3 * PPQ);
 
       const expected = [
-        [new Note(C4, N4), Rational.ZERO, N4],
-        [new Note(C4, N4), N4, N2],
+        new AbsInterval(new Note(C4, N4), Rational.ZERO, N4),
+        new AbsInterval(new Note(C4, N4), N4, N2),
       ];
       expect(result).toEqual(expected);
     });
@@ -92,8 +93,8 @@ describe("NoteStream", () => {
       const result = stream.build(3 * PPQ);
 
       const expected = [
-        [new Note(C4, N4), Rational.ZERO, N4],
-        [new Note(C4, N4), N2, N2.add(N4)],
+        new AbsInterval(new Note(C4, N4), Rational.ZERO, N4),
+        new AbsInterval(new Note(C4, N4), N2, N2.add(N4)),
       ];
       expect(result).toEqual(expected);
     });

@@ -30,7 +30,7 @@ describe("midi_to_score", () => {
 
     const result = midi_to_score(empty);
 
-    const expected = new Score();
+    const expected = [new Score(), []];
     expect(result).toEqual(expected);
   });
 
@@ -42,12 +42,15 @@ describe("midi_to_score", () => {
 
     const result = midi_to_score(one_note);
 
-    const expected_score = new Score(
-      new Part("channel0", new Note(C4, N4), {
-        midi_channel: 0,
-        instrument_id: "channel0",
-      }),
-    );
+    const expected_score = [
+      new Score(
+        new Part("channel0", new Note(C4, N4), {
+          midi_channel: 0,
+          instrument_id: "channel0",
+        }),
+      ),
+      [],
+    ];
     expect(result).toEqual(expected_score);
   });
 });
