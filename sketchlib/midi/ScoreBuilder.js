@@ -253,12 +253,7 @@ export class ScoreBuilder {
    * @returns {Score<number>}
    */
   build() {
-    if (this.ignored.length > 0) {
-      console.log("ignored:", this.ignored);
-    }
-
     const channels = [...this.part_builders.keys()].sort();
-    console.log("channels used:", channels);
 
     return new Score(
       ...channels.map((x) => {
