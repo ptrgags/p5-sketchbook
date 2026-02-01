@@ -1,3 +1,4 @@
+import { AbsInterval } from "../music/AbsTimeline.js";
 import { Note } from "../music/Music.js";
 import { Rational } from "../Rational.js";
 import { MIDIMessage, MIDIMessageType } from "./MIDIEvent.js";
@@ -5,10 +6,10 @@ import { MIDIHeader } from "./MIDIFile.js";
 
 export class NoteStream {
   /**
-   *
+   * Constructor
    * @param {number} ticks_per_quarter ticks per quarter for computing note durations
    */
-  constructor(ticks_per_quarter = MIDIHeader.DEFAULT_TICKS_PER_QUARTER) {
+  constructor(ticks_per_quarter) {
     this.ticks_per_quarter = ticks_per_quarter;
 
     /**
@@ -20,7 +21,7 @@ export class NoteStream {
     this.partial_message = undefined;
 
     /**
-     * @type {[Note, Rational, Rational][]}
+     * @type {AbsInterval<Note<number>>[]}
      */
     this.notes = [];
   }
@@ -37,7 +38,7 @@ export class NoteStream {
   }
 
   /**
-   *
+   * Process note on events
    * @param {number} abs_ticks Absolute time in ticks
    * @param {number} pitch MIDI pitch value 0-127
    * @param {number} velocity MIDI velocity value 0-127
@@ -46,6 +47,11 @@ export class NoteStream {
     // If we had a previous note, this flushes it to the array of
     // parsed notes
     this.note_off(abs_ticks);
+
+    // If velocity was 0, this was a note off event, not a note on event
+    if (velocity === 0) {
+      return;
+    }
 
     this.partial_message = [abs_ticks, pitch, velocity];
   }
@@ -58,11 +64,13 @@ export class NoteStream {
     const [start_ticks, pitch, velocity] = this.partial_message;
     const duration_ticks = abs_ticks - start_ticks;
     const note = new Note(pitch, this.to_measures(duration_ticks), velocity);
-    this.notes.push([
-      note,
-      this.to_measures(start_ticks),
-      this.to_measures(abs_ticks),
-    ]);
+    this.notes.push(
+      new AbsInterval(
+        note,
+        this.to_measures(start_ticks),
+        this.to_measures(abs_ticks),
+      ),
+    );
     this.partial_message = undefined;
   }
 
@@ -83,9 +91,9 @@ export class NoteStream {
   }
 
   /**
-   * Flush
+   * Finalize the note stream and return an array of parsed notes
    * @param {number} end_time Time of end of track message
-   * @returns {[Note, Rational, Rational][]} Sequence of absolute note events
+   * @returns {AbsInterval<Note<number>>[]} Sequence of absolute note events
    */
   build(end_time) {
     // Flush the note stream before returning the array
