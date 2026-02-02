@@ -5,7 +5,6 @@ import { is_nearly } from "../sketchlib/is_nearly.js";
 import { BeziergonPrimitive } from "../sketchlib/primitives/BeziergonPrimitive.js";
 import { CirclePrimitive } from "../sketchlib/primitives/CirclePrimitive.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
-import { PointPrimitive } from "../sketchlib/primitives/PointPrimitive.js";
 import { group } from "../sketchlib/primitives/shorthand.js";
 
 /**
@@ -225,10 +224,7 @@ export class CoralTree {
     this.root.get_all_nodes(nodes);
     const circle_prims = nodes.map((node) => node.circle);
 
-    const vertex_prims = this.get_outline_vertices().map(
-      (x) => new PointPrimitive(x),
-    );
-
+    const vertex_prims = this.get_outline_vertices();
     return group(...circle_prims, ...vertex_prims);
   }
 }

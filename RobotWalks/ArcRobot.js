@@ -10,7 +10,6 @@ import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
-import { PointPrimitive } from "../sketchlib/primitives/PointPrimitive.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 
@@ -288,8 +287,7 @@ export class ArcRobot {
       this.forward_dir(frame).scale(ORIENTATION_LINE_LENGTH),
     );
 
-    const current_position = new PointPrimitive(pos);
-    const styled_position = style(current_position, POINT_STYLE);
+    const styled_position = style(pos, POINT_STYLE);
 
     const orientation_line = new LinePrimitive(pos, step_forward);
     const styled_orientation = style(orientation_line, YELLOW_LINES);
