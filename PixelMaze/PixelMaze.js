@@ -9,8 +9,8 @@ import { Player } from "./Player.js";
 import { preload_p5_resources } from "./preload.js";
 import { Tilemap } from "./Tilemap.js";
 import { Viewport } from "./Viewport.js";
-import { Direction } from "../pga2d/Direction.js";
-import { Point } from "../pga2d/Point.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 
 const TILE_SIZE = 16;
 const TILE_SCALE = 2;
@@ -61,7 +61,7 @@ const VIEWPORT = new Viewport(
   Point.ORIGIN,
   new Direction(WIDTH, HEIGHT),
   VIEWPORT_MARGIN,
-  TILE_SCALE
+  TILE_SCALE,
 );
 
 export const sketch = (p) => {
@@ -93,17 +93,17 @@ export const sketch = (p) => {
 
     current_sprite = new P5Sprite(
       p5_resources.images.character,
-      resources.sprites.walk[CardinalDirection.LEFT]
+      resources.sprites.walk[CardinalDirection.LEFT],
     );
     tilemap = new P5Tilemap(
       p5_resources.images.tileset,
-      new Tilemap(resources.image_frames.tileset_basic, INDICES)
+      new Tilemap(resources.image_frames.tileset_basic, INDICES),
     );
 
     player = new Player(
       resources.sprites.walk,
       resources.sprites.idle,
-      new Direction(4, 10).scale(TILE_SIZE).to_point()
+      new Direction(4, 10).scale(TILE_SIZE).to_point(),
     );
 
     p.noSmooth();
@@ -130,7 +130,7 @@ export const sketch = (p) => {
       p,
       new P5Sprite(p5_resources.images.character, sprite),
       t,
-      VIEWPORT.map_to_viewport(position)
+      VIEWPORT.map_to_viewport(position),
     );
 
     p.pop();

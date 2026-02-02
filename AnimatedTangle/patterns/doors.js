@@ -1,5 +1,5 @@
-import { Direction } from "../../pga2d/Direction.js";
-import { Point } from "../../pga2d/Point.js";
+import { Direction } from "../../sketchlib/pga2d/Direction.js";
+import { Point } from "../../sketchlib/pga2d/Point.js";
 import { Ease } from "../../sketchlib/Ease.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
@@ -29,7 +29,7 @@ const ANIMATED_STRIPES = new AnimatedStripes(
   STRIPE_CENTER,
   STRIPE_DIRECTION,
   STRIPE_SPACING,
-  STRIPE_DIMENSIONS
+  STRIPE_DIMENSIONS,
 );
 
 const STRIPE_STYLES = [
@@ -62,7 +62,7 @@ const BARBER_POLE = group(
       transform: XFORMS[i],
       style,
     });
-  })
+  }),
 );
 
 const DOOR_WIDTH = 50;
@@ -88,7 +88,7 @@ const LOWER_DOOR = new PolygonPrimitive(
     new Point(QUARTER, 0),
     new Point(0, 0),
   ],
-  true
+  true,
 );
 const UPPER_DOOR = new PolygonPrimitive(
   [
@@ -105,7 +105,7 @@ const UPPER_DOOR = new PolygonPrimitive(
     new Point(THREE_QUARTERS, 0),
     new Point(DOOR_WIDTH, 0),
   ],
-  true
+  true,
 );
 
 const DURATION_OPEN = new Rational(1);
@@ -114,8 +114,8 @@ const LIFT_HEIGHT = 50;
 const OPEN_AND_SHUT = LoopCurve.from_timeline(
   new Sequential(
     new ParamCurve(0, LIFT_HEIGHT, DURATION_OPEN, Ease.in_out_cubic),
-    new ParamCurve(LIFT_HEIGHT, 0, DURATION_OPEN, Ease.in_out_cubic)
-  )
+    new ParamCurve(LIFT_HEIGHT, 0, DURATION_OPEN, Ease.in_out_cubic),
+  ),
 );
 
 const STYLE_DOOR_BACKGROUND = new Style({
@@ -147,9 +147,9 @@ class Door {
 
     const background = new RectPrimitive(
       Point.ORIGIN.add(this.shut_offset).add(
-        Direction.DIR_Y.scale(-DOOR_HEIGHT)
+        Direction.DIR_Y.scale(-DOOR_HEIGHT),
       ),
-      new Direction(DOOR_WIDTH, 2 * DOOR_HEIGHT)
+      new Direction(DOOR_WIDTH, 2 * DOOR_HEIGHT),
     );
 
     this.primitive = group(
@@ -161,17 +161,17 @@ class Door {
       new GroupPrimitive(UPPER_DOOR, {
         transform: this.upper_xform,
         style: STYLE_DOOR,
-      })
+      }),
     );
   }
 
   update(time) {
     const height = OPEN_AND_SHUT.value(time - this.shut_time);
     this.lower_xform.translation = this.shut_offset.add(
-      Direction.DIR_Y.scale(height)
+      Direction.DIR_Y.scale(height),
     );
     this.upper_xform.translation = this.shut_offset.add(
-      Direction.DIR_Y.scale(-height)
+      Direction.DIR_Y.scale(-height),
     );
   }
 }

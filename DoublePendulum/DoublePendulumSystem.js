@@ -9,8 +9,8 @@ import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
 import { style } from "../sketchlib/primitives/shorthand.js";
 import { CirclePrimitive } from "../sketchlib/primitives/CirclePrimitive.js";
-import { Point } from "../pga2d/Point.js";
-import { Direction } from "../pga2d/Direction.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
 
 const STYLE_AXIS = Style.DEFAULT_STROKE.with_width(2);
 const ARM_STYLE = STYLE_AXIS;
@@ -49,7 +49,7 @@ export class DoublePendulumSystem {
     this.simulation = new RungeKuttaIntegrator(
       GeneralizedCoordinates,
       (t, state) => this.motion(state),
-      initial_state
+      initial_state,
     );
     this.history = new RingBuffer(history_size);
     this.history.push(initial_state);
@@ -192,10 +192,10 @@ export class DoublePendulumSystem {
 
   angles_to_positions(origin, theta1, theta2) {
     const offset1 = Direction.from_angle(Math.PI / 2 - theta1).scale(
-      this.pendulum1.length * PIXELS_PER_METER
+      this.pendulum1.length * PIXELS_PER_METER,
     );
     const offset2 = Direction.from_angle(Math.PI / 2 - theta2).scale(
-      this.pendulum2.length * PIXELS_PER_METER
+      this.pendulum2.length * PIXELS_PER_METER,
     );
 
     const bob_position1 = origin.add(offset1);
@@ -236,7 +236,7 @@ export class DoublePendulumSystem {
     const [bob_position1, bob_position2] = this.angles_to_positions(
       origin,
       theta1,
-      theta2
+      theta2,
     );
 
     const arm1 = new LinePrimitive(origin, bob_position1);
@@ -244,11 +244,11 @@ export class DoublePendulumSystem {
 
     const bob1 = new CirclePrimitive(
       bob_position1,
-      PIXELS_PER_METER * this.pendulum1.bob_radius
+      PIXELS_PER_METER * this.pendulum1.bob_radius,
     );
     const bob2 = new CirclePrimitive(
       bob_position2,
-      PIXELS_PER_METER * this.pendulum2.bob_radius
+      PIXELS_PER_METER * this.pendulum2.bob_radius,
     );
 
     return style([arm1, arm2, bob1, bob2], ARM_STYLE);

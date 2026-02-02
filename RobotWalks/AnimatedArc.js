@@ -1,5 +1,5 @@
-import { Direction } from "../pga2d/Direction.js";
-import { Point } from "../pga2d/Point.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 import { ArcAngles } from "../sketchlib/ArcAngles.js";
 import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
 import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
@@ -35,7 +35,7 @@ export class AnimatedArc {
      */
     this.line_primitive = new LinePrimitive(
       center.add(Direction.from_angle(angles.start_angle).scale(radius)),
-      center.add(Direction.from_angle(angles.end_angle).scale(radius))
+      center.add(Direction.from_angle(angles.end_angle).scale(radius)),
     );
 
     /**
@@ -46,7 +46,7 @@ export class AnimatedArc {
       angles.start_angle,
       angles.end_angle,
       start_frame,
-      duration
+      duration,
     );
   }
 
@@ -101,12 +101,12 @@ export class AnimatedArc {
     // based on the tween.
     const interpolated_angles = new ArcAngles(
       this.angles.start_angle,
-      this.angle_tween.get_value(frame)
+      this.angle_tween.get_value(frame),
     );
     const partial_arc = new ArcPrimitive(
       this.center,
       this.radius,
-      interpolated_angles
+      interpolated_angles,
     );
     return partial_arc;
   }

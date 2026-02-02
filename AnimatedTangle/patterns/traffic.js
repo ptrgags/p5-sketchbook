@@ -1,5 +1,5 @@
-import { Direction } from "../../pga2d/Direction.js";
-import { Point } from "../../pga2d/Point.js";
+import { Direction } from "../../sketchlib/pga2d/Direction.js";
+import { Point } from "../../sketchlib/pga2d/Point.js";
 import { Ease } from "../../sketchlib/Ease.js";
 import { CirclePrimitive } from "../../sketchlib/primitives/CirclePrimitive.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
@@ -26,7 +26,7 @@ const TIMELINE_POSITION = new Sequential(
   // Enter from the left, slowing down when we reach the center of motion
   new ParamCurve(-HALF_DIST, 0, HALF_DURATION, Ease.out_cubic),
   // Leave to the right, speeding up from rest
-  new ParamCurve(0, HALF_DIST, HALF_DURATION, Ease.in_cubic)
+  new ParamCurve(0, HALF_DIST, HALF_DURATION, Ease.in_cubic),
 );
 const CURVE_POSITION = LoopCurve.from_timeline(TIMELINE_POSITION);
 
@@ -35,11 +35,11 @@ const PLATFORM_HEIGHT = 25;
 const TOP_HEIGHT = 15;
 const PLATFORM_TOP = new RectPrimitive(
   Point.ORIGIN,
-  new Direction(PLATFORM_WIDTH, TOP_HEIGHT)
+  new Direction(PLATFORM_WIDTH, TOP_HEIGHT),
 );
 const PLATFORM_SHADOW = new RectPrimitive(
   new Point(0, TOP_HEIGHT),
-  new Direction(PLATFORM_WIDTH, PLATFORM_HEIGHT - TOP_HEIGHT)
+  new Direction(PLATFORM_WIDTH, PLATFORM_HEIGHT - TOP_HEIGHT),
 );
 const STYLE_TOP = new Style({
   fill: PALETTE_CORAL[Values.MED_LIGHT],

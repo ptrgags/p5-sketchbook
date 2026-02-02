@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { ImageFrames } from "./ImageFrames";
 import { Grid, Index2D } from "../sketchlib/Grid";
 import { Tilemap } from "./Tilemap.js";
-import { Direction } from "../pga2d/Direction";
+import { Direction } from "../sketchlib/pga2d/Direction";
 
 function make_tileset() {
   return new ImageFrames(new Direction(64, 64), new Direction(16, 16));

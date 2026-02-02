@@ -3,7 +3,7 @@ import { CoralTile } from "./CoralTile.js";
 import { CardinalDirection } from "../sketchlib/CardinalDirection.js";
 import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
-import { Point } from "../pga2d/Point.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 
 /**
  * Render the boundaries and cross-bars of a quad to uncolored geometry
@@ -79,7 +79,7 @@ export function render_tile_walls(tile) {
 
     const [start, end] = WALLS[i];
     primitives.push(
-      new LinePrimitive(quad.uv_to_world(start), quad.uv_to_world(end))
+      new LinePrimitive(quad.uv_to_world(start), quad.uv_to_world(end)),
     );
   }
   return primitives;

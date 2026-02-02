@@ -7,7 +7,7 @@ import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
 import { style } from "../sketchlib/primitives/shorthand.js";
 import { BeziergonPrimitive } from "../sketchlib/primitives/BeziergonPrimitive.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
-import { Point } from "../pga2d/Point.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 import { Quadtree } from "./quadtree.js";
 
 const MAX_EDGE_LENGTH = 150;
@@ -210,12 +210,12 @@ export class DifferentialPolyline {
     this.compute_attraction(
       TEMP_TOTAL_FORCE,
       node,
-      mod(index - 1, this.nodes.length)
+      mod(index - 1, this.nodes.length),
     );
     this.compute_attraction(
       TEMP_TOTAL_FORCE,
       node,
-      (index + 1) % this.nodes.length
+      (index + 1) % this.nodes.length,
     );
     this.compute_repulsion(TEMP_TOTAL_FORCE, node);
     //this.compute_containment(TEMP_TOTAL_FORCE, node);
@@ -234,7 +234,7 @@ export class DifferentialPolyline {
 
   make_curve(line_style) {
     const positions = this.nodes.map(
-      (node) => new Point(node.position.x, node.position.y)
+      (node) => new Point(node.position.x, node.position.y),
     );
 
     const beziergon = BeziergonPrimitive.interpolate_points(positions);
@@ -243,7 +243,7 @@ export class DifferentialPolyline {
 
   make_polyline(line_style) {
     const vertices = this.nodes.map(
-      (x) => new Point(x.position.x, x.position.y)
+      (x) => new Point(x.position.x, x.position.y),
     );
     const polygon = new PolygonPrimitive(vertices, true);
     return style(polygon, line_style);

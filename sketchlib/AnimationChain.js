@@ -1,5 +1,5 @@
-import { Point } from "../pga2d/Point.js";
-import { Motor } from "../pga2d/versors.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
+import { Motor } from "../sketchlib/pga2d/versors.js";
 import { Color } from "./Color.js";
 import { LinePrimitive } from "./primitives/LinePrimitive.js";
 import { PointPrimitive } from "./primitives/PointPrimitive.js";
@@ -30,7 +30,7 @@ export class Joint {
     this.position = Joint.constraint_follow(
       target,
       this.position,
-      this.follow_distance
+      this.follow_distance,
     );
   }
 
@@ -47,7 +47,7 @@ export class Joint {
       joint_b.position,
       this.position,
       this.follow_distance,
-      min_bend_angle
+      min_bend_angle,
     );
   }
 

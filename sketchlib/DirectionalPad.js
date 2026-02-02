@@ -1,5 +1,5 @@
-import { Direction } from "../pga2d/Direction.js";
-import { Point } from "../pga2d/Point.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 import { HEIGHT } from "./dimensions.js";
 import { GroupPrimitive } from "./primitives/GroupPrimitive.js";
 import { DirectionInput } from "./DirectionInput.js";
@@ -17,7 +17,7 @@ export class DirectionalPad {
   constructor() {
     this.touch_dpad = new TouchDPad(
       new Rectangle(DPAD_ORIGIN, DPAD_DIMENSIONS),
-      DEAD_ZONE_RADIUS
+      DEAD_ZONE_RADIUS,
     );
     this.keyboard_dpad = new KeyboardDPad("both");
     this.touch_pad_visible = true;
@@ -38,7 +38,7 @@ export class DirectionalPad {
   get direction() {
     return DirectionInput.first_nonzero(
       this.keyboard_dpad.direction,
-      this.touch_dpad.direction
+      this.touch_dpad.direction,
     );
   }
 

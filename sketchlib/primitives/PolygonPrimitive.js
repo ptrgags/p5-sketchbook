@@ -1,4 +1,4 @@
-import { Point } from "../../pga2d/Point.js";
+import { Point } from "../../sketchlib/pga2d/Point.js";
 import { Primitive } from "./Primitive.js";
 
 /**

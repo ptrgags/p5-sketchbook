@@ -1,5 +1,5 @@
-import { Direction } from "../pga2d/Direction.js";
-import { Point } from "../pga2d/Point.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 import { ImageFrames } from "./ImageFrames.js";
 import { Sprite } from "./Sprite.js";
 import { Tilemap } from "./Tilemap.js";
@@ -25,7 +25,7 @@ function blit_frame(p, p5_image, image_frames, frame_id, position) {
     frame_offset.x,
     frame_offset.y,
     dims.x,
-    dims.y
+    dims.y,
   );
 }
 
@@ -65,7 +65,7 @@ export function blit_sprite(p, p5_sprite, t, position) {
     p5_sprite.p5_image,
     p5_sprite.spritesheet,
     frame_id,
-    position.add(origin.neg())
+    position.add(origin.neg()),
   );
 }
 

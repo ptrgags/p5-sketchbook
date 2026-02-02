@@ -1,5 +1,5 @@
-import { Direction } from "../../pga2d/Direction.js";
-import { Point } from "../../pga2d/Point.js";
+import { Direction } from "../../sketchlib/pga2d/Direction.js";
+import { Point } from "../../sketchlib/pga2d/Point.js";
 import { WIDTH } from "../../sketchlib/dimensions.js";
 import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
@@ -51,7 +51,7 @@ const STYLE_SKY = new Style({
 });
 const BACKGROUND = style(
   new RectPrimitive(Point.ORIGIN, new Direction(500, 100)),
-  STYLE_SKY
+  STYLE_SKY,
 );
 
 const SUN_CENTER = new Point(400, 25);
@@ -138,7 +138,7 @@ function make_snowcaps(mountain_points) {
     const snow_down = snow_right.add(offset);
 
     snowcaps.push(
-      new PolygonPrimitive([snow_left, snow_down, snow_right, up], true)
+      new PolygonPrimitive([snow_left, snow_down, snow_right, up], true),
     );
   }
   return style(snowcaps, STYLE_SNOWCAPS);
@@ -159,7 +159,7 @@ class Seascape {
     this.mountain_points = make_zigzag_points(
       n,
       MOUNTAIN_AMPLITUDE,
-      MOUNTAIN_CENTER
+      MOUNTAIN_CENTER,
     );
 
     this.hill_points = new Array(NUM_HILL_LAYERS);
@@ -169,7 +169,7 @@ class Seascape {
       this.hill_points[i] = make_zigzag_points(
         num_hill_points,
         HILL_AMPLITUDE,
-        center_y
+        center_y,
       );
     }
 
@@ -178,7 +178,7 @@ class Seascape {
 
     const mountain_poly = new PolygonPrimitive(
       [...this.mountain_points, BOTTOM_RIGHT, BOTTOM_LEFT],
-      true
+      true,
     );
     const snowcaps = make_snowcaps(this.mountain_points);
 
@@ -237,7 +237,7 @@ class Seascape {
       this.hill_transforms_orig[i].translation = new Direction(hill_offset, 0);
       this.hill_transforms_copy[i].translation = new Direction(
         hill_offset - WIDTH,
-        0
+        0,
       );
     }
   }

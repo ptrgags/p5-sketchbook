@@ -1,4 +1,4 @@
-import { Point } from "../pga2d/Point.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 import { Color } from "./Color.js";
 import { GroupPrimitive } from "./primitives/GroupPrimitive.js";
 import { RectPrimitive } from "./primitives/RectPrimitive.js";
@@ -42,7 +42,7 @@ export class ToggleButton {
     this.button.events.addEventListener("click", () => {
       this.toggle_state = toggle(this.toggle_state);
       this.events.dispatchEvent(
-        new CustomEvent("toggle", { detail: this.toggle_state })
+        new CustomEvent("toggle", { detail: this.toggle_state }),
       );
     });
   }

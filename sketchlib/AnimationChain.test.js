@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { AnimationChain, Joint } from "./AnimationChain";
-import { PGA_MATCHERS } from "../pga2d/pga_matchers";
-import { Point } from "../pga2d/Point";
+import { PGA_MATCHERS } from "../sketchlib/pga2d/pga_matchers";
+import { Point } from "../sketchlib/pga2d/Point";
 
 expect.extend(PGA_MATCHERS);
 
@@ -64,7 +64,7 @@ describe("Joint", () => {
         b,
         c,
         follow_dist,
-        min_bend
+        min_bend,
       );
 
       const expected = new Point(0, -2);
@@ -83,7 +83,7 @@ describe("Joint", () => {
         b,
         c,
         follow_dist,
-        min_bend
+        min_bend,
       );
 
       // Computed in this Desmos graph: https://www.desmos.com/calculator/afwiazpyir
@@ -104,7 +104,7 @@ describe("Joint", () => {
         b,
         c,
         follow_dist,
-        min_bend
+        min_bend,
       );
 
       const expected = new Point(-Math.SQRT1_2, -Math.SQRT1_2 - 1);
@@ -123,7 +123,7 @@ describe("Joint", () => {
         b,
         c,
         follow_dist,
-        min_bend
+        min_bend,
       );
 
       const expected = new Point(Math.SQRT1_2, -Math.SQRT1_2 - 1);
@@ -142,7 +142,7 @@ describe("Joint", () => {
         b,
         c,
         follow_dist,
-        min_bend
+        min_bend,
       );
 
       const expected = new Point(-Math.SQRT1_2, -1 - Math.SQRT1_2);
@@ -161,7 +161,7 @@ describe("Joint", () => {
         b,
         c,
         follow_dist,
-        min_bend
+        min_bend,
       );
 
       const expected = new Point(0, -3);
@@ -180,7 +180,7 @@ describe("Joint", () => {
         b,
         c,
         follow_dist,
-        min_bend
+        min_bend,
       );
 
       const expected = new Point(2 * Math.SQRT1_2, -2 * Math.SQRT1_2 - 1);
@@ -199,7 +199,7 @@ describe("Joint", () => {
         b,
         c,
         follow_dist,
-        min_bend
+        min_bend,
       );
 
       const expected = new Point(-2 * Math.SQRT1_2, -2 * Math.SQRT1_2 - 1);

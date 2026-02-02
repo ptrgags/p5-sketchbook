@@ -8,8 +8,8 @@ import { Color } from "../sketchlib/Color.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
-import { Direction } from "../pga2d/Direction.js";
-import { Point } from "../pga2d/Point.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 
 const ROWS = 16;
 const COLS = 16;
@@ -100,7 +100,7 @@ export class MosaicGrid {
     // Pick the closest cardinal direction and move one cell in that direction.
     const src_center = new Point(
       MARGIN_X + (j + 0.5) * SQUARE_SIZE,
-      MARGIN_Y + (i + 0.5) * SQUARE_SIZE
+      MARGIN_Y + (i + 0.5) * SQUARE_SIZE,
     );
     const to_mouse = mouse.sub(src_center);
 
@@ -165,11 +165,11 @@ export class MosaicGrid {
     const { i: src_i, j: src_j } = src_index;
     const { i: dst_i, j: dst_j } = dst_index;
     const position_a = CORNER.add(
-      new Direction(src_j * SQUARE_SIZE, src_i * SQUARE_SIZE)
+      new Direction(src_j * SQUARE_SIZE, src_i * SQUARE_SIZE),
     );
     const style_a = this.get_style(src_index);
     const position_b = CORNER.add(
-      new Direction(dst_j * SQUARE_SIZE, dst_i * SQUARE_SIZE)
+      new Direction(dst_j * SQUARE_SIZE, dst_i * SQUARE_SIZE),
     );
     const style_b = this.get_style(dst_index);
     return new PixelSwapPair(
@@ -179,7 +179,7 @@ export class MosaicGrid {
       position_b,
       start_frame,
       SWAP_DURATION,
-      SQUARE_SIZE
+      SQUARE_SIZE,
     );
   }
 

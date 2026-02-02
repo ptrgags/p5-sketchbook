@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Point } from "../../pga2d/Point.js";
+import { Point } from "../../sketchlib/pga2d/Point.js";
 import { CirclePrimitive } from "./CirclePrimitive.js";
 
 describe("CirclePrimitive", () => {

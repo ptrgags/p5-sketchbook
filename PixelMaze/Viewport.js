@@ -1,5 +1,5 @@
-import { Direction } from "../pga2d/Direction.js";
-import { Point } from "../pga2d/Point.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 import { Sprite } from "./Sprite.js";
 
 /**
@@ -65,7 +65,7 @@ export class Viewport {
     this.position = median_point(
       candidate_top_left,
       candidate_unchanged,
-      candidate_bottom_right
+      candidate_bottom_right,
     );
   }
 

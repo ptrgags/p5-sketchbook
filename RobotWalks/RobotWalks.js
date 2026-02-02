@@ -4,8 +4,8 @@ import { ArcRobot, N_VALUES } from "./ArcRobot.js";
 import { TouchButton } from "../sketchlib/TouchButton.js";
 import { Rectangle } from "../sketchlib/Rectangle.js";
 import { CanvasMouseHandler } from "../sketchlib/CanvasMouseHandler.js";
-import { Direction } from "../pga2d/Direction.js";
-import { Point } from "../pga2d/Point.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 
 const MOUSE = new CanvasMouseHandler();
 const DPAD = new DirectionalPad();
@@ -14,7 +14,7 @@ const HALF_SCREEN = new Direction(WIDTH / 2, HEIGHT);
 // Virtual touch buttons for left and right keys on mobile.
 const TOUCH_LEFT = new TouchButton(new Rectangle(Point.ORIGIN, HALF_SCREEN));
 const TOUCH_RIGHT = new TouchButton(
-  new Rectangle(new Point(WIDTH / 2, 0), HALF_SCREEN)
+  new Rectangle(new Point(WIDTH / 2, 0), HALF_SCREEN),
 );
 
 export const sketch = (p) => {
@@ -30,7 +30,7 @@ export const sketch = (p) => {
       WIDTH,
       HEIGHT,
       undefined,
-      document.getElementById("sketch-canvas")
+      document.getElementById("sketch-canvas"),
     ).elt;
 
     MOUSE.setup(canvas);

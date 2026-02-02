@@ -3,9 +3,9 @@ import { Color } from "../sketchlib/Color.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
-import { Point } from "../pga2d/Point.js";
-import { Line } from "../pga2d/Line.js";
-import { Direction } from "../pga2d/Direction.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
+import { Line } from "../sketchlib/pga2d/Line.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -65,19 +65,19 @@ function compute_rails() {
   // elongated triangles
   const left_rail_top = new PolygonPrimitive(
     [expect_point(isx_A_top_left), expect_point(isx_A_top_right), VP_RAILS],
-    CLOSED
+    CLOSED,
   );
   const left_rail_side = new PolygonPrimitive(
     [expect_point(isx_A_top_right), expect_point(isx_A_bottom_right), VP_RAILS],
-    CLOSED
+    CLOSED,
   );
   const right_rail_side = new PolygonPrimitive(
     [expect_point(isx_B_bottom_left), expect_point(isx_B_top_left), VP_RAILS],
-    CLOSED
+    CLOSED,
   );
   const right_rail_top = new PolygonPrimitive(
     [expect_point(isx_B_top_left), expect_point(isx_B_top_right), VP_RAILS],
-    CLOSED
+    CLOSED,
   );
 
   return [left_rail_top, left_rail_side, right_rail_top, right_rail_side];
@@ -165,7 +165,7 @@ function railroad_ties(tie_bottoms, tie_thickness) {
     const top_right = tie_top.meet(guide_right);
 
     ties.push(
-      new PolygonPrimitive([quad_a, quad_b, top_right, top_left], CLOSED)
+      new PolygonPrimitive([quad_a, quad_b, top_right, top_left], CLOSED),
     );
   }
 
@@ -175,13 +175,13 @@ function railroad_ties(tie_bottoms, tie_thickness) {
 function make_background() {
   const sky_prim = new RectPrimitive(
     new Point(0, 0),
-    new Direction(WIDTH, VP_RAILS.y)
+    new Direction(WIDTH, VP_RAILS.y),
   );
   const sky = style(sky_prim, SKY_STYLE);
 
   const ground_prim = new RectPrimitive(
     new Point(0, VP_RAILS.y),
-    new Direction(WIDTH, HEIGHT - VP_RAILS.y)
+    new Direction(WIDTH, HEIGHT - VP_RAILS.y),
   );
   const ground = style(ground_prim, GROUND_STYLE);
 
@@ -236,7 +236,7 @@ function make_ties() {
     tie_bottom_left,
     tie_bottom_right,
     VP_RAILS,
-    TIE_SPACING
+    TIE_SPACING,
   );
   const tie_prims = railroad_ties(tie_bottoms, 0.5);
 
@@ -318,7 +318,7 @@ export const sketch = (p) => {
     }
 
     const tie_prims = ANIMATED_TIES.map((x) =>
-      x.compute_polygon(p.frameCount)
+      x.compute_polygon(p.frameCount),
     ).filter((x) => x !== undefined);
     const ties = style(tie_prims, TIE_STYLE);
 

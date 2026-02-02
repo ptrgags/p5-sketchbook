@@ -1,5 +1,5 @@
-import { Direction } from "../../pga2d/Direction.js";
-import { Point } from "../../pga2d/Point.js";
+import { Direction } from "../../sketchlib/pga2d/Direction.js";
+import { Point } from "../../sketchlib/pga2d/Point.js";
 import { GroupPrimitive } from "../primitives/GroupPrimitive.js";
 import { PartialPrimitive, Primitive } from "../primitives/Primitive.js";
 import { group } from "../primitives/shorthand.js";
