@@ -19,7 +19,7 @@ import {
 import { Color } from "../../sketchlib/Color.js";
 import { CardinalDirection } from "../../sketchlib/CardinalDirection.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
-import { CirclePrimitive } from "../../sketchlib/primitives/CirclePrimitive.js";
+import { Circle } from "../../sketchlib/primitives/Circle.js";
 import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
 
 const WIDTH = 500;
@@ -98,10 +98,7 @@ function render_control_points(tiles) {
 
 const HIGHLIGHT_RADIUS = 8;
 function highlight_selection(selected_object) {
-  const circle = new CirclePrimitive(
-    selected_object.position_world,
-    HIGHLIGHT_RADIUS,
-  );
+  const circle = new Circle(selected_object.position_world, HIGHLIGHT_RADIUS);
   return style(circle, HIGHLIGHT_STYLE);
 }
 

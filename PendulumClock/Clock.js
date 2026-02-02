@@ -3,7 +3,7 @@ import { Point } from "../sketchlib/pga2d/Point.js";
 import { Color } from "../sketchlib/Color.js";
 import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
 import { PI, TAU } from "../sketchlib/math_consts.js";
-import { CirclePrimitive } from "../sketchlib/primitives/CirclePrimitive.js";
+import { Circle } from "../sketchlib/primitives/Circle.js";
 import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { VectorPrimitive } from "../sketchlib/primitives/VectorPrimitive.js";
@@ -13,7 +13,7 @@ import { ClockTime } from "./ClockTime.js";
 const OUTER_RADIUS = 100;
 const INNER_RADIUS = 70;
 const CLOCK_CENTER = new Point(WIDTH / 2, HEIGHT / 4);
-const CLOCK_CIRCLE = new CirclePrimitive(CLOCK_CENTER, OUTER_RADIUS);
+const CLOCK_CIRCLE = new Circle(CLOCK_CENTER, OUTER_RADIUS);
 
 const DIRS_12 = new Array(12).fill(0).map((_, i) => {
   const angle = (TAU * i) / 12;
@@ -107,7 +107,7 @@ function render_pendulum(time) {
 
   const arm = new LinePrimitive(CLOCK_CENTER, bob_center);
 
-  const bob = new CirclePrimitive(bob_center, BOB_RADIUS);
+  const bob = new Circle(bob_center, BOB_RADIUS);
 
   const pendulum_arm = style(arm, STYLE_ARM);
   const pendulum_bob = style(bob, STYLE_BOB);

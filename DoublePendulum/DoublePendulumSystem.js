@@ -8,7 +8,7 @@ import { Color } from "../sketchlib/Color.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
 import { style } from "../sketchlib/primitives/shorthand.js";
-import { CirclePrimitive } from "../sketchlib/primitives/CirclePrimitive.js";
+import { Circle } from "../sketchlib/primitives/Circle.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 
@@ -242,11 +242,11 @@ export class DoublePendulumSystem {
     const arm1 = new LinePrimitive(origin, bob_position1);
     const arm2 = new LinePrimitive(bob_position1, bob_position2);
 
-    const bob1 = new CirclePrimitive(
+    const bob1 = new Circle(
       bob_position1,
       PIXELS_PER_METER * this.pendulum1.bob_radius,
     );
-    const bob2 = new CirclePrimitive(
+    const bob2 = new Circle(
       bob_position2,
       PIXELS_PER_METER * this.pendulum2.bob_radius,
     );
