@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { Point } from "../pga2d/Point.js";
 import { Circle } from "./Circle.js";
 
-describe("CirclePrimitive", () => {
+describe("Circle", () => {
   describe("from_two_points", () => {
     it("with identical points returns degenerate circle", () => {
       const a = new Point(1, 2);
