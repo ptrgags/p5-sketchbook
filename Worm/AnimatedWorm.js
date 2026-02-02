@@ -4,7 +4,7 @@ import { Motor } from "../sketchlib/pga2d/versors.js";
 import { AnimationChain, Joint } from "../sketchlib/AnimationChain.js";
 import { is_nearly } from "../sketchlib/is_nearly.js";
 import { BeziergonPrimitive } from "../sketchlib/primitives/BeziergonPrimitive.js";
-import { Circle } from "../sketchlib/primitives/CirclePrimitive.js";
+import { Circle } from "../sketchlib/primitives/Circle.js";
 import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";

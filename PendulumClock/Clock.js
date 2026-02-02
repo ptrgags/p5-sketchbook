@@ -3,7 +3,7 @@ import { Point } from "../sketchlib/pga2d/Point.js";
 import { Color } from "../sketchlib/Color.js";
 import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
 import { PI, TAU } from "../sketchlib/math_consts.js";
-import { Circle } from "../sketchlib/primitives/CirclePrimitive.js";
+import { Circle } from "../sketchlib/primitives/Circle.js";
 import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { VectorPrimitive } from "../sketchlib/primitives/VectorPrimitive.js";

@@ -1,7 +1,7 @@
 import { Sequential } from "../../sketchlib/music/Timeline.js";
 import { Rational } from "../../sketchlib/Rational.js";
 import { Point } from "../../sketchlib/pga2d/Point.js";
-import { Circle } from "../../sketchlib/primitives/CirclePrimitive.js";
+import { Circle } from "../../sketchlib/primitives/Circle.js";
 import { group, style, xform } from "../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Hold, ParamCurve } from "../../sketchlib/animation/ParamCurve.js";

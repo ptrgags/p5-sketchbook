@@ -8,7 +8,7 @@ import { Color } from "../sketchlib/Color.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
 import { style } from "../sketchlib/primitives/shorthand.js";
-import { Circle } from "../sketchlib/primitives/CirclePrimitive.js";
+import { Circle } from "../sketchlib/primitives/Circle.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 

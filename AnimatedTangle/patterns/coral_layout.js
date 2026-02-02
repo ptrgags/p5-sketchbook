@@ -1,6 +1,6 @@
 import { Direction } from "../../sketchlib/pga2d/Direction.js";
 import { Point } from "../../sketchlib/pga2d/Point.js";
-import { Circle } from "../../sketchlib/primitives/CirclePrimitive.js";
+import { Circle } from "../../sketchlib/primitives/Circle.js";
 
 // Node letter labels refer to the concept art diagram
 const RADIUS_BIG = 25;

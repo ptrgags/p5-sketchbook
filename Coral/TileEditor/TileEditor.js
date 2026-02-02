@@ -19,7 +19,7 @@ import {
 import { Color } from "../../sketchlib/Color.js";
 import { CardinalDirection } from "../../sketchlib/CardinalDirection.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
-import { Circle } from "../../sketchlib/primitives/CirclePrimitive.js";
+import { Circle } from "../../sketchlib/primitives/Circle.js";
 import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
 
 const WIDTH = 500;
