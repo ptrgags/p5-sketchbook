@@ -1,4 +1,4 @@
-# P5 Sketchbook (2016, 2021, 2023-2025)
+# P5 Sketchbook (2016, 2021, 2023-2026)
 
 Repo for storing my one-shot p5.js sketches. Contents are subject to change.
 
