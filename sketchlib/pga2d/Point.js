@@ -1,4 +1,5 @@
 import { is_nearly } from "../is_nearly.js";
+import { Primitive } from "../primitives/Primitive.js";
 import { Direction } from "./Direction.js";
 import { Line } from "./Line.js";
 import { Even } from "./multivectors.js";
@@ -12,6 +13,8 @@ import { Even } from "./multivectors.js";
  *
  * Because this is a bivector, some operations like reflection might have
  * a different sign than you expect.
+ *
+ * @implements {Primitive}
  */
 export class Point {
   /**
@@ -150,6 +153,15 @@ export class Point {
    */
   equals(other) {
     return this.bivec.equals(other.bivec);
+  }
+
+  /**
+   * Draw the point as a small circle
+   * @param {import("p5")} p The p5.js library
+   */
+  draw(p) {
+    const POINT_RADIUS = 4;
+    p.circle(this.x, this.y, 2 * POINT_RADIUS);
   }
 
   /**
