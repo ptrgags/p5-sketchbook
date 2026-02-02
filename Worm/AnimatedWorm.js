@@ -6,7 +6,6 @@ import { is_nearly } from "../sketchlib/is_nearly.js";
 import { BeziergonPrimitive } from "../sketchlib/primitives/BeziergonPrimitive.js";
 import { CirclePrimitive } from "../sketchlib/primitives/CirclePrimitive.js";
 import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
-import { PointPrimitive } from "../sketchlib/primitives/PointPrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
@@ -132,7 +131,7 @@ export class AnimatedWorm {
   }
 
   /**
-   *
+   * This worm is a vertibrate...
    * @returns {GroupPrimitive}
    */
   render_spine() {
@@ -142,9 +141,7 @@ export class AnimatedWorm {
       lines[i] = new LinePrimitive(positions[i], positions[i + 1]);
     }
     const spine_group = style(lines, SPINE_STYLE);
-
-    const centers = positions.map((x) => new PointPrimitive(x));
-    const centers_group = style(centers, CENTER_STYLE);
+    const centers_group = style(positions, CENTER_STYLE);
 
     return group(spine_group, centers_group);
   }
