@@ -1,4 +1,4 @@
-import { Direction } from "../pga2d/Direction.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { group } from "../sketchlib/primitives/shorthand.js";
 import { MidiPitch } from "../sketchlib/music/pitch_conversions.js";
 import { Rectangle } from "../sketchlib/Rectangle.js";
@@ -37,10 +37,10 @@ export class Piano {
     this.octave_pianos = new Array(this.num_octaves);
     for (let i = 0; i < num_octaves; i++) {
       const offset = bounding_rect.position.add(
-        Direction.DIR_X.scale(i * octave_width)
+        Direction.DIR_X.scale(i * octave_width),
       );
       this.octave_pianos[i] = new SingleOctavePiano(
-        new Rectangle(offset, octave_dimensions)
+        new Rectangle(offset, octave_dimensions),
       );
     }
   }

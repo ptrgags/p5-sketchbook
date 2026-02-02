@@ -1,6 +1,6 @@
 import { Style } from "../sketchlib/Style.js";
 import { Color } from "../sketchlib/Color.js";
-import { Motor } from "../pga2d/versors.js";
+import { Motor } from "../sketchlib/pga2d/versors.js";
 import { AnimationChain, Joint } from "../sketchlib/AnimationChain.js";
 import { is_nearly } from "../sketchlib/is_nearly.js";
 import { BeziergonPrimitive } from "../sketchlib/primitives/BeziergonPrimitive.js";
@@ -8,9 +8,9 @@ import { CirclePrimitive } from "../sketchlib/primitives/CirclePrimitive.js";
 import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
 import { PointPrimitive } from "../sketchlib/primitives/PointPrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
-import { Direction } from "../pga2d/Direction.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
-import { Point } from "../pga2d/Point.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 import { GooglyEye } from "../sketchlib/primitives/GooglyEye.js";
 
 const WORM_SEGMENTS = 60;
@@ -77,13 +77,13 @@ export class AnimatedWorm {
         first_point.add(Direction.DIR_X.scale(-WORM_EYE_SEPARATION)),
         this.look_direction,
         WORM_EYE_RADIUS,
-        WORM_PUPIL_RADIUS
+        WORM_PUPIL_RADIUS,
       ),
       new GooglyEye(
         first_point.add(Direction.DIR_X.scale(WORM_EYE_SEPARATION)),
         this.look_direction,
         WORM_EYE_RADIUS,
-        WORM_PUPIL_RADIUS
+        WORM_PUPIL_RADIUS,
       ),
     ];
     /**

@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { frames_to_sec, sec_to_frames, Tween } from "./Tween.js";
-import { PGA_MATCHERS } from "../pga2d/pga_matchers.js";
-import { Point } from "../pga2d/Point.js";
-import { Direction } from "../pga2d/Direction.js";
+import { PGA_MATCHERS } from "../sketchlib/pga2d/pga_matchers.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Ease } from "./Ease.js";
 
 function make_tween() {

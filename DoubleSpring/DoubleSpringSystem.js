@@ -7,8 +7,8 @@ import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
-import { Direction } from "../pga2d/Direction.js";
-import { Point } from "../pga2d/Point.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 
 const PIXELS_PER_METER = 100;
 const X_METERS = Direction.DIR_X.scale(PIXELS_PER_METER);
@@ -84,7 +84,7 @@ export class DoubleSpringSystem {
     this.simulation = new RungeKuttaIntegrator(
       GeneralizedCoordinates,
       (t, state) => this.motion(state),
-      initial_state
+      initial_state,
     );
     this.history = new RingBuffer(history_size);
     this.history.push(initial_state);
@@ -128,10 +128,10 @@ export class DoubleSpringSystem {
 
     const states = [...this.history];
     const points1 = states.map(([x1, v1, ,]) =>
-      origin.add(x_dir.scale(x1)).add(v_dir.scale(v1))
+      origin.add(x_dir.scale(x1)).add(v_dir.scale(v1)),
     );
     const points2 = states.map(([, , x2, v2]) =>
-      origin.add(x_dir.scale(x2)).add(v_dir.scale(v2))
+      origin.add(x_dir.scale(x2)).add(v_dir.scale(v2)),
     );
 
     const phase1 = [];
@@ -186,28 +186,28 @@ export class DoubleSpringSystem {
     const bob1_position = bob_height.add(X_METERS.scale(l1 + x1));
     const bob1 = new RectPrimitive(
       bob1_position,
-      new Direction(w1, w1).scale(PIXELS_PER_METER)
+      new Direction(w1, w1).scale(PIXELS_PER_METER),
     );
 
     const left_spring = render_horizontal_spring(
       bob_height,
       X_METERS.scale(l1 + x1).add(Y_METERS.scale(-w1)),
       NUM_COILS,
-      this.spring1.spring_style
+      this.spring1.spring_style,
     );
 
     const rest_length2 = l1 + w1 + l2;
     const bob2_position = bob_height.add(X_METERS.scale(rest_length2 + x2));
     const bob2 = new RectPrimitive(
       bob2_position,
-      new Direction(w2, w2).scale(PIXELS_PER_METER)
+      new Direction(w2, w2).scale(PIXELS_PER_METER),
     );
 
     const right_spring = render_horizontal_spring(
       bob1_position.add(X_METERS.scale(w1)),
       X_METERS.scale(l2 + (x2 - x1)).add(Y_METERS.scale(-w2)),
       NUM_COILS,
-      this.spring2.spring_style
+      this.spring2.spring_style,
     );
 
     const walls = style([wall, floor], STYLE_WALLS);

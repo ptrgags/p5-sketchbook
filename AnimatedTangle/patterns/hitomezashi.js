@@ -1,5 +1,5 @@
-import { Direction } from "../../pga2d/Direction.js";
-import { Point } from "../../pga2d/Point.js";
+import { Direction } from "../../sketchlib/pga2d/Direction.js";
+import { Point } from "../../sketchlib/pga2d/Point.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
 import { style } from "../../sketchlib/primitives/shorthand.js";
@@ -81,14 +81,14 @@ const UNSTITCH_DURATION = new Rational(4);
 const CURVE_START = LoopCurve.from_timeline(
   new Sequential(
     new Hold(STITCH_DURATION),
-    new ParamCurve(0, 1, UNSTITCH_DURATION)
-  )
+    new ParamCurve(0, 1, UNSTITCH_DURATION),
+  ),
 );
 const CURVE_END = LoopCurve.from_timeline(
   new Sequential(
     new ParamCurve(0, 1, STITCH_DURATION),
-    new Hold(UNSTITCH_DURATION)
-  )
+    new Hold(UNSTITCH_DURATION),
+  ),
 );
 
 const STYLE_STITCHES = new Style({

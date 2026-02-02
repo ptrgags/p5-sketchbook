@@ -1,5 +1,5 @@
-import { Direction } from "../pga2d/Direction.js";
-import { Point } from "../pga2d/Point.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 import { Color } from "../sketchlib/Color.js";
 import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
 import { PI, TAU } from "../sketchlib/math_consts.js";
@@ -62,15 +62,15 @@ function render_clock_hands(time) {
 
   const hour_hand = new VectorPrimitive(
     CLOCK_CENTER,
-    CLOCK_CENTER.add(dir_hour.scale(LENGTH_HOUR_HAND))
+    CLOCK_CENTER.add(dir_hour.scale(LENGTH_HOUR_HAND)),
   );
   const minute_hand = new VectorPrimitive(
     CLOCK_CENTER,
-    CLOCK_CENTER.add(dir_minute.scale(LENGTH_MINUTE_HAND))
+    CLOCK_CENTER.add(dir_minute.scale(LENGTH_MINUTE_HAND)),
   );
   const second_hand = new VectorPrimitive(
     CLOCK_CENTER,
-    CLOCK_CENTER.add(dir_second.scale(LENGTH_SECOND_HAND))
+    CLOCK_CENTER.add(dir_second.scale(LENGTH_SECOND_HAND)),
   );
 
   const style_second = new Style({
@@ -127,7 +127,7 @@ export class Clock {
 
     if (this.current_time.seconds !== this.prev_seconds) {
       this.events.dispatchEvent(
-        new CustomEvent("tick", { detail: this.current_time })
+        new CustomEvent("tick", { detail: this.current_time }),
       );
     }
     this.prev_seconds = this.current_time.seconds;

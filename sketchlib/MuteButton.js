@@ -1,5 +1,5 @@
-import { Direction } from "../pga2d/Direction.js";
-import { Point } from "../pga2d/Point.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 import { Color } from "./Color.js";
 import { WIDTH } from "./dimensions.js";
 import { LinePrimitive } from "./primitives/LinePrimitive.js";
@@ -21,52 +21,52 @@ const SPEAKER_CONE = new PolygonPrimitive(
     SOUND_TOGGLE_CORNER.add(
       new Direction(
         SOUND_TOGGLE_SIZE / 2,
-        SOUND_TOGGLE_SIZE - SOUND_TOGGLE_SIZE / 3
-      )
+        SOUND_TOGGLE_SIZE - SOUND_TOGGLE_SIZE / 3,
+      ),
     ),
     SOUND_TOGGLE_CORNER.add(
-      new Direction(SOUND_TOGGLE_SIZE / 2, SOUND_TOGGLE_SIZE / 3)
+      new Direction(SOUND_TOGGLE_SIZE / 2, SOUND_TOGGLE_SIZE / 3),
     ),
   ],
-  true
+  true,
 );
 const SPEAKER_BASE = new PolygonPrimitive(
   [
     SOUND_TOGGLE_CORNER.add(
-      new Direction(SOUND_TOGGLE_SIZE / 2, SOUND_TOGGLE_SIZE / 3)
+      new Direction(SOUND_TOGGLE_SIZE / 2, SOUND_TOGGLE_SIZE / 3),
     ),
     SOUND_TOGGLE_CORNER.add(
       new Direction(
         SOUND_TOGGLE_SIZE / 2,
-        SOUND_TOGGLE_SIZE - SOUND_TOGGLE_SIZE / 3
-      )
+        SOUND_TOGGLE_SIZE - SOUND_TOGGLE_SIZE / 3,
+      ),
     ),
     SOUND_TOGGLE_CORNER.add(
       new Direction(
         SOUND_TOGGLE_SIZE / 2 + 10,
-        SOUND_TOGGLE_SIZE - SOUND_TOGGLE_SIZE / 3
-      )
+        SOUND_TOGGLE_SIZE - SOUND_TOGGLE_SIZE / 3,
+      ),
     ),
     SOUND_TOGGLE_CORNER.add(
-      new Direction(SOUND_TOGGLE_SIZE / 2 + 10, SOUND_TOGGLE_SIZE / 3)
+      new Direction(SOUND_TOGGLE_SIZE / 2 + 10, SOUND_TOGGLE_SIZE / 3),
     ),
   ],
-  true
+  true,
 );
 
 const SPEAKER = style(
   [SPEAKER_BASE, SPEAKER_CONE],
-  new Style({ stroke: Color.WHITE })
+  new Style({ stroke: Color.WHITE }),
 );
 
 const SPEAKER_SLASH = style(
   new LinePrimitive(
     SOUND_TOGGLE_CORNER.add(new Direction(2, 2)),
     SOUND_TOGGLE_CORNER.add(
-      new Direction((3 * SOUND_TOGGLE_SIZE) / 4 - 2, SOUND_TOGGLE_SIZE - 2)
-    )
+      new Direction((3 * SOUND_TOGGLE_SIZE) / 4 - 2, SOUND_TOGGLE_SIZE - 2),
+    ),
   ),
-  new Style({ stroke: Color.RED })
+  new Style({ stroke: Color.RED }),
 );
 const GROUP_MUTED = group(SPEAKER, SPEAKER_SLASH);
 const GROUP_UNMUTED = SPEAKER;
@@ -76,9 +76,9 @@ export class MuteButton {
     this.sound_toggle = new ToggleButton(
       new Rectangle(
         SOUND_TOGGLE_CORNER,
-        new Direction(SOUND_TOGGLE_SIZE, SOUND_TOGGLE_SIZE)
+        new Direction(SOUND_TOGGLE_SIZE, SOUND_TOGGLE_SIZE),
       ),
-      SOUND_ON
+      SOUND_ON,
     );
 
     this.events = new EventTarget();
@@ -89,9 +89,9 @@ export class MuteButton {
         const state = e.detail;
         const sound_on = state === SOUND_ON;
         this.events.dispatchEvent(
-          new CustomEvent("change", { detail: { sound_on } })
+          new CustomEvent("change", { detail: { sound_on } }),
         );
-      }
+      },
     );
   }
 

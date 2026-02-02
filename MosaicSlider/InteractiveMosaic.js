@@ -1,4 +1,4 @@
-import { Point } from "../pga2d/Point.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 import { Color } from "../sketchlib/Color.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { group } from "../sketchlib/primitives/shorthand.js";
@@ -75,7 +75,7 @@ export class InteractiveMosaic {
       this.swap_pair = this.grid.pop_out_pair(
         this.src_index,
         this.dst_index,
-        this.frame
+        this.frame,
       );
       this.state = SliderState.ANIMATING;
     }

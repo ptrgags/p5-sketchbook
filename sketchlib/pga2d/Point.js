@@ -1,4 +1,4 @@
-import { is_nearly } from "../sketchlib/is_nearly.js";
+import { is_nearly } from "../is_nearly.js";
 import { Direction } from "./Direction.js";
 import { Line } from "./Line.js";
 import { Even } from "./multivectors.js";

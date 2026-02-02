@@ -1,4 +1,4 @@
-import { is_nearly } from "../sketchlib/is_nearly";
+import { is_nearly } from "..//is_nearly";
 import { Direction } from "./Direction";
 import { Line } from "./Line";
 import { Even, Odd } from "./multivectors";

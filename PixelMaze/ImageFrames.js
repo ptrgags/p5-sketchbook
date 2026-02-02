@@ -1,4 +1,4 @@
-import { Direction } from "../pga2d/Direction.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
 
 /**
  * Class for managing frames of a spritesheet or tile
@@ -17,7 +17,7 @@ export class ImageFrames {
 
     if (w % frame_w !== 0 || h % frame_h !== 0) {
       throw new Error(
-        "image_dimensions must be divisible by frame_size in both dimensions"
+        "image_dimensions must be divisible by frame_size in both dimensions",
       );
     }
 

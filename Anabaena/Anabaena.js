@@ -1,8 +1,8 @@
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { fix_mouse_coords } from "../sketchlib/fix_mouse_coords.js";
 
-import { Point } from "../pga2d/Point.js";
-import { Direction } from "../pga2d/Direction.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { prevent_mobile_scroll } from "../sketchlib/prevent_mobile_scroll.js";
 import { LSystem } from "../sketchlib/LSystem.js";
 import { sec_to_frames, Tween } from "../sketchlib/Tween.js";
@@ -63,7 +63,7 @@ class AnabaenaCatenula {
       LENGTH_SHORT,
       LENGTH_LONG,
       0,
-      DURATION_GROWTH
+      DURATION_GROWTH,
     );
 
     /**
@@ -73,7 +73,7 @@ class AnabaenaCatenula {
       LENGTH_LONG,
       LENGTH_BEFORE_SPLIT,
       0,
-      DURATION_GROWTH
+      DURATION_GROWTH,
     );
 
     // The chain will always be this.current_symbols.length + 1
@@ -83,10 +83,10 @@ class AnabaenaCatenula {
         new Joint(INITIAL_POSITION, 0),
         new Joint(
           INITIAL_POSITION.add(Direction.DIR_Y.scale(LENGTH_SHORT)),
-          LENGTH_SHORT
+          LENGTH_SHORT,
         ),
       ],
-      MIN_BEND_ANGLE
+      MIN_BEND_ANGLE,
     );
   }
 

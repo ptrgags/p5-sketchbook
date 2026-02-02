@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { BezierPrimitive } from "./BezierPrimitive";
-import { PGA_MATCHERS } from "../../pga2d/pga_matchers";
-import { Point } from "../../pga2d/Point";
+import { PGA_MATCHERS } from "../../sketchlib/pga2d/pga_matchers";
+import { Point } from "../../sketchlib/pga2d/Point";
 
 expect.extend(PGA_MATCHERS);
 

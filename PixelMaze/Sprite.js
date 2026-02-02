@@ -1,4 +1,4 @@
-import { Direction } from "../pga2d/Direction.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { mod } from "../sketchlib/mod.js";
 import { ImageFrames } from "./ImageFrames.js";
 
@@ -24,7 +24,7 @@ export class Sprite {
 
     if (start_frame < min_frame || start_frame >= max_frame) {
       throw new Error(
-        `start frame out of bounds, must be in [${min_frame}, ${max_frame})`
+        `start frame out of bounds, must be in [${min_frame}, ${max_frame})`,
       );
     }
 
@@ -84,19 +84,19 @@ export class Sprite {
       image_frames,
       start_row + 1,
       frame_count,
-      origin
+      origin,
     );
     const left = Sprite.from_row(
       image_frames,
       start_row + 2,
       frame_count,
-      origin
+      origin,
     );
     const down = Sprite.from_row(
       image_frames,
       start_row + 3,
       frame_count,
-      origin
+      origin,
     );
     return [right, up, left, down];
   }

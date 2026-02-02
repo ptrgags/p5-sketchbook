@@ -1,4 +1,4 @@
-import { Point } from "../../pga2d/Point.js";
+import { Point } from "../../sketchlib/pga2d/Point.js";
 
 /**
  * Cubic Bezier curve
@@ -41,7 +41,7 @@ export class BezierPrimitive {
     const sixth = 1 / 6;
     const p0 = new Point(
       sixth * (x0 + 4 * x1 + x2),
-      sixth * (y0 + 4 * y1 + y2)
+      sixth * (y0 + 4 * y1 + y2),
     );
 
     // p1 and p2 are just 1/3 and 2/3 of the way across the line segment
@@ -52,7 +52,7 @@ export class BezierPrimitive {
     // p3 =
     const p3 = new Point(
       sixth * (x1 + 4 * x2 + x3),
-      sixth * (y1 + 4 * y2 + y3)
+      sixth * (y1 + 4 * y2 + y3),
     );
 
     return new BezierPrimitive(p0, p1, p2, p3);

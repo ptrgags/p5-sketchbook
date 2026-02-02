@@ -7,7 +7,7 @@ import { Index2D } from "../sketchlib/Grid.js";
 import { Tiles } from "./make_maze.js";
 import { Tilemap } from "./Tilemap.js";
 import { DirectionInput } from "../sketchlib/DirectionInput.js";
-import { Point } from "../pga2d/Point.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 
 const TILE_SIZE = 16;
 
@@ -88,7 +88,7 @@ export class Player {
     const destination = this.find_destination_cell(
       tilemap,
       this.position,
-      this.input_direction
+      this.input_direction,
     );
 
     if (destination !== undefined) {
@@ -96,7 +96,7 @@ export class Player {
         this.position,
         destination,
         start_frame,
-        DURATION_WALK
+        DURATION_WALK,
       );
       this.animation_speed = ANIMATION_SPEED_MEDIUM;
     } else {
@@ -106,7 +106,7 @@ export class Player {
         this.position,
         this.position,
         start_frame,
-        DURATION_WALK_IN_PLACE
+        DURATION_WALK_IN_PLACE,
       );
       // Render the walk cycle slower to look like we're obstructed
       this.animation_speed = ANIMATION_SPEED_SLOW;

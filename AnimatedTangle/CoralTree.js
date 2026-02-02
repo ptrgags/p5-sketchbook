@@ -1,6 +1,6 @@
-import { Direction } from "../pga2d/Direction.js";
-import { Point } from "../pga2d/Point.js";
-import { Motor } from "../pga2d/versors.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
+import { Motor } from "../sketchlib/pga2d/versors.js";
 import { is_nearly } from "../sketchlib/is_nearly.js";
 import { BeziergonPrimitive } from "../sketchlib/primitives/BeziergonPrimitive.js";
 import { CirclePrimitive } from "../sketchlib/primitives/CirclePrimitive.js";
@@ -132,7 +132,7 @@ export class CoralNode {
 
     // Get the direction to each child
     const to_children = this.children.map((child) =>
-      child.circle.position.sub(center).normalize()
+      child.circle.position.sub(center).normalize(),
     );
 
     // Point on the left, placed at the half angle between the forward
@@ -153,7 +153,7 @@ export class CoralNode {
       const dir_between = halfway(
         dir_left_child,
         dir_right_child,
-        dir_backward
+        dir_backward,
       );
       const between_point = center.add(dir_between.scale(radius));
 
@@ -168,7 +168,7 @@ export class CoralNode {
     const dir_after = halfway(
       to_children[to_children.length - 1],
       dir_forward,
-      dir_right
+      dir_right,
     );
     const after_point = center.add(dir_after.scale(radius));
 
@@ -226,7 +226,7 @@ export class CoralTree {
     const circle_prims = nodes.map((node) => node.circle);
 
     const vertex_prims = this.get_outline_vertices().map(
-      (x) => new PointPrimitive(x)
+      (x) => new PointPrimitive(x),
     );
 
     return group(...circle_prims, ...vertex_prims);
