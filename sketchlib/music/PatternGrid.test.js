@@ -159,7 +159,7 @@ describe("PatternGrid", () => {
 
       expect(() => {
         return PatternGrid.unzip(chord);
-      }).toThrowError("split is only defined for monophonic music");
+      }).toThrowError("unzip is only defined for monophonic melodies");
     });
 
     it("with quarter note melody produces correct grids", () => {
@@ -206,7 +206,7 @@ describe("PatternGrid", () => {
             Velocity.MF,
             Velocity.FFF,
           ],
-          N4,
+          N16,
         ),
       };
       expect(result).toEqual(expected);

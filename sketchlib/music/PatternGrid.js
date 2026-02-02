@@ -1,7 +1,80 @@
 import { Rational } from "../Rational.js";
 import { Melody, Note, Rest } from "./Music.js";
+import { RelTimelineOps } from "./RelTimelineOps.js";
 import { RhythmStep } from "./RhythmStep.js";
 import { Velocity } from "./Velocity.js";
+
+/**
+ * Iterate over a RhythmGrid and
+ * @param {PatternGrid<RhythmStep>} rhythm
+ * @returns {Generator<[boolean, Rational]>} (is_note, duration) pair.
+ */
+function* beat_iter(rhythm) {
+  /**
+   * @type {RhythmStep | undefined}
+   */
+  let previous = undefined;
+  let is_note = undefined;
+  let run_length = 0;
+  for (const step of rhythm) {
+    // (prev, step)
+    // (undefined, rest | sustain) => start rest
+    // (undefined, hit) => start a beat
+
+    // (rest, hit) => emit run, start note
+    // (hit, hit) => emit run, start note
+    // (sustain, hit) => emit run, start note
+
+    // (hit, rest) => emit run, start rest
+    // (sustain, rest) | run is note => emit run, start rest
+
+    // (rest, rest | sustain) => run_length++
+    // (hit, sustain) => run_length++
+    // (sustain, rest) | run is rest => run_length++
+    // (sustain, sustain) => run_length++
+
+    // If this is the first step, start a new run of note/rest.
+    // Here SUSTAIN is treated like a rest since there is no note before it.
+    if (previous === undefined) {
+      is_note = step === RhythmStep.HIT;
+      run_length = 1;
+    } else if (step === RhythmStep.HIT) {
+      // Emit previous run
+      yield [is_note, rhythm.step_size.mul(new Rational(run_length))];
+
+      // Start a note run
+      is_note = true;
+      run_length = 1;
+    } else if (previous !== RhythmStep.REST && step === RhythmStep.REST) {
+      // Emit previous run
+      yield [is_note, rhythm.step_size.mul(new Rational(run_length))];
+
+      is_note = false;
+      run_length = 1;
+    } else {
+      // all other cases, sustain the current run
+      run_length++;
+    }
+    previous = step;
+  }
+
+  yield [is_note, rhythm.step_size.mul(new Rational(run_length))];
+}
+
+/**
+ * Compute the smallest subdivision, i.e. the largest denominator in all of the
+ * duration values
+ * @param {import("./Music.js").Music<number>} melody
+ * @return {Rational} denominator value
+ */
+function compute_subdivision(melody) {
+  let max_denom = 0;
+  for (const note_or_rest of RelTimelineOps.iter_with_gaps(melody)) {
+    max_denom = Math.max(max_denom, note_or_rest.duration.denominator);
+  }
+
+  return new Rational(1, max_denom);
+}
 
 /**
  * @template T
@@ -108,63 +181,40 @@ export class PatternGrid {
    * }} The rhythm, pitch and velocity of the melody
    */
   static unzip(melody) {
-    return { rhythm: undefined, pitch: undefined, velocity: undefined };
-  }
-}
-
-/**
- * Iterate over a RhythmGrid and
- * @param {PatternGrid<RhythmStep>} rhythm
- * @returns {Generator<[boolean, Rational]>} (is_note, duration) pair.
- */
-function* beat_iter(rhythm) {
-  /**
-   * @type {RhythmStep | undefined}
-   */
-  let previous = undefined;
-  let is_note = undefined;
-  let run_length = 0;
-  for (const step of rhythm) {
-    // (prev, step)
-    // (undefined, rest | sustain) => start rest
-    // (undefined, hit) => start a beat
-
-    // (rest, hit) => emit run, start note
-    // (hit, hit) => emit run, start note
-    // (sustain, hit) => emit run, start note
-
-    // (hit, rest) => emit run, start rest
-    // (sustain, rest) | run is note => emit run, start rest
-
-    // (rest, rest | sustain) => run_length++
-    // (hit, sustain) => run_length++
-    // (sustain, rest) | run is rest => run_length++
-    // (sustain, sustain) => run_length++
-
-    // If this is the first step, start a new run of note/rest.
-    // Here SUSTAIN is treated like a rest since there is no note before it.
-    if (previous === undefined) {
-      is_note = step === RhythmStep.HIT;
-      run_length = 1;
-    } else if (step === RhythmStep.HIT) {
-      // Emit previous run
-      yield [is_note, rhythm.step_size.mul(new Rational(run_length))];
-
-      // Start a note run
-      is_note = true;
-      run_length = 1;
-    } else if (previous !== RhythmStep.REST && step === RhythmStep.REST) {
-      // Emit previous run
-      yield [is_note, rhythm.step_size.mul(new Rational(run_length))];
-
-      is_note = false;
-      run_length = 1;
-    } else {
-      // all other cases, sustain the current run
-      run_length++;
+    // First, check if the melody is monophonic
+    if (RelTimelineOps.num_lanes(melody) > 1) {
+      throw new Error("unzip is only defined for monophonic melodies");
     }
-    previous = step;
-  }
 
-  yield [is_note, rhythm.step_size.mul(new Rational(run_length))];
+    // First, figure out the grid subdivision
+    const subdivision = compute_subdivision(melody);
+
+    const SMALL_SUBDIVISION = new Rational(1, 64);
+    if (subdivision.lt(SMALL_SUBDIVISION)) {
+      console.warn("Unusual grid subdivision detected:", subdivision);
+    }
+
+    const rhythm_values = [];
+    const pitch_values = [];
+    const velocity_values = [];
+
+    for (const note of RelTimelineOps.iter_with_gaps(melody)) {
+      if (note instanceof Rest) {
+        // TODO: repeat the value (note.duration / subdivision) times
+        rhythm_values.push(RhythmStep.REST);
+      } else {
+        // TODO: It should be x------ where the length of the string
+        // is equal to note.duration / subdivision
+        rhythm_values.push(RhythmStep.HIT);
+        pitch_values.push(note.pitch);
+        velocity_values.push(note.velocity);
+      }
+    }
+
+    return {
+      rhythm: new PatternGrid(rhythm_values, subdivision),
+      pitch: new PatternGrid(pitch_values, subdivision),
+      velocity: new PatternGrid(velocity_values, subdivision),
+    };
+  }
 }
