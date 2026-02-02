@@ -96,6 +96,20 @@ export class PatternGrid {
 
     return new Melody(...notes);
   }
+
+  /**
+   * Unzip a (monophonic) timeline into rhythm, pitch, and velocity. This will be quantized
+   * to the smallest denominator in the score.
+   * @param {import("./Timeline.js").Timeline<Note>} melody The original melody
+   * @returns {{
+   *    rhythm: PatternGrid<RhythmStep>,
+   *    pitch: PatternGrid<number>,
+   *    velocity: PatternGrid<number>,
+   * }} The rhythm, pitch and velocity of the melody
+   */
+  static unzip(melody) {
+    return { rhythm: undefined, pitch: undefined, velocity: undefined };
+  }
 }
 
 /**

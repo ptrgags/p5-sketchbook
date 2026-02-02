@@ -1,10 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { PatternGrid } from "./PatternGrid.js";
-import { N16, N4, N8 } from "./durations.js";
+import { N16, N2, N4, N8 } from "./durations.js";
 import { RhythmStep } from "./RhythmStep.js";
-import { C4, C5, E4, F4, F5, G4 } from "./pitches.js";
+import { C3, C4, C5, E4, F4, F5, G3, G4 } from "./pitches.js";
 import { Velocity } from "./Velocity.js";
-import { Melody, Note, Rest } from "./Music.js";
+import { Harmony, Melody, Note, Rest } from "./Music.js";
 import { Rational } from "../Rational.js";
 
 describe("PatternGrid", () => {
@@ -35,7 +35,7 @@ describe("PatternGrid", () => {
     });
   });
 
-  describe("zip and unzip", () => {
+  describe("zip", () => {
     it("zip with different number of pitches and velocities throws", () => {
       const rhythm = PatternGrid.rhythm("x.x.x.x.", N8);
       const pitches = new PatternGrid([C4, E4, G4, C5], N4);
@@ -145,6 +145,70 @@ describe("PatternGrid", () => {
         new Note(C5, N16, Velocity.P),
         new Rest(N16),
       );
+      expect(result).toEqual(expected);
+    });
+  });
+
+  describe("unzip", () => {
+    it("with polyphonic music throws", () => {
+      const chord = new Harmony(
+        new Note(G4, N4),
+        new Note(E4, N4),
+        new Note(C4, N4),
+      );
+
+      expect(() => {
+        return PatternGrid.unzip(chord);
+      }).toThrowError("split is only defined for monophonic music");
+    });
+
+    it("with quarter note melody produces correct grids", () => {
+      const melody = new Melody(
+        new Note(C4, N4, Velocity.P),
+        new Note(E4, N4, Velocity.F),
+        new Rest(N4),
+        new Note(G4, N4, Velocity.FFF),
+      );
+
+      const result = PatternGrid.unzip(melody);
+
+      const expected = {
+        rhythm: PatternGrid.rhythm("xx.x", N4),
+        pitch: new PatternGrid([C4, E4, G4], N4),
+        velocity: new PatternGrid([Velocity.P, Velocity.F, Velocity.FFF], N4),
+      };
+      expect(result).toEqual(expected);
+    });
+
+    it("with complex rhythm produces correct grids", () => {
+      const melody = new Melody(
+        new Note(C4, N2, Velocity.P),
+        new Note(E4, N4, Velocity.F),
+        new Note(C3, N8),
+        new Rest(N4),
+        new Note(G3, N8),
+        new Note(C3, N16),
+        new Rest(N4),
+        new Note(G4, new Rational(3, 8), Velocity.FFF),
+      );
+
+      const result = PatternGrid.unzip(melody);
+
+      const expected = {
+        rhythm: PatternGrid.rhythm("x-------x---x-....x-xx---x-----", N16),
+        pitch: new PatternGrid([C4, E4, C3, G3, C3, G4], N16),
+        velocity: new PatternGrid(
+          [
+            Velocity.P,
+            Velocity.F,
+            Velocity.MF,
+            Velocity.MF,
+            Velocity.MF,
+            Velocity.FFF,
+          ],
+          N4,
+        ),
+      };
       expect(result).toEqual(expected);
     });
   });
