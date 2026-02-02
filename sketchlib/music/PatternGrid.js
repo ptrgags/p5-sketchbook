@@ -1,6 +1,7 @@
 import { Rational } from "../Rational.js";
-import { Note, Rest } from "./Music.js";
+import { Melody, Note, Rest } from "./Music.js";
 import { RhythmStep } from "./RhythmStep.js";
+import { Velocity } from "./Velocity.js";
 
 /**
  * @template T
@@ -14,6 +15,14 @@ export class PatternGrid {
   constructor(values, step_size) {
     this.values = values;
     this.step_size = step_size;
+  }
+
+  *[Symbol.iterator]() {
+    yield* this.values;
+  }
+
+  get length() {
+    return this.values.length;
   }
 
   get duration() {
@@ -53,6 +62,95 @@ export class PatternGrid {
    * @returns {import("./Timeline.js").Timeline<Note<number>>}
    */
   static zip(rhythm, pitches, velocities) {
-    return Rest.ZERO;
+    if (!velocities) {
+      const all_mf = new Array(pitches.length).fill(Velocity.MF);
+      velocities = new PatternGrid(all_mf, pitches.step_size);
+    }
+
+    if (velocities.length != pitches.length) {
+      throw new Error("pitches and velocities must have the same length");
+    }
+
+    const beats = [...beat_iter(rhythm)];
+    const note_count = beats.reduce(
+      (acc, [is_note]) => acc + Number(is_note),
+      0,
+    );
+
+    if (note_count > pitches.length) {
+      throw new Error("Not enough pitches for this rhythm");
+    }
+
+    const notes = [];
+    let next_note = 0;
+    for (const [is_note, duration] of beats) {
+      if (is_note) {
+        const pitch = pitches.values[next_note];
+        const velocity = velocities.values[next_note];
+        notes.push(new Note(pitch, duration, velocity));
+        next_note++;
+      } else {
+        notes.push(new Rest(duration));
+      }
+    }
+
+    return new Melody(...notes);
   }
+}
+
+/**
+ * Iterate over a RhythmGrid and
+ * @param {PatternGrid<RhythmStep>} rhythm
+ * @returns {Generator<[boolean, Rational]>} (is_note, duration) pair.
+ */
+function* beat_iter(rhythm) {
+  /**
+   * @type {RhythmStep | undefined}
+   */
+  let previous = undefined;
+  let is_note = undefined;
+  let run_length = 0;
+  for (const step of rhythm) {
+    // (prev, step)
+    // (undefined, rest | sustain) => start rest
+    // (undefined, hit) => start a beat
+
+    // (rest, hit) => emit run, start note
+    // (hit, hit) => emit run, start note
+    // (sustain, hit) => emit run, start note
+
+    // (hit, rest) => emit run, start rest
+    // (sustain, rest) | run is note => emit run, start rest
+
+    // (rest, rest | sustain) => run_length++
+    // (hit, sustain) => run_length++
+    // (sustain, rest) | run is rest => run_length++
+    // (sustain, sustain) => run_length++
+
+    // If this is the first step, start a new run of note/rest.
+    // Here SUSTAIN is treated like a rest since there is no note before it.
+    if (previous === undefined) {
+      is_note = step === RhythmStep.HIT;
+      run_length = 1;
+    } else if (step === RhythmStep.HIT) {
+      // Emit previous run
+      yield [is_note, rhythm.step_size.mul(new Rational(run_length))];
+
+      // Start a note run
+      is_note = true;
+      run_length = 1;
+    } else if (previous !== RhythmStep.REST && step === RhythmStep.REST) {
+      // Emit previous run
+      yield [is_note, rhythm.step_size.mul(new Rational(run_length))];
+
+      is_note = false;
+      run_length = 1;
+    } else {
+      // all other cases, sustain the current run
+      run_length++;
+    }
+    previous = step;
+  }
+
+  yield [is_note, rhythm.step_size.mul(new Rational(run_length))];
 }
