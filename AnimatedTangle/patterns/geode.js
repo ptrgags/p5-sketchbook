@@ -2,7 +2,7 @@ import { Sequential } from "../../sketchlib/music/Timeline.js";
 import { Rational } from "../../sketchlib/Rational.js";
 import { Direction } from "../../sketchlib/pga2d/Direction.js";
 import { Point } from "../../sketchlib/pga2d/Point.js";
-import { CirclePrimitive } from "../../sketchlib/primitives/CirclePrimitive.js";
+import { Circle } from "../../sketchlib/primitives/CirclePrimitive.js";
 import { Mask } from "../../sketchlib/primitives/ClipMask.js";
 import { ClipPrimitive } from "../../sketchlib/primitives/ClipPrimitive.js";
 import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
@@ -31,7 +31,7 @@ const DURATION_TOTAL = new Rational(8);
 const DURATION_GROW = DURATION_TOTAL.mul(new Rational(2, 3));
 const DURATION_PAUSE = DURATION_TOTAL.mul(new Rational(1, 3));
 
-const ROCK_CIRCLE = new CirclePrimitive(new Point(350, 600), 150);
+const ROCK_CIRCLE = new Circle(new Point(350, 600), 150);
 
 const ROCK_STRIPES1 = make_stripes(
   new Point(350, 600),

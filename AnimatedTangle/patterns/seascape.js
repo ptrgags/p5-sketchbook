@@ -16,7 +16,7 @@ import { mod } from "../../sketchlib/mod.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { BeziergonPrimitive } from "../../sketchlib/primitives/BeziergonPrimitive.js";
 import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
-import { CirclePrimitive } from "../../sketchlib/primitives/CirclePrimitive.js";
+import { Circle } from "../../sketchlib/primitives/CirclePrimitive.js";
 import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
 import { Animated } from "../../sketchlib/animation/Animated.js";
 
@@ -72,7 +72,7 @@ const STYLE_SUN = new Style({
   fill: PALETTE_CORAL[Values.LIGHT],
 });
 const SUN_RAYS = style(SUN_RAY_LINES, STYLE_SUN_LINES);
-const SUN_DISK = style(new CirclePrimitive(SUN_CENTER, SUN_RADIUS), STYLE_SUN);
+const SUN_DISK = style(new Circle(SUN_CENTER, SUN_RADIUS), STYLE_SUN);
 const SUN = group(SUN_DISK, SUN_RAYS);
 
 const STYLE_SNOWCAPS = new Style({

@@ -1,7 +1,7 @@
 import { Direction } from "../../sketchlib/pga2d/Direction.js";
 import { Point } from "../../sketchlib/pga2d/Point.js";
 import { Ease } from "../../sketchlib/Ease.js";
-import { CirclePrimitive } from "../../sketchlib/primitives/CirclePrimitive.js";
+import { Circle } from "../../sketchlib/primitives/CirclePrimitive.js";
 import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
@@ -88,8 +88,8 @@ export class Polyp {
     this.position = position;
     this.dist_from_anchor = this.position.dist(ANCHOR_POINT);
 
-    this.mouth_back = new CirclePrimitive(this.position, MOUTH_MAX);
-    this.mouth_front = new CirclePrimitive(this.position, MOUTH_MIN);
+    this.mouth_back = new Circle(this.position, MOUTH_MAX);
+    this.mouth_front = new Circle(this.position, MOUTH_MIN);
 
     this.tentacle_lines = SIXTH_ROOTS.map((dir) => {
       const anchor_point = this.position.add(dir.scale(MOUTH_MIN));
@@ -99,7 +99,7 @@ export class Polyp {
 
     this.tentacle_circles = SIXTH_ROOTS.map((dir) => {
       const position = this.position.add(dir.scale(TENTACLE_MAX));
-      return new CirclePrimitive(position, TENTACLE_CIRCLE_RADIUS);
+      return new Circle(position, TENTACLE_CIRCLE_RADIUS);
     });
 
     this.primitive = group(

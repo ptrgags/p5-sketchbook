@@ -5,7 +5,7 @@ import { Primitive } from "./Primitive.js";
  * A circle with a center and radius
  * @implements {Primitive}
  */
-export class CirclePrimitive {
+export class Circle {
   /**
    * Constructor
    * @param {Point} position The center of the circle
@@ -36,6 +36,6 @@ export class CirclePrimitive {
     const diameter = a.dist(b);
     const radius = diameter / 2;
 
-    return new CirclePrimitive(midpoint, radius);
+    return new Circle(midpoint, radius);
   }
 }

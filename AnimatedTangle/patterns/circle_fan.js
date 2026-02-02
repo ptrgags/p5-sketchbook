@@ -1,7 +1,7 @@
 import { Sequential } from "../../sketchlib/music/Timeline.js";
 import { Rational } from "../../sketchlib/Rational.js";
 import { Point } from "../../sketchlib/pga2d/Point.js";
-import { CirclePrimitive } from "../../sketchlib/primitives/CirclePrimitive.js";
+import { Circle } from "../../sketchlib/primitives/CirclePrimitive.js";
 import { group, style, xform } from "../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Hold, ParamCurve } from "../../sketchlib/animation/ParamCurve.js";
@@ -129,7 +129,7 @@ class CircleFan {
     });
 
     this.circles = MAX_RADII.map((r) => {
-      return new CirclePrimitive(CENTER, r);
+      return new Circle(CENTER, r);
     });
 
     // To render correctly we need to interleave the circles and diamonds

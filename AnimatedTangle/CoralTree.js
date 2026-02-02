@@ -3,7 +3,7 @@ import { Point } from "../sketchlib/pga2d/Point.js";
 import { Motor } from "../sketchlib/pga2d/versors.js";
 import { is_nearly } from "../sketchlib/is_nearly.js";
 import { BeziergonPrimitive } from "../sketchlib/primitives/BeziergonPrimitive.js";
-import { CirclePrimitive } from "../sketchlib/primitives/CirclePrimitive.js";
+import { Circle } from "../sketchlib/primitives/CirclePrimitive.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { group } from "../sketchlib/primitives/shorthand.js";
 
@@ -74,7 +74,7 @@ function make_skip_between(num_children) {
 export class CoralNode {
   /**
    * Constructor
-   * @param {CirclePrimitive} circle The circle for the boundary
+   * @param {Circle} circle The circle for the boundary
    * @param {CoralNode[]} children Child nodes
    * @param {SkipSettings} skip A dictionary of points to skip when drawing the
    * curve. This can make more interesting coral shapes.

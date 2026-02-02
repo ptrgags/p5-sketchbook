@@ -4,7 +4,7 @@ import { Motor } from "../sketchlib/pga2d/versors.js";
 import { AnimationChain, Joint } from "../sketchlib/AnimationChain.js";
 import { is_nearly } from "../sketchlib/is_nearly.js";
 import { BeziergonPrimitive } from "../sketchlib/primitives/BeziergonPrimitive.js";
-import { CirclePrimitive } from "../sketchlib/primitives/CirclePrimitive.js";
+import { Circle } from "../sketchlib/primitives/CirclePrimitive.js";
 import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
@@ -148,13 +148,13 @@ export class AnimatedWorm {
 
   /**
    *
-   * @returns {CirclePrimitive[]}
+   * @returns {Circle[]}
    */
   compute_circles() {
     const positions = this.chain.get_positions();
     const circles = new Array(positions.length);
     for (const [i, center] of positions.entries()) {
-      circles[i] = new CirclePrimitive(center, WORM_THICKNESS);
+      circles[i] = new Circle(center, WORM_THICKNESS);
     }
 
     return circles;
