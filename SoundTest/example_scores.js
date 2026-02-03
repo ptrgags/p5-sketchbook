@@ -2,6 +2,7 @@ import { N1, N16, N2, N4, N8 } from "../sketchlib/music/durations.js";
 import { MidiPitch } from "../sketchlib/music/pitch_conversions.js";
 import {
   A,
+  A3,
   A4,
   AS4,
   B,
@@ -14,6 +15,7 @@ import {
   C5,
   CS4,
   D,
+  D3,
   D4,
   D5,
   DS4,
@@ -44,6 +46,7 @@ import { transpose_scale_degree } from "../sketchlib/music/transpose.js";
 import { Rational } from "../sketchlib/Rational.js";
 import { Part, Score } from "../sketchlib/music/Score.js";
 import { PatternGrid } from "../sketchlib/music/PatternGrid.js";
+import { Velocity } from "../sketchlib/music/Velocity.js";
 /**
  * Convert a scale to a pitch, using a fixed octave
  * @param {number[]} scale Array of pitch classes for the scale
@@ -357,12 +360,20 @@ export function organ_chords() {
 }
 
 export function pattern_test() {
-  const pitches = new PatternGrid([C4, CS4, DS4, F4, G4, GS4, AS4, C5], N8);
+  const pitches_a = new PatternGrid([
+    A3, E4, D4,
+    B3,D4, E4,
+  ], N4)
+
+    const pitches_b = new PatternGrid([ 
+    C4, D4,  C4,
+    F4, GS4, A4,
+  ], N4)
+
+  const rhythm = PatternGrid.rhythm("xxx-----x-x-x-------", N8);
   const melody = new Melody(
-    PatternGrid.zip(PatternGrid.rhythm("x--xx--x", N8), pitches),
-    PatternGrid.zip(PatternGrid.rhythm("x.x.x.x.", N8), pitches),
-    PatternGrid.zip(PatternGrid.rhythm("x-x.x--x--x.xx-x", N16), pitches),
-    PatternGrid.zip(PatternGrid.rhythm("x..x--x..x-x-.xx", N16), pitches),
+    PatternGrid.zip(rhythm, pitches_a),
+    PatternGrid.zip(rhythm, pitches_b),
   );
 
   return new Score(
