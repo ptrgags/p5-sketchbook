@@ -1,3 +1,8 @@
+import { Rational } from "../Rational.js";
+import { Harmony, Note } from "./Music.js";
+import { Gap } from "./Timeline.js";
+import { Velocity } from "./Velocity.js";
+
 /**
  * A specific chord voicing, i.e. an ordered
  * tuple of pitches.
@@ -27,5 +32,21 @@ export class ChordVoicing {
   move(intervals) {
     const pitches = this.pitches.map((x, i) => x + intervals[i]);
     return new ChordVoicing(pitches);
+  }
+
+  /**
+   * Convert the voicing to a single chord
+   * @param {Rational} duration The duration of the chord
+   * @param {number} [velocity=Velocity.MF] The velocity of all notes
+   * @returns {Harmony<number>} The harmony. Note that undefined voices are
+   * converted to gaps. To remove them, flatten the harmony after this function.
+   */
+  to_harmony(duration, velocity = Velocity.MF) {
+    const top_to_bottom = [...this.pitches]
+      .reverse()
+      .map((x) =>
+        x !== undefined ? new Note(x, duration, velocity) : new Gap(duration),
+      );
+    return new Harmony(...top_to_bottom);
   }
 }
