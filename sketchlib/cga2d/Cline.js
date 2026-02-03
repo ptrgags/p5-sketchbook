@@ -1,14 +1,13 @@
-import { Line } from "../../pga2d/Line.js";
-import { Point } from "../../pga2d/Point.js";
+import { Line } from "../pga2d/Line.js";
+import { Point } from "../pga2d/Point.js";
 import { is_nearly } from "../is_nearly.js";
-import { CirclePrimitive } from "../primitives/CirclePrimitive.js";
-import { PointPrimitive } from "../primitives/PointPrimitive.js";
+import { Circle } from "../primitives/Circle.js";
 import { COdd } from "./COdd.js";
 
 /**
  * Compute a cline primitive
  * @param {COdd} vector
- * @returns {Line | PointPrimitive | CirclePrimitive}
+ * @returns {Circle | Line | Point}
  */
 function compute_primitive(vector) {
   const { x, y, p, m } = vector;
@@ -27,6 +26,7 @@ function compute_primitive(vector) {
   // Normalize so the o component is 1;
   const center_x = x / o;
   const center_y = y / o;
+  const center = new Point(center_x, center_y);
 
   // the infinity component is 1/2(m + p)/o after normalization
   // however, we'll cancel the 1/2 factor in a sec
@@ -39,14 +39,14 @@ function compute_primitive(vector) {
 
   const discriminant = center_sqr - twice_inf;
   if (is_nearly(discriminant, 0)) {
-    return new PointPrimitive(new Point(center_x, center_y));
+    return center;
   } else if (discriminant < 0) {
     // Not sure how to interpret a negative radius here
     throw new Error("trying to render circle with negative radius");
   }
 
   const radius = Math.sqrt(center_sqr - twice_inf);
-  return new CirclePrimitive(new Point(center_x, center_y), radius);
+  return new Circle(center, radius);
 }
 
 /**
@@ -69,21 +69,12 @@ export class Cline {
    * @returns
    */
   draw(p) {
-    if (
-      this.prim instanceof PointPrimitive ||
-      this.prim instanceof CirclePrimitive
-    ) {
-      this.prim.draw(p);
-    }
-
-    if (this.prim instanceof Line) {
-      throw new Error("not implemented: Draw line");
-    }
+    this.prim.draw(p);
   }
 
   /**
    * Create a generalized circle/line from a circle
-   * @param {CirclePrimitive} circle
+   * @param {Circle} circle
    */
   static from_circle(circle) {
     const { position, radius } = circle;
