@@ -1,14 +1,14 @@
 import { Sequential } from "../../sketchlib/music/Timeline.js";
 import { Rational } from "../../sketchlib/Rational.js";
-import { Point } from "../../pga2d/Point.js";
-import { CirclePrimitive } from "../../sketchlib/primitives/CirclePrimitive.js";
+import { Point } from "../../sketchlib/pga2d/Point.js";
+import { Circle } from "../../sketchlib/primitives/Circle.js";
 import { group, style, xform } from "../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Hold, ParamCurve } from "../../sketchlib/animation/ParamCurve.js";
 import { lerp } from "../../sketchlib/lerp.js";
-import { Direction } from "../../pga2d/Direction.js";
+import { Direction } from "../../sketchlib/pga2d/Direction.js";
 import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
-import { Motor } from "../../pga2d/versors.js";
+import { Motor } from "../../sketchlib/pga2d/versors.js";
 import { Transform } from "../../sketchlib/primitives/Transform.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import {
@@ -32,7 +32,7 @@ const PAUSE_DURATION = new Rational(1);
 const RADIUS_STEPS = [];
 for (let i = 0; i < CIRCLE_COUNT; i++) {
   RADIUS_STEPS.push(
-    new ParamCurve(i * 50, (i + 1) * 50, EXPAND_DURATION, Ease.in_out_cubic)
+    new ParamCurve(i * 50, (i + 1) * 50, EXPAND_DURATION, Ease.in_out_cubic),
   );
 }
 
@@ -44,9 +44,9 @@ const CURVE_RADIUS = LoopCurve.from_timeline(
       CIRCLE_COUNT * 50,
       0,
       EXPAND_DURATION.mul(new Rational(CIRCLE_COUNT)),
-      Ease.in_out_cubic
-    )
-  )
+      Ease.in_out_cubic,
+    ),
+  ),
 );
 
 const STYLE_CIRCLES = new Style({
@@ -108,7 +108,7 @@ function make_diamond(angle) {
       CENTER.add(outward.scale(-0.25 * BAND_THICKNESS)),
       CENTER.add(right.scale(0.125 * BAND_THICKNESS)),
     ],
-    true
+    true,
   );
 }
 
@@ -129,7 +129,7 @@ class CircleFan {
     });
 
     this.circles = MAX_RADII.map((r) => {
-      return new CirclePrimitive(CENTER, r);
+      return new Circle(CENTER, r);
     });
 
     // To render correctly we need to interleave the circles and diamonds

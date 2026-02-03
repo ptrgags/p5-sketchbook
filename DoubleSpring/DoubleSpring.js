@@ -1,4 +1,4 @@
-import { Point } from "../pga2d/Point.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { group } from "../sketchlib/primitives/shorthand.js";
 import { Oklch } from "../sketchlib/Oklch.js";
@@ -47,7 +47,7 @@ for (let i = 0; i < N; i++) {
     make_spring("left", i),
     make_spring("right", i),
     vary_position(i),
-    HISTORY_SIZE
+    HISTORY_SIZE,
   );
 }
 
@@ -59,7 +59,7 @@ export const sketch = (p) => {
       WIDTH,
       HEIGHT,
       undefined,
-      document.getElementById("sketch-canvas")
+      document.getElementById("sketch-canvas"),
     );
   };
 
@@ -79,7 +79,7 @@ export const sketch = (p) => {
     const phase_axes = SPRING_SYSTEMS[0].render_phase_axes(
       phase_origin,
       X_SCALE,
-      V_SCALE
+      V_SCALE,
     );
 
     const phase_animations = SPRING_SYSTEMS.flatMap((system) => {

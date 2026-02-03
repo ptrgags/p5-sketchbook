@@ -1,8 +1,7 @@
-import { Direction } from "../pga2d/Direction.js";
-import { Point } from "../pga2d/Point.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
-import { PointPrimitive } from "../sketchlib/primitives/PointPrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 import { LoopCurve } from "../sketchlib/animation/LoopCurve.js";
@@ -22,15 +21,15 @@ const DURATION_BURST = Rational.ONE.sub(DURATION_SPIRAL);
 const CURVE_RADIUS = LoopCurve.from_timeline(
   new Sequential(
     new ParamCurve(0, 1, DURATION_BURST),
-    new ParamCurve(1, 0, DURATION_SPIRAL)
-  )
+    new ParamCurve(1, 0, DURATION_SPIRAL),
+  ),
 );
 const CURVE_PHASE = LoopCurve.from_timeline(
   new Sequential(
     // Hold the angle steady while bursting
     new Hold(DURATION_BURST),
-    new ParamCurve(0, 1, DURATION_SPIRAL)
-  )
+    new ParamCurve(0, 1, DURATION_SPIRAL),
+  ),
 );
 
 // Color parameters in Oklch color space
@@ -48,8 +47,8 @@ const CURVE_HUE = LoopCurve.from_timeline(
     ParamCurve.const_val(start_hue + 0 * hue_step, N4),
     ParamCurve.const_val(start_hue + 1 * hue_step, N4),
     ParamCurve.const_val(start_hue + 2 * hue_step, N4),
-    ParamCurve.const_val(start_hue + 3 * hue_step, N4)
-  )
+    ParamCurve.const_val(start_hue + 3 * hue_step, N4),
+  ),
 );
 
 export class SpiralBurst {
@@ -87,7 +86,7 @@ export class SpiralBurst {
       const angle = this.phases[i] + phase_shift * Math.PI;
       const radius = this.radii[i] * radius_scale;
       const offset = Direction.from_angle(angle).scale(radius);
-      const point = new PointPrimitive(CENTER.add(offset));
+      const point = CENTER.add(offset);
       points[i] = style(point, point_style);
     }
 

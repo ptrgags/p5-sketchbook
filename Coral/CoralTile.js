@@ -2,8 +2,8 @@ import { ControlPoint } from "./ControlPoint.js";
 import { Rect } from "./Rect.js";
 import { FlagSet } from "../sketchlib/FlagSet.js";
 import { CardinalDirection } from "../sketchlib/CardinalDirection.js";
-import { Point } from "../pga2d/Point.js";
-import { Direction } from "../pga2d/Direction.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
 
 const DIR_LEFT = Direction.DIR_X.neg();
 const DIR_RIGHT = Direction.DIR_X;
@@ -152,7 +152,7 @@ export class CoralTile {
     }
 
     const parsed_control_points = control_points.map((x) =>
-      ControlPoint.parse_json(x)
+      ControlPoint.parse_json(x),
     );
 
     return new CoralTile(quad, connection_flags, parsed_control_points);

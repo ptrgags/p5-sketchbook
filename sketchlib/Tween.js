@@ -1,5 +1,5 @@
-import { Direction } from "../pga2d/Direction.js";
-import { Point } from "../pga2d/Point.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 import { clamp } from "./clamp.js";
 import { Ease } from "./Ease.js";
 import { lerp } from "./lerp.js";
@@ -30,7 +30,7 @@ export class Tween {
     start_time,
     duration,
     lerp_func,
-    easing_curve = Ease.identity
+    easing_curve = Ease.identity,
   ) {
     this.start_value = start_value;
     this.end_value = end_value;
@@ -97,7 +97,7 @@ export class Tween {
     end_value,
     start_time,
     duration,
-    easing_curve = Ease.identity
+    easing_curve = Ease.identity,
   ) {
     return new Tween(
       start_value,
@@ -105,7 +105,7 @@ export class Tween {
       start_time,
       duration,
       lerp,
-      easing_curve
+      easing_curve,
     );
   }
 
@@ -123,7 +123,7 @@ export class Tween {
     end_point,
     start_time,
     duration,
-    easing_curve = Ease.identity
+    easing_curve = Ease.identity,
   ) {
     return new Tween(
       start_point,
@@ -131,7 +131,7 @@ export class Tween {
       start_time,
       duration,
       Point.lerp,
-      easing_curve
+      easing_curve,
     );
   }
 
@@ -149,7 +149,7 @@ export class Tween {
     end_dir,
     start_time,
     duration,
-    easing_curve = Ease.identity
+    easing_curve = Ease.identity,
   ) {
     return new Tween(
       start_dir,
@@ -157,7 +157,7 @@ export class Tween {
       start_time,
       duration,
       Direction.lerp,
-      easing_curve
+      easing_curve,
     );
   }
 

@@ -6,8 +6,8 @@ import { GroupPrimitive } from "../primitives/GroupPrimitive.js";
 import { LinePrimitive } from "../primitives/LinePrimitive.js";
 import { RectPrimitive } from "../primitives/RectPrimitive.js";
 import { group, style } from "../primitives/shorthand.js";
-import { Point } from "../../pga2d/Point.js";
-import { Direction } from "../../pga2d/Direction.js";
+import { Point } from "../../sketchlib/pga2d/Point.js";
+import { Direction } from "../../sketchlib/pga2d/Direction.js";
 import { Harmony, Melody, Note, Rest } from "./Music.js";
 import { Score } from "./Score.js";
 
@@ -73,11 +73,11 @@ function render_notes(offset, music, measure_dimensions, pitch_range) {
 
     const note_offset = new Direction(
       0,
-      measure_dimensions.y - (pitch_index + 1) * note_height
+      measure_dimensions.y - (pitch_index + 1) * note_height,
     );
     const dimensions = new Direction(
       music.duration.real * measure_dimensions.x,
-      note_height
+      note_height,
     );
     return new RectPrimitive(offset.add(note_offset), dimensions);
   }
@@ -90,7 +90,7 @@ function render_notes(offset, music, measure_dimensions, pitch_range) {
         child_offset,
         child,
         measure_dimensions,
-        pitch_range
+        pitch_range,
       );
       all_notes.push(child_notes);
 
@@ -108,7 +108,7 @@ function render_notes(offset, music, measure_dimensions, pitch_range) {
         .map((x) => {
           return render_notes(offset, x, measure_dimensions, pitch_range);
         })
-        .filter((x) => x !== undefined)
+        .filter((x) => x !== undefined),
     );
   }
 }
@@ -127,18 +127,18 @@ export function render_music(
   music,
   measure_dimensions,
   background_style,
-  note_style
+  note_style,
 ) {
   // Background rectangle ----------------------
   const duration = music.duration;
   const width_measures = duration.real;
   const dimensions = new Direction(
     width_measures * measure_dimensions.x,
-    measure_dimensions.y
+    measure_dimensions.y,
   );
   const background = style(
     new RectPrimitive(offset, dimensions),
-    background_style
+    background_style,
   );
 
   // Vertical lines to mark the start of each measure -------------
@@ -148,7 +148,7 @@ export function render_music(
     const x = i * measure_dimensions.x;
     measure_lines[i] = new LinePrimitive(
       offset.add(Direction.DIR_X.scale(x)),
-      offset.add(new Direction(x, measure_dimensions.y))
+      offset.add(new Direction(x, measure_dimensions.y)),
     );
   }
   const styled_lines = style(measure_lines, MEASURE_LINE_STYLE);
@@ -164,7 +164,7 @@ export function render_music(
   // Many small rectangles for the notes ----------------------
   const notes = style(
     render_notes(offset, music, measure_dimensions, pitch_range),
-    note_style
+    note_style,
   );
 
   return group(background, styled_lines, notes);
@@ -188,7 +188,7 @@ export function render_score(offset, score, measure_dimensions, styles) {
       part.music,
       measure_dimensions,
       styles[i],
-      NOTE_STYLE
+      NOTE_STYLE,
     );
     const part_group = style(rendered, styles[i]);
     parts.push(part_group);

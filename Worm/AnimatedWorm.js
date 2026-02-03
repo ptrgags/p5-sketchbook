@@ -1,16 +1,15 @@
 import { Style } from "../sketchlib/Style.js";
 import { Color } from "../sketchlib/Color.js";
-import { Motor } from "../pga2d/versors.js";
+import { Motor } from "../sketchlib/pga2d/versors.js";
 import { AnimationChain, Joint } from "../sketchlib/AnimationChain.js";
 import { is_nearly } from "../sketchlib/is_nearly.js";
 import { BeziergonPrimitive } from "../sketchlib/primitives/BeziergonPrimitive.js";
-import { CirclePrimitive } from "../sketchlib/primitives/CirclePrimitive.js";
+import { Circle } from "../sketchlib/primitives/Circle.js";
 import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
-import { PointPrimitive } from "../sketchlib/primitives/PointPrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
-import { Direction } from "../pga2d/Direction.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
-import { Point } from "../pga2d/Point.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 import { GooglyEye } from "../sketchlib/primitives/GooglyEye.js";
 
 const WORM_SEGMENTS = 60;
@@ -77,13 +76,13 @@ export class AnimatedWorm {
         first_point.add(Direction.DIR_X.scale(-WORM_EYE_SEPARATION)),
         this.look_direction,
         WORM_EYE_RADIUS,
-        WORM_PUPIL_RADIUS
+        WORM_PUPIL_RADIUS,
       ),
       new GooglyEye(
         first_point.add(Direction.DIR_X.scale(WORM_EYE_SEPARATION)),
         this.look_direction,
         WORM_EYE_RADIUS,
-        WORM_PUPIL_RADIUS
+        WORM_PUPIL_RADIUS,
       ),
     ];
     /**
@@ -132,7 +131,7 @@ export class AnimatedWorm {
   }
 
   /**
-   *
+   * This worm is a vertibrate...
    * @returns {GroupPrimitive}
    */
   render_spine() {
@@ -142,22 +141,20 @@ export class AnimatedWorm {
       lines[i] = new LinePrimitive(positions[i], positions[i + 1]);
     }
     const spine_group = style(lines, SPINE_STYLE);
-
-    const centers = positions.map((x) => new PointPrimitive(x));
-    const centers_group = style(centers, CENTER_STYLE);
+    const centers_group = style(positions, CENTER_STYLE);
 
     return group(spine_group, centers_group);
   }
 
   /**
    *
-   * @returns {CirclePrimitive[]}
+   * @returns {Circle[]}
    */
   compute_circles() {
     const positions = this.chain.get_positions();
     const circles = new Array(positions.length);
     for (const [i, center] of positions.entries()) {
-      circles[i] = new CirclePrimitive(center, WORM_THICKNESS);
+      circles[i] = new Circle(center, WORM_THICKNESS);
     }
 
     return circles;

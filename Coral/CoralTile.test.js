@@ -4,8 +4,8 @@ import { CoralTile } from "./CoralTile.js";
 import { CardinalDirection } from "../sketchlib/CardinalDirection.js";
 import { FlagSet } from "../sketchlib/FlagSet.js";
 import { ControlPoint } from "./ControlPoint.js";
-import { Point } from "../pga2d/Point.js";
-import { Direction } from "../pga2d/Direction.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
 
 describe("CoralTile", () => {
   const QUAD = new Rect(0, 0, 200, 200);

@@ -1,4 +1,4 @@
-import { Direction } from "../pga2d/Direction.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { mod } from "../sketchlib/mod.js";
 
 export const MAX_N = 12;
@@ -40,7 +40,7 @@ export class RobotCommand {
   constructor(n, weights, orientation, label) {
     if (weights.length !== n) {
       throw new Error(
-        `length of weights array must match n. expected ${n}, got ${weights.length}`
+        `length of weights array must match n. expected ${n}, got ${weights.length}`,
       );
     }
     this.n = n;
@@ -76,7 +76,7 @@ export class RobotCommand {
   static compose(next_command, prev_command) {
     if (prev_command.n !== next_command.n) {
       throw new Error(
-        `mismatched n values cannot be composed: ${next_command.n}, ${prev_command.n}`
+        `mismatched n values cannot be composed: ${next_command.n}, ${prev_command.n}`,
       );
     }
 

@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { PGA_MATCHERS } from "../pga2d/pga_matchers";
+import { PGA_MATCHERS } from "../sketchlib/pga2d/pga_matchers";
 import { RobotCommand } from "./RobotCommand";
-import { Direction } from "../pga2d/Direction";
+import { Direction } from "../sketchlib/pga2d/Direction";
 
 expect.extend(PGA_MATCHERS);
 
@@ -26,7 +26,7 @@ describe("RobotCommand", () => {
       // omega - 1 = (cos(tau/5), sin(tau/5)) - (1, 0)
       const expected = new Direction(
         Math.cos(FIFTH_TURN) - 1.0,
-        Math.sin(FIFTH_TURN)
+        Math.sin(FIFTH_TURN),
       );
       expect(result).toBePoint(expected);
     });
@@ -39,7 +39,7 @@ describe("RobotCommand", () => {
       // 1 - omega^4 = (1, 0) - (cos(4tau/5), sin(4tau/5))
       const expected = new Direction(
         1 - Math.cos(4 * FIFTH_TURN),
-        -Math.sin(4 * FIFTH_TURN)
+        -Math.sin(4 * FIFTH_TURN),
       );
       expect(result).toBePoint(expected);
     });
@@ -55,7 +55,7 @@ describe("RobotCommand", () => {
     it("computes offset for nontrivial path", () => {
       let path = RobotCommand.compose(
         RobotCommand.right_turn(N),
-        RobotCommand.left_turn(N)
+        RobotCommand.left_turn(N),
       );
       path = RobotCommand.compose(RobotCommand.right_turn(N), path);
 
@@ -69,7 +69,7 @@ describe("RobotCommand", () => {
       // 2 * omega -1 - omega^4
       const expected = new Direction(
         2 * Math.cos(FIFTH_TURN) - 1 - Math.cos(4 * FIFTH_TURN),
-        2 * Math.sin(FIFTH_TURN) - Math.sin(4 * FIFTH_TURN)
+        2 * Math.sin(FIFTH_TURN) - Math.sin(4 * FIFTH_TURN),
       );
       expect(result).toBeDirection(expected);
     });
@@ -171,11 +171,11 @@ describe("RobotCommand", () => {
       // (ll)r = l(lr)
       const ll_r = RobotCommand.compose(
         RobotCommand.compose(left, left),
-        right
+        right,
       );
       const l_lr = RobotCommand.compose(
         left,
-        RobotCommand.compose(left, right)
+        RobotCommand.compose(left, right),
       );
 
       expect(ll_r).toEqual(l_lr);

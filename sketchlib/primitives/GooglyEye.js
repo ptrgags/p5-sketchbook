@@ -1,5 +1,5 @@
-import { Direction } from "../../pga2d/Direction.js";
-import { Point } from "../../pga2d/Point.js";
+import { Direction } from "../../sketchlib/pga2d/Direction.js";
+import { Point } from "../../sketchlib/pga2d/Point.js";
 import { Primitive } from "./Primitive.js";
 
 const SCLERA_COLOR = 255;
@@ -32,7 +32,7 @@ export class GooglyEye {
      * @type {Point}
      */
     this.pupil_center = this.position.add(
-      this.look_direction.scale(this.sclera_radius - this.pupil_radius)
+      this.look_direction.scale(this.sclera_radius - this.pupil_radius),
     );
   }
 
@@ -45,7 +45,7 @@ export class GooglyEye {
     this.position = position;
     this.look_direction = look_direction;
     this.pupil_center = this.position.add(
-      this.look_direction.scale(this.sclera_radius - this.pupil_radius)
+      this.look_direction.scale(this.sclera_radius - this.pupil_radius),
     );
   }
 

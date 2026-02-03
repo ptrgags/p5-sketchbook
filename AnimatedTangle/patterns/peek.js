@@ -1,8 +1,8 @@
 import { Hold, ParamCurve } from "../../sketchlib/animation/ParamCurve.js";
 import { Sequential } from "../../sketchlib/music/Timeline.js";
 import { Rational } from "../../sketchlib/Rational.js";
-import { Direction } from "../../pga2d/Direction.js";
-import { Point } from "../../pga2d/Point.js";
+import { Direction } from "../../sketchlib/pga2d/Direction.js";
+import { Point } from "../../sketchlib/pga2d/Point.js";
 import { GooglyEye } from "../../sketchlib/primitives/GooglyEye.js";
 import { AnimationCurve } from "../../sketchlib/animation/AnimationCurve.js";
 import { LoopCurve } from "../../sketchlib/animation/LoopCurve.js";
@@ -23,8 +23,8 @@ const CURVE_POSITION = LoopCurve.from_timeline(
     // return to start
     new ParamCurve(1, 0, DURATION_FRAME),
     // stay in place while turning
-    new ParamCurve(0, 0, DURATION_FRAME)
-  )
+    new ParamCurve(0, 0, DURATION_FRAME),
+  ),
 );
 
 const CURVE_ANGLE = LoopCurve.from_timeline(
@@ -35,10 +35,10 @@ const CURVE_ANGLE = LoopCurve.from_timeline(
     new ParamCurve(0, Math.PI, DURATION_FRAME),
     new Hold(DURATION_FRAME),
     // Rotate CCW towards end
-    new ParamCurve(Math.PI, 2 * Math.PI, DURATION_FRAME)
+    new ParamCurve(Math.PI, 2 * Math.PI, DURATION_FRAME),
     // End of the loop, we jump from angle + 2pi to angle, which are
     // equivalent
-  )
+  ),
 );
 
 /**
@@ -61,7 +61,7 @@ class PeekingEye {
       start_point,
       direction,
       SCLERA_RADIUS,
-      PUPIL_RADIUS
+      PUPIL_RADIUS,
     );
   }
 

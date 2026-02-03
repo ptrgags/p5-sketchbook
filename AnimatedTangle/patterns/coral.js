@@ -1,5 +1,5 @@
-import { Direction } from "../../pga2d/Direction.js";
-import { Point } from "../../pga2d/Point.js";
+import { Direction } from "../../sketchlib/pga2d/Direction.js";
+import { Point } from "../../sketchlib/pga2d/Point.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { CoralNode, CoralTree } from "../CoralTree.js";
@@ -75,7 +75,7 @@ class SwayingCoral {
       CIRCLE_K,
       [node_l],
       // Skip for K
-      { right: true }
+      { right: true },
     );
     // N -- hinges about M
     const node_n = new CoralNode(CIRCLE_N);
@@ -113,34 +113,34 @@ class SwayingCoral {
                       CIRCLE_G,
                       [node_h],
                       // skip for G
-                      { right: false }
+                      { right: false },
                     ),
                     // I
                     new CoralNode(
                       CIRCLE_I,
                       [new CoralNode(CIRCLE_J, [node_k])],
                       // skip for I
-                      { left: true }
+                      { left: true },
                     ),
                     // M
                     new CoralNode(CIRCLE_M, [node_n]),
                   ],
                   // Skip for F
-                  { between: [true, true] }
+                  { between: [true, true] },
                 ),
               ],
               // Skip for D
               // Turns out I needed the left point else the curve is too
               // broad
-              { between: [true] }
+              { between: [true] },
             ),
             // O
             new CoralNode(CIRCLE_O, [node_p]),
           ],
           // skip for B
-          { between: [false, true] }
+          { between: [false, true] },
         ),
-      ])
+      ]),
     );
 
     // Make a set of animated stripes as a background
@@ -148,7 +148,7 @@ class SwayingCoral {
       new Point(150, 500),
       new Direction(-1, 2).normalize(),
       10,
-      new Direction(550, 600)
+      new Direction(550, 600),
     );
     const styled_stripes = style(this.stripes.primitive, STYLE_STRIPES);
 
@@ -166,7 +166,7 @@ class SwayingCoral {
         CIRCLE_C.position,
         SWAY_AMPLITUDE,
         SWAY_FREQUENCY,
-        5 * PHASE_OFFSET
+        5 * PHASE_OFFSET,
       ),
       // Hinge for node E
       new Hinge(
@@ -174,14 +174,14 @@ class SwayingCoral {
         CIRCLE_E.position,
         SWAY_AMPLITUDE,
         SWAY_FREQUENCY,
-        4 * PHASE_OFFSET
+        4 * PHASE_OFFSET,
       ),
       // Hinge for node H
       new Hinge(
         CIRCLE_G.position,
         CIRCLE_H.position,
         SWAY_AMPLITUDE,
-        SWAY_FREQUENCY
+        SWAY_FREQUENCY,
       ),
       // Hinge for node k
       new Hinge(
@@ -189,7 +189,7 @@ class SwayingCoral {
         CIRCLE_K.position,
         SWAY_AMPLITUDE,
         SWAY_FREQUENCY,
-        PHASE_OFFSET
+        PHASE_OFFSET,
       ),
       // Hinge for node L
       new Hinge(
@@ -197,7 +197,7 @@ class SwayingCoral {
         CIRCLE_L.position,
         SWAY_AMPLITUDE,
         SWAY_FREQUENCY,
-        PHASE_OFFSET
+        PHASE_OFFSET,
       ),
       // Hinge for node N
       new Hinge(
@@ -205,7 +205,7 @@ class SwayingCoral {
         CIRCLE_N.position,
         SWAY_AMPLITUDE,
         SWAY_FREQUENCY,
-        2 * PHASE_OFFSET
+        2 * PHASE_OFFSET,
       ),
       // Hinge for node P
       new Hinge(
@@ -213,7 +213,7 @@ class SwayingCoral {
         CIRCLE_P.position,
         0.5 * SWAY_AMPLITUDE,
         SWAY_FREQUENCY,
-        3 * PHASE_OFFSET
+        3 * PHASE_OFFSET,
       ),
     ];
     this.polyps = ALL_CIRCLES.map((c) => new Polyp(c.position));

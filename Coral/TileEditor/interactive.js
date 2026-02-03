@@ -1,6 +1,6 @@
-import { Direction } from "../../pga2d/Direction.js";
-import { Point } from "../../pga2d/Point.js";
-import { Flector } from "../../pga2d/versors.js";
+import { Direction } from "../../sketchlib/pga2d/Direction.js";
+import { Point } from "../../sketchlib/pga2d/Point.js";
+import { Flector } from "../../sketchlib/pga2d/versors.js";
 import { ControlPoint } from "../ControlPoint.js";
 import { Rect } from "../Rect.js";
 
@@ -35,7 +35,7 @@ export class InteractiveVertex {
    */
   is_hovering(mouse) {
     const position_world = this.tile_quad.uv_to_world(
-      this.control_point.position
+      this.control_point.position,
     );
     const dist_sqr = mouse.dist_sqr(position_world);
 
@@ -86,7 +86,7 @@ export class InteractiveTangent {
    */
   is_hovering(mouse) {
     const position_world = this.tile_quad.uv_to_world(
-      this.control_point.forward_point
+      this.control_point.forward_point,
     );
     const dist_sqr = mouse.dist_sqr(position_world);
 
@@ -111,7 +111,7 @@ export class InteractiveTangent {
         : original_tangent;
 
     this.control_point.tangent = corrected_tangent.limit_length(
-      MAX_TANGENT_MAGNITUDE
+      MAX_TANGENT_MAGNITUDE,
     );
   }
 }

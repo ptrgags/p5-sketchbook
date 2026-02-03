@@ -1,8 +1,19 @@
 // Links for all of the sketches. Links are added to the page in this order
 export const LINKS = [
   {
+    title: "CGA Test",
+    link: "./CGATest",
+    is_lab: true,
+    year: "2026-02",
+  },
+  {
     title: "Animated Tangle",
     year: "2025-12/2026-01",
+  },
+  {
+    title: "Sound Test",
+    is_lab: true,
+    year: "2025-05/2026-01",
   },
   {
     title: "Musical Tree",
@@ -12,11 +23,6 @@ export const LINKS = [
   {
     title: "Robot Walks",
     year: "2025-11",
-  },
-  {
-    title: "Sound Test",
-    is_lab: true,
-    year: "2025-05, 2025-07, 2025-11",
   },
   {
     title: "Pendulum Clock",

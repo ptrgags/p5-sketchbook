@@ -19,9 +19,8 @@ import {
 import { Color } from "../../sketchlib/Color.js";
 import { CardinalDirection } from "../../sketchlib/CardinalDirection.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
-import { CirclePrimitive } from "../../sketchlib/primitives/CirclePrimitive.js";
+import { Circle } from "../../sketchlib/primitives/Circle.js";
 import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
-import { PointPrimitive } from "../../sketchlib/primitives/PointPrimitive.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -42,7 +41,7 @@ const CONNECTION_ORDER = [
 const TILES = SMALL_QUADS.map(({ i, j }, quad) => {
   const connection_flags = new FlagSet(
     CONNECTION_ORDER[i][j],
-    CardinalDirection.COUNT
+    CardinalDirection.COUNT,
   );
   return new CoralTile(quad, connection_flags);
 });
@@ -56,10 +55,10 @@ for (const tile of TILES) {
     tangent_constraint,
   ] of tile.get_constraints()) {
     VERTICES.push(
-      new InteractiveVertex(control_point, vertex_constraint, tile.quad)
+      new InteractiveVertex(control_point, vertex_constraint, tile.quad),
     );
     TANGENTS.push(
-      new InteractiveTangent(control_point, tangent_constraint, tile.quad)
+      new InteractiveTangent(control_point, tangent_constraint, tile.quad),
     );
   }
 }
@@ -85,8 +84,8 @@ function render_control_points(tiles) {
       const vertex = quad.uv_to_world(point.position);
       const tangent_point = quad.uv_to_world(point.forward_point);
       tangent_lines.push(new LinePrimitive(vertex, tangent_point));
-      vertices.push(new PointPrimitive(vertex));
-      tangent_tips.push(new PointPrimitive(tangent_point));
+      vertices.push(vertex);
+      tangent_tips.push(tangent_point);
     }
   }
 
@@ -99,10 +98,7 @@ function render_control_points(tiles) {
 
 const HIGHLIGHT_RADIUS = 8;
 function highlight_selection(selected_object) {
-  const circle = new CirclePrimitive(
-    selected_object.position_world,
-    HIGHLIGHT_RADIUS
-  );
+  const circle = new Circle(selected_object.position_world, HIGHLIGHT_RADIUS);
   return style(circle, HIGHLIGHT_STYLE);
 }
 

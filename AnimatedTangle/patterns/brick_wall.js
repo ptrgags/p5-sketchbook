@@ -1,5 +1,5 @@
-import { Direction } from "../../pga2d/Direction.js";
-import { Point } from "../../pga2d/Point.js";
+import { Direction } from "../../sketchlib/pga2d/Direction.js";
+import { Point } from "../../sketchlib/pga2d/Point.js";
 import { Mask } from "../../sketchlib/primitives/ClipMask.js";
 import { ClipPrimitive } from "../../sketchlib/primitives/ClipPrimitive.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
@@ -37,7 +37,7 @@ const HIT_TIMES = [
 const PANEL_CORNER = new Point(300, 300);
 const PANEL_DIMENSIONS = new Direction(200, 200);
 const BRICK_DIMENSIONS = PANEL_DIMENSIONS.mul_components(
-  new Direction(0.5, 0.25)
+  new Direction(0.5, 0.25),
 );
 
 const STYLE_BACKGROUND = new Style({
@@ -45,7 +45,7 @@ const STYLE_BACKGROUND = new Style({
 });
 const BRICK_BACKGROUND = style(
   new RectPrimitive(PANEL_CORNER, PANEL_DIMENSIONS),
-  STYLE_BACKGROUND
+  STYLE_BACKGROUND,
 );
 
 const STRIPE_SPACING = 20;
@@ -60,9 +60,9 @@ const BRICK_STRIPES = style(
     new Direction(1, -1).normalize(),
     STRIPE_SPACING,
     new Direction(200 * Math.SQRT2, 200 * Math.SQRT2),
-    0
+    0,
   ),
-  STYLE_STRIPES
+  STYLE_STRIPES,
 );
 const BRICK_PATTERN = group(BRICK_BACKGROUND, BRICK_STRIPES);
 
@@ -86,7 +86,7 @@ class Brick {
       -FALL_LENGTH,
       0,
       hit_time - FALL_DURATION,
-      FALL_DURATION
+      FALL_DURATION,
     );
 
     // The brick is an unstyled rectangle. BrickWall will use this primitive
@@ -101,7 +101,7 @@ class Brick {
   update(time) {
     this.height = this.tween.get_value(time);
     this.primitive.position = this.hit_position.add(
-      Direction.DIR_Y.scale(this.height)
+      Direction.DIR_Y.scale(this.height),
     );
   }
 }
@@ -132,8 +132,8 @@ const DURATION_LIFT = new Rational(3);
 const CURVE_TIMING = LoopCurve.from_timeline(
   new Sequential(
     new ParamCurve(-FALL_DURATION, 4 + FALL_DURATION, DURATION_FALL),
-    new ParamCurve(4 + FALL_DURATION, -FALL_DURATION, DURATION_LIFT)
-  )
+    new ParamCurve(4 + FALL_DURATION, -FALL_DURATION, DURATION_LIFT),
+  ),
 );
 
 /**
@@ -143,7 +143,7 @@ class BrickWall {
   constructor() {
     this.bricks = BRICK_OFFSETS.map((offset, i) => {
       const position = PANEL_CORNER.add(
-        BRICK_DIMENSIONS.mul_components(offset)
+        BRICK_DIMENSIONS.mul_components(offset),
       );
       return new Brick(position, HIT_TIMES[i]);
     });
@@ -163,7 +163,7 @@ class BrickWall {
     });
     const striped_bricks = new ClipPrimitive(
       new Mask(brick_shape),
-      BRICK_PATTERN
+      BRICK_PATTERN,
     );
 
     this.primitive = group(drop_shadow, striped_bricks);

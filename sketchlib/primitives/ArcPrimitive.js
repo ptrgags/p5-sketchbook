@@ -1,6 +1,6 @@
-import { Direction } from "../../pga2d/Direction.js";
-import { Point } from "../../pga2d/Point.js";
-import { Motor } from "../../pga2d/versors.js";
+import { Direction } from "../../sketchlib/pga2d/Direction.js";
+import { Point } from "../../sketchlib/pga2d/Point.js";
+import { Motor } from "../../sketchlib/pga2d/versors.js";
 import { ArcAngles } from "../ArcAngles.js";
 import { PartialPrimitive, Primitive } from "./Primitive.js";
 
@@ -51,7 +51,7 @@ export class ArcPrimitive {
   render_partial(t) {
     const interpolated_angles = new ArcAngles(
       this.angles.start_angle,
-      lerp(this.angles.start_angle, this.angles.end_angle, t)
+      lerp(this.angles.start_angle, this.angles.end_angle, t),
     );
     return new ArcPrimitive(this.center, this.radius, interpolated_angles);
   }
@@ -66,12 +66,12 @@ export class ArcPrimitive {
     const start_angle = lerp(
       this.angles.start_angle,
       this.angles.end_angle,
-      t_start
+      t_start,
     );
     const end_angle = lerp(
       this.angles.start_angle,
       this.angles.end_angle,
-      t_end
+      t_end,
     );
 
     const interpolated_angles = new ArcAngles(start_angle, end_angle);
