@@ -30,6 +30,7 @@ import {
   phase_scale,
   symmetry_melody,
   organ_chords,
+  pattern_test,
 } from "./example_scores.js";
 import { Piano } from "./Piano.js";
 import { SpiralBurst } from "./SpiralBurst.js";
@@ -47,6 +48,7 @@ const SOUND_MANIFEST = {
     symmetry_melody: symmetry_melody(),
     binary_progression: binary_chords(),
     organ_chords: organ_chords(),
+    pattern_test: pattern_test(),
   },
 };
 
@@ -111,6 +113,10 @@ MELODY_BUTTONS.set(
 MELODY_BUTTONS.set(
   new Index2D(2, 0),
   new MelodyButtonDescriptor("organ_chords", "Organ Test Chords"),
+);
+MELODY_BUTTONS.set(
+  new Index2D(2, 1),
+  new MelodyButtonDescriptor("pattern_test", "PatternGrid Test"),
 );
 
 const MELODY_BUTTON_SIZE = 150;
