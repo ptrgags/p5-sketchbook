@@ -1,5 +1,5 @@
-import { Point } from "../pga2d/Point.js";
-import { Motor } from "../pga2d/versors.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
+import { Motor } from "../sketchlib/pga2d/versors.js";
 
 /**
  * Helper class for animating a point that sways back and forth

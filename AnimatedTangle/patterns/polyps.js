@@ -1,7 +1,7 @@
-import { Direction } from "../../pga2d/Direction.js";
-import { Point } from "../../pga2d/Point.js";
+import { Direction } from "../../sketchlib/pga2d/Direction.js";
+import { Point } from "../../sketchlib/pga2d/Point.js";
 import { Ease } from "../../sketchlib/Ease.js";
-import { CirclePrimitive } from "../../sketchlib/primitives/CirclePrimitive.js";
+import { Circle } from "../../sketchlib/primitives/Circle.js";
 import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
@@ -26,7 +26,7 @@ const EXTEND_TENTACLES = Tween.scalar(
   TENTACLE_MAX,
   0,
   1,
-  Ease.in_out_cubic
+  Ease.in_out_cubic,
 );
 const OPEN_MOUTH = Tween.scalar(MOUTH_MIN, MOUTH_MAX, 0, 1, Ease.in_out_cubic);
 
@@ -36,8 +36,8 @@ const MAX_DIST = 600;
 const CURVE_EXTEND_RADIUS = LoopCurve.from_timeline(
   new Sequential(
     new ParamCurve(MAX_DIST, 0, new Rational(2, 3), Ease.in_cubic),
-    new ParamCurve(0, MAX_DIST, new Rational(3), Ease.in_out_cubic)
-  )
+    new ParamCurve(0, MAX_DIST, new Rational(3), Ease.in_out_cubic),
+  ),
 );
 
 const TENTACLE_EXTEND_LENGTH = 200;
@@ -54,7 +54,7 @@ const WAVE_PASSAGE_TO_EXTEND_TIME = Tween.scalar(
   0,
   1,
   0,
-  TENTACLE_EXTEND_LENGTH
+  TENTACLE_EXTEND_LENGTH,
 );
 
 const STYLE_MOUTH_BACK = new Style({
@@ -88,8 +88,8 @@ export class Polyp {
     this.position = position;
     this.dist_from_anchor = this.position.dist(ANCHOR_POINT);
 
-    this.mouth_back = new CirclePrimitive(this.position, MOUTH_MAX);
-    this.mouth_front = new CirclePrimitive(this.position, MOUTH_MIN);
+    this.mouth_back = new Circle(this.position, MOUTH_MAX);
+    this.mouth_front = new Circle(this.position, MOUTH_MIN);
 
     this.tentacle_lines = SIXTH_ROOTS.map((dir) => {
       const anchor_point = this.position.add(dir.scale(MOUTH_MIN));
@@ -99,14 +99,14 @@ export class Polyp {
 
     this.tentacle_circles = SIXTH_ROOTS.map((dir) => {
       const position = this.position.add(dir.scale(TENTACLE_MAX));
-      return new CirclePrimitive(position, TENTACLE_CIRCLE_RADIUS);
+      return new Circle(position, TENTACLE_CIRCLE_RADIUS);
     });
 
     this.primitive = group(
       style(this.mouth_back, STYLE_MOUTH_BACK),
       style(this.mouth_front, STYLE_MOUTH_FRONT),
       style(this.tentacle_lines, STYLE_TENTACLE_LINES),
-      style(this.tentacle_circles, STYLE_TENTACLE_CIRCLES)
+      style(this.tentacle_circles, STYLE_TENTACLE_CIRCLES),
     );
   }
 
@@ -125,7 +125,7 @@ export class Polyp {
     const extend_signal = CURVE_EXTEND_RADIUS.value(time);
 
     const extend_t = WAVE_PASSAGE_TO_EXTEND_TIME.get_value(
-      extend_signal - this.dist_from_anchor
+      extend_signal - this.dist_from_anchor,
     );
     const tentacle_r = EXTEND_TENTACLES.get_value(extend_t);
 

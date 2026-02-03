@@ -1,4 +1,4 @@
-import { is_nearly } from "../sketchlib/is_nearly.js";
+import { is_nearly } from "../is_nearly.js";
 
 // Much of the math here is determined by using the geometric algebra library
 // kingdon. See my other repo math-notebook in symbolic/gaproduct.py.
@@ -149,7 +149,7 @@ export class Even {
 
   toString() {
     return `${this.scalar.toPrecision(2)} + ${this.xy.toPrecision(
-      2
+      2,
     )}xy + ${this.xo.toPrecision(2)}xo + ${this.yo.toPrecision(2)}yo`;
   }
 }
@@ -177,7 +177,7 @@ export class Odd {
       this.x * scalar,
       this.y * scalar,
       this.o * scalar,
-      this.xyo * scalar
+      this.xyo * scalar,
     );
   }
 
@@ -191,7 +191,7 @@ export class Odd {
       this.x / length,
       this.y / length,
       this.o / length,
-      this.xyo / length
+      this.xyo / length,
     );
   }
 
@@ -323,7 +323,7 @@ export class Odd {
 
   toString() {
     return `${this.x.toPrecision(2)}x + ${this.y.toPrecision(
-      2
+      2,
     )}y + ${this.o.toPrecision(2)}o + ${this.xyo.toPrecision(2)}xyo`;
   }
 }

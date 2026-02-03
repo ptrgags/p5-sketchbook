@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { DirectionInput } from "./DirectionInput.js";
 import { CardinalDirection } from "./CardinalDirection.js";
-import { Direction } from "../pga2d/Direction.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
 
 describe("DirectionInput", () => {
   describe("first_nonzero", () => {
@@ -17,7 +17,7 @@ describe("DirectionInput", () => {
       const identity = DirectionInput.NO_INPUT;
       const right_pressed = new DirectionInput(
         CardinalDirection.RIGHT,
-        Direction.DIR_X
+        Direction.DIR_X,
       );
 
       const id_right = DirectionInput.first_nonzero(identity, right_pressed);
@@ -30,11 +30,11 @@ describe("DirectionInput", () => {
     it("With two inputs returns the first one", () => {
       const right_pressed = new DirectionInput(
         CardinalDirection.RIGHT,
-        Direction.DIR_X
+        Direction.DIR_X,
       );
       const down_pressed = new DirectionInput(
         CardinalDirection.DOWN,
-        Direction.DIR_Y
+        Direction.DIR_Y,
       );
 
       const result = DirectionInput.first_nonzero(right_pressed, down_pressed);
@@ -46,16 +46,16 @@ describe("DirectionInput", () => {
       const b = new DirectionInput(CardinalDirection.DOWN, Direction.DIR_Y);
       const c = new DirectionInput(
         CardinalDirection.LEFT,
-        Direction.DIR_X.neg()
+        Direction.DIR_X.neg(),
       );
 
       const ab_c = DirectionInput.first_nonzero(
         DirectionInput.first_nonzero(a, b),
-        c
+        c,
       );
       const a_bc = DirectionInput.first_nonzero(
         a,
-        DirectionInput.first_nonzero(b, c)
+        DirectionInput.first_nonzero(b, c),
       );
 
       expect(ab_c).toBe(a_bc);

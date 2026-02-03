@@ -14,8 +14,8 @@ import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
-import { Point } from "../pga2d/Point.js";
-import { Direction } from "../pga2d/Direction.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { ParamCurve } from "../sketchlib/animation/ParamCurve.js";
 import { AnimationCurve } from "../sketchlib/animation/AnimationCurve.js";
 import { whole_fract } from "../sketchlib/whole_fract.js";
@@ -47,7 +47,7 @@ export class TurtleGraphics {
     // Angles are measured from vertical, not horizontal
     const ANGLE_ZERO = -Math.PI / 2;
     return Direction.from_angle(
-      ANGLE_ZERO + this.delta_angle * this.orientation
+      ANGLE_ZERO + this.delta_angle * this.orientation,
     );
   }
 
@@ -270,7 +270,7 @@ class TreeMusicBuilder {
         label: "Turn Operations",
         midi_channel: 2,
         midi_instrument: 37 - 1, // slap bass 1
-      })
+      }),
     );
   }
 }
@@ -302,7 +302,7 @@ class TreeAnimationBuilder {
     const increase = new ParamCurve(
       this.state_index,
       this.state_index + 1,
-      duration
+      duration,
     );
     this.state_curve.push(increase);
     this.state_index++;
@@ -320,7 +320,7 @@ class TreeAnimationBuilder {
     const increase = new ParamCurve(
       this.line_count,
       this.line_count + 1,
-      duration
+      duration,
     );
     this.line_count++;
 
@@ -373,13 +373,13 @@ class TreeAnimationBuilder {
    */
   build() {
     const line_count = AnimationCurve.from_timeline(
-      new Sequential(...this.line_count_curve)
+      new Sequential(...this.line_count_curve),
     );
     const state = AnimationCurve.from_timeline(
-      new Sequential(...this.state_curve)
+      new Sequential(...this.state_curve),
     );
     const depth = AnimationCurve.from_timeline(
-      new Sequential(...this.depth_curve)
+      new Sequential(...this.depth_curve),
     );
 
     return {
@@ -516,13 +516,13 @@ const STYLE_TURTLE = new Style({
  */
 function render_turtle(position, orientation) {
   const dir_front = Direction.from_angle(
-    -Math.PI / 2 + orientation * DELTA_ANGLE
+    -Math.PI / 2 + orientation * DELTA_ANGLE,
   );
   const dir_back_left = Direction.from_angle(
-    -Math.PI / 2 + orientation * DELTA_ANGLE + (5 * Math.PI) / 6
+    -Math.PI / 2 + orientation * DELTA_ANGLE + (5 * Math.PI) / 6,
   );
   const dir_back_right = Direction.from_angle(
-    -Math.PI / 2 + orientation * DELTA_ANGLE - (5 * Math.PI) / 6
+    -Math.PI / 2 + orientation * DELTA_ANGLE - (5 * Math.PI) / 6,
   );
 
   const polygon = new PolygonPrimitive(
@@ -531,7 +531,7 @@ function render_turtle(position, orientation) {
       position.add(dir_back_left.scale(RADIUS_TURTLE)),
       position.add(dir_back_right.scale(RADIUS_TURTLE)),
     ],
-    true
+    true,
   );
 
   return style(polygon, STYLE_TURTLE);
@@ -541,7 +541,7 @@ const STACK_RECT_DIMENSIONS = new Direction(RADIUS_TURTLE / 2, RADIUS_TURTLE);
 const OFFSET_STACK_START = new Direction(RADIUS_TURTLE + 4, -RADIUS_TURTLE / 2);
 const STACK_SPACING = 2;
 const OFFSET_STACK_STRIDE = Direction.DIR_X.scale(
-  STACK_RECT_DIMENSIONS.x + STACK_SPACING
+  STACK_RECT_DIMENSIONS.x + STACK_SPACING,
 );
 
 const STYLE_STACK = new Style({
@@ -557,16 +557,16 @@ function render_stack(position, depth) {
   for (let i = 0; i < whole_depth; i++) {
     rects[i] = new RectPrimitive(
       first_offset.add(OFFSET_STACK_STRIDE.scale(i)),
-      STACK_RECT_DIMENSIONS
+      STACK_RECT_DIMENSIONS,
     );
   }
 
   if (!is_nearly(fract_depth, 0.0)) {
     const partial_rect = new RectPrimitive(
       first_offset.add(
-        OFFSET_STACK_STRIDE.scale(whole_depth + (1 - fract_depth))
+        OFFSET_STACK_STRIDE.scale(whole_depth + (1 - fract_depth)),
       ),
-      STACK_RECT_DIMENSIONS
+      STACK_RECT_DIMENSIONS,
     );
     rects.push(partial_rect);
   }

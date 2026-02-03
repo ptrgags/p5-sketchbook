@@ -1,8 +1,8 @@
 import { Sequential } from "../../sketchlib/music/Timeline.js";
 import { Rational } from "../../sketchlib/Rational.js";
-import { Direction } from "../../pga2d/Direction.js";
-import { Point } from "../../pga2d/Point.js";
-import { CirclePrimitive } from "../../sketchlib/primitives/CirclePrimitive.js";
+import { Direction } from "../../sketchlib/pga2d/Direction.js";
+import { Point } from "../../sketchlib/pga2d/Point.js";
+import { Circle } from "../../sketchlib/primitives/Circle.js";
 import { Mask } from "../../sketchlib/primitives/ClipMask.js";
 import { ClipPrimitive } from "../../sketchlib/primitives/ClipPrimitive.js";
 import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
@@ -31,21 +31,21 @@ const DURATION_TOTAL = new Rational(8);
 const DURATION_GROW = DURATION_TOTAL.mul(new Rational(2, 3));
 const DURATION_PAUSE = DURATION_TOTAL.mul(new Rational(1, 3));
 
-const ROCK_CIRCLE = new CirclePrimitive(new Point(350, 600), 150);
+const ROCK_CIRCLE = new Circle(new Point(350, 600), 150);
 
 const ROCK_STRIPES1 = make_stripes(
   new Point(350, 600),
   new Direction(2, 1).normalize(),
   6,
   new Direction(400, 400),
-  0
+  0,
 );
 const ROCK_STRIPES2 = make_stripes(
   new Point(350, 600),
   new Direction(2, -1).normalize(),
   6,
   new Direction(400, 400),
-  0
+  0,
 );
 
 const STYLE_INSIDE_GEODE = new Style({
@@ -72,8 +72,8 @@ export class Geode {
     this.curve_thickness = LoopCurve.from_timeline(
       new Sequential(
         new ParamCurve(0, max_width, DURATION_GROW),
-        new ParamCurve(max_width, max_width, DURATION_PAUSE)
-      )
+        new ParamCurve(max_width, max_width, DURATION_PAUSE),
+      ),
     );
 
     this.primitive = group(
@@ -81,11 +81,11 @@ export class Geode {
         new Mask(ROCK_CIRCLE),
         group(
           style(ROCK_STRIPES1, STYLE_ROCK1),
-          style(ROCK_STRIPES2, STYLE_ROCK2)
-        )
+          style(ROCK_STRIPES2, STYLE_ROCK2),
+        ),
       ),
       style(boundary, STYLE_INSIDE_GEODE),
-      new ClipPrimitive(new Mask(boundary), group(...layers))
+      new ClipPrimitive(new Mask(boundary), group(...layers)),
     );
   }
 
@@ -116,7 +116,7 @@ const GEODE_BOUNDARY = new PolygonPrimitive(
     new Point(275, 500),
     new Point(250, 550),
   ],
-  true
+  true,
 );
 
 const MAX_THICKNESS = 16;
@@ -131,8 +131,8 @@ const PALETTE_AGATE = Random.shuffle(
   Oklch.gradient(
     PALETTE_CORAL[Values.DARK],
     PALETTE_CORAL[Values.LIGHT],
-    WIDTHS.length
-  )
+    WIDTHS.length,
+  ),
 );
 
 /**
@@ -143,7 +143,7 @@ const GEODE_STYLES = PALETTE_AGATE.map(
     new Style({
       stroke: x,
       width: WIDTHS[i],
-    })
+    }),
 );
 
 export const GEODE = new Geode(GEODE_BOUNDARY, GEODE_STYLES);

@@ -1,4 +1,4 @@
-import { Direction } from "../pga2d/Direction.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
 
 /**
  * One of the 4 cardinal directions. They're ordered from the right in CCW

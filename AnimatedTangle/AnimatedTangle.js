@@ -1,5 +1,5 @@
-import { Direction } from "../pga2d/Direction.js";
-import { Point } from "../pga2d/Point.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 import { WIDTH, HEIGHT, SCREEN_CENTER } from "../sketchlib/dimensions.js";
 import { Mask } from "../sketchlib/primitives/ClipMask.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
@@ -34,33 +34,33 @@ function make_points(...coords) {
 
 const PANEL_LANDSCAPE = new PolygonPrimitive(
   make_points([0, 0], [0, 100], [500, 100], [500, 0]),
-  true
+  true,
 );
 
 const PANEL_TRAFFIC = new PolygonPrimitive(
   make_points([0, 100], [0, 200], [200, 200], [400, 100]),
-  true
+  true,
 );
 
 const PANEL_QUARTERS = new PolygonPrimitive(
   make_points([500, 100], [400, 100], [200, 200], [300, 400], [500, 500]),
-  true
+  true,
 );
 const PANEL_CORAL = new PolygonPrimitive(
   make_points([0, 200], [0, 700], [200, 600], [300, 400], [200, 200]),
-  true
+  true,
 );
 const PANEL_DOORS = new PolygonPrimitive(
   make_points([0, 700], [300, 700], [200, 600]),
-  true
+  true,
 );
 const PANEL_GEODE = new PolygonPrimitive(
   make_points([500, 700], [500, 500], [300, 400], [200, 600], [300, 700]),
-  true
+  true,
 );
 const PANEL_STRIPES = new PolygonPrimitive(
   make_points([0, 700], [300, 700], [200, 600]),
-  true
+  true,
 );
 
 const PANEL_STYLE = new Style({
@@ -77,25 +77,25 @@ const PANELS = style(
     PANEL_GEODE,
     PANEL_STRIPES,
   ],
-  PANEL_STYLE
+  PANEL_STYLE,
 );
 
 const QUARTERS_DIMENSIONS = new Direction(200, 200);
 const QUARTER_HITOMEZASHI = new RectPrimitive(
   new Point(100, 100),
-  QUARTERS_DIMENSIONS
+  QUARTERS_DIMENSIONS,
 );
 const QUARTER_CIRCLE_FAN = new RectPrimitive(
   new Point(300, 100),
-  QUARTERS_DIMENSIONS
+  QUARTERS_DIMENSIONS,
 );
 const QUARTER_BRICK_WALL = new RectPrimitive(
   new Point(300, 300),
-  QUARTERS_DIMENSIONS
+  QUARTERS_DIMENSIONS,
 );
 const QUARTER_PEEK = new RectPrimitive(
   new Point(100, 300),
-  QUARTERS_DIMENSIONS
+  QUARTERS_DIMENSIONS,
 );
 
 const STYLE_QUARTERS = new Style({
@@ -108,7 +108,7 @@ const QUARTER_DIVIDER = style(
     new LinePrimitive(new Point(100, 300), new Point(500, 300)),
     new LinePrimitive(new Point(300, 100), new Point(300, 500)),
   ],
-  STYLE_QUARTERS
+  STYLE_QUARTERS,
 );
 
 const QUARTERS = new VectorTangle(
@@ -118,7 +118,7 @@ const QUARTERS = new VectorTangle(
     [new Mask(QUARTER_BRICK_WALL), BRICKS.primitive],
     [new Mask(QUARTER_PEEK), EYE.primitive],
   ],
-  QUARTER_DIVIDER
+  QUARTER_DIVIDER,
 );
 
 // Full scene
@@ -132,7 +132,7 @@ const TANGLE = new VectorTangle(
     [new Mask(PANEL_DOORS), DOORS.primitive],
     [new Mask(PANEL_GEODE), GEODE.primitive],
   ],
-  PANELS
+  PANELS,
 );
 
 const ANIMATIONS = new AnimationGroup(
@@ -144,7 +144,7 @@ const ANIMATIONS = new AnimationGroup(
   CIRCLE_FAN,
   GEODE,
   BRICKS,
-  DOORS
+  DOORS,
 );
 
 const STYLE_BACKGROUND_STRIPES = new Style({
@@ -158,9 +158,9 @@ const BACKGROUND_STRIPES = style(
     new Direction(1, 1).normalize(),
     20,
     new Direction(800, 800),
-    0
+    0,
   ),
-  STYLE_BACKGROUND_STRIPES
+  STYLE_BACKGROUND_STRIPES,
 );
 
 const COORDS = new DebugCoordinates();
@@ -172,7 +172,7 @@ export const sketch = (p) => {
       WIDTH,
       HEIGHT,
       undefined,
-      document.getElementById("sketch-canvas")
+      document.getElementById("sketch-canvas"),
     );
   };
 

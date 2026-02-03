@@ -1,6 +1,6 @@
 import { Rectangle } from "./Rectangle.js";
-import { Direction } from "../pga2d/Direction.js";
-import { Point } from "../pga2d/Point.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 import { CardinalDirection } from "./CardinalDirection.js";
 
 /**
@@ -332,14 +332,14 @@ export class Grid {
     // rectangle be?
     const total_item_space = new Direction(
       item_size.x * this.cols,
-      item_size.y * this.rows
+      item_size.y * this.rows,
     );
     const remaining_space = boundary.dimensions.sub(total_item_space);
     const padding = remaining_space.sub(margin.scale(2));
 
     const padding_size = new Direction(
       padding.x / (this.cols - 1),
-      padding.y / (this.rows - 1)
+      padding.y / (this.rows - 1),
     );
 
     const offset = boundary.position.add(margin);

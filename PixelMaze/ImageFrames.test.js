@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { ImageFrames } from "./ImageFrames.js";
-import { PGA_MATCHERS } from "../pga2d/pga_matchers.js";
-import { Direction } from "../pga2d/Direction.js";
+import { PGA_MATCHERS } from "../sketchlib/pga2d/pga_matchers.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
 
 expect.extend(PGA_MATCHERS);
 
@@ -17,7 +17,7 @@ describe("ImageFrames", () => {
     // two cells tall
     const frames = new ImageFrames(
       new Direction(64, 128),
-      new Direction(16, 32)
+      new Direction(16, 32),
     );
     // second row, third column
     const frame_id = 6;

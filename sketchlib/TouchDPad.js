@@ -1,5 +1,5 @@
-import { Direction } from "../pga2d/Direction.js";
-import { Point } from "../pga2d/Point.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 import { CardinalDirection, to_direction } from "./CardinalDirection.js";
 import { GroupPrimitive } from "./primitives/GroupPrimitive.js";
 import { PolygonPrimitive } from "./primitives/PolygonPrimitive.js";
@@ -134,22 +134,22 @@ export class TouchDPad {
 
     const right_button = new PolygonPrimitive(
       [center, mid_dr, edge_rd, edge_ru, mid_ur],
-      true
+      true,
     );
 
     const up_button = new PolygonPrimitive(
       [center, mid_ur, edge_ur, edge_ul, mid_ul],
-      true
+      true,
     );
 
     const left_button = new PolygonPrimitive(
       [center, mid_ul, edge_lu, edge_ld, mid_dl],
-      true
+      true,
     );
 
     const down_button = new PolygonPrimitive(
       [center, mid_dl, edge_dl, edge_dr, mid_dr],
-      true
+      true,
     );
     return [right_button, up_button, left_button, down_button];
   }
@@ -191,7 +191,7 @@ export class TouchDPad {
   debug_render() {
     const boundary = new RectPrimitive(
       this.rect.position,
-      this.rect.dimensions
+      this.rect.dimensions,
     );
     const center = this.rect.center;
     const half_dimensions = this.rect.dimensions.scale(0.5);
@@ -199,18 +199,18 @@ export class TouchDPad {
     const analog_direction = this.direction.analog;
     const analog_offset = new Direction(
       analog_direction.x * half_dimensions.x,
-      analog_direction.y * half_dimensions.y
+      analog_direction.y * half_dimensions.y,
     );
     const analog_arrow = new VectorPrimitive(center, center.add(analog_offset));
 
     const digital_direction = to_direction(this.direction.digital).flip_y();
     const digital_offset = new Direction(
       digital_direction.x * half_dimensions.x,
-      digital_direction.y * half_dimensions.y
+      digital_direction.y * half_dimensions.y,
     );
     const digital_arrow = new VectorPrimitive(
       center,
-      center.add(digital_offset)
+      center.add(digital_offset),
     );
 
     return style([boundary, analog_arrow, digital_arrow], Style.DEFAULT_STROKE);

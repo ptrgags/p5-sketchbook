@@ -1,30 +1,5 @@
+import { gcd } from "./gcd.js";
 import { mod } from "./mod.js";
-
-/**
- * Greatest common divisor
- * @param {number} a The first number
- * @param {number} b The second number
- * @returns {number} The greatest common divisor
- */
-function gcd(a, b) {
-  if (a < 0 || !isFinite(a)) {
-    throw new Error("a must be non-negative integer");
-  }
-
-  if (b < 0 || !isFinite(b)) {
-    throw new Error("b must be non-negative integer");
-  }
-
-  if (b > a) {
-    return gcd(b, a);
-  }
-
-  if (b === 0) {
-    return a;
-  }
-
-  return gcd(b, mod(a, b));
-}
 
 /**
  * like Math.sign, but sign_nonzero(0) = 1, not 0.

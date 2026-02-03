@@ -1,8 +1,10 @@
-import { N1, N2, N4, N8 } from "../sketchlib/music/durations.js";
+import { N1, N16, N2, N4, N8 } from "../sketchlib/music/durations.js";
 import { MidiPitch } from "../sketchlib/music/pitch_conversions.js";
 import {
   A,
+  A3,
   A4,
+  AS4,
   B,
   B3,
   B4,
@@ -11,9 +13,12 @@ import {
   C3,
   C4,
   C5,
+  CS4,
   D,
+  D3,
   D4,
   D5,
+  DS4,
   E,
   E4,
   F,
@@ -23,6 +28,7 @@ import {
   G4,
   G5,
   GS,
+  GS4,
   REST,
 } from "../sketchlib/music/pitches.js";
 import { retrograde } from "../sketchlib/music/retrograde.js";
@@ -39,6 +45,8 @@ import { Gap } from "../sketchlib/music/Timeline.js";
 import { transpose_scale_degree } from "../sketchlib/music/transpose.js";
 import { Rational } from "../sketchlib/Rational.js";
 import { Part, Score } from "../sketchlib/music/Score.js";
+import { PatternGrid } from "../sketchlib/music/PatternGrid.js";
+import { Velocity } from "../sketchlib/music/Velocity.js";
 /**
  * Convert a scale to a pitch, using a fixed octave
  * @param {number[]} scale Array of pitch classes for the scale
@@ -81,14 +89,14 @@ export function layered_melody() {
       [4, N4D],
       [REST, N8],
       [5, N4D],
-      [REST, N8]
-    )
+      [REST, N8],
+    ),
   );
 
   const cycle_length = N1;
   const cycle_a = map_pitch(
     SCALE5,
-    parse_cycle(cycle_length, [0, REST, 1, 2, REST, 4])
+    parse_cycle(cycle_length, [0, REST, 1, 2, REST, 4]),
   );
 
   const cycle_b = map_pitch(
@@ -97,20 +105,20 @@ export function layered_melody() {
       [0, 3],
       [5, REST],
       [0, 4, 2, 4],
-    ])
+    ]),
   );
 
   const sine_part = Melody.from_loop(pedal, new Rational(34));
   const square_part = new Melody(
     new Rest(new Rational(2)),
-    Melody.from_loop(scale_arp, new Rational(22))
+    Melody.from_loop(scale_arp, new Rational(22)),
   );
   const poly_part = new Harmony(
     new Melody(
       new Rest(new Rational(8)),
       Melody.from_repeat(cycle_a, 12),
       new Rest(new Rational(4)),
-      Melody.from_repeat(cycle_a, 4)
+      Melody.from_repeat(cycle_a, 4),
     ),
     new Melody(
       new Rest(new Rational(8)),
@@ -118,8 +126,8 @@ export function layered_melody() {
       new Rest(new Rational(4)),
       Melody.from_repeat(cycle_b, 4),
       new Rest(new Rational(4)),
-      Melody.from_repeat(cycle_b, 4)
-    )
+      Melody.from_repeat(cycle_b, 4),
+    ),
   );
 
   return new Score(
@@ -137,7 +145,7 @@ export function layered_melody() {
       instrument_id: "poly",
       midi_instrument: 15 - 1, // tubular bells
       midi_channel: 2,
-    })
+    }),
   );
 }
 
@@ -147,7 +155,7 @@ export function phase_scale() {
   const phase_b = parse_cycle(Rational.ONE, [0, 1, 2, 3, 4, 3, 2, 1]);
   const phase_c = parse_cycle(
     new Rational(10, 8),
-    [0, 1, 2, 3, 4, 5, 4, 3, 2, 1]
+    [0, 1, 2, 3, 4, 5, 4, 3, 2, 1],
   );
 
   // lcm(6, 8, 10) = 120 eighth notes duration total
@@ -155,7 +163,7 @@ export function phase_scale() {
   const phase_part_scale = new Harmony(
     Melody.from_loop(phase_a, total_duration),
     Melody.from_loop(phase_b, total_duration),
-    Melody.from_loop(phase_c, total_duration)
+    Melody.from_loop(phase_c, total_duration),
   );
 
   const phase_part_midi = map_pitch(SCALE3, phase_part_scale);
@@ -164,7 +172,7 @@ export function phase_scale() {
       instrument_id: "poly",
       midi_instrument: 10 - 1, // glockenspiel,
       midi_channel: 0,
-    })
+    }),
   );
 }
 
@@ -188,7 +196,7 @@ export function symmetry_melody() {
     [7, N4],
     [6, N4],
     [5, N4],
-    [4, N4]
+    [4, N4],
   );
   const bottom_motif = new Note(0, new Rational(2));
 
@@ -201,14 +209,14 @@ export function symmetry_melody() {
   const final_chord = new Harmony(
     new Note(0, N1),
     new Note(2, N1),
-    new Note(4, N1)
+    new Note(4, N1),
   );
 
   const sequence = new Melody(
     motif_scale,
     motif_third,
     motif_sixth,
-    motif_ninth
+    motif_ninth,
   );
   const sequence_retrograde = retrograde(sequence);
   const part_scale = new Melody(sequence, sequence_retrograde, final_chord);
@@ -220,7 +228,7 @@ export function symmetry_melody() {
       instrument_id: "supersaw",
       midi_instrument: 12 - 1, // vibraphone
       midi_channel: 0,
-    })
+    }),
   );
 }
 
@@ -256,14 +264,14 @@ function to_bits(x, width) {
  */
 function bit_chord(bit_pattern, chord_notes, silence) {
   return new Harmony(
-    ...bit_pattern.map((bit, i) => (bit ? chord_notes[i] : silence))
+    ...bit_pattern.map((bit, i) => (bit ? chord_notes[i] : silence)),
   );
 }
 
 export function binary_chords() {
   const chord_duration = N1;
   const major_seventh = [B4, G4, E4, C4].map(
-    (x) => new Note(x, chord_duration)
+    (x) => new Note(x, chord_duration),
   );
 
   const silence = new Rest(chord_duration);
@@ -279,19 +287,19 @@ export function binary_chords() {
    * @type {Melody<Number>}
    */
   const upwards_progression = new Melody(
-    ...bits_lsb.map((x) => bit_chord(x, major_seventh, silence))
+    ...bits_lsb.map((x) => bit_chord(x, major_seventh, silence)),
   );
 
   // For the second half, flip the bit patterns vertically while keeping the
   // pitches in the same rows. This makes the chord start on the 7th and work
   // downwards
   const downwards_progression = new Melody(
-    ...bits_lsb.map((x) => bit_chord([...x].reverse(), major_seventh, silence))
+    ...bits_lsb.map((x) => bit_chord([...x].reverse(), major_seventh, silence)),
   );
 
   const full_progression = new Melody(
     upwards_progression,
-    downwards_progression
+    downwards_progression,
   );
 
   const rhythm_bass = parse_cycle(N1, [C3, [C3, G3], C3, [C3, G3]]);
@@ -307,7 +315,7 @@ export function binary_chords() {
       instrument_id: "square",
       midi_instrument: 37 - 1, // slap bass 1,
       midi_channel: 1,
-    })
+    }),
   );
 }
 
@@ -316,30 +324,30 @@ export function organ_chords() {
     new Note(D5, N1),
     new Note(B4, N1),
     new Note(G4, N1),
-    new Note(E4, N1)
+    new Note(E4, N1),
   );
   const d_min_7 = new Harmony(
     new Note(C5, N1),
     new Note(A4, N1),
     new Note(F4, N1),
-    new Note(D4, N1)
+    new Note(D4, N1),
   );
   const c_maj_7 = new Harmony(
     new Note(B4, N1),
     new Note(G4, N1),
     new Note(E4, N1),
-    new Note(C4, N1)
+    new Note(C4, N1),
   );
   const b_half_dim = new Harmony(
     new Note(A4, N1),
     new Note(F4, N1),
     new Note(D4, N1),
-    new Note(B3, N1)
+    new Note(B3, N1),
   );
 
   const chords = Melody.from_repeat(
     new Melody(e_min_7, d_min_7, c_maj_7, b_half_dim),
-    4
+    4,
   );
 
   return new Score(
@@ -347,6 +355,25 @@ export function organ_chords() {
       instrument_id: "organ",
       midi_instrument: 17 - 1,
       midi_channel: 1,
-    })
+    }),
+  );
+}
+
+export function pattern_test() {
+  const pitches_a = new PatternGrid([A3, E4, D4, B3, D4, E4], N4);
+  const pitches_b = new PatternGrid([C4, D4, C4, F4, GS4, A4], N4);
+
+  const rhythm = PatternGrid.rhythm("xxx-----x-x-x-------", N8);
+  const melody = new Melody(
+    PatternGrid.zip(rhythm, pitches_a),
+    PatternGrid.zip(rhythm, pitches_b),
+  );
+
+  return new Score(
+    new Part("melody", melody, {
+      instrument_id: "organ",
+      midi_instrument: 17 - 1,
+      midi_channel: 1,
+    }),
   );
 }

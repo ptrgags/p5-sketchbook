@@ -1,4 +1,4 @@
-import { Direction } from "../pga2d/Direction.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { ImageFrames } from "./ImageFrames.js";
 import { Sprite } from "./Sprite.js";
 
@@ -25,7 +25,7 @@ function parse_sprites(manifest, image_frames, sprites) {
         frames,
         start_row,
         frame_count,
-        origin
+        origin,
       );
     } else if (type === "row") {
       const { row, frame_count, origin } = sprite_info;
@@ -43,7 +43,7 @@ export function parse_resources(manifest, p5_resources, resources) {
   parse_image_frames(
     p5_resources.images,
     manifest.image_frames,
-    resources.image_frames
+    resources.image_frames,
   );
   parse_sprites(manifest.sprites, resources.image_frames, resources.sprites);
 }

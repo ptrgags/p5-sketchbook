@@ -1,8 +1,7 @@
-import { Point } from "../pga2d/Point.js";
-import { Motor } from "../pga2d/versors.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
+import { Motor } from "../sketchlib/pga2d/versors.js";
 import { Color } from "./Color.js";
 import { LinePrimitive } from "./primitives/LinePrimitive.js";
-import { PointPrimitive } from "./primitives/PointPrimitive.js";
 import { group, style } from "./primitives/shorthand.js";
 import { Style } from "./Style.js";
 
@@ -30,7 +29,7 @@ export class Joint {
     this.position = Joint.constraint_follow(
       target,
       this.position,
-      this.follow_distance
+      this.follow_distance,
     );
   }
 
@@ -47,7 +46,7 @@ export class Joint {
       joint_b.position,
       this.position,
       this.follow_distance,
-      min_bend_angle
+      min_bend_angle,
     );
   }
 
@@ -158,8 +157,7 @@ export class AnimationChain {
     }
     const spine_group = style(lines, SPINE_STYLE);
 
-    const centers = positions.map((x) => new PointPrimitive(x));
-    const centers_group = style(centers, CENTER_STYLE);
+    const centers_group = style(positions, CENTER_STYLE);
 
     return group(spine_group, centers_group);
   }

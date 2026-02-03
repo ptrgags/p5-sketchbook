@@ -1,5 +1,5 @@
-import { Direction } from "../pga2d/Direction.js";
-import { Point } from "../pga2d/Point.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
@@ -24,7 +24,7 @@ export class PixelSwapPair {
     position_b,
     start_frame,
     duration_frames,
-    pixel_width
+    pixel_width,
   ) {
     this.style_a = style_a;
     this.style_b = style_b;
@@ -34,13 +34,13 @@ export class PixelSwapPair {
       this.position_a,
       this.position_b,
       start_frame,
-      duration_frames
+      duration_frames,
     );
     this.tween_ba = Tween.point(
       this.position_b,
       this.position_a,
       start_frame,
-      duration_frames
+      duration_frames,
     );
     this.pixel_dimensions = new Direction(pixel_width, pixel_width);
   }

@@ -1,4 +1,4 @@
-import { Direction } from "../pga2d/Direction.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { CardinalDirection } from "./CardinalDirection.js";
 
 export class DirectionInput {
@@ -25,5 +25,5 @@ export class DirectionInput {
   }
 }
 DirectionInput.NO_INPUT = Object.freeze(
-  new DirectionInput(undefined, Direction.ZERO)
+  new DirectionInput(undefined, Direction.ZERO),
 );

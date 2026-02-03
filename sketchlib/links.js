@@ -5,6 +5,11 @@ export const LINKS = [
     year: "2025-12/2026-01",
   },
   {
+    title: "Sound Test",
+    is_lab: true,
+    year: "2025-05/2026-01",
+  },
+  {
     title: "Musical Tree",
     is_lab: true,
     year: "2025-12",
@@ -12,11 +17,6 @@ export const LINKS = [
   {
     title: "Robot Walks",
     year: "2025-11",
-  },
-  {
-    title: "Sound Test",
-    is_lab: true,
-    year: "2025-05, 2025-07, 2025-11",
   },
   {
     title: "Pendulum Clock",

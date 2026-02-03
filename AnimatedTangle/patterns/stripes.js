@@ -1,6 +1,6 @@
-import { Direction } from "../../pga2d/Direction.js";
-import { Point } from "../../pga2d/Point.js";
-import { Motor } from "../../pga2d/versors.js";
+import { Direction } from "../../sketchlib/pga2d/Direction.js";
+import { Point } from "../../sketchlib/pga2d/Point.js";
+import { Motor } from "../../sketchlib/pga2d/versors.js";
 import { mod } from "../../sketchlib/mod.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
@@ -74,7 +74,7 @@ export class AnimatedStripes {
       this.dir_forward,
       this.spacing,
       this.dimensions,
-      mod(time, 1.0)
+      mod(time, 1.0),
     );
     this.lines_array.length = 0;
     this.lines_array.push(...new_stripes);

@@ -1,4 +1,4 @@
-import { Direction } from "../pga2d/Direction.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Color } from "../sketchlib/Color.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
@@ -25,7 +25,7 @@ function make_white_keys(bounding_rect) {
     const offset = Direction.DIR_X.scale(i * key_dimensions.x);
     result[i] = new RectPrimitive(
       bounding_rect.position.add(offset),
-      key_dimensions
+      key_dimensions,
     );
   }
   return result;
@@ -48,7 +48,7 @@ function make_black_keys(bounding_rect) {
     const offset = Direction.DIR_X.scale((i * width) / 28);
     return new RectPrimitive(
       bounding_rect.position.add(offset),
-      key_dimensions
+      key_dimensions,
     );
   });
 }
@@ -96,18 +96,18 @@ export class SingleOctavePiano {
 
     this.white_highlights = new ShowHidePrimitive(
       white_key_rects,
-      new Array(NUM_WHITE_KEYS).fill(false)
+      new Array(NUM_WHITE_KEYS).fill(false),
     );
     this.black_highlights = new ShowHidePrimitive(
       black_key_rects,
-      new Array(NUM_BLACK_KEYS).fill(false)
+      new Array(NUM_BLACK_KEYS).fill(false),
     );
 
     this.primitive = group(
       white_keys,
       style(this.white_highlights, STYLE_HIGHLIGHT),
       black_keys,
-      style(this.black_highlights, STYLE_HIGHLIGHT)
+      style(this.black_highlights, STYLE_HIGHLIGHT),
     );
   }
 

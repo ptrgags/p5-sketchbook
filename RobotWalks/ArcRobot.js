@@ -10,9 +10,8 @@ import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
-import { PointPrimitive } from "../sketchlib/primitives/PointPrimitive.js";
-import { Direction } from "../pga2d/Direction.js";
-import { Point } from "../pga2d/Point.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 
 // How many frames to animate each 1/5 turn arc
 const FULL_CIRCLE_DURATION = 120;
@@ -205,7 +204,7 @@ export class ArcRobot {
 
     // Model space is y-up, but screen space is y-down
     const arc_center_screen = START_POINT.add(
-      arc_center_model.flip_y().scale(PIXELS_PER_METER)
+      arc_center_model.flip_y().scale(PIXELS_PER_METER),
     );
     const angles_screen = angles_model.flip_y();
 
@@ -216,7 +215,7 @@ export class ArcRobot {
       PIXELS_PER_METER,
       angles_screen,
       frame,
-      this.movement_duration
+      this.movement_duration,
     );
     this.animation_state = RobotAnimationState.MOVING;
     this.command_seq = full_command_seq;
@@ -285,11 +284,10 @@ export class ArcRobot {
   render(frame) {
     const pos = this.current_position(frame);
     const step_forward = pos.add(
-      this.forward_dir(frame).scale(ORIENTATION_LINE_LENGTH)
+      this.forward_dir(frame).scale(ORIENTATION_LINE_LENGTH),
     );
 
-    const current_position = new PointPrimitive(pos);
-    const styled_position = style(current_position, POINT_STYLE);
+    const styled_position = style(pos, POINT_STYLE);
 
     const orientation_line = new LinePrimitive(pos, step_forward);
     const styled_orientation = style(orientation_line, YELLOW_LINES);
@@ -303,7 +301,7 @@ export class ArcRobot {
         arc_bg,
         arc_fg,
         styled_orientation,
-        styled_position
+        styled_position,
       );
     }
 

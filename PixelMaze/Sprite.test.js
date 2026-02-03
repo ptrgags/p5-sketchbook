@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { ImageFrames } from "./ImageFrames.js";
 import { Sprite } from "./Sprite.js";
-import { Direction } from "../pga2d/Direction.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
 
 function make_image_frames() {
   const image_dimensions = new Direction(64, 256);
@@ -36,7 +36,7 @@ describe("Sprite", () => {
         image_frames,
         start_of_last_row,
         too_long,
-        Direction.ZERO
+        Direction.ZERO,
       );
     }).toThrowError("animation too long");
   });
@@ -74,7 +74,7 @@ describe("Sprite", () => {
       image_frames,
       4,
       2,
-      Direction.ZERO
+      Direction.ZERO,
     );
 
     const expected = [
