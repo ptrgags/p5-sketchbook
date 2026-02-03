@@ -4,9 +4,9 @@ import { Part, Score } from "../music/Score.js";
 import { RelativeTimingTrack } from "./MIDITrack.js";
 import { midi_to_score } from "./midi_to_score.js";
 import { MIDIEvent, MIDIMessage, MIDIMetaEvent } from "./MIDIEvent.js";
-import { C4, E4 } from "../music/pitches.js";
+import { C4, E4, G4 } from "../music/pitches.js";
 import { Melody, Note, Rest } from "../music/Music.js";
-import { N1, N4 } from "../music/durations.js";
+import { N1, N2, N4 } from "../music/durations.js";
 
 const PPQ = MIDIHeader.DEFAULT_TICKS_PER_QUARTER;
 
@@ -14,12 +14,24 @@ const PPQ = MIDIHeader.DEFAULT_TICKS_PER_QUARTER;
 /**
  *
  * @param  {...[number, MIDIEvent]} messages
- * @returns
+ * @returns {MIDIFile<RelativeTimingTrack>}
  */
 function make_midi(...messages) {
   return new MIDIFile(MIDIHeader.DEFAULT_FORMAT0, [
     new RelativeTimingTrack(messages),
   ]);
+}
+
+/**
+ * Make a Format 1 MIDI file
+ * @param  {...[number, MIDIEvent][]} tracks
+ * @returns {MIDIFile<RelativeTimingTrack>}
+ */
+function make_format1(...tracks) {
+  return new MIDIFile(
+    MIDIHeader.format1(tracks.length),
+    tracks.map((x) => new RelativeTimingTrack(x)),
+  );
 }
 
 describe("midi_to_score", () => {
@@ -102,14 +114,14 @@ describe("midi_to_score", () => {
   });
 
   it("with channel that starts later returns correct timing", () => {
-    const one_note = make_midi(
+    const with_delay = make_midi(
       [0, MIDIMessage.note_on(0, C4)],
       [PPQ, MIDIMessage.note_off(0, C4)],
       [0, MIDIMessage.note_on(1, E4)],
       [PPQ, MIDIMessage.note_off(1, E4)],
     );
 
-    const result = midi_to_score(one_note);
+    const result = midi_to_score(with_delay);
 
     const expected_score = [
       new Score(
@@ -123,6 +135,39 @@ describe("midi_to_score", () => {
         }),
       ),
       [],
+    ];
+    expect(result).toEqual(expected_score);
+  });
+
+  it("with format1 file parses correctly", () => {
+    const format1 = make_format1(
+      [[0, MIDIMetaEvent.set_tempo(128)]],
+      [
+        [0, MIDIMessage.note_on(0, C4)],
+        [PPQ, MIDIMessage.note_off(0, C4)],
+        [0, MIDIMessage.note_on(0, E4)],
+        [PPQ, MIDIMessage.note_off(0, E4)],
+      ],
+      [
+        [0, MIDIMessage.note_on(1, G4)],
+        [2 * PPQ, MIDIMessage.note_off(1, G4)],
+      ],
+    );
+
+    const result = midi_to_score(format1);
+
+    const expected_score = [
+      new Score(
+        new Part("channel0", new Melody(new Note(C4, N4), new Note(E4, N4)), {
+          midi_channel: 0,
+          instrument_id: "channel0",
+        }),
+        new Part("channel1", new Note(G4, N2), {
+          midi_channel: 1,
+          instrument_id: "channel1",
+        }),
+      ),
+      [128],
     ];
     expect(result).toEqual(expected_score);
   });
