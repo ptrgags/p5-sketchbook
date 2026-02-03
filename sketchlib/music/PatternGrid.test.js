@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { PatternGrid } from "./PatternGrid.js";
 import { N16, N2, N4, N8 } from "./durations.js";
 import { RhythmStep } from "./RhythmStep.js";
-import { C3, C4, C5, E4, F4, F5, G3, G4 } from "./pitches.js";
+import { A4, B4, C3, C4, C5, D4, E4, F4, F5, G3, G4 } from "./pitches.js";
 import { Velocity } from "./Velocity.js";
 import { Harmony, Melody, Note, Rest } from "./Music.js";
 import { Rational } from "../Rational.js";
@@ -72,7 +72,7 @@ describe("PatternGrid", () => {
       expect(result).toEqual(expected);
     });
 
-    it("zip with velocity produces a melody with all notes at mezzo-forte", () => {
+    it("zip with velocity produces a melody with correct velocities", () => {
       const rhythm = PatternGrid.rhythm("x.x--.x-x..xx.x.", N16);
       const pitches = new PatternGrid([C4, G4, C4, E4, F4, G4, C5], N8);
       const velocities = new PatternGrid(
@@ -213,5 +213,77 @@ describe("PatternGrid", () => {
     });
   });
 
-  describe("overlay and split", () => {});
+  describe("overlay", () => {
+    it("with different array lengths throws", () => {
+      const rhythm = PatternGrid.rhythm("x.xx.x--", N8);
+      const pitches = new PatternGrid([C4, D4, E4, F4, G4, A4, B4], N8);
+
+      expect(() => {
+        return PatternGrid.overlay(rhythm, pitches);
+      }).toThrowError("grid sizes must match");
+    });
+
+    it("with different number of velocities throws", () => {
+      const rhythm = PatternGrid.rhythm("x.xx.x--", N8);
+      const pitches = new PatternGrid([C4, D4, E4, F4, G4, A4, B4, C5], N8);
+      const velocities = new PatternGrid(new Array(7).fill(Velocity.F), N8);
+      expect(() => {
+        return PatternGrid.overlay(rhythm, pitches, velocities);
+      }).toThrowError("grid sizes must match");
+    });
+
+    it("with different pitch step size throws", () => {
+      const rhythm = PatternGrid.rhythm("x.xx.x--", N8);
+      const pitches = new PatternGrid([C4, D4, E4, F4, G4, A4, B4, C5], N16);
+      expect(() => {
+        return PatternGrid.overlay(rhythm, pitches);
+      }).toThrowError("grid sizes must match");
+    });
+
+    it("with different number of velocities throws", () => {
+      const rhythm = PatternGrid.rhythm("x.xx.x--", N8);
+      const pitches = new PatternGrid([C4, D4, E4, F4, G4, A4, B4, C5], N8);
+      const velocities = new PatternGrid(new Array(8).fill(Velocity.F), N16);
+      expect(() => {
+        return PatternGrid.overlay(rhythm, pitches, velocities);
+      }).toThrowError("grid sizes must match");
+    });
+
+    it("without velocity produces a melody with all notes at mezzo-forte", () => {
+      const rhythm = PatternGrid.rhythm("x.xx.x--", N8);
+      const pitches = new PatternGrid([C4, D4, E4, F4, G4, A4, B4, C5], N8);
+
+      const result = PatternGrid.overlay(rhythm, pitches);
+
+      const expected = new Melody(
+        new Note(C4, N8),
+        new Rest(N8),
+        new Note(E4, N8),
+        new Note(F4, N8),
+        new Rest(N8),
+        new Note(A4, new Rational(3, 8)),
+      );
+      expect(result).toEqual(expected);
+    });
+
+    it("with velocity produces a melody with correct velocities", () => {
+      const rhythm = PatternGrid.rhythm("x.xx.x--", N8);
+      const pitches = new PatternGrid([C4, D4, E4, F4, G4, A4, B4, C5], N8);
+      const f = Velocity.F;
+      const p = Velocity.P;
+      const velocities = new PatternGrid([f, f, f, f, p, p, p, p], N8);
+
+      const result = PatternGrid.overlay(rhythm, pitches, velocities);
+
+      const expected = new Melody(
+        new Note(C4, N8, f),
+        new Rest(N8),
+        new Note(E4, N8, f),
+        new Note(F4, N8, f),
+        new Rest(N8),
+        new Note(A4, new Rational(3, 8), p),
+      );
+      expect(result).toEqual(expected);
+    });
+  });
 });

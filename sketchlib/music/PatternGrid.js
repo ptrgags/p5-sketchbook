@@ -6,11 +6,12 @@ import { RhythmStep } from "./RhythmStep.js";
 import { Velocity } from "./Velocity.js";
 
 /**
- * Iterate over a RhythmGrid and
+ * Iterate over a RhythmGrid and return runs of rests/sustained notes.
+ * This version returns the durations in steps of the rhythm grid.
  * @param {PatternGrid<RhythmStep>} rhythm
- * @returns {Generator<[boolean, Rational]>} (is_note, duration) pair.
+ * @returns {Generator<[boolean, number]>} (is_note, duration_steps) pair.
  */
-function* beat_iter(rhythm) {
+function* beat_iter_steps(rhythm) {
   /**
    * @type {RhythmStep | undefined}
    */
@@ -41,14 +42,14 @@ function* beat_iter(rhythm) {
       run_length = 1;
     } else if (step === RhythmStep.HIT) {
       // Emit previous run
-      yield [is_note, rhythm.step_size.mul(new Rational(run_length))];
+      yield [is_note, run_length];
 
       // Start a note run
       is_note = true;
       run_length = 1;
     } else if (previous !== RhythmStep.REST && step === RhythmStep.REST) {
       // Emit previous run
-      yield [is_note, rhythm.step_size.mul(new Rational(run_length))];
+      yield [is_note, run_length];
 
       is_note = false;
       run_length = 1;
@@ -59,7 +60,19 @@ function* beat_iter(rhythm) {
     previous = step;
   }
 
-  yield [is_note, rhythm.step_size.mul(new Rational(run_length))];
+  yield [is_note, run_length];
+}
+
+/**
+ * Iterate over a RhythmGrid and return runs of rests/sustained notes.
+ * This version returns the durations in steps of the rhythm grid.
+ * @param {PatternGrid<RhythmStep>} rhythm
+ * @returns {Generator<[boolean, Rational]>} (is_note, duration) pair.
+ */
+function* beat_iter_duration(rhythm) {
+  for (const [is_note, steps] of beat_iter_steps(rhythm)) {
+    yield [is_note, rhythm.step_size.mul(new Rational(steps))];
+  }
 }
 
 /**
@@ -129,7 +142,7 @@ export class PatternGrid {
   }
 
   /**
-   * Zip the beats of a rhythm together with
+   * Zip the beats of a rhythm together with pitch and velocity to make a melody
    * @param {PatternGrid<RhythmStep>} rhythm The rhythm to determine the length of notes
    * @param {PatternGrid<number>} pitches The pitches. There must be at least one for every beat of the rhythm. The step size of the grid is ignored.
    * @param {PatternGrid<number>} [velocities] Optional grid of velocity values. If omitted, everything will be mezzo-forte. The step size of this grid is ignored
@@ -145,7 +158,7 @@ export class PatternGrid {
       throw new Error("pitches and velocities must have the same length");
     }
 
-    const beats = [...beat_iter(rhythm)];
+    const beats = [...beat_iter_duration(rhythm)];
     const note_count = beats.reduce(
       (acc, [is_note]) => acc + Number(is_note),
       0,
@@ -221,5 +234,48 @@ export class PatternGrid {
       pitch: new PatternGrid(pitch_values, subdivision),
       velocity: new PatternGrid(velocity_values, subdivision),
     };
+  }
+
+  /**
+   * Overlay rhythm, pitch and velocity grids to create a monophonic melody
+   * @param {PatternGrid<RhythmStep>} rhythm The rhythm to determine the length of notes
+   * @param {PatternGrid<number>} pitches The pitches. There must be at least one for every beat of the rhythm. The step size of the grid is ignored.
+   * @param {PatternGrid<number>} [velocities] Optional grid of velocity values. If omitted, everything will be mezzo-forte. The step size of this grid is ignored
+   * @returns {import("./Timeline.js").Timeline<Note<number>>} A monophonic melody
+   */
+  static overlay(rhythm, pitches, velocities) {
+    if (!velocities) {
+      const velocity_values = new Array(rhythm.length).fill(Velocity.MF);
+      velocities = new PatternGrid(velocity_values, rhythm.step_size);
+    }
+
+    if (
+      pitches.length !== rhythm.length ||
+      velocities.length !== rhythm.length ||
+      !pitches.step_size.equals(rhythm.step_size) ||
+      !velocities.step_size.equals(rhythm.step_size)
+    ) {
+      throw new Error("grid sizes must match");
+    }
+
+    let notes = [];
+    let step = 0;
+    for (const [is_note, steps] of beat_iter_steps(rhythm)) {
+      const duration = rhythm.step_size.mul(new Rational(steps));
+      if (is_note) {
+        const pitch = pitches.values[step];
+        const velocity = velocities.values[step];
+        notes.push(new Note(pitch, duration, velocity));
+      } else {
+        notes.push(new Rest(duration));
+      }
+      step += steps;
+    }
+
+    return new Melody(...notes);
+  }
+
+  static split(melody) {
+    return { rhythm: undefined, pitches: undefined, velocites: undefined };
   }
 }
