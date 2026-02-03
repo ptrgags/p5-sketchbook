@@ -274,6 +274,20 @@ export class MIDIMetaEvent {
     return new MIDIMetaEvent(MIDIMetaType.TRACK_NAME, encoded_name);
   }
 
+  static set_tempo(bpm) {
+    const microsec_per_quarter = Math.round(
+      MIDIMetaEvent.MICROSEC_PER_MIN / bpm,
+    );
+
+    const data = new Uint8Array([
+      (microsec_per_quarter >> 16) & 0xff,
+      (microsec_per_quarter >> 8) & 0xff,
+      microsec_per_quarter & 0xff,
+    ]);
+
+    return new MIDIMetaEvent(MIDIMetaType.SET_TEMPO, data);
+  }
+
   /**
    * Decode a binary meta message
    * @param {DataView} data_view Data view to read from
@@ -297,6 +311,7 @@ export class MIDIMetaEvent {
     return [message, after_offset];
   }
 }
+MIDIMetaEvent.MICROSEC_PER_MIN = 60e6;
 MIDIMetaEvent.MAGIC = 0xff;
 MIDIMetaEvent.END_OF_TRACK = Object.freeze(
   new MIDIMetaEvent(MIDIMetaType.END_OF_TRACK, new Uint8Array(0)),
