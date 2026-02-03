@@ -18,11 +18,27 @@
   <body>
     <sketchbook-navbar></sketchbook-navbar>
     <div class="container">
-      <h1>Conformal Geometric Algebra Test(YEAR)</h1>
+      <h1>Conformal Geometric Algebra (CGA) Test (2026-02)</h1>
       <div class="sketch">
         <canvas id="sketch-canvas" width="500" height="700"></canvas>
       </div>
-      <div class="description">DESCRIPTION GOES HERE</div>
+      <div class="description">
+        <p>
+          I want to port some of the things I did in
+          <a href="https://github.com/ptrgags/math-notebook/tree/main"
+            >math-notebook</a
+          >
+          to p5 so I can animate them. Except this time, I want to try using 2D
+          Conformal Geometric Algebra (2D CGA) rather than complex numbers.
+          There's a lot of moving pieces (see
+          <a href="https://github.com/ptrgags/p5-sketchbook/issues/217"
+            >the GitHubIssue</a
+          >). So far this is just a test of rendering the geometry primitives. A
+          Cline is a generalized circle or line. It does also have the corner
+          case of a circle of radius zero (aka a null point in CGA). Right now,
+          this sketch just creates clines and renders them.
+        </p>
+      </div>
     </div>
   </body>
 </html>
