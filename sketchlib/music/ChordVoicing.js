@@ -25,6 +25,25 @@ export class ChordVoicing {
   }
 
   /**
+   * Subtract a chord voicing from this one, which produces an array
+   * of intervals for use with move()
+   * @param {ChordVoicing} other Another chord voicing
+   * @returns {number[]} intervals in semitones for moving each voice
+   */
+  sub(other) {
+    if (other.num_voices != this.num_voices) {
+      throw new Error(
+        "Can only subtract chords with the same number of voices",
+      );
+    }
+
+    return this.pitches.map((dest_pitch, i) => {
+      const src_pitch = other.pitches[i];
+      return dest_pitch - src_pitch;
+    });
+  }
+
+  /**
    * Constructor
    * @param {number[]} intervals Signed intervals in semitones to move each voice
    * @returns {ChordVoicing}
