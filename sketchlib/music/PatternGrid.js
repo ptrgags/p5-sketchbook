@@ -1,3 +1,4 @@
+import { lcm } from "../gcd.js";
 import { Rational } from "../Rational.js";
 import { Melody, Note, Rest } from "./Music.js";
 import { RelTimelineOps } from "./RelTimelineOps.js";
@@ -68,12 +69,12 @@ function* beat_iter(rhythm) {
  * @return {Rational} denominator value
  */
 function compute_subdivision(melody) {
-  let max_denom = 0;
+  let subdivision = 1;
   for (const note_or_rest of RelTimelineOps.iter_with_gaps(melody)) {
-    max_denom = Math.max(max_denom, note_or_rest.duration.denominator);
+    subdivision = lcm(subdivision, note_or_rest.duration.denominator);
   }
 
-  return new Rational(1, max_denom);
+  return new Rational(1, subdivision);
 }
 
 /**
@@ -189,7 +190,7 @@ export class PatternGrid {
     // First, figure out the grid subdivision
     const subdivision = compute_subdivision(melody);
 
-    const SMALL_SUBDIVISION = new Rational(1, 64);
+    const SMALL_SUBDIVISION = new Rational(1, 128);
     if (subdivision.lt(SMALL_SUBDIVISION)) {
       console.warn("Unusual grid subdivision detected:", subdivision);
     }
@@ -199,13 +200,17 @@ export class PatternGrid {
     const velocity_values = [];
 
     for (const note of RelTimelineOps.iter_with_gaps(melody)) {
+      const repeat_count = note.duration.div(subdivision).numerator;
       if (note instanceof Rest) {
-        // TODO: repeat the value (note.duration / subdivision) times
-        rhythm_values.push(RhythmStep.REST);
+        // Make a pattern like .....
+        const rests = new Array(repeat_count).fill(RhythmStep.REST);
+        rhythm_values.push(...rests);
       } else {
-        // TODO: It should be x------ where the length of the string
-        // is equal to note.duration / subdivision
-        rhythm_values.push(RhythmStep.HIT);
+        // Make a pattern like x------ where the total length is based on
+        // the repeat
+        const steps = new Array(repeat_count).fill(RhythmStep.SUSTAIN);
+        steps[0] = RhythmStep.HIT;
+        rhythm_values.push(...steps);
         pitch_values.push(note.pitch);
         velocity_values.push(note.velocity);
       }

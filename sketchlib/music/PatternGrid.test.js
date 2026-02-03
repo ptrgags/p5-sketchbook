@@ -195,7 +195,7 @@ describe("PatternGrid", () => {
       const result = PatternGrid.unzip(melody);
 
       const expected = {
-        rhythm: PatternGrid.rhythm("x-------x---x-....x-xx---x-----", N16),
+        rhythm: PatternGrid.rhythm("x-------x---x-....x-x....x-----", N16),
         pitch: new PatternGrid([C4, E4, C3, G3, C3, G4], N16),
         velocity: new PatternGrid(
           [
