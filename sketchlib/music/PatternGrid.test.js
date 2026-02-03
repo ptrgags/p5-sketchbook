@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { PatternGrid } from "./PatternGrid.js";
-import { N16, N2, N4, N8 } from "./durations.js";
+import { N1, N16, N2, N4, N8 } from "./durations.js";
 import { RhythmStep } from "./RhythmStep.js";
 import { A4, B4, C3, C4, C5, D4, E4, F4, F5, G3, G4 } from "./pitches.js";
 import { Velocity } from "./Velocity.js";
@@ -47,6 +47,15 @@ describe("PatternGrid", () => {
       expect(() => {
         return PatternGrid.zip(rhythm, pitches, velocities);
       }).toThrowError("pitches and velocities must have the same length");
+    });
+
+    it("zip with empty grids produces empty timeline", () => {
+      const rhythm = PatternGrid.empty();
+      const pitches = PatternGrid.empty();
+      const velocities = PatternGrid.empty();
+
+      const result = PatternGrid.zip(rhythm, pitches, velocities);
+      expect(result).toEqual(Rest.ZERO);
     });
 
     it("zip without velocity produces a melody with all notes at mezzo-forte", () => {
@@ -160,6 +169,19 @@ describe("PatternGrid", () => {
       expect(() => {
         return PatternGrid.unzip(chord);
       }).toThrowError("unzip is only defined for monophonic melodies");
+    });
+
+    it("with empty melody produces empty grids", () => {
+      const empty = Rest.ZERO;
+
+      const result = PatternGrid.unzip(empty);
+
+      const expected = {
+        rhythm: PatternGrid.empty(),
+        pitch: PatternGrid.empty(),
+        velocity: PatternGrid.empty(),
+      };
+      expect(result).toEqual(expected);
     });
 
     it("with quarter note melody produces correct grids", () => {
@@ -298,6 +320,19 @@ describe("PatternGrid", () => {
       expect(() => {
         return PatternGrid.deoverlay(chord);
       }).toThrowError("unzip is only defined for monophonic melodies");
+    });
+
+    it("with empty melody produces empty grids", () => {
+      const empty = Rest.ZERO;
+
+      const result = PatternGrid.deoverlay(empty);
+
+      const expected = {
+        rhythm: PatternGrid.empty(),
+        pitch: PatternGrid.empty(),
+        velocity: PatternGrid.empty(),
+      };
+      expect(result).toEqual(expected);
     });
 
     it("with quarter note melody produces correct grids", () => {

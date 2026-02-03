@@ -1,5 +1,6 @@
 import { lcm } from "../gcd.js";
 import { Rational } from "../Rational.js";
+import { flatten_timeline } from "./flatten_timeline.js";
 import { Melody, Note, Rest } from "./Music.js";
 import { RelTimelineOps } from "./RelTimelineOps.js";
 import { RhythmStep } from "./RhythmStep.js";
@@ -117,6 +118,14 @@ export class PatternGrid {
   }
 
   /**
+   * @template T
+   * @returns {PatternGrid<T>}
+   */
+  static empty() {
+    return new PatternGrid([], Rational.ONE);
+  }
+
+  /**
    *
    * @param {string} rhythm_str
    * @param {Rational} step_size
@@ -181,7 +190,8 @@ export class PatternGrid {
       }
     }
 
-    return new Melody(...notes);
+    const result = new Melody(...notes);
+    return flatten_timeline(result);
   }
 
   /**
@@ -272,7 +282,8 @@ export class PatternGrid {
       step += steps;
     }
 
-    return new Melody(...notes);
+    const result = new Melody(...notes);
+    return flatten_timeline(result);
   }
 
   /**
