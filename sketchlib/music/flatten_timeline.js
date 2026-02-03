@@ -2,7 +2,7 @@
  * @typedef {import("./Timeline").TimeInterval} TimeInterval
  */
 
-import { Gap, Parallel, Sequential } from "./Timeline";
+import { Gap, Parallel, Sequential } from "./Timeline.js";
 
 /**
  * @template {TimeInterval} T
