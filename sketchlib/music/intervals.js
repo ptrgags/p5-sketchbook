@@ -1,0 +1,13 @@
+export const P1 = 0;
+export const m2 = 1;
+export const M2 = 2;
+export const m3 = 3;
+export const M3 = 4;
+export const P4 = 5;
+export const T = 6;
+export const P5 = 7;
+export const m6 = 8;
+export const M6 = 9;
+export const m7 = 10;
+export const M7 = 11;
+export const P8 = 12;
