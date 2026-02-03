@@ -1,8 +1,14 @@
 import { is_nearly } from "../is_nearly.js";
+import { Primitive } from "../primitives/Primitive.js";
 import { Direction } from "./Direction.js";
 import { Odd } from "./multivectors.js";
 import { Point } from "./Point.js";
 
+/**
+ * a line in PGA is represented by a unit normal and distance from origin
+ *
+ * @implements {Primitive}
+ */
 export class Line {
   /**
    * @param {number} nx The x-component of the normal
@@ -105,6 +111,34 @@ export class Line {
     }
 
     return `Line(${this.nx}, ${this.ny}, ${this.d})`;
+  }
+
+  /**
+   * Draw the line as a line segment that goes past the canvas bounds
+   * @param {import('p5')} p p5 library
+   */
+  draw(p) {
+    const { nx, ny, d } = this;
+
+    // The line will be as long as half the perimeter of the canvas
+    // we want half of that here.
+    const RADIUS = 600;
+
+    // Center point is in the direction n a distance d
+    const cx = d * nx;
+    const cy = d * ny;
+    // rotate the normal to get a tangent
+    // via (x, y) -> (-y, x)
+    const tx = -ny;
+    const ty = nx;
+
+    // the points are
+    // center +/- radius * tangent
+    const x1 = cx + RADIUS * tx;
+    const y1 = cy + RADIUS * ty;
+    const x2 = cx - RADIUS * tx;
+    const y2 = cy - RADIUS * ty;
+    p.line(x1, y1, x2, y2);
   }
 }
 Line.X_AXIS = Object.freeze(new Line(0, 1, 0));
