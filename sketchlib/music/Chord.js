@@ -1,6 +1,9 @@
 import { arrays_equal } from "../arrays_equal.js";
+import { Rational } from "../Rational.js";
+import { ChordVoicing } from "./ChordVoicing.js";
 import { M3, m3, M6, m6, m7, M7, P1, P5, T } from "./intervals.js";
 import { IntervalStack, PitchClassStack, PitchStack } from "./IntervalStack.js";
+import { PatternGrid } from "./PatternGrid.js";
 import { MidiPitch } from "./pitch_conversions.js";
 
 /**
@@ -117,5 +120,28 @@ export class Chord {
 
     const pitch = MidiPitch.format_pitch(this.pitches.root);
     return `${pitch}${symbol}`;
+  }
+
+  /**
+   * Areggiate the chord as a single monophonic pattern
+   * @param {number[]} indices Indices for looking up notes
+   * @param {Rational} step_size Step size for the pattern grid
+   * @returns {PatternGrid<number>}
+   */
+  arpeggiate(indices, step_size) {
+    const values = indices.map((x) => this.pitches.value(x));
+    return new PatternGrid(values, step_size);
+  }
+
+  /**
+   * Voice the chord by giving
+   * @param {(number | undefined)[]} indices Voices, listed from bottom to top. To leave a voice silent, use REST
+   * @returns {ChordVoicing}
+   */
+  voice(indices) {
+    const values = indices.map((x) =>
+      x !== undefined ? this.pitches.value(x) : undefined,
+    );
+    return new ChordVoicing(values);
   }
 }
