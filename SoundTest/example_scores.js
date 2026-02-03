@@ -360,15 +360,8 @@ export function organ_chords() {
 }
 
 export function pattern_test() {
-  const pitches_a = new PatternGrid([
-    A3, E4, D4,
-    B3,D4, E4,
-  ], N4)
-
-    const pitches_b = new PatternGrid([ 
-    C4, D4,  C4,
-    F4, GS4, A4,
-  ], N4)
+  const pitches_a = new PatternGrid([A3, E4, D4, B3, D4, E4], N4);
+  const pitches_b = new PatternGrid([C4, D4, C4, F4, GS4, A4], N4);
 
   const rhythm = PatternGrid.rhythm("xxx-----x-x-x-------", N8);
   const melody = new Melody(
