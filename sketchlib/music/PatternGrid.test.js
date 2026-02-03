@@ -35,6 +35,19 @@ describe("PatternGrid", () => {
     });
   });
 
+  it("length returns array length", () => {
+    const grid = PatternGrid.rhythm("x..x..", N4);
+
+    expect(grid.length).toBe(6);
+  });
+
+  it("duration computes total length based on step size", () => {
+    const grid = PatternGrid.rhythm("x..x--", N4);
+
+    const expected = new Rational(6, 4);
+    expect(grid.duration).toEqual(expected);
+  });
+
   describe("zip", () => {
     it("zip with different number of pitches and velocities throws", () => {
       const rhythm = PatternGrid.rhythm("x.x.x.x.", N8);
