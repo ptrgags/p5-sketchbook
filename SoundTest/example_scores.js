@@ -47,6 +47,7 @@ import { Rational } from "../sketchlib/Rational.js";
 import { Part, Score } from "../sketchlib/music/Score.js";
 import { PatternGrid } from "../sketchlib/music/PatternGrid.js";
 import { Velocity } from "../sketchlib/music/Velocity.js";
+import { HALF_DIM7, MAJOR7, MINOR7 } from "../sketchlib/music/chords.js";
 /**
  * Convert a scale to a pitch, using a fixed octave
  * @param {number[]} scale Array of pitch classes for the scale
@@ -320,35 +321,18 @@ export function binary_chords() {
 }
 
 export function organ_chords() {
-  const e_min_7 = new Harmony(
-    new Note(D5, N1),
-    new Note(B4, N1),
-    new Note(G4, N1),
-    new Note(E4, N1),
-  );
-  const d_min_7 = new Harmony(
-    new Note(C5, N1),
-    new Note(A4, N1),
-    new Note(F4, N1),
-    new Note(D4, N1),
-  );
-  const c_maj_7 = new Harmony(
-    new Note(B4, N1),
-    new Note(G4, N1),
-    new Note(E4, N1),
-    new Note(C4, N1),
-  );
-  const b_half_dim = new Harmony(
-    new Note(A4, N1),
-    new Note(F4, N1),
-    new Note(D4, N1),
-    new Note(B3, N1),
+  const e_min7 = MINOR7.to_chord(E4);
+  const d_min7 = MINOR7.to_chord(D4);
+  const c_maj7 = MAJOR7.to_chord(C4);
+  const b_hdim7 = HALF_DIM7.to_chord(B3);
+  const progression = [e_min7, d_min7, c_maj7, b_hdim7];
+
+  // Voice as a block chord
+  const block_chords = progression.map((x) =>
+    x.voice([0, 1, 2, 3]).to_harmony(N1),
   );
 
-  const chords = Melody.from_repeat(
-    new Melody(e_min_7, d_min_7, c_maj_7, b_half_dim),
-    4,
-  );
+  const chords = Melody.from_repeat(new Melody(...block_chords), 4);
 
   return new Score(
     new Part("chords", chords, {
