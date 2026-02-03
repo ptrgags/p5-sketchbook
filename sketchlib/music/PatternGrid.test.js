@@ -171,12 +171,12 @@ describe("PatternGrid", () => {
       );
 
       const result = PatternGrid.unzip(melody);
-
       const expected = {
         rhythm: PatternGrid.rhythm("xx.x", N4),
         pitch: new PatternGrid([C4, E4, G4], N4),
         velocity: new PatternGrid([Velocity.P, Velocity.F, Velocity.FFF], N4),
       };
+
       expect(result).toEqual(expected);
     });
 
@@ -283,6 +283,145 @@ describe("PatternGrid", () => {
         new Rest(N8),
         new Note(A4, new Rational(3, 8), p),
       );
+      expect(result).toEqual(expected);
+    });
+  });
+
+  describe("deoverlay", () => {
+    it("with polyphonic music throws", () => {
+      const chord = new Harmony(
+        new Note(G4, N4),
+        new Note(E4, N4),
+        new Note(C4, N4),
+      );
+
+      expect(() => {
+        return PatternGrid.deoverlay(chord);
+      }).toThrowError("unzip is only defined for monophonic melodies");
+    });
+
+    it("with quarter note melody produces correct grids", () => {
+      const melody = new Melody(
+        new Note(C4, N4, Velocity.P),
+        new Note(E4, N4, Velocity.F),
+        new Rest(N4),
+        new Note(G4, N4, Velocity.FFF),
+      );
+
+      const result = PatternGrid.deoverlay(melody);
+
+      const expected = {
+        rhythm: PatternGrid.rhythm("xx.x", N4),
+        pitch: new PatternGrid([C4, E4, undefined, G4], N4),
+        velocity: new PatternGrid(
+          [Velocity.P, Velocity.F, undefined, Velocity.FFF],
+          N4,
+        ),
+      };
+      expect(result).toEqual(expected);
+    });
+
+    it("with complex rhythm produces correct grids", () => {
+      const melody = new Melody(
+        new Note(C4, N2, Velocity.P),
+        new Note(E4, N4, Velocity.F),
+        new Note(C3, N8),
+        new Rest(N4),
+        new Note(G3, N8),
+        new Note(C3, N16),
+        new Rest(N4),
+        new Note(G4, new Rational(3, 8), Velocity.FFF),
+      );
+
+      const result = PatternGrid.deoverlay(melody);
+
+      const p = Velocity.P;
+      const f = Velocity.F;
+      const mf = Velocity.MF;
+      const fff = Velocity.FFF;
+      const expected = {
+        rhythm: PatternGrid.rhythm("x-------x---x-....x-x....x-----", N16),
+        pitch: new PatternGrid(
+          [
+            C4,
+            C4,
+            C4,
+            C4,
+            C4,
+            C4,
+            C4,
+            C4,
+            E4,
+            E4,
+            E4,
+            E4,
+            C3,
+            C3,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            G3,
+            G3,
+            C3,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            G4,
+            G4,
+            G4,
+            G4,
+            G4,
+            G4,
+          ],
+          N16,
+        ),
+        velocity: new PatternGrid(
+          [
+            // first note
+            p,
+            p,
+            p,
+            p,
+            p,
+            p,
+            p,
+            p,
+            // second note
+            f,
+            f,
+            f,
+            f,
+            // third note
+            mf,
+            mf,
+            // first rest
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            // fourth note
+            mf,
+            mf,
+            // fifth note
+            mf,
+            // second rest
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            // sixth note
+            fff,
+            fff,
+            fff,
+            fff,
+            fff,
+            fff,
+          ],
+          N16,
+        ),
+      };
       expect(result).toEqual(expected);
     });
   });

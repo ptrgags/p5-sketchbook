@@ -275,7 +275,68 @@ export class PatternGrid {
     return new Melody(...notes);
   }
 
-  static split(melody) {
-    return { rhythm: undefined, pitches: undefined, velocites: undefined };
+  /**
+   * Split the layers of a (monophonic) music into rhythm, pitch, and velocity. This will be quantized
+   * to the smallest denominator in the score.
+   *
+   * Rests are encoded as undefined pitch/velocity
+   * Sustained notes have constant pitch/velocity
+   * @param {import("./Timeline.js").Timeline<Note>} melody The original melody
+   * @returns {{
+   *    rhythm: PatternGrid<RhythmStep>,
+   *    pitch: PatternGrid<number | undefined>,
+   *    velocity: PatternGrid<number | undefined>,
+   * }} The rhythm, pitch and velocity of the melody
+   */
+  static deoverlay(melody) {
+    // First, check if the melody is monophonic
+    if (RelTimelineOps.num_lanes(melody) > 1) {
+      throw new Error("unzip is only defined for monophonic melodies");
+    }
+
+    // First, figure out the grid subdivision
+    const subdivision = compute_subdivision(melody);
+
+    const SMALL_SUBDIVISION = new Rational(1, 128);
+    if (subdivision.lt(SMALL_SUBDIVISION)) {
+      console.warn("Unusual grid subdivision detected:", subdivision);
+    }
+
+    const rhythm_values = [];
+    const pitch_values = [];
+    const velocity_values = [];
+
+    for (const note of RelTimelineOps.iter_with_gaps(melody)) {
+      const step_count = note.duration.div(subdivision).numerator;
+      if (note instanceof Rest) {
+        // Make a pattern like .....
+        const rests = new Array(step_count).fill(RhythmStep.REST);
+        rhythm_values.push(...rests);
+
+        // We don't have pitch or rhythm information, so store undefined in
+        // each step
+        const values = new Array(step_count);
+        pitch_values.push(...values);
+        velocity_values.push(...values);
+      } else {
+        // Make a pattern like x------ where the total length is based on
+        // the repeat
+        const steps = new Array(step_count).fill(RhythmStep.SUSTAIN);
+        steps[0] = RhythmStep.HIT;
+        rhythm_values.push(...steps);
+
+        const pitches = new Array(step_count).fill(note.pitch);
+        pitch_values.push(...pitches);
+
+        const velocities = new Array(step_count).fill(note.velocity);
+        velocity_values.push(...velocities);
+      }
+    }
+
+    return {
+      rhythm: new PatternGrid(rhythm_values, subdivision),
+      pitch: new PatternGrid(pitch_values, subdivision),
+      velocity: new PatternGrid(velocity_values, subdivision),
+    };
   }
 }
