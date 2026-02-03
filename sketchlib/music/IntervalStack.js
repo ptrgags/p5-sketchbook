@@ -35,6 +35,12 @@ export class IntervalStack {
   }
 }
 
+/**
+ * An interval stack rooted at one of the 12 pitch classes.
+ *
+ * This is used for chord symbols and pitch symbols, more for
+ * music theory analysis than practical use.
+ */
 export class PitchClassStack {
   /**
    * Constructor
@@ -59,6 +65,11 @@ export class PitchClassStack {
   }
 }
 
+/**
+ * An interval stack rooted on a specific pitch
+ *
+ * This is used for concrete scales and chords.
+ */
 export class PitchStack {
   /**
    * Constructor
