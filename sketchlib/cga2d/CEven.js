@@ -30,36 +30,77 @@ export class CEven {
    * @returns {CEven}
    */
   add(other) {
-    return new CEven(0, 0, 0, 0, 0, 0, 0, 0);
+    const scalar = this.scalar + other.scalar;
+    const xy = this.xy + other.xy;
+    const xp = this.xp + other.xp;
+    const xm = this.xm + other.xm;
+    const yp = this.yp + other.yp;
+    const ym = this.ym + other.ym;
+    const pm = this.pm + other.pm;
+    const xypm = this.xypm + other.xypm;
+
+    return new CEven(scalar, xy, xp, xm, yp, ym, pm, xypm);
   }
 
   /**
    *
-   * @param {*} other
-   * @returns
+   * @param {CEven} other
+   * @returns {CEven}
    */
   sub(other) {
-    return new CEven(0, 0, 0, 0, 0, 0, 0, 0);
+    const scalar = this.scalar - other.scalar;
+    const xy = this.xy - other.xy;
+    const xp = this.xp - other.xp;
+    const xm = this.xm - other.xm;
+    const yp = this.yp - other.yp;
+    const ym = this.ym - other.ym;
+    const pm = this.pm - other.pm;
+    const xypm = this.xypm - other.xypm;
+
+    return new CEven(scalar, xy, xp, xm, yp, ym, pm, xypm);
   }
 
   /**
-   * Compute the dual.
-   * @returns
+   * Compute the Hodge dual
+   * @returns {CEven}
    */
   dual() {
-    return new CEven(0, 0, 0, 0, 0, 0, 0, 0);
+    // this_blade ^ abs_dual(this_blade) = sign * xypm
+    // dual(this_blade) = sign * abs_dual(this_blade)
+    // 1 ^ xypm = xypm
+    // xy ^ pm = xypm
+    // xp ^ ym = -xypm
+    // xm ^ yp = xypm
+    // yp ^ xm = xypm
+    // ym ^ xp = -xypm
+    // pm ^ xy = xypm
+    // xypm ^ 1 = xypm
+    const scalar = this.xypm;
+    const xy = this.pm;
+    const xp = -this.ym;
+    const xm = this.yp;
+    const yp = this.xm;
+    const ym = -this.xp;
+    const pm = this.xy;
+    const xypm = this.scalar;
+    return new CEven(scalar, xy, xp, xm, yp, ym, pm, xypm);
   }
 
-  /**
-   * Compute the antidual.
-   * @returns
-   */
-  antidual() {
-    return new CEven(0, 0, 0, 0, 0, 0, 0, 0);
-  }
+  // in 2D CGA, the anti (hodge) dual has the same signs as the dual, so
+  // this function is free!
+  antidual = this.dual;
 
   reverse() {
-    return new CEven(0, 0, 0, 0, 0, 0, 0, 0);
+    return new CEven(
+      this.scalar,
+      -this.xy,
+      -this.xp,
+      -this.xm,
+      -this.yp,
+      -this.ym,
+      -this.pm,
+      this.xypm,
+    );
   }
 
   inverse() {

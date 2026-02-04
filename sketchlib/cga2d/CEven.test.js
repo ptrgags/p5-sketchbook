@@ -33,8 +33,8 @@ describe("CEven", () => {
 
     const result = a.dual();
 
-    const expected = new COdd(4, -3, 2, 1, 4, 3, -2, 1);
-    expect(result).toBeCOdd(expected);
+    const expected = new CEven(8, 7, -6, 5, 4, -3, 2, 1);
+    expect(result).toBeCEven(expected);
   });
 
   it("dual and antidual are the same in PGA2D", () => {
@@ -43,7 +43,7 @@ describe("CEven", () => {
     const a_dual = a.dual();
     const a_antidual = a.antidual();
 
-    expect(a_dual).toBeOdd(a_antidual);
+    expect(a_dual).toBeCEven(a_antidual);
   });
 
   it("computes reverse", () => {
@@ -51,7 +51,7 @@ describe("CEven", () => {
 
     const result = a.reverse();
 
-    const expected = new CEven(1, -2, -3, -4, -5, -6, -7, -8);
+    const expected = new CEven(1, -2, -3, -4, -5, -6, -7, 8);
     expect(result).toBeCEven(expected);
   });
 
