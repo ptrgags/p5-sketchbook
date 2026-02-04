@@ -33,13 +33,17 @@ export class ChordVoicing {
   sub(other) {
     if (other.num_voices != this.num_voices) {
       throw new Error(
-        "Can only subtract chords with the same number of voices",
+        "can only subtract chords with the same number of voices",
       );
     }
 
-    return this.pitches.map((dest_pitch, i) => {
+    return this.pitches.map((dst_pitch, i) => {
       const src_pitch = other.pitches[i];
-      return dest_pitch - src_pitch;
+      if (src_pitch === undefined || dst_pitch === undefined) {
+        throw new Error("sub only defined for voicings without rests");
+      }
+
+      return dst_pitch - src_pitch;
     });
   }
 
