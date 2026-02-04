@@ -1,6 +1,12 @@
 import { Rational } from "../Rational.js";
 import { REST } from "./pitches.js";
-import { Gap, Parallel, Sequential, timeline_map } from "./Timeline.js";
+import {
+  Gap,
+  Parallel,
+  Sequential,
+  TimeInterval,
+  timeline_map,
+} from "./Timeline.js";
 import { Velocity } from "./Velocity.js";
 
 /**
@@ -11,24 +17,24 @@ export class Note {
   /**
    * Constructor
    * @param {P} pitch Pitch
-   * @param {Rational} duration The duration
    * @param {number} [velocity=Velocity.MF] Note velocity in [0, 127]
    */
-  constructor(pitch, duration, velocity = Velocity.MF) {
+  constructor(pitch, velocity = Velocity.MF) {
     this.pitch = pitch;
-    this.duration = duration;
     this.velocity = velocity;
   }
+}
 
-  /**
-   * Map the pitch type to a new type
-   * @template Q The new pitch type
-   * @param {function(P): Q} convert_pitch Function to convert pitch types
-   * @return {Note<Q>} A new alternation with pitches of the destination type
-   */
-  map_pitch(convert_pitch) {
-    return new Note(convert_pitch(this.pitch), this.duration);
-  }
+/**
+ * Shorthand to create a note wrapped in a TimeInterval
+ * @template P
+ * @param {P} pitch
+ * @param {Rational} duration
+ * @param {number} [velocity]
+ * @returns {TimeInterval<Note<P>>}
+ */
+export function make_note(pitch, duration, velocity) {
+  return new TimeInterval(new Note(pitch, velocity), duration);
 }
 
 // Musical aliases.
@@ -51,7 +57,7 @@ export function parse_melody(...tuples) {
   for (const tuple of tuples) {
     const [pitch, duration] = tuple;
     const note =
-      pitch === undefined ? new Rest(duration) : new Note(pitch, duration);
+      pitch === undefined ? new Rest(duration) : make_note(pitch, duration);
     children.push(note);
   }
 
@@ -85,7 +91,7 @@ export function parse_cycle(cycle_length, notes) {
     } else if (Array.isArray(note)) {
       child = parse_cycle(beat_length, note);
     } else {
-      child = new Note(note, beat_length);
+      child = make_note(note, beat_length);
     }
 
     children.push(child);
@@ -110,7 +116,7 @@ export function parse_cycle(cycle_length, notes) {
  */
 export function map_pitch(pitch_func, music) {
   return timeline_map(
-    (note) => new Note(pitch_func(note.pitch), note.duration),
+    (note) => new Note(pitch_func(note.pitch), note.velocity),
     music,
   );
 }

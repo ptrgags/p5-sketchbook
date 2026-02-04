@@ -189,7 +189,7 @@ function flatten_parallel(par) {
 
 export class AbsTimelineOps {
   /**
-   * @template {import("./Timeline.js").TimeInterval} T
+   * @template T
    * @param {import("./Timeline.js").Timeline<T>} rel_timeline Relative timeline to convert
    * @param {Rational} [start_time=Rational.ZERO] Start time for the timeline (often zero)
    * @return {AbsTimeline<T>} Timeline
@@ -215,7 +215,7 @@ export class AbsTimelineOps {
     } else {
       // Plain interval
       return new AbsInterval(
-        rel_timeline,
+        rel_timeline.value,
         start_time,
         start_time.add(rel_timeline.duration),
       );

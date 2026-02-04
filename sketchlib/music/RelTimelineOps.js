@@ -1,4 +1,4 @@
-import { Gap, Parallel, Sequential } from "./Timeline.js";
+import { Gap, Parallel, Sequential, TimeInterval } from "./Timeline.js";
 
 export class RelTimelineOps {
   /**
@@ -32,9 +32,9 @@ export class RelTimelineOps {
 
   /**
    * Iterate over the timeline, including the gaps
-   * @template {import("./Timeline.js").TimeInterval} T
+   * @template T
    * @param {import("./Timeline.js").Timeline<T>} timeline
-   * @return {Generator<Gap | T>}
+   * @return {Generator<Gap | TimeInterval<T>>}
    */
   static *iter_with_gaps(timeline) {
     if (timeline instanceof Sequential) {
