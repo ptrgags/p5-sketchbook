@@ -66,7 +66,7 @@ const PART_STYLES = Oklch.gradient(
 );
 
 const RENDERED_TIMELINES = {};
-const MEASURE_DIMENSIONS = new Direction(50, 100);
+const MEASURE_DIMENSIONS = new Direction(25, 50);
 
 for (const [key, score] of Object.entries(SOUND_MANIFEST.scores)) {
   RENDERED_TIMELINES[key] = render_score(
