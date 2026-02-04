@@ -1,8 +1,25 @@
 import { describe, it, expect } from "vitest";
 import { ChordQuality } from "./Chord.js";
 import { M2, m2, m3, M3, m7, M7, P1, P5, T } from "./intervals.js";
-import { MAJOR_TRIAD, MINOR7 } from "./chords.js";
-import { A, A4, CS, CS6 } from "./pitches.js";
+import { DIM7, MAJOR7, MAJOR_TRIAD, MINOR7 } from "./chords.js";
+import {
+  A,
+  A3,
+  A4,
+  AS3,
+  AS4,
+  C4,
+  C5,
+  CS,
+  CS6,
+  DS5,
+  G4,
+  GS3,
+  REST,
+} from "./pitches.js";
+import { N4 } from "./durations.js";
+import { PatternGrid } from "./PatternGrid.js";
+import { ChordVoicing } from "./ChordVoicing.js";
 
 describe("ChordQuality", () => {
   it("formats major chord as M", () => {
@@ -70,5 +87,56 @@ describe("Chord", () => {
 
     const expected = "C#6m7";
     expect(result).toEqual(expected);
+  });
+
+  describe("arpeggiate", () => {
+    it("with empty indices returns empty pattern", () => {
+      const chord = MAJOR7.to_chord(G4);
+
+      const result = chord.arpeggiate([], N4);
+
+      const expected = new PatternGrid([], N4);
+      expect(result).toEqual(expected);
+    });
+
+    it("with indices returns pattern grid with correct pitches", () => {
+      const chord = MINOR7.to_chord(C4);
+      const indices = [-1, 0, 3, 4];
+
+      const result = chord.arpeggiate(indices, N4);
+
+      const expected = new PatternGrid([AS3, C4, AS4, C5], N4);
+      expect(result).toEqual(expected);
+    });
+  });
+
+  describe("voice", () => {
+    it("with no indices returns empty voicing", () => {
+      const chord = DIM7.to_chord(C4);
+
+      const result = chord.voice([]);
+
+      const expected = new ChordVoicing([]);
+      expect(result).toEqual(expected);
+    });
+
+    it("with indices returns voicing with correct pitches", () => {
+      const chord = DIM7.to_chord(C4);
+
+      const result = chord.voice([-1, 0, 3, 5]);
+
+      const expected = new ChordVoicing([A3, C4, A4, DS5]);
+      expect(result).toEqual(expected);
+    });
+
+    it("with REST values reserves voice slots", () => {
+      const chord = MAJOR7.to_chord(C4);
+      const indices = [0, REST, 2, REST];
+
+      const result = chord.voice(indices);
+
+      const expected = new ChordVoicing([C4, REST, G4, REST]);
+      expect(result).toEqual(expected);
+    });
   });
 });
