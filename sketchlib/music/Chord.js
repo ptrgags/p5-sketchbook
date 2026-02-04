@@ -4,7 +4,7 @@ import { ChordVoicing } from "./ChordVoicing.js";
 import { M3, m3, M6, m6, m7, M7, P1, P5, T } from "./intervals.js";
 import { IntervalStack, PitchClassStack, PitchStack } from "./IntervalStack.js";
 import { PatternGrid } from "./PatternGrid.js";
-import { MIDIPitch } from "./pitch_conversions.js";
+import { MIDIPitch } from "./MIDIPitch.js";
 
 /**
  * Chord quality interval patterns and their corresponding chord symbol

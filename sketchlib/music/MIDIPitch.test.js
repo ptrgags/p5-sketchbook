@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { MIDIPitch } from "./pitch_conversions.js";
+import { MIDIPitch } from "./MIDIPitch.js";
 import { B, C, C4, E, E5, F_1 } from "./pitches.js";
 
 describe("MidiPitch", () => {

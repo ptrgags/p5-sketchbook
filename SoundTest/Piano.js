@@ -1,6 +1,6 @@
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { group } from "../sketchlib/primitives/shorthand.js";
-import { MIDIPitch } from "../sketchlib/music/pitch_conversions.js";
+import { MIDIPitch } from "../sketchlib/music/MIDIPitch.js";
 import { Rectangle } from "../sketchlib/Rectangle.js";
 import { SingleOctavePiano } from "./SingleOctavePiano.js";
 

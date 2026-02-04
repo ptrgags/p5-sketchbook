@@ -1,5 +1,5 @@
 import { N1, N16, N2, N4, N8, N8T } from "../sketchlib/music/durations.js";
-import { MIDIPitch } from "../sketchlib/music/pitch_conversions.js";
+import { MIDIPitch } from "../sketchlib/music/MIDIPitch.js";
 import {
   A,
   A3,

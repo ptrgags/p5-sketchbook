@@ -10,7 +10,7 @@ import {
 import { N1, N2, N4, N4T, N8, N8T } from "./durations.js";
 import { Rational } from "../Rational.js";
 import { A4, AS4, B4, C, C4, E, E4, F4, G4, REST } from "./pitches.js";
-import { MIDIPitch } from "./pitch_conversions.js";
+import { MIDIPitch } from "./MIDIPitch.js";
 
 describe("Melody", () => {
   it("duration computes sum of notes", () => {
