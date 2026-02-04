@@ -1,6 +1,6 @@
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { group } from "../sketchlib/primitives/shorthand.js";
-import { MidiPitch } from "../sketchlib/music/pitch_conversions.js";
+import { MIDIPitch } from "../sketchlib/music/MIDIPitch.js";
 import { Rectangle } from "../sketchlib/Rectangle.js";
 import { SingleOctavePiano } from "./SingleOctavePiano.js";
 
@@ -53,7 +53,7 @@ export class Piano {
    * @param {number} midi_note MIDI pitch number in [0, 127]
    */
   trigger(midi_note) {
-    const octave = MidiPitch.get_octave(midi_note);
+    const octave = MIDIPitch.get_octave(midi_note);
     if (
       octave < this.octave_start ||
       octave >= this.octave_start + this.num_octaves
@@ -65,7 +65,7 @@ export class Piano {
     // Increment the counter
     this.key_presses[midi_note]++;
 
-    const pitch = MidiPitch.get_pitch_class(midi_note);
+    const pitch = MIDIPitch.get_pitch_class(midi_note);
     this.octave_pianos[octave - this.octave_start].set_key(pitch, true);
   }
 
@@ -75,7 +75,7 @@ export class Piano {
    * @param {number} midi_note MIDI pitch number in [0, 127]
    */
   release(midi_note) {
-    const octave = MidiPitch.get_octave(midi_note);
+    const octave = MIDIPitch.get_octave(midi_note);
     if (
       octave < this.octave_start ||
       octave >= this.octave_start + this.num_octaves
@@ -93,7 +93,7 @@ export class Piano {
 
     if (this.key_presses[midi_note] <= 0) {
       // Only release the note if duplicates have been resolved
-      const pitch = MidiPitch.get_pitch_class(midi_note);
+      const pitch = MIDIPitch.get_pitch_class(midi_note);
       this.octave_pianos[octave - this.octave_start].set_key(pitch, false);
     }
   }

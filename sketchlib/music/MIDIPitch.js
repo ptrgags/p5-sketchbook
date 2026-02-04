@@ -1,6 +1,21 @@
 import { mod } from "../mod.js";
 
-export class MidiPitch {
+const PITCH_CLASS_LABELS = [
+  "C",
+  "C#",
+  "D",
+  "D#",
+  "E",
+  "F",
+  "F#",
+  "G",
+  "G#",
+  "A",
+  "A#",
+  "B",
+];
+
+export class MIDIPitch {
   /**
    * Get the pitch class from a midi note
    * @param {number} midi_pitch The MIDI pitch number in [0, 127]
@@ -42,5 +57,29 @@ export class MidiPitch {
     }
 
     return midi_pitch;
+  }
+
+  /**
+   * Format a pitch class as a string, like "C" or "F#"
+   * @param {number} pitch_class Pitch class [0, 11]
+   * @returns {string}
+   */
+  static format_pitch_class(pitch_class) {
+    return PITCH_CLASS_LABELS[pitch_class];
+  }
+
+  /**
+   * Format an absolute pitch, like "C4" or "F#5". Note that
+   * sharps are always used, even if the key signature would
+   * normally call for a flat
+   * @param {number} midi_pitch MIDI pitch [0, 127]
+   * @returns {string}
+   */
+  static format_pitch(midi_pitch) {
+    const pitch_class = this.get_pitch_class(midi_pitch);
+    const octave = this.get_octave(midi_pitch);
+
+    const pitch_label = PITCH_CLASS_LABELS[pitch_class];
+    return `${pitch_label}${octave}`;
   }
 }

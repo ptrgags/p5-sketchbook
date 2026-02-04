@@ -1,5 +1,5 @@
-import { N1, N16, N2, N4, N8 } from "../sketchlib/music/durations.js";
-import { MidiPitch } from "../sketchlib/music/pitch_conversions.js";
+import { N1, N16, N2, N4, N8, N8T } from "../sketchlib/music/durations.js";
+import { MIDIPitch } from "../sketchlib/music/MIDIPitch.js";
 import {
   A,
   A3,
@@ -47,6 +47,9 @@ import { Rational } from "../sketchlib/Rational.js";
 import { Part, Score } from "../sketchlib/music/Score.js";
 import { PatternGrid } from "../sketchlib/music/PatternGrid.js";
 import { Velocity } from "../sketchlib/music/Velocity.js";
+import { HALF_DIM7, MAJOR7, MINOR7 } from "../sketchlib/music/chords.js";
+import { P1 } from "../sketchlib/music/intervals.js";
+import { ChordVoicing } from "../sketchlib/music/ChordVoicing.js";
 /**
  * Convert a scale to a pitch, using a fixed octave
  * @param {number[]} scale Array of pitch classes for the scale
@@ -57,7 +60,7 @@ import { Velocity } from "../sketchlib/music/Velocity.js";
 function scale_to_pitch(scale, octave) {
   return (scale_degree) => {
     const pitch_class = scale[scale_degree];
-    return MidiPitch.from_pitch_octave(pitch_class, octave);
+    return MIDIPitch.from_pitch_octave(pitch_class, octave);
   };
 }
 
@@ -181,7 +184,7 @@ function scale_degree_to_pitch(scale, start_octave) {
   return (scale_degree) => {
     const pitch_class = scale[scale_degree % scale.length];
     const octave = start_octave + Math.floor(scale_degree / scale.length);
-    return MidiPitch.from_pitch_octave(pitch_class, octave);
+    return MIDIPitch.from_pitch_octave(pitch_class, octave);
   };
 }
 const MAJOR_SCALE = scale_degree_to_pitch(MAJOR_SCALE_PITCHES, 4);
@@ -320,38 +323,57 @@ export function binary_chords() {
 }
 
 export function organ_chords() {
-  const e_min_7 = new Harmony(
-    new Note(D5, N1),
-    new Note(B4, N1),
-    new Note(G4, N1),
-    new Note(E4, N1),
-  );
-  const d_min_7 = new Harmony(
-    new Note(C5, N1),
-    new Note(A4, N1),
-    new Note(F4, N1),
-    new Note(D4, N1),
-  );
-  const c_maj_7 = new Harmony(
-    new Note(B4, N1),
-    new Note(G4, N1),
-    new Note(E4, N1),
-    new Note(C4, N1),
-  );
-  const b_half_dim = new Harmony(
-    new Note(A4, N1),
-    new Note(F4, N1),
-    new Note(D4, N1),
-    new Note(B3, N1),
-  );
+  const e_min7 = MINOR7.to_chord(E4);
+  const d_min7 = MINOR7.to_chord(D4);
+  const c_maj7 = MAJOR7.to_chord(C4);
+  const b_hdim7 = HALF_DIM7.to_chord(B3);
+  const progression = [e_min7, d_min7, c_maj7, b_hdim7];
 
-  const chords = Melody.from_repeat(
-    new Melody(e_min_7, d_min_7, c_maj_7, b_half_dim),
-    4,
+  // Make voicings as block chords
+  const block_chords = progression.map((x) => x.voice([0, 1, 2, 3]));
+
+  // rhythm will be:
+  //
+  // grid size: N8T
+  //
+  // Em7             Dm7
+  // x-- --- --- xxx|x-- --- --- xxx|
+  // chord       ^cascade into next chord
+  //
+
+  const three_beats = new Rational(3, 4);
+  const chords = [];
+  for (let i = 0; i < 3; i++) {
+    const chord = block_chords[i];
+
+    // Hold the block chord for 3 beats
+    chords.push(chord.to_harmony(three_beats));
+    const [, delta3, delta5, delta7] = block_chords[i + 1].sub(chord);
+
+    // Now move the chord downwards towards the next chord one step at a time
+    const cascade1 = chord.move([0, 0, 0, delta7]);
+    const cascade2 = cascade1.move([0, 0, delta5, 0]);
+    const cascade3 = cascade2.move([0, delta3, 0, 0]);
+
+    chords.push(
+      cascade1.to_harmony(N8T),
+      cascade2.to_harmony(N8T),
+      cascade3.to_harmony(N8T),
+    );
+  }
+
+  // For the ending, it's a little different, long held chords
+  //
+  // Grid size N1
+  // Bhdim7 |  C
+  // x      |  x
+  chords.push(
+    block_chords.at(-1).to_harmony(N1),
+    new ChordVoicing([C4, E4, G4, C5]).to_harmony(N1),
   );
 
   return new Score(
-    new Part("chords", chords, {
+    new Part("chords", new Melody(...chords), {
       instrument_id: "organ",
       midi_instrument: 17 - 1,
       midi_channel: 1,
