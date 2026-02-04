@@ -46,7 +46,7 @@ const SOUND_MANIFEST = {
     phase_scale: SCORE_PHASE_SCALE,
     symmetry_melody: SCORE_SYMMETRY_MELODY,
     binary_progression: SCORE_BINARY_CHORDS,
-    organ_chords: SCORE_ORGAN_CHORDS,
+    chord_cascade: SCORE_ORGAN_CHORDS,
     pattern_test: SCORE_PATTERN_TEST,
   },
 };
@@ -111,7 +111,7 @@ MELODY_BUTTONS.set(
 );
 MELODY_BUTTONS.set(
   new Index2D(2, 0),
-  new MelodyButtonDescriptor("organ_chords", "Organ Test Chords"),
+  new MelodyButtonDescriptor("chord_cascade", "Chord Cascade"),
 );
 MELODY_BUTTONS.set(
   new Index2D(2, 1),

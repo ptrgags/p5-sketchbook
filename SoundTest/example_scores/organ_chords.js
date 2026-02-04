@@ -57,7 +57,9 @@ chords.push(
 
 export const SCORE_ORGAN_CHORDS = new Score(
   new Part("chords", new Melody(...chords), {
-    instrument_id: "organ",
+    // Temporarily using poly since DrawbarOrgan is
+    // buggy.
+    instrument_id: "poly",
     midi_instrument: 17 - 1,
     midi_channel: 1,
   }),
