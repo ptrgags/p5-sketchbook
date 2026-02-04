@@ -1,3 +1,4 @@
+import { is_nearly } from "../is_nearly.js";
 import { COdd } from "./COdd.js";
 
 export class CEven {
@@ -65,8 +66,21 @@ export class CEven {
     return new CEven(0, 0, 0, 0, 0, 0, 0, 0);
   }
 
+  /**
+   * Check if two CEven objects are equal
+   * @param {CEven} other
+   */
   equals(other) {
-    return false;
+    return (
+      is_nearly(this.scalar, other.scalar) &&
+      is_nearly(this.xy, other.xy) &&
+      is_nearly(this.xp, other.xp) &&
+      is_nearly(this.xm, other.xm) &&
+      is_nearly(this.yp, other.yp) &&
+      is_nearly(this.ym, other.ym) &&
+      is_nearly(this.pm, other.pm) &&
+      is_nearly(this.xypm, other.xypm)
+    );
   }
 
   sandwich_even(other) {
@@ -110,7 +124,18 @@ export class CEven {
   }
 
   static lerp(a, b, t) {
-    return new CEven(0, 0, 0, 0, 0, 0, 0, 0);
+    const s = 1 - t;
+
+    const scalar = s * a.scalar + t * b.scalar;
+    const xy = s * a.xy + t * b.xy;
+    const xp = s * a.xp + t * b.xp;
+    const xm = s * a.xm + t * b.xm;
+    const yp = s * a.yp + t * b.yp;
+    const ym = s * a.ym + t * b.ym;
+    const pm = s * a.pm + t * b.pm;
+    const xypm = s * a.xypm + t * b.xypm;
+
+    return new CEven(scalar, xy, xp, xm, yp, ym, pm, xypm);
   }
 }
 CEven.ZERO = Object.freeze(new CEven(0, 0, 0, 0, 0, 0, 0, 0));

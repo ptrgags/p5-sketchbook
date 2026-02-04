@@ -126,7 +126,7 @@ describe("CEven", () => {
 
     const result = CEven.lerp(a, b, 0.75);
 
-    const expected = new CEven(-2, 1.25, -0.75, 2.5, 4, 3, -2, 1);
+    const expected = new CEven(-2, 1.25, -0.75, 2.5, 4.25, 3.75, 0.25, 2.75);
     expect(result).toBeCEven(expected);
   });
 
@@ -136,7 +136,7 @@ describe("CEven", () => {
 
     const result = CEven.lerp(a, b, -1);
 
-    const expected = new CEven(5, 3, 8, 6, 4, 3, -2, 1);
+    const expected = new CEven(5, 3, 8, 6, 6, 9, 16, 15);
     expect(result).toBeCEven(expected);
   });
 
@@ -146,7 +146,7 @@ describe("CEven", () => {
 
     const result = CEven.lerp(a, b, 2);
 
-    const expected = new CEven(-7, 0, -7, 0, 4, 3, -2, 1);
+    const expected = new CEven(-7, 0, -7, 0, 3, 0, -11, -6);
     expect(result).toBeCEven(expected);
   });
 });
