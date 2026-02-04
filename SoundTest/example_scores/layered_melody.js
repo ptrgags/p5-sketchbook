@@ -1,0 +1,104 @@
+import { N4, N8, N1 } from "../../sketchlib/music/durations.js";
+import {
+  parse_melody,
+  map_pitch,
+  parse_cycle,
+  Melody,
+  Rest,
+  Harmony,
+} from "../../sketchlib/music/Music.js";
+import {
+  B,
+  C,
+  C3,
+  C4,
+  C5,
+  E,
+  F,
+  G,
+  GS,
+  REST,
+} from "../../sketchlib/music/pitches.js";
+import { make_scale } from "../../sketchlib/music/scales.js";
+import { Part, Score } from "../../sketchlib/music/Score.js";
+import { Rational } from "../../sketchlib/Rational.js";
+
+const pedal = parse_melody([C3, N4], [REST, N4]);
+
+const N4D = new Rational(3, 8);
+
+const CUSTOM_SCALE = [C, E, F, G, GS, B];
+const SCALE4 = make_scale(CUSTOM_SCALE, C4);
+const SCALE5 = make_scale(CUSTOM_SCALE, C5);
+
+// scores are expressed in scale degrees then converted to pitches
+const scale_arp = map_pitch(
+  SCALE4,
+  parse_melody(
+    // Measure 1
+    [0, N4],
+    [1, N4],
+    [2, N4],
+    [3, N4],
+    // Measure 2
+    [4, N4D],
+    [REST, N8],
+    [5, N4D],
+    [REST, N8],
+  ),
+);
+
+const cycle_length = N1;
+const cycle_a = map_pitch(
+  SCALE5,
+  parse_cycle(cycle_length, [0, REST, 1, 2, REST, 4]),
+);
+
+const cycle_b = map_pitch(
+  SCALE5,
+  parse_cycle(cycle_length, [
+    [0, 3],
+    [5, REST],
+    [0, 4, 2, 4],
+  ]),
+);
+
+const sine_part = Melody.from_loop(pedal, new Rational(34));
+const square_part = new Melody(
+  new Rest(new Rational(2)),
+  Melody.from_loop(scale_arp, new Rational(22)),
+);
+const poly_part = new Harmony(
+  new Melody(
+    new Rest(new Rational(8)),
+    Melody.from_repeat(cycle_a, 12),
+    new Rest(new Rational(4)),
+    Melody.from_repeat(cycle_a, 4),
+  ),
+  new Melody(
+    new Rest(new Rational(8)),
+    Melody.from_repeat(cycle_b, 8),
+    new Rest(new Rational(4)),
+    Melody.from_repeat(cycle_b, 4),
+    new Rest(new Rational(4)),
+    Melody.from_repeat(cycle_b, 4),
+  ),
+);
+
+export const SCORE_LAYERED_MELODY = new Score(
+  new Part("pedal", sine_part, {
+    instrument_id: "sine",
+    midi_instrument: 36 - 1, // fretless bass
+    midi_channel: 0,
+  }),
+  new Part("scale_arp", square_part, {
+    instrument_id: "square",
+    midi_instrument: 47 - 1, // orchestral harp
+    midi_channel: 1,
+  }),
+  new Part("poly_part", poly_part, {
+    instrument_id: "poly",
+    midi_instrument: 15 - 1, // tubular bells
+    midi_channel: 2,
+  }),
+);
