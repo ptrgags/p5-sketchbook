@@ -5,6 +5,7 @@ import {
   Harmony,
   Melody,
   map_pitch,
+  make_note,
 } from "../../sketchlib/music/Music.js";
 import { retrograde } from "../../sketchlib/music/retrograde.js";
 import { transpose_scale_degree } from "../../sketchlib/music/transpose.js";
@@ -27,7 +28,7 @@ const top_motif = parse_melody(
   [5, N4],
   [4, N4],
 );
-const bottom_motif = new Note(0, new Rational(2));
+const bottom_motif = make_note(0, new Rational(2));
 
 const motif_scale = new Harmony(top_motif, bottom_motif);
 
@@ -36,9 +37,9 @@ const motif_sixth = transpose_scale_degree(4, motif_scale);
 const motif_ninth = transpose_scale_degree(8, motif_scale);
 
 const final_chord = new Harmony(
-  new Note(0, N1),
-  new Note(2, N1),
-  new Note(4, N1),
+  make_note(0, N1),
+  make_note(2, N1),
+  make_note(4, N1),
 );
 
 const sequence = new Melody(motif_scale, motif_third, motif_sixth, motif_ninth);

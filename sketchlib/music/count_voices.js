@@ -2,7 +2,7 @@ import { Gap, Parallel, Sequential } from "./Timeline.js";
 
 /**
  * Count the number of distinct parallel lines in the timeline.
- * @template {import("./Timeline.js").TimeInterval} T
+ * @template T
  * @param {import("./Timeline.js").Timeline<T>} timeline The timeline to check
  * @returns {number} The number of voices in the timeline
  */

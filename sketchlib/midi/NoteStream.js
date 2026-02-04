@@ -2,7 +2,6 @@ import { AbsInterval } from "../music/AbsTimeline.js";
 import { Note } from "../music/Music.js";
 import { Rational } from "../Rational.js";
 import { MIDIMessage, MIDIMessageType } from "./MIDIEvent.js";
-import { MIDIHeader } from "./MIDIFile.js";
 
 export class NoteStream {
   /**

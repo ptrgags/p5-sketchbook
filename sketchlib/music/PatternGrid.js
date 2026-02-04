@@ -1,7 +1,7 @@
 import { lcm } from "../gcd.js";
 import { Rational } from "../Rational.js";
 import { flatten_timeline } from "./flatten_timeline.js";
-import { Melody, Note, Rest } from "./Music.js";
+import { make_note, Melody, Note, Rest } from "./Music.js";
 import { RelTimelineOps } from "./RelTimelineOps.js";
 import { RhythmStep } from "./RhythmStep.js";
 import { Velocity } from "./Velocity.js";
@@ -183,7 +183,7 @@ export class PatternGrid {
       if (is_note) {
         const pitch = pitches.values[next_note];
         const velocity = velocities.values[next_note];
-        notes.push(new Note(pitch, duration, velocity));
+        notes.push(make_note(pitch, duration, velocity));
         next_note++;
       } else {
         notes.push(new Rest(duration));
@@ -275,7 +275,7 @@ export class PatternGrid {
       if (is_note) {
         const pitch = pitches.values[step];
         const velocity = velocities.values[step];
-        notes.push(new Note(pitch, duration, velocity));
+        notes.push(make_note(pitch, duration, velocity));
       } else {
         notes.push(new Rest(duration));
       }

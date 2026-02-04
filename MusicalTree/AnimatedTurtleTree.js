@@ -19,7 +19,13 @@ import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { ParamCurve } from "../sketchlib/animation/ParamCurve.js";
 import { AnimationCurve } from "../sketchlib/animation/AnimationCurve.js";
 import { whole_fract } from "../sketchlib/whole_fract.js";
-import { map_pitch, Melody, Note, Rest } from "../sketchlib/music/Music.js";
+import {
+  make_note,
+  map_pitch,
+  Melody,
+  Note,
+  Rest,
+} from "../sketchlib/music/Music.js";
 
 const TREE_LSYSTEM = new LSystem("Fa", {
   a: "[+Fa][-Fa]",
@@ -161,16 +167,16 @@ const SCALE = make_scale(MAJOR_PENTATONIC);
 const DUR_SHORT = N16;
 
 // For stack commands, it's hi-lo for push lo-hi for pop
-const NOTE_STACK_HI = new Note(7, DUR_SHORT);
-const NOTE_STACK_LO = new Note(6, DUR_SHORT);
+const NOTE_STACK_HI = make_note(7, DUR_SHORT);
+const NOTE_STACK_LO = make_note(6, DUR_SHORT);
 const PAUSE_STACK = new Rest(DUR_SHORT);
 const DUR_STACK = DUR_SHORT.mul(new Rational(3));
 const REST_STACK = new Rest(DUR_STACK);
 
 // For turn commands, just a single short note. Left turn (increment angle)
 // is the high note, right turn is the lower note
-const NOTE_LEFT = new Note(-1, DUR_SHORT);
-const NOTE_RIGHT = new Note(-2, DUR_SHORT);
+const NOTE_LEFT = make_note(-1, DUR_SHORT);
+const NOTE_RIGHT = make_note(-2, DUR_SHORT);
 const REST_TURN = new Rest(DUR_SHORT);
 
 // For forward commands, the length and duration depends on the depth
@@ -201,7 +207,7 @@ class TreeMusicBuilder {
     const pitch = PITCH_FWD_START + depth;
     const rest = new Rest(duration);
 
-    this.draw_notes.push(new Note(pitch, duration));
+    this.draw_notes.push(make_note(pitch, duration));
     this.stack_notes.push(rest);
     this.turn_notes.push(rest);
   }

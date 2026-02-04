@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Melody, Note, Rest, Harmony } from "../music/Music.js";
+import { Melody, Note, Rest, Harmony, make_note } from "../music/Music.js";
 import { N1, N2, N4 } from "../music/durations.js";
 import { C4, C5, CS5, E4, G4, REST } from "../music/pitches.js";
 import { precompile_music } from "./compile_music.js";
@@ -9,7 +9,7 @@ import { Parallel, Sequential } from "../music/Timeline.js";
 
 describe("precompile_music", () => {
   it("single note compiles to part", () => {
-    const note = new Note(CS5, N4);
+    const note = make_note(CS5, N4);
 
     const result = precompile_music(note);
 
@@ -28,10 +28,10 @@ describe("precompile_music", () => {
 
   it("simple melody compiles to single part", () => {
     const melody = new Melody(
-      new Note(C4, N2),
-      new Note(E4, N4),
+      make_note(C4, N2),
+      make_note(E4, N4),
       new Rest(N4),
-      new Note(G4, N1)
+      make_note(G4, N1),
     );
 
     const result = precompile_music(melody);
@@ -46,10 +46,10 @@ describe("precompile_music", () => {
 
   it("melody of melodies compiles to multiple parts", () => {
     const sub_melody = new Melody(
-      new Note(C4, N2),
-      new Note(E4, N4),
+      make_note(C4, N2),
+      make_note(E4, N4),
       new Rest(N4),
-      new Note(G4, N1)
+      make_note(G4, N1),
     );
     const melody = new Melody(sub_melody, sub_melody, sub_melody);
 
@@ -65,7 +65,7 @@ describe("precompile_music", () => {
   });
 
   it("melody with initial gap just changes offset", () => {
-    const melody = new Melody(new Rest(N4), new Note(C4, N2));
+    const melody = new Melody(new Rest(N4), make_note(C4, N2));
 
     const result = precompile_music(melody);
 
@@ -77,9 +77,9 @@ describe("precompile_music", () => {
 
   it("chord compiles to parallel clips (for now)", () => {
     const chord = new Harmony(
-      new Note(C4, N1),
-      new Note(E4, N1),
-      new Note(G4, N1)
+      make_note(C4, N1),
+      make_note(E4, N1),
+      make_note(G4, N1),
     );
 
     const result = precompile_music(chord);
@@ -87,16 +87,16 @@ describe("precompile_music", () => {
     const expected = new Parallel(
       new PartDescriptor(N1, [["0:0", ["C4", "1:0"]]]),
       new PartDescriptor(N1, [["0:0", ["E4", "1:0"]]]),
-      new PartDescriptor(N1, [["0:0", ["G4", "1:0"]]])
+      new PartDescriptor(N1, [["0:0", ["G4", "1:0"]]]),
     );
     expect(result).toEqual(expected);
   });
 
   it("parallel melodies compile to parallel clips", () => {
     const chord = new Harmony(
-      new Melody(new Note(C4, N1), new Note(G4, N2)),
-      new Note(E4, N1),
-      new Melody(new Note(G4, N1), new Rest(N4), new Note(C5, N4))
+      new Melody(make_note(C4, N1), make_note(G4, N2)),
+      make_note(E4, N1),
+      new Melody(make_note(G4, N1), new Rest(N4), make_note(C5, N4)),
     );
 
     const result = precompile_music(chord);
@@ -110,7 +110,7 @@ describe("precompile_music", () => {
       new PartDescriptor(new Rational(3, 2), [
         ["0:0", ["G4", "1:0"]],
         ["1:1", ["C5", "0:1"]],
-      ])
+      ]),
     );
     expect(result).toEqual(expected);
   });
