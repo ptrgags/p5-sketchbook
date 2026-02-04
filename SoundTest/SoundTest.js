@@ -24,32 +24,30 @@ import { PlayButtonScene } from "../sketchlib/PlayButtonScene.js";
 import { Rectangle } from "../sketchlib/Rectangle.js";
 import { SoundManager } from "../sketchlib/SoundManager.js";
 import { TouchButton } from "../sketchlib/TouchButton.js";
-import {
-  binary_chords,
-  layered_melody,
-  phase_scale,
-  symmetry_melody,
-  organ_chords,
-  pattern_test,
-} from "./example_scores.js";
 import { Piano } from "./Piano.js";
 import { SpiralBurst } from "./SpiralBurst.js";
 import { expect_element } from "../sketchlib/dom/expect_element.js";
 import { decode_midi } from "../sketchlib/midi/decode_midi.js";
 import { MusicalCues } from "../sketchlib/music/MusicalCues.js";
 import { midi_to_score } from "../sketchlib/midi/midi_to_score.js";
+import { SCORE_PHASE_SCALE } from "./example_scores/phase_scale.js";
+import { SCORE_SYMMETRY_MELODY } from "./example_scores/symmetry_melody.js";
+import { SCORE_BINARY_CHORDS } from "./example_scores/binary_chords.js";
+import { SCORE_ORGAN_CHORDS } from "./example_scores/organ_chords.js";
+import { SCORE_PATTERN_TEST } from "./example_scores/pattern_test.js";
+import { SCORE_LAYERED_MELODY } from "./example_scores/layered_melody.js";
 
 const MOUSE = new CanvasMouseHandler();
 
 /**@type {import("../sketchlib/SoundManager.js").SoundManifest} */
 const SOUND_MANIFEST = {
   scores: {
-    layered_melody: layered_melody(),
-    phase_scale: phase_scale(),
-    symmetry_melody: symmetry_melody(),
-    binary_progression: binary_chords(),
-    organ_chords: organ_chords(),
-    pattern_test: pattern_test(),
+    layered_melody: SCORE_LAYERED_MELODY,
+    phase_scale: SCORE_PHASE_SCALE,
+    symmetry_melody: SCORE_SYMMETRY_MELODY,
+    binary_progression: SCORE_BINARY_CHORDS,
+    chord_cascade: SCORE_ORGAN_CHORDS,
+    pattern_test: SCORE_PATTERN_TEST,
   },
 };
 
@@ -113,7 +111,7 @@ MELODY_BUTTONS.set(
 );
 MELODY_BUTTONS.set(
   new Index2D(2, 0),
-  new MelodyButtonDescriptor("organ_chords", "Organ Test Chords"),
+  new MelodyButtonDescriptor("chord_cascade", "Chord Cascade"),
 );
 MELODY_BUTTONS.set(
   new Index2D(2, 1),
