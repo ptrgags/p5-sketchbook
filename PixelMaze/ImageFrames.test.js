@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { ImageFrames } from "./ImageFrames.js";
-import { PGA_MATCHERS } from "../sketchlib/pga2d/pga_matchers.js";
+import { PGA_MATCHERS } from "../sketchlib/test_helpers/pga_matchers.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 
 expect.extend(PGA_MATCHERS);

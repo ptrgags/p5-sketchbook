@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { Viewport } from "./Viewport";
-import { PGA_MATCHERS } from "../sketchlib/pga2d/pga_matchers";
+import { PGA_MATCHERS } from "../sketchlib/test_helpers/pga_matchers";
 import { Sprite } from "./Sprite";
 import { ImageFrames } from "./ImageFrames";
 import { Direction } from "../sketchlib/pga2d/Direction";

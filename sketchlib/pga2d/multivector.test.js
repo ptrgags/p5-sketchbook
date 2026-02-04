@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { Even, Odd } from "./multivectors";
-import { PGA_MATCHERS } from "./pga_matchers";
+import { PGA_MATCHERS } from "../test_helpers/pga_matchers";
 
 expect.extend(PGA_MATCHERS);
 

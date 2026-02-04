@@ -1,11 +1,8 @@
-import {
-  diff_float_property,
-  diff_property,
-} from "../test_helpers/diff_properties.js";
-import { Direction } from "./Direction";
-import { Line } from "./Line";
-import { Even, Odd } from "./multivectors";
-import { Point } from "./Point";
+import { diff_float_property, diff_property } from "./diff_properties.js";
+import { Direction } from "../pga2d/Direction.js";
+import { Line } from "../pga2d/Line.js";
+import { Even, Odd } from "../pga2d/multivectors.js";
+import { Point } from "../pga2d/Point.js";
 
 function format_even_diff(received, expected) {
   if (!(received instanceof Even)) {

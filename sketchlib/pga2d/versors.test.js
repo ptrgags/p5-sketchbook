@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { Motor, Flector } from "./versors";
-import { PGA_MATCHERS } from "./pga_matchers";
+import { PGA_MATCHERS } from "../test_helpers/pga_matchers";
 import { Point } from "./Point";
 import { Line } from "./Line";
 import { Direction } from "./Direction";
@@ -17,10 +17,10 @@ describe("Motor", () => {
 
       const inverse = rotation.reverse();
       const forward_backward = inverse.transform_point(
-        rotation.transform_point(test_point)
+        rotation.transform_point(test_point),
       );
       const backward_forward = rotation.transform_point(
-        inverse.transform_point(test_point)
+        inverse.transform_point(test_point),
       );
 
       expect(forward_backward).toBePoint(backward_forward);
