@@ -5,6 +5,7 @@ import { PGA_MATCHERS } from "../test_helpers/pga_matchers";
 expect.extend(PGA_MATCHERS);
 
 // These tests are checked against the kingdon GA library
+// see math-notebook
 describe("Even", () => {
   it("adds even multivectors", () => {
     const a = new Even(1, 2, 3, 4);

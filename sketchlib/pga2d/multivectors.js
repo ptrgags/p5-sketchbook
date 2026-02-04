@@ -12,6 +12,11 @@ export class Even {
     this.yo = yo;
   }
 
+  /**
+   * Add two Even multivectors together
+   * @param {Even} other
+   * @returns {Even}
+   */
   add(other) {
     const scalar = this.scalar + other.scalar;
     const xy = this.xy + other.xy;

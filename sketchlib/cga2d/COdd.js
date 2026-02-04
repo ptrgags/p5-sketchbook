@@ -21,3 +21,4 @@ export class COdd {
     this.ypm = ypm;
   }
 }
+COdd.ZERO = Object.freeze(new COdd(0, 0, 0, 0, 0, 0, 0, 0));

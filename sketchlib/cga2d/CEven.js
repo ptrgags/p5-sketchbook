@@ -1,3 +1,5 @@
+import { COdd } from "./COdd.js";
+
 export class CEven {
   /**
    * Constructor
@@ -21,7 +23,53 @@ export class CEven {
     this.xypm = xypm;
   }
 
-  sandwich_even() {
+  /**
+   * Add two CEvens together
+   * @param {CEven} other
+   * @returns {CEven}
+   */
+  add(other) {
+    return new CEven(0, 0, 0, 0, 0, 0, 0, 0);
+  }
+
+  /**
+   *
+   * @param {*} other
+   * @returns
+   */
+  sub(other) {
+    return new CEven(0, 0, 0, 0, 0, 0, 0, 0);
+  }
+
+  /**
+   * Compute the dual.
+   * @returns
+   */
+  dual() {
+    return new CEven(0, 0, 0, 0, 0, 0, 0, 0);
+  }
+
+  /**
+   * Compute the antidual.
+   * @returns
+   */
+  antidual() {
+    return new CEven(0, 0, 0, 0, 0, 0, 0, 0);
+  }
+
+  reverse() {
+    return new CEven(0, 0, 0, 0, 0, 0, 0, 0);
+  }
+
+  inverse() {
+    return new CEven(0, 0, 0, 0, 0, 0, 0, 0);
+  }
+
+  equals(other) {
+    return false;
+  }
+
+  sandwich_even(other) {
     //A: As + Axy 𝐞₁₂ + Axp 𝐞₁₃ + Axn 𝐞₁₄ + Ayp 𝐞₂₃ + Ayn 𝐞₂₄ + Apn 𝐞₃₄ + Axypn 𝐞₁₂₃₄
     //B: Bs + Bxy 𝐞₁₂ + Bxp 𝐞₁₃ + Bxn 𝐞₁₄ + Byp 𝐞₂₃ + Byn 𝐞₂₄ + Bpn 𝐞₃₄ + Bxypn 𝐞₁₂₃₄
     //Bs
@@ -34,7 +82,7 @@ export class CEven {
     // Bxypn 𝐞₁₂₃₄
   }
 
-  sandwich_odd() {
+  sandwich_odd(other) {
     // This feels off... why am I getting things raised to the 4th power?
     // divisor: (Apn**4 - 2*Apn**2*As**2 + 2*Apn**2*Axn**2 - 2*Apn**2*Axp**2 + 2*Apn**2*Axy**2 + 2*Apn**2*Axypn**2 + 2*Apn**2*Ayn**2 - 2*Apn**2*Ayp**2 - 8*Apn*As*Axy*Axypn + 8*Apn*Axn*Axy*Ayp - 8*Apn*Axp*Axy*Ayn + As**4 - 2*As**2*Axn**2 + 2*As**2*Axp**2 + 2*As**2*Axy**2 + 2*As**2*Axypn**2 - 2*As**2*Ayn**2 + 2*As**2*Ayp**2 - 8*As*Axn*Axypn*Ayp + 8*As*Axp*Axypn*Ayn + Axn**4 - 2*Axn**2*Axp**2 - 2*Axn**2*Axy**2 + 2*Axn**2*Axypn**2 + 2*Axn**2*Ayn**2 + 2*Axn**2*Ayp**2 - 8*Axn*Axp*Ayn*Ayp + Axp**4 + 2*Axp**2*Axy**2 - 2*Axp**2*Axypn**2 + 2*Axp**2*Ayn**2 + 2*Axp**2*Ayp**2 + Axy**4 - 2*Axy**2*Axypn**2 - 2*Axy**2*Ayn**2 + 2*Axy**2*Ayp**2 + Axypn**4 + 2*Axypn**2*Ayn**2 - 2*Axypn**2*Ayp**2 + Ayn**4 - 2*Ayn**2*Ayp**2 + Ayp**4)
     //A: As + Axy 𝐞₁₂ + Axp 𝐞₁₃ + Axn 𝐞₁₄ + Ayp 𝐞₂₃ + Ayn 𝐞₂₄ + Apn 𝐞₃₄ + Axypn 𝐞₁₂₃₄
@@ -48,4 +96,22 @@ export class CEven {
     // ((Apn**4*Bpn + 2*Apn**3*Axn*Bxn - 2*Apn**3*Axp*Bxp + 2*Apn**3*Ayn*Byn - 2*Apn**3*Ayp*Byp - 2*Apn**2*As**2*Bpn - 2*Apn**2*As*Axn*Bxp + 2*Apn**2*As*Axp*Bxn - 2*Apn**2*As*Ayn*Byp + 2*Apn**2*As*Ayp*Byn + 2*Apn**2*Axn*Axy*Byp + 2*Apn**2*Axn*Axypn*Byn + 4*Apn**2*Axn*Ayp*Bxy - 2*Apn**2*Axp*Axy*Byn - 2*Apn**2*Axp*Axypn*Byp - 4*Apn**2*Axp*Ayn*Bxy + 2*Apn**2*Axy**2*Bpn - 2*Apn**2*Axy*Ayn*Bxp + 2*Apn**2*Axy*Ayp*Bxn + 2*Apn**2*Axypn**2*Bpn - 2*Apn**2*Axypn*Ayn*Bxn + 2*Apn**2*Axypn*Ayp*Bxp - 2*Apn*As**2*Axn*Bxn + 2*Apn*As**2*Axp*Bxp - 2*Apn*As**2*Ayn*Byn + 2*Apn*As**2*Ayp*Byp - 4*Apn*As*Axn*Axy*Byn - 4*Apn*As*Axn*Axypn*Byp + 4*Apn*As*Axp*Axy*Byp + 4*Apn*As*Axp*Axypn*Byn - 8*Apn*As*Axy*Axypn*Bpn + 4*Apn*As*Axy*Ayn*Bxn - 4*Apn*As*Axy*Ayp*Bxp + 4*Apn*As*Axypn*Ayn*Bxp - 4*Apn*As*Axypn*Ayp*Bxn + 2*Apn*Axn**3*Bxn - 2*Apn*Axn**2*Axp*Bxp - 4*Apn*Axn**2*Axy*Bxy + 2*Apn*Axn**2*Ayn*Byn + 2*Apn*Axn**2*Ayp*Byp - 2*Apn*Axn*Axp**2*Bxn - 4*Apn*Axn*Axp*Ayn*Byp - 4*Apn*Axn*Axp*Ayp*Byn + 2*Apn*Axn*Axy**2*Bxn - 4*Apn*Axn*Axy*Axypn*Bxp + 2*Apn*Axn*Axypn**2*Bxn + 2*Apn*Axn*Ayn**2*Bxn - 4*Apn*Axn*Ayn*Ayp*Bxp + 2*Apn*Axn*Ayp**2*Bxn + 2*Apn*Axp**3*Bxp + 4*Apn*Axp**2*Axy*Bxy + 2*Apn*Axp**2*Ayn*Byn + 2*Apn*Axp**2*Ayp*Byp - 2*Apn*Axp*Axy**2*Bxp + 4*Apn*Axp*Axy*Axypn*Bxn - 2*Apn*Axp*Axypn**2*Bxp + 2*Apn*Axp*Ayn**2*Bxp - 4*Apn*Axp*Ayn*Ayp*Bxn + 2*Apn*Axp*Ayp**2*Bxp + 2*Apn*Axy**2*Ayn*Byn - 2*Apn*Axy**2*Ayp*Byp - 4*Apn*Axy*Axypn*Ayn*Byp + 4*Apn*Axy*Axypn*Ayp*Byn - 4*Apn*Axy*Ayn**2*Bxy + 4*Apn*Axy*Ayp**2*Bxy + 2*Apn*Axypn**2*Ayn*Byn - 2*Apn*Axypn**2*Ayp*Byp + 2*Apn*Ayn**3*Byn - 2*Apn*Ayn**2*Ayp*Byp - 2*Apn*Ayn*Ayp**2*Byn + 2*Apn*Ayp**3*Byp + As**4*Bpn + 2*As**3*Axn*Bxp - 2*As**3*Axp*Bxn + 2*As**3*Ayn*Byp - 2*As**3*Ayp*Byn + 2*As**2*Axn*Axy*Byp + 2*As**2*Axn*Axypn*Byn - 4*As**2*Axn*Ayp*Bxy - 2*As**2*Axp*Axy*Byn - 2*As**2*Axp*Axypn*Byp + 4*As**2*Axp*Ayn*Bxy + 2*As**2*Axy**2*Bpn - 2*As**2*Axy*Ayn*Bxp + 2*As**2*Axy*Ayp*Bxn + 2*As**2*Axypn**2*Bpn - 2*As**2*Axypn*Ayn*Bxn + 2*As**2*Axypn*Ayp*Bxp - 2*As*Axn**3*Bxp + 2*As*Axn**2*Axp*Bxn + 4*As*Axn**2*Axypn*Bxy - 2*As*Axn**2*Ayn*Byp - 2*As*Axn**2*Ayp*Byn + 2*As*Axn*Axp**2*Bxp + 4*As*Axn*Axp*Ayn*Byn + 4*As*Axn*Axp*Ayp*Byp + 2*As*Axn*Axy**2*Bxp - 4*As*Axn*Axy*Axypn*Bxn + 2*As*Axn*Axypn**2*Bxp - 2*As*Axn*Ayn**2*Bxp + 4*As*Axn*Ayn*Ayp*Bxn - 2*As*Axn*Ayp**2*Bxp - 2*As*Axp**3*Bxn - 4*As*Axp**2*Axypn*Bxy - 2*As*Axp**2*Ayn*Byp - 2*As*Axp**2*Ayp*Byn - 2*As*Axp*Axy**2*Bxn + 4*As*Axp*Axy*Axypn*Bxp - 2*As*Axp*Axypn**2*Bxn - 2*As*Axp*Ayn**2*Bxn + 4*As*Axp*Ayn*Ayp*Bxp - 2*As*Axp*Ayp**2*Bxn + 2*As*Axy**2*Ayn*Byp - 2*As*Axy**2*Ayp*Byn - 4*As*Axy*Axypn*Ayn*Byn + 4*As*Axy*Axypn*Ayp*Byp + 2*As*Axypn**2*Ayn*Byp - 2*As*Axypn**2*Ayp*Byn + 4*As*Axypn*Ayn**2*Bxy - 4*As*Axypn*Ayp**2*Bxy - 2*As*Ayn**3*Byp + 2*As*Ayn**2*Ayp*Byn + 2*As*Ayn*Ayp**2*Byp - 2*As*Ayp**3*Byn - Axn**4*Bpn - 2*Axn**3*Axy*Byp + 2*Axn**3*Axypn*Byn + 2*Axn**2*Axp**2*Bpn + 2*Axn**2*Axp*Axy*Byn - 2*Axn**2*Axp*Axypn*Byp + 2*Axn**2*Axy*Ayn*Bxp + 2*Axn**2*Axy*Ayp*Bxn - 2*Axn**2*Axypn*Ayn*Bxn - 2*Axn**2*Axypn*Ayp*Bxp - 2*Axn**2*Ayn**2*Bpn - 2*Axn**2*Ayp**2*Bpn + 2*Axn*Axp**2*Axy*Byp - 2*Axn*Axp**2*Axypn*Byn - 4*Axn*Axp*Axy*Ayn*Bxn - 4*Axn*Axp*Axy*Ayp*Bxp + 4*Axn*Axp*Axypn*Ayn*Bxp + 4*Axn*Axp*Axypn*Ayp*Bxn + 8*Axn*Axp*Ayn*Ayp*Bpn + 2*Axn*Axy**3*Byp - 2*Axn*Axy**2*Axypn*Byn - 4*Axn*Axy**2*Ayp*Bxy - 2*Axn*Axy*Axypn**2*Byp - 2*Axn*Axy*Ayn**2*Byp + 4*Axn*Axy*Ayn*Ayp*Byn - 2*Axn*Axy*Ayp**2*Byp + 2*Axn*Axypn**3*Byn + 4*Axn*Axypn**2*Ayp*Bxy + 2*Axn*Axypn*Ayn**2*Byn - 4*Axn*Axypn*Ayn*Ayp*Byp + 2*Axn*Axypn*Ayp**2*Byn - Axp**4*Bpn - 2*Axp**3*Axy*Byn + 2*Axp**3*Axypn*Byp + 2*Axp**2*Axy*Ayn*Bxp + 2*Axp**2*Axy*Ayp*Bxn - 2*Axp**2*Axypn*Ayn*Bxn - 2*Axp**2*Axypn*Ayp*Bxp - 2*Axp**2*Ayn**2*Bpn - 2*Axp**2*Ayp**2*Bpn - 2*Axp*Axy**3*Byn + 2*Axp*Axy**2*Axypn*Byp + 4*Axp*Axy**2*Ayn*Bxy + 2*Axp*Axy*Axypn**2*Byn - 2*Axp*Axy*Ayn**2*Byn + 4*Axp*Axy*Ayn*Ayp*Byp - 2*Axp*Axy*Ayp**2*Byn - 2*Axp*Axypn**3*Byp - 4*Axp*Axypn**2*Ayn*Bxy + 2*Axp*Axypn*Ayn**2*Byp - 4*Axp*Axypn*Ayn*Ayp*Byn + 2*Axp*Axypn*Ayp**2*Byp + Axy**4*Bpn - 2*Axy**3*Ayn*Bxp + 2*Axy**3*Ayp*Bxn - 2*Axy**2*Axypn**2*Bpn + 2*Axy**2*Axypn*Ayn*Bxn - 2*Axy**2*Axypn*Ayp*Bxp + 2*Axy*Axypn**2*Ayn*Bxp - 2*Axy*Axypn**2*Ayp*Bxn + 2*Axy*Ayn**3*Bxp - 2*Axy*Ayn**2*Ayp*Bxn - 2*Axy*Ayn*Ayp**2*Bxp + 2*Axy*Ayp**3*Bxn + Axypn**4*Bpn - 2*Axypn**3*Ayn*Bxn + 2*Axypn**3*Ayp*Bxp - 2*Axypn*Ayn**3*Bxn + 2*Axypn*Ayn**2*Ayp*Bxp + 2*Axypn*Ayn*Ayp**2*Bxn - 2*Axypn*Ayp**3*Bxp - Ayn**4*Bpn + 2*Ayn**2*Ayp**2*Bpn - Ayp**4*Bpn) /(Apn**4 - 2*Apn**2*As**2 + 2*Apn**2*Axn**2 - 2*Apn**2*Axp**2 + 2*Apn**2*Axy**2 + 2*Apn**2*Axypn**2 + 2*Apn**2*Ayn**2 - 2*Apn**2*Ayp**2 - 8*Apn*As*Axy*Axypn + 8*Apn*Axn*Axy*Ayp - 8*Apn*Axp*Axy*Ayn + As**4 - 2*As**2*Axn**2 + 2*As**2*Axp**2 + 2*As**2*Axy**2 + 2*As**2*Axypn**2 - 2*As**2*Ayn**2 + 2*As**2*Ayp**2 - 8*As*Axn*Axypn*Ayp + 8*As*Axp*Axypn*Ayn + Axn**4 - 2*Axn**2*Axp**2 - 2*Axn**2*Axy**2 + 2*Axn**2*Axypn**2 + 2*Axn**2*Ayn**2 + 2*Axn**2*Ayp**2 - 8*Axn*Axp*Ayn*Ayp + Axp**4 + 2*Axp**2*Axy**2 - 2*Axp**2*Axypn**2 + 2*Axp**2*Ayn**2 + 2*Axp**2*Ayp**2 + Axy**4 - 2*Axy**2*Axypn**2 - 2*Axy**2*Ayn**2 + 2*Axy**2*Ayp**2 + Axypn**4 + 2*Axypn**2*Ayn**2 - 2*Axypn**2*Ayp**2 + Ayn**4 - 2*Ayn**2*Ayp**2 + Ayp**4)) 𝐞₃₄
     // Bxypn 𝐞₁₂₃₄
   }
+
+  /**
+   * Sandwich product ABA^{-1}
+   * @param {CEven | COdd} other
+   */
+  sandwich(other) {
+    if (other instanceof CEven) {
+      this.sandwich_even(other);
+    } else {
+      this.sandwich_odd(other);
+    }
+  }
+
+  static lerp(a, b, t) {
+    return new CEven(0, 0, 0, 0, 0, 0, 0, 0);
+  }
 }
+CEven.ZERO = Object.freeze(new CEven(0, 0, 0, 0, 0, 0, 0, 0));
+CEven.IDENTITY = Object.freeze(new CEven(1, 0, 0, 0, 0, 0, 0, 0));
