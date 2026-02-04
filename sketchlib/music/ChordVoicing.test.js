@@ -1,10 +1,42 @@
 import { describe, it, expect } from "vitest";
 import { ChordVoicing } from "./ChordVoicing.js";
-import { B3, C4, C5, D5, E4, F4, G4, REST } from "./pitches.js";
-import { m2, P1, P5 } from "./intervals.js";
+import { B3, B4, C4, C5, CS4, D5, DS4, E4, F4, G4, REST } from "./pitches.js";
+import { m2, M3, m3, P1, P5 } from "./intervals.js";
+import { Harmony, Note, Rest } from "./Music.js";
+import { N1 } from "./durations.js";
+import { Velocity } from "./Velocity.js";
 
 describe("ChordVoicing", () => {
-  describe("move", () => {});
+  describe("move", () => {
+    it("with wrong number of intervals throws error", () => {
+      const chord = new ChordVoicing([C4, E4, G4]);
+      const intervals = [P1];
+
+      expect(() => {
+        return chord.move(intervals);
+      }).toThrowError("number of intervals must match number of voices");
+    });
+
+    it("with intervals moves pitches by corresponding amounts", () => {
+      const intervals = [m3, -m3, M3];
+      const chord = new ChordVoicing([C4, E4, G4]);
+
+      const result = chord.move(intervals);
+
+      const expected = new ChordVoicing([DS4, CS4, B4]);
+      expect(result).toEqual(expected);
+    });
+
+    it("with chord with rests ignores that interval", () => {
+      const intervals = [m3, -m3, M3];
+      const chord = new ChordVoicing([C4, REST, G4]);
+
+      const result = chord.move(intervals);
+
+      const expected = new ChordVoicing([DS4, REST, B4]);
+      expect(result).toEqual(expected);
+    });
+  });
 
   describe("sub", () => {
     it("with mismatched voice count throws error", () => {
@@ -47,5 +79,46 @@ describe("ChordVoicing", () => {
     });
   });
 
-  describe("to_harmony", () => {});
+  describe("to_harmony", () => {
+    it("without velocity creates a harmony of notes at mezzo-forte", () => {
+      const chord = new ChordVoicing([C4, E4, G4]);
+
+      const result = chord.to_harmony(N1);
+
+      const expected = new Harmony(
+        new Note(G4, N1),
+        new Note(E4, N1),
+        new Note(C4, N1),
+      );
+      expect(result).toEqual(expected);
+    });
+
+    it("with velocity creates a harmony of notes at that velocity", () => {
+      const chord = new ChordVoicing([C4, E4, G4]);
+
+      const result = chord.to_harmony(N1, Velocity.FFF);
+
+      const expected = new Harmony(
+        new Note(G4, N1, Velocity.FFF),
+        new Note(E4, N1, Velocity.FFF),
+        new Note(C4, N1, Velocity.FFF),
+      );
+      expect(result).toEqual(expected);
+    });
+
+    it("with voicing with rests creates a harmony of notes and rests", () => {
+      const chord = new ChordVoicing([C4, E4, REST, G4, REST]);
+
+      const result = chord.to_harmony(N1, Velocity.FFF);
+
+      const expected = new Harmony(
+        new Rest(N1),
+        new Note(G4, N1, Velocity.FFF),
+        new Rest(N1),
+        new Note(E4, N1, Velocity.FFF),
+        new Note(C4, N1, Velocity.FFF),
+      );
+      expect(result).toEqual(expected);
+    });
+  });
 });

@@ -1,5 +1,6 @@
 import { Rational } from "../Rational.js";
 import { Harmony, Note } from "./Music.js";
+import { REST } from "./pitches.js";
 import { Gap } from "./Timeline.js";
 import { Velocity } from "./Velocity.js";
 
@@ -48,12 +49,19 @@ export class ChordVoicing {
   }
 
   /**
-   * Constructor
+   * Move each voice by the corresponding interval in the intervals array.
+   * If the voicing has rests, those will stay as rests.
    * @param {number[]} intervals Signed intervals in semitones to move each voice
    * @returns {ChordVoicing}
    */
   move(intervals) {
-    const pitches = this.pitches.map((x, i) => x + intervals[i]);
+    if (intervals.length !== this.num_voices) {
+      throw new Error("number of intervals must match number of voices");
+    }
+
+    const pitches = this.pitches.map((x, i) =>
+      x === REST ? REST : x + intervals[i],
+    );
     return new ChordVoicing(pitches);
   }
 
@@ -68,7 +76,7 @@ export class ChordVoicing {
     const top_to_bottom = [...this.pitches]
       .reverse()
       .map((x) =>
-        x !== undefined ? new Note(x, duration, velocity) : new Gap(duration),
+        x == REST ? new Gap(duration) : new Note(x, duration, velocity),
       );
     return new Harmony(...top_to_bottom);
   }
