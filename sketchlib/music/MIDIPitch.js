@@ -69,7 +69,9 @@ export class MIDIPitch {
   }
 
   /**
-   * Format an absolute pitch, like "C4" or "F#5"
+   * Format an absolute pitch, like "C4" or "F#5". Note that
+   * sharps are always used, even if the key signature would
+   * normally call for a flat
    * @param {number} midi_pitch MIDI pitch [0, 127]
    * @returns {string}
    */

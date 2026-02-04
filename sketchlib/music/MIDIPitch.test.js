@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { MIDIPitch } from "./MIDIPitch.js";
-import { B, C, C4, E, E5, F_1 } from "./pitches.js";
+import { B, C, C4, CS, CS7, D, D5, E, E5, F_1 } from "./pitches.js";
 
-describe("MidiPitch", () => {
+describe("MiIDIPitch", () => {
   describe("get_pitch_class", () => {
     it("throws for negative pitch", () => {
       expect(() => {
@@ -71,6 +71,34 @@ describe("MidiPitch", () => {
         // MIDI only goes up to G9
         return MIDIPitch.from_pitch_octave(B, 9);
       }).toThrowError("out of MIDI range");
+    });
+  });
+
+  describe("format_pitch_class", () => {
+    it("Formats single letter pitch class", () => {
+      const result = MIDIPitch.format_pitch_class(D);
+
+      expect(result).toBe("D");
+    });
+
+    it("formats sharp with octothorpe", () => {
+      const result = MIDIPitch.format_pitch_class(CS);
+
+      expect(result).toBe("C#");
+    });
+  });
+
+  describe("format_pitch", () => {
+    it("Formats pitch with octave", () => {
+      const result = MIDIPitch.format_pitch(D5);
+
+      expect(result).toBe("D5");
+    });
+
+    it("formats sharp with octothorpe", () => {
+      const result = MIDIPitch.format_pitch(CS7);
+
+      expect(result).toBe("C#7");
     });
   });
 });
