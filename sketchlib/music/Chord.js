@@ -19,8 +19,8 @@ const SYMBOL_LIST = [
   // Seventh chords
   [[P1, m3, T, M6], "dim7"],
   [[P1, m3, T, m7], "hdim7"],
-  [[P1, m3, P5, m7], "min7"],
-  [[P1, m3, P5, M7], "m7"],
+  [[P1, m3, P5, m7], "m7"],
+  [[P1, m3, P5, M7], "mM7"],
   [[P1, M3, P5, m7], "7"],
   [[P1, M3, P5, M7], "M7"],
   [[P1, M3, m6, M7], "aug7"],
@@ -88,7 +88,7 @@ export class ChordSymbol {
   format() {
     // Format the symbol, but for major triads, it's common to not have
     // any suffix. E.g. C not CM
-    let symbol = format_intervals(this.pitch_classes.intervals);
+    let symbol = format_intervals(this.pitch_classes.intervals.intervals);
     symbol = symbol === "M" ? "" : symbol;
 
     const pitch_class = MIDIPitch.format_pitch_class(
@@ -115,7 +115,7 @@ export class Chord {
   format() {
     // Format the symbol, but for major triads, it's common to not have
     // any suffix. E.g. C4 not C4M
-    let symbol = format_intervals(this.pitches.intervals);
+    let symbol = format_intervals(this.pitches.intervals.intervals);
     symbol = symbol === "M" ? "" : symbol;
 
     const pitch = MIDIPitch.format_pitch(this.pitches.root);
