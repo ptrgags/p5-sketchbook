@@ -10,7 +10,7 @@ import {
 import { N1, N2, N4, N4T, N8, N8T } from "./durations.js";
 import { Rational } from "../Rational.js";
 import { A4, AS4, B4, C, C4, E, E4, F4, G4, REST } from "./pitches.js";
-import { MidiPitch } from "./pitch_conversions.js";
+import { MIDIPitch } from "./pitch_conversions.js";
 
 describe("Melody", () => {
   it("duration computes sum of notes", () => {
@@ -27,7 +27,7 @@ describe("map_pitch", () => {
   it("converts pitch between formats", () => {
     const melody = new Melody(new Note(C4, N4), new Rest(N4), new Note(E4, N4));
 
-    const result = map_pitch(MidiPitch.get_pitch_class, melody);
+    const result = map_pitch(MIDIPitch.get_pitch_class, melody);
 
     // Same melody but with the octave numbers removed
     const expected = new Melody(new Note(C, N4), new Rest(N4), new Note(E, N4));
@@ -51,7 +51,7 @@ describe("parse_melody", () => {
     const expected = new Melody(
       new Note(C4, N4),
       new Rest(N2),
-      new Note(G4, N4)
+      new Note(G4, N4),
     );
 
     expect(result).toEqual(expected);
@@ -94,7 +94,7 @@ describe("parse_cycle", () => {
     const expected = new Melody(
       new Note(C4, N4T),
       new Note(E4, N4T),
-      new Note(G4, N4T)
+      new Note(G4, N4T),
     );
     expect(result).toEqual(expected);
   });
@@ -108,7 +108,7 @@ describe("parse_cycle", () => {
       new Note(C4, N4),
       new Note(E4, N4),
       new Note(G4, N4),
-      new Note(B4, N4)
+      new Note(B4, N4),
     );
     expect(result).toEqual(expected);
   });
@@ -122,7 +122,7 @@ describe("parse_cycle", () => {
       new Note(C4, N4),
       new Melody(new Note(E4, N8), new Note(F4, N8)),
       new Note(G4, N4),
-      new Melody(new Note(A4, N8T), new Note(AS4, N8T), new Note(B4, N8T))
+      new Melody(new Note(A4, N8T), new Note(AS4, N8T), new Note(B4, N8T)),
     );
     expect(result).toEqual(expected);
   });

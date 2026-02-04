@@ -15,7 +15,7 @@ const PITCH_CLASS_LABELS = [
   "B",
 ];
 
-export class MidiPitch {
+export class MIDIPitch {
   /**
    * Get the pitch class from a midi note
    * @param {number} midi_pitch The MIDI pitch number in [0, 127]

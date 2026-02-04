@@ -4,7 +4,7 @@ import { ChordVoicing } from "./ChordVoicing.js";
 import { M3, m3, M6, m6, m7, M7, P1, P5, T } from "./intervals.js";
 import { IntervalStack, PitchClassStack, PitchStack } from "./IntervalStack.js";
 import { PatternGrid } from "./PatternGrid.js";
-import { MidiPitch } from "./pitch_conversions.js";
+import { MIDIPitch } from "./pitch_conversions.js";
 
 /**
  * Chord quality interval patterns and their corresponding chord symbol
@@ -91,7 +91,7 @@ export class ChordSymbol {
     let symbol = format_intervals(this.pitch_classes.intervals);
     symbol = symbol === "M" ? "" : symbol;
 
-    const pitch_class = MidiPitch.format_pitch_class(
+    const pitch_class = MIDIPitch.format_pitch_class(
       this.pitch_classes.pitch_class,
     );
     return `${pitch_class}${symbol}`;
@@ -118,7 +118,7 @@ export class Chord {
     let symbol = format_intervals(this.pitches.intervals);
     symbol = symbol === "M" ? "" : symbol;
 
-    const pitch = MidiPitch.format_pitch(this.pitches.root);
+    const pitch = MIDIPitch.format_pitch(this.pitches.root);
     return `${pitch}${symbol}`;
   }
 

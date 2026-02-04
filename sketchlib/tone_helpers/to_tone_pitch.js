@@ -1,4 +1,4 @@
-import { MidiPitch } from "../music/pitch_conversions.js";
+import { MIDIPitch } from "../music/pitch_conversions.js";
 
 const PITCH_CLASSES = [
   "C",
@@ -21,8 +21,8 @@ const PITCH_CLASSES = [
  * @returns
  */
 export function to_tone_pitch(midi_pitch) {
-  const octave = MidiPitch.get_octave(midi_pitch);
-  const pitch_class = MidiPitch.get_pitch_class(midi_pitch);
+  const octave = MIDIPitch.get_octave(midi_pitch);
+  const pitch_class = MIDIPitch.get_pitch_class(midi_pitch);
 
   const pitch_letter = PITCH_CLASSES[pitch_class];
   return `${pitch_letter}${octave}`;

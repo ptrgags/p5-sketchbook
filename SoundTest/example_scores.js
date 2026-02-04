@@ -1,5 +1,5 @@
 import { N1, N16, N2, N4, N8, N8T } from "../sketchlib/music/durations.js";
-import { MidiPitch } from "../sketchlib/music/pitch_conversions.js";
+import { MIDIPitch } from "../sketchlib/music/pitch_conversions.js";
 import {
   A,
   A3,
@@ -60,7 +60,7 @@ import { ChordVoicing } from "../sketchlib/music/ChordVoicing.js";
 function scale_to_pitch(scale, octave) {
   return (scale_degree) => {
     const pitch_class = scale[scale_degree];
-    return MidiPitch.from_pitch_octave(pitch_class, octave);
+    return MIDIPitch.from_pitch_octave(pitch_class, octave);
   };
 }
 
@@ -184,7 +184,7 @@ function scale_degree_to_pitch(scale, start_octave) {
   return (scale_degree) => {
     const pitch_class = scale[scale_degree % scale.length];
     const octave = start_octave + Math.floor(scale_degree / scale.length);
-    return MidiPitch.from_pitch_octave(pitch_class, octave);
+    return MIDIPitch.from_pitch_octave(pitch_class, octave);
   };
 }
 const MAJOR_SCALE = scale_degree_to_pitch(MAJOR_SCALE_PITCHES, 4);
