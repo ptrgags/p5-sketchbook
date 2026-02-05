@@ -274,7 +274,7 @@ export class AbsTimelineOps {
    * @returns {Generator<AbsInterval<T>>}
    */
   static *iter_intervals(timeline) {
-    for (const x of this.iter_intervals(timeline)) {
+    for (const x of this.iter_with_gaps(timeline)) {
       if (x instanceof AbsInterval) {
         yield x;
       }
@@ -293,13 +293,13 @@ export class AbsTimelineOps {
     } else if (timeline instanceof AbsParallel) {
       const sorted_intervals = timeline.children
         .flatMap((child) => {
-          return [...this.iter_intervals(child)];
+          return [...this.iter_with_gaps(child)];
         })
         .sort((a, b) => a.start_time.real - b.start_time.real);
       yield* sorted_intervals;
     } else if (timeline instanceof AbsSequential) {
       for (const child of timeline.children) {
-        yield* this.iter_intervals(child);
+        yield* this.iter_with_gaps(child);
       }
     } else {
       yield timeline;
