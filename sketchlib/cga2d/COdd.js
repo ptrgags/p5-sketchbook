@@ -29,46 +29,205 @@ export class COdd {
 
   /**
    * Geometric product with an odd multivector
-   * @param {COdd} other
+   * @param {COdd} odd
    * @returns {CEven}
    */
-  gp_odd(other) {
-    /**
-     * Geometric Product ========================
-A: Ax 𝐞₁ + Ay 𝐞₂ + Ap 𝐞₃ + An 𝐞₄ + Axyp 𝐞₁₂₃ + Axyn 𝐞₁₂₄ + Axpn 𝐞₁₃₄ + Aypn 𝐞₂₃₄
-B: Bx 𝐞₁ + By 𝐞₂ + Bp 𝐞₃ + Bn 𝐞₄ + Bxyp 𝐞₁₂₃ + Bxyn 𝐞₁₂₄ + Bxpn 𝐞₁₃₄ + Bypn 𝐞₂₃₄
-(-An*Bn + Ap*Bp + Ax*Bx + Axpn*Bxpn + Axyn*Bxyn - Axyp*Bxyp + Ay*By + Aypn*Bypn)
-(-An*Bxyn + Ap*Bxyp + Ax*By + Axpn*Bypn - Axyn*Bn + Axyp*Bp - Ay*Bx - Aypn*Bxpn) 𝐞₁₂ 
-(-An*Bxpn - Ap*Bx + Ax*Bp - Axpn*Bn - Axyn*Bypn - Axyp*By - Ay*Bxyp + Aypn*Bxyn) 𝐞₁₃ 
-(-An*Bx - Ap*Bxpn + Ax*Bn - Axpn*Bp - Axyn*By - Axyp*Bypn - Ay*Bxyn + Aypn*Bxyp) 𝐞₁₄ 
-(-An*Bypn - Ap*By + Ax*Bxyp - Axpn*Bxyn + Axyn*Bxpn + Axyp*Bx + Ay*Bp - Aypn*Bn) 𝐞₂₃ 
-(-An*By - Ap*Bypn + Ax*Bxyn - Axpn*Bxyp + Axyn*Bx + Axyp*Bxpn + Ay*Bn - Aypn*Bp) 𝐞₂₄ 
-(-An*Bp + Ap*Bn + Ax*Bxpn + Axpn*Bx + Axyn*Bxyp - Axyp*Bxyn + Ay*Bypn + Aypn*By) 𝐞₃₄
-(-An*Bxyp + Ap*Bxyn + Ax*Bypn + Axpn*By - Axyn*Bp + Axyp*Bn - Ay*Bxpn - Aypn*Bx) 𝐞₁₂₃₄
-     */
-    return CEven.ZERO;
+  gp_odd(odd) {
+    const {
+      x: Ax,
+      y: Ay,
+      p: Ap,
+      m: Am,
+      xyp: Axyp,
+      xym: Axym,
+      xpm: Axpm,
+      ypm: Aypm,
+    } = this;
+    const {
+      x: Bx,
+      y: By,
+      p: Bp,
+      m: Bm,
+      xyp: Bxyp,
+      xym: Bxym,
+      xpm: Bxpm,
+      ypm: Bypm,
+    } = odd;
+
+    const scalar =
+      -Am * Bm +
+      Ap * Bp +
+      Ax * Bx +
+      Axpm * Bxpm +
+      Axym * Bxym -
+      Axyp * Bxyp +
+      Ay * By +
+      Aypm * Bypm;
+    const xy =
+      -Am * Bxym +
+      Ap * Bxyp +
+      Ax * By +
+      Axpm * Bypm -
+      Axym * Bm +
+      Axyp * Bp -
+      Ay * Bx -
+      Aypm * Bxpm;
+    const xp =
+      -Am * Bxpm -
+      Ap * Bx +
+      Ax * Bp -
+      Axpm * Bm -
+      Axym * Bypm -
+      Axyp * By -
+      Ay * Bxyp +
+      Aypm * Bxym;
+    const xm =
+      -Am * Bx -
+      Ap * Bxpm +
+      Ax * Bm -
+      Axpm * Bp -
+      Axym * By -
+      Axyp * Bypm -
+      Ay * Bxym +
+      Aypm * Bxyp;
+    const yp =
+      -Am * Bypm -
+      Ap * By +
+      Ax * Bxyp -
+      Axpm * Bxym +
+      Axym * Bxpm +
+      Axyp * Bx +
+      Ay * Bp -
+      Aypm * Bm;
+    const ym =
+      -Am * By -
+      Ap * Bypm +
+      Ax * Bxym -
+      Axpm * Bxyp +
+      Axym * Bx +
+      Axyp * Bxpm +
+      Ay * Bm -
+      Aypm * Bp;
+    const pm =
+      -Am * Bp +
+      Ap * Bm +
+      Ax * Bxpm +
+      Axpm * Bx +
+      Axym * Bxyp -
+      Axyp * Bxym +
+      Ay * Bypm +
+      Aypm * By;
+    const xypm =
+      -Am * Bxyp +
+      Ap * Bxym +
+      Ax * Bypm +
+      Axpm * By -
+      Axym * Bp +
+      Axyp * Bm -
+      Ay * Bxpm -
+      Aypm * Bx;
+    return new CEven(scalar, xy, xp, xm, yp, ym, pm, xypm);
   }
 
   /**
    * Geometric product with an even multivector
-   * @param {CEven} other
+   * @param {CEven} even
    * @returns {COdd}
    */
-  gp_even(other) {
-    /**
-     * Geometric Product ========================
-A: Ax 𝐞₁ + Ay 𝐞₂ + Ap 𝐞₃ + An 𝐞₄ + Axyp 𝐞₁₂₃ + Axyn 𝐞₁₂₄ + Axpn 𝐞₁₃₄ + Aypn 𝐞₂₃₄
-B: Bs + Bxy 𝐞₁₂ + Bxp 𝐞₁₃ + Bxn 𝐞₁₄ + Byp 𝐞₂₃ + Byn 𝐞₂₄ + Bpn 𝐞₃₄ + Bxypn 𝐞₁₂₃₄
-(An*Bxn - Ap*Bxp + Ax*Bs + Axpn*Bpn + Axyn*Byn - Axyp*Byp - Ay*Bxy - Aypn*Bxypn) 𝐞₁ 
-(An*Byn - Ap*Byp + Ax*Bxy + Axpn*Bxypn - Axyn*Bxn + Axyp*Bxp + Ay*Bs + Aypn*Bpn) 𝐞₂ 
-(An*Bpn + Ap*Bs + Ax*Bxp - Axpn*Bxn - Axyn*Bxypn - Axyp*Bxy + Ay*Byp - Aypn*Byn) 𝐞₃ 
-(An*Bs + Ap*Bpn + Ax*Bxn - Axpn*Bxp - Axyn*Bxy - Axyp*Bxypn + Ay*Byn - Aypn*Byp) 𝐞₄
-(An*Bxypn + Ap*Bxy + Ax*Byp - Axpn*Byn + Axyn*Bpn + Axyp*Bs - Ay*Bxp + Aypn*Bxn) 𝐞₁₂₃ 
-(An*Bxy + Ap*Bxypn + Ax*Byn - Axpn*Byp + Axyn*Bs + Axyp*Bpn - Ay*Bxn + Aypn*Bxp) 𝐞₁₂₄ 
-(An*Bxp - Ap*Bxn + Ax*Bpn + Axpn*Bs + Axyn*Byp - Axyp*Byn - Ay*Bxypn - Aypn*Bxy) 𝐞₁₃₄ 
-(An*Byp - Ap*Byn + Ax*Bxypn + Axpn*Bxy - Axyn*Bxp + Axyp*Bxn + Ay*Bpn + Aypn*Bs) 𝐞₂₃₄
-     */
-    return this;
+  gp_even(even) {
+    const {
+      x: Ax,
+      y: Ay,
+      p: Ap,
+      m: Am,
+      xyp: Axyp,
+      xym: Axym,
+      xpm: Axpm,
+      ypm: Aypm,
+    } = this;
+    const {
+      scalar: Bs,
+      xy: Bxy,
+      xp: Bxp,
+      xm: Bxm,
+      yp: Byp,
+      ym: Bym,
+      pm: Bpm,
+      xypm: Bxypm,
+    } = even;
+    const x =
+      Am * Bxm -
+      Ap * Bxp +
+      Ax * Bs +
+      Axpm * Bpm +
+      Axym * Bym -
+      Axyp * Byp -
+      Ay * Bxy -
+      Aypm * Bxypm;
+    const y =
+      Am * Bym -
+      Ap * Byp +
+      Ax * Bxy +
+      Axpm * Bxypm -
+      Axym * Bxm +
+      Axyp * Bxp +
+      Ay * Bs +
+      Aypm * Bpm;
+    const p =
+      Am * Bpm +
+      Ap * Bs +
+      Ax * Bxp -
+      Axpm * Bxm -
+      Axym * Bxypm -
+      Axyp * Bxy +
+      Ay * Byp -
+      Aypm * Bym;
+    const m =
+      Am * Bs +
+      Ap * Bpm +
+      Ax * Bxm -
+      Axpm * Bxp -
+      Axym * Bxy -
+      Axyp * Bxypm +
+      Ay * Bym -
+      Aypm * Byp;
+    const xyp =
+      Am * Bxypm +
+      Ap * Bxy +
+      Ax * Byp -
+      Axpm * Bym +
+      Axym * Bpm +
+      Axyp * Bs -
+      Ay * Bxp +
+      Aypm * Bxm;
+    const xym =
+      Am * Bxy +
+      Ap * Bxypm +
+      Ax * Bym -
+      Axpm * Byp +
+      Axym * Bs +
+      Axyp * Bpm -
+      Ay * Bxm +
+      Aypm * Bxp;
+    const xpm =
+      Am * Bxp -
+      Ap * Bxm +
+      Ax * Bpm +
+      Axpm * Bs +
+      Axym * Byp -
+      Axyp * Bym -
+      Ay * Bxypm -
+      Aypm * Bxy;
+    const ypm =
+      Am * Byp -
+      Ap * Bym +
+      Ax * Bxypm +
+      Axpm * Bxy -
+      Axym * Bxp +
+      Axyp * Bxm +
+      Ay * Bpm +
+      Aypm * Bs;
+    return new COdd(x, y, p, m, xyp, xym, xpm, ypm);
   }
 
   gp(other) {

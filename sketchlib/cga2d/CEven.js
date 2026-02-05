@@ -1,11 +1,6 @@
 import { is_nearly } from "../is_nearly.js";
 import { COdd } from "./COdd.js";
 
-/**
- * @template T
- * @typedef {T extends (COdd | CEven) ? COdd : CEven} SameParity<T>
- */
-
 export class CEven {
   /**
    * Constructor
@@ -129,26 +124,111 @@ export class CEven {
     );
   }
 
+  // Geometric product code partially generated with the help of
+  // my repo math-notebook, specifically the symbolic subdirectory which
+  // uses kingdon for symbolic computation.
+
   /**
    * Geometric product with an even multivector
    * @param {CEven} even
    * @returns {CEven}
    */
   gp_even(even) {
-    /**
-     * Geometric Product ========================
-A: As + Axy 𝐞₁₂ + Axp 𝐞₁₃ + Axn 𝐞₁₄ + Ayp 𝐞₂₃ + Ayn 𝐞₂₄ + Apn 𝐞₃₄ + Axypn 𝐞₁₂₃₄
-B: Bs + Bxy 𝐞₁₂ + Bxp 𝐞₁₃ + Bxn 𝐞₁₄ + Byp 𝐞₂₃ + Byn 𝐞₂₄ + Bpn 𝐞₃₄ + Bxypn 𝐞₁₂₃₄
-(Apn*Bpn + As*Bs + Axn*Bxn - Axp*Bxp - Axy*Bxy - Axypn*Bxypn + Ayn*Byn - Ayp*Byp)
-(Apn*Bxypn + As*Bxy + Axn*Byn - Axp*Byp + Axy*Bs + Axypn*Bpn - Ayn*Bxn + Ayp*Bxp) 𝐞₁₂ 
-(-Apn*Bxn + As*Bxp + Axn*Bpn + Axp*Bs + Axy*Byp - Axypn*Byn - Ayn*Bxypn - Ayp*Bxy) 𝐞₁₃ 
-(-Apn*Bxp + As*Bxn + Axn*Bs + Axp*Bpn + Axy*Byn - Axypn*Byp - Ayn*Bxy - Ayp*Bxypn) 𝐞₁₄ 
-(-Apn*Byn + As*Byp + Axn*Bxypn + Axp*Bxy - Axy*Bxp + Axypn*Bxn + Ayn*Bpn + Ayp*Bs) 𝐞₂₃ 
-(-Apn*Byp + As*Byn + Axn*Bxy + Axp*Bxypn - Axy*Bxn + Axypn*Bxp + Ayn*Bs + Ayp*Bpn) 𝐞₂₄ 
-(Apn*Bs + As*Bpn + Axn*Bxp - Axp*Bxn - Axy*Bxypn - Axypn*Bxy + Ayn*Byp - Ayp*Byn) 𝐞₃₄
-(Apn*Bxy + As*Bxypn + Axn*Byp - Axp*Byn + Axy*Bpn + Axypn*Bs - Ayn*Bxp + Ayp*Bxn) 𝐞₁₂₃
-     */
-    return even;
+    const {
+      scalar: As,
+      xy: Axy,
+      xp: Axp,
+      xm: Axm,
+      yp: Ayp,
+      ym: Aym,
+      pm: Apm,
+      xypm: Axypm,
+    } = this;
+    const {
+      scalar: Bs,
+      xy: Bxy,
+      xp: Bxp,
+      xm: Bxm,
+      yp: Byp,
+      ym: Bym,
+      pm: Bpm,
+      xypm: Bxypm,
+    } = even;
+
+    const scalar =
+      Apm * Bpm +
+      As * Bs +
+      Axm * Bxm -
+      Axp * Bxp -
+      Axy * Bxy -
+      Axypm * Bxypm +
+      Aym * Bym -
+      Ayp * Byp;
+    const xy =
+      Apm * Bxypm +
+      As * Bxy +
+      Axm * Bym -
+      Axp * Byp +
+      Axy * Bs +
+      Axypm * Bpm -
+      Aym * Bxm +
+      Ayp * Bxp;
+    const xp =
+      -Apm * Bxm +
+      As * Bxp +
+      Axm * Bpm +
+      Axp * Bs +
+      Axy * Byp -
+      Axypm * Bym -
+      Aym * Bxypm -
+      Ayp * Bxy;
+    const xm =
+      -Apm * Bxp +
+      As * Bxm +
+      Axm * Bs +
+      Axp * Bpm +
+      Axy * Bym -
+      Axypm * Byp -
+      Aym * Bxy -
+      Ayp * Bxypm;
+    const yp =
+      -Apm * Bym +
+      As * Byp +
+      Axm * Bxypm +
+      Axp * Bxy -
+      Axy * Bxp +
+      Axypm * Bxm +
+      Aym * Bpm +
+      Ayp * Bs;
+    const ym =
+      -Apm * Byp +
+      As * Bym +
+      Axm * Bxy +
+      Axp * Bxypm -
+      Axy * Bxm +
+      Axypm * Bxp +
+      Aym * Bs +
+      Ayp * Bpm;
+    const pm =
+      Apm * Bs +
+      As * Bpm +
+      Axm * Bxp -
+      Axp * Bxm -
+      Axy * Bxypm -
+      Axypm * Bxy +
+      Aym * Byp -
+      Ayp * Bym;
+    const xypm =
+      Apm * Bxy +
+      As * Bxypm +
+      Axm * Byp -
+      Axp * Bym +
+      Axy * Bpm +
+      Axypm * Bs -
+      Aym * Bxp +
+      Ayp * Bxm;
+
+    return new CEven(scalar, xy, xp, xm, yp, ym, pm, xypm);
   }
 
   /**
@@ -157,20 +237,101 @@ B: Bs + Bxy 𝐞₁₂ + Bxp 𝐞₁₃ + Bxn 𝐞₁₄ + Byp 𝐞₂₃ + Byn 
    * @returns {COdd}
    */
   gp_odd(odd) {
-    /**
-     * Geometric Product ========================
-A: As + Axy 𝐞₁₂ + Axp 𝐞₁₃ + Axn 𝐞₁₄ + Ayp 𝐞₂₃ + Ayn 𝐞₂₄ + Apn 𝐞₃₄ + Axypn 𝐞₁₂₃₄
-B: Bx 𝐞₁ + By 𝐞₂ + Bp 𝐞₃ + Bn 𝐞₄ + Bxyp 𝐞₁₂₃ + Bxyn 𝐞₁₂₄ + Bxpn 𝐞₁₃₄ + Bypn 𝐞₂₃₄
-(Apn*Bxpn + As*Bx - Axn*Bn + Axp*Bp + Axy*By + Axypn*Bypn + Ayn*Bxyn - Ayp*Bxyp) 𝐞₁ 
-(Apn*Bypn + As*By - Axn*Bxyn + Axp*Bxyp - Axy*Bx - Axypn*Bxpn - Ayn*Bn + Ayp*Bp) 𝐞₂ 
-(-Apn*Bn + As*Bp - Axn*Bxpn - Axp*Bx - Axy*Bxyp + Axypn*Bxyn - Ayn*Bypn - Ayp*By) 𝐞₃ 
-(-Apn*Bp + As*Bn - Axn*Bx - Axp*Bxpn - Axy*Bxyn + Axypn*Bxyp - Ayn*By - Ayp*Bypn) 𝐞₄
-(-Apn*Bxyn + As*Bxyp - Axn*Bypn - Axp*By + Axy*Bp - Axypn*Bn + Ayn*Bxpn + Ayp*Bx) 𝐞₁₂₃ 
-(-Apn*Bxyp + As*Bxyn - Axn*By - Axp*Bypn + Axy*Bn - Axypn*Bp + Ayn*Bx + Ayp*Bxpn) 𝐞₁₂₄ 
-(Apn*Bx + As*Bxpn - Axn*Bp + Axp*Bn + Axy*Bypn + Axypn*By + Ayn*Bxyp - Ayp*Bxyn) 𝐞₁₃₄ 
-(Apn*By + As*Bypn - Axn*Bxyp + Axp*Bxyn - Axy*Bxpn - Axypn*Bx - Ayn*Bp + Ayp*Bn) 𝐞₂₃₄
-     */
-    return odd;
+    const {
+      scalar: As,
+      xy: Axy,
+      xp: Axp,
+      xm: Axm,
+      yp: Ayp,
+      ym: Aym,
+      pm: Apm,
+      xypm: Axypm,
+    } = this;
+    const {
+      x: Bx,
+      y: By,
+      p: Bp,
+      m: Bm,
+      xyp: Bxyp,
+      xym: Bxym,
+      xpm: Bxpm,
+      ypm: Bypm,
+    } = odd;
+
+    const x =
+      Apm * Bxpm +
+      As * Bx -
+      Axm * Bm +
+      Axp * Bp +
+      Axy * By +
+      Axypm * Bypm +
+      Aym * Bxym -
+      Ayp * Bxyp;
+    const y =
+      Apm * Bypm +
+      As * By -
+      Axm * Bxym +
+      Axp * Bxyp -
+      Axy * Bx -
+      Axypm * Bxpm -
+      Aym * Bm +
+      Ayp * Bp;
+    const p =
+      -Apm * Bm +
+      As * Bp -
+      Axm * Bxpm -
+      Axp * Bx -
+      Axy * Bxyp +
+      Axypm * Bxym -
+      Aym * Bypm -
+      Ayp * By;
+    const m =
+      -Apm * Bp +
+      As * Bm -
+      Axm * Bx -
+      Axp * Bxpm -
+      Axy * Bxym +
+      Axypm * Bxyp -
+      Aym * By -
+      Ayp * Bypm;
+    const xyp =
+      -Apm * Bxym +
+      As * Bxyp -
+      Axm * Bypm -
+      Axp * By +
+      Axy * Bp -
+      Axypm * Bm +
+      Aym * Bxpm +
+      Ayp * Bx;
+    const xym =
+      -Apm * Bxyp +
+      As * Bxym -
+      Axm * By -
+      Axp * Bypm +
+      Axy * Bm -
+      Axypm * Bp +
+      Aym * Bx +
+      Ayp * Bxpm;
+    const xpm =
+      Apm * Bx +
+      As * Bxpm -
+      Axm * Bp +
+      Axp * Bm +
+      Axy * Bypm +
+      Axypm * By +
+      Aym * Bxyp -
+      Ayp * Bxym;
+    const ypm =
+      Apm * By +
+      As * Bypm -
+      Axm * Bxyp +
+      Axp * Bxym -
+      Axy * Bxpm -
+      Axypm * Bx -
+      Aym * Bp +
+      Ayp * Bm;
+
+    return new COdd(x, y, p, m, xyp, xym, xpm, ypm);
   }
 
   /**
