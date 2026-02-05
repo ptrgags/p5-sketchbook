@@ -10,7 +10,12 @@ import {
 import { Rational } from "../Rational.js";
 import { to_tone_time } from "./to_tone_time.js";
 import { to_tone_pitch } from "./to_tone_pitch.js";
-import { make_part_clip, PartDescriptor, ToneClip } from "./tone_clips.js";
+import {
+  make_part_clip,
+  make_part_descriptor,
+  PartDescriptor,
+  ToneClip,
+} from "./tone_clips.js";
 
 /**
  * Precompile a lone note to a part. Usually overkill, but it makes scheduling
@@ -19,12 +24,9 @@ import { make_part_clip, PartDescriptor, ToneClip } from "./tone_clips.js";
  * @returns {TimeInterval<PartDescriptor>} A part for the single note.
  */
 function precompile_note(note) {
-  return new TimeInterval(
-    new PartDescriptor([
-      ["0:0", [to_tone_pitch(note.value.pitch), to_tone_time(note.duration)]],
-    ]),
-    note.duration,
-  );
+  return make_part_descriptor(note.duration, [
+    ["0:0", [to_tone_pitch(note.value.pitch), to_tone_time(note.duration)]],
+  ]);
 }
 
 /**
@@ -40,9 +42,9 @@ function make_part_events(midi_notes) {
   for (const note of midi_notes) {
     if (note instanceof Rest) {
       offset = offset.add(note.duration);
-    } else if (note instanceof Note) {
+    } else if (note instanceof TimeInterval) {
       const start = to_tone_time(offset);
-      const pitch = to_tone_pitch(note.pitch);
+      const pitch = to_tone_pitch(note.value.pitch);
       const dur = to_tone_time(note.duration);
 
       /**
@@ -66,7 +68,7 @@ function make_melody_part(notes) {
   const events = make_part_events(notes);
   const duration = notes.reduce((acc, x) => acc.add(x.duration), Rational.ZERO);
 
-  return new TimeInterval(new PartDescriptor(events), duration);
+  return make_part_descriptor(duration, events);
 }
 
 /**
