@@ -155,7 +155,7 @@ export class PatternGrid {
    * @param {PatternGrid<RhythmStep>} rhythm The rhythm to determine the length of notes
    * @param {PatternGrid<number>} pitches The pitches. There must be at least one for every beat of the rhythm. The step size of the grid is ignored.
    * @param {PatternGrid<number>} [velocities] Optional grid of velocity values. If omitted, everything will be mezzo-forte. The step size of this grid is ignored
-   * @returns {import("./Timeline.js").Timeline<Note<number>>}
+   * @returns {import("./Music.js").Music<number>}
    */
   static zip(rhythm, pitches, velocities) {
     if (!velocities) {
@@ -197,7 +197,7 @@ export class PatternGrid {
   /**
    * Unzip a (monophonic) timeline into rhythm, pitch, and velocity. This will be quantized
    * to the smallest denominator in the score.
-   * @param {import("./Timeline.js").Timeline<Note>} melody The original melody
+   * @param {import("./Music.js").Music<number>} melody The original melody
    * @returns {{
    *    rhythm: PatternGrid<RhythmStep>,
    *    pitch: PatternGrid<number>,
@@ -234,8 +234,8 @@ export class PatternGrid {
         const steps = new Array(repeat_count).fill(RhythmStep.SUSTAIN);
         steps[0] = RhythmStep.HIT;
         rhythm_values.push(...steps);
-        pitch_values.push(note.pitch);
-        velocity_values.push(note.velocity);
+        pitch_values.push(note.value.pitch);
+        velocity_values.push(note.value.velocity);
       }
     }
 
@@ -336,10 +336,10 @@ export class PatternGrid {
         steps[0] = RhythmStep.HIT;
         rhythm_values.push(...steps);
 
-        const pitches = new Array(step_count).fill(note.pitch);
+        const pitches = new Array(step_count).fill(note.value.pitch);
         pitch_values.push(...pitches);
 
-        const velocities = new Array(step_count).fill(note.velocity);
+        const velocities = new Array(step_count).fill(note.value.velocity);
         velocity_values.push(...velocities);
       }
     }

@@ -3,7 +3,7 @@ import { Gap, Parallel, Sequential, TimeInterval } from "./Timeline.js";
 export class RelTimelineOps {
   /**
    * Iterate over the timeline, including the gaps
-   * @template {import("./Timeline.js").TimeInterval} T
+   * @template T
    * @param {import("./Timeline.js").Timeline<T>} timeline
    * @return {number} The maximum number of parallel lanes in the timeline
    */
