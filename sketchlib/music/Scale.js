@@ -36,6 +36,19 @@ export class ScaleQuality {
   stack_thirds(n) {
     return [];
   }
+
+  to_symbol(pitch_class) {
+    return new ScaleSymbol(this.intervals.intervals, pitch_class);
+  }
+
+  /**
+   *
+   * @param {*} tonic
+   * @returns {Scale}
+   */
+  to_scale(tonic) {
+    return new Scale(this.intervals.intervals, tonic);
+  }
 }
 
 export class ScaleSymbol {
