@@ -1,8 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { Sequential, TimeInterval } from "../music/Timeline.js";
-import { Hold, make_param, ParamCurve } from "./ParamCurve.js";
+import { Sequential } from "../music/Timeline.js";
+import { Hold, make_param } from "./ParamCurve.js";
 import { Rational } from "../Rational.js";
-import { AnimationCurve } from "./AnimationCurve.js";
 import { LoopCurve } from "./LoopCurve.js";
 
 /**

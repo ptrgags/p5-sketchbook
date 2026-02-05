@@ -3,9 +3,9 @@ import { Melody, Note, Rest, Harmony, make_note } from "../music/Music.js";
 import { N1, N2, N4 } from "../music/durations.js";
 import { C4, C5, CS5, E4, G4, REST } from "../music/pitches.js";
 import { precompile_music } from "./compile_music.js";
-import { PartDescriptor } from "./tone_clips.js";
+import { make_part_descriptor, PartDescriptor } from "./tone_clips.js";
 import { Rational } from "../Rational.js";
-import { Parallel, Sequential } from "../music/Timeline.js";
+import { Parallel, Sequential, TimeInterval } from "../music/Timeline.js";
 
 describe("precompile_music", () => {
   it("single note compiles to part", () => {
@@ -13,7 +13,7 @@ describe("precompile_music", () => {
 
     const result = precompile_music(note);
 
-    const expected = new PartDescriptor(N4, [["0:0", ["C#5", "0:1"]]]);
+    const expected = make_part_descriptor(N4, [["0:0", ["C#5", "0:1"]]]);
     expect(result).toEqual(expected);
   });
 
@@ -36,7 +36,7 @@ describe("precompile_music", () => {
 
     const result = precompile_music(melody);
 
-    const expected = new PartDescriptor(new Rational(2, 1), [
+    const expected = make_part_descriptor(new Rational(2, 1), [
       ["0:0", ["C4", "0:2"]],
       ["0:2", ["E4", "0:1"]],
       ["1:0", ["G4", "1:0"]],
@@ -55,7 +55,7 @@ describe("precompile_music", () => {
 
     const result = precompile_music(melody);
 
-    const expected_sub = new PartDescriptor(new Rational(2, 1), [
+    const expected_sub = make_part_descriptor(new Rational(2, 1), [
       ["0:0", ["C4", "0:2"]],
       ["0:2", ["E4", "0:1"]],
       ["1:0", ["G4", "1:0"]],
@@ -69,7 +69,7 @@ describe("precompile_music", () => {
 
     const result = precompile_music(melody);
 
-    const expected = new PartDescriptor(new Rational(3, 4), [
+    const expected = make_part_descriptor(new Rational(3, 4), [
       ["0:1", ["C4", "0:2"]],
     ]);
     expect(result).toEqual(expected);
@@ -85,9 +85,9 @@ describe("precompile_music", () => {
     const result = precompile_music(chord);
 
     const expected = new Parallel(
-      new PartDescriptor(N1, [["0:0", ["C4", "1:0"]]]),
-      new PartDescriptor(N1, [["0:0", ["E4", "1:0"]]]),
-      new PartDescriptor(N1, [["0:0", ["G4", "1:0"]]]),
+      make_part_descriptor(N1, [["0:0", ["C4", "1:0"]]]),
+      make_part_descriptor(N1, [["0:0", ["E4", "1:0"]]]),
+      make_part_descriptor(N1, [["0:0", ["G4", "1:0"]]]),
     );
     expect(result).toEqual(expected);
   });
@@ -102,12 +102,12 @@ describe("precompile_music", () => {
     const result = precompile_music(chord);
 
     const expected = new Parallel(
-      new PartDescriptor(new Rational(3, 2), [
+      make_part_descriptor(new Rational(3, 2), [
         ["0:0", ["C4", "1:0"]],
         ["1:0", ["G4", "0:2"]],
       ]),
-      new PartDescriptor(N1, [["0:0", ["E4", "1:0"]]]),
-      new PartDescriptor(new Rational(3, 2), [
+      make_part_descriptor(N1, [["0:0", ["E4", "1:0"]]]),
+      make_part_descriptor(new Rational(3, 2), [
         ["0:0", ["G4", "1:0"]],
         ["1:1", ["C5", "0:1"]],
       ]),

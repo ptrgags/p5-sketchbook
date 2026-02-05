@@ -7,7 +7,7 @@ import {
 import { AbsTimelineOps } from "../music/AbsTimelineOps.js";
 import { Harmony, Melody, Note } from "../music/Music.js";
 import { Part, Score } from "../music/Score.js";
-import { Gap } from "../music/Timeline.js";
+import { Gap, TimeInterval } from "../music/Timeline.js";
 import { Rational } from "../Rational.js";
 import {
   MIDIEvent,
@@ -24,7 +24,7 @@ import { NoteStream } from "./NoteStream.js";
  */
 function timeline_to_music(abs_music) {
   if (abs_music instanceof AbsInterval) {
-    return abs_music.value;
+    return new TimeInterval(abs_music.value, abs_music.duration);
   }
 
   if (abs_music instanceof AbsSequential) {

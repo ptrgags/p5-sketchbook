@@ -12,15 +12,24 @@ export class PartDescriptor {
   }
 }
 
+/**
+ * Make a PartDescriptor wrapped in a time interval like the
+ * old interface
+ * @param {Rational} duration
+ * @param {[string, [string, string]][]} events
+ * @returns {TimeInterval<PartDescriptor>}
+ */
+export function make_part_descriptor(duration, events) {
+  return new TimeInterval(new PartDescriptor(events), duration);
+}
+
 export class ToneClip {
   /**
    * Constructor
    * @param {import("tone").ToneEvent} material The Tone JS material
-   * @param {Rational} duration The duration of the clip in measures
    */
-  constructor(material, duration) {
+  constructor(material) {
     this.material = material;
-    this.duration = duration;
   }
 }
 
@@ -29,7 +38,7 @@ export class ToneClip {
  * @param {import("tone")} tone the Tone.js library
  * @param {import("tone").Synth} instrument the instrument to play
  * @param {TimeInterval<PartDescriptor>} descriptor The description of the notes to play
- * @returns {ToneClip} The computed Part wrapped in a ToneClip
+ * @returns {TimeInterval<ToneClip>} The computed Part wrapped in a ToneClip
  */
 export function make_part_clip(tone, instrument, descriptor) {
   const part = new tone.Part((time, note) => {
@@ -40,5 +49,5 @@ export function make_part_clip(tone, instrument, descriptor) {
   part.loop = true;
   part.loopStart = "0:0";
   part.loopEnd = to_tone_time(descriptor.duration);
-  return new ToneClip(part, descriptor.duration);
+  return new TimeInterval(new ToneClip(part), descriptor.duration);
 }

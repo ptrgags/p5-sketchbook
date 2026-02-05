@@ -1,5 +1,5 @@
 import { Harmony, Melody, Note, Rest } from "./Music.js";
-import { Gap } from "./Timeline.js";
+import { Gap, TimeInterval } from "./Timeline.js";
 
 /**
  * sdrawkcab cisum eht yalP
@@ -8,7 +8,7 @@ import { Gap } from "./Timeline.js";
  * @return {import("./Music.js").Music<P>} The music reversed
  */
 export function retrograde(music) {
-  if (music instanceof Note || music instanceof Gap) {
+  if (music instanceof TimeInterval || music instanceof Gap) {
     return music;
   }
 

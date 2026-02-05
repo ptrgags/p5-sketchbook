@@ -115,8 +115,11 @@ export function parse_cycle(cycle_length, notes) {
  * @param {Music<P>} music The musical material
  */
 export function map_pitch(pitch_func, music) {
-  return timeline_map(
-    (note) => new Note(pitch_func(note.pitch), note.velocity),
-    music,
-  );
+  return timeline_map((interval) => {
+    const note = interval.value;
+    return new TimeInterval(
+      new Note(pitch_func(note.pitch), note.velocity),
+      interval.duration,
+    );
+  }, music);
 }

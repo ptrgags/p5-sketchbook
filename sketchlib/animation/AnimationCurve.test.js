@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Hold, ParamCurve } from "./ParamCurve";
+import { Hold, make_param, ParamCurve } from "./ParamCurve";
 import { Rational } from "../Rational";
 import { Gap, Sequential } from "../music/Timeline";
 import { AnimationCurve } from "./AnimationCurve";

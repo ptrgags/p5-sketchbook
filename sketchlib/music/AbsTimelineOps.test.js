@@ -27,11 +27,7 @@ describe("AbsTimelineOps", () => {
 
       const result = AbsTimelineOps.from_relative(timeline, new Rational(2));
 
-      const expected = new AbsInterval(
-        timeline,
-        new Rational(2),
-        new Rational(5, 2),
-      );
+      const expected = new AbsInterval(3, new Rational(2), new Rational(5, 2));
       expect(result).toEqual(expected);
     });
 
@@ -41,7 +37,7 @@ describe("AbsTimelineOps", () => {
 
       const result = AbsTimelineOps.from_relative(timeline, offset);
 
-      const expected = new AbsInterval(timeline, offset, new Rational(5, 4));
+      const expected = new AbsInterval(3, offset, new Rational(5, 4));
       expect(result).toEqual(expected);
     });
 
@@ -53,9 +49,9 @@ describe("AbsTimelineOps", () => {
       const result = AbsTimelineOps.from_relative(timeline, Rational.ZERO);
 
       const expected = new AbsSequential(
-        new AbsInterval(timeline2, Rational.ZERO, new Rational(1, 2)),
-        new AbsInterval(timeline1, new Rational(1, 2), new Rational(3, 2)),
-        new AbsInterval(timeline2, new Rational(3, 2), new Rational(2)),
+        new AbsInterval(2, Rational.ZERO, new Rational(1, 2)),
+        new AbsInterval(1, new Rational(1, 2), new Rational(3, 2)),
+        new AbsInterval(2, new Rational(3, 2), new Rational(2)),
       );
       expect(result).toEqual(expected);
     });
@@ -69,9 +65,9 @@ describe("AbsTimelineOps", () => {
       const result = AbsTimelineOps.from_relative(timeline, offset);
 
       const expected = new AbsSequential(
-        new AbsInterval(timeline2, offset, Rational.ONE),
-        new AbsInterval(timeline1, Rational.ONE, new Rational(2)),
-        new AbsInterval(timeline2, new Rational(2), new Rational(5, 2)),
+        new AbsInterval(2, offset, Rational.ONE),
+        new AbsInterval(1, Rational.ONE, new Rational(2)),
+        new AbsInterval(2, new Rational(2), new Rational(5, 2)),
       );
       expect(result).toEqual(expected);
     });
@@ -84,8 +80,8 @@ describe("AbsTimelineOps", () => {
       const result = AbsTimelineOps.from_relative(timeline, Rational.ZERO);
 
       const expected = new AbsParallel(
-        new AbsInterval(timeline1, Rational.ZERO, Rational.ONE),
-        new AbsInterval(timeline2, Rational.ZERO, new Rational(1, 2)),
+        new AbsInterval(1, Rational.ZERO, Rational.ONE),
+        new AbsInterval(2, Rational.ZERO, new Rational(1, 2)),
       );
       expect(result).toEqual(expected);
     });

@@ -174,8 +174,8 @@ export function precompile_music(music) {
  */
 export function compile_music(tone, instrument, music) {
   const precompiled = precompile_music(music);
-  return timeline_map((x) => {
-    return make_part_clip(tone, instrument, x);
+  return timeline_map((interval) => {
+    return make_part_clip(tone, instrument, interval);
   }, precompiled);
 }
 
