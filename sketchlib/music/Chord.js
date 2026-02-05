@@ -134,7 +134,7 @@ export class Chord {
   }
 
   /**
-   * Voice the chord by giving
+   * Voice the chord by providing a list of indices, one per desired voice.
    * @param {(number | undefined)[]} indices Voices, listed from bottom to top. To leave a voice silent, use REST
    * @returns {ChordVoicing}
    */
