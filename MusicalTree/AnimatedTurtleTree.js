@@ -305,7 +305,7 @@ class TreeAnimationBuilder {
    * @param {Rational} duration The duration for this command
    */
   increment_state(duration) {
-    const increase = new ParamCurve(
+    const increase = make_param(
       this.state_index,
       this.state_index + 1,
       duration,
@@ -323,7 +323,7 @@ class TreeAnimationBuilder {
     // same calculation as in the music builder
     const duration = DUR_SHORT.mul(new Rational(this.max_depth - depth + 1));
 
-    const increase = new ParamCurve(
+    const increase = make_param(
       this.line_count,
       this.line_count + 1,
       duration,
@@ -342,7 +342,7 @@ class TreeAnimationBuilder {
    * @param {number} old_depth The depth _before_ the push command
    */
   push(old_depth) {
-    const increase = new ParamCurve(old_depth, old_depth + 1, DUR_STACK);
+    const increase = make_param(old_depth, old_depth + 1, DUR_STACK);
 
     this.line_count_curve.push(GAP_STACK);
     this.increment_state(DUR_STACK);
@@ -354,7 +354,7 @@ class TreeAnimationBuilder {
    * @param {number} old_depth The depth _before_ the pop command
    */
   pop(old_depth) {
-    const decrease = new ParamCurve(old_depth, old_depth - 1, DUR_STACK);
+    const decrease = make_param(old_depth, old_depth - 1, DUR_STACK);
 
     this.line_count_curve.push(GAP_STACK);
     this.increment_state(DUR_STACK);

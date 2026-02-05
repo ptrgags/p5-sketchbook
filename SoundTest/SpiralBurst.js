@@ -20,15 +20,15 @@ const DURATION_BURST = Rational.ONE.sub(DURATION_SPIRAL);
 
 const CURVE_RADIUS = LoopCurve.from_timeline(
   new Sequential(
-    new ParamCurve(0, 1, DURATION_BURST),
-    new ParamCurve(1, 0, DURATION_SPIRAL),
+    make_param(0, 1, DURATION_BURST),
+    make_param(1, 0, DURATION_SPIRAL),
   ),
 );
 const CURVE_PHASE = LoopCurve.from_timeline(
   new Sequential(
     // Hold the angle steady while bursting
     new Hold(DURATION_BURST),
-    new ParamCurve(0, 1, DURATION_SPIRAL),
+    make_param(0, 1, DURATION_SPIRAL),
   ),
 );
 
@@ -36,8 +36,8 @@ const CURVE_PHASE = LoopCurve.from_timeline(
 
 // At the start of the burst, the lightness and chroma jump up,
 // then ramp down over the course of a measure
-const CURVE_LIGHTNESS = LoopCurve.from_timeline(new ParamCurve(0.7, 0.1, N1));
-const CURVE_CHROMA = LoopCurve.from_timeline(new ParamCurve(0.3, 0.05, N1));
+const CURVE_LIGHTNESS = LoopCurve.from_timeline(make_param(0.7, 0.1, N1));
+const CURVE_CHROMA = LoopCurve.from_timeline(make_param(0.3, 0.05, N1));
 
 // The hue changes every quarter note as a step function
 const start_hue = 80;

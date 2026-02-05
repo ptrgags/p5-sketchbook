@@ -81,12 +81,12 @@ const UNSTITCH_DURATION = new Rational(4);
 const CURVE_START = LoopCurve.from_timeline(
   new Sequential(
     new Hold(STITCH_DURATION),
-    new ParamCurve(0, 1, UNSTITCH_DURATION),
+    make_param(0, 1, UNSTITCH_DURATION),
   ),
 );
 const CURVE_END = LoopCurve.from_timeline(
   new Sequential(
-    new ParamCurve(0, 1, STITCH_DURATION),
+    make_param(0, 1, STITCH_DURATION),
     new Hold(UNSTITCH_DURATION),
   ),
 );

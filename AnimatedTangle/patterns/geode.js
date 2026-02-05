@@ -71,8 +71,8 @@ export class Geode {
     const max_width = this.stripe_styles[0].stroke_width;
     this.curve_thickness = LoopCurve.from_timeline(
       new Sequential(
-        new ParamCurve(0, max_width, DURATION_GROW),
-        new ParamCurve(max_width, max_width, DURATION_PAUSE),
+        make_param(0, max_width, DURATION_GROW),
+        make_param(max_width, max_width, DURATION_PAUSE),
       ),
     );
 

@@ -12,13 +12,13 @@ import { Tween } from "../Tween.js";
 function make_curve() {
   return new Sequential(
     // t = 0 to t = 1
-    new ParamCurve(0, 100, new Rational(1)),
+    make_param(0, 100, new Rational(1)),
     // t = 1 to t = 1.5
-    new ParamCurve(100, 100, new Rational(1, 2)),
+    make_param(100, 100, new Rational(1, 2)),
     // t = 1.5 to t = 2.5
-    new ParamCurve(100, 0, new Rational(1)),
+    make_param(100, 0, new Rational(1)),
     // t = 2.5 to t = 3, jump to a different value
-    new ParamCurve(2, 2, new Rational(1, 2))
+    make_param(2, 2, new Rational(1, 2)),
   );
 }
 
@@ -45,10 +45,10 @@ describe("AnimationCurve", () => {
     it("with timeline with gap computes correct duration", () => {
       const curve = AnimationCurve.from_timeline(
         new Sequential(
-          new ParamCurve(0, 1, Rational.ONE),
+          make_param(0, 1, Rational.ONE),
           new Hold(new Rational(2)),
-          new ParamCurve(1, 2, Rational.ONE)
-        )
+          make_param(1, 2, Rational.ONE),
+        ),
       );
 
       expect(curve.duration).toBe(4);
@@ -57,9 +57,9 @@ describe("AnimationCurve", () => {
     it("with timeline ending in hold computes correct duration", () => {
       const curve = AnimationCurve.from_timeline(
         new Sequential(
-          new ParamCurve(0, 1, Rational.ONE),
-          new Hold(new Rational(2))
-        )
+          make_param(0, 1, Rational.ONE),
+          new Hold(new Rational(2)),
+        ),
       );
 
       expect(curve.duration).toBe(3);
@@ -69,8 +69,8 @@ describe("AnimationCurve", () => {
       const curve = AnimationCurve.from_timeline(
         new Sequential(
           new Hold(new Rational(2)),
-          new ParamCurve(0, 1, Rational.ONE)
-        )
+          make_param(0, 1, Rational.ONE),
+        ),
       );
 
       expect(curve.duration).toBe(3);
@@ -126,8 +126,8 @@ describe("AnimationCurve", () => {
       const curves = AnimationCurve.from_timeline(
         new Sequential(
           new Gap(new Rational(2)),
-          new ParamCurve(5, 10, new Rational(1))
-        )
+          make_param(5, 10, new Rational(1)),
+        ),
       );
 
       // The initial gap should grab the value from the
@@ -149,12 +149,12 @@ describe("AnimationCurve", () => {
       const curves = AnimationCurve.from_timeline(
         new Sequential(
           // t = 0 to 1 -> ramp from 5 to 10
-          new ParamCurve(5, 10, Rational.ONE),
+          make_param(5, 10, Rational.ONE),
           // t = 1 to 3 -> hold at 10
           new Gap(new Rational(2)),
           // t = 3 to 4 -> ramp back down from 10 to 5
-          new ParamCurve(10, 5, Rational.ONE)
-        )
+          make_param(10, 5, Rational.ONE),
+        ),
       );
 
       // 1/4 * 5 + 3/4 * 10 = 5/4 + 30/4 = 35/4 = 8.75
@@ -172,9 +172,9 @@ describe("AnimationCurve", () => {
     it("with gap at end holds last value", () => {
       const curves = AnimationCurve.from_timeline(
         new Sequential(
-          new ParamCurve(10, 5, new Rational(1)),
-          new Gap(new Rational(2))
-        )
+          make_param(10, 5, new Rational(1)),
+          new Gap(new Rational(2)),
+        ),
       );
 
       // (10 + 5)/2 = 15/2 = 7.5

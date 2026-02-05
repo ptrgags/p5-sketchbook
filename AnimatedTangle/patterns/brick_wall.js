@@ -131,8 +131,8 @@ const DURATION_LIFT = new Rational(3);
 // Fall at a regular speed, then speed up when undoing the animation
 const CURVE_TIMING = LoopCurve.from_timeline(
   new Sequential(
-    new ParamCurve(-FALL_DURATION, 4 + FALL_DURATION, DURATION_FALL),
-    new ParamCurve(4 + FALL_DURATION, -FALL_DURATION, DURATION_LIFT),
+    make_param(-FALL_DURATION, 4 + FALL_DURATION, DURATION_FALL),
+    make_param(4 + FALL_DURATION, -FALL_DURATION, DURATION_LIFT),
   ),
 );
 

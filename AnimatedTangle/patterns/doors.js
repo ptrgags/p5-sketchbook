@@ -113,8 +113,8 @@ const LIFT_HEIGHT = 50;
 
 const OPEN_AND_SHUT = LoopCurve.from_timeline(
   new Sequential(
-    new ParamCurve(0, LIFT_HEIGHT, DURATION_OPEN, Ease.in_out_cubic),
-    new ParamCurve(LIFT_HEIGHT, 0, DURATION_OPEN, Ease.in_out_cubic),
+    make_param(0, LIFT_HEIGHT, DURATION_OPEN, Ease.in_out_cubic),
+    make_param(LIFT_HEIGHT, 0, DURATION_OPEN, Ease.in_out_cubic),
   ),
 );
 

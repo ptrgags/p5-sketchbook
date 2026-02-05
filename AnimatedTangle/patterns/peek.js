@@ -17,13 +17,13 @@ const DURATION_FRAME = new Rational(1);
 const CURVE_POSITION = LoopCurve.from_timeline(
   new Sequential(
     // move from start -> end
-    new ParamCurve(0, 1, DURATION_FRAME),
+    make_param(0, 1, DURATION_FRAME),
     // stay in place while turning
-    new ParamCurve(1, 1, DURATION_FRAME),
+    make_param(1, 1, DURATION_FRAME),
     // return to start
-    new ParamCurve(1, 0, DURATION_FRAME),
+    make_param(1, 0, DURATION_FRAME),
     // stay in place while turning
-    new ParamCurve(0, 0, DURATION_FRAME),
+    make_param(0, 0, DURATION_FRAME),
   ),
 );
 
@@ -32,10 +32,10 @@ const CURVE_ANGLE = LoopCurve.from_timeline(
     // Look in the direction from start -> end
     new Hold(DURATION_FRAME),
     // Rotate CCW back towards start
-    new ParamCurve(0, Math.PI, DURATION_FRAME),
+    make_param(0, Math.PI, DURATION_FRAME),
     new Hold(DURATION_FRAME),
     // Rotate CCW towards end
-    new ParamCurve(Math.PI, 2 * Math.PI, DURATION_FRAME),
+    make_param(Math.PI, 2 * Math.PI, DURATION_FRAME),
     // End of the loop, we jump from angle + 2pi to angle, which are
     // equivalent
   ),

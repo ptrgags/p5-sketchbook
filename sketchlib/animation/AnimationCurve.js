@@ -1,6 +1,5 @@
 import { Tween } from "../Tween.js";
 import { whole_fract } from "../whole_fract.js";
-import { Rational } from "../Rational.js";
 import { ParamCurve } from "./ParamCurve.js";
 import { PiecewiseLinear } from "./PiecewiseLinear.js";
 import { AbsTimelineOps } from "../music/AbsTimelineOps.js";
