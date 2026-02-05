@@ -72,7 +72,7 @@ export class Sequential {
   /**
    * Make a sequence by repeating a timeline N times
    * Note that this may create nesting
-   * @template {TimeInterval} T the event type
+   * @template T the event type
    * @param {Timeline<T>} material The material to repeat
    * @param {number} repeats Postive integer number of repeats
    * @return {Timeline<T>} if repeats === 1, material is returned as-is. if
@@ -94,7 +94,7 @@ export class Sequential {
   /**
    * Similar to from_repeat, but instead of specifying the number of
    * repeats, specify the total duration to loop the clip
-   * @template {TimeInterval} T the event type
+   * @template T the event type
    * @param {Timeline<T>} material The material to loop
    * @param {Rational} total_duration The total duration to loop in measures
    */
@@ -151,7 +151,7 @@ export class Parallel {
  * Map a function over a timeline.
  * @template T The original value type
  * @template U The new value type after applying f
- * @param {function(T): U} f A function to apply to each event in the timeline
+ * @param {function(TimeInterval<T>): TimeInterval<U>} f A function to apply to each event in the timeline
  * @param {Timeline<T>} timeline The original timeline
  * @returns {Timeline<U>} A new timeline with the
  */
@@ -170,5 +170,5 @@ export function timeline_map(f, timeline) {
     return new Parallel(...children);
   }
 
-  return new TimeInterval(f(timeline.value), timeline.duration);
+  return f(timeline);
 }

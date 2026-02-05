@@ -7,20 +7,7 @@ import {
   AbsParallel,
 } from "./AbsTimeline.js";
 import { AbsTimelineOps } from "./AbsTimelineOps.js";
-import { Gap, Sequential, Parallel } from "./Timeline.js";
-
-/**
- * Make an interval object for use in tests below
- * @param {Rational} duration
- * @param {number} value
- * @returns {object} An interval
- */
-function stub_interval(duration, value) {
-  return {
-    duration,
-    value,
-  };
-}
+import { Gap, Sequential, Parallel, TimeInterval } from "./Timeline.js";
 
 describe("AbsTimelineOps", () => {
   describe("from_relative", () => {
@@ -36,7 +23,7 @@ describe("AbsTimelineOps", () => {
 
     it("With interval gives AbsInterval", () => {
       const duration = new Rational(1, 2);
-      const timeline = stub_interval(duration, 3);
+      const timeline = new TimeInterval(3, duration);
 
       const result = AbsTimelineOps.from_relative(timeline, new Rational(2));
 
@@ -49,7 +36,7 @@ describe("AbsTimelineOps", () => {
     });
 
     it("with offset schedules event with times offset", () => {
-      const timeline = stub_interval(Rational.ONE, 3);
+      const timeline = new TimeInterval(3, Rational.ONE);
       const offset = new Rational(1, 4);
 
       const result = AbsTimelineOps.from_relative(timeline, offset);
@@ -59,8 +46,8 @@ describe("AbsTimelineOps", () => {
     });
 
     it("schedules sequential timeline with correct timing", () => {
-      const timeline1 = stub_interval(Rational.ONE, 1);
-      const timeline2 = stub_interval(new Rational(1, 2), 2);
+      const timeline1 = new TimeInterval(1, Rational.ONE);
+      const timeline2 = new TimeInterval(2, new Rational(1, 2));
       const timeline = new Sequential(timeline2, timeline1, timeline2);
 
       const result = AbsTimelineOps.from_relative(timeline, Rational.ZERO);
@@ -74,8 +61,8 @@ describe("AbsTimelineOps", () => {
     });
 
     it("with sequential timeline produces one event per child", () => {
-      const timeline1 = stub_interval(Rational.ONE, 1);
-      const timeline2 = stub_interval(new Rational(1, 2), 2);
+      const timeline1 = new TimeInterval(1, Rational.ONE);
+      const timeline2 = new TimeInterval(2, new Rational(1, 2));
       const timeline = new Sequential(timeline2, timeline1, timeline2);
       const offset = new Rational(1, 2);
 
@@ -90,8 +77,8 @@ describe("AbsTimelineOps", () => {
     });
 
     it("with parallel timeline produces AbsParallel with correct timing", () => {
-      const timeline1 = stub_interval(Rational.ONE, 1);
-      const timeline2 = stub_interval(new Rational(1, 2), 2);
+      const timeline1 = new TimeInterval(1, Rational.ONE);
+      const timeline2 = new TimeInterval(2, new Rational(1, 2));
       const timeline = new Parallel(timeline1, timeline2);
 
       const result = AbsTimelineOps.from_relative(timeline, Rational.ZERO);

@@ -212,14 +212,14 @@ export class AbsTimelineOps {
           AbsTimelineOps.from_relative(x, start_time),
         ),
       );
-    } else {
-      // Plain interval
-      return new AbsInterval(
-        rel_timeline.value,
-        start_time,
-        start_time.add(rel_timeline.duration),
-      );
     }
+
+    // TimeInterval
+    return new AbsInterval(
+      rel_timeline.value,
+      start_time,
+      start_time.add(rel_timeline.duration),
+    );
   }
 
   /**
