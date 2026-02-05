@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
+  make_note,
   map_pitch,
   Melody,
   Note,
@@ -14,7 +15,7 @@ import { MIDIPitch } from "./MIDIPitch.js";
 
 describe("Melody", () => {
   it("duration computes sum of notes", () => {
-    const melody = new Melody(new Note(3, N4), new Rest(N8), new Note(4, N4));
+    const melody = new Melody(make_note(3, N4), new Rest(N8), make_note(4, N4));
     const result = melody.duration;
 
     // 2/4 + 1/8 = 5/8
@@ -25,12 +26,20 @@ describe("Melody", () => {
 
 describe("map_pitch", () => {
   it("converts pitch between formats", () => {
-    const melody = new Melody(new Note(C4, N4), new Rest(N4), new Note(E4, N4));
+    const melody = new Melody(
+      make_note(C4, N4),
+      new Rest(N4),
+      make_note(E4, N4),
+    );
 
     const result = map_pitch(MIDIPitch.get_pitch_class, melody);
 
     // Same melody but with the octave numbers removed
-    const expected = new Melody(new Note(C, N4), new Rest(N4), new Note(E, N4));
+    const expected = new Melody(
+      make_note(C, N4),
+      new Rest(N4),
+      make_note(E, N4),
+    );
     expect(result).toEqual(expected);
   });
 });
@@ -49,9 +58,9 @@ describe("parse_melody", () => {
     const result = parse_melody(...tuples);
 
     const expected = new Melody(
-      new Note(C4, N4),
+      make_note(C4, N4),
       new Rest(N2),
-      new Note(G4, N4),
+      make_note(G4, N4),
     );
 
     expect(result).toEqual(expected);
@@ -64,7 +73,7 @@ describe("parse_cycle", () => {
 
     const result = parse_cycle(N4, cycle);
 
-    const expected = new Melody(new Note(C4, N4));
+    const expected = new Melody(make_note(C4, N4));
     expect(result).toEqual(expected);
   });
 
@@ -82,7 +91,7 @@ describe("parse_cycle", () => {
 
     const result = parse_cycle(N2, cycle);
 
-    const expected = new Melody(new Note(C4, N4), new Note(G4, N4));
+    const expected = new Melody(make_note(C4, N4), make_note(G4, N4));
     expect(result).toEqual(expected);
   });
 
@@ -92,9 +101,9 @@ describe("parse_cycle", () => {
     const result = parse_cycle(N2, cycle);
 
     const expected = new Melody(
-      new Note(C4, N4T),
-      new Note(E4, N4T),
-      new Note(G4, N4T),
+      make_note(C4, N4T),
+      make_note(E4, N4T),
+      make_note(G4, N4T),
     );
     expect(result).toEqual(expected);
   });
@@ -105,10 +114,10 @@ describe("parse_cycle", () => {
     const result = parse_cycle(N1, cycle);
 
     const expected = new Melody(
-      new Note(C4, N4),
-      new Note(E4, N4),
-      new Note(G4, N4),
-      new Note(B4, N4),
+      make_note(C4, N4),
+      make_note(E4, N4),
+      make_note(G4, N4),
+      make_note(B4, N4),
     );
     expect(result).toEqual(expected);
   });
@@ -119,10 +128,10 @@ describe("parse_cycle", () => {
     const result = parse_cycle(N1, cycle);
 
     const expected = new Melody(
-      new Note(C4, N4),
-      new Melody(new Note(E4, N8), new Note(F4, N8)),
-      new Note(G4, N4),
-      new Melody(new Note(A4, N8T), new Note(AS4, N8T), new Note(B4, N8T)),
+      make_note(C4, N4),
+      new Melody(make_note(E4, N8), make_note(F4, N8)),
+      make_note(G4, N4),
+      new Melody(make_note(A4, N8T), make_note(AS4, N8T), make_note(B4, N8T)),
     );
     expect(result).toEqual(expected);
   });

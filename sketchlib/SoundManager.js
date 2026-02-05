@@ -242,7 +242,7 @@ export class SoundManager {
 
     const transport = this.tone.getTransport();
 
-    for (const clip of score) {
+    for (const clip of AbsTimelineOps.iter_intervals(score)) {
       const start = to_tone_time(clip.start_time);
       const end = to_tone_time(clip.end_time);
       clip.value.material.start(start).stop(end);
@@ -266,7 +266,7 @@ export class SoundManager {
 
     const A_LITTLE_BIT = 0; //0.05;
     const now = this.tone.now() + A_LITTLE_BIT;
-    for (const clip of sfx_score) {
+    for (const clip of AbsTimelineOps.iter_intervals(sfx_score)) {
       const start_time = to_tone_time(clip.start_time);
       const end_time = to_tone_time(clip.end_time);
       const start_sec = now + this.tone.Time(start_time).toSeconds();

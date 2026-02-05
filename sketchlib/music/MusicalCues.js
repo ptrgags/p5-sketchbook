@@ -26,7 +26,7 @@ export class Cue {
     const note_off = [];
     for (const part of score.parts) {
       const abs_part = AbsTimelineOps.from_relative(part.music);
-      for (const note of abs_part) {
+      for (const note of AbsTimelineOps.iter_intervals(abs_part)) {
         const note_on_cue = new Cue(note.start_time, note);
         const note_off_cue = new Cue(note.end_time, note);
         note_on.push(note_on_cue);

@@ -8,7 +8,10 @@ import { Style } from "../../sketchlib/Style.js";
 import { Tween } from "../../sketchlib/Tween.js";
 import { Animated } from "../../sketchlib/animation/Animated.js";
 import { LoopCurve } from "../../sketchlib/animation/LoopCurve.js";
-import { ParamCurve } from "../../sketchlib/animation/ParamCurve.js";
+import {
+  make_param,
+  ParamCurve,
+} from "../../sketchlib/animation/ParamCurve.js";
 import { Sequential } from "../../sketchlib/music/Timeline.js";
 import { Rational } from "../../sketchlib/Rational.js";
 import { PALETTE_CORAL, PALETTE_NAVY, Values } from "../theme_colors.js";
@@ -35,8 +38,8 @@ const ANCHOR_POINT = new Point(0, 600);
 const MAX_DIST = 600;
 const CURVE_EXTEND_RADIUS = LoopCurve.from_timeline(
   new Sequential(
-    new ParamCurve(MAX_DIST, 0, new Rational(2, 3), Ease.in_cubic),
-    new ParamCurve(0, MAX_DIST, new Rational(3), Ease.in_out_cubic),
+    make_param(MAX_DIST, 0, new Rational(2, 3), Ease.in_cubic),
+    make_param(0, MAX_DIST, new Rational(3), Ease.in_out_cubic),
   ),
 );
 

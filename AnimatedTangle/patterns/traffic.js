@@ -10,7 +10,10 @@ import { Style } from "../../sketchlib/Style.js";
 import { Animated } from "../../sketchlib/animation/Animated.js";
 import { AnimationGroup } from "../../sketchlib/animation/AnimationGroup.js";
 import { LoopCurve } from "../../sketchlib/animation/LoopCurve.js";
-import { ParamCurve } from "../../sketchlib/animation/ParamCurve.js";
+import {
+  make_param,
+  ParamCurve,
+} from "../../sketchlib/animation/ParamCurve.js";
 import { Sequential } from "../../sketchlib/music/Timeline.js";
 import { Rational } from "../../sketchlib/Rational.js";
 import {
@@ -24,9 +27,9 @@ const HALF_DIST = 300;
 const HALF_DURATION = new Rational(2);
 const TIMELINE_POSITION = new Sequential(
   // Enter from the left, slowing down when we reach the center of motion
-  new ParamCurve(-HALF_DIST, 0, HALF_DURATION, Ease.out_cubic),
+  make_param(-HALF_DIST, 0, HALF_DURATION, Ease.out_cubic),
   // Leave to the right, speeding up from rest
-  new ParamCurve(0, HALF_DIST, HALF_DURATION, Ease.in_cubic),
+  make_param(0, HALF_DIST, HALF_DURATION, Ease.in_cubic),
 );
 const CURVE_POSITION = LoopCurve.from_timeline(TIMELINE_POSITION);
 

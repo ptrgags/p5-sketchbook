@@ -1,10 +1,15 @@
-import { Gap, Parallel, Sequential } from "./Timeline.js";
+import { Gap, Parallel, Sequential, TimeInterval } from "./Timeline.js";
+
+/**
+ * @template T
+ * @typedef {import("./Timeline.js").Timeline<T>} Timeline
+ */
 
 export class RelTimelineOps {
   /**
    * Iterate over the timeline, including the gaps
-   * @template {import("./Timeline.js").TimeInterval} T
-   * @param {import("./Timeline.js").Timeline<T>} timeline
+   * @template T
+   * @param {Timeline<T>} timeline
    * @return {number} The maximum number of parallel lanes in the timeline
    */
   static num_lanes(timeline) {
@@ -31,10 +36,25 @@ export class RelTimelineOps {
   }
 
   /**
+   * Iterate over the intervals of the timeline, filtering
+   * out gaps
+   * @template T
+   * @param {Timeline<T>} timeline
+   * @returns {Generator<TimeInterval<T>>}
+   */
+  static *iter_intervals(timeline) {
+    for (const x of this.iter_with_gaps(timeline)) {
+      if (x instanceof TimeInterval) {
+        yield x;
+      }
+    }
+  }
+
+  /**
    * Iterate over the timeline, including the gaps
-   * @template {import("./Timeline.js").TimeInterval} T
+   * @template T
    * @param {import("./Timeline.js").Timeline<T>} timeline
-   * @return {Generator<Gap | T>}
+   * @return {Generator<Gap | TimeInterval<T>>}
    */
   static *iter_with_gaps(timeline) {
     if (timeline instanceof Sequential) {

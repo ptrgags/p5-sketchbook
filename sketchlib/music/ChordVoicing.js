@@ -1,5 +1,5 @@
 import { Rational } from "../Rational.js";
-import { Harmony, Note } from "./Music.js";
+import { Harmony, make_note, Note } from "./Music.js";
 import { REST } from "./pitches.js";
 import { Gap } from "./Timeline.js";
 import { Velocity } from "./Velocity.js";
@@ -76,7 +76,7 @@ export class ChordVoicing {
     const top_to_bottom = [...this.pitches]
       .reverse()
       .map((x) =>
-        x == REST ? new Gap(duration) : new Note(x, duration, velocity),
+        x == REST ? new Gap(duration) : make_note(x, duration, velocity),
       );
     return new Harmony(...top_to_bottom);
   }

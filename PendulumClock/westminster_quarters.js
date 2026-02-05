@@ -1,5 +1,10 @@
 import { Rational } from "../sketchlib/Rational.js";
-import { Melody, Note, parse_melody } from "../sketchlib/music/Music.js";
+import {
+  make_note,
+  Melody,
+  Note,
+  parse_melody,
+} from "../sketchlib/music/Music.js";
 import { Part, Score } from "../sketchlib/music/Score.js";
 import { N1, N2, N4, N8 } from "../sketchlib/music/durations.js";
 import { B3, E3, E4, FS4, GS4 } from "../sketchlib/music/pitches.js";
@@ -22,10 +27,10 @@ const FOURTH_QUARTER = new Melody(
   CHANGES[1],
   CHANGES[2],
   CHANGES[3],
-  CHANGES[4]
+  CHANGES[4],
 );
 
-const HOUR_BELL = new Note(E3, N2);
+const HOUR_BELL = make_note(E3, N2);
 
 /**
  *

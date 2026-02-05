@@ -10,7 +10,10 @@ import { Primitive } from "../../sketchlib/primitives/Primitive.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { make_stripes } from "./stripes.js";
-import { ParamCurve } from "../../sketchlib/animation/ParamCurve.js";
+import {
+  make_param,
+  ParamCurve,
+} from "../../sketchlib/animation/ParamCurve.js";
 import { PALETTE_CORAL, PALETTE_ROCK, Values } from "../theme_colors.js";
 import { Oklch } from "../../sketchlib/Oklch.js";
 import { Random } from "../../sketchlib/random.js";
@@ -71,8 +74,8 @@ export class Geode {
     const max_width = this.stripe_styles[0].stroke_width;
     this.curve_thickness = LoopCurve.from_timeline(
       new Sequential(
-        new ParamCurve(0, max_width, DURATION_GROW),
-        new ParamCurve(max_width, max_width, DURATION_PAUSE),
+        make_param(0, max_width, DURATION_GROW),
+        make_param(max_width, max_width, DURATION_PAUSE),
       ),
     );
 

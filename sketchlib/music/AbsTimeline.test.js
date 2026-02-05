@@ -1,12 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { Rational } from "../Rational.js";
-import { Gap, Parallel, Sequential } from "./Timeline.js";
-import {
-  AbsGap,
-  AbsInterval,
-  AbsParallel,
-  AbsSequential,
-} from "./AbsTimeline.js";
+import { AbsInterval, AbsParallel, AbsSequential } from "./AbsTimeline.js";
 
 describe("AbsSequential", () => {
   it("constructor with no children sets start/end/duration to zero", () => {
@@ -69,22 +63,6 @@ describe("AbsSequential", () => {
     // 3 - 1/2 = 5/2
     expect(timeline.duration).toEqual(new Rational(5, 2));
   });
-
-  it("iterator returns inner intervals", () => {
-    const timeline = new AbsSequential(
-      new AbsInterval(1, new Rational(1, 2), Rational.ONE),
-      new AbsGap(Rational.ONE, new Rational(2)),
-      new AbsInterval(3, new Rational(2), new Rational(3)),
-    );
-
-    const result = [...timeline];
-
-    const expected = [
-      new AbsInterval(1, new Rational(1, 2), Rational.ONE),
-      new AbsInterval(3, new Rational(2), new Rational(3)),
-    ];
-    expect(result).toEqual(expected);
-  });
 });
 
 describe("AbsParallel", () => {
@@ -130,23 +108,5 @@ describe("AbsParallel", () => {
     );
 
     expect(timeline.duration).toEqual(new Rational(2));
-  });
-
-  it("iterator returns inner children in sorted order by start time", () => {
-    const timeline = new AbsParallel(
-      new AbsSequential(
-        new AbsGap(Rational.ZERO, new Rational(1, 2)),
-        new AbsInterval(2, new Rational(1, 2), Rational.ONE),
-      ),
-      new AbsInterval(1, Rational.ZERO, Rational.ONE),
-    );
-
-    const result = [...timeline];
-
-    const expected = [
-      new AbsInterval(1, Rational.ZERO, Rational.ONE),
-      new AbsInterval(2, new Rational(1, 2), Rational.ONE),
-    ];
-    expect(result).toEqual(expected);
   });
 });

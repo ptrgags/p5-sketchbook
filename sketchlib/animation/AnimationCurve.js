@@ -1,6 +1,5 @@
 import { Tween } from "../Tween.js";
 import { whole_fract } from "../whole_fract.js";
-import { Rational } from "../Rational.js";
 import { ParamCurve } from "./ParamCurve.js";
 import { PiecewiseLinear } from "./PiecewiseLinear.js";
 import { AbsTimelineOps } from "../music/AbsTimelineOps.js";
@@ -116,14 +115,14 @@ export class AnimationCurve {
    */
   static from_timeline(timeline) {
     const abs_timeline = AbsTimelineOps.from_relative(timeline);
-    const tweens = [...abs_timeline].map((x) => {
+    const tweens = [...AbsTimelineOps.iter_intervals(abs_timeline)].map((x) => {
       const curve = x.value;
       // Tween is from [start_time, start_time + duration] -> [start_value, end_value]
       return Tween.scalar(
         curve.start_value,
         curve.end_value,
         x.start_time.real,
-        curve.duration.real,
+        x.duration.real,
         curve.easing_curve,
       );
     });

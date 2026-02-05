@@ -5,7 +5,7 @@ import { RelativeTimingTrack } from "./MIDITrack.js";
 import { midi_to_score } from "./midi_to_score.js";
 import { MIDIEvent, MIDIMessage, MIDIMetaEvent } from "./MIDIEvent.js";
 import { C4, E4, G4 } from "../music/pitches.js";
-import { Melody, Note, Rest } from "../music/Music.js";
+import { make_note, Melody, Note, Rest } from "../music/Music.js";
 import { N1, N2, N4 } from "../music/durations.js";
 
 const PPQ = MIDIHeader.DEFAULT_TICKS_PER_QUARTER;
@@ -56,7 +56,7 @@ describe("midi_to_score", () => {
 
     const expected_score = [
       new Score(
-        new Part("channel0", new Note(C4, N4), {
+        new Part("channel0", make_note(C4, N4), {
           midi_channel: 0,
           instrument_id: "channel0",
         }),
@@ -79,7 +79,7 @@ describe("midi_to_score", () => {
 
     const expected_score = [
       new Score(
-        new Part("channel0", new Note(C4, N1), { instrument_id: "channel0" }),
+        new Part("channel0", make_note(C4, N1), { instrument_id: "channel0" }),
       ),
       [128, 256],
     ];
@@ -99,11 +99,11 @@ describe("midi_to_score", () => {
 
     const expected_score = [
       new Score(
-        new Part("channel0", new Note(C4, N4), {
+        new Part("channel0", make_note(C4, N4), {
           midi_channel: 0,
           instrument_id: "channel0",
         }),
-        new Part("channel1", new Note(E4, N4), {
+        new Part("channel1", make_note(E4, N4), {
           midi_channel: 1,
           instrument_id: "channel1",
         }),
@@ -125,11 +125,11 @@ describe("midi_to_score", () => {
 
     const expected_score = [
       new Score(
-        new Part("channel0", new Note(C4, N4), {
+        new Part("channel0", make_note(C4, N4), {
           midi_channel: 0,
           instrument_id: "channel0",
         }),
-        new Part("channel1", new Melody(new Rest(N4), new Note(E4, N4)), {
+        new Part("channel1", new Melody(new Rest(N4), make_note(E4, N4)), {
           midi_channel: 1,
           instrument_id: "channel1",
         }),
@@ -158,11 +158,11 @@ describe("midi_to_score", () => {
 
     const expected_score = [
       new Score(
-        new Part("channel0", new Melody(new Note(C4, N4), new Note(E4, N4)), {
+        new Part("channel0", new Melody(make_note(C4, N4), make_note(E4, N4)), {
           midi_channel: 0,
           instrument_id: "channel0",
         }),
-        new Part("channel1", new Note(G4, N2), {
+        new Part("channel1", make_note(G4, N2), {
           midi_channel: 1,
           instrument_id: "channel1",
         }),

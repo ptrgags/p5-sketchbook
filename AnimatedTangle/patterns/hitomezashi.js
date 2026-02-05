@@ -8,7 +8,11 @@ import { Style } from "../../sketchlib/Style.js";
 import { Animated } from "../../sketchlib/animation/Animated.js";
 import { AnimatedPath } from "../../sketchlib/animation/AnimatedPath.js";
 import { LoopCurve } from "../../sketchlib/animation/LoopCurve.js";
-import { Hold, ParamCurve } from "../../sketchlib/animation/ParamCurve.js";
+import {
+  Hold,
+  make_param,
+  ParamCurve,
+} from "../../sketchlib/animation/ParamCurve.js";
 import { Sequential } from "../../sketchlib/music/Timeline.js";
 import { Rational } from "../../sketchlib/Rational.js";
 import { PALETTE_CORAL, Values } from "../theme_colors.js";
@@ -81,12 +85,12 @@ const UNSTITCH_DURATION = new Rational(4);
 const CURVE_START = LoopCurve.from_timeline(
   new Sequential(
     new Hold(STITCH_DURATION),
-    new ParamCurve(0, 1, UNSTITCH_DURATION),
+    make_param(0, 1, UNSTITCH_DURATION),
   ),
 );
 const CURVE_END = LoopCurve.from_timeline(
   new Sequential(
-    new ParamCurve(0, 1, STITCH_DURATION),
+    make_param(0, 1, STITCH_DURATION),
     new Hold(UNSTITCH_DURATION),
   ),
 );
