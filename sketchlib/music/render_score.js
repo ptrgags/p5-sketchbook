@@ -67,11 +67,11 @@ function render_notes(offset, music, measure_dimensions, pitch_range) {
     return undefined;
   }
 
-  if (music instanceof Note) {
+  if (music instanceof TimeInterval) {
     const [min_pitch, max_pitch] = pitch_range;
     const pitch_count = max_pitch - min_pitch + 1;
     const note_height = measure_dimensions.y / pitch_count;
-    const pitch_index = music.pitch - min_pitch;
+    const pitch_index = music.value.pitch - min_pitch;
 
     const note_offset = new Direction(
       0,
