@@ -265,4 +265,44 @@ export class AbsTimelineOps {
 
     return timeline;
   }
+
+  /**
+   * Iterate over the intervals of the timeline, filtering
+   * out gaps
+   * @template T
+   * @param {AbsTimeline<T>} timeline
+   * @returns {Generator<AbsInterval<T>>}
+   */
+  static *iter_intervals(timeline) {
+    for (const x of this.iter_intervals(timeline)) {
+      if (x instanceof AbsInterval) {
+        yield x;
+      }
+    }
+  }
+
+  /**
+   * Iterate over the intervals and gaps in the timeline.
+   * @template T
+   * @param {AbsTimeline<T>} timeline
+   * @returns {Generator<AbsGap | AbsInterval<T>>}
+   */
+  static *iter_with_gaps(timeline) {
+    if (timeline instanceof AbsInterval) {
+      yield timeline;
+    } else if (timeline instanceof AbsParallel) {
+      const sorted_intervals = timeline.children
+        .flatMap((child) => {
+          return [...this.iter_intervals(child)];
+        })
+        .sort((a, b) => a.start_time.real - b.start_time.real);
+      yield* sorted_intervals;
+    } else if (timeline instanceof AbsSequential) {
+      for (const child of timeline.children) {
+        yield* this.iter_intervals(child);
+      }
+    } else {
+      yield timeline;
+    }
+  }
 }
