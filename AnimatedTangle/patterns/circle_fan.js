@@ -4,7 +4,7 @@ import { Point } from "../../sketchlib/pga2d/Point.js";
 import { Circle } from "../../sketchlib/primitives/Circle.js";
 import { group, style, xform } from "../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
-import { Hold, ParamCurve } from "../../sketchlib/animation/ParamCurve.js";
+import { Hold, make_param } from "../../sketchlib/animation/ParamCurve.js";
 import { lerp } from "../../sketchlib/lerp.js";
 import { Direction } from "../../sketchlib/pga2d/Direction.js";
 import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";

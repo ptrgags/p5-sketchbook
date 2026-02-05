@@ -1,4 +1,8 @@
-import { Hold, ParamCurve } from "../../sketchlib/animation/ParamCurve.js";
+import {
+  Hold,
+  make_param,
+  ParamCurve,
+} from "../../sketchlib/animation/ParamCurve.js";
 import { Sequential } from "../../sketchlib/music/Timeline.js";
 import { Rational } from "../../sketchlib/Rational.js";
 import { Direction } from "../../sketchlib/pga2d/Direction.js";

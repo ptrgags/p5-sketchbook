@@ -5,9 +5,13 @@ import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 import { LoopCurve } from "../sketchlib/animation/LoopCurve.js";
-import { Hold, ParamCurve } from "../sketchlib/animation/ParamCurve.js";
+import {
+  Hold,
+  make_param,
+  ParamCurve,
+} from "../sketchlib/animation/ParamCurve.js";
 import { N1, N4 } from "../sketchlib/music/durations.js";
-import { Sequential } from "../sketchlib/music/Timeline.js";
+import { Sequential, TimeInterval } from "../sketchlib/music/Timeline.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Rational } from "../sketchlib/Rational.js";
 
@@ -44,10 +48,10 @@ const start_hue = 80;
 const hue_step = 60;
 const CURVE_HUE = LoopCurve.from_timeline(
   new Sequential(
-    ParamCurve.const_val(start_hue + 0 * hue_step, N4),
-    ParamCurve.const_val(start_hue + 1 * hue_step, N4),
-    ParamCurve.const_val(start_hue + 2 * hue_step, N4),
-    ParamCurve.const_val(start_hue + 3 * hue_step, N4),
+    new TimeInterval(ParamCurve.const_val(start_hue + 0 * hue_step), N4),
+    new TimeInterval(ParamCurve.const_val(start_hue + 1 * hue_step), N4),
+    new TimeInterval(ParamCurve.const_val(start_hue + 2 * hue_step), N4),
+    new TimeInterval(ParamCurve.const_val(start_hue + 3 * hue_step), N4),
   ),
 );
 

@@ -10,7 +10,10 @@ import { Primitive } from "../../sketchlib/primitives/Primitive.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { make_stripes } from "./stripes.js";
-import { ParamCurve } from "../../sketchlib/animation/ParamCurve.js";
+import {
+  make_param,
+  ParamCurve,
+} from "../../sketchlib/animation/ParamCurve.js";
 import { PALETTE_CORAL, PALETTE_ROCK, Values } from "../theme_colors.js";
 import { Oklch } from "../../sketchlib/Oklch.js";
 import { Random } from "../../sketchlib/random.js";

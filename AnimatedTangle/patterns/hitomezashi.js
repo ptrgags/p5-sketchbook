@@ -8,7 +8,11 @@ import { Style } from "../../sketchlib/Style.js";
 import { Animated } from "../../sketchlib/animation/Animated.js";
 import { AnimatedPath } from "../../sketchlib/animation/AnimatedPath.js";
 import { LoopCurve } from "../../sketchlib/animation/LoopCurve.js";
-import { Hold, ParamCurve } from "../../sketchlib/animation/ParamCurve.js";
+import {
+  Hold,
+  make_param,
+  ParamCurve,
+} from "../../sketchlib/animation/ParamCurve.js";
 import { Sequential } from "../../sketchlib/music/Timeline.js";
 import { Rational } from "../../sketchlib/Rational.js";
 import { PALETTE_CORAL, Values } from "../theme_colors.js";
