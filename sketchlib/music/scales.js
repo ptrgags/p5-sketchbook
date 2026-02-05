@@ -1,9 +1,19 @@
 import { mod } from "../mod.js";
 import { A, AS, B, C, C4, CS, D, DS, E, F, G, GS } from "./pitches.js";
+import { ScaleQuality } from "./Scale.js";
 
-export const MAJOR = [C, D, E, F, G, A, B];
-export const NATURAL_MINOR = [C, D, DS, F, G, GS, AS];
-export const HARMONIC_MINOR = [C, D, DS, F, G, GS, B];
+export const MAJOR_SCALE = new ScaleQuality([C, D, E, F, G, A, B]);
+export const NATURAL_MINOR_SCALE = new ScaleQuality([C, D, DS, F, G, GS, AS]);
+export const HARMONIC_MINOR_SCALE = new ScaleQuality([C, D, DS, F, G, GS, B]);
+export const MELODIC_MINOR_SCALE = new ScaleQuality([C, D, DS, F, G, A, B]);
+
+export const IONIAN_MODE = MAJOR_SCALE;
+export const DORIAN_MODE = MAJOR_SCALE.mode(1);
+export const PHRYGIAN_MODE = MAJOR_SCALE.mode(2);
+export const LYDIAN_MODE = MAJOR_SCALE.mode(3);
+export const MIXOLYDIAN_MODE = MAJOR_SCALE.mode(4);
+export const AEOLIAN_MODE = NATURAL_MINOR_SCALE;
+export const LOCRIAN_MODE = MAJOR_SCALE.mode(6);
 
 export const MAJOR_PENTATONIC = [C, D, E, G, A];
 export const MINOR_PENTATONIC = [C, DS, F, G, AS];
