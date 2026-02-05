@@ -16,7 +16,7 @@ import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
-import { ParamCurve } from "../sketchlib/animation/ParamCurve.js";
+import { make_param, ParamCurve } from "../sketchlib/animation/ParamCurve.js";
 import { AnimationCurve } from "../sketchlib/animation/AnimationCurve.js";
 import { whole_fract } from "../sketchlib/whole_fract.js";
 import {
@@ -323,11 +323,7 @@ class TreeAnimationBuilder {
     // same calculation as in the music builder
     const duration = DUR_SHORT.mul(new Rational(this.max_depth - depth + 1));
 
-    const increase = make_param(
-      this.line_count,
-      this.line_count + 1,
-      duration,
-    );
+    const increase = make_param(this.line_count, this.line_count + 1, duration);
     this.line_count++;
 
     const gap = new Gap(duration);

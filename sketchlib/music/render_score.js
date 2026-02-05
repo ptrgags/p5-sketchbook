@@ -10,6 +10,7 @@ import { Point } from "../../sketchlib/pga2d/Point.js";
 import { Direction } from "../../sketchlib/pga2d/Direction.js";
 import { Harmony, Melody, Note, Rest } from "./Music.js";
 import { Score } from "./Score.js";
+import { TimeInterval } from "./Timeline.js";
 
 // For the background colors I'm using, solid black fill looks fine
 const NOTE_STYLE = new Style({
@@ -31,8 +32,9 @@ function get_pitch_range(music) {
     return undefined;
   }
 
-  if (music instanceof Note) {
-    return [music.pitch, music.pitch];
+  if (music instanceof TimeInterval) {
+    const pitch = music.value.pitch;
+    return [pitch, pitch];
   }
 
   // For Melody and Harmony, examine the pitches across all notes and
