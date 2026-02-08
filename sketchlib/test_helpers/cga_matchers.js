@@ -26,11 +26,6 @@ function format_codd_diff(received, expected) {
 
   const diffs = [];
 
-  diff_float_property(diffs, received, expected, "x", "x");
-  diff_float_property(diffs, received, expected, "y", "y");
-  diff_float_property(diffs, received, expected, "o", "o");
-  diff_float_property(diffs, received, expected, "xyo", "xyo");
-
   for (const property_name of ODD_PROPERTIES) {
     diff_float_property(diffs, received, expected, property_name);
   }

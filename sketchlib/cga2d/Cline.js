@@ -3,6 +3,7 @@ import { Point } from "../pga2d/Point.js";
 import { is_nearly } from "../is_nearly.js";
 import { Circle } from "../primitives/Circle.js";
 import { COdd } from "./COdd.js";
+import { Primitive } from "../primitives/Primitive.js";
 
 /**
  * Compute a cline primitive
@@ -60,7 +61,10 @@ export class Cline {
   constructor(vector) {
     this.vector = vector;
 
-    this.prim = compute_primitive(vector);
+    /**
+     * @type {Point | Line | Primitive}
+     */
+    this.primitive = compute_primitive(vector);
   }
 
   /**
@@ -69,7 +73,7 @@ export class Cline {
    * @returns
    */
   draw(p) {
-    this.prim.draw(p);
+    this.primitive.draw(p);
   }
 
   /**
@@ -120,6 +124,9 @@ export class Cline {
   static from_point(point) {
     const { x, y } = point;
 
+    // x + 1/2 x^2 inf + o
+    // x + 1/2 x^2 (m + p) + 1/2(m - p)
+    // x + 1/2(x^2 - 1) p + 1/2 (x^2 + 1) m
     const squared_factor = x * x + y * y;
     const m = 0.5 * (squared_factor + 1);
     const p = 0.5 * (squared_factor - 1);

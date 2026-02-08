@@ -84,6 +84,23 @@ export class COdd {
   }
 
   /**
+   * Check if two CEven objects are equal
+   * @param {COdd} other
+   */
+  equals(other) {
+    return (
+      is_nearly(this.x, other.x) &&
+      is_nearly(this.y, other.y) &&
+      is_nearly(this.p, other.p) &&
+      is_nearly(this.m, other.m) &&
+      is_nearly(this.xyp, other.xyp) &&
+      is_nearly(this.xym, other.xym) &&
+      is_nearly(this.xpm, other.xpm) &&
+      is_nearly(this.ypm, other.ypm)
+    );
+  }
+
+  /**
    * Geometric product with an odd multivector
    * @param {COdd} odd
    * @returns {CEven}
