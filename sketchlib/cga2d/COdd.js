@@ -1,3 +1,4 @@
+import { is_nearly } from "../is_nearly.js";
 import { CEven } from "./CEven.js";
 
 export class COdd {
@@ -21,6 +22,61 @@ export class COdd {
     this.xym = xym;
     this.xpm = xpm;
     this.ypm = ypm;
+  }
+
+  norm_sqr() {
+    return (
+      this.x * this.x +
+      this.y * this.y +
+      this.p * this.p -
+      this.m * this.m +
+      // TODO: Check these signs
+      this.xyp * this.xyp -
+      this.xym * this.xym -
+      this.xpm * this.xpm -
+      this.ypm * this.ypm
+    );
+  }
+
+  norm() {
+    // TODO: not sure how to handle this for negative
+    // multivectors. See what kindon does.
+    const norm_sqr = this.norm_sqr();
+    if (norm_sqr < 0) {
+      throw new Error("taking norm of negative multivector");
+    }
+    return Math.sqrt(norm_sqr);
+  }
+
+  normalize() {
+    const length = this.norm();
+    if (is_nearly(length, 0)) {
+      return this;
+    }
+
+    return new COdd(
+      this.x / length,
+      this.y / length,
+      this.p / length,
+      this.m / length,
+      this.xyp / length,
+      this.xym / length,
+      this.xpm / length,
+      this.ypm / length,
+    );
+  }
+
+  neg() {
+    return new COdd(
+      -this.x,
+      -this.y,
+      -this.p,
+      -this.m,
+      -this.xyp,
+      -this.xym,
+      -this.xpm,
+      -this.ypm,
+    );
   }
 
   reverse() {
@@ -238,7 +294,19 @@ export class COdd {
     return this.gp_even(other);
   }
 
+  unit_sandwich_odd(odd) {
+    // Note: For odd sandwich odd, we need to negate the result.
+    return this.gp_odd(odd).gp_odd(this.reverse()).neg();
+  }
+
+  unit_sandwich_even(even) {
+    return this.gp_even(even).gp_odd(this.reverse());
+  }
+
   unit_sandwich(other) {
+    if (other instanceof COdd) {
+      return this.unit_sandwich_odd(other);
+    }
     return this.gp(other).gp(this.reverse());
   }
 }
