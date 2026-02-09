@@ -13,6 +13,7 @@ import { Rectangle } from "../sketchlib/Rectangle.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Note } from "../sketchlib/music/Music.js";
+import { KeywordRecognizer } from "../sketchlib/KeywordRecognizer.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -47,6 +48,8 @@ const INCREMENT_RHYTHM = new TouchButton(
 const DECREMENT_RHYTHM = new TouchButton(
   new Rectangle(new Point(WIDTH / 2, HEIGHT / 2), BUTTON_DIMS),
 );
+
+const SLASH = new KeywordRecognizer();
 
 class SoundScene {
   /**
@@ -84,6 +87,12 @@ class SoundScene {
     INCREMENT_RHYTHM.events.addEventListener("released", () => {
       this.rhythm_index++;
       this.update_melody();
+    });
+
+    this.is_paused = false;
+    SLASH.register(["Slash", "KeyP"], () => {
+      this.is_paused = !this.is_paused;
+      this.looper.toggle_paused(this.is_paused);
     });
 
     this.update_melody();
@@ -212,4 +221,8 @@ export const sketch = (p) => {
   MOUSE.mouse_dragged(p, (input) => {
     scene.mouse_dragged(input);
   });
+
+  p.keyReleased = (e) => {
+    SLASH.input(e.code);
+  };
 };

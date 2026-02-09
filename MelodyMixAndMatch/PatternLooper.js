@@ -172,6 +172,19 @@ export class PatternLooper {
   }
 
   /**
+   *
+   * @param {boolean} is_paused
+   */
+  toggle_paused(is_paused) {
+    const transport = this.tone.getTransport();
+    if (is_paused) {
+      transport.pause();
+    } else {
+      transport.start();
+    }
+  }
+
+  /**
    * Toggle the sound on/off.
    * @param {boolean} sound_on true if the sound should turn on
    */
