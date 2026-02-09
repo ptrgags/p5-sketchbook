@@ -129,6 +129,10 @@ export class DrawbarOrgan {
     this.synth.triggerAttackRelease(pitch, duration, time, velocity);
   }
 
+  silence() {
+    this.synth.triggerRelease("+0");
+  }
+
   destroy() {
     if (this.synth) {
       this.synth.dispose();

@@ -12,6 +12,7 @@ import { TouchButton } from "../sketchlib/TouchButton.js";
 import { Rectangle } from "../sketchlib/Rectangle.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Note } from "../sketchlib/music/Music.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -84,11 +85,17 @@ class SoundScene {
       this.rhythm_index++;
       this.update_melody();
     });
+
+    this.update_melody();
   }
 
   update_melody() {
     const rhythm = RHYTHMS[this.rhythm_index % RHYTHMS.length];
     const pitches = PITCHES[this.pitch_index % PITCHES.length];
+    const notes = pitches.values.map((x) => new Note(x));
+    const timeline = PatternGrid.zip_timeline(rhythm, notes);
+
+    this.looper.set_pattern(timeline);
 
     //this.looper.set_pattern();
   }
@@ -110,6 +117,11 @@ class SoundScene {
    */
   mouse_pressed(input) {
     this.mute_button.mouse_pressed(input);
+
+    INCREMENT_PITCH.mouse_pressed(input.mouse_coords);
+    DECREMENT_PITCH.mouse_pressed(input.mouse_coords);
+    INCREMENT_RHYTHM.mouse_pressed(input.mouse_coords);
+    DECREMENT_RHYTHM.mouse_pressed(input.mouse_coords);
   }
 
   /**
@@ -118,6 +130,11 @@ class SoundScene {
    */
   mouse_moved(input) {
     this.mute_button.mouse_moved(input);
+
+    INCREMENT_PITCH.mouse_moved(input.mouse_coords);
+    DECREMENT_PITCH.mouse_moved(input.mouse_coords);
+    INCREMENT_RHYTHM.mouse_moved(input.mouse_coords);
+    DECREMENT_RHYTHM.mouse_moved(input.mouse_coords);
   }
 
   /**
@@ -126,6 +143,11 @@ class SoundScene {
    */
   mouse_dragged(input) {
     this.mute_button.mouse_dragged(input);
+
+    INCREMENT_PITCH.mouse_dragged(input.mouse_coords);
+    DECREMENT_PITCH.mouse_dragged(input.mouse_coords);
+    INCREMENT_RHYTHM.mouse_dragged(input.mouse_coords);
+    DECREMENT_RHYTHM.mouse_dragged(input.mouse_coords);
   }
 
   /**
@@ -134,6 +156,11 @@ class SoundScene {
    */
   mouse_released(input) {
     this.mute_button.mouse_released(input);
+
+    INCREMENT_PITCH.mouse_released(input.mouse_coords);
+    DECREMENT_PITCH.mouse_released(input.mouse_coords);
+    INCREMENT_RHYTHM.mouse_released(input.mouse_coords);
+    DECREMENT_RHYTHM.mouse_released(input.mouse_coords);
   }
 }
 

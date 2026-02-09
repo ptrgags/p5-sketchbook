@@ -2,8 +2,9 @@ import {
   DrawbarOrgan,
   Drawbars,
 } from "../sketchlib/instruments/DrawbarOrgan.js";
+import { AbsTimelineOps } from "../sketchlib/music/AbsTimelineOps.js";
 import { N16 } from "../sketchlib/music/durations.js";
-import { Note } from "../sketchlib/music/Music.js";
+import { Note, Rest } from "../sketchlib/music/Music.js";
 import { PatternGrid } from "../sketchlib/music/PatternGrid.js";
 import {
   A4,
@@ -19,9 +20,12 @@ import {
   G4,
   REST,
 } from "../sketchlib/music/pitches.js";
+import { RelTimelineOps } from "../sketchlib/music/RelTimelineOps.js";
+import { TimeInterval } from "../sketchlib/music/Timeline.js";
 import { Velocity } from "../sketchlib/music/Velocity.js";
 import { range } from "../sketchlib/range.js";
 import { to_tone_pitch } from "../sketchlib/tone_helpers/to_tone_pitch.js";
+import { to_tone_time } from "../sketchlib/tone_helpers/to_tone_time.js";
 import { zip } from "../sketchlib/zip.js";
 
 const DEFAULT_PITCHES = [
@@ -73,14 +77,9 @@ export class PatternLooper {
     this.tone = tone;
     this.init_requested = false;
 
-    /**
-     * @type {PatternGrid<Note<number>>}
-     */
-    this.pattern = new PatternGrid(DEFAULT_NOTES, N16);
-
     // resources allocated in init()
     this.instrument = undefined;
-    this.seq = undefined;
+    this.part = undefined;
   }
 
   async init() {
@@ -91,8 +90,13 @@ export class PatternLooper {
 
     await this.tone.start();
 
+    const transport = this.tone.getTransport();
+    transport.bpm.value = 128;
+    transport.loopStart = "0:0";
+    transport.loopEnd = "1:0";
+    transport.start();
+
     this.init_instruments();
-    this.init_loop();
   }
 
   init_instruments() {
@@ -100,11 +104,9 @@ export class PatternLooper {
     this.instrument.init_mono(this.tone);
   }
 
+  /*
   init_loop() {
     const transport = this.tone.getTransport();
-    transport.bpm.value = 128;
-    transport.loopStart = "0:0";
-    transport.loopEnd = "1:0";
 
     const step_indices = [...range(16)];
     this.seq = new this.tone.Sequence(
@@ -124,6 +126,49 @@ export class PatternLooper {
     this.seq.start(0);
 
     transport.start();
+  }*/
+
+  /**
+   *
+   * @param {import("../sketchlib/music/Timeline.js").Timeline<Note<number>>} timeline
+   */
+  set_pattern(timeline) {
+    const transport = this.tone.getTransport();
+
+    this.instrument.silence();
+
+    if (this.part) {
+      this.part.dispose();
+      this.part = undefined;
+    }
+
+    const abs_timeline = AbsTimelineOps.from_relative(timeline);
+    /**
+     * @type {[string, [string, string, number]][]}
+     */
+    const intervals = [...AbsTimelineOps.iter_intervals(abs_timeline)].map(
+      (x) => {
+        return [
+          to_tone_time(x.start_time),
+          [
+            to_tone_pitch(x.value.pitch),
+            to_tone_time(x.duration),
+            x.value.velocity / 127,
+          ],
+        ];
+      },
+    );
+
+    this.part = new this.tone.Part((time, value) => {
+      const [pitch, duration, velocity] = value;
+      this.instrument.play_note(pitch, duration, time, velocity);
+    }, intervals);
+
+    this.part.loopStart = "0:0";
+    this.part.loopEnd = "1:0";
+    this.part.loop = true;
+
+    this.part.start();
   }
 
   /**
