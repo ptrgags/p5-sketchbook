@@ -55,51 +55,26 @@ describe("CEven", () => {
     expect(result).toBeCEven(expected);
   });
 
-  it("computes inverse", () => {
-    const a = new CEven(1, 2, 3, 4, 5, 6, 7, 8);
-
-    const result = a.inverse();
-
-    const expected = new CEven(1, -2, -3, -4, 5, 6, 7, 8);
-    expect(result).toBeCEven(expected);
-  });
-
-  it("sandwich with null bread and even filling returns zero", () => {
-    const a = new CEven(0, 0, 0, 0, 0, 0, 0, 0);
-    const b = new CEven(1, 2, 3, 4, 5, 6, 7, 8);
-
-    const result = a.sandwich(b);
-
-    expect(result).toBeCEven(CEven.ZERO);
-  });
-
-  it("sandwich with null bread and odd filling returns zero", () => {
-    const a = new CEven(0, 1, 1, 0, 0, 0, 0, 0);
+  it("unit_sandwich with unit versor and odd filling returns correct odd result", () => {
+    // 90 degree rotation
+    const a = new CEven(Math.SQRT1_2, Math.SQRT1_2, 0, 0, 0, 0, 0, 0);
     const b = new COdd(1, 2, 3, 4, 5, 6, 7, 8);
 
-    const result = a.sandwich(b);
+    const result = a.unit_sandwich(b);
 
-    expect(result).toBeCOdd(COdd.ZERO);
-  });
-
-  it("computes sandwich with even filling", () => {
-    const a = new CEven(1, 2, 3, 4, 5, 6, 7, 8);
-    const b = new CEven(-3, 1, -2, 2, 4, 3, -2, 1);
-
-    const result = a.sandwich(b);
-
-    const expected = new CEven(-3, 1, 3.6, 4.8, 4, 3, -2, 1);
-    expect(result).toBeCEven(expected);
-  });
-
-  it("computes sandwich with odd filling", () => {
-    const a = new CEven(1, 2, 3, 4, 5, 6, 7, 8);
-    const b = new COdd(-3, 1, -2, 2, 4, 3, -2, 1);
-
-    const result = a.sandwich(b);
-
-    const expected = new COdd(2.6, 1.8, -12, 2, 4, 3, -2, 1);
+    const expected = new COdd(2, -1, 3, 4, 5, 6, 8, -7);
     expect(result).toBeCOdd(expected);
+  });
+
+  it("unit_sandwich with unit versor and even filling returns correct odd result", () => {
+    // 90 degree rotation
+    const a = new CEven(Math.SQRT1_2, Math.SQRT1_2, 0, 0, 0, 0, 0, 0);
+    const b = new CEven(1, 2, 3, 4, 5, 6, 7, 8);
+
+    const result = a.unit_sandwich(b);
+
+    const expected = new CEven(1, 2, 5, 6, -3, -4, 7, 8);
+    expect(result).toBeCEven(expected);
   });
 
   it("lerp with t zero returns first point", () => {
