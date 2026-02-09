@@ -4,6 +4,7 @@ import { flatten_timeline } from "./flatten_timeline.js";
 import { make_note, Melody, Note, Rest } from "./Music.js";
 import { RelTimelineOps } from "./RelTimelineOps.js";
 import { RhythmStep } from "./RhythmStep.js";
+import { TimeInterval } from "./Timeline.js";
 import { Velocity } from "./Velocity.js";
 
 /**
@@ -12,7 +13,7 @@ import { Velocity } from "./Velocity.js";
  * @param {PatternGrid<RhythmStep>} rhythm
  * @returns {Generator<[boolean, number]>} (is_note, duration_steps) pair.
  */
-function* beat_iter_steps(rhythm) {
+function* beat_iter(rhythm) {
   /**
    * @type {RhythmStep | undefined}
    */
@@ -71,7 +72,7 @@ function* beat_iter_steps(rhythm) {
  * @returns {Generator<[boolean, Rational]>} (is_note, duration) pair.
  */
 function* beat_iter_duration(rhythm) {
-  for (const [is_note, steps] of beat_iter_steps(rhythm)) {
+  for (const [is_note, steps] of beat_iter(rhythm)) {
     yield [is_note, rhythm.step_size.mul(new Rational(steps))];
   }
 }
@@ -151,46 +152,35 @@ export class PatternGrid {
   }
 
   /**
-   * Zip the beats of a rhythm together with pitch and velocity to make a melody
-   * @param {PatternGrid<RhythmStep>} rhythm The rhythm to determine the length of notes
-   * @param {PatternGrid<number>} pitches The pitches. There must be at least one for every beat of the rhythm. The step size of the grid is ignored.
-   * @param {PatternGrid<number>} [velocities] Optional grid of velocity values. If omitted, everything will be mezzo-forte. The step size of this grid is ignored
-   * @returns {import("./Music.js").Music<number>}
+   * @template T
+   * @param {PatternGrid<RhythmStep>} rhythm
+   * @param {T[]} values
+   * @returns {import("./Timeline.js").Timeline<T>}
    */
-  static zip(rhythm, pitches, velocities) {
-    if (!velocities) {
-      const all_mf = new Array(pitches.length).fill(Velocity.MF);
-      velocities = new PatternGrid(all_mf, pitches.step_size);
-    }
-
-    if (velocities.length != pitches.length) {
-      throw new Error("pitches and velocities must have the same length");
-    }
-
-    const beats = [...beat_iter_duration(rhythm)];
+  static zip_timeline(rhythm, values) {
+    const beats = [...beat_iter(rhythm)];
     const note_count = beats.reduce(
       (acc, [is_note]) => acc + Number(is_note),
       0,
     );
 
-    if (note_count > pitches.length) {
-      throw new Error("Not enough pitches for this rhythm");
+    if (note_count > values.length) {
+      throw new Error("Not enough values for this rhythm");
     }
 
-    const notes = [];
+    const intervals = [];
     let next_note = 0;
-    for (const [is_note, duration] of beats) {
+    for (const [is_note, steps] of beats) {
+      const duration = rhythm.step_size.mul(new Rational(steps));
       if (is_note) {
-        const pitch = pitches.values[next_note];
-        const velocity = velocities.values[next_note];
-        notes.push(make_note(pitch, duration, velocity));
+        intervals.push(new TimeInterval(values[next_note], duration));
         next_note++;
       } else {
-        notes.push(new Rest(duration));
+        intervals.push(new Rest(duration));
       }
     }
 
-    const result = new Melody(...notes);
+    const result = new Melody(...intervals);
     return flatten_timeline(result);
   }
 
@@ -270,7 +260,7 @@ export class PatternGrid {
 
     let notes = [];
     let step = 0;
-    for (const [is_note, steps] of beat_iter_steps(rhythm)) {
+    for (const [is_note, steps] of beat_iter(rhythm)) {
       const duration = rhythm.step_size.mul(new Rational(steps));
       if (is_note) {
         const pitch = pitches.values[step];

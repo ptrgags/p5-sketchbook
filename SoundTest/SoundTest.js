@@ -421,7 +421,7 @@ class SoundScene {
  */
 export const sketch = (p) => {
   /** @type {PlayButtonScene | SoundScene} */
-  let scene = new PlayButtonScene(SOUND);
+  let scene = new PlayButtonScene();
   p.setup = () => {
     const canvas = p.createCanvas(
       WIDTH,
@@ -433,7 +433,8 @@ export const sketch = (p) => {
 
     MOUSE.setup(canvas);
 
-    scene.events.addEventListener("scene-change", () => {
+    scene.events.addEventListener("scene-change", async () => {
+      await SOUND.init();
       scene = new SoundScene(SOUND, MELODY_BUTTONS);
     });
   };

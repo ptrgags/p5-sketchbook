@@ -1,6 +1,12 @@
 // Links for all of the sketches. Links are added to the page in this order
 export const LINKS = [
   {
+    title: "Melody Mix and Match",
+    link: "./MelodyMixAndMatch",
+    is_lab: true,
+    year: "2026-02",
+  },
+  {
     title: "CGA Test",
     link: "./CGATest",
     is_lab: true,

@@ -39,7 +39,7 @@ class SoundScene {
       "change",
       (/** @type {CustomEvent}*/ e) => {
         this.sound.toggle_sound(e.detail.sound_on);
-      }
+      },
     );
   }
 
@@ -96,19 +96,20 @@ class SoundScene {
  */
 export const sketch = (p) => {
   /** @type {PlayButtonScene | SoundScene} */
-  let scene = new PlayButtonScene(SOUND);
+  let scene = new PlayButtonScene();
   p.setup = () => {
     const canvas = p.createCanvas(
       WIDTH,
       HEIGHT,
       undefined,
       // @ts-ignore
-      document.getElementById("sketch-canvas")
+      document.getElementById("sketch-canvas"),
     ).elt;
 
     MOUSE.setup(canvas);
 
-    scene.events.addEventListener("scene-change", () => {
+    scene.events.addEventListener("scene-change", async () => {
+      await SOUND.init();
       scene = new SoundScene(SOUND);
     });
   };
