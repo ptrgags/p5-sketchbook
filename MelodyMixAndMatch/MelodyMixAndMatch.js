@@ -3,13 +3,49 @@ import { CanvasMouseHandler } from "../sketchlib/CanvasMouseHandler.js";
 import { MouseInput } from "../sketchlib/MouseInput.js";
 import { MuteButton } from "../sketchlib/MuteButton.js";
 import { PlayButtonScene } from "../sketchlib/PlayButtonScene.js";
-import { SoundManager } from "../sketchlib/SoundManager.js";
 import { PatternLooper } from "./PatternLooper.js";
+import { HARMONIC_MINOR_SCALE } from "../sketchlib/music/scales.js";
+import { C4 } from "../sketchlib/music/pitches.js";
+import { N16 } from "../sketchlib/music/durations.js";
+import { PatternGrid } from "../sketchlib/music/PatternGrid.js";
+import { TouchButton } from "../sketchlib/TouchButton.js";
+import { Rectangle } from "../sketchlib/Rectangle.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
 
 const MOUSE = new CanvasMouseHandler();
 
 //@ts-ignore
 const LOOPER = new PatternLooper(Tone);
+
+const SCALE = HARMONIC_MINOR_SCALE.to_scale(C4);
+
+const PITCHES = [
+  SCALE.sequence([0, 1, 2, 3, 1, 2, 3, 4, 2, 3, 4, 5, 3, 4, 5, 6], N16),
+  SCALE.sequence([0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7], N16),
+  SCALE.sequence([0, 2, 4, 6, 1, 3, 5, 7, 8, 6, 4, 2, 7, 5, 3, 1], N16),
+];
+
+const RHYTHMS = [
+  PatternGrid.rhythm("xxxxxxxxxxxxxxxx", N16),
+  PatternGrid.rhythm("x--xx--xx--xx--x", N16),
+  PatternGrid.rhythm("x.x.x.x.x.x.x.x.", N16),
+  PatternGrid.rhythm("x-x-x-xxx-------", N16),
+];
+
+const BUTTON_DIMS = new Direction(WIDTH / 2, HEIGHT / 2);
+const INCREMENT_PITCH = new TouchButton(
+  new Rectangle(Point.ORIGIN, BUTTON_DIMS),
+);
+const DECREMENT_PITCH = new TouchButton(
+  new Rectangle(new Point(0, HEIGHT / 2), BUTTON_DIMS),
+);
+const INCREMENT_RHYTHM = new TouchButton(
+  new Rectangle(new Point(WIDTH / 2, 0), BUTTON_DIMS),
+);
+const DECREMENT_RHYTHM = new TouchButton(
+  new Rectangle(new Point(WIDTH / 2, HEIGHT / 2), BUTTON_DIMS),
+);
 
 class SoundScene {
   /**
@@ -28,8 +64,33 @@ class SoundScene {
       },
     );
 
-    // Schedule sound callbacks here
-    // this.sound.events.addEventListener('event', (e) => ...);
+    this.pitch_index = 0;
+    this.rhythm_index = 0;
+
+    DECREMENT_PITCH.events.addEventListener("released", () => {
+      this.pitch_index--;
+      this.update_melody();
+    });
+    INCREMENT_PITCH.events.addEventListener("released", () => {
+      this.pitch_index++;
+      this.update_melody();
+    });
+
+    DECREMENT_RHYTHM.events.addEventListener("released", () => {
+      this.rhythm_index--;
+      this.update_melody();
+    });
+    INCREMENT_RHYTHM.events.addEventListener("released", () => {
+      this.rhythm_index++;
+      this.update_melody();
+    });
+  }
+
+  update_melody() {
+    const rhythm = RHYTHMS[this.rhythm_index % RHYTHMS.length];
+    const pitches = PITCHES[this.pitch_index % PITCHES.length];
+
+    //this.looper.set_pattern();
   }
 
   update() {
