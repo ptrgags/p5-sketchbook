@@ -4,25 +4,29 @@ import { MouseInput } from "../sketchlib/MouseInput.js";
 import { MuteButton } from "../sketchlib/MuteButton.js";
 import { PlayButtonScene } from "../sketchlib/PlayButtonScene.js";
 import { SoundManager } from "../sketchlib/SoundManager.js";
+import { PatternLooper } from "./PatternLooper.js";
 
 const MOUSE = new CanvasMouseHandler();
 
-// Add scores here
-/**@type {import("../sketchlib/SoundManager.js").SoundManifest} */
-const SOUND_MANIFEST = {};
-
 //@ts-ignore
-const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
+const LOOPER = new PatternLooper(Tone);
 
 class SoundScene {
   /**
-   * Constructor
-   * @param {SoundManager} sound Reference to the sound manager
+   *
+   * @param {PatternLooper} looper
    */
-  constructor(sound) {
-    this.sound = sound;
+  constructor(looper) {
+    this.looper = looper;
     this.mute_button = new MuteButton();
     this.events = new EventTarget();
+
+    this.mute_button.events.addEventListener(
+      "change",
+      (/**@type {CustomEvent}*/ e) => {
+        this.looper.toggle_sound(e.detail.sound_on);
+      },
+    );
 
     // Schedule sound callbacks here
     // this.sound.events.addEventListener('event', (e) => ...);
@@ -91,8 +95,8 @@ export const sketch = (p) => {
     MOUSE.setup(canvas);
 
     scene.events.addEventListener("scene-change", async () => {
-      await SOUND.init();
-      scene = new SoundScene(SOUND);
+      await LOOPER.init();
+      scene = new SoundScene(LOOPER);
     });
   };
 

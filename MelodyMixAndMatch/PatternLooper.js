@@ -1,0 +1,117 @@
+import {
+  DrawbarOrgan,
+  Drawbars,
+} from "../sketchlib/instruments/DrawbarOrgan.js";
+import { N16 } from "../sketchlib/music/durations.js";
+import { Note } from "../sketchlib/music/Music.js";
+import { PatternGrid } from "../sketchlib/music/PatternGrid.js";
+import {
+  A4,
+  B4,
+  C4,
+  C5,
+  D4,
+  D5,
+  E4,
+  E5,
+  F4,
+  F5,
+  G4,
+  REST,
+} from "../sketchlib/music/pitches.js";
+import { range } from "../sketchlib/range.js";
+import { to_tone_pitch } from "../sketchlib/tone_helpers/to_tone_pitch.js";
+
+export class PatternLooper {
+  /**
+   * Constructor
+   * @param {import('tone')} tone
+   */
+  constructor(tone) {
+    this.tone = tone;
+    this.init_requested = false;
+
+    const default_notes = [
+      C4,
+      E4,
+      G4,
+      C5,
+      D4,
+      F4,
+      A4,
+      D5,
+      E4,
+      G4,
+      B4,
+      E5,
+      F4,
+      A4,
+      C5,
+      F5,
+    ].map((x) => new Note(x));
+
+    /**
+     * @type {PatternGrid<Note<number>>}
+     */
+    this.pattern = new PatternGrid(default_notes, N16);
+
+    // resources allocated in init()
+    this.instrument = undefined;
+    this.seq = undefined;
+  }
+
+  async init() {
+    if (this.init_requested) {
+      return;
+    }
+    this.init_requested = true;
+
+    await this.tone.start();
+
+    this.init_instruments();
+    this.init_loop();
+  }
+
+  init_instruments() {
+    this.instrument = new DrawbarOrgan(new Drawbars("00 8765 432"));
+    this.instrument.init_mono(this.tone);
+  }
+
+  init_loop() {
+    const transport = this.tone.getTransport();
+    transport.bpm.value = 128;
+    transport.loopStart = "0:0";
+    transport.loopEnd = "1:0";
+
+    const step_indices = [...range(16)];
+    this.seq = new this.tone.Sequence(
+      (time, index) => {
+        const note = this.pattern.values[index];
+        this.instrument.play_note(
+          to_tone_pitch(note.pitch),
+          "16n",
+          time,
+          note.velocity / 127,
+        );
+      },
+      step_indices,
+      "16n",
+    );
+
+    this.seq.start(0);
+
+    transport.start();
+  }
+
+  /**
+   * Toggle the sound on/off.
+   * @param {boolean} sound_on true if the sound should turn on
+   */
+  toggle_sound(sound_on) {
+    const FADE_SEC = 0.2;
+    const next_volume_db = sound_on ? 0 : -Infinity;
+    // While you could set the destination's mute property, that abrupt change
+    // can sound like crackling audio, so fade the volume quickly instead.
+    this.tone.getDestination().volume.rampTo(next_volume_db, FADE_SEC);
+  }
+}
