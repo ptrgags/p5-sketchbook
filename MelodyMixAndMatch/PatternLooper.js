@@ -102,6 +102,7 @@ export class PatternLooper {
   init_instruments() {
     this.instrument = new DrawbarOrgan(new Drawbars("00 8765 432"));
     this.instrument.init_mono(this.tone);
+    this.instrument.volume = -9;
   }
 
   /**

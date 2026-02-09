@@ -14,6 +14,7 @@ import { Point } from "../sketchlib/pga2d/Point.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Note } from "../sketchlib/music/Music.js";
 import { KeywordRecognizer } from "../sketchlib/KeywordRecognizer.js";
+import { mod } from "../sketchlib/mod.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -33,6 +34,7 @@ const RHYTHMS = [
   PatternGrid.rhythm("x--xx--xx--xx--x", N16),
   PatternGrid.rhythm("x.x.x.x.x.x.x.x.", N16),
   PatternGrid.rhythm("x-x-x-xxx-------", N16),
+  PatternGrid.rhythm("x....x...x..x.xx", N16),
 ];
 
 const BUTTON_DIMS = new Direction(WIDTH / 2, HEIGHT / 2);
@@ -99,14 +101,12 @@ class SoundScene {
   }
 
   update_melody() {
-    const rhythm = RHYTHMS[this.rhythm_index % RHYTHMS.length];
-    const pitches = PITCHES[this.pitch_index % PITCHES.length];
+    const rhythm = RHYTHMS[mod(this.rhythm_index, RHYTHMS.length)];
+    const pitches = PITCHES[mod(this.pitch_index, PITCHES.length)];
     const notes = pitches.values.map((x) => new Note(x));
     const timeline = PatternGrid.zip_timeline(rhythm, notes);
 
     this.looper.set_pattern(timeline);
-
-    //this.looper.set_pattern();
   }
 
   update() {
