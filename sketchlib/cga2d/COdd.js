@@ -79,8 +79,105 @@ export class COdd {
     );
   }
 
+  /**
+   * Add two odd multivectors
+   * @param {COdd} other
+   * @returns {COdd}
+   */
+  add(other) {
+    const x = this.x + other.x;
+    const y = this.y + other.y;
+    const p = this.p + other.p;
+    const m = this.m + other.m;
+    const xyp = this.xyp + other.xyp;
+    const xym = this.xym + other.xym;
+    const xpm = this.xpm + other.xpm;
+    const ypm = this.ypm + other.ypm;
+    return new COdd(x, y, p, m, xyp, xym, xpm, ypm);
+  }
+
+  /**
+   * Subtract two odd multivectors
+   * @param {COdd} other
+   * @returns {COdd}
+   */
+  sub(other) {
+    const x = this.x - other.x;
+    const y = this.y - other.y;
+    const p = this.p - other.p;
+    const m = this.m - other.m;
+    const xyp = this.xyp - other.xyp;
+    const xym = this.xym - other.xym;
+    const xpm = this.xpm - other.xpm;
+    const ypm = this.ypm - other.ypm;
+    return new COdd(x, y, p, m, xyp, xym, xpm, ypm);
+  }
+
+  /**
+   * Compute the Hoge Dual
+   * @returns {COdd}
+   */
+  dual() {
+    // this_blade ^ abs_dual(this_blade) = sign * xypm
+    // dual(this_blade) = sign * abs_dual(this_blade)
+    // x ^ ypm = xypm
+    // y ^ xpm = -xypm
+    // p ^ xym = xypm
+    // m ^ xyp = -xypm
+    // xyp ^ m = xypm
+    // xym ^ p = -xypm
+    // xpm ^ y = xypm
+    // ypm ^ x = -xypm
+    const x = -this.ypm;
+    const y = this.xpm;
+    const p = -this.xym;
+    const m = this.xyp;
+    const xyp = -this.m;
+    const xym = this.p;
+    const xpm = -this.y;
+    const ypm = this.x;
+    return new COdd(x, y, p, m, xyp, xym, xpm, ypm);
+  }
+
+  /**
+   * Antidual, the inverse of dual. It's nearly the same
+   * except for a few pesky sign flips
+   * @returns {COdd}
+   */
+  antidual() {
+    // abs_antidual(this_blade) ^ this_blade = sign * xypm
+    // antidual(this_blade) = sign * abs_antidual(this_blade)
+    // x ^ ypm = xypm
+    // y ^ xpm = -xypm
+    // p ^ xym = xypm
+    // m ^ xyp = -xypm
+    // xyp ^ m = xypm
+    // xym ^ p = -xypm
+    // xpm ^ y = xypm
+    // ypm ^ x = -xypm
+    // Huh, I see that in this case, odd.antidual() = odd.dual().neg()
+    const x = this.ypm;
+    const y = -this.xpm;
+    const p = this.xym;
+    const m = -this.xyp;
+    const xyp = this.m;
+    const xym = -this.p;
+    const xpm = this.y;
+    const ypm = -this.x;
+    return new COdd(x, y, p, m, xyp, xym, xpm, ypm);
+  }
+
   reverse() {
-    return this;
+    return new COdd(
+      this.x,
+      this.y,
+      this.p,
+      this.m,
+      -this.xyp,
+      -this.xym,
+      -this.xpm,
+      -this.ypm,
+    );
   }
 
   /**
@@ -303,6 +400,11 @@ export class COdd {
     return new COdd(x, y, p, m, xyp, xym, xpm, ypm);
   }
 
+  /**
+   * Geometric Product
+   * @param {COdd | CEven} other
+   * @returns {COdd | CEven}
+   */
   gp(other) {
     if (other instanceof COdd) {
       return this.gp_odd(other);
@@ -311,20 +413,58 @@ export class COdd {
     return this.gp_even(other);
   }
 
+  /**
+   * Unit sandwich for odd multivectors
+   * @param {COdd} odd
+   * @returns {COdd}
+   */
   unit_sandwich_odd(odd) {
     // Note: For odd sandwich odd, we need to negate the result.
     return this.gp_odd(odd).gp_odd(this.reverse()).neg();
   }
 
+  /**
+   * Unit sandwich for even multivectors
+   * @param {CEven} even
+   * @returns {CEven}
+   */
   unit_sandwich_even(even) {
     return this.gp_even(even).gp_odd(this.reverse());
   }
 
+  /**
+   * Compute the sandwich product ABA^(-1), but only
+   * where A is of magnitude +1, so this can be computed
+   * more efficiently as A * B * A.reverse()
+   * @param {CEven | COdd} other
+   * @returns {CEven | COdd}
+   */
   unit_sandwich(other) {
     if (other instanceof COdd) {
       return this.unit_sandwich_odd(other);
     }
     return this.gp(other).gp(this.reverse());
+  }
+
+  /**
+   * Linearly interpolate two odd multivectors
+   * @param {COdd} a First multivector
+   * @param {COdd} b Second multivector
+   * @param {number} t interpolation factor
+   * @returns {COdd} Interpolated value
+   */
+  static lerp(a, b, t) {
+    const s = 1 - t;
+
+    const x = s * a.x + t * b.x;
+    const y = s * a.y + t * b.y;
+    const p = s * a.p + t * b.p;
+    const m = s * a.m + t * b.m;
+    const xyp = s * a.xyp + t * b.xyp;
+    const xym = s * a.xym + t * b.xym;
+    const xpm = s * a.xpm + t * b.xpm;
+    const ypm = s * a.ypm + t * b.ypm;
+    return new COdd(x, y, p, m, xyp, xym, xpm, ypm);
   }
 }
 COdd.ZERO = Object.freeze(new COdd(0, 0, 0, 0, 0, 0, 0, 0));

@@ -24,8 +24,60 @@ export class CEven {
     this.xypm = xypm;
   }
 
+  norm_sqr() {
+    return (
+      this.xy * this.xy +
+      this.xp * this.xp +
+      this.xm * this.xm +
+      this.yp * this.yp -
+      this.ym * this.ym -
+      this.pm * this.pm -
+      this.xypm * this.xypm
+    );
+  }
+
+  norm() {
+    const norm_sqr = this.norm_sqr();
+    if (norm_sqr < 0) {
+      throw new Error("taking norm of negative multivector");
+    }
+
+    return Math.sqrt(norm_sqr);
+  }
+
+  normalize() {
+    const length = this.norm();
+    if (is_nearly(length, 0)) {
+      return this;
+    }
+
+    return new CEven(
+      this.scalar / length,
+      this.xy / length,
+      this.xp / length,
+      this.xm / length,
+      this.yp / length,
+      this.ym / length,
+      this.pm / length,
+      this.xypm / length,
+    );
+  }
+
+  neg() {
+    return new CEven(
+      this.scalar,
+      -this.xy,
+      -this.xp,
+      -this.xm,
+      -this.yp,
+      -this.ym,
+      -this.pm,
+      this.xypm,
+    );
+  }
+
   /**
-   * Add two CEvens together
+   * Add two even multivectors together
    * @param {CEven} other
    * @returns {CEven}
    */
@@ -43,7 +95,7 @@ export class CEven {
   }
 
   /**
-   *
+   * Subtract two even multivectors
    * @param {CEven} other
    * @returns {CEven}
    */
@@ -86,8 +138,11 @@ export class CEven {
     return new CEven(scalar, xy, xp, xm, yp, ym, pm, xypm);
   }
 
-  // in 2D CGA, the anti (hodge) dual has the same signs as the dual, so
-  // this function is free!
+  /**
+   * in 2D CGA, the anti (hodge) dual of an even multivector
+   * has the same signs as the dual, so we get this for free!
+   * @returns {CEven}
+   */
   antidual = this.dual;
 
   reverse() {
@@ -101,10 +156,6 @@ export class CEven {
       -this.pm,
       this.xypm,
     );
-  }
-
-  inverse() {
-    return new CEven(0, 0, 0, 0, 0, 0, 0, 0);
   }
 
   /**
@@ -348,6 +399,24 @@ export class CEven {
   }
 
   /**
+   * Unit sandwich where the filling is an odd multivector
+   * @param {COdd} odd
+   * @returns {COdd}
+   */
+  unit_sandwich_odd(odd) {
+    return this.gp_odd(odd).gp_even(this.reverse());
+  }
+
+  /**
+   * Unit sandwich where the filling is an even multivector
+   * @param {CEven} even
+   * @returns {CEven}
+   */
+  unit_sandwich_even(even) {
+    return this.gp_even(even).gp_even(this.reverse());
+  }
+
+  /**
    * Compute the sandwich product A * B * A.rev() for unit versor A
    * (i.e. a CEven that squares to 1).
    * @param {CEven | COdd} other
@@ -357,6 +426,13 @@ export class CEven {
     return this.gp(other).gp(this.reverse());
   }
 
+  /**
+   * Interpolate between even multivectors
+   * @param {CEven} a First multivector
+   * @param {CEven} b Second multivector
+   * @param {number} t Interpolation factor
+   * @returns {CEven} Interpolated value
+   */
   static lerp(a, b, t) {
     const s = 1 - t;
 
