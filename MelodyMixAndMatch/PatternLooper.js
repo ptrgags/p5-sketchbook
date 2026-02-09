@@ -19,8 +19,50 @@ import {
   G4,
   REST,
 } from "../sketchlib/music/pitches.js";
+import { Velocity } from "../sketchlib/music/Velocity.js";
 import { range } from "../sketchlib/range.js";
 import { to_tone_pitch } from "../sketchlib/tone_helpers/to_tone_pitch.js";
+import { zip } from "../sketchlib/zip.js";
+
+const DEFAULT_PITCHES = [
+  C4,
+  E4,
+  G4,
+  C5,
+  D4,
+  F4,
+  A4,
+  D5,
+  E4,
+  G4,
+  B4,
+  E5,
+  F4,
+  A4,
+  C5,
+  F5,
+];
+const DEFAULT_VELOCITIES = [
+  Velocity.P,
+  Velocity.P,
+  Velocity.P,
+  Velocity.P,
+  Velocity.MP,
+  Velocity.MP,
+  Velocity.MP,
+  Velocity.MP,
+  Velocity.F,
+  Velocity.F,
+  Velocity.F,
+  Velocity.F,
+  Velocity.FF,
+  Velocity.FF,
+  Velocity.FF,
+  Velocity.FF,
+];
+const DEFAULT_NOTES = zip(DEFAULT_PITCHES, DEFAULT_VELOCITIES).map(
+  ([pitch, velocity]) => new Note(pitch, velocity),
+);
 
 export class PatternLooper {
   /**
@@ -31,29 +73,10 @@ export class PatternLooper {
     this.tone = tone;
     this.init_requested = false;
 
-    const default_notes = [
-      C4,
-      E4,
-      G4,
-      C5,
-      D4,
-      F4,
-      A4,
-      D5,
-      E4,
-      G4,
-      B4,
-      E5,
-      F4,
-      A4,
-      C5,
-      F5,
-    ].map((x) => new Note(x));
-
     /**
      * @type {PatternGrid<Note<number>>}
      */
-    this.pattern = new PatternGrid(default_notes, N16);
+    this.pattern = new PatternGrid(DEFAULT_NOTES, N16);
 
     // resources allocated in init()
     this.instrument = undefined;
