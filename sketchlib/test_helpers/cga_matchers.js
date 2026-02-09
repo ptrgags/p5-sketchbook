@@ -5,7 +5,7 @@ import { diff_float_property } from "./diff_properties.js";
 const EVEN_PROPERTIES = ["scalar", "xy", "xp", "xm", "yp", "ym", "pm", "xypm"];
 function format_ceven_diff(received, expected) {
   if (!(received instanceof CEven)) {
-    return `received is not an Even object: ${received}`;
+    return `received is not a CEven object: ${received}`;
   }
 
   const diffs = [];
@@ -21,7 +21,7 @@ const ODD_PROPERTIES = ["x", "y", "p", "m", "xyp", "xym", "xpm", "ypm"];
 
 function format_codd_diff(received, expected) {
   if (!(received instanceof COdd)) {
-    return `received is not an Odd object: ${received}`;
+    return `received is not a COdd object: ${received}`;
   }
 
   const diffs = [];
