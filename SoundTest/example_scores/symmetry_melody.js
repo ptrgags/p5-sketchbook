@@ -10,20 +10,14 @@ import { retrograde } from "../../sketchlib/music/retrograde.js";
 import { transpose_scale_degree } from "../../sketchlib/music/transpose.js";
 import { Rational } from "../../sketchlib/Rational.js";
 import { Part, Score } from "../../sketchlib/music/Score.js";
-import { MAJOR_SCALE, make_scale } from "../../sketchlib/music/scales.js";
+import { MAJOR_SCALE } from "../../sketchlib/music/scales.js";
 import { C4 } from "../../sketchlib/music/pitches.js";
+import { PatternGrid } from "../../sketchlib/music/PatternGrid.js";
 
 // The top line plays a short motif while the bottom line holds a long note.
-const top_motif = parse_melody(
-  [0, N4],
-  [2, N2],
-  [4, N8],
-  [2, N8],
-  [7, N4],
-  [6, N4],
-  [5, N4],
-  [4, N4],
-);
+const pitches = new PatternGrid([0, 2, 4, 2, 7, 6, 5, 4], N8);
+const rhythm = PatternGrid.rhythm("x-x---xxx-x-x-x-", N8);
+const top_motif = PatternGrid.zip(rhythm, pitches);
 const bottom_motif = new Note(0, new Rational(2));
 
 const motif_scale = new Harmony(top_motif, bottom_motif);

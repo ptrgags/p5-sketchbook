@@ -36,12 +36,12 @@ const scale_arp = PatternGrid.zip(arp_rhythm, arp_pitches);
 
 const cycle_length = N1;
 const cycle_a = map_pitch(
-  (p) => SCALE5.value(p),
+  (deg) => SCALE5.value(deg),
   parse_cycle(cycle_length, [0, REST, 1, 2, REST, 4]),
 );
 
 const cycle_b = map_pitch(
-  (p) => SCALE5.value(p),
+  (deg) => SCALE5.value(deg),
   parse_cycle(cycle_length, [
     [0, 3],
     [5, REST],
