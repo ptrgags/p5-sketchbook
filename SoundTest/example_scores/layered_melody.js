@@ -26,30 +26,9 @@ import { Rational } from "../../sketchlib/Rational.js";
 
 const pedal = parse_melody([C3, N4], [REST, N4]);
 
-const N4D = new Rational(3, 8);
-
 const CUSTOM_SCALE = new ScaleQuality([C, E, F, G, GS, B]);
 const SCALE4 = CUSTOM_SCALE.to_scale(C4);
 const SCALE5 = CUSTOM_SCALE.to_scale(C5);
-
-// scores are expressed in scale degrees then converted to pitches
-/*
-const scale_arp = map_pitch(
-  (p) => SCALE4.value(p),
-  parse_melody(
-    // Measure 1
-    [0, N4],
-    [1, N4],
-    [2, N4],
-    [3, N4],
-    // Measure 2
-    [4, N4D],
-    [REST, N8],
-    [5, N4D],
-    [REST, N8],
-  ),
-);
-*/
 
 const arp_rhythm = PatternGrid.rhythm("x-x-x-x-x--.x--.", N8);
 const arp_pitches = SCALE4.sequence([0, 1, 2, 3, 4, 5], N8);
