@@ -20,7 +20,7 @@ export class ScaleQuality {
    * Compute a mode of a scale by starting at the specified place
    * in the list.
    * E.g. MAJOR_SCALE.mode(1) is the same as DORIAN_SCALE
-   * @param {number} start_index What interval to start the new scale at
+   * @param {number} start_index What interval to start the new scale at. This must be in [0, length)
    * @returns {ScaleQuality}
    */
   mode(start_index) {
@@ -37,14 +37,19 @@ export class ScaleQuality {
     return [];
   }
 
+  /**
+   * Given a pitch class, turn this scale into a ScaleSymbol
+   * @param {number} pitch_class The pitch class
+   * @returns {ScaleSymbol}
+   */
   to_symbol(pitch_class) {
     return new ScaleSymbol(this.intervals.intervals, pitch_class);
   }
 
   /**
-   *
-   * @param {*} tonic
-   * @returns {Scale}
+   * Given a root note, turn this into a concrete Scale
+   * @param {number} tonic MIDI note of the tomic
+   * @returns {Scale} Scale starting on the tonic
    */
   to_scale(tonic) {
     return new Scale(this.intervals.intervals, tonic);
