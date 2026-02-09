@@ -1,9 +1,27 @@
 import { describe, it, expect } from "vitest";
 import { MAJOR_SCALE, PHRYGIAN_MODE } from "./scales.js";
-import { A3, C4, E4, F4, F5, G2, G4 } from "./pitches.js";
+import {
+  A,
+  A3,
+  A4,
+  B,
+  B4,
+  C,
+  C4,
+  D,
+  D4,
+  E,
+  E4,
+  F,
+  F4,
+  F5,
+  G,
+  G2,
+  G4,
+} from "./pitches.js";
 import { N4 } from "./durations.js";
 import { PatternGrid } from "./PatternGrid.js";
-import { ScaleQuality } from "./Scale.js";
+import { ScaleQuality, ScaleSymbol } from "./Scale.js";
 import { ChordQuality } from "./Chord.js";
 import { P1 } from "./intervals.js";
 import {
@@ -112,7 +130,33 @@ describe("ScaleQuality", () => {
   });
 });
 
-describe("ScaleSymbol", () => {});
+describe("ScaleSymbol", () => {
+  it("mode computes correct scale symbol", () => {
+    const scale = MAJOR_SCALE.to_symbol(C);
+
+    const result = scale.mode(2);
+
+    const expected = PHRYGIAN_MODE.to_symbol(E);
+    expect(result).toEqual(expected);
+  });
+
+  it("stack_thirds computes correct chord symbols", () => {
+    const scale = MAJOR_SCALE.to_symbol(C);
+
+    const result = scale.stack_thirds(3);
+
+    const expected = [
+      MAJOR_TRIAD.to_symbol(C),
+      MINOR_TRIAD.to_symbol(D),
+      MINOR_TRIAD.to_symbol(E),
+      MAJOR_TRIAD.to_symbol(F),
+      MAJOR_TRIAD.to_symbol(G),
+      MINOR_TRIAD.to_symbol(A),
+      DIMINISHED_TRIAD.to_symbol(B),
+    ];
+    expect(result).toEqual(expected);
+  });
+});
 
 describe("Scale", () => {
   it("value with degree in range returns one of the pitches", () => {
@@ -149,6 +193,32 @@ describe("Scale", () => {
     const result = scale.sequence(degrees, N4);
 
     const expected = new PatternGrid([C4, G4, A3, F4], N4);
+    expect(result).toEqual(expected);
+  });
+
+  it("mode computes correct scale symbol", () => {
+    const scale = MAJOR_SCALE.to_scale(C4);
+
+    const result = scale.mode(2);
+
+    const expected = PHRYGIAN_MODE.to_scale(E4);
+    expect(result).toEqual(expected);
+  });
+
+  it("stack_thirds computes correct chord symbols", () => {
+    const scale = MAJOR_SCALE.to_scale(C4);
+
+    const result = scale.stack_thirds(3);
+
+    const expected = [
+      MAJOR_TRIAD.to_chord(C4),
+      MINOR_TRIAD.to_chord(D4),
+      MINOR_TRIAD.to_chord(E4),
+      MAJOR_TRIAD.to_chord(F4),
+      MAJOR_TRIAD.to_chord(G4),
+      MINOR_TRIAD.to_chord(A4),
+      DIMINISHED_TRIAD.to_chord(B4),
+    ];
     expect(result).toEqual(expected);
   });
 });

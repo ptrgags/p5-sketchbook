@@ -14,6 +14,10 @@ export class IntervalStack {
     this.intervals = intervals;
   }
 
+  get length() {
+    return this.intervals.length;
+  }
+
   /**
    * Get an interval value for a given value in the list. When the index
    * is out of bounds, it transposes up or down by octaves.
@@ -52,6 +56,10 @@ export class PitchClassStack {
     this.intervals = intervals;
   }
 
+  get length() {
+    return this.intervals.length;
+  }
+
   /**
    * Get a ptich from the stack, starting from the root pitch and
    * going up the stack one by one.
@@ -79,6 +87,10 @@ export class PitchStack {
   constructor(intervals, root) {
     this.root = root;
     this.intervals = intervals;
+  }
+
+  get length() {
+    return this.intervals.length;
   }
 
   /**
