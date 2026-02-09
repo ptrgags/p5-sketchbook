@@ -1,6 +1,5 @@
-import { N4, N2, N8, N1 } from "../../sketchlib/music/durations.js";
+import { N8, N1 } from "../../sketchlib/music/durations.js";
 import {
-  parse_melody,
   Note,
   Harmony,
   Melody,
