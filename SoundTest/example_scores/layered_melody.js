@@ -7,6 +7,7 @@ import {
   Rest,
   Harmony,
 } from "../../sketchlib/music/Music.js";
+import { PatternGrid } from "../../sketchlib/music/PatternGrid.js";
 import {
   B,
   C,
@@ -19,43 +20,28 @@ import {
   GS,
   REST,
 } from "../../sketchlib/music/pitches.js";
-import { make_scale } from "../../sketchlib/music/scales.js";
+import { ScaleQuality } from "../../sketchlib/music/Scale.js";
 import { Part, Score } from "../../sketchlib/music/Score.js";
 import { Rational } from "../../sketchlib/Rational.js";
 
 const pedal = parse_melody([C3, N4], [REST, N4]);
 
-const N4D = new Rational(3, 8);
+const CUSTOM_SCALE = new ScaleQuality([C, E, F, G, GS, B]);
+const SCALE4 = CUSTOM_SCALE.to_scale(C4);
+const SCALE5 = CUSTOM_SCALE.to_scale(C5);
 
-const CUSTOM_SCALE = [C, E, F, G, GS, B];
-const SCALE4 = make_scale(CUSTOM_SCALE, C4);
-const SCALE5 = make_scale(CUSTOM_SCALE, C5);
-
-// scores are expressed in scale degrees then converted to pitches
-const scale_arp = map_pitch(
-  SCALE4,
-  parse_melody(
-    // Measure 1
-    [0, N4],
-    [1, N4],
-    [2, N4],
-    [3, N4],
-    // Measure 2
-    [4, N4D],
-    [REST, N8],
-    [5, N4D],
-    [REST, N8],
-  ),
-);
+const arp_rhythm = PatternGrid.rhythm("x-x-x-x-x--.x--.", N8);
+const arp_pitches = SCALE4.sequence([0, 1, 2, 3, 4, 5], N8);
+const scale_arp = PatternGrid.zip(arp_rhythm, arp_pitches);
 
 const cycle_length = N1;
 const cycle_a = map_pitch(
-  SCALE5,
+  (deg) => SCALE5.value(deg),
   parse_cycle(cycle_length, [0, REST, 1, 2, REST, 4]),
 );
 
 const cycle_b = map_pitch(
-  SCALE5,
+  (deg) => SCALE5.value(deg),
   parse_cycle(cycle_length, [
     [0, 3],
     [5, REST],
