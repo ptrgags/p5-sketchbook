@@ -62,6 +62,26 @@ describe("COdd", () => {
     expect(result).toBeCOdd(expected);
   });
 
+  it("gp with even produces correct odd multivector", () => {
+    const a = new COdd(1, 2, 3, 4, 5, 6, 7, 8);
+    const b = new CEven(1, 2, 3, 4, 5, 6, 7, 8);
+
+    const result = a.gp(b);
+
+    const expected = new COdd(0, 116, -90, -72, 74, 60, -18, 48);
+    expect(result).toBeCOdd(expected);
+  });
+
+  it("gp with odd produces correct even multivector", () => {
+    const a = new COdd(1, 2, 3, 4, 5, 6, 7, 8);
+    const b = new COdd(1, 2, 3, 4, 5, 6, 7, 8);
+
+    const result = a.gp(b);
+
+    const expected = new CEven(122, -18, -76, -66, -54, -36, 46, 0);
+    expect(result).toBeCEven(expected);
+  });
+
   it("unit sandwich with unit vector and odd multivector returns odd multivector with correct signs", () => {
     const n = new COdd(3 / 5, 4 / 5, 0, 0, 0, 0, 0, 0);
     const b = new COdd(1, 2, 3, 4, 5, 6, 7, 8);

@@ -55,6 +55,26 @@ describe("CEven", () => {
     expect(result).toBeCEven(expected);
   });
 
+  it("gp with even produces correct even multivector", () => {
+    const a = new CEven(1, 2, 3, 4, 5, 6, 7, 8);
+    const b = new CEven(1, 2, 3, 4, 5, 6, 7, 8);
+
+    const result = a.gp(b);
+
+    const expected = new CEven(0, 116, -90, -72, 74, 60, -18, 48);
+    expect(result).toBeCEven(expected);
+  });
+
+  it("gp with odd produces correct odd multivector", () => {
+    const a = new CEven(1, 2, 3, 4, 5, 6, 7, 8);
+    const b = new COdd(1, 2, 3, 4, 5, 6, 7, 8);
+
+    const result = a.gp(b);
+
+    const expected = new COdd(122, -18, -76, -66, -54, -36, 46, 0);
+    expect(result).toBeCOdd(expected);
+  });
+
   it("unit_sandwich with unit versor and odd filling returns correct odd result", () => {
     // 90 degree rotation
     const a = new CEven(Math.SQRT1_2, Math.SQRT1_2, 0, 0, 0, 0, 0, 0);
