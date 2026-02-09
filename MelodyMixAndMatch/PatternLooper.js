@@ -104,30 +104,6 @@ export class PatternLooper {
     this.instrument.init_mono(this.tone);
   }
 
-  /*
-  init_loop() {
-    const transport = this.tone.getTransport();
-
-    const step_indices = [...range(16)];
-    this.seq = new this.tone.Sequence(
-      (time, index) => {
-        const note = this.pattern.values[index];
-        this.instrument.play_note(
-          to_tone_pitch(note.pitch),
-          "16n",
-          time,
-          note.velocity / 127,
-        );
-      },
-      step_indices,
-      "16n",
-    );
-
-    this.seq.start(0);
-
-    transport.start();
-  }*/
-
   /**
    *
    * @param {import("../sketchlib/music/Timeline.js").Timeline<Note<number>>} timeline
