@@ -4,7 +4,7 @@ import { CanvasMouseHandler } from "../sketchlib/CanvasMouseHandler.js";
 import { N16, N8 } from "../sketchlib/music/durations.js";
 import { A3, C4 } from "../sketchlib/music/pitches.js";
 
-import { Melody, Note } from "../sketchlib/music/Music.js";
+import { make_note, Melody, Note } from "../sketchlib/music/Music.js";
 import { MuteButton } from "../sketchlib/MuteButton.js";
 import { PlayButtonScene } from "../sketchlib/PlayButtonScene.js";
 import { SoundManager } from "../sketchlib/SoundManager.js";
@@ -19,16 +19,16 @@ import { Part, Score } from "../sketchlib/music/Score.js";
 const MOUSE = new CanvasMouseHandler();
 
 const MELODY_TICK_TOCK = new Melody(
-  new Note(A3, N8),
-  new Note(C4, N16),
-  new Note(C4, N16)
+  make_note(A3, N8),
+  make_note(C4, N16),
+  make_note(C4, N16),
 );
 const TICK_TOCK = new Score(
   new Part("tick_tock", MELODY_TICK_TOCK, {
     instrument_id: "tick",
     midi_channel: 0,
     midi_instrument: 81 - 1, // square lead
-  })
+  }),
 );
 
 /** @type {import("../sketchlib/SoundManager.js").SoundManifest} */
@@ -54,7 +54,7 @@ class PendulumClockScene {
       "change",
       (/** @type {CustomEvent}*/ e) => {
         this.sound.toggle_sound(e.detail.sound_on);
-      }
+      },
     );
 
     this.next_available_second = -1;
@@ -129,7 +129,7 @@ export const sketch = (p) => {
       WIDTH,
       HEIGHT,
       undefined,
-      document.getElementById("sketch-canvas")
+      document.getElementById("sketch-canvas"),
     ).elt;
 
     MOUSE.setup(canvas);

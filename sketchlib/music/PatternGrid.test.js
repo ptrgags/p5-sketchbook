@@ -4,7 +4,7 @@ import { N1, N16, N2, N4, N8 } from "./durations.js";
 import { RhythmStep } from "./RhythmStep.js";
 import { A4, B4, C3, C4, C5, D4, E4, F4, F5, G3, G4 } from "./pitches.js";
 import { Velocity } from "./Velocity.js";
-import { Harmony, Melody, Note, Rest } from "./Music.js";
+import { Harmony, make_note, Melody, Note, Rest } from "./Music.js";
 import { Rational } from "../Rational.js";
 
 describe("PatternGrid", () => {
@@ -78,17 +78,17 @@ describe("PatternGrid", () => {
       const result = PatternGrid.zip(rhythm, pitches);
 
       const expected = new Melody(
-        new Note(C4, N16),
+        make_note(C4, N16),
         new Rest(N16),
-        new Note(G4, new Rational(3, 16)),
+        make_note(G4, new Rational(3, 16)),
         new Rest(N16),
-        new Note(C4, N8),
-        new Note(E4, N16),
+        make_note(C4, N8),
+        make_note(E4, N16),
         new Rest(N8),
-        new Note(F4, N16),
-        new Note(G4, N16),
+        make_note(F4, N16),
+        make_note(G4, N16),
         new Rest(N16),
-        new Note(C5, N16),
+        make_note(C5, N16),
         new Rest(N16),
       );
       expect(result).toEqual(expected);
@@ -113,17 +113,17 @@ describe("PatternGrid", () => {
       const result = PatternGrid.zip(rhythm, pitches, velocities);
 
       const expected = new Melody(
-        new Note(C4, N16, Velocity.P),
+        make_note(C4, N16, Velocity.P),
         new Rest(N16),
-        new Note(G4, new Rational(3, 16), Velocity.F),
+        make_note(G4, new Rational(3, 16), Velocity.F),
         new Rest(N16),
-        new Note(C4, N8, Velocity.P),
-        new Note(E4, N16, Velocity.F),
+        make_note(C4, N8, Velocity.P),
+        make_note(E4, N16, Velocity.F),
         new Rest(N8),
-        new Note(F4, N16, Velocity.P),
-        new Note(G4, N16, Velocity.F),
+        make_note(F4, N16, Velocity.P),
+        make_note(G4, N16, Velocity.F),
         new Rest(N16),
-        new Note(C5, N16, Velocity.P),
+        make_note(C5, N16, Velocity.P),
         new Rest(N16),
       );
       expect(result).toEqual(expected);
@@ -154,17 +154,17 @@ describe("PatternGrid", () => {
       const result = PatternGrid.zip(rhythm, pitches, velocities);
 
       const expected = new Melody(
-        new Note(C4, N16, Velocity.P),
+        make_note(C4, N16, Velocity.P),
         new Rest(N16),
-        new Note(G4, new Rational(3, 16), Velocity.F),
+        make_note(G4, new Rational(3, 16), Velocity.F),
         new Rest(N16),
-        new Note(C4, N8, Velocity.P),
-        new Note(E4, N16, Velocity.F),
+        make_note(C4, N8, Velocity.P),
+        make_note(E4, N16, Velocity.F),
         new Rest(N8),
-        new Note(F4, N16, Velocity.P),
-        new Note(G4, N16, Velocity.F),
+        make_note(F4, N16, Velocity.P),
+        make_note(G4, N16, Velocity.F),
         new Rest(N16),
-        new Note(C5, N16, Velocity.P),
+        make_note(C5, N16, Velocity.P),
         new Rest(N16),
       );
       expect(result).toEqual(expected);
@@ -174,9 +174,9 @@ describe("PatternGrid", () => {
   describe("unzip", () => {
     it("with polyphonic music throws", () => {
       const chord = new Harmony(
-        new Note(G4, N4),
-        new Note(E4, N4),
-        new Note(C4, N4),
+        make_note(G4, N4),
+        make_note(E4, N4),
+        make_note(C4, N4),
       );
 
       expect(() => {
@@ -199,10 +199,10 @@ describe("PatternGrid", () => {
 
     it("with quarter note melody produces correct grids", () => {
       const melody = new Melody(
-        new Note(C4, N4, Velocity.P),
-        new Note(E4, N4, Velocity.F),
+        make_note(C4, N4, Velocity.P),
+        make_note(E4, N4, Velocity.F),
         new Rest(N4),
-        new Note(G4, N4, Velocity.FFF),
+        make_note(G4, N4, Velocity.FFF),
       );
 
       const result = PatternGrid.unzip(melody);
@@ -217,14 +217,14 @@ describe("PatternGrid", () => {
 
     it("with complex rhythm produces correct grids", () => {
       const melody = new Melody(
-        new Note(C4, N2, Velocity.P),
-        new Note(E4, N4, Velocity.F),
-        new Note(C3, N8),
+        make_note(C4, N2, Velocity.P),
+        make_note(E4, N4, Velocity.F),
+        make_note(C3, N8),
         new Rest(N4),
-        new Note(G3, N8),
-        new Note(C3, N16),
+        make_note(G3, N8),
+        make_note(C3, N16),
         new Rest(N4),
-        new Note(G4, new Rational(3, 8), Velocity.FFF),
+        make_note(G4, new Rational(3, 8), Velocity.FFF),
       );
 
       const result = PatternGrid.unzip(melody);
@@ -291,12 +291,12 @@ describe("PatternGrid", () => {
       const result = PatternGrid.overlay(rhythm, pitches);
 
       const expected = new Melody(
-        new Note(C4, N8),
+        make_note(C4, N8),
         new Rest(N8),
-        new Note(E4, N8),
-        new Note(F4, N8),
+        make_note(E4, N8),
+        make_note(F4, N8),
         new Rest(N8),
-        new Note(A4, new Rational(3, 8)),
+        make_note(A4, new Rational(3, 8)),
       );
       expect(result).toEqual(expected);
     });
@@ -311,12 +311,12 @@ describe("PatternGrid", () => {
       const result = PatternGrid.overlay(rhythm, pitches, velocities);
 
       const expected = new Melody(
-        new Note(C4, N8, f),
+        make_note(C4, N8, f),
         new Rest(N8),
-        new Note(E4, N8, f),
-        new Note(F4, N8, f),
+        make_note(E4, N8, f),
+        make_note(F4, N8, f),
         new Rest(N8),
-        new Note(A4, new Rational(3, 8), p),
+        make_note(A4, new Rational(3, 8), p),
       );
       expect(result).toEqual(expected);
     });
@@ -325,9 +325,9 @@ describe("PatternGrid", () => {
   describe("deoverlay", () => {
     it("with polyphonic music throws", () => {
       const chord = new Harmony(
-        new Note(G4, N4),
-        new Note(E4, N4),
-        new Note(C4, N4),
+        make_note(G4, N4),
+        make_note(E4, N4),
+        make_note(C4, N4),
       );
 
       expect(() => {
@@ -350,10 +350,10 @@ describe("PatternGrid", () => {
 
     it("with quarter note melody produces correct grids", () => {
       const melody = new Melody(
-        new Note(C4, N4, Velocity.P),
-        new Note(E4, N4, Velocity.F),
+        make_note(C4, N4, Velocity.P),
+        make_note(E4, N4, Velocity.F),
         new Rest(N4),
-        new Note(G4, N4, Velocity.FFF),
+        make_note(G4, N4, Velocity.FFF),
       );
 
       const result = PatternGrid.deoverlay(melody);
@@ -371,14 +371,14 @@ describe("PatternGrid", () => {
 
     it("with complex rhythm produces correct grids", () => {
       const melody = new Melody(
-        new Note(C4, N2, Velocity.P),
-        new Note(E4, N4, Velocity.F),
-        new Note(C3, N8),
+        make_note(C4, N2, Velocity.P),
+        make_note(E4, N4, Velocity.F),
+        make_note(C3, N8),
         new Rest(N4),
-        new Note(G3, N8),
-        new Note(C3, N16),
+        make_note(G3, N8),
+        make_note(C3, N16),
         new Rest(N4),
-        new Note(G4, new Rational(3, 8), Velocity.FFF),
+        make_note(G4, new Rational(3, 8), Velocity.FFF),
       );
 
       const result = PatternGrid.deoverlay(melody);

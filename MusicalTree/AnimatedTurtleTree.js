@@ -16,10 +16,16 @@ import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
-import { ParamCurve } from "../sketchlib/animation/ParamCurve.js";
+import { make_param, ParamCurve } from "../sketchlib/animation/ParamCurve.js";
 import { AnimationCurve } from "../sketchlib/animation/AnimationCurve.js";
 import { whole_fract } from "../sketchlib/whole_fract.js";
-import { map_pitch, Melody, Note, Rest } from "../sketchlib/music/Music.js";
+import {
+  make_note,
+  map_pitch,
+  Melody,
+  Note,
+  Rest,
+} from "../sketchlib/music/Music.js";
 
 const TREE_LSYSTEM = new LSystem("Fa", {
   a: "[+Fa][-Fa]",
@@ -161,16 +167,16 @@ const SCALE = make_scale(MAJOR_PENTATONIC);
 const DUR_SHORT = N16;
 
 // For stack commands, it's hi-lo for push lo-hi for pop
-const NOTE_STACK_HI = new Note(7, DUR_SHORT);
-const NOTE_STACK_LO = new Note(6, DUR_SHORT);
+const NOTE_STACK_HI = make_note(7, DUR_SHORT);
+const NOTE_STACK_LO = make_note(6, DUR_SHORT);
 const PAUSE_STACK = new Rest(DUR_SHORT);
 const DUR_STACK = DUR_SHORT.mul(new Rational(3));
 const REST_STACK = new Rest(DUR_STACK);
 
 // For turn commands, just a single short note. Left turn (increment angle)
 // is the high note, right turn is the lower note
-const NOTE_LEFT = new Note(-1, DUR_SHORT);
-const NOTE_RIGHT = new Note(-2, DUR_SHORT);
+const NOTE_LEFT = make_note(-1, DUR_SHORT);
+const NOTE_RIGHT = make_note(-2, DUR_SHORT);
 const REST_TURN = new Rest(DUR_SHORT);
 
 // For forward commands, the length and duration depends on the depth
@@ -201,7 +207,7 @@ class TreeMusicBuilder {
     const pitch = PITCH_FWD_START + depth;
     const rest = new Rest(duration);
 
-    this.draw_notes.push(new Note(pitch, duration));
+    this.draw_notes.push(make_note(pitch, duration));
     this.stack_notes.push(rest);
     this.turn_notes.push(rest);
   }
@@ -299,7 +305,7 @@ class TreeAnimationBuilder {
    * @param {Rational} duration The duration for this command
    */
   increment_state(duration) {
-    const increase = new ParamCurve(
+    const increase = make_param(
       this.state_index,
       this.state_index + 1,
       duration,
@@ -317,11 +323,7 @@ class TreeAnimationBuilder {
     // same calculation as in the music builder
     const duration = DUR_SHORT.mul(new Rational(this.max_depth - depth + 1));
 
-    const increase = new ParamCurve(
-      this.line_count,
-      this.line_count + 1,
-      duration,
-    );
+    const increase = make_param(this.line_count, this.line_count + 1, duration);
     this.line_count++;
 
     const gap = new Gap(duration);
@@ -336,7 +338,7 @@ class TreeAnimationBuilder {
    * @param {number} old_depth The depth _before_ the push command
    */
   push(old_depth) {
-    const increase = new ParamCurve(old_depth, old_depth + 1, DUR_STACK);
+    const increase = make_param(old_depth, old_depth + 1, DUR_STACK);
 
     this.line_count_curve.push(GAP_STACK);
     this.increment_state(DUR_STACK);
@@ -348,7 +350,7 @@ class TreeAnimationBuilder {
    * @param {number} old_depth The depth _before_ the pop command
    */
   pop(old_depth) {
-    const decrease = new ParamCurve(old_depth, old_depth - 1, DUR_STACK);
+    const decrease = make_param(old_depth, old_depth - 1, DUR_STACK);
 
     this.line_count_curve.push(GAP_STACK);
     this.increment_state(DUR_STACK);

@@ -1,8 +1,19 @@
 import { Rational } from "../Rational.js";
 
 /**
- * @typedef {{duration: Rational}} TimeInterval
+ * @template T
  */
+export class TimeInterval {
+  /**
+   * Constructor
+   * @param {T} value
+   * @param {Rational} duration Duration of the time interval
+   */
+  constructor(value, duration) {
+    this.value = value;
+    this.duration = duration;
+  }
+}
 
 /**
  * A gap in the timeline. This is mostly needed inside containers to
@@ -37,7 +48,7 @@ Gap.ZERO = Object.freeze(new Gap(Rational.ZERO));
 
 /**
  * A sequence of events in time
- * @template {TimeInterval} T The event type
+ * @template T The value type
  */
 export class Sequential {
   /**
@@ -61,7 +72,7 @@ export class Sequential {
   /**
    * Make a sequence by repeating a timeline N times
    * Note that this may create nesting
-   * @template {TimeInterval} T the event type
+   * @template T the event type
    * @param {Timeline<T>} material The material to repeat
    * @param {number} repeats Postive integer number of repeats
    * @return {Timeline<T>} if repeats === 1, material is returned as-is. if
@@ -83,7 +94,7 @@ export class Sequential {
   /**
    * Similar to from_repeat, but instead of specifying the number of
    * repeats, specify the total duration to loop the clip
-   * @template {TimeInterval} T the event type
+   * @template T the event type
    * @param {Timeline<T>} material The material to loop
    * @param {Rational} total_duration The total duration to loop in measures
    */
@@ -108,7 +119,7 @@ export class Sequential {
 
 /**
  * Events played simultaneously.
- * @template {TimeInterval} T
+ * @template T The value type
  */
 export class Parallel {
   /**
@@ -132,15 +143,15 @@ export class Parallel {
 }
 
 /**
- * @template {TimeInterval} T
- * @typedef {T | Gap | Sequential<T> | Parallel<T>} Timeline<T>
+ * @template T
+ * @typedef {TimeInterval<T> | Gap | Sequential<T> | Parallel<T>} Timeline<T>
  */
 
 /**
  * Map a function over a timeline.
- * @template {TimeInterval} T The original event type
- * @template {TimeInterval} U The new event type after applying f
- * @param {function(T): U} f A function to apply to each event in the timeline
+ * @template T The original value type
+ * @template U The new value type after applying f
+ * @param {function(TimeInterval<T>): TimeInterval<U>} f A function to apply to each event in the timeline
  * @param {Timeline<T>} timeline The original timeline
  * @returns {Timeline<U>} A new timeline with the
  */
@@ -159,6 +170,5 @@ export function timeline_map(f, timeline) {
     return new Parallel(...children);
   }
 
-  // if it's none of the above, then it's a plain T
   return f(timeline);
 }

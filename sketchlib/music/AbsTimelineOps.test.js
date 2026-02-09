@@ -7,20 +7,7 @@ import {
   AbsParallel,
 } from "./AbsTimeline.js";
 import { AbsTimelineOps } from "./AbsTimelineOps.js";
-import { Gap, Sequential, Parallel } from "./Timeline.js";
-
-/**
- * Make an interval object for use in tests below
- * @param {Rational} duration
- * @param {number} value
- * @returns {object} An interval
- */
-function stub_interval(duration, value) {
-  return {
-    duration,
-    value,
-  };
-}
+import { Gap, Sequential, Parallel, TimeInterval } from "./Timeline.js";
 
 describe("AbsTimelineOps", () => {
   describe("from_relative", () => {
@@ -36,69 +23,65 @@ describe("AbsTimelineOps", () => {
 
     it("With interval gives AbsInterval", () => {
       const duration = new Rational(1, 2);
-      const timeline = stub_interval(duration, 3);
+      const timeline = new TimeInterval(3, duration);
 
       const result = AbsTimelineOps.from_relative(timeline, new Rational(2));
 
-      const expected = new AbsInterval(
-        timeline,
-        new Rational(2),
-        new Rational(5, 2),
-      );
+      const expected = new AbsInterval(3, new Rational(2), new Rational(5, 2));
       expect(result).toEqual(expected);
     });
 
     it("with offset schedules event with times offset", () => {
-      const timeline = stub_interval(Rational.ONE, 3);
+      const timeline = new TimeInterval(3, Rational.ONE);
       const offset = new Rational(1, 4);
 
       const result = AbsTimelineOps.from_relative(timeline, offset);
 
-      const expected = new AbsInterval(timeline, offset, new Rational(5, 4));
+      const expected = new AbsInterval(3, offset, new Rational(5, 4));
       expect(result).toEqual(expected);
     });
 
     it("schedules sequential timeline with correct timing", () => {
-      const timeline1 = stub_interval(Rational.ONE, 1);
-      const timeline2 = stub_interval(new Rational(1, 2), 2);
+      const timeline1 = new TimeInterval(1, Rational.ONE);
+      const timeline2 = new TimeInterval(2, new Rational(1, 2));
       const timeline = new Sequential(timeline2, timeline1, timeline2);
 
       const result = AbsTimelineOps.from_relative(timeline, Rational.ZERO);
 
       const expected = new AbsSequential(
-        new AbsInterval(timeline2, Rational.ZERO, new Rational(1, 2)),
-        new AbsInterval(timeline1, new Rational(1, 2), new Rational(3, 2)),
-        new AbsInterval(timeline2, new Rational(3, 2), new Rational(2)),
+        new AbsInterval(2, Rational.ZERO, new Rational(1, 2)),
+        new AbsInterval(1, new Rational(1, 2), new Rational(3, 2)),
+        new AbsInterval(2, new Rational(3, 2), new Rational(2)),
       );
       expect(result).toEqual(expected);
     });
 
     it("with sequential timeline produces one event per child", () => {
-      const timeline1 = stub_interval(Rational.ONE, 1);
-      const timeline2 = stub_interval(new Rational(1, 2), 2);
+      const timeline1 = new TimeInterval(1, Rational.ONE);
+      const timeline2 = new TimeInterval(2, new Rational(1, 2));
       const timeline = new Sequential(timeline2, timeline1, timeline2);
       const offset = new Rational(1, 2);
 
       const result = AbsTimelineOps.from_relative(timeline, offset);
 
       const expected = new AbsSequential(
-        new AbsInterval(timeline2, offset, Rational.ONE),
-        new AbsInterval(timeline1, Rational.ONE, new Rational(2)),
-        new AbsInterval(timeline2, new Rational(2), new Rational(5, 2)),
+        new AbsInterval(2, offset, Rational.ONE),
+        new AbsInterval(1, Rational.ONE, new Rational(2)),
+        new AbsInterval(2, new Rational(2), new Rational(5, 2)),
       );
       expect(result).toEqual(expected);
     });
 
     it("with parallel timeline produces AbsParallel with correct timing", () => {
-      const timeline1 = stub_interval(Rational.ONE, 1);
-      const timeline2 = stub_interval(new Rational(1, 2), 2);
+      const timeline1 = new TimeInterval(1, Rational.ONE);
+      const timeline2 = new TimeInterval(2, new Rational(1, 2));
       const timeline = new Parallel(timeline1, timeline2);
 
       const result = AbsTimelineOps.from_relative(timeline, Rational.ZERO);
 
       const expected = new AbsParallel(
-        new AbsInterval(timeline1, Rational.ZERO, Rational.ONE),
-        new AbsInterval(timeline2, Rational.ZERO, new Rational(1, 2)),
+        new AbsInterval(1, Rational.ZERO, Rational.ONE),
+        new AbsInterval(2, Rational.ZERO, new Rational(1, 2)),
       );
       expect(result).toEqual(expected);
     });
@@ -539,6 +522,116 @@ describe("AbsTimelineOps", () => {
       const result = AbsTimelineOps.flatten(whole_lot_of_nothing);
 
       expect(result).toBe(AbsGap.ZERO);
+    });
+  });
+
+  describe("iter_with_gaps", () => {
+    it("with AbsGap returns gap", () => {
+      const timeline = new AbsGap(Rational.ZERO, Rational.ONE);
+
+      const result = [...AbsTimelineOps.iter_with_gaps(timeline)];
+
+      const expected = [timeline];
+      expect(result).toEqual(expected);
+    });
+
+    it("with AbsInterval returns interval", () => {
+      const timeline = new AbsInterval(1, Rational.ZERO, Rational.ONE);
+
+      const result = [...AbsTimelineOps.iter_with_gaps(timeline)];
+
+      const expected = [timeline];
+      expect(result).toEqual(expected);
+    });
+
+    it("with AbsSequential returns inner intervals", () => {
+      const timeline = new AbsSequential(
+        new AbsInterval(1, new Rational(1, 2), Rational.ONE),
+        new AbsGap(Rational.ONE, new Rational(2)),
+        new AbsInterval(3, new Rational(2), new Rational(3)),
+      );
+
+      const result = [...AbsTimelineOps.iter_with_gaps(timeline)];
+
+      const expected = [
+        new AbsInterval(1, new Rational(1, 2), Rational.ONE),
+        new AbsGap(Rational.ONE, new Rational(2)),
+        new AbsInterval(3, new Rational(2), new Rational(3)),
+      ];
+      expect(result).toEqual(expected);
+    });
+
+    it("with AbsParallel returns inner intervals sorted by start time", () => {
+      const timeline = new AbsParallel(
+        new AbsSequential(
+          new AbsGap(Rational.ZERO, new Rational(1, 2)),
+          new AbsInterval(2, new Rational(1, 2), Rational.ONE),
+        ),
+        new AbsInterval(1, Rational.ZERO, Rational.ONE),
+      );
+
+      const result = [...AbsTimelineOps.iter_with_gaps(timeline)];
+
+      const expected = [
+        new AbsGap(Rational.ZERO, new Rational(1, 2)),
+        new AbsInterval(1, Rational.ZERO, Rational.ONE),
+        new AbsInterval(2, new Rational(1, 2), Rational.ONE),
+      ];
+      expect(result).toEqual(expected);
+    });
+  });
+
+  describe("iter_intervals", () => {
+    it("with AbsGap yields nothing", () => {
+      const timeline = new AbsGap(Rational.ZERO, Rational.ONE);
+
+      const result = [...AbsTimelineOps.iter_intervals(timeline)];
+
+      const expected = [];
+      expect(result).toEqual(expected);
+    });
+
+    it("with AbsInterval returns interval", () => {
+      const timeline = new AbsInterval(1, Rational.ZERO, Rational.ONE);
+
+      const result = [...AbsTimelineOps.iter_intervals(timeline)];
+
+      const expected = [timeline];
+      expect(result).toEqual(expected);
+    });
+
+    it("with AbsSequential returns inner intervals", () => {
+      const timeline = new AbsSequential(
+        new AbsInterval(1, new Rational(1, 2), Rational.ONE),
+        new AbsGap(Rational.ONE, new Rational(2)),
+        new AbsInterval(3, new Rational(2), new Rational(3)),
+      );
+
+      const result = [...AbsTimelineOps.iter_intervals(timeline)];
+
+      const expected = [
+        new AbsInterval(1, new Rational(1, 2), Rational.ONE),
+        new AbsInterval(3, new Rational(2), new Rational(3)),
+      ];
+      expect(result).toEqual(expected);
+    });
+
+    it("with AbsParallel returns inner intervals sorted by start time", () => {
+      const timeline = new AbsParallel(
+        new AbsSequential(
+          new AbsGap(Rational.ZERO, new Rational(1, 2)),
+          new AbsInterval(2, new Rational(1, 2), Rational.ONE),
+        ),
+        new AbsInterval(1, Rational.ZERO, Rational.ONE),
+      );
+
+      const result = [...AbsTimelineOps.iter_intervals(timeline)];
+
+      const expected = [
+        new AbsInterval(1, Rational.ZERO, Rational.ONE),
+        new AbsInterval(2, new Rational(1, 2), Rational.ONE),
+      ];
+      expect(result).toEqual(expected);
     });
   });
 });

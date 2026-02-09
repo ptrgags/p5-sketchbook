@@ -1,6 +1,7 @@
 import { N1 } from "../../sketchlib/music/durations.js";
 import {
   Harmony,
+  make_note,
   Melody,
   Note,
   parse_cycle,
@@ -38,7 +39,7 @@ function bit_chord(bit_pattern, chord_notes, silence) {
 }
 
 const chord_duration = N1;
-const major_seventh = [B4, G4, E4, C4].map((x) => new Note(x, chord_duration));
+const major_seventh = [B4, G4, E4, C4].map((x) => make_note(x, chord_duration));
 
 const silence = new Rest(chord_duration);
 

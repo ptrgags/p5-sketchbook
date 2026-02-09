@@ -4,6 +4,7 @@ import {
   Harmony,
   Melody,
   map_pitch,
+  make_note,
 } from "../../sketchlib/music/Music.js";
 import { retrograde } from "../../sketchlib/music/retrograde.js";
 import { transpose_scale_degree } from "../../sketchlib/music/transpose.js";
@@ -17,7 +18,7 @@ import { PatternGrid } from "../../sketchlib/music/PatternGrid.js";
 const pitches = new PatternGrid([0, 2, 4, 2, 7, 6, 5, 4], N8);
 const rhythm = PatternGrid.rhythm("x-x---xxx-x-x-x-", N8);
 const top_motif = PatternGrid.zip(rhythm, pitches);
-const bottom_motif = new Note(0, new Rational(2));
+const bottom_motif = make_note(0, new Rational(2));
 
 const motif_scale = new Harmony(top_motif, bottom_motif);
 
@@ -26,9 +27,9 @@ const motif_sixth = transpose_scale_degree(4, motif_scale);
 const motif_ninth = transpose_scale_degree(8, motif_scale);
 
 const final_chord = new Harmony(
-  new Note(0, N1),
-  new Note(2, N1),
-  new Note(4, N1),
+  make_note(0, N1),
+  make_note(2, N1),
+  make_note(4, N1),
 );
 
 const sequence = new Melody(motif_scale, motif_third, motif_sixth, motif_ninth);

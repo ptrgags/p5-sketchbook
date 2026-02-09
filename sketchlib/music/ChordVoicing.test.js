@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { ChordVoicing } from "./ChordVoicing.js";
 import { B3, B4, C4, C5, CS4, D5, DS4, E4, F4, G4, REST } from "./pitches.js";
 import { m2, M3, m3, P1, P5 } from "./intervals.js";
-import { Harmony, Note, Rest } from "./Music.js";
+import { Harmony, make_note, Note, Rest } from "./Music.js";
 import { N1 } from "./durations.js";
 import { Velocity } from "./Velocity.js";
 
@@ -86,9 +86,9 @@ describe("ChordVoicing", () => {
       const result = chord.to_harmony(N1);
 
       const expected = new Harmony(
-        new Note(G4, N1),
-        new Note(E4, N1),
-        new Note(C4, N1),
+        make_note(G4, N1),
+        make_note(E4, N1),
+        make_note(C4, N1),
       );
       expect(result).toEqual(expected);
     });
@@ -99,9 +99,9 @@ describe("ChordVoicing", () => {
       const result = chord.to_harmony(N1, Velocity.FFF);
 
       const expected = new Harmony(
-        new Note(G4, N1, Velocity.FFF),
-        new Note(E4, N1, Velocity.FFF),
-        new Note(C4, N1, Velocity.FFF),
+        make_note(G4, N1, Velocity.FFF),
+        make_note(E4, N1, Velocity.FFF),
+        make_note(C4, N1, Velocity.FFF),
       );
       expect(result).toEqual(expected);
     });
@@ -113,10 +113,10 @@ describe("ChordVoicing", () => {
 
       const expected = new Harmony(
         new Rest(N1),
-        new Note(G4, N1, Velocity.FFF),
+        make_note(G4, N1, Velocity.FFF),
         new Rest(N1),
-        new Note(E4, N1, Velocity.FFF),
-        new Note(C4, N1, Velocity.FFF),
+        make_note(E4, N1, Velocity.FFF),
+        make_note(C4, N1, Velocity.FFF),
       );
       expect(result).toEqual(expected);
     });

@@ -1,8 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { Sequential } from "../music/Timeline.js";
-import { Hold, ParamCurve } from "./ParamCurve.js";
+import { Hold, make_param } from "./ParamCurve.js";
 import { Rational } from "../Rational.js";
-import { AnimationCurve } from "./AnimationCurve.js";
 import { LoopCurve } from "./LoopCurve.js";
 
 /**
@@ -11,8 +10,8 @@ import { LoopCurve } from "./LoopCurve.js";
  */
 function make_loop() {
   const timeline = new Sequential(
-    new ParamCurve(0, 100, new Rational(1)),
-    new Hold(new Rational(2))
+    make_param(0, 100, new Rational(1)),
+    new Hold(new Rational(2)),
   );
   return LoopCurve.from_timeline(timeline);
 }

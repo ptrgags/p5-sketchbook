@@ -4,7 +4,7 @@ import { Point } from "../../sketchlib/pga2d/Point.js";
 import { Circle } from "../../sketchlib/primitives/Circle.js";
 import { group, style, xform } from "../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
-import { Hold, ParamCurve } from "../../sketchlib/animation/ParamCurve.js";
+import { Hold, make_param } from "../../sketchlib/animation/ParamCurve.js";
 import { lerp } from "../../sketchlib/lerp.js";
 import { Direction } from "../../sketchlib/pga2d/Direction.js";
 import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
@@ -32,7 +32,7 @@ const PAUSE_DURATION = new Rational(1);
 const RADIUS_STEPS = [];
 for (let i = 0; i < CIRCLE_COUNT; i++) {
   RADIUS_STEPS.push(
-    new ParamCurve(i * 50, (i + 1) * 50, EXPAND_DURATION, Ease.in_out_cubic),
+    make_param(i * 50, (i + 1) * 50, EXPAND_DURATION, Ease.in_out_cubic),
   );
 }
 
@@ -40,7 +40,7 @@ const CURVE_RADIUS = LoopCurve.from_timeline(
   new Sequential(
     ...RADIUS_STEPS,
     new Hold(PAUSE_DURATION),
-    new ParamCurve(
+    make_param(
       CIRCLE_COUNT * 50,
       0,
       EXPAND_DURATION.mul(new Rational(CIRCLE_COUNT)),

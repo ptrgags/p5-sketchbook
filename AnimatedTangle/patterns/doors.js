@@ -9,7 +9,10 @@ import { Transform } from "../../sketchlib/primitives/Transform.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Animated } from "../../sketchlib/animation/Animated.js";
 import { LoopCurve } from "../../sketchlib/animation/LoopCurve.js";
-import { ParamCurve } from "../../sketchlib/animation/ParamCurve.js";
+import {
+  make_param,
+  ParamCurve,
+} from "../../sketchlib/animation/ParamCurve.js";
 import { Sequential } from "../../sketchlib/music/Timeline.js";
 import { Rational } from "../../sketchlib/Rational.js";
 import {
@@ -113,8 +116,8 @@ const LIFT_HEIGHT = 50;
 
 const OPEN_AND_SHUT = LoopCurve.from_timeline(
   new Sequential(
-    new ParamCurve(0, LIFT_HEIGHT, DURATION_OPEN, Ease.in_out_cubic),
-    new ParamCurve(LIFT_HEIGHT, 0, DURATION_OPEN, Ease.in_out_cubic),
+    make_param(0, LIFT_HEIGHT, DURATION_OPEN, Ease.in_out_cubic),
+    make_param(LIFT_HEIGHT, 0, DURATION_OPEN, Ease.in_out_cubic),
   ),
 );
 

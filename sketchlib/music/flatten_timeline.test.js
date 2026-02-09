@@ -1,14 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { flatten_timeline } from "./flatten_timeline.js";
-import { Gap, Parallel, Sequential } from "./Timeline.js";
+import { Gap, Parallel, Sequential, TimeInterval } from "./Timeline.js";
 import { N2, N4 } from "./durations.js";
-
-function stub_interval(value, duration) {
-  return {
-    value,
-    duration,
-  };
-}
 
 describe("flatten_timeline", () => {
   it("with Gap is identity", () => {
@@ -20,7 +13,7 @@ describe("flatten_timeline", () => {
   });
 
   it("with interval is identity", () => {
-    const interval = stub_interval(3, N4);
+    const interval = new TimeInterval(3, N4);
 
     const result = flatten_timeline(interval);
 
@@ -36,7 +29,10 @@ describe("flatten_timeline", () => {
   });
 
   it("with flat Sequential is identity", () => {
-    const seq = new Sequential(stub_interval(1, N4), stub_interval(1, N4));
+    const seq = new Sequential(
+      new TimeInterval(1, N4),
+      new TimeInterval(1, N4),
+    );
 
     const result = flatten_timeline(seq);
 
@@ -44,7 +40,7 @@ describe("flatten_timeline", () => {
   });
 
   it("with Sequential with single child returns child", () => {
-    const interval = stub_interval(1, N4);
+    const interval = new TimeInterval(1, N4);
     const seq = new Sequential(interval);
 
     const result = flatten_timeline(seq);
@@ -61,7 +57,7 @@ describe("flatten_timeline", () => {
   });
 
   it("with Sequential with zero gaps filters out gaps", () => {
-    const interval = stub_interval(1, N4);
+    const interval = new TimeInterval(1, N4);
     const seq = new Sequential(
       interval,
       Gap.ZERO,
@@ -77,8 +73,8 @@ describe("flatten_timeline", () => {
   });
 
   it("with nested Sequentials returns flattened Sequential", () => {
-    const interval1 = stub_interval(1, N4);
-    const interval2 = stub_interval(2, N2);
+    const interval1 = new TimeInterval(1, N4);
+    const interval2 = new TimeInterval(2, N2);
     const nested = new Sequential(
       new Sequential(interval1, interval2),
       interval2,
@@ -112,7 +108,7 @@ describe("flatten_timeline", () => {
   });
 
   it("with Parallel with single child returns child", () => {
-    const interval = stub_interval(1, N4);
+    const interval = new TimeInterval(1, N4);
     const par = new Parallel(interval);
 
     const result = flatten_timeline(par);
@@ -121,8 +117,8 @@ describe("flatten_timeline", () => {
   });
 
   it("flattens nested Absparallel", () => {
-    const interval1 = stub_interval(1, N4);
-    const interval2 = stub_interval(2, N2);
+    const interval1 = new TimeInterval(1, N4);
+    const interval2 = new TimeInterval(2, N2);
     const nested = new Parallel(
       new Parallel(interval1, interval2),
       interval2,
@@ -156,7 +152,7 @@ describe("flatten_timeline", () => {
   });
 
   it("with Parallel with zero gaps filters out gaps", () => {
-    const interval = stub_interval(1, N4);
+    const interval = new TimeInterval(1, N4);
     const seq = new Parallel(interval, Gap.ZERO, interval, interval, Gap.ZERO);
 
     const result = flatten_timeline(seq);
@@ -166,8 +162,8 @@ describe("flatten_timeline", () => {
   });
 
   it("flattens sequential within parallel", () => {
-    const interval1 = stub_interval(1, N4);
-    const interval2 = stub_interval(2, N2);
+    const interval1 = new TimeInterval(1, N4);
+    const interval2 = new TimeInterval(2, N2);
     const nested = new Parallel(
       new Sequential(
         interval1,
@@ -187,8 +183,8 @@ describe("flatten_timeline", () => {
   });
 
   it("flattens parallel within sequential", () => {
-    const interval1 = stub_interval(1, N4);
-    const interval2 = stub_interval(2, N2);
+    const interval1 = new TimeInterval(1, N4);
+    const interval2 = new TimeInterval(2, N2);
     const nested = new Sequential(
       new Parallel(interval1, new Parallel(interval2, interval1), interval1),
       interval1,
@@ -204,8 +200,8 @@ describe("flatten_timeline", () => {
   });
 
   it("flattens sequential across redundant parallel", () => {
-    const interval1 = stub_interval(1, N4);
-    const interval2 = stub_interval(2, N2);
+    const interval1 = new TimeInterval(1, N4);
+    const interval2 = new TimeInterval(2, N2);
 
     const nested = new Sequential(
       interval1,
@@ -228,8 +224,8 @@ describe("flatten_timeline", () => {
   });
 
   it("flattens parallel over redundant sequential", () => {
-    const interval1 = stub_interval(1, N4);
-    const interval2 = stub_interval(2, N2);
+    const interval1 = new TimeInterval(1, N4);
+    const interval2 = new TimeInterval(2, N2);
 
     const nested = new Parallel(
       interval1,

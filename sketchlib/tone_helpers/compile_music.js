@@ -1,27 +1,38 @@
 import { Melody, Note, Rest, Harmony } from "../music/Music.js";
 import { Score } from "../music/Score.js";
-import { Gap, Parallel, Sequential, timeline_map } from "../music/Timeline.js";
+import {
+  Gap,
+  Parallel,
+  Sequential,
+  TimeInterval,
+  timeline_map,
+} from "../music/Timeline.js";
 import { Rational } from "../Rational.js";
 import { to_tone_time } from "./to_tone_time.js";
 import { to_tone_pitch } from "./to_tone_pitch.js";
-import { make_part_clip, PartDescriptor, ToneClip } from "./tone_clips.js";
+import {
+  make_part_clip,
+  make_part_descriptor,
+  PartDescriptor,
+  ToneClip,
+} from "./tone_clips.js";
 
 /**
  * Precompile a lone note to a part. Usually overkill, but it makes scheduling
  * more consistent.
- * @param {Note<number>} note a note expressed as MIDI note number
- * @returns {PartDescriptor} A part for the single note.
+ * @param {TimeInterval<Note<number>>} note a note expressed as MIDI note number
+ * @returns {TimeInterval<PartDescriptor>} A part for the single note.
  */
 function precompile_note(note) {
-  return new PartDescriptor(note.duration, [
-    ["0:0", [to_tone_pitch(note.pitch), to_tone_time(note.duration)]],
+  return make_part_descriptor(note.duration, [
+    ["0:0", [to_tone_pitch(note.value.pitch), to_tone_time(note.duration)]],
   ]);
 }
 
 /**
  * Compile a Melody to the events to pass into Tone.Part Exposed as this method
  * can be tested without needing dependencies on Tone.js
- * @param {(Gap | Note<number>)[]} midi_notes Melody in MIDI note values
+ * @param {(Gap | TimeInterval<Note<number>>)[]} midi_notes Melody in MIDI note values
  * @returns {[string, [string, string]][]} Array of (start_time, (pitch, duration))
  * events to pass into the Tone.Part constructor
  */
@@ -31,9 +42,9 @@ function make_part_events(midi_notes) {
   for (const note of midi_notes) {
     if (note instanceof Rest) {
       offset = offset.add(note.duration);
-    } else if (note instanceof Note) {
+    } else if (note instanceof TimeInterval) {
       const start = to_tone_time(offset);
-      const pitch = to_tone_pitch(note.pitch);
+      const pitch = to_tone_pitch(note.value.pitch);
       const dur = to_tone_time(note.duration);
 
       /**
@@ -50,14 +61,14 @@ function make_part_events(midi_notes) {
 
 /**
  * Make a single ToneJS part descriptor from an array of notes
- * @param {(Gap | Note<number>)[]} notes MIDI notes
- * @returns {PartDescriptor} The computed part descriptor
+ * @param {(Gap | TimeInterval<Note<number>>)[]} notes MIDI notes
+ * @returns {TimeInterval<PartDescriptor>} The computed part descriptor
  */
 function make_melody_part(notes) {
   const events = make_part_events(notes);
   const duration = notes.reduce((acc, x) => acc.add(x.duration), Rational.ZERO);
 
-  return new PartDescriptor(duration, events);
+  return make_part_descriptor(duration, events);
 }
 
 /**
@@ -68,11 +79,11 @@ function make_melody_part(notes) {
 function precompile_melody(midi_melody) {
   const descriptors = [];
 
-  /** @type {(Gap | Note<number>)[]} */
+  /** @type {(Gap | TimeInterval<Note<number>>)[]} */
   let loose_notes = [];
   for (const child of midi_melody.children) {
     // Gather up loose notes/rests to combine into a single clip.
-    if (child instanceof Rest || child instanceof Note) {
+    if (child instanceof Rest || child instanceof TimeInterval) {
       loose_notes.push(child);
       continue;
     }
@@ -143,7 +154,7 @@ export function precompile_music(music) {
     return music;
   }
 
-  if (music instanceof Note) {
+  if (music instanceof TimeInterval) {
     return precompile_note(music);
   }
 
@@ -165,8 +176,8 @@ export function precompile_music(music) {
  */
 export function compile_music(tone, instrument, music) {
   const precompiled = precompile_music(music);
-  return timeline_map((x) => {
-    return make_part_clip(tone, instrument, x);
+  return timeline_map((interval) => {
+    return make_part_clip(tone, instrument, interval);
   }, precompiled);
 }
 

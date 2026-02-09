@@ -1,18 +1,14 @@
-/**
- * @typedef {import("./Timeline").TimeInterval} TimeInterval
- */
-
 import { Gap, Parallel, Sequential } from "./Timeline.js";
 
 /**
- * @template {TimeInterval} T
+ * @template T
  * @typedef {import("./Timeline").Timeline<T>} Timeline
  */
 
 /**
  * Flatten a sequential recursively, combining nested sequentials together.
  * Mutually recursive with flatten_parallel
- * @template {TimeInterval} T
+ * @template T
  * @param {Sequential<T>} seq Sequential timeline
  * @returns {Timeline<T>} The flattened timeline.
  */
@@ -53,7 +49,7 @@ function flatten_sequential(seq) {
 /**
  * Flatten a parallel timeline, combining nested parallel timelines into
  * a single Parallel. Mutually recursive with flatten_sequential
- * @template {TimeInterval} T
+ * @template T
  * @param {Parallel<T>} par A parallel timeline
  * @returns {Timeline<T>} The flattened timeline
  */
@@ -91,7 +87,7 @@ function flatten_parallel(par) {
 
 /**
  * Flatten a timeline, removing redundant uses of Sequential or Parallel
- * @template {TimeInterval} T
+ * @template T
  * @param {Timeline<T>} timeline The original timeline
  * @returns {Timeline<T>} The flattened timeline
  */

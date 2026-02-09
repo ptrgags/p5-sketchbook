@@ -46,14 +46,16 @@ function make_track(channel, music, midi_instrument) {
   /**
    * @type {[number, MIDIEvent][]}
    */
-  const events = [...abs_music].flatMap((note) => {
-    const note_on = MIDIMessage.note_on(channel, note.value.pitch);
-    const note_off = MIDIMessage.note_off(channel, note.value.pitch);
-    return [
-      [to_ticks(note.start_time), note_on],
-      [to_ticks(note.end_time), note_off],
-    ];
-  });
+  const events = [...AbsTimelineOps.iter_intervals(abs_music)].flatMap(
+    (note) => {
+      const note_on = MIDIMessage.note_on(channel, note.value.pitch);
+      const note_off = MIDIMessage.note_off(channel, note.value.pitch);
+      return [
+        [to_ticks(note.start_time), note_on],
+        [to_ticks(note.end_time), note_off],
+      ];
+    },
+  );
 
   if (midi_instrument === undefined) {
     return new AbsoluteTimingTrack(events).to_relative();

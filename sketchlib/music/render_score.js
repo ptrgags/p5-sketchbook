@@ -8,8 +8,10 @@ import { RectPrimitive } from "../primitives/RectPrimitive.js";
 import { group, style } from "../primitives/shorthand.js";
 import { Point } from "../../sketchlib/pga2d/Point.js";
 import { Direction } from "../../sketchlib/pga2d/Direction.js";
-import { Harmony, Melody, Note, Rest } from "./Music.js";
+import { Harmony, Melody, Rest } from "./Music.js";
 import { Score } from "./Score.js";
+import { TimeInterval } from "./Timeline.js";
+import { RelTimelineOps } from "./RelTimelineOps.js";
 
 // For the background colors I'm using, solid black fill looks fine
 const NOTE_STYLE = new Style({
@@ -26,28 +28,20 @@ const MEASURE_LINE_STYLE = new Style({
  * @return {[number, number] | undefined} [min, max] pitch, or undefined if the music is silent
  */
 function get_pitch_range(music) {
-  if (music instanceof Rest) {
-    // No pitch information
-    return undefined;
+  let min_pitch = Infinity;
+  let max_pitch = -Infinity;
+  for (const interval of RelTimelineOps.iter_intervals(music)) {
+    const pitch = interval.value.pitch;
+    min_pitch = Math.min(min_pitch, pitch);
+    max_pitch = Math.max(max_pitch, pitch);
   }
 
-  if (music instanceof Note) {
-    return [music.pitch, music.pitch];
+  if (isFinite(min_pitch)) {
+    return [min_pitch, max_pitch];
   }
 
-  // For Melody and Harmony, examine the pitches across all notes and
-  // get the overall min/max
-  const child_ranges = music.children
-    .map((x) => get_pitch_range(x))
-    .filter((x) => x !== undefined);
-
-  if (child_ranges.length === 0) {
-    return undefined;
-  }
-
-  return child_ranges.reduce(([acc_min, acc_max], [min_pitch, max_pitch]) => {
-    return [Math.min(acc_min, min_pitch), Math.max(acc_max, max_pitch)];
-  });
+  // No intervals found.
+  return undefined;
 }
 
 /**
@@ -65,11 +59,11 @@ function render_notes(offset, music, measure_dimensions, pitch_range) {
     return undefined;
   }
 
-  if (music instanceof Note) {
+  if (music instanceof TimeInterval) {
     const [min_pitch, max_pitch] = pitch_range;
     const pitch_count = max_pitch - min_pitch + 1;
     const note_height = measure_dimensions.y / pitch_count;
-    const pitch_index = music.pitch - min_pitch;
+    const pitch_index = music.value.pitch - min_pitch;
 
     const note_offset = new Direction(
       0,

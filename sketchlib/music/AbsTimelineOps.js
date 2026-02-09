@@ -189,7 +189,7 @@ function flatten_parallel(par) {
 
 export class AbsTimelineOps {
   /**
-   * @template {import("./Timeline.js").TimeInterval} T
+   * @template T
    * @param {import("./Timeline.js").Timeline<T>} rel_timeline Relative timeline to convert
    * @param {Rational} [start_time=Rational.ZERO] Start time for the timeline (often zero)
    * @return {AbsTimeline<T>} Timeline
@@ -212,14 +212,14 @@ export class AbsTimelineOps {
           AbsTimelineOps.from_relative(x, start_time),
         ),
       );
-    } else {
-      // Plain interval
-      return new AbsInterval(
-        rel_timeline,
-        start_time,
-        start_time.add(rel_timeline.duration),
-      );
     }
+
+    // TimeInterval
+    return new AbsInterval(
+      rel_timeline.value,
+      start_time,
+      start_time.add(rel_timeline.duration),
+    );
   }
 
   /**
@@ -264,5 +264,45 @@ export class AbsTimelineOps {
     }
 
     return timeline;
+  }
+
+  /**
+   * Iterate over the intervals of the timeline, filtering
+   * out gaps
+   * @template T
+   * @param {AbsTimeline<T>} timeline
+   * @returns {Generator<AbsInterval<T>>}
+   */
+  static *iter_intervals(timeline) {
+    for (const x of this.iter_with_gaps(timeline)) {
+      if (x instanceof AbsInterval) {
+        yield x;
+      }
+    }
+  }
+
+  /**
+   * Iterate over the intervals and gaps in the timeline.
+   * @template T
+   * @param {AbsTimeline<T>} timeline
+   * @returns {Generator<AbsGap | AbsInterval<T>>}
+   */
+  static *iter_with_gaps(timeline) {
+    if (timeline instanceof AbsInterval) {
+      yield timeline;
+    } else if (timeline instanceof AbsParallel) {
+      const sorted_intervals = timeline.children
+        .flatMap((child) => {
+          return [...this.iter_with_gaps(child)];
+        })
+        .sort((a, b) => a.start_time.real - b.start_time.real);
+      yield* sorted_intervals;
+    } else if (timeline instanceof AbsSequential) {
+      for (const child of timeline.children) {
+        yield* this.iter_with_gaps(child);
+      }
+    } else {
+      yield timeline;
+    }
   }
 }

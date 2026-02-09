@@ -10,7 +10,10 @@ import { Style } from "../../sketchlib/Style.js";
 import { Tween } from "../../sketchlib/Tween.js";
 import { Animated } from "../../sketchlib/animation/Animated.js";
 import { LoopCurve } from "../../sketchlib/animation/LoopCurve.js";
-import { ParamCurve } from "../../sketchlib/animation/ParamCurve.js";
+import {
+  make_param,
+  ParamCurve,
+} from "../../sketchlib/animation/ParamCurve.js";
 import { Sequential } from "../../sketchlib/music/Timeline.js";
 import { Rational } from "../../sketchlib/Rational.js";
 import { PALETTE_CORAL, PALETTE_ROCK, Values } from "../theme_colors.js";
@@ -131,8 +134,8 @@ const DURATION_LIFT = new Rational(3);
 // Fall at a regular speed, then speed up when undoing the animation
 const CURVE_TIMING = LoopCurve.from_timeline(
   new Sequential(
-    new ParamCurve(-FALL_DURATION, 4 + FALL_DURATION, DURATION_FALL),
-    new ParamCurve(4 + FALL_DURATION, -FALL_DURATION, DURATION_LIFT),
+    make_param(-FALL_DURATION, 4 + FALL_DURATION, DURATION_FALL),
+    make_param(4 + FALL_DURATION, -FALL_DURATION, DURATION_LIFT),
   ),
 );
 

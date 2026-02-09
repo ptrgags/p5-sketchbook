@@ -2,7 +2,6 @@ import { AbsInterval } from "../music/AbsTimeline.js";
 import { Note } from "../music/Music.js";
 import { Rational } from "../Rational.js";
 import { MIDIMessage, MIDIMessageType } from "./MIDIEvent.js";
-import { MIDIHeader } from "./MIDIFile.js";
 
 export class NoteStream {
   /**
@@ -56,14 +55,18 @@ export class NoteStream {
     this.partial_message = [abs_ticks, pitch, velocity];
   }
 
+  /**
+   *
+   * @param {number} abs_ticks
+   * @returns
+   */
   note_off(abs_ticks) {
     if (!this.partial_message) {
       return;
     }
 
     const [start_ticks, pitch, velocity] = this.partial_message;
-    const duration_ticks = abs_ticks - start_ticks;
-    const note = new Note(pitch, this.to_measures(duration_ticks), velocity);
+    const note = new Note(pitch, velocity);
     this.notes.push(
       new AbsInterval(
         note,
