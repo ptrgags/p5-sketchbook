@@ -1,7 +1,17 @@
+import { range } from "../range.js";
 import { Rational } from "../Rational.js";
 import { ChordQuality } from "./Chord.js";
 import { IntervalStack, PitchClassStack, PitchStack } from "./IntervalStack.js";
 import { PatternGrid } from "./PatternGrid.js";
+
+/**
+ * Measure intervals from the first value
+ * @param {number[]} values
+ * @return {number[]}
+ */
+function from_root(values) {
+  return values.map((x) => x - values[0]);
+}
 
 export class ScaleQuality {
   /**
@@ -24,17 +34,40 @@ export class ScaleQuality {
    * @returns {ScaleQuality}
    */
   mode(start_index) {
-    return new ScaleQuality(this.intervals.intervals);
+    if (start_index < 0 || this.length <= start_index) {
+      throw new Error(
+        `start_index must be an integer in [0, ${this.length - 1}]`,
+      );
+    }
+
+    const abs_intervals = [...range(this.length)].map((i) =>
+      this.intervals.value(start_index + i),
+    );
+    const rel_intervals = from_root(abs_intervals);
+
+    return new ScaleQuality(rel_intervals);
   }
 
   /**
    * Stack thirds at each position of the scale to get
-   * the chords for this key.
+   * the corresponding chords.
    * @param {number} n How many thirds to stack. E.g. 3 for triads, 4 for seventh chords
    * @returns {ChordQuality[]} A chord quality for each position in the scale.
    */
   stack_thirds(n) {
-    return [];
+    if (n <= 0 || this.length <= n) {
+      throw new Error(`n must be an integer in [1, ${this.length}]`);
+    }
+
+    // For each note of the scale, make a chord.
+    return [...range(this.length)].map((i) => {
+      // gather intervals start, start + 2, start + 4
+      const abs_intervals = [...range(n)].map((j) => {
+        return this.intervals.value(i + 2 * j);
+      });
+      const rel_intervals = from_root(abs_intervals);
+      return new ChordQuality(rel_intervals);
+    });
   }
 
   /**

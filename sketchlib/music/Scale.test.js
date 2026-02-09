@@ -23,7 +23,7 @@ describe("ScaleQuality", () => {
 
     expect(() => {
       return scale.mode(-1);
-    }).toThrowError("start_index must be in [0, 6]");
+    }).toThrowError("start_index must be an integer in [0, 6]");
   });
 
   it("mode with index out of range throws", () => {
@@ -32,7 +32,7 @@ describe("ScaleQuality", () => {
 
     expect(() => {
       return scale.mode(10);
-    }).toThrowError("start_index must be in [0, 6]");
+    }).toThrowError("start_index must be an integer in [0, 6]");
   });
 
   it("mode with 0 as start index is identity", () => {

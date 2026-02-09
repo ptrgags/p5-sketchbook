@@ -9,16 +9,7 @@ import {
 import { B4, G4, E4, C4, C3, G3 } from "../../sketchlib/music/pitches.js";
 import { Part, Score } from "../../sketchlib/music/Score.js";
 import { Gap } from "../../sketchlib/music/Timeline.js";
-
-/**
- * Create an integer range [0, n)
- * Why is this not a built-in function??
- * @param {number} n The maximum value
- * @returns {number[]} an array [0, 1, ..., n - 1]
- */
-function range(n) {
-  return new Array(n).fill(0).map((_, i) => i);
-}
+import { range } from "../../sketchlib/range.js";
 
 /**
  * Take a number and convert to bits. They are returned in LSB order
@@ -56,7 +47,7 @@ const silence = new Rest(chord_duration);
 /**
  * @type {Boolean[][]}
  */
-const bits_lsb = range(16).map((x) => to_bits(x, 4));
+const bits_lsb = [...range(16)].map((x) => to_bits(x, 4));
 
 /**
  * @type {Melody<Number>}
