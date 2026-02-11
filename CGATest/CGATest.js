@@ -19,8 +19,6 @@ const REFLECTED_CIRCLE = new Cline(REFLECT.unit_sandwich_odd(CIRCLE.vector));
 
 const INVERT = CIRCLE.vector.normalize();
 const INVERTED_POINT = new Cline(INVERT.unit_sandwich_odd(POINT.vector));
-
-// TODO: This is computing a point, not a line...
 const INVERTED_LINE = new Cline(INVERT.unit_sandwich_odd(LINE.vector));
 
 const LINE_STYLE = new Style({
