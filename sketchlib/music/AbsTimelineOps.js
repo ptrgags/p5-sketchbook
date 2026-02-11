@@ -16,16 +16,26 @@ import { Gap, Parallel, Sequential } from "./Timeline.js";
  * Concat timelines, adding an AbsGap in between if needed
  * @template T
  * @param {AbsTimeline<T>} a First timeline
- * @param {AbsTimeline<T>} b second timeline
+ * @param {AbsInterval<T>} b second timeline
  * @returns {AbsSequential<T>} The concatenated timeline
  */
 function concat_timelines(a, b) {
-  if (a.end_time.equals(b.start_time)) {
-    return new AbsSequential(a, b);
+  const children = [];
+
+  // If the left timeline is a sequential, unpack it
+  // to avoid unnecessary nesting
+  if (a instanceof AbsSequential) {
+    children.push(...a.children);
+  } else {
+    children.push(a);
   }
 
-  const gap = new AbsGap(a.end_time, b.start_time);
-  return new AbsSequential(a, gap, b);
+  if (!a.end_time.equals(b.start_time)) {
+    const gap = new AbsGap(a.end_time, b.start_time);
+    children.push(gap);
+  }
+
+  return new AbsSequential(...children, b);
 }
 
 /**
