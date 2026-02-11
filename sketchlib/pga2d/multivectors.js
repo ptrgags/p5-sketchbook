@@ -12,6 +12,11 @@ export class Even {
     this.yo = yo;
   }
 
+  /**
+   * Add two Even multivectors together
+   * @param {Even} other
+   * @returns {Even}
+   */
   add(other) {
     const scalar = this.scalar + other.scalar;
     const xy = this.xy + other.xy;
@@ -20,6 +25,11 @@ export class Even {
     return new Even(scalar, xy, xo, yo);
   }
 
+  /**
+   * Subtract two Even multivectors
+   * @param {Even} other
+   * @returns {Even}
+   */
   sub(other) {
     const scalar = this.scalar - other.scalar;
     const xy = this.xy - other.xy;
@@ -28,8 +38,24 @@ export class Even {
     return new Even(scalar, xy, xo, yo);
   }
 
+  /**
+   * Compute the multivector y such that for each blade,
+   * x_i wedge y_i = pseudoscalar
+   * @returns {Odd}
+   */
   dual() {
-    return new Odd(this.yo, -this.xo, this.xy, this.scalar);
+    // this_blade ^ abs_dual(this_blade) = sign * xyo
+    // dual(this_blade) = sign * abs_dual(this_blade)
+    // 1 ^ xyo = xyo
+    // xy ^ o = xyo
+    // xo ^ y = -xyo
+    // yo ^ x = xyo
+    const x = this.yo;
+    const y = -this.xo;
+    const o = this.xy;
+    const xyo = this.scalar;
+
+    return new Odd(x, y, o, xyo);
   }
 
   // in 2D PGA, the antidual has exactly the same signs as the dual

@@ -9,4 +9,8 @@ describe("is_nearly", () => {
   it("returns false if difference is larger than 1e-8", () => {
     expect(is_nearly(0.1, 0.1 + 1.1e-8)).toBe(false);
   });
+
+  it("works with custom epsilon", () => {
+    expect(is_nearly(0.100123, 0.1, 0.001)).toBe(true);
+  });
 });

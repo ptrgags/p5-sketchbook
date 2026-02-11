@@ -1,26 +1,8 @@
-import { is_nearly } from "..//is_nearly";
-import { Direction } from "./Direction";
-import { Line } from "./Line";
-import { Even, Odd } from "./multivectors";
-import { Point } from "./Point";
-
-function diff_property(diffs, received, expected, property_name) {
-  const received_value = received[property_name];
-  const expected_value = expected[property_name];
-  if (received_value !== expected_value) {
-    diffs.push(`${property_name}: ${received_value} !== ${expected_value}`);
-  }
-}
-
-function diff_float_property(diffs, received, expected, property_name, label) {
-  const received_value = received[property_name];
-  const expected_value = expected[property_name];
-
-  label = label ?? property_name;
-  if (!is_nearly(received_value, expected_value)) {
-    diffs.push(`${label}: !is_nearly(${received_value}, ${expected_value})`);
-  }
-}
+import { diff_float_property, diff_property } from "./diff_properties.js";
+import { Direction } from "../pga2d/Direction.js";
+import { Line } from "../pga2d/Line.js";
+import { Even, Odd } from "../pga2d/multivectors.js";
+import { Point } from "../pga2d/Point.js";
 
 function format_even_diff(received, expected) {
   if (!(received instanceof Even)) {

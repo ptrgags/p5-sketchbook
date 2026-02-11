@@ -39,3 +39,4 @@ export class Circle {
     return new Circle(midpoint, radius);
   }
 }
+Circle.UNIT_CIRCLE = Object.freeze(new Circle(Point.ORIGIN, 1));

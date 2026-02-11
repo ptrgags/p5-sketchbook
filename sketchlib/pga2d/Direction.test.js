@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { Direction } from "./Direction";
 import { Point } from "./Point";
 import { Line } from "./Line";
-import { PGA_MATCHERS } from "./pga_matchers";
+import { PGA_MATCHERS } from "../test_helpers/pga_matchers";
 
 expect.extend(PGA_MATCHERS);
 

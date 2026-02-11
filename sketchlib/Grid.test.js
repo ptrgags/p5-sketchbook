@@ -2,7 +2,7 @@ import { describe, it, expect, test } from "vitest";
 import { Grid, griderator, Index2D } from "./Grid";
 import { CardinalDirection } from "./CardinalDirection";
 import { Rectangle } from "./Rectangle";
-import { PGA_MATCHERS } from "../sketchlib/pga2d/pga_matchers";
+import { PGA_MATCHERS } from "./test_helpers/pga_matchers";
 import { Point } from "../sketchlib/pga2d/Point";
 import { Direction } from "../sketchlib/pga2d/Direction";
 
