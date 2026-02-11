@@ -39,7 +39,7 @@ function compute_primitive(vector) {
   const center_sqr = center_x * center_x + center_y * center_y;
 
   const discriminant = center_sqr - twice_inf;
-  if (is_nearly(discriminant, 0)) {
+  if (is_nearly(discriminant, 0, 1e-5)) {
     return center;
   } else if (discriminant < 0) {
     // Not sure how to interpret a negative radius here
