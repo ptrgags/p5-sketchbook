@@ -24,6 +24,12 @@ export class COdd {
     this.ypm = ypm;
   }
 
+  /**
+   * Compute the squared norm of the odd multivector
+   * TODO: I need to check the math on this, as the dot product isn't
+   * always a scalar in 4D+
+   * @returns {number}
+   */
   norm_sqr() {
     return (
       this.x * this.x +
@@ -38,6 +44,10 @@ export class COdd {
     );
   }
 
+  /**
+   * Get the magnitude of the multivector
+   * @returns {number}
+   */
   norm() {
     // TODO: not sure how to handle this for negative
     // multivectors. See what kindon does.
@@ -48,6 +58,10 @@ export class COdd {
     return Math.sqrt(norm_sqr);
   }
 
+  /**
+   * Rescale the multivector so it has unit magnitude
+   * @returns {COdd}
+   */
   normalize() {
     const length = this.norm();
     if (is_nearly(length, 0)) {
@@ -66,6 +80,10 @@ export class COdd {
     );
   }
 
+  /**
+   * Negate all the coordinates of this multivector
+   * @returns {COdd}
+   */
   neg() {
     return new COdd(
       -this.x,
@@ -167,6 +185,12 @@ export class COdd {
     return new COdd(x, y, p, m, xyp, xym, xpm, ypm);
   }
 
+  /**
+   * The reverse operation takes each blade and reverses the
+   * order of basis vectors in the wedge product.
+   * This makes the trivector part reverse orientation
+   * @returns {COdd}
+   */
   reverse() {
     return new COdd(
       this.x,

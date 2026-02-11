@@ -24,6 +24,12 @@ export class CEven {
     this.xypm = xypm;
   }
 
+  /**
+   * Compute the squared norm of the multivector
+   * TODO: I need to check the math on this, as the dot product isn't
+   * always a scalar in 4D+
+   * @returns {number}
+   */
   norm_sqr() {
     return (
       this.xy * this.xy +
@@ -36,6 +42,10 @@ export class CEven {
     );
   }
 
+  /**
+   * Get the magnitude of the multivector
+   * @returns {number}
+   */
   norm() {
     const norm_sqr = this.norm_sqr();
     if (norm_sqr < 0) {
@@ -45,6 +55,10 @@ export class CEven {
     return Math.sqrt(norm_sqr);
   }
 
+  /**
+   * Rescale the multivector so it has unit magnitude
+   * @returns {CEven}
+   */
   normalize() {
     const length = this.norm();
     if (is_nearly(length, 0)) {
@@ -63,6 +77,10 @@ export class CEven {
     );
   }
 
+  /**
+   * Negate all the coordinates of this multivector
+   * @returns {CEven}
+   */
   neg() {
     return new CEven(
       this.scalar,
@@ -145,6 +163,12 @@ export class CEven {
    */
   antidual = this.dual;
 
+  /**
+   * The reverse operation takes each blade and reverses the
+   * order of basis vectors. This makes the bivector part
+   * reverse orientation
+   * @returns {CEven}
+   */
   reverse() {
     return new CEven(
       this.scalar,
