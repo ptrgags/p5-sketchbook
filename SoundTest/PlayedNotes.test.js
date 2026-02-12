@@ -18,6 +18,29 @@ function make_note(pitch, start_time, end_time) {
 }
 
 describe("PlayedNotes", () => {
+  describe("pitch_range", () => {
+    it("with empty list of intervals returns undefined", () => {
+      const notes = new PlayedNotes([]);
+
+      const result = notes.pitch_range;
+
+      expect(result).toBeUndefined();
+    });
+
+    it("with several notes returns the min and max pitches", () => {
+      const notes = new PlayedNotes([
+        make_note(C4, Rational.ZERO, N1),
+        make_note(E4, N2, new Rational(2)),
+        make_note(G4, N1, new Rational(3)),
+      ]);
+
+      const result = notes.pitch_range;
+
+      const expected = [C4, G4];
+      expect(result).toEqual(expected);
+    });
+  });
+
   describe("get_held_pitches", () => {
     it("with t less than start returns empty set", () => {
       const notes = new PlayedNotes([

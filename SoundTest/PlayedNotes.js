@@ -2,6 +2,29 @@ import { AbsInterval } from "../sketchlib/music/AbsTimeline.js";
 import { Note } from "../sketchlib/music/Music.js";
 
 /**
+ * Compute the minimum and maximum pitch for a set of
+ * intervals.
+ * TODO: a similar function is defined in render_score.js
+ * @param {AbsInterval<Note<number>>[]} intervals
+ * @returns {[number, number] | undefined}
+ */
+function compute_pitch_range(intervals) {
+  if (intervals.length === 0) {
+    return undefined;
+  }
+
+  let max_pitch = 0;
+  let min_pitch = 127;
+  for (const interval of intervals) {
+    const pitch = interval.value.pitch;
+    max_pitch = Math.max(max_pitch, pitch);
+    min_pitch = Math.min(min_pitch, pitch);
+  }
+
+  return [min_pitch, max_pitch];
+}
+
+/**
  * Track the pitches pressed and released at a single instant
  * in time.
  */
@@ -32,6 +55,25 @@ function get_or_insert(map, key, default_func) {
     map.set(key, default_func());
   }
   return map.get(key);
+}
+
+/**
+ *
+ * @param {AbsInterval<Note<number>>[]} abs_notes
+ * @returns {Map<number, NoteSets>}
+ */
+function compute_note_sets(abs_notes) {
+  const note_sets = new Map();
+  for (const interval of abs_notes) {
+    const start = interval.start_time.real;
+    const end = interval.end_time.real;
+    const pitch = interval.value.pitch;
+
+    get_or_insert(note_sets, start, () => new NoteSets()).pressed.add(pitch);
+    get_or_insert(note_sets, end, () => new NoteSets()).released.add(pitch);
+  }
+
+  return note_sets;
 }
 
 /**
@@ -70,27 +112,15 @@ export class PlayedNotes {
    */
   constructor(abs_notes) {
     /**
-     * @type {Map<number, NoteSets>}
+     * @type {[number, number]}
      */
-    this.note_sets = new Map();
+    this.pitch_range = compute_pitch_range(abs_notes);
 
-    for (const interval of abs_notes) {
-      const start = interval.start_time.real;
-      const end = interval.end_time.real;
-      const pitch = interval.value.pitch;
-
-      get_or_insert(this.note_sets, start, () => new NoteSets()).pressed.add(
-        pitch,
-      );
-      get_or_insert(this.note_sets, end, () => new NoteSets()).released.add(
-        pitch,
-      );
-    }
-
+    const note_sets = compute_note_sets(abs_notes);
     /**
      * @type {[number, Set<number>][]}
      */
-    this.held_notes = compute_held(this.note_sets);
+    this.held_notes = compute_held(note_sets);
   }
 
   /**
