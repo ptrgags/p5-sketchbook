@@ -231,7 +231,7 @@ class SoundScene {
     this.sound = sound;
     this.mute_button = new MuteButton();
     this.events = new EventTarget();
-    this.piano = new Piano(PIANO_BOUNDS, 3, 4);
+    this.piano = new Piano(new PlayedNotes([]));
     this.spiral_burst = new SpiralBurst();
 
     this.mute_button.events.addEventListener(
@@ -291,12 +291,14 @@ class SoundScene {
      */
     this.selected_melody = undefined;
 
-    CUES.events.addEventListener("note-on", (/** @type {CustomEvent} */ e) => {
-      this.piano.trigger(e.detail.value.pitch);
-    });
-    CUES.events.addEventListener("note-off", (/** @type {CustomEvent} */ e) => {
-      this.piano.release(e.detail.value.pitch);
-    });
+    CUES.events.addEventListener(
+      "note-on",
+      (/** @type {CustomEvent} */ e) => {},
+    );
+    CUES.events.addEventListener(
+      "note-off",
+      (/** @type {CustomEvent} */ e) => {},
+    );
 
     this.melody_buttons = melodies.map_array((index, descriptor) => {
       const corner = index.to_world(FIRST_BUTTON_POSITION, BUTTON_STRIDE);
@@ -313,7 +315,7 @@ class SoundScene {
     const score = SOUND_MANIFEST.scores[score_id];
 
     this.selected_melody = score_id;
-    this.update_piano(score);
+    this.replace_piano(score);
     this.sound.play_score(score_id);
     this.export_button.disabled = false;
     this.export_gm_button.disabled = false;
@@ -329,14 +331,13 @@ class SoundScene {
    *
    * @param {Score<number>} score
    */
-  update_piano(score) {
+  replace_piano(score) {
     const all_notes = score.parts.flatMap((part) => {
       const abs_music = AbsTimelineOps.from_relative(part.music);
       return [...AbsTimelineOps.iter_intervals(abs_music)];
     });
-    const held_notes = new PlayedNotes(all_notes);
-    console.log(held_notes);
-    this.piano.reset();
+    const played_notes = new PlayedNotes(all_notes);
+    this.piano = new Piano(played_notes);
   }
 
   /**
@@ -377,17 +378,20 @@ class SoundScene {
   render() {
     const current_time = SOUND.transport_time;
 
+    // this should really go in update()
+    this.piano.update(current_time);
+
     const mute = this.mute_button.render();
     const melody_buttons = this.melody_buttons.map((x) => x.debug_render());
-    const piano = this.piano.render();
     const burst = this.spiral_burst.render(current_time);
     const timeline = this.render_timeline(current_time);
 
+    // TODO: this should be rewritten to use the Animated interface
     return group(
       mute,
       ...melody_buttons,
       BUTTON_LABELS,
-      piano,
+      this.piano.primitive,
       timeline,
       CURSOR,
       burst,

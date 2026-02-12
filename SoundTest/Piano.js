@@ -3,12 +3,15 @@ import { group } from "../sketchlib/primitives/shorthand.js";
 import { MIDIPitch } from "../sketchlib/music/MIDIPitch.js";
 import { Rectangle } from "../sketchlib/Rectangle.js";
 import { SingleOctavePiano } from "./SingleOctavePiano.js";
+import { Animated } from "../sketchlib/animation/Animated.js";
+import { PlayedNotes } from "./PlayedNotes.js";
+import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 
 /**
  * Multiple-octave piano visualization. The size and number of octaves is
  * configurable.
  */
-export class Piano {
+class OldPiano {
   /**
    * Constructor
    * @param {Rectangle} bounding_rect Bounding rectangle for the whole keyboard
@@ -98,6 +101,8 @@ export class Piano {
     }
   }
 
+  update(time) {}
+
   reset() {
     this.key_presses.fill(0);
     this.octave_pianos.forEach((x) => x.reset());
@@ -107,4 +112,19 @@ export class Piano {
     const octave_primitives = this.octave_pianos.map((x) => x.primitive);
     return group(...octave_primitives);
   }
+}
+
+/**
+ * @implements {Animated}
+ */
+export class Piano {
+  /**
+   * Constructor
+   * @param {PlayedNotes} score_notes The notes that will be played over time
+   */
+  constructor(score_notes) {
+    this.primitive = GroupPrimitive.EMPTY;
+  }
+
+  update(time) {}
 }
