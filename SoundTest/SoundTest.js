@@ -80,8 +80,6 @@ for (const [key, score] of Object.entries(SOUND_MANIFEST.scores)) {
 
 //@ts-ignore
 const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
-//@ts-ignore
-const CUES = new MusicalCues(Tone);
 
 class MelodyButtonDescriptor {
   /**
@@ -291,15 +289,6 @@ class SoundScene {
      */
     this.selected_melody = undefined;
 
-    CUES.events.addEventListener(
-      "note-on",
-      (/** @type {CustomEvent} */ e) => {},
-    );
-    CUES.events.addEventListener(
-      "note-off",
-      (/** @type {CustomEvent} */ e) => {},
-    );
-
     this.melody_buttons = melodies.map_array((index, descriptor) => {
       const corner = index.to_world(FIRST_BUTTON_POSITION, BUTTON_STRIDE);
       const rectangle = new Rectangle(corner, MELODY_BUTTON_DIMENSIONS);
@@ -319,12 +308,6 @@ class SoundScene {
     this.sound.play_score(score_id);
     this.export_button.disabled = false;
     this.export_gm_button.disabled = false;
-
-    // TEMP: This only works after play_score because SoundManager clears
-    // the _entire_ timeline. The next version should keep track of
-    // scheduled IDs and only clear ones pertaining to music.
-    CUES.unschedule_all();
-    CUES.schedule_notes(score);
   }
 
   /**
