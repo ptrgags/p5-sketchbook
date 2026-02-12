@@ -103,5 +103,14 @@ describe("PlayedNotes", () => {
       const expected = new Set([G4]);
       expect(result).toEqual(expected);
     });
+
+    it("with no music returns empty set", () => {
+      const notes = new PlayedNotes([]);
+
+      const result = notes.get_held_pitches(1 / 4);
+
+      const expected = new Set([]);
+      expect(result).toEqual(expected);
+    });
   });
 });

@@ -100,7 +100,11 @@ export class PlayedNotes {
    */
   get_held_pitches(t) {
     // If t is outside the range, return the empty set
-    if (t < this.held_notes[0][0] || t >= this.held_notes.at(-1)[0]) {
+    if (
+      this.held_notes.length === 0 ||
+      t < this.held_notes[0][0] ||
+      t >= this.held_notes.at(-1)[0]
+    ) {
       return new Set();
     }
 
