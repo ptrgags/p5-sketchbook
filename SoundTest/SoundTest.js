@@ -231,7 +231,7 @@ class SoundScene {
     this.sound = sound;
     this.mute_button = new MuteButton();
     this.events = new EventTarget();
-    this.piano = new Piano(new PlayedNotes([]));
+    this.piano = new Piano(PIANO_BOUNDS, new PlayedNotes([]));
     this.spiral_burst = new SpiralBurst();
 
     this.mute_button.events.addEventListener(
@@ -337,7 +337,7 @@ class SoundScene {
       return [...AbsTimelineOps.iter_intervals(abs_music)];
     });
     const played_notes = new PlayedNotes(all_notes);
-    this.piano = new Piano(played_notes);
+    this.piano = new Piano(PIANO_BOUNDS, played_notes);
   }
 
   /**
