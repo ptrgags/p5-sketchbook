@@ -36,6 +36,9 @@ import { SCORE_BINARY_CHORDS } from "./example_scores/binary_chords.js";
 import { SCORE_ORGAN_CHORDS } from "./example_scores/organ_chords.js";
 import { SCORE_PATTERN_TEST } from "./example_scores/pattern_test.js";
 import { SCORE_LAYERED_MELODY } from "./example_scores/layered_melody.js";
+import { Score } from "../sketchlib/music/Score.js";
+import { AbsTimelineOps } from "../sketchlib/music/AbsTimelineOps.js";
+import { PlayedNotes } from "./PlayedNotes.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -307,8 +310,10 @@ class SoundScene {
   }
 
   change_score(score_id) {
+    const score = SOUND_MANIFEST.scores[score_id];
+
     this.selected_melody = score_id;
-    this.piano.reset();
+    this.update_piano(score);
     this.sound.play_score(score_id);
     this.export_button.disabled = false;
     this.export_gm_button.disabled = false;
@@ -316,9 +321,22 @@ class SoundScene {
     // TEMP: This only works after play_score because SoundManager clears
     // the _entire_ timeline. The next version should keep track of
     // scheduled IDs and only clear ones pertaining to music.
-    const score = SOUND_MANIFEST.scores[score_id];
     CUES.unschedule_all();
     CUES.schedule_notes(score);
+  }
+
+  /**
+   *
+   * @param {Score<number>} score
+   */
+  update_piano(score) {
+    const all_notes = score.parts.flatMap((part) => {
+      const abs_music = AbsTimelineOps.from_relative(part.music);
+      return [...AbsTimelineOps.iter_intervals(abs_music)];
+    });
+    const held_notes = new PlayedNotes(all_notes);
+    console.log(held_notes);
+    this.piano.reset();
   }
 
   /**
