@@ -14,7 +14,28 @@ expect.extend(PGA_MATCHERS);
 expect.extend(CGA_MATCHERS);
 
 describe("CVersor", () => {
-  describe("reflection", () => {});
+  describe("reflection", () => {
+    // reflects point over line
+    // fixes point on line
+    // fixes point at infinity
+    // fixes point
+    // fixes circle centered on line
+    // flips circle preserving radius
+    // fixes line of reflection
+    // fixes orthogonal line
+    // is an involution
+  });
+
+  describe("circle_inversion", () => {
+    // fixes point on unit circle
+    // swaps origin and infinity
+    // fixes unit circle
+    // fixes line through origin
+    // line outside the circle inverts to a circle through the origin...
+    //    this is because inf -> 0,
+    //    the closest point on the line to the origin is closest to the circle, so its inverse determines the point opposite the origin... I think?
+    // is an involution
+  });
 
   describe("translation", () => {
     it("translates point", () => {
@@ -150,11 +171,49 @@ describe("CVersor", () => {
     });
   });
 
-  describe("dilation", () => {});
+  describe("dilation", () => {
+    // fixes origin
+    // fixes point at infinity
+    // scales coordinates of point
+    // with circle at origin adjusts radius
+    // with general circle scales the center away from the origin and adjusts the radius
+    // fixes line through origin
+    // scales line distance with same normal
+    // inverse is same as scale by reciprocal factor
+  });
 
-  describe("inverse", () => {});
+  describe("inverse", () => {
+    it("a versor and its inverse compose to identity", () => {
+      const translation = CVersor.translation(new Direction(1, 2));
+      const rotation = CVersor.rotation(Math.PI);
+      const versor = translation.compose(rotation);
 
-  describe("compose", () => {});
+      const inv = versor.inv();
+      const v_inv = versor.compose(inv);
+      const inv_v = inv.compose(versor);
 
-  describe("conjugate", () => {});
+      expect(v_inv).toEqual(CVersor.IDENTITY);
+      expect(inv_v).toEqual(CVersor.IDENTITY);
+    });
+  });
+
+  describe("compose", () => {
+    it("scale and rotation make a spiral transformation", () => {
+      const point = Cline.from_point(new Point(2, 1));
+      const scale = CVersor.dilation(2);
+      const rot90 = CVersor.rotation(Math.PI / 2);
+
+      const spiral = rot90.compose(scale);
+      const result = spiral.transform_cline(point);
+
+      // (2, 1) --rot--> (-1, 2) --scale--> (-2, 4)
+      const expected = new Point(-2, 4);
+      expect(result.primitive).toEqual(expected);
+    });
+  });
+
+  describe("conjugate", () => {
+    // a general line reflection is  T(dist) sandwich reflect(normal)
+    // a general circle inversion is T(center)S(radius) sandwich circle_inversion
+  });
 });
