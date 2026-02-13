@@ -259,4 +259,35 @@ describe("Direction", () => {
       expect_direction_array(result, expected);
     });
   });
+
+  describe("4-fold rotations", () => {
+    it("rot90 returns direction rotated 90 degrees in the positive direction", () => {
+      const dir = new Direction(3, 4);
+
+      const result = dir.rot90();
+
+      const expected = new Direction(-4, 3);
+      expect(result).toBeDirection(expected);
+    });
+
+    it("rot180 returns the same result as neg", () => {
+      const dir = new Direction(3, 4);
+
+      const rot = dir.rot180();
+      const neg = dir.rot180();
+
+      const expected = new Direction(-3, -4);
+      expect(rot).toBeDirection(expected);
+      expect(neg).toBeDirection(expected);
+    });
+
+    it("rot270 returns direction rotated 90 degrees in the negative direction", () => {
+      const dir = new Direction(3, 4);
+
+      const result = dir.rot270();
+
+      const expected = new Direction(4, -3);
+      expect(result).toBeDirection(expected);
+    });
+  });
 });
