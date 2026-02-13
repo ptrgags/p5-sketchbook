@@ -134,3 +134,13 @@ export class Cline {
     return new Cline(new COdd(x, y, p, m, 0, 0, 0, 0));
   }
 }
+/**
+ * Null point representing infinity, inf = (m + p)
+ * @type {Readonly<Cline>}
+ */
+Cline.INF = Object.freeze(new Cline(new COdd(0, 0, 1, 1, 0, 0, 0, 0)));
+/**
+ * Null point representing the origin, o = 1/2(m - p)
+ * @type {Readonly<Cline>}
+ */
+Cline.ORIGIN = Object.freeze(Cline.from_point(Point.ORIGIN));

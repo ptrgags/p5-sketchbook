@@ -37,7 +37,7 @@ export class CVersor {
    * @param {Direction} offset The offset length and direction
    * @returns {CVersor}
    */
-  static translate(offset) {
+  static translation(offset) {
     const { x, y } = offset;
 
     // R = exp(-offset/2 inf)
@@ -79,7 +79,7 @@ export class CVersor {
    * @param {number} factor nonzero scale factor
    * @returns {CVersor}
    */
-  static scale(factor) {
+  static dilation(factor) {
     // R = exp(-ln(factor)/2 pm)
     // = cosh(-ln(factor)/2) + sinh(-ln(factor)/2) pm
     // = cosh(ln(factor)/2) - sinh(ln(factor)/2) pm
@@ -112,6 +112,17 @@ export class CVersor {
     const s = -0.5 * (sqrt_factor - inv_sqrt);
     const versor = new CEven(c, 0, 0, 0, 0, 0, s, 0);
     return new CVersor(versor);
+  }
+
+  /**
+   * Invert the versor. Since these versors are represented
+   * by unit multivectors, this can be done using
+   * versor.reverse() rather than the inverse calculation
+   * which is rather gnarly
+   * @returns {CVersor}
+   */
+  inv() {
+    return new CVersor(this.versor.reverse());
   }
 
   /**
