@@ -69,7 +69,7 @@ export class CVersor {
     //   = cos(-angle/2) + sin(-angle/2) xy
     //   = cos(angle/2) - sin(angle/2) xy
     const c = Math.cos(angle / 2);
-    const s = Math.sin(angle / 2);
+    const s = -Math.sin(angle / 2);
     const versor = new CEven(c, s, 0, 0, 0, 0, 0, 0);
     return new CVersor(versor);
   }
@@ -155,3 +155,10 @@ export class CVersor {
     return new Cline(result);
   }
 }
+/**
+ * The identity versor is the scalar 1
+ * @type {CVersor}
+ */
+CVersor.IDENTITY = Object.freeze(
+  new CVersor(new CEven(1, 0, 0, 0, 0, 0, 0, 0)),
+);

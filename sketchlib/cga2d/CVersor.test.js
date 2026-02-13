@@ -81,9 +81,78 @@ describe("CVersor", () => {
     });
   });
 
-  describe("rotation", () => {});
+  describe("rotation", () => {
+    it("Rotates point in the positive direction", () => {
+      const point = Cline.from_point(new Point(3, 4));
+      const rotation = CVersor.rotation(Math.PI / 2);
+
+      const result = rotation.transform_cline(point);
+
+      // Rotate 90 degrees is (-y, x)
+      const expected = new Point(-4, 3);
+      expect(result.primitive).toBePoint(expected);
+    });
+
+    it("fixes circle centered at origin", () => {
+      const circle = new Circle(Point.ORIGIN, 5);
+      const circle_cline = Cline.from_circle(circle);
+      const rotation = CVersor.rotation(Math.PI / 2);
+
+      const result = rotation.transform_cline(circle_cline);
+
+      expect(result.primitive).toEqual(circle);
+    });
+
+    it("rotates circle center with same radius", () => {
+      const circle = new Circle(new Point(5, -2), 5);
+      const circle_cline = Cline.from_circle(circle);
+      const rotation = CVersor.rotation(Math.PI / 2);
+
+      const result = rotation.transform_cline(circle_cline);
+
+      const expected = new Circle(new Point(2, 5), 5);
+      expect(result.primitive).toEqual(expected);
+    });
+
+    it("rotates line with same distance", () => {
+      const line = Cline.from_line(new Line(3 / 5, 4 / 5, 10));
+      const rotation = CVersor.rotation(Math.PI / 2);
+
+      const result = rotation.transform_cline(line);
+
+      const expected = new Line(-4 / 5, 3 / 5, 10);
+      expect(result.primitive).toEqual(expected);
+    });
+
+    it("fixes the origin", () => {
+      const rotation = CVersor.rotation(Math.PI / 2);
+
+      const result = rotation.transform_cline(Cline.ORIGIN);
+
+      expect(result).toEqual(Cline.ORIGIN);
+    });
+
+    it("fixes the point at infinity", () => {
+      const rotation = CVersor.rotation(Math.PI / 2);
+
+      const result = rotation.transform_cline(Cline.INF);
+
+      expect(result).toEqual(Cline.INF);
+    });
+
+    it("inverse is the same as rotation with negative angle", () => {
+      const rotation = CVersor.rotation(Math.PI / 2);
+
+      const neg_angle = CVersor.rotation(-Math.PI / 2);
+      const inv = rotation.inv();
+
+      expect(inv.versor).toEqual(neg_angle.versor);
+    });
+  });
 
   describe("dilation", () => {});
+
+  describe("inverse", () => {});
 
   describe("compose", () => {});
 
