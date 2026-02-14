@@ -36,10 +36,12 @@ import { SCORE_BINARY_CHORDS } from "./example_scores/binary_chords.js";
 import { SCORE_ORGAN_CHORDS } from "./example_scores/organ_chords.js";
 import { SCORE_PATTERN_TEST } from "./example_scores/pattern_test.js";
 import { SCORE_LAYERED_MELODY } from "./example_scores/layered_melody.js";
-import { Score } from "../sketchlib/music/Score.js";
+import { Part, Score } from "../sketchlib/music/Score.js";
 import { AbsTimelineOps } from "../sketchlib/music/AbsTimelineOps.js";
 import { PlayedNotes } from "./PlayedNotes.js";
 import { Ocarina } from "./Ocarina.js";
+import { RelTimelineOps } from "../sketchlib/music/RelTimelineOps.js";
+import { A4, F6 } from "../sketchlib/music/pitches.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -310,7 +312,7 @@ class SoundScene {
     const score = SOUND_MANIFEST.scores[score_id];
 
     this.selected_melody = score_id;
-    this.replace_piano(score);
+    this.replace_instruments(score);
     this.sound.play_score(score_id);
     this.export_button.disabled = false;
     this.export_gm_button.disabled = false;
@@ -319,17 +321,90 @@ class SoundScene {
   /**
    *
    * @param {Score<number>} score
+   * @returns {{
+   * drums: Part<number>[],
+   * monophonic: Part<number>[],
+   * polyphonic: Part<number>[]
+   * }}
    */
-  replace_piano(score) {
-    const non_drums = score.parts.filter((part) => {
+  classify_parts(score) {
+    const drums = [];
+    const monophonic = [];
+    const polyphonic = [];
+    for (const part of score.parts) {
       const DRUMS = 9;
-      return part.midi_channel !== DRUMS;
-    });
-    const all_notes = non_drums.flatMap((part) => {
-      const abs_music = AbsTimelineOps.from_relative(part.music);
-      return [...AbsTimelineOps.iter_intervals(abs_music)];
-    });
-    const played_notes = new PlayedNotes(all_notes);
+      if (part.midi_channel === DRUMS) {
+        drums.push(part);
+        continue;
+      }
+
+      const voices = RelTimelineOps.num_lanes(part.music);
+      if (voices === 1) {
+        monophonic.push(part);
+      } else {
+        polyphonic.push(part);
+      }
+    }
+
+    return {
+      drums,
+      monophonic,
+      polyphonic,
+    };
+  }
+
+  /**
+   *
+   * @param {Score<number>} score
+   */
+  replace_instruments(score) {
+    const { polyphonic, monophonic } = this.classify_parts(score);
+
+    const all_intervals = [];
+
+    const ocarina_compatible = [];
+    for (const mono_part of monophonic) {
+      const abs_music = AbsTimelineOps.from_relative(mono_part.music);
+      const intervals = [...AbsTimelineOps.iter_intervals(abs_music)];
+      const notes = new PlayedNotes(intervals);
+
+      // check if ocarina compatible for a tenor ocarina
+      if (
+        notes.pitch_range &&
+        notes.pitch_range[0] >= A4 &&
+        notes.pitch_range[1] <= F6 &&
+        // only kep the first compatible melody
+        ocarina_compatible.length === 0
+      ) {
+        ocarina_compatible.push(notes);
+      } else {
+        all_intervals.push(...intervals);
+      }
+
+      console.log(mono_part, notes.pitch_range);
+    }
+
+    console.log("ocarina compatible: ", ocarina_compatible);
+    if (ocarina_compatible.length === 0) {
+      this.ocarina = new Ocarina(
+        new Rectangle(Point.ORIGIN, new Direction(400, 400)),
+        new PlayedNotes([]),
+        4,
+      );
+    } else {
+      const [ocarina_notes] = ocarina_compatible;
+      this.ocarina = new Ocarina(
+        new Rectangle(Point.ORIGIN, new Direction(400, 400)),
+        ocarina_notes,
+        4,
+      );
+    }
+
+    for (const poly_part of polyphonic) {
+      const abs_music = AbsTimelineOps.from_relative(poly_part.music);
+      all_intervals.push(...AbsTimelineOps.iter_intervals(abs_music));
+    }
+    const played_notes = new PlayedNotes(all_intervals);
     this.piano = new Piano(PIANO_BOUNDS, played_notes);
   }
 
@@ -373,6 +448,7 @@ class SoundScene {
 
     // this should really go in update()
     this.piano.update(current_time);
+    this.ocarina.update(current_time);
 
     const mute = this.mute_button.render();
     const melody_buttons = this.melody_buttons.map((x) => x.debug_render());
