@@ -34,360 +34,45 @@ const FINGER_HOLES_UV = [
 // sporano ocarina range: [A5, F7]
 const FINGERING_CHART = [
   // A4
-  [
-    // Left hand
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    // right hand
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-  ],
+  "111111|111111",
   // A#4
-  [
-    // left hand
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    // right hand
-    true,
-    true,
-    true,
-    true,
-    true,
-    false,
-  ],
+  "111111|111110",
   // B4
-  [
-    // left
-    true,
-    true,
-    true,
-    true,
-    true,
-    false,
-    // right hand
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-  ],
+  "111110|111111",
   // C5
-  [
-    // left
-    true,
-    true,
-    true,
-    true,
-    true,
-    false,
-    // right
-    true,
-    true,
-    true,
-    true,
-    true,
-    false,
-  ],
+  "111110|111110",
   // C#5
-  [
-    // left
-    true,
-    true,
-    true,
-    true,
-    true,
-    false,
-    // right
-    true,
-    true,
-    true,
-    false,
-    true,
-    true,
-  ],
+  "111110|111011",
   // D5
-  [
-    // left
-    true,
-    true,
-    true,
-    true,
-    true,
-    false,
-    // right
-    true,
-    true,
-    true,
-    false,
-    true,
-    false,
-  ],
+  "111110|111010",
   // D#5
-  [
-    // left
-    true,
-    true,
-    true,
-    true,
-    true,
-    false,
-    // right
-    true,
-    true,
-    false,
-    false,
-    true,
-    true,
-  ],
+  "111110|110011",
   // E5
-  [
-    // left
-    true,
-    true,
-    true,
-    true,
-    true,
-    false,
-    // right
-    true,
-    true,
-    false,
-    false,
-    true,
-    false,
-  ],
+  "111110|110010",
   // F5
-  [
-    // left
-    true,
-    true,
-    true,
-    true,
-    true,
-    false,
-    // right
-    true,
-    false,
-    false,
-    false,
-    true,
-    false,
-  ],
+  "111110|100010",
   // F#5
-  [
-    // left
-    true,
-    true,
-    true,
-    true,
-    true,
-    false,
-    // right
-    false,
-    false,
-    true,
-    false,
-    true,
-    false,
-  ],
+  "111110|001010",
   // G5
-  [
-    // left
-    true,
-    true,
-    true,
-    true,
-    true,
-    false,
-    // right
-    false,
-    false,
-    false,
-    false,
-    true,
-    false,
-  ],
+  "111110|000010",
   // G#5
-  [
-    // left
-    true,
-    true,
-    false,
-    true,
-    true,
-    false,
-    // right
-    false,
-    false,
-    true,
-    false,
-    true,
-    false,
-  ],
+  "110110|001010",
   // A5
-  [
-    // left
-    true,
-    true,
-    false,
-    true,
-    true,
-    false,
-    // right
-    false,
-    false,
-    false,
-    false,
-    true,
-    false,
-  ],
+  "110110|000010",
   // A#5
-  [
-    // left
-    true,
-    false,
-    false,
-    true,
-    true,
-    false,
-    // right
-    false,
-    false,
-    true,
-    false,
-    true,
-    false,
-  ],
+  "100110|001010",
   // B5
-  [
-    // left
-    true,
-    false,
-    false,
-    true,
-    true,
-    false,
-    // right
-    false,
-    false,
-    false,
-    false,
-    true,
-    false,
-  ],
+  "100110|000010",
   // C6
-  [
-    // left
-    false,
-    false,
-    false,
-    true,
-    true,
-    false,
-    // right
-    false,
-    false,
-    false,
-    false,
-    true,
-    false,
-  ],
+  "000110|000010",
   // C#6
-  [
-    // left
-    false,
-    false,
-    false,
-    true,
-    false,
-    false,
-    // right
-    false,
-    false,
-    true,
-    false,
-    true,
-    false,
-  ],
+  "000100|001010",
   // D6
-  [
-    // left
-    false,
-    false,
-    false,
-    true,
-    false,
-    false,
-    // right
-    false,
-    false,
-    false,
-    false,
-    true,
-    false,
-  ],
+  "000100|000010",
   // D#6
-  [
-    // left
-    false,
-    false,
-    false,
-    true,
-    false,
-    false,
-    // right
-    false,
-    false,
-    true,
-    false,
-    false,
-    false,
-  ],
+  "000100|001000",
   // E6
-  [
-    // left
-    false,
-    false,
-    false,
-    true,
-    false,
-    false,
-    // right
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-  ],
+  "000100|000000",
   // F6
-  [
-    // left
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    // right
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-  ],
+  "000000|000000",
 ];
