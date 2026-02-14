@@ -315,7 +315,11 @@ class SoundScene {
    * @param {Score<number>} score
    */
   replace_piano(score) {
-    const all_notes = score.parts.flatMap((part) => {
+    const non_drums = score.parts.filter((part) => {
+      const DRUMS = 9;
+      return part.midi_channel !== DRUMS;
+    });
+    const all_notes = non_drums.flatMap((part) => {
       const abs_music = AbsTimelineOps.from_relative(part.music);
       return [...AbsTimelineOps.iter_intervals(abs_music)];
     });
