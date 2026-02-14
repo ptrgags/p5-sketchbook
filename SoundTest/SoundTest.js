@@ -368,6 +368,11 @@ class SoundScene {
       const intervals = [...AbsTimelineOps.iter_intervals(abs_music)];
       const notes = new PlayedNotes(intervals);
 
+      if (notes.pitch_range) {
+        const octave = Ocarina.check_compatibility(notes.pitch_range);
+        console.log("octave", octave);
+      }
+
       // check if ocarina compatible for a tenor ocarina
       if (
         notes.pitch_range &&
@@ -461,9 +466,9 @@ class SoundScene {
       ...melody_buttons,
       BUTTON_LABELS,
       this.piano.primitive,
-      this.ocarina.primitive,
       timeline,
       CURSOR,
+      this.ocarina.primitive,
       burst,
     );
   }

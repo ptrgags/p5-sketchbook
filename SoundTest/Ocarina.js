@@ -1,6 +1,6 @@
 import { Animated } from "../sketchlib/animation/Animated.js";
 import { MIDIPitch } from "../sketchlib/music/MIDIPitch.js";
-import { A, F } from "../sketchlib/music/pitches.js";
+import { A, A4, F, F6 } from "../sketchlib/music/pitches.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
@@ -154,5 +154,34 @@ export class Ocarina {
     const index = pitch - this.start_note;
     const fingering = FINGERING_CHART[index] ?? NO_HOLES;
     this.primitive.show_flags = fingering;
+  }
+
+  /**
+   *
+   * @param {[number, number]} pitch_range (min_pitch, max_pitch)
+   * @returns {number | undefined}
+   */
+  static check_compatibility(pitch_range) {
+    const [min_pitch, max_pitch] = pitch_range;
+
+    // If the range is too big, it's definitely not
+    // compatible
+    if (max_pitch - min_pitch > F6 - A4) {
+      return undefined;
+    }
+
+    // bass = A3 to F5
+    // alto/tenor = A3 to F6
+    for (let octave = 3; octave <= 5; octave++) {
+      const start = MIDIPitch.from_pitch_octave(A, octave);
+      const end = MIDIPitch.from_pitch_octave(F, octave + 2);
+
+      if (min_pitch >= start && max_pitch <= end) {
+        return octave;
+      }
+    }
+
+    // not compatible
+    return undefined;
   }
 }
