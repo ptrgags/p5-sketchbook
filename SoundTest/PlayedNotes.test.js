@@ -3,7 +3,7 @@ import { PlayedNotes } from "./PlayedNotes.js";
 import { AbsInterval } from "../sketchlib/music/AbsTimeline.js";
 import { Note } from "../sketchlib/music/Music.js";
 import { Rational } from "../sketchlib/Rational.js";
-import { C4, E4, G4 } from "../sketchlib/music/pitches.js";
+import { C3, C4, D4, E4, F4, G4 } from "../sketchlib/music/pitches.js";
 import { N1, N2, N4 } from "../sketchlib/music/durations.js";
 
 /**
@@ -92,6 +92,30 @@ describe("PlayedNotes", () => {
       expect(result).toEqual(expected);
     });
 
+    it("with t in gap returns empty set", () => {
+      const notes = new PlayedNotes([
+        make_note(C4, Rational.ZERO, N4),
+        make_note(E4, N2, new Rational(3, 4)),
+      ]);
+
+      const result = notes.get_held_pitches(3 / 8);
+
+      const expected = new Set([]);
+      expect(result).toEqual(expected);
+    });
+
+    it("with chord and t in overlap returns correct pitches", () => {
+      const chord = new PlayedNotes([
+        make_note(C4, Rational.ZERO, N1),
+        make_note(E4, Rational.ZERO, N1),
+        make_note(G4, Rational.ZERO, N1),
+      ]);
+
+      const result = chord.get_held_pitches(1 / 2);
+      const expected = new Set([C4, E4, G4]);
+      expect(result).toEqual(expected);
+    });
+
     it("with legato melody and t in overlap returns correct pitches", () => {
       // C---|....|
       // ..E-|----|
@@ -133,6 +157,49 @@ describe("PlayedNotes", () => {
       const result = notes.get_held_pitches(1 / 4);
 
       const expected = new Set([]);
+      expect(result).toEqual(expected);
+    });
+  });
+
+  describe("debug parallel case", () => {
+    const corner_case = new PlayedNotes([
+      // bass line
+      make_note(C3, Rational.ZERO, N4),
+      make_note(C3, N2, new Rational(3, 4)),
+      make_note(C3, Rational.ONE, new Rational(5, 4)),
+      make_note(C3, new Rational(6, 4), new Rational(7, 4)),
+      // scale in parallel starting at measure 1
+      make_note(C4, Rational.ONE, new Rational(5, 4)),
+      make_note(D4, new Rational(5, 4), new Rational(6, 4)),
+      make_note(E4, new Rational(6, 4), new Rational(7, 4)),
+      make_note(F4, new Rational(7, 4), new Rational(8, 4)),
+    ]);
+
+    it("with t before overlap returns correct pitches", () => {
+      const result = corner_case.get_held_pitches(1 / 8);
+
+      const expected = new Set([C3]);
+      expect(result).toEqual(expected);
+    });
+
+    it("with t at start of overlap returns correct pitches", () => {
+      const result = corner_case.get_held_pitches(1);
+
+      const expected = new Set([C3, C4]);
+      expect(result).toEqual(expected);
+    });
+
+    it("with t in gap of bass line returns correct pitches", () => {
+      const result = corner_case.get_held_pitches(11 / 8);
+
+      const expected = new Set([D4]);
+      expect(result).toEqual(expected);
+    });
+
+    it("with t in middle of overlap returns correct pitches", () => {
+      const result = corner_case.get_held_pitches(13 / 8);
+
+      const expected = new Set([C3, E4]);
       expect(result).toEqual(expected);
     });
   });
