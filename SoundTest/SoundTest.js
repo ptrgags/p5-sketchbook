@@ -36,6 +36,9 @@ import { SCORE_BINARY_CHORDS } from "./example_scores/binary_chords.js";
 import { SCORE_ORGAN_CHORDS } from "./example_scores/organ_chords.js";
 import { SCORE_PATTERN_TEST } from "./example_scores/pattern_test.js";
 import { SCORE_LAYERED_MELODY } from "./example_scores/layered_melody.js";
+import { Score } from "../sketchlib/music/Score.js";
+import { AbsTimelineOps } from "../sketchlib/music/AbsTimelineOps.js";
+import { PlayedNotes } from "./PlayedNotes.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -77,8 +80,6 @@ for (const [key, score] of Object.entries(SOUND_MANIFEST.scores)) {
 
 //@ts-ignore
 const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
-//@ts-ignore
-const CUES = new MusicalCues(Tone);
 
 class MelodyButtonDescriptor {
   /**
@@ -228,7 +229,7 @@ class SoundScene {
     this.sound = sound;
     this.mute_button = new MuteButton();
     this.events = new EventTarget();
-    this.piano = new Piano(PIANO_BOUNDS, 3, 4);
+    this.piano = new Piano(PIANO_BOUNDS, new PlayedNotes([]));
     this.spiral_burst = new SpiralBurst();
 
     this.mute_button.events.addEventListener(
@@ -288,13 +289,6 @@ class SoundScene {
      */
     this.selected_melody = undefined;
 
-    CUES.events.addEventListener("note-on", (/** @type {CustomEvent} */ e) => {
-      this.piano.trigger(e.detail.value.pitch);
-    });
-    CUES.events.addEventListener("note-off", (/** @type {CustomEvent} */ e) => {
-      this.piano.release(e.detail.value.pitch);
-    });
-
     this.melody_buttons = melodies.map_array((index, descriptor) => {
       const corner = index.to_world(FIRST_BUTTON_POSITION, BUTTON_STRIDE);
       const rectangle = new Rectangle(corner, MELODY_BUTTON_DIMENSIONS);
@@ -307,18 +301,30 @@ class SoundScene {
   }
 
   change_score(score_id) {
+    const score = SOUND_MANIFEST.scores[score_id];
+
     this.selected_melody = score_id;
-    this.piano.reset();
+    this.replace_piano(score);
     this.sound.play_score(score_id);
     this.export_button.disabled = false;
     this.export_gm_button.disabled = false;
+  }
 
-    // TEMP: This only works after play_score because SoundManager clears
-    // the _entire_ timeline. The next version should keep track of
-    // scheduled IDs and only clear ones pertaining to music.
-    const score = SOUND_MANIFEST.scores[score_id];
-    CUES.unschedule_all();
-    CUES.schedule_notes(score);
+  /**
+   *
+   * @param {Score<number>} score
+   */
+  replace_piano(score) {
+    const non_drums = score.parts.filter((part) => {
+      const DRUMS = 9;
+      return part.midi_channel !== DRUMS;
+    });
+    const all_notes = non_drums.flatMap((part) => {
+      const abs_music = AbsTimelineOps.from_relative(part.music);
+      return [...AbsTimelineOps.iter_intervals(abs_music)];
+    });
+    const played_notes = new PlayedNotes(all_notes);
+    this.piano = new Piano(PIANO_BOUNDS, played_notes);
   }
 
   /**
@@ -359,17 +365,20 @@ class SoundScene {
   render() {
     const current_time = SOUND.transport_time;
 
+    // this should really go in update()
+    this.piano.update(current_time);
+
     const mute = this.mute_button.render();
     const melody_buttons = this.melody_buttons.map((x) => x.debug_render());
-    const piano = this.piano.render();
     const burst = this.spiral_burst.render(current_time);
     const timeline = this.render_timeline(current_time);
 
+    // TODO: this should be rewritten to use the Animated interface
     return group(
       mute,
       ...melody_buttons,
       BUTTON_LABELS,
-      piano,
+      this.piano.primitive,
       timeline,
       CURSOR,
       burst,

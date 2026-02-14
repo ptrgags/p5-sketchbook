@@ -87,6 +87,10 @@ const STYLE_HIGHLIGHT = new Style({
  * Single octave piano keyboard
  */
 export class SingleOctavePiano {
+  /**
+   * Construct
+   * @param {Rectangle} bounding_rect The bounding rectangle within which to draw the piano
+   */
   constructor(bounding_rect) {
     const white_key_rects = make_white_keys(bounding_rect);
     const black_key_rects = make_black_keys(bounding_rect);
