@@ -10,6 +10,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Use latest Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'latest'
       - name: Install npm packages
         run: npm install
       - name: run tests
