@@ -159,47 +159,21 @@ describe("PlayedNotes", () => {
       const expected = new Set([]);
       expect(result).toEqual(expected);
     });
-  });
 
-  describe("debug parallel case", () => {
-    const corner_case = new PlayedNotes([
-      // bass line
-      make_note(C3, Rational.ZERO, N4),
-      make_note(C3, N2, new Rational(3, 4)),
-      make_note(C3, Rational.ONE, new Rational(5, 4)),
-      make_note(C3, new Rational(6, 4), new Rational(7, 4)),
-      // scale in parallel starting at measure 1
-      make_note(C4, Rational.ONE, new Rational(5, 4)),
-      make_note(D4, new Rational(5, 4), new Rational(6, 4)),
-      make_note(E4, new Rational(6, 4), new Rational(7, 4)),
-      make_note(F4, new Rational(7, 4), new Rational(8, 4)),
-    ]);
+    it("sorts intervals correctly", () => {
+      const notes = new PlayedNotes([
+        make_note(C4, Rational.ONE, new Rational(2)),
+        make_note(E4, new Rational(2), new Rational(3)),
+        // I had a bug where I was sorting incorrectly
+        // (using the default sort which TIL is a _lexicographic sort_ 🤯)
+        // If that sort is used, this note gets moved between the C and E
+        // and that messes up the pitch sets
+        make_note(G4, new Rational(10), new Rational(1)),
+      ]);
 
-    it("with t before overlap returns correct pitches", () => {
-      const result = corner_case.get_held_pitches(1 / 8);
+      const result = notes.get_held_pitches(2.5);
 
-      const expected = new Set([C3]);
-      expect(result).toEqual(expected);
-    });
-
-    it("with t at start of overlap returns correct pitches", () => {
-      const result = corner_case.get_held_pitches(1);
-
-      const expected = new Set([C3, C4]);
-      expect(result).toEqual(expected);
-    });
-
-    it("with t in gap of bass line returns correct pitches", () => {
-      const result = corner_case.get_held_pitches(11 / 8);
-
-      const expected = new Set([D4]);
-      expect(result).toEqual(expected);
-    });
-
-    it("with t in middle of overlap returns correct pitches", () => {
-      const result = corner_case.get_held_pitches(13 / 8);
-
-      const expected = new Set([C3, E4]);
+      const expected = new Set([E4]);
       expect(result).toEqual(expected);
     });
   });

@@ -82,7 +82,7 @@ function compute_note_sets(abs_notes) {
  * @returns {[number, Set<number>][]} A timeline of notes
  */
 function compute_held(note_sets) {
-  const sorted_times = [...note_sets.keys()].sort();
+  const sorted_times = [...note_sets.keys()].sort((a, b) => a - b);
   const result = [];
 
   /**
