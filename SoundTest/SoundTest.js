@@ -39,6 +39,7 @@ import { SCORE_LAYERED_MELODY } from "./example_scores/layered_melody.js";
 import { Score } from "../sketchlib/music/Score.js";
 import { AbsTimelineOps } from "../sketchlib/music/AbsTimelineOps.js";
 import { PlayedNotes } from "./PlayedNotes.js";
+import { Ocarina } from "./Ocarina.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -230,6 +231,11 @@ class SoundScene {
     this.mute_button = new MuteButton();
     this.events = new EventTarget();
     this.piano = new Piano(PIANO_BOUNDS, new PlayedNotes([]));
+    this.ocarina = new Ocarina(
+      new Rectangle(Point.ORIGIN, new Direction(400, 400)),
+      new PlayedNotes([]),
+      4,
+    );
     this.spiral_burst = new SpiralBurst();
 
     this.mute_button.events.addEventListener(
@@ -379,6 +385,7 @@ class SoundScene {
       ...melody_buttons,
       BUTTON_LABELS,
       this.piano.primitive,
+      this.ocarina.primitive,
       timeline,
       CURSOR,
       burst,

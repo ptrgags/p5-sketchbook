@@ -126,11 +126,13 @@ export class Ocarina {
     this.start_note = MIDIPitch.from_pitch_octave(A, start_octave);
     this.end_note = MIDIPitch.from_pitch_octave(F, start_octave + 2);
 
-    const [min_pitch, max_pitch] = score_notes.pitch_range;
-    if (min_pitch < this.start_note || max_pitch > this.end_note) {
-      console.warn(
-        "score_notes has pitches out of range, these will be ignored",
-      );
+    if (score_notes.pitch_range) {
+      const [min_pitch, max_pitch] = score_notes.pitch_range;
+      if (min_pitch < this.start_note || max_pitch > this.end_note) {
+        console.warn(
+          "score_notes has pitches out of range, these will be ignored",
+        );
+      }
     }
 
     this.primitive = new ShowHidePrimitive(FINGER_HOLES_UV, NO_HOLES);
