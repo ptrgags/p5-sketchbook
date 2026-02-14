@@ -112,7 +112,7 @@ export class PlayedNotes {
    */
   constructor(abs_notes) {
     /**
-     * @type {[number, number]}
+     * @type {[number, number] | undefined}
      */
     this.pitch_range = compute_pitch_range(abs_notes);
 
