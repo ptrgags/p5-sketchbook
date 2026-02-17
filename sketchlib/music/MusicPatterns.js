@@ -10,6 +10,17 @@ export class MusicPatterns {
    * @returns {PatternGrid<Note<P>>}
    */
   static make_notes(pitches, velocities) {
+    /*
+    if (!velocities) {
+      const all_mf = new Array(pitches.length).fill(Velocity.MF);
+      velocities = new PatternGrid(all_mf, pitches.step_size);
+    }
+
+    if (velocities.length != pitches.length) {
+      throw new Error("pitches and velocities must have the same length");
+    }
+    */
+
     return PatternGrid.empty();
   }
 }

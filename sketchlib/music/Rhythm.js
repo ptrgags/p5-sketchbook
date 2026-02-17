@@ -1,7 +1,8 @@
 import { Rational } from "../Rational.js";
 import { PatternGrid } from "./PatternGrid.js";
+import { RelTimelineOps } from "./RelTimelineOps.js";
 import { RhythmStep } from "./RhythmStep.js";
-import { Sequential } from "./Timeline.js";
+import { Gap, Sequential, TimeInterval } from "./Timeline.js";
 
 /**
  *
@@ -45,11 +46,17 @@ function parse_rhythm(rhythm_str, step_size) {
 export class Rhythm {
   /**
    * Constructor
-   * @param {string} rhythm_str String of characters from RhythmStep, i.e. x for note onset, - for sustain, . for rest. | and space can be used as separators for readability.
+   * @param {string | RhythmStep[]} rhythm String of characters from RhythmStep, i.e. x for note onset, - for sustain, . for rest. | and space can be used as separators for readability. It can also be an explicit array of RhythmStep, this is mainly used internally
    * @param {Rational} step_size Duration of each step
    */
-  constructor(rhythm_str, step_size) {
-    this.pattern = parse_rhythm(rhythm_str, step_size);
+  constructor(rhythm, step_size) {
+    /**
+     * @type {PatternGrid<RhythmStep>}
+     */
+    this.pattern =
+      typeof rhythm === "string"
+        ? parse_rhythm(rhythm, step_size)
+        : new PatternGrid(rhythm, step_size);
   }
 
   get length_steps() {
@@ -134,7 +141,29 @@ export class Rhythm {
    * @returns {Sequential<T>} A Sequential containing a flat array of TimeInterval and Gap
    */
   zip(values) {
-    return new Sequential();
+    const beats = [...this.beat_iter()];
+    const note_count = beats.reduce(
+      (acc, [is_note]) => acc + Number(is_note),
+      0,
+    );
+
+    if (note_count > values.length) {
+      throw new Error("Not enough pitches for this rhythm");
+    }
+
+    const intervals = [];
+    let next_step = 0;
+    for (const [is_note, steps] of beats) {
+      const duration = new Rational(steps).mul(this.pattern.step_size);
+      if (is_note) {
+        intervals.push(new TimeInterval(values[next_step], duration));
+        next_step++;
+      } else {
+        intervals.push(new Gap(duration));
+      }
+    }
+
+    return new Sequential(...intervals);
   }
 
   /**
@@ -149,7 +178,26 @@ export class Rhythm {
    * @returns {Sequential<T>}
    */
   overlay(values) {
-    return new Sequential();
+    if (
+      values.length !== this.pattern.length ||
+      !values.step_size.equals(this.pattern.step_size)
+    ) {
+      throw new Error("grid sizes must match");
+    }
+
+    let notes = [];
+    let step = 0;
+    for (const [is_note, steps] of this.beat_iter()) {
+      const duration = this.pattern.step_size.mul(new Rational(steps));
+      if (is_note) {
+        notes.push(new TimeInterval(values[step], duration));
+      } else {
+        notes.push(new Gap(duration));
+      }
+      step += steps;
+    }
+
+    return new Sequential(...notes);
   }
 
   /**
@@ -166,9 +214,41 @@ export class Rhythm {
    * }}
    */
   static unzip(timeline) {
+    if (RelTimelineOps.num_lanes(timeline) > 1) {
+      throw new Error("unzip is only defined for monophonic melodies");
+    }
+
+    // First, figure out the grid subdivision
+    const subdivision = RelTimelineOps.smallest_subdivision(timeline);
+
+    const SMALL_SUBDIVISION = new Rational(1, 128);
+    if (subdivision.lt(SMALL_SUBDIVISION)) {
+      console.warn("Unusual grid subdivision detected:", subdivision);
+    }
+
+    const rhythm_values = [];
+    const values = [];
+
+    for (const note of RelTimelineOps.iter_with_gaps(timeline)) {
+      const repeat_count = note.duration.div(subdivision).numerator;
+      if (note instanceof Gap) {
+        // Make a pattern like .....
+        const rests = new Array(repeat_count).fill(RhythmStep.REST);
+        rhythm_values.push(...rests);
+      } else {
+        // Make a pattern like x------ where the total length is based on
+        // the repeat
+        const steps = new Array(repeat_count).fill(RhythmStep.SUSTAIN);
+        steps[0] = RhythmStep.HIT;
+        rhythm_values.push(...steps);
+
+        values.push(note.value);
+      }
+    }
+
     return {
-      rhythm: Rhythm.EMPTY,
-      values: [],
+      rhythm: new Rhythm(rhythm_values, subdivision),
+      values,
     };
   }
 
@@ -184,9 +264,45 @@ export class Rhythm {
    * }}
    */
   static deoverlay(timeline) {
+    if (RelTimelineOps.num_lanes(timeline) > 1) {
+      throw new Error("unzip is only defined for monophonic melodies");
+    }
+
+    // First, figure out the grid subdivision
+    const subdivision = RelTimelineOps.smallest_subdivision(timeline);
+
+    const SMALL_SUBDIVISION = new Rational(1, 128);
+    if (subdivision.lt(SMALL_SUBDIVISION)) {
+      console.warn("Unusual grid subdivision detected:", subdivision);
+    }
+
+    const rhythm_values = [];
+    const values = [];
+
+    for (const interval of RelTimelineOps.iter_with_gaps(timeline)) {
+      const step_count = interval.duration.div(subdivision).numerator;
+      if (interval instanceof Gap) {
+        // Make a pattern like .....
+        const rests = new Array(step_count).fill(RhythmStep.REST);
+        rhythm_values.push(...rests);
+
+        // A gap doesn't have a value, so store undefineds
+        values.push(...new Array(step_count));
+      } else {
+        // Make a pattern like x------ where the total length is based on
+        // the repeat
+        const steps = new Array(step_count).fill(RhythmStep.SUSTAIN);
+        steps[0] = RhythmStep.HIT;
+        rhythm_values.push(...steps);
+
+        const vals = new Array(step_count).fill(interval.value);
+        values.push(...vals);
+      }
+    }
+
     return {
-      rhythm: Rhythm.EMPTY,
-      values: PatternGrid.empty(),
+      rhythm: new Rhythm(rhythm_values, subdivision),
+      values: new PatternGrid(values, subdivision),
     };
   }
 }

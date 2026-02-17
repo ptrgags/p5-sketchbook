@@ -374,4 +374,8 @@ describe("Rational", () => {
       expect(b_lt_a).toBe(true);
     });
   });
+
+  describe("gcd", () => {});
+
+  describe("lcm", () => {});
 });

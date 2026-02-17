@@ -1,3 +1,4 @@
+import { Rational } from "../Rational.js";
 import { Gap, Parallel, Sequential, TimeInterval } from "./Timeline.js";
 
 /**
@@ -53,7 +54,7 @@ export class RelTimelineOps {
   /**
    * Iterate over the timeline, including the gaps
    * @template T
-   * @param {import("./Timeline.js").Timeline<T>} timeline
+   * @param {Timeline<T>} timeline
    * @return {Generator<Gap | TimeInterval<T>>}
    */
   static *iter_with_gaps(timeline) {
@@ -68,5 +69,18 @@ export class RelTimelineOps {
     } else {
       yield timeline;
     }
+  }
+
+  /**
+   * @template T
+   * @param {Timeline<T>} timeline
+   * @return {Rational}
+   */
+  static smallest_subdivision(timeline) {
+    let subdivision = Rational.ONE;
+    for (const interval of RelTimelineOps.iter_with_gaps(timeline)) {
+      subdivision = subdivision.gcd(interval.duration);
+    }
+    throw new Error("Method not implemented.");
   }
 }
