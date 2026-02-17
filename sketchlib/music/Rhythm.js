@@ -81,58 +81,40 @@ export class Rhythm {
    * @returns {Generator<[boolean, number]>} (is_note, duration_steps) pair.
    */
   *beat_iter() {
-    /**
-     * @type {RhythmStep | undefined}
-     */
-    let previous = undefined;
-    let is_note = undefined;
-    let run_length = 0;
-    for (const step of this.pattern) {
-      // (prev, step)
-      // (undefined, rest | sustain) => start rest
-      // (undefined, hit) => start a beat
+    const steps = [...this.pattern];
 
-      // (rest, hit) => emit run, start note
-      // (hit, hit) => emit run, start note
-      // (sustain, hit) => emit run, start note
+    if (steps.length === 0) {
+      return;
+    }
 
-      // (hit, rest) => emit run, start rest
-      // (sustain, rest) | run is note => emit run, start rest
-
-      // (rest, rest | sustain) => run_length++
-      // (hit, sustain) => run_length++
-      // (sustain, rest) | run is rest => run_length++
-      // (sustain, sustain) => run_length++
-
-      // If this is the first step, start a new run of note/rest.
-      // Here SUSTAIN is treated like a rest since there is no note before it.
-      if (previous === undefined) {
-        is_note = step === RhythmStep.HIT;
-        run_length = 1;
-      } else if (step === RhythmStep.HIT) {
-        // Emit previous run
-        yield [is_note, run_length];
-
-        // Start a note run
-        is_note = true;
-        run_length = 1;
-      } else if (previous !== RhythmStep.REST && step === RhythmStep.REST) {
-        // Emit previous run
-        yield [is_note, run_length];
-
-        is_note = false;
-        run_length = 1;
-      } else {
-        // all other cases, sustain the current run
-        run_length++;
+    // Scan one run of notes/rests at a time
+    let next_index = 0;
+    do {
+      // Notes start with x. a stray sustain at the start is treated
+      // as a rest.
+      const is_note = steps[next_index] === RhythmStep.HIT;
+      let length = 1;
+      for (let j = 1; next_index + j <= steps.length; j++) {
+        const lookahead = steps[next_index + j];
+        if (
+          // The run reaches the end of the array
+          lookahead === undefined ||
+          // notes continue with sustains, and end at the start
+          // of a new note or a rest
+          (is_note && lookahead !== RhythmStep.SUSTAIN) ||
+          // rests continue through following rests or sustains
+          // but end on a new hit
+          (!is_note && lookahead === RhythmStep.HIT)
+        ) {
+          length = j;
+          break;
+        }
       }
-      previous = step;
-    }
 
-    // Flush the last entry
-    if (is_note !== undefined) {
-      yield [is_note, run_length];
-    }
+      yield [is_note, length];
+
+      next_index += length;
+    } while (next_index < steps.length);
   }
 
   /**
