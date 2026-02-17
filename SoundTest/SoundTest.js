@@ -28,7 +28,6 @@ import { Piano } from "./Piano.js";
 import { SpiralBurst } from "./SpiralBurst.js";
 import { expect_element } from "../sketchlib/dom/expect_element.js";
 import { decode_midi } from "../sketchlib/midi/decode_midi.js";
-import { MusicalCues } from "../sketchlib/music/MusicalCues.js";
 import { midi_to_score } from "../sketchlib/midi/midi_to_score.js";
 import { SCORE_PHASE_SCALE } from "./example_scores/phase_scale.js";
 import { SCORE_SYMMETRY_MELODY } from "./example_scores/symmetry_melody.js";
