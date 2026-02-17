@@ -177,7 +177,7 @@ export class Rhythm {
    * splits it into a rhythm and a grid of values at the same
    * resolution (based on the finest resolution in the timeline)
    * @template T
-   * @param {import("./Timeline.js").Timeline<T>} timeline 
+   * @param {import("./Timeline.js").Timeline<T>} timeline
    * @returns {{
    *    rhythm: Rhythm,
    *    values: PatternGrid<T | undefined>
@@ -185,9 +185,9 @@ export class Rhythm {
    */
   static deoverlay(timeline) {
     return {
-        rhythm: Rhythm.EMPTY,
-        values: PatternGrid.empty();
-    }
+      rhythm: Rhythm.EMPTY,
+      values: PatternGrid.empty(),
+    };
   }
 }
 Rhythm.EMPTY = Object.freeze(new Rhythm("", Rational.ONE));
