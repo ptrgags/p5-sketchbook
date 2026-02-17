@@ -48,6 +48,40 @@ export class PatternGrid {
   }
 
   /**
+   * Keep the grid values the same, but scale the step size. This is like
+   * stretching/squishing the pattern in time without changing the structure
+   * @example
+   * // returns PatternGrid([1, 2, 3], 1/2)
+   * new PatternGrid([1, 2, 3], new Rational(1, 4)).scale(2);
+   * @param {Rational} factor Scale factor to multiply the step size
+   * @returns {PatternGrid<T>}
+   */
+  scale(factor) {
+    throw new Error("not implemented");
+  }
+
+  /**
+   * Subdivid
+   * @param {number} factor Positive integer factor for how many times to repeat each element
+   * @returns {PatternGrid<T>}
+   */
+  subdivide(factor) {
+    throw new Error("not implemented");
+  }
+
+  /**
+   * Map a function over each step of the pattern. This is just like Array.map()
+   * but for PatternGrids.
+   * @template U
+   * @param {function(T, number): U} f a function from (x: T, i: number) to some new type U
+   * @returns {PatternGrid<U>} New grid with the same size but transformed values
+   */
+  map(f) {
+    return new PatternGrid(this.values.map(f), this.step_size);
+  }
+
+  /**
+   * Return the empty pattern
    * @template T
    * @returns {PatternGrid<T>}
    */
@@ -66,6 +100,7 @@ export class PatternGrid {
    * @returns {PatternGrid<C>}
    */
   static merge(a, b, merge_func) {
-    return PatternGrid.empty();
+    const merged_values = a.values.map((x, i) => merge_func(x, b[i]));
+    return new PatternGrid(merged_values, a.step_size);
   }
 }
