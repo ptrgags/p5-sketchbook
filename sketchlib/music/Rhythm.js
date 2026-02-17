@@ -127,14 +127,49 @@ export class Rhythm {
 
   /**
    * Take the beats of this rhythm and zip them with
-   * a list of values so you get TimeInterval(value, duration)
+   * a list of values so you get TimeInterval(value, duration) | Gap(duration)
    * pairs. The result is returned as Sequential of these
    * @template T
-   * @param {T[]} values Values to zip with. This must have at least as many values as this rhythm's number of beats
-   * @returns {Sequential<T>} A Sequential containing a flat array of time intervals
+   * @param {T[] | PatternGrid<T>} values Values to zip with. This must have at least as many values as this rhythm's number of beats. If a PatternGrid is given, the step size is ignored
+   * @returns {Sequential<T>} A Sequential containing a flat array of TimeInterval and Gap
    */
   zip(values) {
     return new Sequential();
+  }
+
+  /**
+   * Similar to zip, this takes a rhythm and values and turns them into a timeline.
+   * However, instead of zipping the values one per beat, each beat looks up the
+   * value at that step. This means some values may be skipped over in the case of rests.
+   *
+   * This allows making step sequencers where you can have a pitch assigned for each
+   * step of a sequence, yet toggle them on and off.
+   * @template T
+   * @param {PatternGrid<T>} values Values to overlay. It must have the same duration as the rhythm (but different step_size is allowed)
+   * @returns {Sequential<T>}
+   */
+  overlay(values) {
+    return new Sequential();
+  }
+
+  /**
+   * Split a timeline into a rhythm + a sequence of values, one per beat
+   *
+   * This is approximately an inverse of zip(), however it accepts a broader
+   * range of timeline values (any single-lane timeline)
+   *
+   * @template T
+   * @param {import("./Timeline.js").Timeline<T>} timeline Timeline of values. It must have a single lane.
+   * @returns {{
+   *    rhythm: Rhythm,
+   *    values: T[]
+   * }}
+   */
+  static unzip(timeline) {
+    return {
+      rhythm: Rhythm.EMPTY,
+      values: [],
+    };
   }
 }
 Rhythm.EMPTY = Object.freeze(new Rhythm("", Rational.ONE));
