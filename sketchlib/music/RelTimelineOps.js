@@ -81,6 +81,6 @@ export class RelTimelineOps {
     for (const interval of RelTimelineOps.iter_with_gaps(timeline)) {
       subdivision = subdivision.gcd(interval.duration);
     }
-    throw new Error("Method not implemented.");
+    return subdivision;
   }
 }
