@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { Rhythm } from "./Rhythm.js";
-import { N2T, N4, N8 } from "./durations.js";
+import { N16, N2, N2T, N4, N8 } from "./durations.js";
 import { RhythmStep } from "./RhythmStep.js";
 import { PatternGrid } from "./PatternGrid.js";
-import { Gap, Sequential, TimeInterval } from "./Timeline.js";
+import { Gap, Parallel, Sequential, TimeInterval } from "./Timeline.js";
 import { Rational } from "../Rational.js";
 
 describe("Rhythm", () => {
@@ -122,6 +122,70 @@ describe("Rhythm", () => {
         new Gap(N4),
         new TimeInterval(3, N4),
       );
+      expect(result).toEqual(expected);
+    });
+  });
+
+  describe("unzip", () => {
+    it("with parallel timeline music throws", () => {
+      const parallel = new Sequential(
+        new TimeInterval(1, N4),
+        new TimeInterval(2, N4),
+        new TimeInterval(3, N4),
+      );
+
+      expect(() => {
+        return Rhythm.unzip(parallel);
+      }).toThrowError("unzip is only defined for single-lane timelines");
+    });
+
+    it("with empty melody produces empty grids", () => {
+      const empty = Gap.ZERO;
+
+      const result = Rhythm.unzip(empty);
+
+      const expected = {
+        rhythm: Rhythm.EMPTY,
+        values: PatternGrid.empty(),
+      };
+      expect(result).toEqual(expected);
+    });
+
+    it("with quarter note timeline correct grids", () => {
+      const melody = new Parallel(
+        new TimeInterval(1, N4),
+        new TimeInterval(2, N4),
+        new Gap(N4),
+        new TimeInterval(3, N4),
+      );
+
+      const result = Rhythm.unzip(melody);
+      const expected = {
+        rhythm: new Rhythm("xx.x", N4),
+        values: new PatternGrid([1, 2, 3], N4),
+      };
+
+      expect(result).toEqual(expected);
+    });
+
+    it("with complex rhythm produces correct grids", () => {
+      const melody = new Parallel(
+        new TimeInterval(1, N2),
+        new TimeInterval(2, N4),
+        new TimeInterval(3, N8),
+        new Gap(N4),
+        new TimeInterval(4, N8),
+        new TimeInterval(5, N16),
+        new Gap(N4),
+        new TimeInterval(6, new Rational(3, 8)),
+      );
+
+      const result = Rhythm.unzip(melody);
+
+      const expected = {
+        rhythm: new Rhythm("x-------|x---x-..|..x-x...|.x-----.", N16),
+        values: new PatternGrid([1, 2, 3, 4, 5, 6], N16),
+      };
       expect(result).toEqual(expected);
     });
   });
