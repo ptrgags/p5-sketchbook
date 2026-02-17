@@ -57,16 +57,33 @@ export class PatternGrid {
    * @returns {PatternGrid<T>}
    */
   scale(factor) {
-    throw new Error("not implemented");
+    return new PatternGrid(this.values, this.step_size.mul(factor));
   }
 
   /**
-   * Subdivid
+   * Subdivide the grid so each value is repeated a number of times, while
+   * keeping the overall duration constant
    * @param {number} factor Positive integer factor for how many times to repeat each element
    * @returns {PatternGrid<T>}
    */
   subdivide(factor) {
-    throw new Error("not implemented");
+    if (factor < 1) {
+      throw new Error("factor must be a positive integer");
+    }
+
+    if (factor === 1) {
+      return this;
+    }
+
+    const repeated = new Array(factor * this.values.length);
+    for (const [i, x] of this.values.entries()) {
+      for (let j = 0; j < factor; j++) {
+        repeated[i * factor + j] = x;
+      }
+    }
+
+    const step_size = this.duration.div(new Rational(factor));
+    return new PatternGrid(repeated, step_size);
   }
 
   /**
@@ -100,7 +117,19 @@ export class PatternGrid {
    * @returns {PatternGrid<C>}
    */
   static merge(a, b, merge_func) {
-    const merged_values = a.values.map((x, i) => merge_func(x, b[i]));
+    if (!a.duration.equals(b.duration)) {
+      throw new Error("a and b must have the same duration");
+    }
+
+    if (a.length !== b.length) {
+      const common_length = lcm(a.length, b.length);
+      const factor_a = common_length / a.length;
+      const factor_b = common_length / b.length;
+      a = a.subdivide(factor_a);
+      b = b.subdivide(factor_b);
+    }
+
+    const merged_values = a.values.map((x, i) => merge_func(x, b.values[i]));
     return new PatternGrid(merged_values, a.step_size);
   }
 }

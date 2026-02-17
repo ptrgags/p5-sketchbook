@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { PatternGrid } from "./PatternGrid.js";
-import { N2T, N4, N8T } from "./durations.js";
+import { N2T, N4, N4T, N8T } from "./durations.js";
 import { Rational } from "../Rational.js";
 
 describe("PatternGrid", () => {
@@ -15,6 +15,55 @@ describe("PatternGrid", () => {
 
     const expected = new Rational(6, 4);
     expect(grid.duration).toEqual(expected);
+  });
+
+  describe("scale", () => {
+    it("scales step size, leaving values unchanged", () => {
+      const pattern = new PatternGrid([1, 2, 3], N4);
+
+      const result = pattern.scale(new Rational(2, 3));
+
+      // A 1/n triplet is 2/3 the length of a 1/n note
+      const expected = new PatternGrid([1, 2, 3], N4T);
+      expect(result).toEqual(expected);
+    });
+  });
+
+  describe("subdivide", () => {
+    it("with zero throws error", () => {
+      const pattern = new PatternGrid([1, 2, 3], N4);
+
+      expect(() => {
+        return pattern.subdivide(0);
+      }).toThrowError("factor must be a positive integer");
+    });
+
+    it("with negative factor throws error", () => {
+      const pattern = new PatternGrid([1, 2, 3], N4);
+
+      expect(() => {
+        return pattern.subdivide(-2);
+      }).toThrowError("factor must be a positive integer");
+    });
+
+    it("with factor of 1 returns same grid", () => {
+      const pattern = new PatternGrid([1, 2, 3], N4);
+
+      const result = pattern.subdivide(1);
+
+      expect(result).toEqual(pattern);
+    });
+
+    it("with factor repeats values that many times", () => {
+      const pattern = new PatternGrid([1, 2, 3], N4);
+
+      const result = pattern.subdivide(3);
+
+      // 1/4 divided into 3 is 1/12 which is an eighth note triplet
+      // to check, 9 * 1/12 = 3/4, so the overall duration is the same ✅
+      const expected = new PatternGrid([1, 1, 1, 2, 2, 2, 3, 3, 3], N8T);
+      expect(result).toEqual(expected);
+    });
   });
 
   describe("merge", () => {
