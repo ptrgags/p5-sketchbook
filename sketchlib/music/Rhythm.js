@@ -171,5 +171,23 @@ export class Rhythm {
       values: [],
     };
   }
+
+  /**
+   * The sort-of-inverse of overlay, this takes a single-lane timeline and
+   * splits it into a rhythm and a grid of values at the same
+   * resolution (based on the finest resolution in the timeline)
+   * @template T
+   * @param {import("./Timeline.js").Timeline<T>} timeline 
+   * @returns {{
+   *    rhythm: Rhythm,
+   *    values: PatternGrid<T | undefined>
+   * }}
+   */
+  static deoverlay(timeline) {
+    return {
+        rhythm: Rhythm.EMPTY,
+        values: PatternGrid.empty();
+    }
+  }
 }
 Rhythm.EMPTY = Object.freeze(new Rhythm("", Rational.ONE));

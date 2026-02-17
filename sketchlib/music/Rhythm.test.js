@@ -189,4 +189,148 @@ describe("Rhythm", () => {
       expect(result).toEqual(expected);
     });
   });
+
+  describe("overlay", () => {
+    it("with different array lengths throws", () => {
+      const rhythm = new Rhythm("x.xx.x--", N8);
+      const values = new PatternGrid([1, 2, 3, 4, 5, 6, 7, 8], N8);
+
+      expect(() => {
+        return rhythm.overlay(values);
+      }).toThrowError("grid sizes must match");
+    });
+
+    it("with different number of velocities throws", () => {
+      const rhythm = new Rhythm("x.xx.x--", N8);
+      const values = new PatternGrid([1, 2, 3, 4, 5, 6, 7, 8], N8);
+      expect(() => {
+        return rhythm.overlay(values);
+      }).toThrowError("grid sizes must match");
+    });
+
+    it("with different pitch step size throws", () => {
+      const rhythm = new Rhythm("x.xx.x--", N8);
+      const values = new PatternGrid([1, 2, 3, 4, 5, 6, 7, 8], N16);
+      expect(() => {
+        return rhythm.overlay(values);
+      }).toThrowError("grid sizes must match");
+    });
+
+    it("with values creates a timeline", () => {
+      const rhythm = new Rhythm("x.xx.x--", N8);
+      const values = new PatternGrid([1, 2, 3, 4, 5, 6, 7, 8], N8);
+
+      const result = rhythm.overlay(values);
+
+      const expected = new Sequential(
+        new TimeInterval(1, N8),
+        new Gap(N8),
+        new TimeInterval(3, N8),
+        new TimeInterval(4, N8),
+        new Gap(N8),
+        new TimeInterval(6, new Rational(3, 8)),
+      );
+      expect(result).toEqual(expected);
+    });
+  });
+
+  describe("deoverlay", () => {
+    it("with polyphonic pattern throws", () => {
+      const poly = new Parallel(
+        new TimeInterval(1, N4),
+        new TimeInterval(2, N4),
+        new TimeInterval(3, N4),
+      );
+
+      expect(() => {
+        return Rhythm.deoverlay(poly);
+      }).toThrowError("deoverlay is only defined for single-lane timelines");
+    });
+
+    it("with empty melody produces empty grids", () => {
+      const empty = Gap.ZERO;
+
+      const result = Rhythm.deoverlay(empty);
+
+      const expected = {
+        rhythm: PatternGrid.empty(),
+        pitch: PatternGrid.empty(),
+        velocity: PatternGrid.empty(),
+      };
+      expect(result).toEqual(expected);
+    });
+
+    it("with quarter note pattern produces correct grids", () => {
+      const timeline = new Sequential(
+        new TimeInterval(1, N4),
+        new TimeInterval(2, N4),
+        new Gap(N4),
+        new TimeInterval(3, N4),
+      );
+
+      const result = Rhythm.deoverlay(timeline);
+
+      const expected = {
+        rhythm: new Rhythm("xx.x", N4),
+        pitch: new PatternGrid([1, 2, undefined, 3], N4),
+      };
+      expect(result).toEqual(expected);
+    });
+
+    it("with complex rhythm produces correct grids", () => {
+      const melody = new Sequential(
+        new TimeInterval(1, N2),
+        new TimeInterval(2, N4),
+        new TimeInterval(3, N8),
+        new Gap(N4),
+        new TimeInterval(4, N8),
+        new TimeInterval(5, N16),
+        new Gap(N4),
+        new TimeInterval(6, new Rational(3, 8)),
+      );
+
+      const result = Rhythm.deoverlay(melody);
+
+      const expected = {
+        rhythm: new Rhythm("x-------|x---x-..|..x-x...|.x-----.", N16),
+        values: new PatternGrid(
+          [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            2,
+            2,
+            2,
+            2,
+            3,
+            3,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            4,
+            4,
+            4,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+          ],
+          N16,
+        ),
+      };
+      expect(result).toEqual(expected);
+    });
+  });
 });
