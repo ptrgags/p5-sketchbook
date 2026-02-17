@@ -59,6 +59,44 @@ describe("Rhythm", () => {
     });
   });
 
+  describe("beat_iter", () => {
+    it("with empty rhythm produces empty generator", () => {
+      const rhythm = Rhythm.EMPTY;
+
+      const result = [...rhythm.beat_iter()];
+
+      const expected = [];
+      expect(result).toEqual(expected);
+    });
+
+    it("with rhythm produces one entry per note or run of rests", () => {
+      const rhythm = new Rhythm("x--...|xx-..x.x", N4);
+
+      const result = [...rhythm.beat_iter()];
+
+      const expected = [
+        [true, 3],
+        [false, 3],
+        [true, 1],
+        [true, 2],
+        [false, 2],
+        [true, 1],
+        [false, 1],
+        [true, 1],
+      ];
+      expect(result).toEqual(expected);
+    });
+
+    it("handles stray sustains as extending rests", () => {
+      const rhythm = new Rhythm("--...---", N4);
+
+      const result = [...rhythm.beat_iter()];
+
+      const expected = [[false, 8]];
+      expect(result).toEqual(expected);
+    });
+  });
+
   describe("zip", () => {
     it("zip with empty grids produces empty timeline", () => {
       const rhythm = Rhythm.EMPTY;
@@ -66,7 +104,8 @@ describe("Rhythm", () => {
 
       const result = rhythm.zip(values);
 
-      expect(result).toEqual(Gap.ZERO);
+      const expected = new Sequential();
+      expect(result).toEqual(expected);
     });
 
     it("with not enough values throws error", () => {
@@ -110,7 +149,7 @@ describe("Rhythm", () => {
       expect(result).toEqual(expected);
     });
 
-    it("with values PatternGrid ignores duration", () => {
+    it("with values as PatternGrid ignores duration", () => {
       const rhythm = new Rhythm("xx.x", N4);
       const values = new PatternGrid([1, 2, 3], N2T);
 
@@ -128,7 +167,7 @@ describe("Rhythm", () => {
 
   describe("unzip", () => {
     it("with parallel timeline music throws", () => {
-      const parallel = new Sequential(
+      const parallel = new Parallel(
         new TimeInterval(1, N4),
         new TimeInterval(2, N4),
         new TimeInterval(3, N4),
@@ -146,13 +185,13 @@ describe("Rhythm", () => {
 
       const expected = {
         rhythm: Rhythm.EMPTY,
-        values: PatternGrid.empty(),
+        values: [],
       };
       expect(result).toEqual(expected);
     });
 
     it("with quarter note timeline correct grids", () => {
-      const melody = new Parallel(
+      const melody = new Sequential(
         new TimeInterval(1, N4),
         new TimeInterval(2, N4),
         new Gap(N4),
@@ -162,14 +201,14 @@ describe("Rhythm", () => {
       const result = Rhythm.unzip(melody);
       const expected = {
         rhythm: new Rhythm("xx.x", N4),
-        values: new PatternGrid([1, 2, 3], N4),
+        values: [1, 2, 3],
       };
 
       expect(result).toEqual(expected);
     });
 
     it("with complex rhythm produces correct grids", () => {
-      const melody = new Parallel(
+      const melody = new Sequential(
         new TimeInterval(1, N2),
         new TimeInterval(2, N4),
         new TimeInterval(3, N8),
@@ -178,31 +217,25 @@ describe("Rhythm", () => {
         new TimeInterval(5, N16),
         new Gap(N4),
         new TimeInterval(6, new Rational(3, 8)),
+        new Gap(N16),
       );
 
       const result = Rhythm.unzip(melody);
 
       const expected = {
         rhythm: new Rhythm("x-------|x---x-..|..x-x...|.x-----.", N16),
-        values: new PatternGrid([1, 2, 3, 4, 5, 6], N16),
+        values: [1, 2, 3, 4, 5, 6],
       };
       expect(result).toEqual(expected);
     });
   });
 
   describe("overlay", () => {
-    it("with different array lengths throws", () => {
+    it("with different durations", () => {
       const rhythm = new Rhythm("x.xx.x--", N8);
-      const values = new PatternGrid([1, 2, 3, 4, 5, 6, 7, 8], N8);
+      // whoops, missing a value
+      const values = new PatternGrid([1, 2, 3, 4, 5, 6, 7], N8);
 
-      expect(() => {
-        return rhythm.overlay(values);
-      }).toThrowError("grid sizes must match");
-    });
-
-    it("with different number of velocities throws", () => {
-      const rhythm = new Rhythm("x.xx.x--", N8);
-      const values = new PatternGrid([1, 2, 3, 4, 5, 6, 7, 8], N8);
       expect(() => {
         return rhythm.overlay(values);
       }).toThrowError("grid sizes must match");
@@ -253,9 +286,8 @@ describe("Rhythm", () => {
       const result = Rhythm.deoverlay(empty);
 
       const expected = {
-        rhythm: PatternGrid.empty(),
-        pitch: PatternGrid.empty(),
-        velocity: PatternGrid.empty(),
+        rhythm: Rhythm.EMPTY,
+        values: PatternGrid.empty(),
       };
       expect(result).toEqual(expected);
     });
@@ -272,7 +304,7 @@ describe("Rhythm", () => {
 
       const expected = {
         rhythm: new Rhythm("xx.x", N4),
-        pitch: new PatternGrid([1, 2, undefined, 3], N4),
+        values: new PatternGrid([1, 2, undefined, 3], N4),
       };
       expect(result).toEqual(expected);
     });
@@ -287,6 +319,7 @@ describe("Rhythm", () => {
         new TimeInterval(5, N16),
         new Gap(N4),
         new TimeInterval(6, new Rational(3, 8)),
+        new Gap(N16),
       );
 
       const result = Rhythm.deoverlay(melody);
@@ -315,17 +348,18 @@ describe("Rhythm", () => {
             undefined,
             4,
             4,
-            4,
+            5,
             undefined,
             undefined,
             undefined,
             undefined,
-            5,
-            5,
-            5,
-            5,
-            5,
-            5,
+            6,
+            6,
+            6,
+            6,
+            6,
+            6,
+            undefined,
           ],
           N16,
         ),

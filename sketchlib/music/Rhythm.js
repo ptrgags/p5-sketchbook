@@ -129,7 +129,10 @@ export class Rhythm {
       previous = step;
     }
 
-    yield [is_note, run_length];
+    // Flush the last entry
+    if (is_note !== undefined) {
+      yield [is_note, run_length];
+    }
   }
 
   /**
@@ -141,6 +144,11 @@ export class Rhythm {
    * @returns {Sequential<T>} A Sequential containing a flat array of TimeInterval and Gap
    */
   zip(values) {
+    // Peel the PatternGrid to access the juicy array within...
+    if (values instanceof PatternGrid) {
+      values = values.values;
+    }
+
     const beats = [...this.beat_iter()];
     const note_count = beats.reduce(
       (acc, [is_note]) => acc + Number(is_note),
@@ -148,7 +156,9 @@ export class Rhythm {
     );
 
     if (note_count > values.length) {
-      throw new Error("Not enough pitches for this rhythm");
+      throw new Error(
+        `rhythm needs at least ${note_count} values, got ${values.length}`,
+      );
     }
 
     const intervals = [];
@@ -190,7 +200,7 @@ export class Rhythm {
     for (const [is_note, steps] of this.beat_iter()) {
       const duration = this.pattern.step_size.mul(new Rational(steps));
       if (is_note) {
-        notes.push(new TimeInterval(values[step], duration));
+        notes.push(new TimeInterval(values.values[step], duration));
       } else {
         notes.push(new Gap(duration));
       }
@@ -215,7 +225,7 @@ export class Rhythm {
    */
   static unzip(timeline) {
     if (RelTimelineOps.num_lanes(timeline) > 1) {
-      throw new Error("unzip is only defined for monophonic melodies");
+      throw new Error("unzip is only defined for single-lane timelines");
     }
 
     // First, figure out the grid subdivision
@@ -265,7 +275,7 @@ export class Rhythm {
    */
   static deoverlay(timeline) {
     if (RelTimelineOps.num_lanes(timeline) > 1) {
-      throw new Error("unzip is only defined for monophonic melodies");
+      throw new Error("deoverlay is only defined for single-lane timelines");
     }
 
     // First, figure out the grid subdivision
