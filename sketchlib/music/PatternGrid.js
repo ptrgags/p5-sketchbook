@@ -143,6 +143,10 @@ export class PatternGrid {
         c === RhythmStep.SUSTAIN
       ) {
         values.push(c);
+      } else if (c === " " || c === "|") {
+        // treat spaces and | as comments to help make
+        // rhythms more readable
+        continue;
       } else {
         throw new Error(`invalid rhythm, ${rhythm_str}`);
       }
