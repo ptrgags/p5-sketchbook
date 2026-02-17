@@ -7,76 +7,6 @@ import { RhythmStep } from "./RhythmStep.js";
 import { Velocity } from "./Velocity.js";
 
 /**
- * Iterate over a RhythmGrid and return runs of rests/sustained notes.
- * This version returns the durations in steps of the rhythm grid.
- * @param {PatternGrid<RhythmStep>} rhythm
- * @returns {Generator<[boolean, number]>} (is_note, duration_steps) pair.
- */
-function* beat_iter_steps(rhythm) {
-  /**
-   * @type {RhythmStep | undefined}
-   */
-  let previous = undefined;
-  let is_note = undefined;
-  let run_length = 0;
-  for (const step of rhythm) {
-    // (prev, step)
-    // (undefined, rest | sustain) => start rest
-    // (undefined, hit) => start a beat
-
-    // (rest, hit) => emit run, start note
-    // (hit, hit) => emit run, start note
-    // (sustain, hit) => emit run, start note
-
-    // (hit, rest) => emit run, start rest
-    // (sustain, rest) | run is note => emit run, start rest
-
-    // (rest, rest | sustain) => run_length++
-    // (hit, sustain) => run_length++
-    // (sustain, rest) | run is rest => run_length++
-    // (sustain, sustain) => run_length++
-
-    // If this is the first step, start a new run of note/rest.
-    // Here SUSTAIN is treated like a rest since there is no note before it.
-    if (previous === undefined) {
-      is_note = step === RhythmStep.HIT;
-      run_length = 1;
-    } else if (step === RhythmStep.HIT) {
-      // Emit previous run
-      yield [is_note, run_length];
-
-      // Start a note run
-      is_note = true;
-      run_length = 1;
-    } else if (previous !== RhythmStep.REST && step === RhythmStep.REST) {
-      // Emit previous run
-      yield [is_note, run_length];
-
-      is_note = false;
-      run_length = 1;
-    } else {
-      // all other cases, sustain the current run
-      run_length++;
-    }
-    previous = step;
-  }
-
-  yield [is_note, run_length];
-}
-
-/**
- * Iterate over a RhythmGrid and return runs of rests/sustained notes.
- * This version returns the durations in steps of the rhythm grid.
- * @param {PatternGrid<RhythmStep>} rhythm
- * @returns {Generator<[boolean, Rational]>} (is_note, duration) pair.
- */
-function* beat_iter_duration(rhythm) {
-  for (const [is_note, steps] of beat_iter_steps(rhythm)) {
-    yield [is_note, rhythm.step_size.mul(new Rational(steps))];
-  }
-}
-
-/**
  * Compute the smallest subdivision, i.e. the largest denominator in all of the
  * duration values
  * @param {import("./Music.js").Music<number>} melody
@@ -123,35 +53,6 @@ export class PatternGrid {
    */
   static empty() {
     return new PatternGrid([], Rational.ONE);
-  }
-
-  /**
-   *
-   * @param {string} rhythm_str
-   * @param {Rational} step_size
-   * @returns {PatternGrid<RhythmStep>}
-   */
-  static rhythm(rhythm_str, step_size) {
-    /**
-     * @type {RhythmStep[]}
-     */
-    const values = [];
-    for (const c of rhythm_str) {
-      if (
-        c === RhythmStep.HIT ||
-        c === RhythmStep.REST ||
-        c === RhythmStep.SUSTAIN
-      ) {
-        values.push(c);
-      } else if (c === " " || c === "|") {
-        // treat spaces and | as comments to help make
-        // rhythms more readable
-        continue;
-      } else {
-        throw new Error(`invalid rhythm, ${rhythm_str}`);
-      }
-    }
-    return new PatternGrid(values, step_size);
   }
 
   /**
@@ -353,5 +254,19 @@ export class PatternGrid {
       pitch: new PatternGrid(pitch_values, subdivision),
       velocity: new PatternGrid(velocity_values, subdivision),
     };
+  }
+
+  /**
+   * Take two patterns and merge them together
+   * @template A
+   * @template B
+   * @template C
+   * @param {PatternGrid<A>} a
+   * @param {PatternGrid<B>} b
+   * @param {function(A, B): C} merge_func
+   * @returns {PatternGrid<C>}
+   */
+  static merge(a, b, merge_func) {
+    return PatternGrid.empty();
   }
 }
