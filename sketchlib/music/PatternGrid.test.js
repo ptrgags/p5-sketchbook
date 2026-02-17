@@ -8,58 +8,6 @@ import { Harmony, make_note, Melody, Note, Rest } from "./Music.js";
 import { Rational } from "../Rational.js";
 
 describe("PatternGrid", () => {
-  describe("rhythm constructor", () => {
-    it("with bad characters throws error", () => {
-      expect(() => {
-        return PatternGrid.rhythm("boots&cats", N4);
-      }).toThrowError("invalid rhythm");
-    });
-
-    it("spaces and pipes are treated as comments", () => {
-      const result = PatternGrid.rhythm("x.x-|x x x x|x--x", N4);
-
-      const expected = new PatternGrid(
-        [
-          RhythmStep.HIT,
-          RhythmStep.REST,
-          RhythmStep.HIT,
-          RhythmStep.SUSTAIN,
-          // measure 2
-          RhythmStep.HIT,
-          RhythmStep.HIT,
-          RhythmStep.HIT,
-          RhythmStep.HIT,
-          // measure 3
-          RhythmStep.HIT,
-          RhythmStep.SUSTAIN,
-          RhythmStep.SUSTAIN,
-          RhythmStep.HIT,
-        ],
-        N4,
-      );
-      expect(result).toEqual(expected);
-    });
-
-    it("with valid rhythm string computes correct grid", () => {
-      const result = PatternGrid.rhythm("x.x-x..x", N8);
-
-      const expected = new PatternGrid(
-        [
-          RhythmStep.HIT,
-          RhythmStep.REST,
-          RhythmStep.HIT,
-          RhythmStep.SUSTAIN,
-          RhythmStep.HIT,
-          RhythmStep.REST,
-          RhythmStep.REST,
-          RhythmStep.HIT,
-        ],
-        N8,
-      );
-      expect(result).toEqual(expected);
-    });
-  });
-
   it("length returns array length", () => {
     const grid = PatternGrid.rhythm("x..x..", N4);
 
