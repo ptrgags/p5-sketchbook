@@ -1,4 +1,4 @@
-import { gcd } from "./gcd.js";
+import { gcd, lcm } from "./gcd.js";
 import { mod } from "./mod.js";
 
 /**
@@ -199,7 +199,13 @@ export class Rational {
    * @returns {Rational} gcd(a/b, c/d) = gcd(a,c)/lcm(b, d)
    */
   gcd(other) {
-    throw new Error("Method not implemented.");
+    if (other.lt(Rational.ZERO)) {
+      throw new Error("other must be nonnegative");
+    }
+
+    const { numerator: a, denominator: b } = this;
+    const { numerator: c, denominator: d } = other;
+    return new Rational(gcd(a, c), lcm(b, d));
   }
 
   /**
@@ -208,7 +214,13 @@ export class Rational {
    * @returns {Rational} lcm(a/b, c/d) = lcm(a, c)/gcd(b,d)
    */
   lcm(other) {
-    throw new Error("Method not implemented.");
+    if (other.le(Rational.ZERO)) {
+      throw new Error("other must be positive");
+    }
+
+    const { numerator: a, denominator: b } = this;
+    const { numerator: c, denominator: d } = other;
+    return new Rational(lcm(a, c), gcd(b, d));
   }
 }
 
