@@ -73,7 +73,7 @@ describe("PatternGrid", () => {
 
       expect(() => {
         return PatternGrid.merge(a, b, (x, y) => x + y);
-      }).toThrowError("grids must have the same duration");
+      }).toThrowError("grids must have the same duration in time");
     });
 
     it("with empty patterns returns empty pattern", () => {

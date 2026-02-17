@@ -26,7 +26,7 @@ describe("MusicPatterns", () => {
 
       expect(() => {
         return MusicPatterns.make_notes(pitches, velocities);
-      }).toThrowError("a and b must have the same duration");
+      }).toThrowError("grids must have the same duration in time");
     });
 
     it("with no velocities makes notes at default velocity", () => {

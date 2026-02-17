@@ -82,7 +82,7 @@ export class PatternGrid {
       }
     }
 
-    const step_size = this.duration.div(new Rational(factor));
+    const step_size = this.step_size.div(new Rational(factor));
     return new PatternGrid(repeated, step_size);
   }
 
@@ -118,7 +118,7 @@ export class PatternGrid {
    */
   static merge(a, b, merge_func) {
     if (!a.duration.equals(b.duration)) {
-      throw new Error("a and b must have the same duration");
+      throw new Error("grids must have the same duration in time");
     }
 
     if (a.length !== b.length) {
