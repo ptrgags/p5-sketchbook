@@ -118,6 +118,21 @@ export class DrawbarOrgan {
     ).toDestination();
   }
 
+  /**
+   * Play a note on the organ
+   * @param {string} pitch
+   * @param {string} duration
+   * @param {number} time
+   * @param {number} velocity
+   */
+  play_note(pitch, duration, time, velocity) {
+    this.synth.triggerAttackRelease(pitch, duration, time, velocity);
+  }
+
+  silence() {
+    this.synth.triggerRelease("+0");
+  }
+
   destroy() {
     if (this.synth) {
       this.synth.dispose();
