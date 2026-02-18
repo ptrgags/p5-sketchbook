@@ -59,10 +59,19 @@ export class Rhythm {
         : new PatternGrid(rhythm, step_size);
   }
 
+  /**
+   * Get the length of the pattern in steps of the underlying pattern grid.
+   * @type {number}
+   */
   get length_steps() {
     return this.pattern.length;
   }
 
+  /**
+   * Get the length of the pattern in beats, as in how many note onsets
+   * are found in the rhythm.
+   * @type {number}
+   */
   get length_beats() {
     // Count the number of note onsets - this is the number
     // of beats.
@@ -71,6 +80,10 @@ export class Rhythm {
       .reduce((acc, x) => acc + x);
   }
 
+  /**
+   * Get the length of the rhythm in time, usually in measures of 4/4
+   * @type {Rational}
+   */
   get duration() {
     return this.pattern.duration;
   }

@@ -39,10 +39,18 @@ export class PatternGrid {
     yield* this.values;
   }
 
+  /**
+   * The number of steps in this pattern
+   * @type {number}
+   */
   get length() {
     return this.values.length;
   }
 
+  /**
+   * The duration of this pattern in time (usually in measures of 4/4 time)
+   * @type {Rational}
+   */
   get duration() {
     return this.step_size.mul(new Rational(this.values.length));
   }
@@ -107,14 +115,17 @@ export class PatternGrid {
   }
 
   /**
-   * Take two patterns and merge them together
+   * Take two patterns and merge them together with a function applied
+   * component-wise. The patterns must have the same duration in time, though
+   * they can have different step sizes. The result will be subdivided as
+   * needed so there's a common grid
    * @template A
    * @template B
    * @template C
-   * @param {PatternGrid<A>} a
-   * @param {PatternGrid<B>} b
-   * @param {function(A, B): C} merge_func
-   * @returns {PatternGrid<C>}
+   * @param {PatternGrid<A>} a First pattern
+   * @param {PatternGrid<B>} b Second pattern.
+   * @param {function(A, B): C} merge_func Function for combining elements
+   * @returns {PatternGrid<C>} The merged pattern grid.
    */
   static merge(a, b, merge_func) {
     if (!a.duration.equals(b.duration)) {

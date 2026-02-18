@@ -72,9 +72,11 @@ export class RelTimelineOps {
   }
 
   /**
+   * Find the smallest subdivision of time used in a timeline
+   * This can be used for determining the step size of a PatternGrid
    * @template T
-   * @param {Timeline<T>} timeline
-   * @return {Rational}
+   * @param {Timeline<T>} timeline The timeline
+   * @return {Rational} greatest common divisor of all durations (including gaps)
    */
   static smallest_subdivision(timeline) {
     let subdivision = Rational.ONE;
