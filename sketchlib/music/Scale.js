@@ -191,9 +191,9 @@ export class Scale {
   }
 
   /**
-   *
+   * Get a single pitch from the scale
    * @param {number} degree Scale degree measured from 0 at the tonic
-   * @returns
+   * @returns {number}
    */
   value(degree) {
     return this.pitches.value(degree);

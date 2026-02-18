@@ -19,8 +19,6 @@ import {
   G2,
   G4,
 } from "./pitches.js";
-import { N4 } from "./durations.js";
-import { PatternGrid } from "./PatternGrid.js";
 import { ScaleQuality, ScaleSymbol } from "./Scale.js";
 import { ChordQuality } from "./Chord.js";
 import { P1 } from "./intervals.js";

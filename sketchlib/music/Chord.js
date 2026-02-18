@@ -116,6 +116,15 @@ export class Chord {
   }
 
   /**
+   * Get a single pitch from the chord at the given index
+   * @param {number} index Index of the note starting at 0 at the root
+   * @returns
+   */
+  value(index) {
+    return this.pitches.value(index);
+  }
+
+  /**
    * Format as a chord symbol with the octave of the root. Like A3min7 or D5maj7
    * @returns {string}
    */

@@ -13,6 +13,8 @@ import {
   CS,
   CS6,
   DS5,
+  E3,
+  E7,
   G4,
   REST,
 } from "./pitches.js";
@@ -70,6 +72,33 @@ describe("ChordSymbol", () => {
 });
 
 describe("Chord", () => {
+  it("value with degree in range returns one of the pitches", () => {
+    const chord = MAJOR_TRIAD.to_chord(C4);
+
+    const result = chord.value(2);
+
+    const expected = G4;
+    expect(result).toEqual(expected);
+  });
+
+  it("value with negative value transposes by octaves", () => {
+    const chord = MAJOR_TRIAD.to_chord(C4);
+
+    const result = chord.value(-2);
+
+    const expected = E3;
+    expect(result).toEqual(expected);
+  });
+
+  it("value with value out of range transposes by octaves", () => {
+    const chord = MAJOR_TRIAD.to_chord(C4);
+
+    const result = chord.value(10);
+
+    const expected = E7;
+    expect(result).toEqual(expected);
+  });
+
   it("formats major chord as pitch only", () => {
     const chord = MAJOR_TRIAD.to_chord(A4);
 

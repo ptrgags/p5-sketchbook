@@ -163,4 +163,20 @@ export class MusicPatterns {
 
     return MusicPatterns.voice_lead(rhythm, chords, indices, velocities);
   }
+
+  /**
+   * Arpeggiate many chords at once, returning a monophonic melody
+   * @param {Rhythm} rhythm The rhythm for the individual notes
+   * @param {PatternGrid<Chord>} chords The chord progression
+   * @param {PatternGrid<number>} indices Array of indices. They will be relative to the corresponding chord
+   * @param {PatternGrid<number>} [velocities] Velocities for the individual notes
+   * @return {Melody<number>} A Melody containing notes
+   */
+  static arpeggiate(rhythm, chords, indices, velocities) {
+    const pitches = PatternGrid.merge(chords, indices, (chord, index) => {
+      return chord.value(index);
+    });
+    const notes = MusicPatterns.make_notes(pitches, velocities);
+    return rhythm.zip(notes);
+  }
 }
