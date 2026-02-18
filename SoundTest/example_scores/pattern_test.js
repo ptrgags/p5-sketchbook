@@ -47,7 +47,7 @@ const chord_part = MusicPatterns.block_chords(
 export const SCORE_PATTERN_TEST = new Score(
   new Part("melody", melody, {
     instrument_id: "square",
-    midi_instrument: 17 - 1, // Drawbar organ
+    midi_instrument: 17 - 1, // Lead 1 (Square)
     midi_channel: 1,
   }),
   new Part("block_chords", chord_part, {
