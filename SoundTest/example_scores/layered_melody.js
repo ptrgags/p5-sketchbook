@@ -32,8 +32,11 @@ const SCALE4 = CUSTOM_SCALE.to_scale(C4);
 const SCALE5 = CUSTOM_SCALE.to_scale(C5);
 
 const arp_rhythm = new Rhythm("x-x-x-x-x--.x--.", N8);
-const arp_pitches = SCALE4.sequence([0, 1, 2, 3, 4, 5], N8);
-const scale_arp = arp_rhythm.zip(MusicPatterns.make_notes(arp_pitches));
+const scale_arp = MusicPatterns.scale_melody(
+  arp_rhythm,
+  SCALE4,
+  [0, 1, 2, 3, 4, 5],
+);
 
 const cycle_length = N1;
 const cycle_a = map_pitch(

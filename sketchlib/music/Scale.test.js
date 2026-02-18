@@ -19,8 +19,6 @@ import {
   G2,
   G4,
 } from "./pitches.js";
-import { N4 } from "./durations.js";
-import { PatternGrid } from "./PatternGrid.js";
 import { ScaleQuality, ScaleSymbol } from "./Scale.js";
 import { ChordQuality } from "./Chord.js";
 import { P1 } from "./intervals.js";
@@ -190,9 +188,9 @@ describe("Scale", () => {
     const scale = MAJOR_SCALE.to_scale(C4);
     const degrees = [0, 4, -2, 3];
 
-    const result = scale.sequence(degrees, N4);
+    const result = scale.sequence(degrees);
 
-    const expected = new PatternGrid([C4, G4, A3, F4], N4);
+    const expected = [C4, G4, A3, F4];
     expect(result).toEqual(expected);
   });
 

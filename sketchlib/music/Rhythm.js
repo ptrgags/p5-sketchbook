@@ -88,6 +88,10 @@ export class Rhythm {
     return this.pattern.duration;
   }
 
+  get step_size() {
+    return this.pattern.step_size;
+  }
+
   /**
    * Iterate over a RhythmGrid and return runs of rests/sustained notes.
    * This version returns the durations in steps of the rhythm grid.
