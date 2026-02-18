@@ -1,3 +1,4 @@
+import { range } from "../range.js";
 import { Rational } from "../Rational.js";
 import { Chord } from "./Chord.js";
 import { ChordVoicing } from "./ChordVoicing.js";
@@ -105,21 +106,12 @@ export class MusicPatterns {
   }
 
   /**
-   *
-   * @param {Rhythm} rhythm
-   * @param {PatternGrid<Chord>} chords
-   * @param {PatternGrid<number>} [transpose]
-   * @param {PatternGrid<number>} [velocity]
-   */
-  static block_chords(rhythm, chords, transpose, velocity) {}
-
-  /**
-   *
-   * @param {Rhythm} rhythm
-   * @param {PatternGrid<Chord>} chords
-   * @param {PatternGrid<(number | undefined)[]>} indices
-   * @param {PatternGrid<number>} [velocities]
-   * @return {Melody<number>}
+   * Take a sequence of chords and voice them with a specific voicing.
+   * @param {Rhythm} rhythm The rhythm the chords will be played at
+   * @param {PatternGrid<Chord>} chords The chord progression
+   * @param {PatternGrid<(number | undefined)[]>} indices Array of indices for each chord
+   * @param {PatternGrid<number>} [velocities] Velocities for each chord
+   * @return {Melody<number>} A Melody of Harmony, where each harmony contains only notes or gaps
    */
   static voice_lead(rhythm, chords, indices, velocities) {
     // voice the chords and apply the velocity
@@ -147,5 +139,25 @@ export class MusicPatterns {
     );
 
     return new Melody(...children);
+  }
+
+  /**
+   * Voice lead as block chords in closed position,
+   * e.g. a C4 major triad will be voiced as [C4, E4, G4]
+   *
+   * This is like voice_lead except with a more specific voicing
+   * @param {Rhythm} rhythm Rhythm for the chords
+   * @param {PatternGrid<Chord>} chords The chords to play
+   * @param {PatternGrid<number>} [transpose] If specified, transpose each chord by an offset (relative to the number of notes in the corresponding chord)
+   * @param {PatternGrid<number>} [velocities] Velocities for each chord
+   * @return {Melody<Number>} A Harmony of Melody of notes
+   */
+  static block_chords(rhythm, chords, transpose, velocities) {
+    const indices = PatternGrid.merge(chords, transpose, (chord, offset) => {
+      // For example, a triad would be [0, 1, 2] + offset
+      const indices = [...range(chord.length)].map((x) => x + offset);
+      return indices;
+    });
+    return MusicPatterns.voice_lead(rhythm, chords, indices, velocities);
   }
 }

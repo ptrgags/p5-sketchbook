@@ -42,9 +42,6 @@ const bits_msb = bits_lsb.map((x) => x.slice().reverse());
 const indices_lsb = new PatternGrid(bits_lsb.map(to_voice_indices), N1);
 const indices_msb = new PatternGrid(bits_msb.map(to_voice_indices), N1);
 
-console.log(bits_lsb, bits_msb);
-console.log(indices_lsb, indices_msb);
-
 // Rhythm for one of the lsb/msb halves
 const chord_rhythm_half = new Rhythm("x".repeat(N), N1);
 // The chord is constant

@@ -109,6 +109,15 @@ export class Chord {
   }
 
   /**
+   * Get the number of pitches in this chord in root position. E.g for a triad
+   * this will return 3, for a seventh chord this will return 4
+   * @type {number}
+   */
+  get length() {
+    return this.pitches.length;
+  }
+
+  /**
    * Format as a chord symbol with the octave of the root. Like A3min7 or D5maj7
    * @returns {string}
    */
