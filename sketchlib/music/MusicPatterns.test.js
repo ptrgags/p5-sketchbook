@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { PatternGrid } from "./PatternGrid.js";
 import { B4, C4, E4, G4 } from "./pitches.js";
-import { N2, N4 } from "./durations.js";
+import { N2, N4, N8 } from "./durations.js";
 import { Velocity } from "./Velocity.js";
 import { MusicPatterns } from "./MusicPatterns.js";
 import { make_note, Melody, Note, Rest } from "./Music.js";
@@ -42,6 +42,18 @@ describe("MusicPatterns", () => {
       expect(result).toEqual(expected);
     });
 
+    it("with pitch as flat array makes pattern in quarter notes", () => {
+      const pitches = [C4, E4, G4, B4];
+
+      const result = MusicPatterns.make_notes(pitches);
+
+      const expected = new PatternGrid(
+        [new Note(C4), new Note(E4), new Note(G4), new Note(B4)],
+        N4,
+      );
+      expect(result).toEqual(expected);
+    });
+
     it("with pitches and velocities of the same shape makes notes", () => {
       const pitches = new PatternGrid([C4, E4, G4], N4);
       const velocities = new PatternGrid(
@@ -62,6 +74,45 @@ describe("MusicPatterns", () => {
       expect(result).toEqual(expected);
     });
 
+    it("with pitches as flat array matches duration of velocities", () => {
+      const pitches = [C4, E4, G4, B4];
+      const velocities = new PatternGrid(
+        [Velocity.PP, Velocity.P, Velocity.F, Velocity.FF],
+        N8,
+      );
+
+      const result = MusicPatterns.make_notes(pitches, velocities);
+
+      const expected = new PatternGrid(
+        [
+          new Note(C4, Velocity.PP),
+          new Note(E4, Velocity.P),
+          new Note(G4, Velocity.F),
+          new Note(B4, Velocity.FF),
+        ],
+        N8,
+      );
+      expect(result).toEqual(expected);
+    });
+
+    it("with velocity as flat array matches duration of pitches", () => {
+      const pitches = new PatternGrid([C4, E4, G4, B4], N8);
+      const velocities = [Velocity.PP, Velocity.P, Velocity.F, Velocity.FF];
+
+      const result = MusicPatterns.make_notes(pitches, velocities);
+
+      const expected = new PatternGrid(
+        [
+          new Note(C4, Velocity.PP),
+          new Note(E4, Velocity.P),
+          new Note(G4, Velocity.F),
+          new Note(B4, Velocity.FF),
+        ],
+        N8,
+      );
+      expect(result).toEqual(expected);
+    });
+
     it("with velocities at different step size but same duration produces correct notes", () => {
       const pitches = new PatternGrid([C4, E4, G4, B4], N4);
       const velocities = new PatternGrid([Velocity.MP, Velocity.F], N2);
@@ -74,6 +125,24 @@ describe("MusicPatterns", () => {
           new Note(E4, Velocity.MP),
           new Note(G4, Velocity.F),
           new Note(B4, Velocity.F),
+        ],
+        N4,
+      );
+      expect(result).toEqual(expected);
+    });
+
+    it("with pitches and velocities as flat arrays assumes quarter notes", () => {
+      const pitches = [C4, E4, G4, B4];
+      const velocities = [Velocity.PP, Velocity.P, Velocity.F, Velocity.FF];
+
+      const result = MusicPatterns.make_notes(pitches, velocities);
+
+      const expected = new PatternGrid(
+        [
+          new Note(C4, Velocity.PP),
+          new Note(E4, Velocity.P),
+          new Note(G4, Velocity.F),
+          new Note(B4, Velocity.FF),
         ],
         N4,
       );
