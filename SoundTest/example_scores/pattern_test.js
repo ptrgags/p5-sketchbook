@@ -15,14 +15,10 @@ import {
 import { Rhythm } from "../../sketchlib/music/Rhythm.js";
 import { Part, Score } from "../../sketchlib/music/Score.js";
 
-const pitches_a = new PatternGrid([A3, E4, D4, B3, D4, E4], N4);
-const pitches_b = new PatternGrid([C4, D4, C4, F4, GS4, A4], N4);
-
-const notes_a = MusicPatterns.make_notes(pitches_a);
-const notes_b = MusicPatterns.make_notes(pitches_b);
-
-const rhythm = new Rhythm("xxx-----x-x-x-------", N8);
-const melody = new Melody(rhythm.zip(notes_a), rhythm.zip(notes_b));
+const rhythm = new Rhythm("xxx-----|x-x-x---", N8);
+const motif_a = MusicPatterns.melody(rhythm, [A3, E4, D4, B3, D4, E4]);
+const motif_b = MusicPatterns.melody(rhythm, [C4, D4, C4, F4, GS4, A4]);
+const melody = new Melody(motif_a, motif_b);
 
 export const SCORE_PATTERN_TEST = new Score(
   new Part("melody", melody, {

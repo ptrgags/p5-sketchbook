@@ -1,6 +1,7 @@
 import { lcm } from "../gcd.js";
 import { Note } from "./Music.js";
 import { PatternGrid } from "./PatternGrid.js";
+import { Rhythm } from "./Rhythm.js";
 
 export class MusicPatterns {
   /**
@@ -17,5 +18,20 @@ export class MusicPatterns {
     }
 
     return PatternGrid.merge(pitches, velocities, (p, v) => new Note(p, v));
+  }
+
+  /**
+   * Compose a melody. This is a wrapper around MusicPatterns.make_notes + Rhythm.zip
+   * @template P
+   * @param {Rhythm} rhythm The rhythm of the melody
+   * @param {P[]} pitches The pitches (one per beat)
+   * @param {number[]} [velocities] The velocities (one per beat)
+   */
+  static melody(rhythm, pitches, velocities) {
+    let notes = velocities
+      ? pitches.map((p, i) => new Note(p, velocities[i]))
+      : pitches.map((p) => new Note(p));
+
+    return rhythm.zip(notes);
   }
 }
