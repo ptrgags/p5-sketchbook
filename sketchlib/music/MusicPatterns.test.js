@@ -1,11 +1,13 @@
 import { describe, it, expect } from "vitest";
 import { PatternGrid } from "./PatternGrid.js";
-import { B4, C4, E4, G4 } from "./pitches.js";
+import { B4, C4, C5, D4, D5, E4, E5, F4, F5, G4 } from "./pitches.js";
 import { N2, N4, N8 } from "./durations.js";
 import { Velocity } from "./Velocity.js";
 import { MusicPatterns } from "./MusicPatterns.js";
 import { make_note, Melody, Note, Rest } from "./Music.js";
 import { Rhythm } from "./Rhythm.js";
+import { MAJOR_SCALE } from "./scales.js";
+import { Rational } from "../Rational.js";
 
 describe("MusicPatterns", () => {
   describe("make_notes", () => {
@@ -178,6 +180,73 @@ describe("MusicPatterns", () => {
         new Rest(N4),
         make_note(E4, N4, Velocity.FF),
         new Rest(N4),
+      );
+      expect(result).toEqual(expected);
+    });
+  });
+
+  describe("scale_melody", () => {
+    it("creates melody based on rhythm and scale degrees", () => {
+      const rhythm = new Rhythm("xxxxxxxx|x--.x--.", N8);
+      const scale = MAJOR_SCALE.to_scale(C4);
+      const degrees = [0, 1, 2, 3, 7, 8, 9, 10, 0, 7];
+
+      const result = MusicPatterns.scale_melody(rhythm, scale, degrees);
+
+      const expected = new Melody(
+        make_note(C4, N8),
+        make_note(D4, N8),
+        make_note(E4, N8),
+        make_note(F4, N8),
+        make_note(C5, N8),
+        make_note(D5, N8),
+        make_note(E5, N8),
+        make_note(F5, N8),
+        make_note(C4, new Rational(3, 8)),
+        new Rest(N8),
+        make_note(C5, new Rational(3, 8)),
+        new Rest(N8),
+      );
+      expect(result).toEqual(expected);
+    });
+
+    it("with velocities merges grids", () => {
+      const rhythm = new Rhythm("xxxxxxxx|x--.x--.", N8);
+      const scale = MAJOR_SCALE.to_scale(C4);
+      const degrees = [0, 1, 2, 3, 7, 8, 9, 10, 0, 7];
+      const velocities = [
+        Velocity.P,
+        Velocity.P,
+        Velocity.P,
+        Velocity.P,
+        Velocity.MP,
+        Velocity.MP,
+        Velocity.MP,
+        Velocity.MP,
+        Velocity.MF,
+        Velocity.F,
+      ];
+
+      const result = MusicPatterns.scale_melody(
+        rhythm,
+        scale,
+        degrees,
+        velocities,
+      );
+
+      const expected = new Melody(
+        make_note(C4, N8, Velocity.P),
+        make_note(D4, N8, Velocity.P),
+        make_note(E4, N8, Velocity.P),
+        make_note(F4, N8, Velocity.P),
+        make_note(C5, N8, Velocity.MP),
+        make_note(D5, N8, Velocity.MP),
+        make_note(E5, N8, Velocity.MP),
+        make_note(F5, N8, Velocity.MP),
+        make_note(C4, new Rational(3, 8), Velocity.MF),
+        new Rest(N8),
+        make_note(C5, new Rational(3, 8), Velocity.F),
+        new Rest(N8),
       );
       expect(result).toEqual(expected);
     });
