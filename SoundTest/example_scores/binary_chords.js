@@ -1,72 +1,73 @@
-import { N1 } from "../../sketchlib/music/durations.js";
-import {
-  Harmony,
-  make_note,
-  Melody,
-  Note,
-  parse_cycle,
-  Rest,
-} from "../../sketchlib/music/Music.js";
-import { B4, G4, E4, C4, C3, G3 } from "../../sketchlib/music/pitches.js";
+import { MAJOR7 } from "../../sketchlib/music/chords.js";
+import { N1, N8 } from "../../sketchlib/music/durations.js";
+import { Melody } from "../../sketchlib/music/Music.js";
+import { MusicPatterns } from "../../sketchlib/music/MusicPatterns.js";
+import { PatternGrid } from "../../sketchlib/music/PatternGrid.js";
+import { C4, C3, G3, REST } from "../../sketchlib/music/pitches.js";
+import { Rhythm } from "../../sketchlib/music/Rhythm.js";
 import { Part, Score } from "../../sketchlib/music/Score.js";
-import { Gap } from "../../sketchlib/music/Timeline.js";
 import { range } from "../../sketchlib/range.js";
-
 /**
  * Take a number and convert to bits. They are returned in LSB order
  * @param {number} x A number
  * @param {number} width how many bits wide should the results be
- * @returns An array of size width storing the bits.
+ * @returns {boolean[]} An array of size width storing the bits.
  */
-function to_bits(x, width) {
+function to_bits_lsb(x, width) {
   const bits = new Array(width).fill(0).map((_, i) => Boolean((x >> i) & 1));
-  bits.reverse();
   return bits;
 }
 
 /**
- * Given a pattern of bits and corresponding notes, make a chord
  *
- * @template P
- * @param {Boolean[]} bit_pattern The bits in MSB first order
- * @param {Note<P>[]} chord_notes The notes to use for the chord
- * @param {Gap} silence The rest to insert in gaps
+ * @param {boolean[]} bits
+ * @returns {(number | undefined)[]}
  */
-function bit_chord(bit_pattern, chord_notes, silence) {
-  return new Harmony(
-    ...bit_pattern.map((bit, i) => (bit ? chord_notes[i] : silence)),
-  );
+function to_voice_indices(bits) {
+  // the indices are always [0, 1, 2, 3], except when bits are 0,
+  // the corresponding index is REST
+  return bits.map((bit, i) => (bit ? i : REST));
 }
 
-const chord_duration = N1;
-const major_seventh = [B4, G4, E4, C4].map((x) => make_note(x, chord_duration));
+const C4M7 = MAJOR7.to_chord(C4);
 
-const silence = new Rest(chord_duration);
+// We're going to iterate from [0, N) and play a chord for each value. This
+// is done twice, first in LSB order, then MSB order
+const BITS = 4;
+const N = 1 << BITS;
 
-// For the upper voices, Generate all 4-bit patterns and construct chords
-// from them.
-/**
- * @type {Boolean[][]}
- */
-const bits_lsb = [...range(16)].map((x) => to_bits(x, 4));
+const bits_lsb = [...range(N)].map((x) => to_bits_lsb(x, BITS));
+const bits_msb = bits_lsb.map((x) => x.slice().reverse());
 
-/**
- * @type {Melody<Number>}
- */
-const upwards_progression = new Melody(
-  ...bits_lsb.map((x) => bit_chord(x, major_seventh, silence)),
+const indices_lsb = new PatternGrid(bits_lsb.map(to_voice_indices), N1);
+const indices_msb = new PatternGrid(bits_msb.map(to_voice_indices), N1);
+
+console.log(bits_lsb, bits_msb);
+console.log(indices_lsb, indices_msb);
+
+// Rhythm for one of the lsb/msb halves
+const chord_rhythm_half = new Rhythm("x".repeat(N), N1);
+// The chord is constant
+const chord_pattern = new PatternGrid([C4M7], chord_rhythm_half.duration);
+
+const upwards_progression = MusicPatterns.voice_lead(
+  chord_rhythm_half,
+  chord_pattern,
+  indices_lsb,
 );
-
-// For the second half, flip the bit patterns vertically while keeping the
-// pitches in the same rows. This makes the chord start on the 7th and work
-// downwards
-const downwards_progression = new Melody(
-  ...bits_lsb.map((x) => bit_chord([...x].reverse(), major_seventh, silence)),
+const downwards_progression = MusicPatterns.voice_lead(
+  chord_rhythm_half,
+  chord_pattern,
+  indices_msb,
 );
-
 const full_progression = new Melody(upwards_progression, downwards_progression);
 
-const rhythm_bass = parse_cycle(N1, [C3, [C3, G3], C3, [C3, G3]]);
+const rhythm_bass = MusicPatterns.melody(new Rhythm("x--xx--x", N8), [
+  C3,
+  G3,
+  C3,
+  G3,
+]);
 const rhythm_loop = Melody.from_loop(rhythm_bass, full_progression.duration);
 
 export const SCORE_BINARY_CHORDS = new Score(

@@ -1,8 +1,13 @@
+import { Rational } from "../Rational.js";
+import { Chord } from "./Chord.js";
+import { ChordVoicing } from "./ChordVoicing.js";
 import { N4 } from "./durations.js";
-import { Melody, Note } from "./Music.js";
+import { Melody, Note, Rest } from "./Music.js";
 import { PatternGrid } from "./PatternGrid.js";
+import { RelTimelineOps } from "./RelTimelineOps.js";
 import { Rhythm } from "./Rhythm.js";
 import { Scale } from "./Scale.js";
+import { TimeInterval, timeline_map } from "./Timeline.js";
 
 /**
  * Convert pitches to notes at the default velocity.
@@ -97,5 +102,50 @@ export class MusicPatterns {
     const pitches = scale.sequence(degrees);
     const notes = MusicPatterns.make_notes(pitches, velocities);
     return rhythm.zip(notes);
+  }
+
+  /**
+   *
+   * @param {Rhythm} rhythm
+   * @param {PatternGrid<Chord>} chords
+   * @param {PatternGrid<number>} [transpose]
+   * @param {PatternGrid<number>} [velocity]
+   */
+  static block_chords(rhythm, chords, transpose, velocity) {}
+
+  /**
+   *
+   * @param {Rhythm} rhythm
+   * @param {PatternGrid<Chord>} chords
+   * @param {PatternGrid<(number | undefined)[]>} indices
+   * @param {PatternGrid<number>} [velocities]
+   * @return {Melody<number>}
+   */
+  static voice_lead(rhythm, chords, indices, velocities) {
+    // voice the chords and apply the velocity
+    const voicings = PatternGrid.merge(chords, indices, (chord, idxs) =>
+      chord.voice(idxs),
+    );
+    const with_velocity = MusicPatterns.make_notes(voicings, velocities);
+
+    const timeline = rhythm.zip(with_velocity);
+    const children = [...RelTimelineOps.iter_with_gaps(timeline)].map(
+      (interval) => {
+        if (interval instanceof Rest) {
+          return interval;
+        }
+
+        // right now things are nested as
+        // TimeInterval(Note(voicing, velocity), duration)
+        // we want
+        // voicing.to_harmony(duration, velocity)
+        const voicing = interval.value.pitch;
+        const velocity = interval.value.velocity;
+        const duration = interval.duration;
+        return voicing.to_harmony(duration, velocity);
+      },
+    );
+
+    return new Melody(...children);
   }
 }
