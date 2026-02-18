@@ -202,13 +202,11 @@ export class Scale {
   /**
    * Sequence notes for the scale. This is useful for making
    * melodies and bass lines
-   * @param {number[]} degrees
-   * @param {Rational} step_size
-   * @return {PatternGrid<number>}
+   * @param {number[]} degrees Scale degrees
+   * @return {number[]} Array of pitches
    */
-  sequence(degrees, step_size) {
-    const values = degrees.map((x) => this.pitches.value(x));
-    return new PatternGrid(values, step_size);
+  sequence(degrees) {
+    return degrees.map((x) => this.pitches.value(x));
   }
 
   /**
