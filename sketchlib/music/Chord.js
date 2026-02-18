@@ -1,9 +1,7 @@
 import { arrays_equal } from "../arrays_equal.js";
-import { Rational } from "../Rational.js";
 import { ChordVoicing } from "./ChordVoicing.js";
 import { M3, m3, M6, m6, m7, M7, P1, P5, T } from "./intervals.js";
 import { IntervalStack, PitchClassStack, PitchStack } from "./IntervalStack.js";
-import { PatternGrid } from "./PatternGrid.js";
 import { MIDIPitch } from "./MIDIPitch.js";
 
 /**
@@ -134,12 +132,10 @@ export class Chord {
   /**
    * Areggiate the chord as a single monophonic pattern
    * @param {number[]} indices Indices for looking up notes
-   * @param {Rational} step_size Step size for the pattern grid
-   * @returns {PatternGrid<number>}
+   * @returns {number[]} Sequence of pitches
    */
-  arpeggiate(indices, step_size) {
-    const values = indices.map((x) => this.pitches.value(x));
-    return new PatternGrid(values, step_size);
+  arpeggiate(indices) {
+    return indices.map((x) => this.pitches.value(x));
   }
 
   /**

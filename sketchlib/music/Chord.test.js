@@ -14,7 +14,6 @@ import {
   CS6,
   DS5,
   G4,
-  GS3,
   REST,
 } from "./pitches.js";
 import { N4 } from "./durations.js";
@@ -93,9 +92,9 @@ describe("Chord", () => {
     it("with empty indices returns empty pattern", () => {
       const chord = MAJOR7.to_chord(G4);
 
-      const result = chord.arpeggiate([], N4);
+      const result = chord.arpeggiate([]);
 
-      const expected = new PatternGrid([], N4);
+      const expected = [];
       expect(result).toEqual(expected);
     });
 
@@ -103,9 +102,9 @@ describe("Chord", () => {
       const chord = MINOR7.to_chord(C4);
       const indices = [-1, 0, 3, 4];
 
-      const result = chord.arpeggiate(indices, N4);
+      const result = chord.arpeggiate(indices);
 
-      const expected = new PatternGrid([AS3, C4, AS4, C5], N4);
+      const expected = [AS3, C4, AS4, C5];
       expect(result).toEqual(expected);
     });
   });
