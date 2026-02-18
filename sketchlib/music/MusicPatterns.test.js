@@ -1,13 +1,14 @@
 import { describe, it, expect } from "vitest";
 import { PatternGrid } from "./PatternGrid.js";
-import { B4, C4, C5, D4, D5, E4, E5, F4, F5, G4 } from "./pitches.js";
-import { N2, N4, N8 } from "./durations.js";
+import { A4, B4, C4, C5, D4, D5, E4, E5, F4, F5, G4, REST } from "./pitches.js";
+import { N1, N2, N4, N8 } from "./durations.js";
 import { Velocity } from "./Velocity.js";
 import { MusicPatterns } from "./MusicPatterns.js";
-import { make_note, Melody, Note, Rest } from "./Music.js";
+import { Harmony, make_note, Melody, Note, Rest } from "./Music.js";
 import { Rhythm } from "./Rhythm.js";
 import { MAJOR_SCALE } from "./scales.js";
 import { Rational } from "../Rational.js";
+import { MAJOR_TRIAD } from "./chords.js";
 
 describe("MusicPatterns", () => {
   describe("make_notes", () => {
@@ -247,6 +248,79 @@ describe("MusicPatterns", () => {
         new Rest(N8),
         make_note(C5, new Rational(3, 8), Velocity.F),
         new Rest(N8),
+      );
+      expect(result).toEqual(expected);
+    });
+  });
+
+  describe("voice_lead", () => {
+    it("constructs timeline from parallel patterns", () => {
+      const waltz_rhythm = new Rhythm("xxx|xxx", N4);
+      const I_IV = new PatternGrid(
+        [MAJOR_TRIAD.to_chord(C4), MAJOR_TRIAD.to_chord(F4)],
+        new Rational(3, 4),
+      );
+      // waltz rhythm
+      const indices = new PatternGrid(
+        [
+          [0, REST, REST],
+          [REST, 1, 2],
+          [REST, 1, 2],
+          [0, REST, REST],
+          [REST, 1, 2],
+          [REST, 1, 2],
+        ],
+        N4,
+      );
+
+      const result = MusicPatterns.voice_lead(waltz_rhythm, I_IV, indices);
+
+      const expected = new Melody(
+        new Harmony(new Rest(N4), new Rest(N4), make_note(C4, N4)),
+        new Harmony(make_note(G4, N4), make_note(E4, N4), new Rest(N4)),
+        new Harmony(make_note(G4, N4), make_note(E4, N4), new Rest(N4)),
+        new Harmony(new Rest(N4), new Rest(N4), make_note(F4, N4)),
+        new Harmony(make_note(C5, N4), make_note(A4, N4), new Rest(N4)),
+        new Harmony(make_note(C5, N4), make_note(A4, N4), new Rest(N4)),
+      );
+      expect(result).toEqual(expected);
+    });
+
+    it("with velocity sets the note velocity", () => {
+      const waltz_rhythm = new Rhythm("xxx|xxx", N4);
+      const I_IV = new PatternGrid(
+        [MAJOR_TRIAD.to_chord(C4), MAJOR_TRIAD.to_chord(F4)],
+        new Rational(3, 4),
+      );
+      const indices = new PatternGrid(
+        [
+          [0, REST, REST],
+          [REST, 1, 2],
+          [REST, 1, 2],
+          [0, REST, REST],
+          [REST, 1, 2],
+          [REST, 1, 2],
+        ],
+        N4,
+      );
+      const p = Velocity.P;
+      const f = Velocity.F;
+      const velocities = new PatternGrid([p, f], new Rational(3, 4));
+
+      const result = MusicPatterns.voice_lead(
+        waltz_rhythm,
+        I_IV,
+        indices,
+        velocities,
+      );
+
+      const expected = new Melody(
+        new Harmony(new Rest(N4), new Rest(N4), make_note(C4, N4, p)),
+        new Harmony(make_note(G4, N4, p), make_note(E4, N4, p), new Rest(N4)),
+        new Harmony(make_note(G4, N4, p), make_note(E4, N4, p), new Rest(N4)),
+        new Harmony(new Rest(N4), new Rest(N4), make_note(F4, N4, f)),
+        new Harmony(make_note(C5, N4, f), make_note(A4, N4, f), new Rest(N4)),
+        new Harmony(make_note(C5, N4, f), make_note(A4, N4, f), new Rest(N4)),
       );
       expect(result).toEqual(expected);
     });
