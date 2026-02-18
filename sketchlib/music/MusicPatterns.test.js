@@ -1,6 +1,22 @@
 import { describe, it, expect } from "vitest";
 import { PatternGrid } from "./PatternGrid.js";
-import { A4, B4, C4, C5, D4, D5, E4, E5, F4, F5, G4, REST } from "./pitches.js";
+import {
+  A4,
+  B4,
+  C3,
+  C4,
+  C5,
+  D4,
+  D5,
+  E3,
+  E4,
+  E5,
+  F4,
+  F5,
+  G3,
+  G4,
+  REST,
+} from "./pitches.js";
 import { N1, N2, N4, N8 } from "./durations.js";
 import { Velocity } from "./Velocity.js";
 import { MusicPatterns } from "./MusicPatterns.js";
@@ -8,7 +24,7 @@ import { Harmony, make_note, Melody, Note, Rest } from "./Music.js";
 import { Rhythm } from "./Rhythm.js";
 import { MAJOR_SCALE } from "./scales.js";
 import { Rational } from "../Rational.js";
-import { MAJOR_TRIAD } from "./chords.js";
+import { MAJOR_TRIAD, MINOR7 } from "./chords.js";
 
 describe("MusicPatterns", () => {
   describe("make_notes", () => {
@@ -321,6 +337,83 @@ describe("MusicPatterns", () => {
         new Harmony(new Rest(N4), new Rest(N4), make_note(F4, N4, f)),
         new Harmony(make_note(C5, N4, f), make_note(A4, N4, f), new Rest(N4)),
         new Harmony(make_note(C5, N4, f), make_note(A4, N4, f), new Rest(N4)),
+      );
+      expect(result).toEqual(expected);
+    });
+  });
+
+  describe("block_chords", () => {
+    it("voices chords in closed position", () => {
+      const rhythm = new Rhythm("xx", N1);
+      const chords = new PatternGrid(
+        [MAJOR_TRIAD.to_chord(C4), MINOR7.to_chord(E4)],
+        N1,
+      );
+
+      const result = MusicPatterns.block_chords(rhythm, chords);
+
+      const expected = new Melody(
+        new Harmony(make_note(G4, N1), make_note(E4, N1), make_note(C4, N1)),
+        new Harmony(
+          make_note(D5, N1),
+          make_note(B4, N1),
+          make_note(G4, N1),
+          make_note(E4, N1),
+        ),
+      );
+      expect(result).toEqual(expected);
+    });
+
+    it("with transpose can transpose and invert chords", () => {
+      const rhythm = new Rhythm("xx", N1);
+      const chords = new PatternGrid(
+        [MAJOR_TRIAD.to_chord(C4), MINOR7.to_chord(E4)],
+        N1,
+      );
+      const transpose = new PatternGrid([-3, -1], N1);
+
+      const result = MusicPatterns.block_chords(rhythm, chords, transpose);
+
+      const expected = new Melody(
+        new Harmony(make_note(G3, N1), make_note(E3, N1), make_note(C3, N1)),
+        new Harmony(
+          make_note(B4, N1),
+          make_note(G4, N1),
+          make_note(E4, N1),
+          make_note(D4, N1),
+        ),
+      );
+      expect(result).toEqual(expected);
+    });
+
+    it("with velocities sets note velocity", () => {
+      const rhythm = new Rhythm("xx", N1);
+      const chords = new PatternGrid(
+        [MAJOR_TRIAD.to_chord(C4), MINOR7.to_chord(E4)],
+        N1,
+      );
+      const f = Velocity.F;
+      const velocities = new PatternGrid([f], rhythm.duration);
+
+      const result = MusicPatterns.block_chords(
+        rhythm,
+        chords,
+        undefined,
+        velocities,
+      );
+
+      const expected = new Melody(
+        new Harmony(
+          make_note(G4, N1, f),
+          make_note(E4, N1, f),
+          make_note(C4, N1, f),
+        ),
+        new Harmony(
+          make_note(D5, N1, f),
+          make_note(B4, N1, f),
+          make_note(G4, N1, f),
+          make_note(E4, N1, f),
+        ),
       );
       expect(result).toEqual(expected);
     });

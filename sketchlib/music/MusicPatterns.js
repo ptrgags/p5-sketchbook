@@ -1,14 +1,11 @@
 import { range } from "../range.js";
-import { Rational } from "../Rational.js";
 import { Chord } from "./Chord.js";
-import { ChordVoicing } from "./ChordVoicing.js";
 import { N4 } from "./durations.js";
 import { Melody, Note, Rest } from "./Music.js";
 import { PatternGrid } from "./PatternGrid.js";
 import { RelTimelineOps } from "./RelTimelineOps.js";
 import { Rhythm } from "./Rhythm.js";
 import { Scale } from "./Scale.js";
-import { TimeInterval, timeline_map } from "./Timeline.js";
 
 /**
  * Convert pitches to notes at the default velocity.
@@ -153,11 +150,17 @@ export class MusicPatterns {
    * @return {Melody<Number>} A Harmony of Melody of notes
    */
   static block_chords(rhythm, chords, transpose, velocities) {
-    const indices = PatternGrid.merge(chords, transpose, (chord, offset) => {
-      // For example, a triad would be [0, 1, 2] + offset
-      const indices = [...range(chord.length)].map((x) => x + offset);
-      return indices;
-    });
+    let indices;
+    if (!transpose) {
+      indices = chords.map((chord) => [...range(chord.length)]);
+    } else {
+      indices = PatternGrid.merge(chords, transpose, (chord, offset) => {
+        // For example, a triad would be [0, 1, 2] + offset
+        const indices = [...range(chord.length)].map((x) => x + offset);
+        return indices;
+      });
+    }
+
     return MusicPatterns.voice_lead(rhythm, chords, indices, velocities);
   }
 }
