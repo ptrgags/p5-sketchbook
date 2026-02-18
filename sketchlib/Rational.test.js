@@ -374,4 +374,62 @@ describe("Rational", () => {
       expect(b_lt_a).toBe(true);
     });
   });
+
+  describe("gcd", () => {
+    it("with zero returns this", () => {
+      const a = new Rational(3, 4);
+
+      const result = a.gcd(Rational.ZERO);
+
+      expect(result).toEqual(a);
+    });
+
+    it("with negative fraction throws", () => {
+      const a = new Rational(3, 4);
+      const b = new Rational(-1, 4);
+
+      expect(() => {
+        return a.gcd(b);
+      }).toThrow("other must be nonnegative");
+    });
+
+    it("with positive fractions computes gcd", () => {
+      const a = new Rational(3, 4);
+      const b = new Rational(2, 3);
+
+      const result = a.gcd(b);
+
+      const expected = new Rational(1, 12);
+      expect(result).toEqual(expected);
+    });
+  });
+
+  describe("lcm", () => {
+    it("with zero throws error", () => {
+      const a = new Rational(3, 4);
+
+      expect(() => {
+        return a.lcm(Rational.ZERO);
+      }).toThrowError("other must be positive");
+    });
+
+    it("with negative fraction throws", () => {
+      const a = new Rational(3, 4);
+      const b = new Rational(-1, 4);
+
+      expect(() => {
+        return a.lcm(b);
+      }).toThrow("other must be positive");
+    });
+
+    it("with positive fractions computes gcd", () => {
+      const a = new Rational(3, 4);
+      const b = new Rational(2, 3);
+
+      const result = a.lcm(b);
+
+      const expected = new Rational(6, 1);
+      expect(result).toEqual(expected);
+    });
+  });
 });

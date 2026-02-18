@@ -113,4 +113,67 @@ describe("RelTimelineOps", () => {
       expect(result).toEqual(expected);
     });
   });
+
+  describe("smallest_subdivision", () => {
+    it("with empty timeline returns 1", () => {
+      const empty = Gap.ZERO;
+
+      const result = RelTimelineOps.smallest_subdivision(empty);
+
+      const expected = Rational.ONE;
+      expect(result).toEqual(expected);
+    });
+
+    it("with intervals of the same duration returns that duration", () => {
+      const interval = new TimeInterval(1, new Rational(1, 4));
+      const timeline = new Sequential(interval, interval, interval, interval);
+
+      const result = RelTimelineOps.smallest_subdivision(interval);
+
+      const expected = new Rational(1, 4);
+      expect(result).toEqual(expected);
+    });
+
+    it("includes gaps in calculation", () => {
+      const interval = new TimeInterval(1, new Rational(1, 4));
+      const gap = new Gap(new Rational(1, 8));
+      const timeline = new Sequential(
+        interval,
+        interval,
+        gap,
+        interval,
+        interval,
+        gap,
+      );
+
+      const result = RelTimelineOps.smallest_subdivision(timeline);
+
+      const expected = new Rational(1, 8);
+      expect(result).toEqual(expected);
+    });
+
+    it("computes smallest subdivision across all intervals and gaps", () => {
+      const interval = new TimeInterval(1, new Rational(1, 4));
+      const gap = new Gap(new Rational(1, 8));
+      const another = new TimeInterval(2, new Rational(4, 3));
+      const timeline = new Sequential(
+        interval,
+        interval,
+        gap,
+        interval,
+        another,
+        interval,
+        gap,
+      );
+
+      const result = RelTimelineOps.smallest_subdivision(timeline);
+
+      // gcd(1/4, 1/8, 4/3) = gcd(1, 1, 4)/lcm(4, 8, 3) = 1/lcm(12, 8)
+      // lcm(12, 8) = 12 * 8 / gcd(12, 8) = 12 * 8 / gcd(8, 4) = 12 * 8 / 4
+      // = 12 * 2 = 24
+      // so the result is 1/24
+      const expected = new Rational(1, 24);
+      expect(result).toEqual(expected);
+    });
+  });
 });

@@ -1,4 +1,4 @@
-import { N8, N1 } from "../../sketchlib/music/durations.js";
+import { N8, N1, N4 } from "../../sketchlib/music/durations.js";
 import {
   Note,
   Harmony,
@@ -12,12 +12,14 @@ import { Rational } from "../../sketchlib/Rational.js";
 import { Part, Score } from "../../sketchlib/music/Score.js";
 import { MAJOR_SCALE } from "../../sketchlib/music/scales.js";
 import { C4 } from "../../sketchlib/music/pitches.js";
+import { Rhythm } from "../../sketchlib/music/Rhythm.js";
+import { MusicPatterns } from "../../sketchlib/music/MusicPatterns.js";
 import { PatternGrid } from "../../sketchlib/music/PatternGrid.js";
 
 // The top line plays a short motif while the bottom line holds a long note.
-const pitches = new PatternGrid([0, 2, 4, 2, 7, 6, 5, 4], N8);
-const rhythm = PatternGrid.rhythm("x-x---xxx-x-x-x-", N8);
-const top_motif = PatternGrid.zip(rhythm, pitches);
+const scale_degrees = new PatternGrid([0, 2, 4, 2, 7, 6, 5, 4], N4);
+const rhythm = new Rhythm("x-x---xxx-x-x-x-", N8);
+const top_motif = rhythm.zip(MusicPatterns.make_notes(scale_degrees));
 
 const bottom_motif = make_note(-5, new Rational(2));
 

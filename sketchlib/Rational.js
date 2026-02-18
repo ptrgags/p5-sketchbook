@@ -1,4 +1,4 @@
-import { gcd } from "./gcd.js";
+import { gcd, lcm } from "./gcd.js";
 import { mod } from "./mod.js";
 
 /**
@@ -191,6 +191,36 @@ export class Rational {
    */
   ge(other) {
     return !this.lt(other);
+  }
+
+  /**
+   * Compute the GCD of two positive rational numbers
+   * @param {Rational} other Another rational number
+   * @returns {Rational} gcd(a/b, c/d) = gcd(a,c)/lcm(b, d)
+   */
+  gcd(other) {
+    if (other.lt(Rational.ZERO)) {
+      throw new Error("other must be nonnegative");
+    }
+
+    const { numerator: a, denominator: b } = this;
+    const { numerator: c, denominator: d } = other;
+    return new Rational(gcd(a, c), lcm(b, d));
+  }
+
+  /**
+   * Compute the LCM of two positive rational numbers
+   * @param {Rational} other Another rational number
+   * @returns {Rational} lcm(a/b, c/d) = lcm(a, c)/gcd(b,d)
+   */
+  lcm(other) {
+    if (other.le(Rational.ZERO)) {
+      throw new Error("other must be positive");
+    }
+
+    const { numerator: a, denominator: b } = this;
+    const { numerator: c, denominator: d } = other;
+    return new Rational(lcm(a, c), gcd(b, d));
   }
 }
 

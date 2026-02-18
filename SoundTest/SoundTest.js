@@ -28,7 +28,6 @@ import { Piano } from "./Piano.js";
 import { SpiralBurst } from "./SpiralBurst.js";
 import { expect_element } from "../sketchlib/dom/expect_element.js";
 import { decode_midi } from "../sketchlib/midi/decode_midi.js";
-import { MusicalCues } from "../sketchlib/music/MusicalCues.js";
 import { midi_to_score } from "../sketchlib/midi/midi_to_score.js";
 import { SCORE_PHASE_SCALE } from "./example_scores/phase_scale.js";
 import { SCORE_SYMMETRY_MELODY } from "./example_scores/symmetry_melody.js";
@@ -39,6 +38,7 @@ import { SCORE_LAYERED_MELODY } from "./example_scores/layered_melody.js";
 import { Score } from "../sketchlib/music/Score.js";
 import { AbsTimelineOps } from "../sketchlib/music/AbsTimelineOps.js";
 import { PlayedNotes } from "./PlayedNotes.js";
+import { RelTimelineOps } from "../sketchlib/music/RelTimelineOps.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -258,6 +258,11 @@ class SoundScene {
         const [fname, midi_data] = await import_midi_file(e.target.files);
         const midi = decode_midi(midi_data);
         const [score, tempos] = midi_to_score(midi);
+
+        const grid_sizes = score.parts.map((x) =>
+          RelTimelineOps.smallest_subdivision(x.music),
+        );
+        console.log("grid sizes", grid_sizes);
 
         const basename = fname.replace(/\.mid$/i, "");
         const score_id = `imported_${basename}`;
