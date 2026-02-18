@@ -24,7 +24,7 @@ import { Harmony, make_note, Melody, Note, Rest } from "./Music.js";
 import { Rhythm } from "./Rhythm.js";
 import { MAJOR_SCALE } from "./scales.js";
 import { Rational } from "../Rational.js";
-import { MAJOR_TRIAD, MINOR7 } from "./chords.js";
+import { MAJOR_TRIAD, MINOR7, MINOR_TRIAD } from "./chords.js";
 
 describe("MusicPatterns", () => {
   describe("make_notes", () => {
@@ -414,6 +414,92 @@ describe("MusicPatterns", () => {
           make_note(G4, N1, f),
           make_note(E4, N1, f),
         ),
+      );
+      expect(result).toEqual(expected);
+    });
+  });
+
+  describe("arpeggiate", () => {
+    it("arpeggiates chords relative to relevant chord", () => {
+      const rhythm = new Rhythm("xxx-xxx-xxx-xxx-", N4);
+      // The usual I-V-vi-IV progression
+      const axis_chords = new PatternGrid(
+        [
+          MAJOR_TRIAD.to_chord(C4),
+          MAJOR_TRIAD.to_chord(G4),
+          MINOR_TRIAD.to_chord(A4),
+          MAJOR_TRIAD.to_chord(F4),
+        ],
+        new Rational(3, 4),
+      );
+      // Up one chord, down the next one
+      const indices = new PatternGrid([0, 1, 2, 2, 1, 0, 0, 1, 2, 2, 1, 0], N4);
+
+      const result = MusicPatterns.arpeggiate(rhythm, axis_chords, indices);
+
+      const expected = new Melody(
+        // Up the I chord
+        make_note(C4, N4),
+        make_note(E4, N4),
+        make_note(G4, N2),
+        // Down the V chord
+        make_note(D5, N4),
+        make_note(B4, N4),
+        make_note(G4, N2),
+        // Up the vi chord
+        make_note(A4, N4),
+        make_note(C5, N4),
+        make_note(E5, N2),
+        // Down the IV chord
+        make_note(C5, N4),
+        make_note(A4, N4),
+        make_note(F4, N2),
+      );
+      expect(result).toEqual(expected);
+    });
+
+    it("with velocities sets the note velocities", () => {
+      const rhythm = new Rhythm("xxx-xxx-xxx-xxx-", N4);
+      // The usual I-V-vi-IV progression
+      const axis_chords = new PatternGrid(
+        [
+          MAJOR_TRIAD.to_chord(C4),
+          MAJOR_TRIAD.to_chord(G4),
+          MINOR_TRIAD.to_chord(A4),
+          MAJOR_TRIAD.to_chord(F4),
+        ],
+        new Rational(3, 4),
+      );
+      // Up one chord, down the next one
+      const indices = new PatternGrid([0, 1, 2, 2, 1, 0, 0, 1, 2, 2, 1, 0], N4);
+      const p = Velocity.P;
+      const f = Velocity.F;
+      const velocities = new PatternGrid([p, p, f, p], new Rational(3, 4));
+
+      const result = MusicPatterns.arpeggiate(
+        rhythm,
+        axis_chords,
+        indices,
+        velocities,
+      );
+
+      const expected = new Melody(
+        // Up the I chord
+        make_note(C4, N4, p),
+        make_note(E4, N4, p),
+        make_note(G4, N2, p),
+        // Down the V chord
+        make_note(D5, N4, p),
+        make_note(B4, N4, p),
+        make_note(G4, N2, p),
+        // Up the vi chord
+        make_note(A4, N4, f),
+        make_note(C5, N4, f),
+        make_note(E5, N2, f),
+        // Down the IV chord
+        make_note(C5, N4, p),
+        make_note(A4, N4, p),
+        make_note(F4, N2, p),
       );
       expect(result).toEqual(expected);
     });
