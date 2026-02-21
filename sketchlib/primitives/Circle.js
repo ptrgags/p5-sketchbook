@@ -1,3 +1,4 @@
+import { is_nearly } from "../is_nearly.js";
 import { Point } from "../pga2d/Point.js";
 import { Primitive } from "./Primitive.js";
 
@@ -23,6 +24,14 @@ export class Circle {
   draw(p) {
     const { x, y } = this.center;
     p.circle(x, y, 2 * this.radius);
+  }
+
+  /**
+   * Check if two circles are equal
+   * @param {Circle} other
+   */
+  equals(other) {
+    this.center.equals(other.center) && is_nearly(this.radius, other.radius);
   }
 
   /**
