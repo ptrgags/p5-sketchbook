@@ -42,7 +42,7 @@ const INVERTED_GEOM = style([INVERTED_LINE, INVERTED_POINT], INVERTED_STYLE);
 
 const CGA_GEOM = group(ORIGINAL_GEOM, REFLECTED_GEOM, INVERTED_GEOM);
 
-const TRANSLATE_CENTER = CVersor.translate(
+const TRANSLATE_CENTER = CVersor.translation(
   new Direction(WIDTH / 2, HEIGHT / 2),
 );
 
