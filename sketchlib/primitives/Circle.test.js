@@ -24,13 +24,13 @@ describe("Circle", () => {
       expect(result).toBe(true);
     });
 
-    it("with point on circle boundary returns false", () => {
+    it("with point on circle boundary returns true", () => {
       const circle = new Circle(new Point(3, -4), 5);
       const point = new Point(8, -4);
 
       const result = circle.contains(point);
 
-      expect(result).toBe(false);
+      expect(result).toBe(true);
     });
 
     it("with point outside circle returns false", () => {

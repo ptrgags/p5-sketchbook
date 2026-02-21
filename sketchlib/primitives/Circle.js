@@ -36,7 +36,7 @@ export class Circle {
     const dx = point.x - this.center.x;
     const dy = point.y - this.center.y;
     const dist_sqr = dx * dx + dy * dy;
-    return dist_sqr < this.radius * this.radius;
+    return dist_sqr <= this.radius * this.radius;
   }
 
   /**
