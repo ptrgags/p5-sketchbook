@@ -23,7 +23,6 @@ const WORM_EYE_SEPARATION = 0.5 * WORM_THICKNESS;
 const WORM_NOSE_RADIUS = 1.25 * WORM_THICKNESS;
 const WORM_MIN_BEND_ANGLE = (3 * Math.PI) / 4;
 
-const ROT90 = Motor.rotation(Point.ORIGIN, Math.PI / 2);
 const ROT45 = Motor.rotation(Point.ORIGIN, Math.PI / 4);
 const DEBUG_SHOW_SPINE = false;
 
@@ -172,8 +171,9 @@ export class AnimatedWorm {
     for (const [i, center] of positions.entries()) {
       const forward_direction =
         i == 0 ? center.sub(positions[1]) : positions[i - 1].sub(center);
+      const unit_forward = forward_direction.normalize();
 
-      const left_dir = ROT90.transform_dir(forward_direction).normalize();
+      const left_dir = unit_forward.rot90();
       const right_dir = left_dir.neg();
 
       left_points[i] = center.add(left_dir.scale(WORM_THICKNESS));
@@ -240,8 +240,8 @@ export class AnimatedWorm {
     const [left, right] = this.googly;
 
     const center = this.chain.get_joint(1).position;
-    const left_dir = ROT90.transform_dir(this.look_direction);
-    const right_dir = ROT90.reverse().transform_dir(this.look_direction);
+    const left_dir = this.look_direction.rot90();
+    const right_dir = this.look_direction.rot270();
 
     const left_position = center.add(left_dir.scale(WORM_EYE_SEPARATION));
     const right_position = center.add(right_dir.scale(WORM_EYE_SEPARATION));
