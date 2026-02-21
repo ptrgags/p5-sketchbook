@@ -30,15 +30,19 @@ function halfway(a, b, tiebreak) {
   return a.add(b).normalize().neg();
 }
 
+/**
+ * Get the direction from one node to its parent
+ * @param {CoralNode} node
+ * @param {CoralNode} parent
+ * @returns
+ */
 function get_forward_dir(node, parent) {
   if (parent) {
-    return parent.circle.position.sub(node.circle.position).normalize();
+    return parent.circle.center.sub(node.circle.center).normalize();
   }
 
   if (node.children.length === 1) {
-    return node.circle.position
-      .sub(node.children[0].circle.position)
-      .normalize();
+    return node.circle.center.sub(node.children[0].circle.center).normalize();
   }
 
   // TODO: For a root with multiple children, maybe take the average of the
