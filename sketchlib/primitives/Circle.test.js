@@ -1,6 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { Point } from "../pga2d/Point.js";
 import { Circle } from "./Circle.js";
+import { GEOMETRY_MATCHERS } from "../test_helpers/geometry_matchers.js";
+
+expect.extend(GEOMETRY_MATCHERS);
 
 describe("Circle", () => {
   describe("contains", () => {
@@ -47,7 +50,7 @@ describe("Circle", () => {
       const result = Circle.from_two_points(a, a);
 
       const expected = new Circle(new Point(1, 2), 0);
-      expect(result).toEqual(expected);
+      expect(result).toBeCircle(expected);
     });
 
     it("with different points computes correct circle", () => {
@@ -70,7 +73,7 @@ describe("Circle", () => {
       const expected_center = new Point(-0.5, 3);
       const expected_radius = 5 / 2;
       const expected = new Circle(expected_center, expected_radius);
-      expect(result).toEqual(expected);
+      expect(result).toBeCircle(expected);
     });
   });
 });

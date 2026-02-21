@@ -44,7 +44,9 @@ export class Circle {
    * @param {Circle} other
    */
   equals(other) {
-    this.center.equals(other.center) && is_nearly(this.radius, other.radius);
+    return (
+      this.center.equals(other.center) && is_nearly(this.radius, other.radius)
+    );
   }
 
   /**
