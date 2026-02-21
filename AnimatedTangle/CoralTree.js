@@ -1,6 +1,5 @@
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
-import { Motor } from "../sketchlib/pga2d/versors.js";
 import { is_nearly } from "../sketchlib/is_nearly.js";
 import { BeziergonPrimitive } from "../sketchlib/primitives/BeziergonPrimitive.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
@@ -102,11 +101,9 @@ export class CoralNode {
     const radius = this.circle.radius;
 
     const dir_forward = get_forward_dir(this, parent);
-    /*const dir_forward = parent
-      ? parent.circle.position.sub(center).normalize()
-      : Direction.DIR_X; // TODO: This is temporary*/
+
     // in P5's y-down coordinates, rotations are clockwise
-    const dir_right = Motor.ROT90.transform_dir(dir_forward);
+    const dir_right = dir_forward.rot90();
     const dir_left = dir_right.neg();
     const dir_backward = dir_forward.neg();
 

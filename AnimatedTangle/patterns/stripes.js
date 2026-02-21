@@ -17,7 +17,7 @@ import { Animated } from "../../sketchlib/animation/Animated.js";
  * @return {GroupPrimitive}
  */
 export function make_stripes(center, dir_forward, spacing, dimensions, phase) {
-  const dir_right = Motor.ROT90.transform_dir(dir_forward);
+  const dir_right = dir_forward.rot90();
 
   const { x: width, y: height } = dimensions;
 

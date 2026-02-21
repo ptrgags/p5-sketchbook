@@ -78,12 +78,39 @@ export class Direction {
   }
 
   /**
+   * Rotate the vector 90 degrees in the positive direction
+   * (from +x to +y) using the coordinate transform (x, y) -> (-y, x)
+   * instead of using a Motor.
+   *
+   * This is handy for computing a normal from a tangent.
+   * @returns {Direction} The rotated vector.
+   */
+  rot90() {
+    return new Direction(-this.y, this.x);
+  }
+
+  /**
    * For a direction, this reverses the orientation. For a point, this
    * is a no-op due to homogeneity
    * @returns {Direction} The direction to negate
    */
   neg() {
     return new Direction(-this.x, -this.y);
+  }
+
+  /**
+   * Rotate the direction 180 degrees. Alias for neg()
+   * @returns {Direction}
+   */
+  rot180 = this.neg;
+
+  /**
+   * Rotate the direction 90 degrees in the negative direction
+   * without using a Motor
+   * @returns {Direction}
+   */
+  rot270() {
+    return new Direction(this.y, -this.x);
   }
 
   /**
