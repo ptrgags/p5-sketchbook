@@ -3,6 +3,43 @@ import { Point } from "../pga2d/Point.js";
 import { Circle } from "./Circle.js";
 
 describe("Circle", () => {
+  describe("contains", () => {
+    it("with circle center returns true", () => {
+      const circle = new Circle(new Point(3, -4), 5);
+
+      const result = circle.contains(circle.center);
+
+      expect(result).toBe(true);
+    });
+
+    it("with point inside circle returns true", () => {
+      const circle = new Circle(new Point(3, -4), 5);
+      const point = new Point(5, -2);
+
+      const result = circle.contains(point);
+
+      expect(result).toBe(true);
+    });
+
+    it("with point on circle boundary returns false", () => {
+      const circle = new Circle(new Point(3, -4), 5);
+      const point = new Point(8, -4);
+
+      const result = circle.contains(point);
+
+      expect(result).toBe(false);
+    });
+
+    it("with point outside circle returns false", () => {
+      const circle = new Circle(new Point(3, -4), 5);
+      const point = new Point(10, 10);
+
+      const result = circle.contains(point);
+
+      expect(result).toBe(false);
+    });
+  });
+
   describe("from_two_points", () => {
     it("with identical points returns degenerate circle", () => {
       const a = new Point(1, 2);

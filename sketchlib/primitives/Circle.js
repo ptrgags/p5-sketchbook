@@ -27,6 +27,19 @@ export class Circle {
   }
 
   /**
+   * Check if this circle strictly contains the point
+   * (i.e. distance squared < r^2)
+   * @param {Point} point The point to check
+   * @returns {boolean} True if the point is strictly inside the circle.
+   */
+  contains(point) {
+    const dx = point.x - this.center.x;
+    const dy = point.y - this.center.y;
+    const dist_sqr = dx * dx + dy * dy;
+    return dist_sqr < this.radius * this.radius;
+  }
+
+  /**
    * Check if two circles are equal
    * @param {Circle} other
    */
