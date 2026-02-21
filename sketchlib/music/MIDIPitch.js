@@ -76,8 +76,8 @@ export class MIDIPitch {
    * @returns {string}
    */
   static format_pitch(midi_pitch) {
-    const pitch_class = this.get_pitch_class(midi_pitch);
-    const octave = this.get_octave(midi_pitch);
+    const pitch_class = MIDIPitch.get_pitch_class(midi_pitch);
+    const octave = MIDIPitch.get_octave(midi_pitch);
 
     const pitch_label = PITCH_CLASS_LABELS[pitch_class];
     return `${pitch_label}${octave}`;

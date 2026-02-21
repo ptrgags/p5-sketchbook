@@ -7,7 +7,7 @@ import {
   Rest,
   Harmony,
 } from "../../sketchlib/music/Music.js";
-import { PatternGrid } from "../../sketchlib/music/PatternGrid.js";
+import { MusicPatterns } from "../../sketchlib/music/MusicPatterns.js";
 import {
   B,
   C,
@@ -20,6 +20,7 @@ import {
   GS,
   REST,
 } from "../../sketchlib/music/pitches.js";
+import { Rhythm } from "../../sketchlib/music/Rhythm.js";
 import { ScaleQuality } from "../../sketchlib/music/Scale.js";
 import { Part, Score } from "../../sketchlib/music/Score.js";
 import { Rational } from "../../sketchlib/Rational.js";
@@ -30,9 +31,12 @@ const CUSTOM_SCALE = new ScaleQuality([C, E, F, G, GS, B]);
 const SCALE4 = CUSTOM_SCALE.to_scale(C4);
 const SCALE5 = CUSTOM_SCALE.to_scale(C5);
 
-const arp_rhythm = PatternGrid.rhythm("x-x-x-x-x--.x--.", N8);
-const arp_pitches = SCALE4.sequence([0, 1, 2, 3, 4, 5], N8);
-const scale_arp = PatternGrid.zip(arp_rhythm, arp_pitches);
+const arp_rhythm = new Rhythm("x-x-x-x-x--.x--.", N8);
+const scale_arp = MusicPatterns.scale_melody(
+  arp_rhythm,
+  SCALE4,
+  [0, 1, 2, 3, 4, 5],
+);
 
 const cycle_length = N1;
 const cycle_a = map_pitch(

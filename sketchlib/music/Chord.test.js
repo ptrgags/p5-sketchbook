@@ -13,8 +13,9 @@ import {
   CS,
   CS6,
   DS5,
+  E3,
+  E7,
   G4,
-  GS3,
   REST,
 } from "./pitches.js";
 import { N4 } from "./durations.js";
@@ -71,6 +72,33 @@ describe("ChordSymbol", () => {
 });
 
 describe("Chord", () => {
+  it("value with degree in range returns one of the pitches", () => {
+    const chord = MAJOR_TRIAD.to_chord(C4);
+
+    const result = chord.value(2);
+
+    const expected = G4;
+    expect(result).toEqual(expected);
+  });
+
+  it("value with negative value transposes by octaves", () => {
+    const chord = MAJOR_TRIAD.to_chord(C4);
+
+    const result = chord.value(-2);
+
+    const expected = E3;
+    expect(result).toEqual(expected);
+  });
+
+  it("value with value out of range transposes by octaves", () => {
+    const chord = MAJOR_TRIAD.to_chord(C4);
+
+    const result = chord.value(10);
+
+    const expected = E7;
+    expect(result).toEqual(expected);
+  });
+
   it("formats major chord as pitch only", () => {
     const chord = MAJOR_TRIAD.to_chord(A4);
 
@@ -93,9 +121,9 @@ describe("Chord", () => {
     it("with empty indices returns empty pattern", () => {
       const chord = MAJOR7.to_chord(G4);
 
-      const result = chord.arpeggiate([], N4);
+      const result = chord.arpeggiate([]);
 
-      const expected = new PatternGrid([], N4);
+      const expected = [];
       expect(result).toEqual(expected);
     });
 
@@ -103,9 +131,9 @@ describe("Chord", () => {
       const chord = MINOR7.to_chord(C4);
       const indices = [-1, 0, 3, 4];
 
-      const result = chord.arpeggiate(indices, N4);
+      const result = chord.arpeggiate(indices);
 
-      const expected = new PatternGrid([AS3, C4, AS4, C5], N4);
+      const expected = [AS3, C4, AS4, C5];
       expect(result).toEqual(expected);
     });
   });

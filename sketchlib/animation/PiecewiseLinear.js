@@ -28,8 +28,8 @@ export class PiecewiseLinear {
       return this.points[0][1];
     }
 
-    if (x >= this.points[this.points.length - 1][0]) {
-      return this.points[this.points.length - 1][1];
+    if (x >= this.points.at(-1)[0]) {
+      return this.points.at(-1)[1];
     }
 
     const larger_index = this.points.findIndex((point) => point[0] > x);
