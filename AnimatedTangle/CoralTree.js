@@ -101,9 +101,7 @@ export class CoralNode {
     const radius = this.circle.radius;
 
     const dir_forward = get_forward_dir(this, parent);
-    /*const dir_forward = parent
-      ? parent.circle.position.sub(center).normalize()
-      : Direction.DIR_X; // TODO: This is temporary*/
+
     // in P5's y-down coordinates, rotations are clockwise
     const dir_right = dir_forward.rot90();
     const dir_left = dir_right.neg();
