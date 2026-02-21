@@ -1,7 +1,6 @@
 import { Random } from "../sketchlib/random.js";
 import { Vector2 } from "./Vector2.js";
 import { DifferentialNode, NEARBY_RADIUS } from "./DifferentialNode.js";
-import { Circle } from "./circle.js";
 import { mod } from "../sketchlib/mod.js";
 import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
 import { style } from "../sketchlib/primitives/shorthand.js";
@@ -9,11 +8,11 @@ import { BeziergonPrimitive } from "../sketchlib/primitives/BeziergonPrimitive.j
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Quadtree } from "./quadtree.js";
+import { Circle } from "../sketchlib/primitives/Circle.js";
 
 const MAX_EDGE_LENGTH = 150;
 
 // How small of an angle below which more nodes will be added
-const PINCH_ANGLE_THRESHOLD = Math.PI / 6;
 const PINCH_THRESHOLD = Math.cos(Math.PI / 4);
 
 const MAX_SPEED = 10;
@@ -49,9 +48,6 @@ export class DifferentialPolyline {
     }
   }
 
-  /**
-   *
-   */
   split_long_edges() {
     for (let i = 0; i < this.nodes.length; i++) {
       const start = this.nodes[i];
@@ -63,9 +59,6 @@ export class DifferentialPolyline {
     }
   }
 
-  /**
-   *
-   */
   split_pinched_angles() {
     const split_points = [];
     for (let i = 0; i < this.nodes.length; i++) {
