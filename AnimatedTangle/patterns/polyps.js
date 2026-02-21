@@ -115,8 +115,8 @@ export class Polyp {
 
   update_position(position) {
     this.position = position;
-    this.mouth_back.position = position;
-    this.mouth_front.position = position;
+    this.mouth_back.center = position;
+    this.mouth_front.center = position;
 
     SIXTH_ROOTS.forEach((dir, i) => {
       this.tentacle_lines[i].a = position.add(dir.scale(MOUTH_MIN));
@@ -138,7 +138,7 @@ export class Polyp {
     SIXTH_ROOTS.forEach((dir, i) => {
       const tentacle_end = this.position.add(dir.scale(tentacle_r));
 
-      this.tentacle_circles[i].position = tentacle_end;
+      this.tentacle_circles[i].center = tentacle_end;
       this.tentacle_lines[i].b = tentacle_end;
     });
   }
