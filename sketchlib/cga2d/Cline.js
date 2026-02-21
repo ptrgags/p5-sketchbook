@@ -81,7 +81,7 @@ export class Cline {
    * @param {Circle} circle
    */
   static from_circle(circle) {
-    const { position, radius } = circle;
+    const { center: position, radius } = circle;
 
     const x = position.x;
     const y = position.y;

@@ -8,11 +8,11 @@ import { Primitive } from "./Primitive.js";
 export class Circle {
   /**
    * Constructor
-   * @param {Point} position The center of the circle
+   * @param {Point} center The center of the circle
    * @param {number} radius The radius of the circle
    */
-  constructor(position, radius) {
-    this.position = position;
+  constructor(center, radius) {
+    this.center = center;
     this.radius = radius;
   }
 
@@ -21,7 +21,7 @@ export class Circle {
    * @param {import("p5")} p The p5.js library
    */
   draw(p) {
-    const { x, y } = this.position;
+    const { x, y } = this.center;
     p.circle(x, y, 2 * this.radius);
   }
 

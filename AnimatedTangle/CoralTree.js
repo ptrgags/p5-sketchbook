@@ -97,7 +97,7 @@ export class CoralNode {
    * @param {CoralNode} [parent] The parent node
    */
   get_outline_vertices(output, parent) {
-    const center = this.circle.position;
+    const center = this.circle.center;
     const radius = this.circle.radius;
 
     const dir_forward = get_forward_dir(this, parent);
@@ -128,7 +128,7 @@ export class CoralNode {
 
     // Get the direction to each child
     const to_children = this.children.map((child) =>
-      child.circle.position.sub(center).normalize(),
+      child.circle.center.sub(center).normalize(),
     );
 
     // Point on the left, placed at the half angle between the forward
