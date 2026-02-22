@@ -15,6 +15,7 @@ import {
   MIDIMessageType,
   MIDIMetaEvent,
   MIDIMetaType,
+  MIDITempoEvent,
 } from "./MIDIEvent.js";
 import { NoteStream } from "./NoteStream.js";
 
@@ -171,10 +172,16 @@ export class ScoreBuilder {
     this.part_builders = new Map();
 
     /**
-     * Array of bpm
+     * Array of bpm values
      * @type {number[]}
      */
     this.tempo_markings = [];
+
+    /**
+     * Set of times when the tempo/time signature changes
+     * @type {Set<number>}
+     */
+    this.section_start_times = new Set([0]);
   }
 
   /**
@@ -214,13 +221,7 @@ export class ScoreBuilder {
   process_meta_message(abs_tick, event) {
     const meta_type = event.meta_type;
 
-    if (meta_type === MIDIMetaType.SET_TEMPO) {
-      const [t0, t1, t2] = event.data;
-      const microsec_per_quarter = (t0 << 16) | (t1 << 8) | t2;
-      const MICROSEC_PER_MIN = 60e6;
-      const bpm = (1 / microsec_per_quarter) * MICROSEC_PER_MIN;
-      this.tempo_markings.push(bpm);
-    } else if (meta_type === MIDIMetaType.TIME_SIGNATURE) {
+    if (meta_type === MIDIMetaType.TIME_SIGNATURE) {
       const [numerator, denominator_power, clocks_per_click, n32_per_quarter] =
         event.data;
       const denominator = 1 << denominator_power;
@@ -233,6 +234,17 @@ export class ScoreBuilder {
   }
 
   /**
+   * Process a MIDI Set Tempo event
+   * @param {number} abs_tick Tick
+   * @param {MIDITempoEvent} message
+   */
+  process_tempo_message(abs_tick, message) {
+    this.section_start_times.add(abs_tick);
+    // TODO: store the time as well
+    this.tempo_markings.push(message.bpm);
+  }
+
+  /**
    * Process a single MIDI message
    * @param {number} abs_tick
    * @param {MIDIEvent} event
@@ -242,6 +254,8 @@ export class ScoreBuilder {
       this.process_channel_message(event.channel, abs_tick, event);
     } else if (event instanceof MIDIMetaEvent) {
       this.process_meta_message(abs_tick, event);
+    } else if (event instanceof MIDITempoEvent) {
+      this.process_tempo_message(abs_tick, event);
     } else {
       // sysex
       this.ignore(abs_tick, event);
