@@ -1,7 +1,9 @@
+import { is_nearly } from "../is_nearly.js";
 import { Point } from "../pga2d/Point.js";
 import { Primitive } from "../primitives/Primitive.js";
 import { CEven } from "./CEven.js";
 import { COdd } from "./COdd.js";
+import { ConformalBasis } from "./ConformalBasis.js";
 
 /**
  * Null point in 2D CGA (circle with radius 0),
@@ -37,7 +39,7 @@ export class NullPoint {
    * @returns {NullPoint}
    */
   transform(versor) {
-    const vec = versor.unit_sandwich_odd(this.vector);
+    const vec = versor.unit_sandwich_odd(this.vector).normalize_o();
     return new NullPoint(vec);
   }
 

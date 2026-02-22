@@ -15,10 +15,10 @@ const POINT = NullPoint.from_point(new Point(250, 450));
 
 // A line is the fixed point of a transformation
 const REFLECT = LINE.vector.normalize();
-const REFLECTED_POINT = new Cline(REFLECT.unit_sandwich_odd(POINT.vector));
+const REFLECTED_POINT = POINT.transform(REFLECT);
 const REFLECTED_CIRCLE = new Cline(REFLECT.unit_sandwich_odd(CIRCLE.vector));
 
-const INVERT = CIRCLE.vector.normalize();
+const INVERT = CIRCLE.vector.normalize_o();
 const INVERTED_POINT = POINT.transform(INVERT);
 const INVERTED_LINE = new Cline(INVERT.unit_sandwich_odd(LINE.vector));
 

@@ -26,6 +26,23 @@ describe("COdd", () => {
     expect(result).toBeCOdd(expected);
   });
 
+  it("normalize_o normalizes based on computed o component", () => {
+    // let's say we have a point x = (2, 3)
+    // x + 1/2(x^2 - 1)p + 1/2(x^2 + 1)m
+    // 1x + 3y + 1/2(13 - 1)p + 1/2(13 + 1)m
+    // 1x + 3y + 6p + 7m
+    // scale this by 2
+    // 2x + 6y + 12p + 14m
+    // o should be 2 now. 1/2(14 - 12) = 1/2(2) = 1. wut...
+
+    const scaled_vec = new COdd(2, 6, 12, 14, 0, 0, 0, 0);
+
+    const result = scaled_vec.normalize_o();
+
+    const expected = new COdd(1, 3, 6, 7, 0, 0, 0, 0);
+    expect(result).toBeCOdd(expected);
+  });
+
   it("neg negates all components", () => {
     const a = new COdd(1, 2, 3, 4, 5, 6, 7, 8);
 
