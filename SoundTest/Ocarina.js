@@ -1,11 +1,16 @@
 import { Animated } from "../sketchlib/animation/Animated.js";
+import { Color } from "../sketchlib/Color.js";
 import { MIDIPitch } from "../sketchlib/music/MIDIPitch.js";
 import { A, A4, F, F6 } from "../sketchlib/music/pitches.js";
+import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
+import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
+import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { ShowHidePrimitive } from "../sketchlib/primitives/ShowHidePrimitive.js";
 import { Rectangle } from "../sketchlib/Rectangle.js";
+import { Style } from "../sketchlib/Style.js";
 import { PlayedNotes } from "./PlayedNotes.js";
 
 // See https://www.desmos.com/calculator/o222tjtle9 for a diagram of the
@@ -163,6 +168,20 @@ const FINGERING_CHART = [
  */
 const NO_HOLES = new Array(12).fill(false);
 
+const STYLE_OCARINA_BOUNDARY = new Style({
+  stroke: Color.BLACK,
+  fill: new Oklch(0.6128, 0.0994, 213),
+});
+
+const STYLE_HOLES_OPEN = new Style({
+  stroke: Color.BLACK,
+  fill: new Oklch(0.7, 0.0994, 213),
+});
+
+const STYLE_HOLES_CLOSED = new Style({
+  fill: Color.BLACK,
+});
+
 /**
  *
  * @param {Rectangle} bounding_rect
@@ -217,8 +236,19 @@ export class Ocarina {
       }
     }
 
+    const body = new RectPrimitive(
+      this.bounding_rect.position,
+      this.bounding_rect.dimensions,
+    );
+
     const tone_holes = position_tone_holes(bounding_rect);
-    this.primitive = new ShowHidePrimitive(tone_holes, NO_HOLES);
+    this.closed_holes = new ShowHidePrimitive(tone_holes, NO_HOLES);
+
+    this.primitive = group(
+      style(body, STYLE_OCARINA_BOUNDARY),
+      style(tone_holes, STYLE_HOLES_OPEN),
+      style(this.closed_holes, STYLE_HOLES_CLOSED),
+    );
   }
 
   /**
@@ -236,7 +266,7 @@ export class Ocarina {
 
     const index = pitch - this.start_note;
     const fingering = FINGERING_CHART[index] ?? NO_HOLES;
-    this.primitive.show_flags = fingering;
+    this.closed_holes.show_flags = fingering;
   }
 
   /**
