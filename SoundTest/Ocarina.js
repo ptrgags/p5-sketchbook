@@ -6,8 +6,11 @@ import { Oklch } from "../sketchlib/Oklch.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { BeziergonPrimitive } from "../sketchlib/primitives/BeziergonPrimitive.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
+import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { ShowHidePrimitive } from "../sketchlib/primitives/ShowHidePrimitive.js";
+import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
+import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
 import { Rectangle } from "../sketchlib/Rectangle.js";
 import { Style } from "../sketchlib/Style.js";
 import { PlayedNotes } from "./PlayedNotes.js";
@@ -293,10 +296,24 @@ export class Ocarina {
     const tone_holes = position_tone_holes(bounding_rect);
     this.closed_holes = new ShowHidePrimitive(tone_holes, NO_HOLES);
 
+    this.pitch_label = new TextPrimitive(
+      "",
+      bounding_rect.position.add(bounding_rect.dimensions),
+    );
+
+    const text_size = Math.max(12, bounding_rect.dimensions.y / 4);
+    const text_style = new TextStyle(text_size, "right", "bottom");
+
     this.primitive = group(
       style(body, style_boundary),
       style(tone_holes, style_open),
       style(this.closed_holes, style_closed),
+      new GroupPrimitive(this.pitch_label, {
+        text_style,
+        style: new Style({
+          fill: Color.WHITE,
+        }),
+      }),
     );
   }
 
@@ -316,6 +333,9 @@ export class Ocarina {
     const index = pitch - this.start_note;
     const fingering = FINGERING_CHART[index] ?? NO_HOLES;
     this.closed_holes.show_flags = fingering;
+
+    this.pitch_label.text =
+      pitch !== undefined ? MIDIPitch.format_pitch(pitch) : "";
   }
 
   /**
