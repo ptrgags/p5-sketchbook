@@ -582,7 +582,6 @@ class SoundScene {
 
     // TODO: this should be rewritten to use the Animated interface
     return group(
-      mute,
       ...melody_buttons,
       BUTTON_LABELS,
       this.piano.primitive,
@@ -592,6 +591,7 @@ class SoundScene {
       this.ocarinas.tenor.primitive,
       this.ocarinas.soprano.primitive,
       burst,
+      mute,
     );
   }
 
