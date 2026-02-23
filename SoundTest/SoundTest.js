@@ -41,6 +41,9 @@ import { PlayedNotes } from "./PlayedNotes.js";
 import { Ocarina } from "./Ocarina.js";
 import { RelTimelineOps } from "../sketchlib/music/RelTimelineOps.js";
 import { A4, F6 } from "../sketchlib/music/pitches.js";
+import { minmax } from "../sketchlib/minmax.js";
+import { Note } from "../sketchlib/music/Music.js";
+import { AbsInterval } from "../sketchlib/music/AbsTimeline.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -353,7 +356,7 @@ class SoundScene {
   }
 
   /**
-   *
+   * Classify parts as drums, monophonic melodies or polyphonic music
    * @param {Score<number>} score
    * @returns {{
    * drums: Part<number>[],
@@ -388,57 +391,144 @@ class SoundScene {
   }
 
   /**
+   * Assign parts from the score to either
+   * @param {Score<number>} score Score of MIDI notes
+   * @returns {{
+   *    piano: PlayedNotes,
+   *    bass_ocarina: PlayedNotes,
+   *    tenor_ocarina: PlayedNotes,
+   *    soprano_ocarina: PlayedNotes,
+   * }}
+   */
+  assign_instruments(score) {
+    const { polyphonic, monophonic } = this.classify_parts(score);
+
+    /**
+     * Temporary storage for intervals that might be used for the ocarinas
+     * @type {{[key: string]: AbsInterval<Note<number>>[][]}}
+     */
+    const ocarina_candidates = {
+      bass: [],
+      tenor: [],
+      soprano: [],
+    };
+
+    /**
+     * @type {AbsInterval<Note<number>>[]}
+     */
+    const piano_intervals = [];
+
+    // See if any of the parts would fit in the ocarina range
+    // and hold them aside.
+    for (const mono_part of monophonic) {
+      const abs_music = AbsTimelineOps.from_relative(mono_part.music);
+      const intervals = [...AbsTimelineOps.iter_intervals(abs_music)];
+      const pitches = intervals.map((x) => x.value.pitch);
+      const pitch_range = minmax(pitches);
+
+      if (!pitch_range) {
+        // Empty part, skip
+        continue;
+      }
+
+      const ocarina_octave = Ocarina.check_compatibility(pitch_range);
+      if (ocarina_octave === Ocarina.OCTAVE_BASS) {
+        ocarina_candidates.bass.push(intervals);
+      } else if (ocarina_octave === Ocarina.OCTAVE_TENOR) {
+        ocarina_candidates.tenor.push(intervals);
+      } else if (ocarina_octave === Ocarina.OCTAVE_SOPRANO) {
+        ocarina_candidates.soprano.push(intervals);
+      } else {
+        // not a match for any of the three ocarinas, so assign to the piano.
+        piano_intervals.push(...intervals);
+      }
+    }
+
+    // Take the first candidate from each list, and assign the rest to the
+    // piano
+    const [selected_bass, ...rest_bass] = ocarina_candidates.bass;
+    const [selected_tenor, ...rest_tenor] = ocarina_candidates.tenor;
+    const [selected_soprano, ...rest_soprano] = ocarina_candidates.soprano;
+    piano_intervals.push(
+      ...rest_bass.flat(),
+      ...rest_tenor.flat(),
+      ...rest_soprano.flat(),
+    );
+
+    // Polyphonic parts are always sent to the piano
+    for (const poly_part of polyphonic) {
+      const abs_music = AbsTimelineOps.from_relative(poly_part.music);
+      piano_intervals.push(...AbsTimelineOps.iter_intervals(abs_music));
+    }
+
+    return {
+      piano: new PlayedNotes(piano_intervals),
+      bass_ocarina: selected_bass ? new PlayedNotes(selected_bass) : undefined,
+      tenor_ocarina: selected_tenor
+        ? new PlayedNotes(selected_tenor)
+        : undefined,
+      soprano_ocarina: selected_soprano
+        ? new PlayedNotes(selected_soprano)
+        : undefined,
+    };
+  }
+
+  /**
    *
    * @param {Score<number>} score
    */
   replace_instruments(score) {
-    const { polyphonic, monophonic } = this.classify_parts(score);
+    const assigned_notes = this.assign_instruments(score);
 
-    const all_intervals = [];
+    this.piano = new Piano(PIANO_BOUNDS, assigned_notes.piano);
 
-    /*
-    const ocarina_compatible = [];
-    for (const mono_part of monophonic) {
-      const abs_music = AbsTimelineOps.from_relative(mono_part.music);
-      const intervals = [...AbsTimelineOps.iter_intervals(abs_music)];
-      const notes = new PlayedNotes(intervals);
-
-      if (notes.pitch_range) {
-        const octave = Ocarina.check_compatibility(notes.pitch_range);
-        console.log("octave", octave);
-      }
-
-      // check if ocarina compatible for a tenor ocarina
-      if (
-        notes.pitch_range &&
-        notes.pitch_range[0] >= A4 &&
-        notes.pitch_range[1] <= F6 &&
-        // only kep the first compatible melody
-        ocarina_compatible.length === 0
-      ) {
-        ocarina_compatible.push(notes);
-      } else {
-        all_intervals.push(...intervals);
-      }
-
-      console.log(mono_part, notes.pitch_range);
-    }
-
-    console.log("ocarina compatible: ", ocarina_compatible);
-    if (ocarina_compatible.length === 0) {
-      this.ocarina = new Ocarina(OCARINA_BOUNDS, new PlayedNotes([]), 4);
+    if (assigned_notes.bass_ocarina) {
+      this.ocarinas.bass = new Ocarina(
+        BASS_OCARINA.bounds,
+        assigned_notes.bass_ocarina,
+        BASS_OCARINA.octave,
+        BASS_OCARINA.color,
+      );
     } else {
-      const [ocarina_notes] = ocarina_compatible;
-      this.ocarina = new Ocarina(OCARINA_BOUNDS, ocarina_notes, 4);
+      this.ocarinas.bass = new Ocarina(
+        BASS_OCARINA.bounds,
+        PlayedNotes.EMPTY,
+        BASS_OCARINA.octave,
+        INACTIVE_COLOR,
+      );
     }
-    */
 
-    for (const poly_part of polyphonic) {
-      const abs_music = AbsTimelineOps.from_relative(poly_part.music);
-      all_intervals.push(...AbsTimelineOps.iter_intervals(abs_music));
+    if (assigned_notes.tenor_ocarina) {
+      this.ocarinas.tenor = new Ocarina(
+        TENOR_OCARINA.bounds,
+        assigned_notes.tenor_ocarina,
+        TENOR_OCARINA.octave,
+        TENOR_OCARINA.color,
+      );
+    } else {
+      this.ocarinas.tenor = new Ocarina(
+        TENOR_OCARINA.bounds,
+        PlayedNotes.EMPTY,
+        TENOR_OCARINA.octave,
+        INACTIVE_COLOR,
+      );
     }
-    const played_notes = new PlayedNotes(all_intervals);
-    this.piano = new Piano(PIANO_BOUNDS, played_notes);
+
+    if (assigned_notes.soprano_ocarina) {
+      this.ocarinas.ocarina = new Ocarina(
+        SOPRANO_OCARINA.bounds,
+        assigned_notes.soprano_ocarina,
+        SOPRANO_OCARINA.octave,
+        SOPRANO_OCARINA.color,
+      );
+    } else {
+      this.ocarinas.soprano = new Ocarina(
+        SOPRANO_OCARINA.bounds,
+        PlayedNotes.EMPTY,
+        SOPRANO_OCARINA.octave,
+        INACTIVE_COLOR,
+      );
+    }
   }
 
   /**
