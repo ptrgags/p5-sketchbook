@@ -1,4 +1,5 @@
 import { Velocity } from "../music/Velocity.js";
+import { Rational } from "../Rational.js";
 import { decode_variable_length } from "./variable_length.js";
 
 /**
@@ -275,10 +276,14 @@ export class MIDIMetaEvent {
   }
 
   /**
+   * @typedef {MIDIMetaEvent | MIDITempoEvent | MIDITimeSignatureEvent} AnyMetaMessage
+   */
+
+  /**
    * Decode a binary meta message
    * @param {DataView} data_view Data view to read from
    * @param {number} offset Offset of the first byte after the 0xFF (i.e. the meta message type field)
-   * @return {[MIDIMetaEvent | MIDITempoEvent, number]} (message, after_offset)
+   * @return {[AnyMetaMessage, number]} (message, after_offset)
    */
   static decode(data_view, offset) {
     const meta_type = data_view.getUint8(offset);
@@ -295,6 +300,8 @@ export class MIDIMetaEvent {
     let message;
     if (meta_type === MIDIMetaType.SET_TEMPO) {
       message = MIDITempoEvent.from_payload(body);
+    } else if (meta_type === MIDIMetaType.TIME_SIGNATURE) {
+      message = MIDITimeSignatureEvent.from_payload(body);
     } else {
       message = new MIDIMetaEvent(meta_type, body);
     }
@@ -376,6 +383,81 @@ export class MIDITempoEvent {
   }
 }
 MIDITempoEvent.MICROSEC_PER_MIN = 60e6;
+
+/**
+ * @implements {MIDIEvent}
+ */
+export class MIDITimeSignatureEvent {
+  /**
+   * Constructor
+   * @param {number} numerator Top number of the time signature
+   * @param {number} denominator Bottom number of the time signature
+   * @param {number} clocks_per_click MIDI clocks per metronome click (unused)
+   * @param {number} n32_per_quarter Number of 1/32 notes in a quarter note (unused)
+   */
+  constructor(numerator, denominator, clocks_per_click, n32_per_quarter) {
+    this.numerator = numerator;
+    this.denominator = denominator;
+    this.measure_duration = new Rational(numerator, denominator);
+
+    // These fields are just stored verbatim
+    this.clocks_per_click = clocks_per_click;
+    this.n32_per_quarter = n32_per_quarter;
+  }
+
+  /**
+   * @type {number[]}
+   */
+  get sort_key() {
+    throw new Error("Method not implemented.");
+  }
+
+  /**
+   * @type {number}
+   */
+  get byte_length() {
+    // 3 for the header + 4 for the payload
+    return 7;
+  }
+
+  /**
+   * Encode the time signature to binary
+   * @param {DataView} data_view
+   * @param {number} offset
+   * @returns {number}
+   */
+  encode(data_view, offset) {
+    const length = 4;
+
+    const denominator_power = this.denominator >> 1;
+    data_view.setUint8(offset + 0, MIDIMetaEvent.MAGIC);
+    data_view.setUint8(offset + 1, MIDIMetaType.TIME_SIGNATURE);
+    data_view.setUint8(offset + 2, length);
+    data_view.setUint8(offset + 3, this.numerator);
+    data_view.setUint8(offset + 4, denominator_power);
+    data_view.setUint8(offset + 5, this.clocks_per_click);
+    data_view.setUint8(offset + 6, this.n32_per_quarter);
+
+    return offset + 7;
+  }
+
+  format() {
+    return `${this.numerator}/${this.denominator}`;
+  }
+
+  static from_payload(payload) {
+    const [numerator, denominator_power, clocks_per_click, n32_per_quarter] =
+      payload;
+    const denominator = 1 << denominator_power;
+
+    return new MIDITimeSignatureEvent(
+      numerator,
+      denominator,
+      clocks_per_click,
+      n32_per_quarter,
+    );
+  }
+}
 
 /**
  * @implements {MIDIEvent}

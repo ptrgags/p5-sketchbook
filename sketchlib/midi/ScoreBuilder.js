@@ -16,6 +16,7 @@ import {
   MIDIMetaEvent,
   MIDIMetaType,
   MIDITempoEvent,
+  MIDITimeSignatureEvent,
 } from "./MIDIEvent.js";
 import { NoteStream } from "./NoteStream.js";
 
@@ -214,23 +215,20 @@ export class ScoreBuilder {
   }
 
   /**
-   * Log some of the meta messages to learn about timing
+   * Process a new time signature
    * @param {number} abs_tick
-   * @param {MIDIMetaEvent} event
+   * @param {MIDITimeSignatureEvent} event
    */
-  process_meta_message(abs_tick, event) {
-    const meta_type = event.meta_type;
-
-    if (meta_type === MIDIMetaType.TIME_SIGNATURE) {
-      const [numerator, denominator_power, clocks_per_click, n32_per_quarter] =
-        event.data;
-      const denominator = 1 << denominator_power;
-      console.log(
-        `New Time Signature: ${numerator}/${denominator}, metronome click = ${clocks_per_click} clocks, 32nd notes per quarter: ${n32_per_quarter}`,
-      );
-    }
-
-    this.ignore(abs_tick, event);
+  process_time_signature_message(abs_tick, event) {
+    this.section_start_times.add(abs_tick / this.ticks_per_quarter / 4);
+    // TODO: Store event.measure_duration
+    console.log(
+      abs_tick,
+      "time signature",
+      event.numerator,
+      "/",
+      event.denominator,
+    );
   }
 
   /**
@@ -239,8 +237,9 @@ export class ScoreBuilder {
    * @param {MIDITempoEvent} message
    */
   process_tempo_message(abs_tick, message) {
-    this.section_start_times.add(abs_tick);
+    this.section_start_times.add(abs_tick / this.ticks_per_quarter / 4);
     // TODO: store the time as well
+    console.log(abs_tick, "tempo", message.bpm);
     this.tempo_markings.push(message.bpm);
   }
 
@@ -252,12 +251,12 @@ export class ScoreBuilder {
   process_event(abs_tick, event) {
     if (event instanceof MIDIMessage) {
       this.process_channel_message(event.channel, abs_tick, event);
-    } else if (event instanceof MIDIMetaEvent) {
-      this.process_meta_message(abs_tick, event);
+    } else if (event instanceof MIDITimeSignatureEvent) {
+      this.process_time_signature_message(abs_tick, event);
     } else if (event instanceof MIDITempoEvent) {
       this.process_tempo_message(abs_tick, event);
     } else {
-      // sysex
+      // sysex and other MIDI meta events
       this.ignore(abs_tick, event);
     }
   }
