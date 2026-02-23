@@ -1,6 +1,5 @@
 import { TimeInterval } from "../music/Timeline.js";
 import { Rational } from "../Rational.js";
-import { to_tone_time } from "./to_tone_time.js";
 
 export class PartDescriptor {
   /**
@@ -46,8 +45,5 @@ export function make_part_clip(tone, instrument, descriptor) {
     instrument.triggerAttackRelease(pitch, duration, time);
   }, descriptor.value.events);
 
-  part.loop = true;
-  part.loopStart = "0:0";
-  part.loopEnd = to_tone_time(descriptor.duration);
   return new TimeInterval(new ToneClip(part), descriptor.duration);
 }
