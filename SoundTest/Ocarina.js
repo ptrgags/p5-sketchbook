@@ -3,10 +3,9 @@ import { Color } from "../sketchlib/Color.js";
 import { MIDIPitch } from "../sketchlib/music/MIDIPitch.js";
 import { A, A4, F, F6 } from "../sketchlib/music/pitches.js";
 import { Oklch } from "../sketchlib/Oklch.js";
-import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
+import { BeziergonPrimitive } from "../sketchlib/primitives/BeziergonPrimitive.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
-import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { ShowHidePrimitive } from "../sketchlib/primitives/ShowHidePrimitive.js";
 import { Rectangle } from "../sketchlib/Rectangle.js";
@@ -89,6 +88,27 @@ const FINGER_HOLES_UV = [
     ),
     RADIUS_SMALL,
   ),
+];
+
+const BODY_SHAPE_UV = [
+  // Double the points near the mouthpiece to make sharper turns
+  new Point(-0.6, -1),
+  new Point(-0.6, -1),
+  new Point(-0.4, -1),
+  new Point(-0.4, -1),
+  new Point(-0.3, -0.7),
+  new Point(-0.3, -0.7),
+  new Point(0.4, -0.4),
+  new Point(1, 0),
+  new Point(1, 0.3),
+  new Point(0.6, 0.5),
+  new Point(0.2, 0.6),
+  new Point(-0.4, 0.5),
+  new Point(-1, 0),
+  new Point(-1, -0.3),
+  // again, doubled for a sharper turn at the mouthpiece
+  new Point(-0.6, -0.6),
+  new Point(-0.6, -0.6),
 ];
 
 /**
@@ -175,20 +195,41 @@ const STYLE_OCARINA_BOUNDARY = new Style({
 
 const STYLE_HOLES_OPEN = new Style({
   stroke: Color.BLACK,
-  fill: new Oklch(0.7, 0.0994, 213),
+  fill: new Oklch(0.85, 0.0994, 213),
 });
 
 const STYLE_HOLES_CLOSED = new Style({
   fill: Color.BLACK,
+  stroke: new Oklch(0.85, 0.0994, 213),
+  width: 2,
 });
 
 /**
  *
  * @param {Rectangle} bounding_rect
- * @returns
+ * @param {Point} centered_uv
+ * @returns {Point}
+ */
+function centered_uv_to_world(bounding_rect, centered_uv) {
+  const { position, dimensions } = bounding_rect;
+  // UVs were defined in [-1, 1], but [0, 1] is more helpful here
+  const unsigned_u = 0.5 + 0.5 * centered_uv.x;
+  const unsigned_v = 0.5 + 0.5 * centered_uv.y;
+
+  // position + uv * dimensions, but we also need to reverse the v coordinate
+  const x = position.x + unsigned_u * dimensions.x;
+  const y = position.y + (1.0 - unsigned_v) * dimensions.y;
+
+  return new Point(x, y);
+}
+
+/**
+ * Position the tone holes in screen space
+ * @param {Rectangle} bounding_rect
+ * @returns {Circle[]}
  */
 function position_tone_holes(bounding_rect) {
-  const { position, dimensions } = bounding_rect;
+  const { dimensions } = bounding_rect;
 
   // Usually dimensions will be square, but just to be safe, take the smallest
   // dimension
@@ -197,18 +238,23 @@ function position_tone_holes(bounding_rect) {
   return FINGER_HOLES_UV.map((circle) => {
     const { center: center_uv, radius: radius_uv } = circle;
 
-    // UVs were defined in [-1, 1], but [0, 1] is more helpful here
-    const unsigned_u = 0.5 + 0.5 * center_uv.x;
-    const unsigned_v = 0.5 + 0.5 * center_uv.y;
-
-    // position + uv * dimensions, but we also need to reverse the v coordinate
-    const x = position.x + unsigned_u * dimensions.x;
-    const y = position.y + (1.0 - unsigned_v) * dimensions.y;
-
-    const center_screen = new Point(x, y);
+    const center_screen = centered_uv_to_world(bounding_rect, center_uv);
     const radius_screen = radius_uv * radius_scale;
     return new Circle(center_screen, radius_screen);
   });
+}
+
+/**
+ * Position the body on the screen
+ * @param {Rectangle} bounding_rect
+ * @returns {BeziergonPrimitive}
+ */
+function position_body(bounding_rect) {
+  const points_screeen = BODY_SHAPE_UV.map((point) =>
+    centered_uv_to_world(bounding_rect, point),
+  );
+
+  return BeziergonPrimitive.interpolate_points(points_screeen);
 }
 
 /**
@@ -236,11 +282,7 @@ export class Ocarina {
       }
     }
 
-    const body = new RectPrimitive(
-      this.bounding_rect.position,
-      this.bounding_rect.dimensions,
-    );
-
+    const body = position_body(bounding_rect);
     const tone_holes = position_tone_holes(bounding_rect);
     this.closed_holes = new ShowHidePrimitive(tone_holes, NO_HOLES);
 
