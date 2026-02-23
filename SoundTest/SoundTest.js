@@ -141,13 +141,13 @@ const BASS_OCARINA = {
   octave: Ocarina.OCTAVE_BASS,
 };
 const TENOR_OCARINA = {
-  bounds: new Rectangle(new Point(200, 500), new Direction(100, 100)),
+  bounds: new Rectangle(new Point(200, 550), new Direction(150, 150)),
   // Purple
   color: new Oklch(0.5, 0.1, 300),
   octave: Ocarina.OCTAVE_TENOR,
 };
 const SOPRANO_OCARINA = {
-  bounds: new Rectangle(new Point(300, 500), new Direction(50, 50)),
+  bounds: new Rectangle(new Point(350, 700 - 112), new Direction(112, 112)),
   // Blue green
   color: new Oklch(0.6, 0.1, 213),
   octave: Ocarina.OCTAVE_BASS,
