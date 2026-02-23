@@ -12,6 +12,7 @@ import { Harmony, Melody, Rest } from "./Music.js";
 import { Score } from "./Score.js";
 import { TimeInterval } from "./Timeline.js";
 import { RelTimelineOps } from "./RelTimelineOps.js";
+import { minmax } from "../minmax.js";
 
 // For the background colors I'm using, solid black fill looks fine
 const NOTE_STYLE = new Style({
@@ -28,20 +29,10 @@ const MEASURE_LINE_STYLE = new Style({
  * @return {[number, number] | undefined} [min, max] pitch, or undefined if the music is silent
  */
 function get_pitch_range(music) {
-  let min_pitch = Infinity;
-  let max_pitch = -Infinity;
-  for (const interval of RelTimelineOps.iter_intervals(music)) {
-    const pitch = interval.value.pitch;
-    min_pitch = Math.min(min_pitch, pitch);
-    max_pitch = Math.max(max_pitch, pitch);
-  }
-
-  if (isFinite(min_pitch)) {
-    return [min_pitch, max_pitch];
-  }
-
-  // No intervals found.
-  return undefined;
+  const pitches = [...RelTimelineOps.iter_intervals(music)].map(
+    (x) => x.value.pitch,
+  );
+  return minmax(pitches);
 }
 
 /**
