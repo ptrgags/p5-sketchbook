@@ -27,6 +27,11 @@ function right_hand(x) {
   return Math.log10(x + 0.5);
 }
 
+/**
+ * Derivative of right_hand(x)
+ * @param {number} x
+ * @returns {number}
+ */
 function dright(x) {
   // d/dx(log10(x + 0.5))
   // = 1/(x + 0.5) * 1/ln(10)
@@ -188,22 +193,6 @@ const FINGERING_CHART = [
  */
 const NO_HOLES = new Array(12).fill(false);
 
-const STYLE_OCARINA_BOUNDARY = new Style({
-  stroke: Color.BLACK,
-  fill: new Oklch(0.6128, 0.0994, 213),
-});
-
-const STYLE_HOLES_OPEN = new Style({
-  stroke: Color.BLACK,
-  fill: new Oklch(0.85, 0.0994, 213),
-});
-
-const STYLE_HOLES_CLOSED = new Style({
-  fill: Color.BLACK,
-  stroke: new Oklch(0.85, 0.0994, 213),
-  width: 2,
-});
-
 /**
  *
  * @param {Rectangle} bounding_rect
@@ -266,9 +255,9 @@ export class Ocarina {
    * @param {Rectangle} bounding_rect Bounding rectangle, usually a square
    * @param {PlayedNotes} score_notes
    * @param {number} start_octave Octave of the lowest note, an A4
+   * @param {Oklch} base_color Base color for drawing the ocarina
    */
-  constructor(bounding_rect, score_notes, start_octave) {
-    this.bounding_rect = bounding_rect;
+  constructor(bounding_rect, score_notes, start_octave, base_color) {
     this.score_notes = score_notes;
     this.start_note = MIDIPitch.from_pitch_octave(A, start_octave);
     this.end_note = MIDIPitch.from_pitch_octave(F, start_octave + 2);
@@ -282,14 +271,32 @@ export class Ocarina {
       }
     }
 
+    const color_dark = base_color.adjust_lightness(-0.4);
+    const color_light = base_color.adjust_lightness(0.2);
+
+    const style_boundary = new Style({
+      stroke: color_dark,
+      fill: base_color,
+    });
+
+    const style_open = new Style({
+      stroke: color_dark,
+      fill: color_light,
+    });
+
+    const style_closed = new Style({
+      fill: color_dark,
+      stroke: color_light,
+    });
+
     const body = position_body(bounding_rect);
     const tone_holes = position_tone_holes(bounding_rect);
     this.closed_holes = new ShowHidePrimitive(tone_holes, NO_HOLES);
 
     this.primitive = group(
-      style(body, STYLE_OCARINA_BOUNDARY),
-      style(tone_holes, STYLE_HOLES_OPEN),
-      style(this.closed_holes, STYLE_HOLES_CLOSED),
+      style(body, style_boundary),
+      style(tone_holes, style_open),
+      style(this.closed_holes, style_closed),
     );
   }
 
@@ -326,7 +333,8 @@ export class Ocarina {
     }
 
     // bass = A3 to F5
-    // alto/tenor = A3 to F6
+    // alto/tenor = A4 to F6
+    // soprano = A5 to F7
     for (let octave = 3; octave <= 5; octave++) {
       const start = MIDIPitch.from_pitch_octave(A, octave);
       const end = MIDIPitch.from_pitch_octave(F, octave + 2);
@@ -340,3 +348,6 @@ export class Ocarina {
     return undefined;
   }
 }
+Ocarina.OCTAVE_BASS = 3;
+Ocarina.OCTAVE_TENOR = 4;
+Ocarina.OCTAVE_SOPRANO = 5;

@@ -142,3 +142,4 @@ export class PlayedNotes {
     return this.held_notes[larger_index - 1][1];
   }
 }
+PlayedNotes.EMPTY = Object.freeze(new PlayedNotes([]));

@@ -122,21 +122,41 @@ MELODY_BUTTONS.set(
 );
 
 const MELODY_BUTTON_SIZE = 150;
-const MELODY_BUTTON_DIMENSIONS = new Direction(
-  MELODY_BUTTON_SIZE,
-  MELODY_BUTTON_SIZE / 3,
-);
+const MELODY_BUTTON_DIMENSIONS = new Direction(MELODY_BUTTON_SIZE, 40);
 const MELODY_BUTTON_CENTER_OFFSET = MELODY_BUTTON_DIMENSIONS.scale(0.5);
 const TEXT_STYLE = new TextStyle(16, "center", "center");
 const TEXT_COLOR = new Style({
   fill: Color.WHITE,
 });
 
+const PIANO_BOUNDS = new Rectangle(new Point(0, 200), new Direction(500, 100));
+
+const BASS_OCARINA = {
+  bounds: new Rectangle(new Point(0, 500), new Direction(200, 200)),
+  // Orange
+  color: new Oklch(0.6, 0.1, 60),
+  octave: Ocarina.OCTAVE_BASS,
+};
+const TENOR_OCARINA = {
+  bounds: new Rectangle(new Point(200, 500), new Direction(100, 100)),
+  // Purple
+  color: new Oklch(0.5, 0.1, 300),
+  octave: Ocarina.OCTAVE_TENOR,
+};
+const SOPRANO_OCARINA = {
+  bounds: new Rectangle(new Point(300, 500), new Direction(50, 50)),
+  // Blue green
+  color: new Oklch(0.6, 0.1, 213),
+  octave: Ocarina.OCTAVE_BASS,
+};
+
+const INACTIVE_COLOR = new Oklch(0.7, 0, 0);
+
 const GRID_BOUNDARY = new Rectangle(
-  new Point(0, HEIGHT / 2),
-  new Direction(WIDTH, HEIGHT / 2),
+  new Point(0, 300),
+  new Direction(WIDTH, 200),
 );
-const GRID_MARGIN = new Direction(75, 80);
+const GRID_MARGIN = new Direction(75, 40);
 const [FIRST_BUTTON_POSITION, BUTTON_STRIDE] = MELODY_BUTTONS.compute_layout(
   GRID_BOUNDARY,
   MELODY_BUTTON_DIMENSIONS,
@@ -166,7 +186,7 @@ function make_button_labels(buttons) {
 
 const BUTTON_LABELS = make_button_labels(MELODY_BUTTONS);
 
-const TIMELINE_TOP = HEIGHT / 8;
+const TIMELINE_TOP = 0;
 
 const CURSOR = style(
   new LinePrimitive(
@@ -216,13 +236,6 @@ async function import_midi_file(file_list) {
   return [fname, buffer];
 }
 
-const PIANO_BOUNDS = new Rectangle(
-  new Point(0, 300),
-  new Direction(500, 300 / 3),
-);
-
-const OCARINA_BOUNDS = new Rectangle(new Point(0, 0), new Direction(200, 200));
-
 class SoundScene {
   /**
    * Constructor
@@ -234,7 +247,26 @@ class SoundScene {
     this.mute_button = new MuteButton();
     this.events = new EventTarget();
     this.piano = new Piano(PIANO_BOUNDS, new PlayedNotes([]));
-    this.ocarina = new Ocarina(OCARINA_BOUNDS, new PlayedNotes([]), 4);
+    this.ocarinas = {
+      bass: new Ocarina(
+        BASS_OCARINA.bounds,
+        PlayedNotes.EMPTY,
+        BASS_OCARINA.octave,
+        INACTIVE_COLOR,
+      ),
+      tenor: new Ocarina(
+        TENOR_OCARINA.bounds,
+        PlayedNotes.EMPTY,
+        TENOR_OCARINA.octave,
+        INACTIVE_COLOR,
+      ),
+      soprano: new Ocarina(
+        SOPRANO_OCARINA.bounds,
+        PlayedNotes.EMPTY,
+        SOPRANO_OCARINA.octave,
+        INACTIVE_COLOR,
+      ),
+    };
     this.spiral_burst = new SpiralBurst();
 
     this.mute_button.events.addEventListener(
@@ -364,6 +396,7 @@ class SoundScene {
 
     const all_intervals = [];
 
+    /*
     const ocarina_compatible = [];
     for (const mono_part of monophonic) {
       const abs_music = AbsTimelineOps.from_relative(mono_part.music);
@@ -398,6 +431,7 @@ class SoundScene {
       const [ocarina_notes] = ocarina_compatible;
       this.ocarina = new Ocarina(OCARINA_BOUNDS, ocarina_notes, 4);
     }
+    */
 
     for (const poly_part of polyphonic) {
       const abs_music = AbsTimelineOps.from_relative(poly_part.music);
@@ -447,7 +481,9 @@ class SoundScene {
 
     // this should really go in update()
     this.piano.update(current_time);
-    this.ocarina.update(current_time);
+    this.ocarinas.bass.update(current_time);
+    this.ocarinas.tenor.update(current_time);
+    this.ocarinas.soprano.update(current_time);
 
     const mute = this.mute_button.render();
     const melody_buttons = this.melody_buttons.map((x) => x.debug_render());
@@ -462,7 +498,9 @@ class SoundScene {
       this.piano.primitive,
       timeline,
       CURSOR,
-      this.ocarina.primitive,
+      this.ocarinas.bass.primitive,
+      this.ocarinas.tenor.primitive,
+      this.ocarinas.soprano.primitive,
       burst,
     );
   }
