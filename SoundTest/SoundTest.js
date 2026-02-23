@@ -221,6 +221,8 @@ const PIANO_BOUNDS = new Rectangle(
   new Direction(500, 300 / 3),
 );
 
+const OCARINA_BOUNDS = new Rectangle(new Point(0, 0), new Direction(200, 200));
+
 class SoundScene {
   /**
    * Constructor
@@ -232,11 +234,7 @@ class SoundScene {
     this.mute_button = new MuteButton();
     this.events = new EventTarget();
     this.piano = new Piano(PIANO_BOUNDS, new PlayedNotes([]));
-    this.ocarina = new Ocarina(
-      new Rectangle(Point.ORIGIN, new Direction(400, 400)),
-      new PlayedNotes([]),
-      4,
-    );
+    this.ocarina = new Ocarina(OCARINA_BOUNDS, new PlayedNotes([]), 4);
     this.spiral_burst = new SpiralBurst();
 
     this.mute_button.events.addEventListener(
@@ -395,18 +393,10 @@ class SoundScene {
 
     console.log("ocarina compatible: ", ocarina_compatible);
     if (ocarina_compatible.length === 0) {
-      this.ocarina = new Ocarina(
-        new Rectangle(Point.ORIGIN, new Direction(400, 400)),
-        new PlayedNotes([]),
-        4,
-      );
+      this.ocarina = new Ocarina(OCARINA_BOUNDS, new PlayedNotes([]), 4);
     } else {
       const [ocarina_notes] = ocarina_compatible;
-      this.ocarina = new Ocarina(
-        new Rectangle(Point.ORIGIN, new Direction(400, 400)),
-        ocarina_notes,
-        4,
-      );
+      this.ocarina = new Ocarina(OCARINA_BOUNDS, ocarina_notes, 4);
     }
 
     for (const poly_part of polyphonic) {
