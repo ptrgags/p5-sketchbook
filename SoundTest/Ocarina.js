@@ -3,34 +3,86 @@ import { MIDIPitch } from "../sketchlib/music/MIDIPitch.js";
 import { A, A4, F, F6 } from "../sketchlib/music/pitches.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
-import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
-import { Primitive } from "../sketchlib/primitives/Primitive.js";
 import { ShowHidePrimitive } from "../sketchlib/primitives/ShowHidePrimitive.js";
 import { Rectangle } from "../sketchlib/Rectangle.js";
 import { PlayedNotes } from "./PlayedNotes.js";
 
-const RADIUS_BIG = 50;
-const RADIUS_SMALL = 25;
+// See https://www.desmos.com/calculator/o222tjtle9 for a diagram of the
+// tone hole placement
 
+const RADIUS_BIG = 0.1;
+const RADIUS_SMALL = 0.05;
+
+/**
+ * Compute the position of one of the
+ * @param {number} x x-coordinate
+ * @returns {number} y coordinate
+ */
+function right_hand(x) {
+  return Math.log10(x + 0.5);
+}
+
+function dright(x) {
+  // d/dx(log10(x + 0.5))
+  // = 1/(x + 0.5) * 1/ln(10)
+  return 1.0 / ((x + 0.5) * Math.LN10);
+}
+
+/**
+ * The left hand is a rotation of the right hand position
+ * @param {number} x x-coordinate
+ * @returns {number} y-coordinate
+ */
+function left_hand(x) {
+  return -Math.log10(-x + 0.5);
+}
+
+/**
+ * Derivative of left_hand(x)
+ * @param {number} x
+ * @returns {number}
+ */
+function dleft(x) {
+  // d/dx(-log_10(-x + 0.5))
+  // = -1/(-x + 0.5) * 1/ln(10) * d/dx(-x + 0.5)
+  // = 1/((0.5 - x)ln(10))
+  return 1.0 / ((0.5 - x) * Math.LN10);
+}
+
+const SUBHOLE_OFFSET = 0.16;
 const FINGER_HOLES_UV = [
   // four main finger holes for left hand
-  new Circle(new Point(50, 50), RADIUS_BIG),
-  new Circle(new Point(150, 50), RADIUS_BIG),
-  new Circle(new Point(250, 50), RADIUS_BIG),
-  new Circle(new Point(350, 50), RADIUS_BIG),
+  new Circle(new Point(-0.8, left_hand(-0.8)), RADIUS_BIG),
+  new Circle(new Point(-0.5, left_hand(-0.5)), RADIUS_BIG),
+  new Circle(new Point(-0.2, left_hand(-0.2)), RADIUS_BIG),
+  new Circle(new Point(0.1, left_hand(0.1)), RADIUS_BIG),
   // left thumb
-  new Circle(new Point(400, 50), RADIUS_BIG),
-  // secondary hole on left finger
-  new Circle(new Point(450, 50), RADIUS_SMALL),
+  new Circle(new Point(-0.8, -0.7), RADIUS_BIG),
+  // subhole on left finger, positioned based on the normal of
+  // the log curve at the second tone hole
+  new Circle(
+    new Point(
+      -0.5 + SUBHOLE_OFFSET * dleft(-0.5),
+      left_hand(-0.5) - SUBHOLE_OFFSET,
+    ),
+    RADIUS_SMALL,
+  ),
   // four main finger holes on right hand
-  new Circle(new Point(50, 100), RADIUS_BIG),
-  new Circle(new Point(150, 100), RADIUS_BIG),
-  new Circle(new Point(250, 100), RADIUS_BIG),
-  new Circle(new Point(350, 100), RADIUS_BIG),
+  new Circle(new Point(-0.1, right_hand(-0.1)), RADIUS_BIG),
+  new Circle(new Point(0.2, right_hand(0.2)), RADIUS_BIG),
+  new Circle(new Point(0.5, right_hand(0.5)), RADIUS_BIG),
+  new Circle(new Point(0.8, right_hand(0.8)), RADIUS_BIG),
   // right thumb
-  new Circle(new Point(400, 100), RADIUS_BIG),
-  // secondary hole on right finger
-  new Circle(new Point(500, 100), RADIUS_SMALL),
+  new Circle(new Point(0.1, -0.7), RADIUS_BIG),
+  // secondary hole on right finger, positioned based on the normal of the
+  // log curve at the second tone hole
+  new Circle(
+    new Point(
+      0.2 - SUBHOLE_OFFSET * dright(0.2),
+      right_hand(0.2) + SUBHOLE_OFFSET,
+    ),
+    RADIUS_SMALL,
+  ),
 ];
 
 /**
@@ -111,12 +163,34 @@ const FINGERING_CHART = [
 const NO_HOLES = new Array(12).fill(false);
 
 /**
+ *
+ * @param {Rectangle} bounding_rect
+ * @returns
+ */
+function position_tone_holes(bounding_rect) {
+  const dimensions = bounding_rect.dimensions;
+
+  // Usually dimensions will be square, but just to be safe, take the smallest
+  // dimension
+  const radius_scale = Math.min(dimensions.x, dimensions.y);
+
+  return FINGER_HOLES_UV.map((circle) => {
+    const { center: center_uv, radius: radius_uv } = circle;
+    const center_screen = bounding_rect.position.add(
+      center_uv.to_direction().mul_components(dimensions),
+    );
+    const radius_screen = radius_uv * radius_scale;
+    return new Circle(center_screen, radius_screen);
+  });
+}
+
+/**
  * @implements {Animated}
  */
 export class Ocarina {
   /**
-   *
-   * @param {Rectangle} bounding_rect
+   * Constructor
+   * @param {Rectangle} bounding_rect Bounding rectangle, usually a square
    * @param {PlayedNotes} score_notes
    * @param {number} start_octave Octave of the lowest note, an A4
    */
@@ -135,7 +209,8 @@ export class Ocarina {
       }
     }
 
-    this.primitive = new ShowHidePrimitive(FINGER_HOLES_UV, NO_HOLES);
+    const tone_holes = position_tone_holes(bounding_rect);
+    this.primitive = new ShowHidePrimitive(tone_holes, NO_HOLES);
   }
 
   /**
