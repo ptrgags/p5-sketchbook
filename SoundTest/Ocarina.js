@@ -1,6 +1,7 @@
 import { Animated } from "../sketchlib/animation/Animated.js";
 import { MIDIPitch } from "../sketchlib/music/MIDIPitch.js";
 import { A, A4, F, F6 } from "../sketchlib/music/pitches.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
 import { ShowHidePrimitive } from "../sketchlib/primitives/ShowHidePrimitive.js";
@@ -168,17 +169,24 @@ const NO_HOLES = new Array(12).fill(false);
  * @returns
  */
 function position_tone_holes(bounding_rect) {
-  const dimensions = bounding_rect.dimensions;
+  const { position, dimensions } = bounding_rect;
 
   // Usually dimensions will be square, but just to be safe, take the smallest
   // dimension
-  const radius_scale = Math.min(dimensions.x, dimensions.y);
+  const radius_scale = 0.5 * Math.min(dimensions.x, dimensions.y);
 
   return FINGER_HOLES_UV.map((circle) => {
     const { center: center_uv, radius: radius_uv } = circle;
-    const center_screen = bounding_rect.position.add(
-      center_uv.to_direction().mul_components(dimensions),
-    );
+
+    // UVs were defined in [-1, 1], but [0, 1] is more helpful here
+    const unsigned_u = 0.5 + 0.5 * center_uv.x;
+    const unsigned_v = 0.5 + 0.5 * center_uv.y;
+
+    // position + uv * dimensions, but we also need to reverse the v coordinate
+    const x = position.x + unsigned_u * dimensions.x;
+    const y = position.y + (1.0 - unsigned_v) * dimensions.y;
+
+    const center_screen = new Point(x, y);
     const radius_screen = radius_uv * radius_scale;
     return new Circle(center_screen, radius_screen);
   });
