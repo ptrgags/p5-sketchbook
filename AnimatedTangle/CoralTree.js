@@ -1,6 +1,5 @@
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
-import { Motor } from "../sketchlib/pga2d/versors.js";
 import { is_nearly } from "../sketchlib/is_nearly.js";
 import { BeziergonPrimitive } from "../sketchlib/primitives/BeziergonPrimitive.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
@@ -31,15 +30,19 @@ function halfway(a, b, tiebreak) {
   return a.add(b).normalize().neg();
 }
 
+/**
+ * Get the direction from one node to its parent
+ * @param {CoralNode} node
+ * @param {CoralNode} parent
+ * @returns
+ */
 function get_forward_dir(node, parent) {
   if (parent) {
-    return parent.circle.position.sub(node.circle.position).normalize();
+    return parent.circle.center.sub(node.circle.center).normalize();
   }
 
   if (node.children.length === 1) {
-    return node.circle.position
-      .sub(node.children[0].circle.position)
-      .normalize();
+    return node.circle.center.sub(node.children[0].circle.center).normalize();
   }
 
   // TODO: For a root with multiple children, maybe take the average of the
@@ -98,15 +101,13 @@ export class CoralNode {
    * @param {CoralNode} [parent] The parent node
    */
   get_outline_vertices(output, parent) {
-    const center = this.circle.position;
+    const center = this.circle.center;
     const radius = this.circle.radius;
 
     const dir_forward = get_forward_dir(this, parent);
-    /*const dir_forward = parent
-      ? parent.circle.position.sub(center).normalize()
-      : Direction.DIR_X; // TODO: This is temporary*/
+
     // in P5's y-down coordinates, rotations are clockwise
-    const dir_right = Motor.ROT90.transform_dir(dir_forward);
+    const dir_right = dir_forward.rot90();
     const dir_left = dir_right.neg();
     const dir_backward = dir_forward.neg();
 
@@ -131,7 +132,7 @@ export class CoralNode {
 
     // Get the direction to each child
     const to_children = this.children.map((child) =>
-      child.circle.position.sub(center).normalize(),
+      child.circle.center.sub(center).normalize(),
     );
 
     // Point on the left, placed at the half angle between the forward

@@ -99,8 +99,6 @@ export class ArcPrimitive {
     // On a circle, the normal is always 90 degrees away from the tangent.
     // though there are two options depending on the direction of the arc
     const normal = Direction.from_angle(angle).scale(this.radius);
-    const rot = this.angles.direction < 0 ? Motor.ROT90.reverse() : Motor.ROT90;
-
-    return rot.transform_dir(normal);
+    return this.angles.direction < 0 ? normal.rot270() : normal.rot90();
   }
 }

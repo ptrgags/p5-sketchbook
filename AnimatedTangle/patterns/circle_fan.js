@@ -100,7 +100,7 @@ const DIAMOND_ANGLES = diamond_angles();
 
 function make_diamond(angle) {
   const outward = Direction.from_angle(angle);
-  const right = Motor.ROT90.transform_dir(outward);
+  const right = outward.rot90();
   return new PolygonPrimitive(
     [
       CENTER.add(outward.scale(0.25 * BAND_THICKNESS)),

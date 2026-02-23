@@ -1,9 +1,7 @@
 import { arrays_equal } from "../arrays_equal.js";
-import { Rational } from "../Rational.js";
 import { ChordVoicing } from "./ChordVoicing.js";
 import { M3, m3, M6, m6, m7, M7, P1, P5, T } from "./intervals.js";
 import { IntervalStack, PitchClassStack, PitchStack } from "./IntervalStack.js";
-import { PatternGrid } from "./PatternGrid.js";
 import { MIDIPitch } from "./MIDIPitch.js";
 
 /**
@@ -109,6 +107,24 @@ export class Chord {
   }
 
   /**
+   * Get the number of pitches in this chord in root position. E.g for a triad
+   * this will return 3, for a seventh chord this will return 4
+   * @type {number}
+   */
+  get length() {
+    return this.pitches.length;
+  }
+
+  /**
+   * Get a single pitch from the chord at the given index
+   * @param {number} index Index of the note starting at 0 at the root
+   * @returns
+   */
+  value(index) {
+    return this.pitches.value(index);
+  }
+
+  /**
    * Format as a chord symbol with the octave of the root. Like A3min7 or D5maj7
    * @returns {string}
    */
@@ -125,12 +141,10 @@ export class Chord {
   /**
    * Areggiate the chord as a single monophonic pattern
    * @param {number[]} indices Indices for looking up notes
-   * @param {Rational} step_size Step size for the pattern grid
-   * @returns {PatternGrid<number>}
+   * @returns {number[]} Sequence of pitches
    */
-  arpeggiate(indices, step_size) {
-    const values = indices.map((x) => this.pitches.value(x));
-    return new PatternGrid(values, step_size);
+  arpeggiate(indices) {
+    return indices.map((x) => this.pitches.value(x));
   }
 
   /**

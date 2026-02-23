@@ -1,3 +1,5 @@
+import { Vector2 } from "./Vector2.js";
+
 export class Rectangle {
   constructor(x, y, w, h) {
     this.x = x;
