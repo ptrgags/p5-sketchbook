@@ -1,5 +1,5 @@
 import { ADSR } from "./ADSR.js";
-import { Instrument } from "./Instrument.js";
+import { Instrument, Polyphony } from "./Instrument.js";
 
 export class Drawbars {
   /**
@@ -55,11 +55,35 @@ export class DrawbarOrgan {
     this.synth = undefined;
 
     this.envelope = ADSR.organ(release_time);
+  }
 
+  /**
+   * @type {number | undefined}
+   */
+  get volume() {
+    return this.synth?.volume.value;
+  }
+
+  /**
+   * @param {number} value
+   */
+  set volume(value) {
+    if (this.synth) {
+      this.synth.volume.value = value;
+    }
+  }
+
+  /**
+   * Initialize the synth
+   * @param {import("tone")} tone Tone library
+   * @param {Polyphony} polyphony Whether to create a mono or polyphonic synth
+   * @param {import("tone").InputNode} destination Audio node to connect to
+   */
+  init(tone, polyphony, destination) {
     /**
      * @type {RecursivePartial<DuoSynthOptions>}
      */
-    this.synth_options = {
+    const options = {
       voice0: {
         oscillator: {
           type: "custom",
@@ -81,46 +105,47 @@ export class DrawbarOrgan {
       },
       vibratoAmount: 0,
     };
+
+    this.synth =
+      polyphony === Polyphony.POLYPHONIC
+        ? new tone.PolySynth(tone.DuoSynth, options)
+        : new tone.DuoSynth(options);
+    this.synth.connect(destination);
   }
 
   /**
-   * @type {number | undefined}
+   * Play a note
+   * @param {string} pitch The pitch in ToneJS format
+   * @param {string} duration The duration in ToneJS format
+   * @param {number} time Tonejs time
    */
-  get volume() {
-    return this.synth?.volume.value;
-  }
-
-  /**
-   * @param {number} value
-   */
-  set volume(value) {
-    if (this.synth) {
-      this.synth.volume.value = value;
+  play_note(pitch, duration, time) {
+    if (!this.synth) {
+      throw new Error("can't play note before init()");
     }
+
+    this.synth.triggerAttackRelease(pitch, duration, time);
   }
 
-  /**
-   *
-   * @param {import('tone')} tone
-   */
-  init_mono(tone) {
-    this.synth = new tone.DuoSynth(this.synth_options).toDestination();
-  }
+  release_all() {
+    if (!this.synth) {
+      return;
+    }
 
-  /**
-   *
-   * @param {import('tone')} tone
-   */
-  init_poly(tone) {
-    this.synth = new tone.PolySynth(
-      tone.DuoSynth,
-      this.synth_options,
-    ).toDestination();
+    //@ts-ignore
+    if (this.synth.releaseAll) {
+      //@ts-ignore
+      this.synth.releaseAll();
+    } else if (this.synth) {
+      //@ts-ignore
+      this.synth.triggerRelease();
+    }
   }
 
   destroy() {
     if (this.synth) {
       this.synth.dispose();
+      this.synth = undefined;
     }
   }
 }

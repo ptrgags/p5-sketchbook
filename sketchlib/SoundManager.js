@@ -2,6 +2,8 @@ import { ADSR } from "./instruments/ADSR.js";
 import { BasicSynth } from "./instruments/BasicSynth.js";
 import { DrawbarOrgan, Drawbars } from "./instruments/DrawbarOrgan.js";
 import { FMSynth } from "./instruments/FMSynth.js";
+import { Polyphony } from "./instruments/Instrument.js";
+import { InstrumentMap } from "./instruments/InstrumentMap.js";
 import { WaveStack } from "./instruments/Wavestack.js";
 import { AbsTimelineOps } from "./music/AbsTimelineOps.js";
 import { Note } from "./music/Music.js";
@@ -10,6 +12,40 @@ import { Rational } from "./Rational.js";
 import { compile_score } from "./tone_helpers/compile_music.js";
 import { to_tone_time } from "./tone_helpers/to_tone_time.js";
 import { ToneClip } from "./tone_helpers/tone_clips.js";
+
+const DEFAULT_INSTRUMENTS = {
+  sine: new BasicSynth("sine"),
+  square: new BasicSynth("square"),
+  poly: new BasicSynth("triangle"),
+  supersaw: new WaveStack("sawtooth", 3, 20),
+  bell: new FMSynth(3, 12, ADSR.pluck(2.0)),
+  tick: new FMSynth(2, 25, ADSR.pluck(0.05)),
+  organ: new DrawbarOrgan(new Drawbars("88 8800 000")),
+};
+
+const GENERAL_MIDI = {
+  channel0: new BasicSynth("triangle"),
+  channel1: new BasicSynth("triangle"),
+  channel2: new BasicSynth("triangle"),
+  channel3: new BasicSynth("triangle"),
+  channel4: new BasicSynth("triangle"),
+  channel5: new BasicSynth("triangle"),
+  channel6: new BasicSynth("triangle"),
+  channel7: new BasicSynth("triangle"),
+  channel8: new BasicSynth("triangle"),
+  channel9: new BasicSynth("triangle"),
+  channel10: new BasicSynth("triangle"),
+  channel11: new BasicSynth("triangle"),
+  channel12: new BasicSynth("triangle"),
+  channel13: new BasicSynth("triangle"),
+  channel14: new BasicSynth("triangle"),
+  channel15: new BasicSynth("triangle"),
+};
+
+const INSTRUMENT_MAP = new InstrumentMap({
+  ...DEFAULT_INSTRUMENTS,
+  ...GENERAL_MIDI,
+});
 
 /**
  * @typedef {{[id: string]: Score}} ScoreDeclarations
@@ -51,9 +87,7 @@ export class SoundManager {
 
     // Instrument management ===========================================
 
-    // Map of instrument id -> Tone instrument. This will change a bit
-    // soon.
-    this.synths = {};
+    this.instruments = INSTRUMENT_MAP;
 
     // Background music management ====================================
 
@@ -122,66 +156,33 @@ export class SoundManager {
   }
 
   init_synths() {
-    const sine = new BasicSynth("sine");
-    sine.init_mono(this.tone);
-    sine.volume = -6;
-
-    const square = new BasicSynth("square");
-    square.init_mono(this.tone);
-    square.volume = -24;
-
-    const poly = new BasicSynth("triangle");
-    poly.init_poly(this.tone);
-    poly.volume = -18;
-
-    const supersaw = new WaveStack("sawtooth", 3, 20);
-    supersaw.init_poly(this.tone);
-    supersaw.volume = -18;
-
-    const bell = new FMSynth(3, 12, ADSR.pluck(2.0));
-    bell.init_mono(this.tone);
-    bell.volume = -3;
-
-    const tick = new FMSynth(2, 25, ADSR.pluck(0.05));
-    tick.init_mono(this.tone);
-    tick.volume = -2;
-
-    const organ = new DrawbarOrgan(new Drawbars("88 8800 000"));
-    organ.init_poly(this.tone);
-    organ.volume = -18;
-
-    this.tone.getDestination();
-
-    // TEMP: Trying out a send track on the organ to get some reverb
-    // this reconnects things so we have
-    // organ --> organ channel --> destination
-    //                |
-    //                v send to reverb
-    //          reverb_channel --> reverb --> destination
-    organ.synth.disconnect();
-    const reverb = new this.tone.Reverb(2).toDestination();
-    const reverb_channel = new this.tone.Channel().connect(reverb);
-    reverb_channel.receive("reverb");
-
-    const organ_channel = new this.tone.Channel(-12).toDestination();
-    organ.synth.connect(organ_channel);
-    organ_channel.send("reverb");
-
-    this.synths.sine = sine.synth;
-    this.synths.square = square.synth;
-    this.synths.poly = poly.synth;
-    this.synths.supersaw = supersaw.synth;
-    this.synths.bell = bell.synth;
-    this.synths.tick = tick.synth;
-    this.synths.organ = organ.synth;
-
-    // TEMP: This should be an InstrumentMap in time
+    const poly_map = {
+      sine: Polyphony.MONOPHONIC,
+      square: Polyphony.MONOPHONIC,
+      poly: Polyphony.POLYPHONIC,
+      supersaw: Polyphony.POLYPHONIC,
+      bell: Polyphony.MONOPHONIC,
+      tick: Polyphony.MONOPHONIC,
+      organ: Polyphony.POLYPHONIC,
+    };
     for (let i = 0; i < 16; i++) {
-      const tri = new BasicSynth("triangle");
-      tri.init_poly(this.tone);
-      tri.volume = -24;
-      this.synths[`channel${i}`] = tri.synth;
+      poly_map[`channel${i}`] = Polyphony.POLYPHONIC;
     }
+    this.instruments.init_synths(this.tone, poly_map);
+
+    const volume_map = {
+      sine: -6,
+      square: -24,
+      poly: -18,
+      supersaw: -18,
+      bell: -3,
+      tick: -2,
+      organ: -18,
+    };
+    for (let i = 0; i < 16; i++) {
+      volume_map[`channel${i}`] = -24;
+    }
+    this.instruments.mix(volume_map);
   }
 
   /**
@@ -207,7 +208,7 @@ export class SoundManager {
    * @param {Score<number>} score Score expressed in MIDI note numbers
    */
   register_score(score_id, score) {
-    const compiled = compile_score(this.tone, this.synths, score);
+    const compiled = compile_score(this.tone, this.instruments, score);
     this.bg_scores[score_id] = AbsTimelineOps.from_relative(compiled);
   }
 
@@ -218,11 +219,12 @@ export class SoundManager {
    * @param {Score<number>} score Score expressed in MIDI note numbers
    */
   register_sfx(sfx_id, score) {
-    const compiled = compile_score(this.tone, this.synths, score);
+    const compiled = compile_score(this.tone, this.instruments, score);
     this.sfx_scores[sfx_id] = AbsTimelineOps.from_relative(compiled);
   }
 
   stop_the_music() {
+    this.instruments.release_all();
     const transport = this.tone.getTransport();
     transport.cancel();
   }
