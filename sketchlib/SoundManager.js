@@ -19,9 +19,8 @@ const DEFAULT_INSTRUMENTS = {
   poly: new BasicSynth("triangle"),
   supersaw: new WaveStack("sawtooth", 3, 20),
   bell: new FMSynth(3, 12, ADSR.pluck(2.0)),
+  tick: new FMSynth(2, 25, ADSR.pluck(0.05)),
   organ: new DrawbarOrgan(new Drawbars("88 8800 000")),
-
-  // These should eventually be in their own map
 };
 
 const GENERAL_MIDI = {
@@ -166,6 +165,9 @@ export class SoundManager {
       tick: Polyphony.MONOPHONIC,
       organ: Polyphony.POLYPHONIC,
     };
+    for (let i = 0; i < 16; i++) {
+      poly_map[`channel${i}`] = Polyphony.POLYPHONIC;
+    }
     this.instruments.init_synths(this.tone, poly_map);
 
     const volume_map = {
