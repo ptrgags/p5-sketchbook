@@ -96,7 +96,8 @@ export class FMSynth {
       return;
     }
 
-    if (this.synth.constructor.name === "PolySynth") {
+    //@ts-ignore
+    if (this.synth.releaseAll) {
       //@ts-ignore
       this.synth.releaseAll();
     } else if (this.synth) {

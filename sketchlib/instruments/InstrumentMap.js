@@ -1,4 +1,3 @@
-import { init } from "p5";
 import { Instrument, Polyphony } from "./Instrument.js";
 
 export class InstrumentMap {

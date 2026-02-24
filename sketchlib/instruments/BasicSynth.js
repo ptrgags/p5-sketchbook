@@ -74,7 +74,12 @@ export class BasicSynth {
   }
 
   release_all() {
-    if (this.synth.constructor.name === "PolySynth") {
+    if (!this.synth) {
+      return;
+    }
+
+    //@ts-ignore
+    if (this.synth.releaseAll) {
       //@ts-ignore
       this.synth.releaseAll();
     } else if (this.synth) {
