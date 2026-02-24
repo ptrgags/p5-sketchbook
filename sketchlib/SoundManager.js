@@ -2,6 +2,7 @@ import { ADSR } from "./instruments/ADSR.js";
 import { BasicSynth } from "./instruments/BasicSynth.js";
 import { DrawbarOrgan, Drawbars } from "./instruments/DrawbarOrgan.js";
 import { FMSynth } from "./instruments/FMSynth.js";
+import { Instrument } from "./instruments/Instrument.js";
 import { WaveStack } from "./instruments/Wavestack.js";
 import { AbsTimelineOps } from "./music/AbsTimelineOps.js";
 import { Note } from "./music/Music.js";
@@ -51,9 +52,10 @@ export class SoundManager {
 
     // Instrument management ===========================================
 
-    // Map of instrument id -> Tone instrument. This will change a bit
-    // soon.
-    this.synths = {};
+    /**
+     * @type {{[instrument_id: string]: Instrument}}
+     */
+    this.instruments = {};
 
     // Background music management ====================================
 
@@ -167,20 +169,22 @@ export class SoundManager {
     organ.synth.connect(organ_channel);
     organ_channel.send("reverb");
 
-    this.synths.sine = sine.synth;
-    this.synths.square = square.synth;
-    this.synths.poly = poly.synth;
-    this.synths.supersaw = supersaw.synth;
-    this.synths.bell = bell.synth;
-    this.synths.tick = tick.synth;
-    this.synths.organ = organ.synth;
+    this.instruments = {
+      sine,
+      square,
+      poly,
+      supersaw,
+      bell,
+      tick,
+      organ,
+    };
 
     // TEMP: This should be an InstrumentMap in time
     for (let i = 0; i < 16; i++) {
       const tri = new BasicSynth("triangle");
       tri.init_poly(this.tone);
       tri.volume = -24;
-      this.synths[`channel${i}`] = tri.synth;
+      this.instruments[`channel${i}`] = tri;
     }
   }
 
@@ -225,6 +229,10 @@ export class SoundManager {
   stop_the_music() {
     const transport = this.tone.getTransport();
     transport.cancel();
+
+    for (const instrument of Object.values(this.instruments)) {
+      instrument.release_all(this.tone);
+    }
   }
 
   /**

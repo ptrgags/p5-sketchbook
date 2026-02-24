@@ -27,6 +27,14 @@ export class Instrument {
   }
 
   /**
+   * Release all notes
+   * @param {import("tone")} tone
+   */
+  release_all(tone) {
+    throw new Error("not implemented");
+  }
+
+  /**
    * Clean up resources
    */
   destroy() {

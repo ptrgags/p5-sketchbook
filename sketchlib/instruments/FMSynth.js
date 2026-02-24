@@ -18,7 +18,7 @@ export class FMSynth {
     cm_ratio,
     mod_index,
     envelope = ADSR.DEFAULT,
-    mod_envelope = ADSR.DIGITAL
+    mod_envelope = ADSR.DIGITAL,
   ) {
     this.cm_ratio = cm_ratio;
     this.mod_index = mod_index;
@@ -85,10 +85,24 @@ export class FMSynth {
     }).toDestination();
   }
 
+  release_all() {
+    if (!this.synth) {
+      return;
+    }
+
+    if (this.synth.constructor.name === "PolySynth") {
+      //@ts-ignore
+      this.synth.releaseAll();
+    } else if (this.synth) {
+      //@ts-ignore
+      this.synth.triggerRelease();
+    }
+  }
+
   destroy() {
     if (this.synth) {
       this.synth.dispose();
+      this.synth = undefined;
     }
-    throw new Error("Method not implemented.");
   }
 }

@@ -1,3 +1,4 @@
+import { PolySynth } from "tone";
 import { ADSR } from "./ADSR.js";
 import { Instrument } from "./Instrument.js";
 
@@ -73,10 +74,20 @@ export class WaveStack {
     }).toDestination();
   }
 
+  release_all() {
+    if (this.synth.constructor.name === "PolySynth") {
+      //@ts-ignore
+      this.synth.releaseAll();
+    } else if (this.synth) {
+      //@ts-ignore
+      this.synth.triggerRelease();
+    }
+  }
+
   destroy() {
     if (this.synth) {
       this.synth.dispose();
+      this.synth = undefined;
     }
-    throw new Error("Method not implemented.");
   }
 }
