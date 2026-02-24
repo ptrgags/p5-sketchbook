@@ -3,6 +3,7 @@ import { BasicSynth } from "./instruments/BasicSynth.js";
 import { DrawbarOrgan, Drawbars } from "./instruments/DrawbarOrgan.js";
 import { FMSynth } from "./instruments/FMSynth.js";
 import { Instrument } from "./instruments/Instrument.js";
+import { InstrumentMap, Polyphony } from "./instruments/InstrumentMap.js";
 import { WaveStack } from "./instruments/Wavestack.js";
 import { AbsTimelineOps } from "./music/AbsTimelineOps.js";
 import { Note } from "./music/Music.js";
@@ -11,6 +12,41 @@ import { Rational } from "./Rational.js";
 import { compile_score } from "./tone_helpers/compile_music.js";
 import { to_tone_time } from "./tone_helpers/to_tone_time.js";
 import { ToneClip } from "./tone_helpers/tone_clips.js";
+
+const DEFAULT_INSTRUMENTS = {
+  sine: new BasicSynth("sine"),
+  square: new BasicSynth("square"),
+  poly: new BasicSynth("triangle"),
+  supersaw: new WaveStack("sawtooth", 3, 20),
+  bell: new FMSynth(3, 12, ADSR.pluck(2.0)),
+  organ: new DrawbarOrgan(new Drawbars("88 8800 000")),
+
+  // These should eventually be in their own map
+};
+
+const GENERAL_MIDI = {
+  channel0: new BasicSynth("triangle"),
+  channel1: new BasicSynth("triangle"),
+  channel2: new BasicSynth("triangle"),
+  channel3: new BasicSynth("triangle"),
+  channel4: new BasicSynth("triangle"),
+  channel5: new BasicSynth("triangle"),
+  channel6: new BasicSynth("triangle"),
+  channel7: new BasicSynth("triangle"),
+  channel8: new BasicSynth("triangle"),
+  channel9: new BasicSynth("triangle"),
+  channel10: new BasicSynth("triangle"),
+  channel11: new BasicSynth("triangle"),
+  channel12: new BasicSynth("triangle"),
+  channel13: new BasicSynth("triangle"),
+  channel14: new BasicSynth("triangle"),
+  channel15: new BasicSynth("triangle"),
+};
+
+const INSTRUMENT_MAP = new InstrumentMap({
+  ...DEFAULT_INSTRUMENTS,
+  ...GENERAL_MIDI,
+});
 
 /**
  * @typedef {{[id: string]: Score}} ScoreDeclarations
@@ -52,10 +88,7 @@ export class SoundManager {
 
     // Instrument management ===========================================
 
-    /**
-     * @type {{[instrument_id: string]: Instrument}}
-     */
-    this.instruments = {};
+    this.instruments = INSTRUMENT_MAP;
 
     // Background music management ====================================
 
@@ -124,6 +157,32 @@ export class SoundManager {
   }
 
   init_synths() {
+    const poly_map = {
+      sine: Polyphony.MONOPHONIC,
+      square: Polyphony.MONOPHONIC,
+      poly: Polyphony.POLYPHONIC,
+      supersaw: Polyphony.POLYPHONIC,
+      bell: Polyphony.MONOPHONIC,
+      tick: Polyphony.MONOPHONIC,
+      organ: Polyphony.POLYPHONIC,
+    };
+    this.instruments.init_synths(this.tone, poly_map);
+
+    const volume_map = {
+      sine: -6,
+      square: -24,
+      poly: -18,
+      supersaw: -18,
+      bell: -3,
+      tick: -2,
+      organ: -18,
+    };
+    for (let i = 0; i < 16; i++) {
+      volume_map[`channel${i}`] = -24;
+    }
+    this.instruments.mix(volume_map);
+
+    /*
     const sine = new BasicSynth("sine");
     sine.init_mono(this.tone);
     sine.volume = -6;
@@ -169,16 +228,6 @@ export class SoundManager {
     organ.synth.connect(organ_channel);
     organ_channel.send("reverb");
 
-    this.instruments = {
-      sine,
-      square,
-      poly,
-      supersaw,
-      bell,
-      tick,
-      organ,
-    };
-
     // TEMP: This should be an InstrumentMap in time
     for (let i = 0; i < 16; i++) {
       const tri = new BasicSynth("triangle");
@@ -186,6 +235,7 @@ export class SoundManager {
       tri.volume = -24;
       this.instruments[`channel${i}`] = tri;
     }
+    */
   }
 
   /**
@@ -211,7 +261,7 @@ export class SoundManager {
    * @param {Score<number>} score Score expressed in MIDI note numbers
    */
   register_score(score_id, score) {
-    const compiled = compile_score(this.tone, this.synths, score);
+    const compiled = compile_score(this.tone, this.instruments, score);
     this.bg_scores[score_id] = AbsTimelineOps.from_relative(compiled);
   }
 
@@ -222,17 +272,14 @@ export class SoundManager {
    * @param {Score<number>} score Score expressed in MIDI note numbers
    */
   register_sfx(sfx_id, score) {
-    const compiled = compile_score(this.tone, this.synths, score);
+    const compiled = compile_score(this.tone, this.instruments, score);
     this.sfx_scores[sfx_id] = AbsTimelineOps.from_relative(compiled);
   }
 
   stop_the_music() {
     const transport = this.tone.getTransport();
     transport.cancel();
-
-    for (const instrument of Object.values(this.instruments)) {
-      instrument.release_all(this.tone);
-    }
+    this.instruments.release_all();
   }
 
   /**
