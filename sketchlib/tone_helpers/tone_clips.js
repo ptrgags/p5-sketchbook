@@ -1,3 +1,4 @@
+import { Instrument } from "../instruments/Instrument.js";
 import { TimeInterval } from "../music/Timeline.js";
 import { Rational } from "../Rational.js";
 import { to_tone_time } from "./to_tone_time.js";
@@ -36,14 +37,14 @@ export class ToneClip {
 /**
  * Make a Tone.Part from a descriptor and an instrument
  * @param {import("tone")} tone the Tone.js library
- * @param {import("tone").Synth} instrument the instrument to play
+ * @param {Instrument} instrument the instrument to play
  * @param {TimeInterval<PartDescriptor>} descriptor The description of the notes to play
  * @returns {TimeInterval<ToneClip>} The computed Part wrapped in a ToneClip
  */
 export function make_part_clip(tone, instrument, descriptor) {
   const part = new tone.Part((time, note) => {
     const [pitch, duration] = note;
-    instrument.triggerAttackRelease(pitch, duration, time);
+    instrument.play_note(pitch, duration, time);
   }, descriptor.value.events);
 
   part.loop = true;

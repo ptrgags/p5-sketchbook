@@ -118,6 +118,20 @@ export class DrawbarOrgan {
     ).toDestination();
   }
 
+  /**
+   * Play a note
+   * @param {string} pitch The pitch in ToneJS format
+   * @param {string} duration The duration in ToneJS format
+   * @param {number} time Tonejs time
+   */
+  play_note(pitch, duration, time) {
+    if (!this.synth) {
+      throw new Error("can't play note before init()");
+    }
+
+    this.synth.triggerAttackRelease(pitch, duration, time);
+  }
+
   release_all() {
     if (this.synth.constructor.name === "PolySynth") {
       //@ts-ignore

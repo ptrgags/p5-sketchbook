@@ -27,10 +27,19 @@ export class Instrument {
   }
 
   /**
-   * Release all notes
-   * @param {import("tone")} tone
+   * Play a note
+   * @param {string} pitch The pitch in ToneJS format
+   * @param {string} duration The duration in ToneJS format
+   * @param {number} time Tonejs time
    */
-  release_all(tone) {
+  play_note(pitch, duration, time) {
+    throw new Error("not implemented");
+  }
+
+  /**
+   * Release all notes
+   */
+  release_all() {
     throw new Error("not implemented");
   }
 
