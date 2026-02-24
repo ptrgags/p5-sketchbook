@@ -279,9 +279,9 @@ export class SoundManager {
   }
 
   stop_the_music() {
+    this.instruments.release_all();
     const transport = this.tone.getTransport();
     transport.cancel();
-    this.instruments.release_all();
   }
 
   /**
