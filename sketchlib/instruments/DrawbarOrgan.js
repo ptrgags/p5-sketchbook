@@ -1,5 +1,5 @@
 import { ADSR } from "./ADSR.js";
-import { Instrument } from "./Instrument.js";
+import { Instrument, Polyphony } from "./Instrument.js";
 
 export class Drawbars {
   /**
@@ -55,11 +55,35 @@ export class DrawbarOrgan {
     this.synth = undefined;
 
     this.envelope = ADSR.organ(release_time);
+  }
 
+  /**
+   * @type {number | undefined}
+   */
+  get volume() {
+    return this.synth?.volume.value;
+  }
+
+  /**
+   * @param {number} value
+   */
+  set volume(value) {
+    if (this.synth) {
+      this.synth.volume.value = value;
+    }
+  }
+
+  /**
+   * Initialize the synth
+   * @param {import("tone")} tone Tone library
+   * @param {Polyphony} polyphony Whether to create a mono or polyphonic synth
+   * @param {import("tone").InputNode} destination Audio node to connect to
+   */
+  init(tone, polyphony, destination) {
     /**
      * @type {RecursivePartial<DuoSynthOptions>}
      */
-    this.synth_options = {
+    const options = {
       voice0: {
         oscillator: {
           type: "custom",
@@ -81,41 +105,12 @@ export class DrawbarOrgan {
       },
       vibratoAmount: 0,
     };
-  }
 
-  /**
-   * @type {number | undefined}
-   */
-  get volume() {
-    return this.synth?.volume.value;
-  }
-
-  /**
-   * @param {number} value
-   */
-  set volume(value) {
-    if (this.synth) {
-      this.synth.volume.value = value;
-    }
-  }
-
-  /**
-   *
-   * @param {import('tone')} tone
-   */
-  init_mono(tone) {
-    this.synth = new tone.DuoSynth(this.synth_options).toDestination();
-  }
-
-  /**
-   *
-   * @param {import('tone')} tone
-   */
-  init_poly(tone) {
-    this.synth = new tone.PolySynth(
-      tone.DuoSynth,
-      this.synth_options,
-    ).toDestination();
+    this.synth =
+      polyphony === Polyphony.POLYPHONIC
+        ? new tone.PolySynth(tone.DuoSynth, options)
+        : new tone.DuoSynth(options);
+    this.synth.connect(destination);
   }
 
   /**

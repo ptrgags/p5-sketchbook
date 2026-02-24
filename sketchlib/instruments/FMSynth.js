@@ -1,5 +1,5 @@
 import { ADSR } from "./ADSR.js";
-import { Instrument } from "./Instrument.js";
+import { Instrument, Polyphony } from "./Instrument.js";
 
 /**
  * Simplified frequency modulation synth with 2 operators. It is always
@@ -48,11 +48,16 @@ export class FMSynth {
   }
 
   /**
-   *
-   * @param {import("tone")} tone
+   * Initialize the synth
+   * @param {import("tone")} tone Tone library
+   * @param {Polyphony} polyphony Whether to create a mono or polyphonic synth
+   * @param {import("tone").InputNode} destination Audio node to connect to
    */
-  init_mono(tone) {
-    this.synth = new tone.FMSynth({
+  init(tone, polyphony, destination) {
+    /**
+     * @type {import("./DrawbarOrgan.js").RecursivePartial<import("tone").FMSynthOptions>}
+     */
+    const options = {
       modulationIndex: this.mod_index,
       harmonicity: this.cm_ratio,
       oscillator: {
@@ -63,26 +68,13 @@ export class FMSynth {
       },
       envelope: this.envelope,
       modulationEnvelope: this.mod_envelope,
-    }).toDestination();
-  }
+    };
 
-  /**
-   *
-   * @param {import("tone")} tone
-   */
-  init_poly(tone) {
-    this.synth = new tone.PolySynth(tone.FMSynth, {
-      modulationIndex: this.mod_index,
-      harmonicity: this.cm_ratio,
-      oscillator: {
-        type: "sine",
-      },
-      modulation: {
-        type: "sine",
-      },
-      envelope: this.envelope,
-      modulationEnvelope: this.mod_envelope,
-    }).toDestination();
+    this.synth =
+      polyphony === Polyphony.POLYPHONIC
+        ? new tone.PolySynth(tone.FMSynth, options)
+        : new tone.FMSynth(options);
+    this.synth.connect(destination);
   }
 
   /**
