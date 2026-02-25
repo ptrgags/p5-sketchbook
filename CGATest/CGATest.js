@@ -33,6 +33,9 @@ const REFLECTED_STYLE = new Style({
 const INVERTED_STYLE = new Style({
   stroke: new Color(255, 127, 0),
 });
+const SPIN_STYLE = new Style({
+  stroke: new Color(0, 255, 127),
+});
 
 const ORIGINAL_GEOM = style([CIRCLE, POINT, LINE], LINE_STYLE);
 const REFLECTED_GEOM = style(
@@ -68,7 +71,7 @@ export const sketch = (p) => {
     const spinning_point = rotate_center.transform_point(POINT);
     const styled = style(
       [spinning_line, spinning_circle, spinning_point],
-      LINE_STYLE,
+      SPIN_STYLE,
     );
 
     CGA_GEOM.draw(p);
