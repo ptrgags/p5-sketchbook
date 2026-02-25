@@ -85,6 +85,25 @@ export class Cline {
   }
 
   /**
+   * Check if two clines are equal
+   * @param {Cline} other Another cline
+   */
+  equals(other) {
+    // Compare the primitives
+    const a = this.primitive;
+    const b = other.primitive;
+
+    if (a instanceof Line && b instanceof Line) {
+      return a.equals(b);
+    } else if (a instanceof Circle && b instanceof Circle) {
+      return a.equals(b);
+    }
+
+    // circle and a line, definitely not equal
+    return false;
+  }
+
+  /**
    * Create a generalized circle/line from a circle
    * @param {Circle} circle
    */

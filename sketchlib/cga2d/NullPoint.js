@@ -44,6 +44,15 @@ export class NullPoint {
   }
 
   /**
+   *
+   * @param {NullPoint} other
+   * @returns {boolean}
+   */
+  equals(other) {
+    return this.point.equals(other.point);
+  }
+
+  /**
    * Convert a regular point to a NullPoint
    * @param {Point} point
    * @returns {NullPoint}

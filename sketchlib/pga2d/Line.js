@@ -102,6 +102,8 @@ export class Line {
    * @returns {boolean} true if the lines are equivalent (up to epsilon)
    */
   equals(other) {
+    // The constructor normalizes the vector, so we
+    // can use an equality test here.
     return this.vec.equals(other.vec);
   }
 
