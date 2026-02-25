@@ -1,45 +1,46 @@
-import { diff_float_property, diff_property } from "./diff_properties.js";
+import {
+  diff_float_property,
+  diff_property,
+  format_diff,
+} from "./diff_properties.js";
 import { Direction } from "../pga2d/Direction.js";
 import { Line } from "../pga2d/Line.js";
 import { Even, Odd } from "../pga2d/multivectors.js";
 import { Point } from "../pga2d/Point.js";
 
-function format_even_diff(received, expected) {
+export function diff_even(diffs, received, expected) {
   if (!(received instanceof Even)) {
-    return `received is not an Even object: ${received}`;
+    diffs.push(`received is not an Even object: ${received}`);
+    return diffs;
   }
-
-  const diffs = [];
 
   diff_float_property(diffs, received, expected, "scalar", "scalar");
   diff_float_property(diffs, received, expected, "yo", "yo");
   diff_float_property(diffs, received, expected, "xo", "xo");
   diff_float_property(diffs, received, expected, "xy", "xy");
 
-  return "actual | expected\n" + diffs.join("\n");
+  return diffs;
 }
 
-function format_odd_diff(received, expected) {
+export function diff_odd(diffs, received, expected) {
   if (!(received instanceof Odd)) {
-    return `received is not an Odd object: ${received}`;
+    diffs.push(`received is not an Odd object: ${received}`);
+    return diffs;
   }
-
-  const diffs = [];
 
   diff_float_property(diffs, received, expected, "x", "x");
   diff_float_property(diffs, received, expected, "y", "y");
   diff_float_property(diffs, received, expected, "o", "o");
   diff_float_property(diffs, received, expected, "xyo", "xyo");
 
-  return "actual | expected\n" + diffs.join("\n");
+  return diffs;
 }
 
-function format_point_diff(received, expected) {
+export function diff_point(diffs, received, expected) {
   if (!(received instanceof Point)) {
-    return `recieved is not a Point object: ${received}`;
+    diffs.push(`recieved is not a Point object: ${received}`);
+    return diffs;
   }
-
-  const diffs = [];
 
   diff_property(diffs, received, expected, "is_direction");
   const r_bivec = received.bivec;
@@ -48,15 +49,14 @@ function format_point_diff(received, expected) {
   diff_float_property(diffs, r_bivec, e_bivec, "xo", "-y");
   diff_float_property(diffs, r_bivec, e_bivec, "xy", "weight");
 
-  return "actual | expected\n" + diffs.join("\n");
+  return diffs;
 }
 
-function format_dir_diff(received, expected) {
+export function diff_dir(diffs, received, expected) {
   if (!(received instanceof Direction)) {
-    return `recieved is not a Direction object: ${received}`;
+    diffs.push(`recieved is not a Direction object: ${received}`);
+    return diffs;
   }
-
-  const diffs = [];
 
   diff_property(diffs, received, expected, "is_direction");
   const r_bivec = received.bivec;
@@ -65,15 +65,14 @@ function format_dir_diff(received, expected) {
   diff_float_property(diffs, r_bivec, e_bivec, "xo", "-y");
   diff_float_property(diffs, r_bivec, e_bivec, "xy", "weight");
 
-  return "actual | expected\n" + diffs.join("\n");
+  return diffs;
 }
 
-function format_line_diff(received, expected) {
+export function diff_line(diffs, received, expected) {
   if (!(received instanceof Line)) {
-    return `recieved is not a Line object: ${received}`;
+    diffs.push(`recieved is not a Line object: ${received}`);
+    return diffs;
   }
-
-  const diffs = [];
 
   diff_property(diffs, received, expected, "is_infinite");
   const r_vec = received.vec;
@@ -82,38 +81,38 @@ function format_line_diff(received, expected) {
   diff_float_property(diffs, r_vec, e_vec, "y");
   diff_float_property(diffs, r_vec, e_vec, "o");
 
-  return "actual | expected\n" + diffs.join("\n");
+  return diffs;
 }
 
 export const PGA_MATCHERS = {
   toBePoint(received, expected) {
     return {
       pass: received.equals(expected),
-      message: () => format_point_diff(received, expected),
+      message: () => format_diff(diff_point([], received, expected)),
     };
   },
   toBeDirection(received, expected) {
     return {
       pass: received.equals(expected),
-      message: () => format_dir_diff(received, expected),
+      message: () => format_diff(diff_dir([], received, expected)),
     };
   },
   toBeLine(received, expected) {
     return {
       pass: received.equals(expected),
-      message: () => format_line_diff(received, expected),
+      message: () => format_diff(diff_line([], received, expected)),
     };
   },
   toBeEven(received, expected) {
     return {
       pass: received.equals(expected),
-      message: () => format_even_diff(received, expected),
+      message: () => format_diff(diff_even([], received, expected)),
     };
   },
   toBeOdd(received, expected) {
     return {
       pass: received.equals(expected),
-      message: () => format_odd_diff(received, expected),
+      message: () => format_diff(diff_odd([], received, expected)),
     };
   },
 };
