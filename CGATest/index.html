@@ -34,16 +34,15 @@
           <a href="https://github.com/ptrgags/p5-sketchbook/issues/217"
             >the GitHubIssue</a
           >). So far this is just a test of rendering the geometry primitives. A
-          Cline is a generalized circle or line. It does also have the corner
-          case of a circle of radius zero (aka a null point in CGA).
+          Cline is a generalized circle or line. Points are encoded as null
+          points (circles with radius 0).
         </p>
         <p>
-          So far, this sketch creates and renders Cline objects. I also started
-          implementing the key math operations such as geometric product and
-          sandwich product. Here, I'm using this math to take the original
-          clines (yellow shapes) and transform them. The blue shapes are the
-          original ones flipped over the yellow line. The orange shapes are the
-          original ones under circle inversion in the yellow circle.
+          This sketch creates some Cline and NullPoint objects and transforms
+          them with versors. The original shapes are in yellow. The blue shapes
+          are the originals flipped over the yellow line. The orange shapes are
+          the originals inverted in the yellow circle. The green animated shapes
+          are the originals rotated around the enter of the screen.
         </p>
       </div>
     </div>
