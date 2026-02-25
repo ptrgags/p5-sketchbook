@@ -6,20 +6,21 @@ import { Line } from "../sketchlib/pga2d/Line.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
+import { NullPoint } from "../sketchlib/cga2d/NullPoint.js";
 
 // Create a few shapes encoded in CGA
 const CIRCLE = Cline.from_circle(new Circle(new Point(250, 350), 50));
 const LINE = Cline.from_line(new Line(3 / 5, 4 / 5, 350));
-const POINT = Cline.from_point(new Point(250, 450));
+const POINT = NullPoint.from_point(new Point(250, 450));
 
 // A line is the fixed point of a transformation
 const REFLECT = LINE.vector.normalize();
-const REFLECTED_POINT = new Cline(REFLECT.unit_sandwich_odd(POINT.vector));
-const REFLECTED_CIRCLE = new Cline(REFLECT.unit_sandwich_odd(CIRCLE.vector));
+const REFLECTED_POINT = POINT.transform(REFLECT);
+const REFLECTED_CIRCLE = CIRCLE.transform(REFLECT);
 
-const INVERT = CIRCLE.vector.normalize();
-const INVERTED_POINT = new Cline(INVERT.unit_sandwich_odd(POINT.vector));
-const INVERTED_LINE = new Cline(INVERT.unit_sandwich_odd(LINE.vector));
+const INVERT = CIRCLE.vector.normalize_o();
+const INVERTED_POINT = POINT.transform(INVERT);
+const INVERTED_LINE = LINE.transform(INVERT);
 
 const LINE_STYLE = new Style({
   stroke: Color.YELLOW,

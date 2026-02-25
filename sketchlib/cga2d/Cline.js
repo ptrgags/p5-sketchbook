@@ -3,12 +3,13 @@ import { Point } from "../pga2d/Point.js";
 import { is_nearly } from "../is_nearly.js";
 import { Circle } from "../primitives/Circle.js";
 import { COdd } from "./COdd.js";
-import { Primitive } from "../primitives/Primitive.js";
+import { CEven } from "./CEven.js";
+import { ConformalBasis } from "./ConformalBasis.js";
 
 /**
  * Compute a cline primitive
  * @param {COdd} vector
- * @returns {Circle | Line | Point}
+ * @returns {Circle | Line}
  */
 function compute_primitive(vector) {
   const { x, y, p, m } = vector;
@@ -39,9 +40,7 @@ function compute_primitive(vector) {
   const center_sqr = center_x * center_x + center_y * center_y;
 
   const discriminant = center_sqr - twice_inf;
-  if (is_nearly(discriminant, 0, 1e-5)) {
-    return center;
-  } else if (discriminant < 0) {
+  if (discriminant < 0) {
     // Not sure how to interpret a negative radius here
     throw new Error("trying to render circle with negative radius");
   }
@@ -62,7 +61,7 @@ export class Cline {
     this.vector = vector;
 
     /**
-     * @type {Point | Line | Primitive}
+     * @type {Line | Circle}
      */
     this.primitive = compute_primitive(vector);
   }
@@ -77,6 +76,15 @@ export class Cline {
   }
 
   /**
+   *
+   * @param {COdd | CEven} versor
+   */
+  transform(versor) {
+    const vec = versor.unit_sandwich_odd(this.vector);
+    return new Cline(vec);
+  }
+
+  /**
    * Create a generalized circle/line from a circle
    * @param {Circle} circle
    */
@@ -84,15 +92,17 @@ export class Cline {
     const { center, radius } = circle;
     const { x, y } = center;
 
+    // The rest of the components are expressed in
+    // the inf, o basis
     // 1/2 A inf + o
-    // = 1/2 A (m + p) + 1/2 (m - p)
-    // = 1/2 A m + 1/2 A p + 1/2 m - 1/2 p
-    // = 1/2 (A + 1) m + 1/2 (A - 1) p
     // where
     // A = (x^2 + y^2 - r^2)
     const squared_factor = x * x + y * y - radius * radius;
-    const m = 0.5 * (squared_factor + 1);
-    const p = 0.5 * (squared_factor - 1);
+    const inf = 0.5 * squared_factor;
+    const o = 1;
+
+    const p = ConformalBasis.get_p(inf, o);
+    const m = ConformalBasis.get_m(inf, o);
     return new Cline(new COdd(x, y, p, m, 0, 0, 0, 0));
   }
 
@@ -108,26 +118,8 @@ export class Cline {
     // = n + d(m + p)
     const x = nx;
     const y = ny;
-    const m = d;
     const p = d;
-
-    return new Cline(new COdd(x, y, p, m, 0, 0, 0, 0));
-  }
-
-  /**
-   * Construct a null point
-   * @param {Point} point
-   * @returns {Cline}
-   */
-  static from_point(point) {
-    const { x, y } = point;
-
-    // x + 1/2 x^2 inf + o
-    // x + 1/2 x^2 (m + p) + 1/2(m - p)
-    // x + 1/2(x^2 - 1) p + 1/2 (x^2 + 1) m
-    const squared_factor = x * x + y * y;
-    const m = 0.5 * (squared_factor + 1);
-    const p = 0.5 * (squared_factor - 1);
+    const m = d;
 
     return new Cline(new COdd(x, y, p, m, 0, 0, 0, 0));
   }
