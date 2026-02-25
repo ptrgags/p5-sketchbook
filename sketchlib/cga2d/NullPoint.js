@@ -62,3 +62,13 @@ export class NullPoint {
     return new NullPoint(vector);
   }
 }
+/**
+ * Null point representing infinity, inf = (m + p)
+ * @type {Readonly<NullPoint>}
+ */
+NullPoint.INF = Object.freeze(new NullPoint(new COdd(0, 0, 1, 1, 0, 0, 0, 0)));
+/**
+ * Null point representing the origin, o = 1/2(m - p)
+ * @type {Readonly<NullPoint>}
+ */
+NullPoint.ORIGIN = Object.freeze(NullPoint.from_point(Point.ORIGIN));

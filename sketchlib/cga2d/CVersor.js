@@ -2,6 +2,7 @@ import { Direction } from "../pga2d/Direction.js";
 import { CEven } from "./CEven.js";
 import { Cline } from "./Cline.js";
 import { COdd } from "./COdd.js";
+import { NullPoint } from "./NullPoint.js";
 
 export class CVersor {
   /**
@@ -151,8 +152,15 @@ export class CVersor {
    * @param {Cline} cline
    */
   transform_cline(cline) {
-    const result = this.versor.unit_sandwich_odd(cline.vector);
-    return new Cline(result);
+    return cline.transform(this.versor);
+  }
+
+  /**
+   * Transform a Null Point object
+   * @param {NullPoint} point
+   */
+  transform_point(point) {
+    return point.transform(this.versor);
   }
 }
 /**
