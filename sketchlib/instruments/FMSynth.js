@@ -1,5 +1,5 @@
 import { ADSR } from "./ADSR.js";
-import { Instrument } from "./Instrument.js";
+import { Instrument, Polyphony } from "./Instrument.js";
 
 /**
  * Simplified frequency modulation synth with 2 operators. It is always
@@ -18,7 +18,7 @@ export class FMSynth {
     cm_ratio,
     mod_index,
     envelope = ADSR.DEFAULT,
-    mod_envelope = ADSR.DIGITAL
+    mod_envelope = ADSR.DIGITAL,
   ) {
     this.cm_ratio = cm_ratio;
     this.mod_index = mod_index;
@@ -48,11 +48,16 @@ export class FMSynth {
   }
 
   /**
-   *
-   * @param {import("tone")} tone
+   * Initialize the synth
+   * @param {import("tone")} tone Tone library
+   * @param {Polyphony} polyphony Whether to create a mono or polyphonic synth
+   * @param {import("tone").InputNode} destination Audio node to connect to
    */
-  init_mono(tone) {
-    this.synth = new tone.FMSynth({
+  init(tone, polyphony, destination) {
+    /**
+     * @type {import("./DrawbarOrgan.js").RecursivePartial<import("tone").FMSynthOptions>}
+     */
+    const options = {
       modulationIndex: this.mod_index,
       harmonicity: this.cm_ratio,
       oscillator: {
@@ -63,32 +68,48 @@ export class FMSynth {
       },
       envelope: this.envelope,
       modulationEnvelope: this.mod_envelope,
-    }).toDestination();
+    };
+
+    this.synth =
+      polyphony === Polyphony.POLYPHONIC
+        ? new tone.PolySynth(tone.FMSynth, options)
+        : new tone.FMSynth(options);
+    this.synth.connect(destination);
   }
 
   /**
-   *
-   * @param {import("tone")} tone
+   * Play a note
+   * @param {string} pitch The pitch in ToneJS format
+   * @param {string} duration The duration in ToneJS format
+   * @param {number} time Tonejs time
    */
-  init_poly(tone) {
-    this.synth = new tone.PolySynth(tone.FMSynth, {
-      modulationIndex: this.mod_index,
-      harmonicity: this.cm_ratio,
-      oscillator: {
-        type: "sine",
-      },
-      modulation: {
-        type: "sine",
-      },
-      envelope: this.envelope,
-      modulationEnvelope: this.mod_envelope,
-    }).toDestination();
+  play_note(pitch, duration, time) {
+    if (!this.synth) {
+      throw new Error("can't play note before init()");
+    }
+
+    this.synth.triggerAttackRelease(pitch, duration, time);
+  }
+
+  release_all() {
+    if (!this.synth) {
+      return;
+    }
+
+    //@ts-ignore
+    if (this.synth.releaseAll) {
+      //@ts-ignore
+      this.synth.releaseAll();
+    } else if (this.synth) {
+      //@ts-ignore
+      this.synth.triggerRelease();
+    }
   }
 
   destroy() {
     if (this.synth) {
       this.synth.dispose();
+      this.synth = undefined;
     }
-    throw new Error("Method not implemented.");
   }
 }

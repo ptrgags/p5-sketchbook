@@ -16,6 +16,8 @@ import {
   PartDescriptor,
   ToneClip,
 } from "./tone_clips.js";
+import { InstrumentMap } from "../instruments/InstrumentMap.js";
+import { Instrument } from "../instruments/Instrument.js";
 
 /**
  * Precompile a lone note to a part. Usually overkill, but it makes scheduling
@@ -170,7 +172,7 @@ export function precompile_music(music) {
 /**
  * Compile the music to a set of ToneJS-compatible clips ready for scheduling.
  * @param {import("tone")} tone The Tone.js library
- * @param {import("tone").Synth} instrument The instrument that will play the material
+ * @param {Instrument} instrument The instrument that will play the material
  * @param {import("../music/Music.js").Music<number>} music The musical material
  * @return {import("../music/Timeline.js").Timeline<ToneClip>} The compiled music clips
  */
@@ -185,7 +187,7 @@ export function compile_music(tone, instrument, music) {
  * Compile a score to a set of ToneJS compatible clips ready for scheduling. This
  * bakes the instruments into the callbacks
  * @param {import("tone")} tone the Tone.js library
- * @param {{[id: string]: import("tone").Synth}} instruments The set of available instruments
+ * @param {InstrumentMap} instruments The set of available instruments
  * @param {Score<number>} score The score of music
  * @returns {import("../music/Timeline.js").Timeline<ToneClip>} A timeline of music clips ready for scheduling.
  */
@@ -194,7 +196,7 @@ export function compile_score(tone, instruments, score) {
   for (const part of score.parts) {
     const clip = compile_music(
       tone,
-      instruments[part.instrument_id],
+      instruments.get(part.instrument_id),
       part.music,
     );
     clips.push(clip);

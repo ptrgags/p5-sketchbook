@@ -1,5 +1,6 @@
 import { is_nearly } from "../is_nearly.js";
 import { CEven } from "./CEven.js";
+import { ConformalBasis } from "./ConformalBasis.js";
 
 export class COdd {
   /**
@@ -78,6 +79,23 @@ export class COdd {
       this.xpm / length,
       this.ypm / length,
     );
+  }
+
+  /**
+   * Normalize the vector component of this COdd so that
+   * the coefficient of o = 1/2(m - p) is 1. This is important for
+   * interpreting CGA geometry
+   * @return {COdd} A vector
+   */
+  normalize_o() {
+    const { x, y, p, m } = this;
+    const o = ConformalBasis.get_o(p, m);
+
+    if (is_nearly(o, 0)) {
+      return this;
+    }
+
+    return new COdd(x / o, y / o, p / o, m / o, 0, 0, 0, 0);
   }
 
   /**

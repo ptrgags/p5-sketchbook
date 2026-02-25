@@ -162,61 +162,61 @@ class SwayingCoral {
     this.hinges = [
       // Hinge for node C
       new Hinge(
-        CIRCLE_B.position,
-        CIRCLE_C.position,
+        CIRCLE_B.center,
+        CIRCLE_C.center,
         SWAY_AMPLITUDE,
         SWAY_FREQUENCY,
         5 * PHASE_OFFSET,
       ),
       // Hinge for node E
       new Hinge(
-        CIRCLE_D.position,
-        CIRCLE_E.position,
+        CIRCLE_D.center,
+        CIRCLE_E.center,
         SWAY_AMPLITUDE,
         SWAY_FREQUENCY,
         4 * PHASE_OFFSET,
       ),
       // Hinge for node H
       new Hinge(
-        CIRCLE_G.position,
-        CIRCLE_H.position,
+        CIRCLE_G.center,
+        CIRCLE_H.center,
         SWAY_AMPLITUDE,
         SWAY_FREQUENCY,
       ),
       // Hinge for node k
       new Hinge(
-        CIRCLE_J.position,
-        CIRCLE_K.position,
+        CIRCLE_J.center,
+        CIRCLE_K.center,
         SWAY_AMPLITUDE,
         SWAY_FREQUENCY,
         PHASE_OFFSET,
       ),
       // Hinge for node L
       new Hinge(
-        CIRCLE_J.position,
-        CIRCLE_L.position,
+        CIRCLE_J.center,
+        CIRCLE_L.center,
         SWAY_AMPLITUDE,
         SWAY_FREQUENCY,
         PHASE_OFFSET,
       ),
       // Hinge for node N
       new Hinge(
-        CIRCLE_M.position,
-        CIRCLE_N.position,
+        CIRCLE_M.center,
+        CIRCLE_N.center,
         SWAY_AMPLITUDE,
         SWAY_FREQUENCY,
         2 * PHASE_OFFSET,
       ),
       // Hinge for node P
       new Hinge(
-        CIRCLE_O.position,
-        CIRCLE_P.position,
+        CIRCLE_O.center,
+        CIRCLE_P.center,
         0.5 * SWAY_AMPLITUDE,
         SWAY_FREQUENCY,
         3 * PHASE_OFFSET,
       ),
     ];
-    this.polyps = ALL_CIRCLES.map((c) => new Polyp(c.position));
+    this.polyps = ALL_CIRCLES.map((c) => new Polyp(c.center));
 
     this.dynamic_polyps = ["C", "E", "H", "K", "L", "N", "P"].map((c) => {
       const index = letter_to_index(c);
@@ -239,7 +239,7 @@ class SwayingCoral {
       hinge.update(time);
 
       // Update the node and polyp position attached to the hinge
-      this.dynamic_nodes[i].circle.position = hinge.position;
+      this.dynamic_nodes[i].circle.center = hinge.position;
       this.dynamic_polyps[i].update_position(hinge.position);
     });
 

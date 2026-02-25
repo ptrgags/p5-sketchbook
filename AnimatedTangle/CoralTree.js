@@ -30,15 +30,19 @@ function halfway(a, b, tiebreak) {
   return a.add(b).normalize().neg();
 }
 
+/**
+ * Get the direction from one node to its parent
+ * @param {CoralNode} node
+ * @param {CoralNode} parent
+ * @returns
+ */
 function get_forward_dir(node, parent) {
   if (parent) {
-    return parent.circle.position.sub(node.circle.position).normalize();
+    return parent.circle.center.sub(node.circle.center).normalize();
   }
 
   if (node.children.length === 1) {
-    return node.circle.position
-      .sub(node.children[0].circle.position)
-      .normalize();
+    return node.circle.center.sub(node.children[0].circle.center).normalize();
   }
 
   // TODO: For a root with multiple children, maybe take the average of the
@@ -97,7 +101,7 @@ export class CoralNode {
    * @param {CoralNode} [parent] The parent node
    */
   get_outline_vertices(output, parent) {
-    const center = this.circle.position;
+    const center = this.circle.center;
     const radius = this.circle.radius;
 
     const dir_forward = get_forward_dir(this, parent);
@@ -128,7 +132,7 @@ export class CoralNode {
 
     // Get the direction to each child
     const to_children = this.children.map((child) =>
-      child.circle.position.sub(center).normalize(),
+      child.circle.center.sub(center).normalize(),
     );
 
     // Point on the left, placed at the half angle between the forward

@@ -1,3 +1,17 @@
+import { Circle } from "../sketchlib/primitives/Circle.js";
+import { Rectangle } from "./rectangle.js";
+
+/**
+ * Get a bounding square around a circle
+ * @param {Circle} circle
+ * @returns {Rectangle}
+ */
+function get_bounding_square(circle) {
+  const { x: cx, y: cy } = circle.center;
+  const r = circle.radius;
+  return new Rectangle(cx - r, cy - r, 2 * r, 2 * r);
+}
+
 const DEFAULT_CAPACITY = 10;
 
 function partition(array, condition) {
@@ -14,6 +28,11 @@ function partition(array, condition) {
 }
 
 export class Quadtree {
+  /**
+   *
+   * @param {Rectangle} bounds
+   * @param {number} capacity
+   */
   constructor(bounds, capacity = DEFAULT_CAPACITY) {
     this.bounds = bounds;
     this.capacity = capacity;
@@ -87,7 +106,7 @@ export class Quadtree {
       // separate the dirty points and send them up the tree. Keep the clean points.
       const [dirty_points, clean_points] = partition(
         this.points,
-        (x) => x.is_dirty
+        (x) => x.is_dirty,
       );
       this.points = clean_points;
       return dirty_points;
@@ -128,8 +147,13 @@ export class Quadtree {
     return outside_parent_list;
   }
 
+  /**
+   * Get points within a circle
+   * @param {Circle} circle
+   * @returns
+   */
   circle_query(circle) {
-    const square = circle.get_bounding_square();
+    const square = get_bounding_square(circle);
     const points = this.rectangle_query(square);
     return points.filter((p) => circle.contains(p.position));
   }

@@ -1,3 +1,4 @@
+import { is_nearly } from "../is_nearly.js";
 import { Point } from "../pga2d/Point.js";
 import { Primitive } from "./Primitive.js";
 
@@ -8,11 +9,11 @@ import { Primitive } from "./Primitive.js";
 export class Circle {
   /**
    * Constructor
-   * @param {Point} position The center of the circle
+   * @param {Point} center The center of the circle
    * @param {number} radius The radius of the circle
    */
-  constructor(position, radius) {
-    this.position = position;
+  constructor(center, radius) {
+    this.center = center;
     this.radius = radius;
   }
 
@@ -21,8 +22,31 @@ export class Circle {
    * @param {import("p5")} p The p5.js library
    */
   draw(p) {
-    const { x, y } = this.position;
+    const { x, y } = this.center;
     p.circle(x, y, 2 * this.radius);
+  }
+
+  /**
+   * Check if this circle strictly contains the point
+   * (i.e. distance squared < r^2)
+   * @param {Point} point The point to check
+   * @returns {boolean} True if the point is strictly inside the circle.
+   */
+  contains(point) {
+    const dx = point.x - this.center.x;
+    const dy = point.y - this.center.y;
+    const dist_sqr = dx * dx + dy * dy;
+    return dist_sqr <= this.radius * this.radius;
+  }
+
+  /**
+   * Check if two circles are equal
+   * @param {Circle} other
+   */
+  equals(other) {
+    return (
+      this.center.equals(other.center) && is_nearly(this.radius, other.radius)
+    );
   }
 
   /**
