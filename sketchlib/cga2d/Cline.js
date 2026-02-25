@@ -101,8 +101,8 @@ export class Cline {
     const inf = 0.5 * squared_factor;
     const o = 1;
 
-    const m = ConformalBasis.get_m(inf, o);
     const p = ConformalBasis.get_p(inf, o);
+    const m = ConformalBasis.get_m(inf, o);
     return new Cline(new COdd(x, y, p, m, 0, 0, 0, 0));
   }
 
@@ -118,8 +118,8 @@ export class Cline {
     // = n + d(m + p)
     const x = nx;
     const y = ny;
-    const m = d;
     const p = d;
+    const m = d;
 
     return new Cline(new COdd(x, y, p, m, 0, 0, 0, 0));
   }

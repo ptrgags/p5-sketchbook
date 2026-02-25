@@ -56,8 +56,8 @@ export class NullPoint {
     const inf = 0.5 * squared_factor;
     const o = 1;
 
-    const m = ConformalBasis.get_m(inf, o);
     const p = ConformalBasis.get_p(inf, o);
+    const m = ConformalBasis.get_m(inf, o);
     const vector = new COdd(x, y, p, m, 0, 0, 0, 0);
     return new NullPoint(vector);
   }
