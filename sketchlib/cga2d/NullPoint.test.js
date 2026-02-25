@@ -65,4 +65,10 @@ describe("NullPoint", () => {
     expect(result.vector).toBeCOdd(expected_vec);
     expect(result.point).toBePoint(expected_point);
   });
+
+  it("INF.point is undefined", () => {
+    const result = NullPoint.INF.point;
+
+    expect(result).toBeUndefined();
+  });
 });

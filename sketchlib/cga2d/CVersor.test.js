@@ -90,14 +90,64 @@ describe("CVersor", () => {
   });
 
   describe("circle_inversion", () => {
-    // fixes point on unit circle
-    // swaps origin and infinity
-    // fixes unit circle
-    // fixes line through origin
-    // line outside the circle inverts to a circle through the origin...
-    //    this is because inf -> 0,
-    //    the closest point on the line to the origin is closest to the circle, so its inverse determines the point opposite the origin... I think?
-    // is an involution
+    it("fixes point on unit circle", () => {
+      const point = NullPoint.from_point(new Point(3 / 5, -4 / 5));
+
+      const result = CVersor.INVERSION.transform_point(point);
+
+      expect(result).toBeNullPoint(point);
+    });
+
+    it("sends the origin to infinity", () => {
+      const result = CVersor.INVERSION.transform_point(NullPoint.ORIGIN);
+
+      expect(result).toBeNullPoint(NullPoint.INF);
+    });
+
+    it("fixes unit circle", () => {
+      const result = CVersor.INVERSION.transform_cline(Cline.UNIT_CIRCLE);
+
+      expect(result).toBeCline(Cline.UNIT_CIRCLE);
+    });
+
+    it("fixes line through the origin", () => {
+      const line = Cline.from_line(new Line(3 / 5, -4 / 5, 0));
+
+      const result = CVersor.INVERSION.transform_cline(line);
+
+      expect(result).toBeCline(line);
+    });
+
+    it("line outside unit circle inverts to a circle through the origin", () => {
+      const line = Cline.from_line(new Line(1, 0, 4));
+
+      const result = CVersor.INVERSION.transform_cline(line);
+
+      // A line outside the unit circle inverts to a circle inside the unit
+      // circle. we can find points on an identify if we watch what happens
+      // to the nearest and furthest points to the unit circle
+
+      // the furthest point on the line is the point at infinity, which
+      // inverts to the origin.
+
+      // the nearest point on the line is (4, 0)
+      // the magnitude is 4, so it inverts to (1/4, 0)
+      // so we have a circle through the origin and this point
+      // so the center is 1/2 * (1/4, 0) = (1/8, 0)
+      // and the radius is 1/8
+      const expected = Cline.from_circle(
+        new Circle(new Point(1 / 8, 0), 1 / 8),
+      );
+      expect(result).toBeCline(expected);
+    });
+
+    it("is an involution", () => {
+      const inv = CVersor.INVERSION;
+
+      const result = inv.compose(inv);
+
+      expect(result).toBeCVersor(CVersor.IDENTITY);
+    });
   });
 
   describe("translation", () => {

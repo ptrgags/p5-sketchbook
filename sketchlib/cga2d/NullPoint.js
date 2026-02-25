@@ -22,7 +22,13 @@ export class NullPoint {
    */
   constructor(vector) {
     this.vector = vector;
-    this.point = new Point(vector.x, vector.y);
+
+    const o = ConformalBasis.get_o(vector.p, vector.m);
+
+    /**
+     * @type {Point | undefined}
+     */
+    this.point = is_nearly(o, 0) ? undefined : new Point(vector.x, vector.y);
   }
 
   /**
@@ -30,7 +36,9 @@ export class NullPoint {
    * @param {import('p5')} p
    */
   draw(p) {
-    this.point.draw(p);
+    if (this.point) {
+      this.point.draw(p);
+    }
   }
 
   /**
@@ -49,6 +57,10 @@ export class NullPoint {
    * @returns {boolean}
    */
   equals(other) {
+    if (this.point === undefined) {
+      return this.point === other.point;
+    }
+
     return this.point.equals(other.point);
   }
 

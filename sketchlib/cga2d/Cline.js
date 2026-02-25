@@ -143,3 +143,6 @@ export class Cline {
     return new Cline(new COdd(x, y, p, m, 0, 0, 0, 0));
   }
 }
+Cline.UNIT_CIRCLE = Object.freeze(Cline.from_circle(Circle.UNIT_CIRCLE));
+Cline.X_AXIS = Object.freeze(Cline.from_line(Line.X_AXIS));
+Cline.Y_AXIS = Object.freeze(Cline.from_line(Line.Y_AXIS));
