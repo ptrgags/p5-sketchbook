@@ -233,14 +233,79 @@ describe("CVersor", () => {
   });
 
   describe("dilation", () => {
-    // fixes origin
-    // fixes point at infinity
-    // scales coordinates of point
-    // with circle at origin adjusts radius
-    // with general circle scales the center away from the origin and adjusts the radius
-    // fixes line through origin
-    // scales line distance with same normal
-    // inverse is same as scale by reciprocal factor
+    it("fixes origin", () => {
+      const scale = CVersor.dilation(3);
+
+      const result = scale.transform_point(NullPoint.ORIGIN);
+
+      expect(result).toBeNullPoint(NullPoint.ORIGIN);
+    });
+
+    it("fixes point at infinity", () => {
+      const scale = CVersor.dilation(3);
+
+      const result = scale.transform_point(NullPoint.INF);
+
+      expect(result).toBeNullPoint(NullPoint.INF);
+    });
+
+    it("scales coordinates of point", () => {
+      const point = NullPoint.from_point(new Point(3, -4));
+      const scale = CVersor.dilation(3);
+
+      const result = scale.transform_point(point);
+
+      const expected = NullPoint.from_point(new Point(9, -12));
+      expect(result).toBeNullPoint(expected);
+    });
+
+    it("With circle at origin scales radius", () => {
+      const circle = Cline.from_circle(new Circle(Point.ORIGIN, 3));
+      const scale = CVersor.dilation(4);
+
+      const result = scale.transform_cline(circle);
+
+      const expected = Cline.from_circle(new Circle(Point.ORIGIN, 12));
+      expect(result).toBeCline(expected);
+    });
+
+    it("With general circle scales the center away from the origin and scales radius", () => {
+      const circle = Cline.from_circle(new Circle(new Point(1, -1), 3));
+      const scale = CVersor.dilation(4);
+
+      const result = scale.transform_cline(circle);
+
+      const expected = Cline.from_circle(new Circle(new Point(4, -4), 12));
+      expect(result).toBeCline(expected);
+    });
+
+    it("fixes line through origin", () => {
+      const line = Cline.from_line(new Line(3 / 5, 4 / 5, 0));
+      const scale = CVersor.dilation(3);
+
+      const result = scale.transform_cline(line);
+
+      expect(result).toBeCline(line);
+    });
+
+    it("scales line distance with same normal", () => {
+      const line = Cline.from_line(new Line(3 / 5, 4 / 5, 2));
+      const scale = CVersor.dilation(3);
+
+      const result = scale.transform_cline(line);
+
+      const expected = Cline.from_line(new Line(3 / 5, 4 / 5, 6));
+      expect(result).toBeCline(expected);
+    });
+
+    it("inverse is scale by reciprocal factor", () => {
+      const scale = CVersor.dilation(4);
+
+      const reciprocal = CVersor.dilation(0.25);
+      const inv = scale.inv();
+
+      expect(reciprocal).toBeCVersor(inv);
+    });
   });
 
   describe("inverse", () => {
