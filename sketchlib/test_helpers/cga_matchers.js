@@ -7,6 +7,7 @@ import { Circle } from "../primitives/Circle.js";
 import { diff_circle } from "./geometry_matchers.js";
 import { diff_line, diff_point } from "./pga_matchers.js";
 import { NullPoint } from "../cga2d/NullPoint.js";
+import { CVersor } from "../cga2d/CVersor.js";
 
 const EVEN_PROPERTIES = ["scalar", "xy", "xp", "xm", "yp", "ym", "pm", "xypm"];
 function diff_ceven(diffs, received, expected) {
@@ -32,6 +33,21 @@ function diff_codd(diffs, received, expected) {
 
   for (const property_name of ODD_PROPERTIES) {
     diff_float_property(diffs, received, expected, property_name);
+  }
+
+  return diffs;
+}
+
+function diff_cversor(diffs, received, expected) {
+  if (!(received instanceof CVersor)) {
+    diffs.push(`expected CVersor, got ${received}`);
+    return diffs;
+  }
+
+  if (expected.versor instanceof COdd) {
+    diff_codd(diffs, received.versor, expected.versor);
+  } else {
+    diff_ceven(diffs, received.versor, expected.versor);
   }
 
   return diffs;
@@ -87,6 +103,12 @@ export const CGA_MATCHERS = {
     return {
       pass: received.equals(expected),
       message: () => format_diff(diff_codd([], received, expected)),
+    };
+  },
+  toBeCVersor(received, expected) {
+    return {
+      pass: received.equals(expected),
+      message: () => format_diff(diff_cversor([], received, expected)),
     };
   },
   toBeCline(received, expected) {

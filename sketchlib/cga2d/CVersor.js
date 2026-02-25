@@ -14,6 +14,21 @@ export class CVersor {
   }
 
   /**
+   * Check if two versors are equal
+   * @param {CVersor} other
+   * @returns {boolean}
+   */
+  equals(other) {
+    if (this.versor instanceof CEven && other.versor instanceof CEven) {
+      return this.versor.equals(other.versor);
+    } else if (this.versor instanceof COdd && other.versor instanceof COdd) {
+      return this.versor.equals(other.versor);
+    } else {
+      return false;
+    }
+  }
+
+  /**
    * Reflect through the origin
    * @param {Direction} normal
    * @returns {CVersor}

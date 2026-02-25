@@ -32,8 +32,7 @@ describe("CVersor", () => {
 
       const result = reflection.transform_point(point);
 
-      const expected = NullPoint.from_point(new Point(4 / 5, 3 / 5));
-      expect(result).toBeNullPoint(expected);
+      expect(result).toBeNullPoint(point);
     });
 
     it("fixes the point at infinity", () => {
@@ -119,8 +118,7 @@ describe("CVersor", () => {
 
       const result = translation.transform_point(NullPoint.INF);
 
-      const expected = NullPoint.INF;
-      expect(result).toEqual(expected);
+      expect(result).toBeNullPoint(NullPoint.INF);
     });
 
     it("inverse is the same as translation with negative offset", () => {
@@ -149,11 +147,10 @@ describe("CVersor", () => {
     });
 
     it("fixes circle centered at origin", () => {
-      const circle = new Circle(Point.ORIGIN, 5);
-      const circle_cline = Cline.from_circle(circle);
+      const circle = Cline.from_circle(new Circle(Point.ORIGIN, 5));
       const rotation = CVersor.rotation(Math.PI / 2);
 
-      const result = rotation.transform_cline(circle_cline);
+      const result = rotation.transform_cline(circle);
 
       expect(result).toBeCline(circle);
     });
@@ -201,7 +198,7 @@ describe("CVersor", () => {
       const neg_angle = CVersor.rotation(-Math.PI / 2);
       const inv = rotation.inv();
 
-      expect(inv.versor).toEqual(neg_angle.versor);
+      expect(inv).toBeCVersor(neg_angle);
     });
   });
 
@@ -226,8 +223,8 @@ describe("CVersor", () => {
       const v_inv = versor.compose(inv);
       const inv_v = inv.compose(versor);
 
-      expect(v_inv).toEqual(CVersor.IDENTITY);
-      expect(inv_v).toEqual(CVersor.IDENTITY);
+      expect(v_inv).toBeCVersor(CVersor.IDENTITY);
+      expect(inv_v).toBeCVersor(CVersor.IDENTITY);
     });
   });
 
