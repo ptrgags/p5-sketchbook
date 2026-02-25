@@ -102,6 +102,8 @@ export class Line {
    * @returns {boolean} true if the lines are equivalent (up to epsilon)
    */
   equals(other) {
+    // The constructor normalizes the vector, so we
+    // can use an equality test here.
     return this.vec.equals(other.vec);
   }
 
@@ -120,9 +122,8 @@ export class Line {
   draw(p) {
     const { nx, ny, d } = this;
 
-    // The line will be as long as half the perimeter of the canvas
-    // we want half of that here.
-    const RADIUS = 600;
+    // Draw a super long line so it goes outside the bounds of the canvas
+    const RADIUS = 1000;
 
     // Center point is in the direction n a distance d
     const cx = d * nx;

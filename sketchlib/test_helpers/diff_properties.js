@@ -39,3 +39,13 @@ export function diff_float_property(
     diffs.push(`${label}: !is_nearly(${received_value}, ${expected_value})`);
   }
 }
+
+/**
+ * Format diffs for test helpers
+ * @param {string[]} diffs Diff error messages
+ * @returns {string} Formatted diff string
+ */
+export function format_diff(diffs) {
+  const diff_lines = diffs.join("\n");
+  return `Actual | Expected\n${diff_lines}`;
+}

@@ -85,6 +85,25 @@ export class Cline {
   }
 
   /**
+   * Check if two clines are equal
+   * @param {Cline} other Another cline
+   */
+  equals(other) {
+    // Compare the primitives
+    const a = this.primitive;
+    const b = other.primitive;
+
+    if (a instanceof Line && b instanceof Line) {
+      return a.equals(b);
+    } else if (a instanceof Circle && b instanceof Circle) {
+      return a.equals(b);
+    }
+
+    // circle and a line, definitely not equal
+    return false;
+  }
+
+  /**
    * Create a generalized circle/line from a circle
    * @param {Circle} circle
    */
@@ -124,3 +143,6 @@ export class Cline {
     return new Cline(new COdd(x, y, p, m, 0, 0, 0, 0));
   }
 }
+Cline.UNIT_CIRCLE = Object.freeze(Cline.from_circle(Circle.UNIT_CIRCLE));
+Cline.X_AXIS = Object.freeze(Cline.from_line(Line.X_AXIS));
+Cline.Y_AXIS = Object.freeze(Cline.from_line(Line.Y_AXIS));

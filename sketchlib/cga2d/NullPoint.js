@@ -22,7 +22,13 @@ export class NullPoint {
    */
   constructor(vector) {
     this.vector = vector;
-    this.point = new Point(vector.x, vector.y);
+
+    const o = ConformalBasis.get_o(vector.p, vector.m);
+
+    /**
+     * @type {Point | undefined}
+     */
+    this.point = is_nearly(o, 0) ? undefined : new Point(vector.x, vector.y);
   }
 
   /**
@@ -30,7 +36,9 @@ export class NullPoint {
    * @param {import('p5')} p
    */
   draw(p) {
-    this.point.draw(p);
+    if (this.point) {
+      this.point.draw(p);
+    }
   }
 
   /**
@@ -41,6 +49,19 @@ export class NullPoint {
   transform(versor) {
     const vec = versor.unit_sandwich_odd(this.vector).normalize_o();
     return new NullPoint(vec);
+  }
+
+  /**
+   *
+   * @param {NullPoint} other
+   * @returns {boolean}
+   */
+  equals(other) {
+    if (this.point === undefined) {
+      return this.point === other.point;
+    }
+
+    return this.point.equals(other.point);
   }
 
   /**
@@ -62,3 +83,13 @@ export class NullPoint {
     return new NullPoint(vector);
   }
 }
+/**
+ * Null point representing infinity, inf = (m + p)
+ * @type {Readonly<NullPoint>}
+ */
+NullPoint.INF = Object.freeze(new NullPoint(new COdd(0, 0, 1, 1, 0, 0, 0, 0)));
+/**
+ * Null point representing the origin, o = 1/2(m - p)
+ * @type {Readonly<NullPoint>}
+ */
+NullPoint.ORIGIN = Object.freeze(NullPoint.from_point(Point.ORIGIN));

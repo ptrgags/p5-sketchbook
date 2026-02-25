@@ -6,6 +6,8 @@ import { Line } from "../sketchlib/pga2d/Line.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
+import { CVersor } from "../sketchlib/cga2d/CVersor.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { NullPoint } from "../sketchlib/cga2d/NullPoint.js";
 
 // Create a few shapes encoded in CGA
@@ -31,6 +33,9 @@ const REFLECTED_STYLE = new Style({
 const INVERTED_STYLE = new Style({
   stroke: new Color(255, 127, 0),
 });
+const SPIN_STYLE = new Style({
+  stroke: new Color(0, 255, 127),
+});
 
 const ORIGINAL_GEOM = style([CIRCLE, POINT, LINE], LINE_STYLE);
 const REFLECTED_GEOM = style(
@@ -40,6 +45,10 @@ const REFLECTED_GEOM = style(
 const INVERTED_GEOM = style([INVERTED_LINE, INVERTED_POINT], INVERTED_STYLE);
 
 const CGA_GEOM = group(ORIGINAL_GEOM, REFLECTED_GEOM, INVERTED_GEOM);
+
+const TRANSLATE_CENTER = CVersor.translation(
+  new Direction(WIDTH / 2, HEIGHT / 2),
+);
 
 export const sketch = (p) => {
   p.setup = () => {
@@ -54,6 +63,19 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
+    const t = p.frameCount / 500;
+    const rotation = CVersor.rotation(t * 2.0 * Math.PI);
+    const rotate_center = TRANSLATE_CENTER.conjugate(rotation);
+    const spinning_line = rotate_center.transform_cline(LINE);
+    const spinning_circle = rotate_center.transform_cline(INVERTED_LINE);
+    const spinning_point = rotate_center.transform_point(POINT);
+    const styled = style(
+      [spinning_line, spinning_circle, spinning_point],
+      SPIN_STYLE,
+    );
+
     CGA_GEOM.draw(p);
+
+    styled.draw(p);
   };
 };
