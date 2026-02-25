@@ -41,14 +41,6 @@ export class CVersor {
   }
 
   /**
-   * Reflect in the unit circle (a circle inversion)
-   * @returns {CVersor}
-   */
-  static circle_inversion() {
-    return new CVersor(new COdd(0, 0, 1, 0, 0, 0, 0, 0));
-  }
-
-  /**
    * Translate by the given offset
    * @param {Direction} offset The offset length and direction
    * @returns {CVersor}
@@ -184,4 +176,12 @@ export class CVersor {
  */
 CVersor.IDENTITY = Object.freeze(
   new CVersor(new CEven(1, 0, 0, 0, 0, 0, 0, 0)),
+);
+/**
+ * Inversion in the unit circle is represented
+ * by the vector p
+ * @type {CVersor}
+ */
+CVersor.INVERSION = Object.freeze(
+  new CVersor(new COdd(0, 0, 1, 0, 0, 0, 0, 0)),
 );

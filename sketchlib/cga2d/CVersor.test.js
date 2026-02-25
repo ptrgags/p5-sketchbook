@@ -274,7 +274,37 @@ describe("CVersor", () => {
   });
 
   describe("conjugate", () => {
-    // a general line reflection is  T(dist) sandwich reflect(normal)
-    // a general circle inversion is T(center)S(radius) sandwich circle_inversion
+    it("a general line reflection is T(dist * normal) sandwich reflect(normal)", () => {
+      // reflection defined explicitly
+      const dist = 2;
+      const normal = new Direction(3 / 5, 4 / 5);
+      const translate = CVersor.translation(normal.scale(dist));
+      const reflect = CVersor.reflection(normal);
+
+      // The equivalent line
+      const cline = Cline.from_line(new Line(normal.x, normal.y, dist));
+
+      // chaining the individual transforms is the same
+      // as reinterpreting the line's vector as a versor.
+      const sandwich = translate.conjugate(reflect);
+      const line_versor = new CVersor(cline.vector);
+
+      expect(sandwich).toBeCVersor(line_versor);
+    });
+
+    it("a general circle inversion is T(center)S(radius) sandwich circle_inversion", () => {
+      const radius = 3;
+      const center = new Point(3, -4);
+      const translate = CVersor.translation(center.to_direction());
+      const scale = CVersor.dilation(radius);
+      const ts = translate.compose(scale);
+      const circle = Cline.from_circle(new Circle(center, radius));
+      const inv = CVersor.INVERSION;
+
+      const sandwich = ts.conjugate(inv);
+      const circle_versor = new CVersor(circle.vector);
+
+      expect(sandwich).toBeCVersor(circle_versor);
+    });
   });
 });
