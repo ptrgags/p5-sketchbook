@@ -8,6 +8,7 @@ import { Circle } from "../primitives/Circle.js";
 import { Line } from "../pga2d/Line.js";
 import { CGA_MATCHERS } from "../test_helpers/cga_matchers.js";
 import { NullPoint } from "./NullPoint.js";
+import { COdd } from "./COdd.js";
 
 expect.extend(PGA_MATCHERS);
 expect.extend(CGA_MATCHERS);
@@ -419,7 +420,19 @@ describe("CVersor", () => {
       const sandwich = ts.conjugate(inv);
       const circle_versor = new CVersor(circle.vector);
 
-      expect(sandwich).toBeCVersor(circle_versor);
+      // The above are only equivalent up to scalar multiple... I don't have
+      // an easy way to check for that right now... so let's do this.
+      if (
+        sandwich.versor instanceof COdd &&
+        circle_versor.versor instanceof COdd
+      ) {
+        expect(sandwich.versor.normalize_o()).toBeCOdd(
+          circle_versor.versor.normalize_o(),
+        );
+      } else {
+        // impossible
+        expect(true).toBe(false);
+      }
     });
   });
 });
