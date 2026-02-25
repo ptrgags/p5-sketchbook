@@ -1,29 +1,22 @@
 /**
  * This class has some static fuctions for switching
  * between the (p, m) and (inf, o) bases in CGA.
+ * These are essentially matrix transforms, written as functions
  *
- * From the definitions:
+ * For the (inf, 0) -> (p, m) direction, we need a matrix A such that
+ * A(inf) = (1, 1) (by definition of inf)
+ * A(o) = (-1/2, 1/2) (by definition of o)
  *
- * inf = m + p
- * o = 1/2(m - p)
+ * Since inf is [1, 0] and o is [0, 1] in this basis, the matrix is simply
+ * listing these values as columns:
+ * A = [1 -1/2]
+ *     [1  1/2]
  *
- * With a bit of algebra, you can find the inverse
- * mapping:
+ * For the other direction, it's a matrix inverse. I'll save you the algebra,
+ * it's
  *
- * p = 1/2 inf - o
- * m = 1/2 inf + o
- *
- * Derivation: -----------------------------
- *
- * Add the inf equation to 2 times the o equation
- * inf + 2o = m + p + m - p
- * inf + 2o = 2m
- * 1/2 inf + o = m
- *
- * Plug this into the inf equation
- * inf = (1/2 inf + o) + p
- * 1/2 inf = o + p
- * 1/2 inf - o = p
+ * A^(-1) = [1/2 1/2]
+ *          [-1   1 ]
  */
 export class ConformalBasis {
   /**
@@ -33,7 +26,7 @@ export class ConformalBasis {
    * @returns {number} The coefficient of the origin basis vector
    */
   static get_o(p, m) {
-    return 0.5 * (m - p);
+    return m - p;
   }
 
   /**
@@ -43,7 +36,7 @@ export class ConformalBasis {
    * @returns {number} The coefficient of the infinity basis vector
    */
   static get_inf(p, m) {
-    return m + p;
+    return 0.5 * (m + p);
   }
 
   /**
@@ -53,7 +46,7 @@ export class ConformalBasis {
    * @returns {number} Coefficient for the plus basis vector
    */
   static get_p(inf, o) {
-    return 0.5 * inf - o;
+    return inf - 0.5 * o;
   }
 
   /**
@@ -63,6 +56,6 @@ export class ConformalBasis {
    * @returns {number} Coefficient for the minus basis vector
    */
   static get_m(inf, o) {
-    return 0.5 * inf + o;
+    return inf + 0.5 * o;
   }
 }
