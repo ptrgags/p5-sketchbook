@@ -4,6 +4,7 @@ import { is_nearly } from "../is_nearly.js";
 import { Circle } from "../primitives/Circle.js";
 import { COdd } from "./COdd.js";
 import { CEven } from "./CEven.js";
+import { ConformalBasis } from "./ConformalBasis.js";
 
 /**
  * Compute a cline primitive
@@ -91,15 +92,17 @@ export class Cline {
     const { center, radius } = circle;
     const { x, y } = center;
 
+    // The rest of the components are expressed in
+    // the inf, o basis
     // 1/2 A inf + o
-    // = 1/2 A (m + p) + 1/2 (m - p)
-    // = 1/2 A m + 1/2 A p + 1/2 m - 1/2 p
-    // = 1/2 (A + 1) m + 1/2 (A - 1) p
     // where
     // A = (x^2 + y^2 - r^2)
     const squared_factor = x * x + y * y - radius * radius;
-    const m = 0.5 * (squared_factor + 1);
-    const p = 0.5 * (squared_factor - 1);
+    const inf = 0.5 * squared_factor;
+    const o = 1;
+
+    const m = ConformalBasis.get_m(inf, o);
+    const p = ConformalBasis.get_p(inf, o);
     return new Cline(new COdd(x, y, p, m, 0, 0, 0, 0));
   }
 

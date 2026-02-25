@@ -52,12 +52,12 @@ export class NullPoint {
     const { x, y } = point;
 
     // x + 1/2 x^2 inf + o
-    // x + 1/2 x^2 (m + p) + 1/2(m - p)
-    // x + 1/2(x^2 - 1) p + 1/2 (x^2 + 1) m
     const squared_factor = x * x + y * y;
-    const m = 0.5 * (squared_factor + 1);
-    const p = 0.5 * (squared_factor - 1);
+    const inf = 0.5 * squared_factor;
+    const o = 1;
 
+    const m = ConformalBasis.get_m(inf, o);
+    const p = ConformalBasis.get_p(inf, o);
     const vector = new COdd(x, y, p, m, 0, 0, 0, 0);
     return new NullPoint(vector);
   }
