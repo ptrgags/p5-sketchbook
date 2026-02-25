@@ -64,10 +64,15 @@ export const sketch = (p) => {
     const rotation = CVersor.rotation(t * 2.0 * Math.PI);
     const rotate_center = TRANSLATE_CENTER.conjugate(rotation);
     const spinning_line = rotate_center.transform_cline(LINE);
-    const styled_line = style(spinning_line, LINE_STYLE);
+    const spinning_circle = rotate_center.transform_cline(INVERTED_LINE);
+    const spinning_point = rotate_center.transform_point(POINT);
+    const styled = style(
+      [spinning_line, spinning_circle, spinning_point],
+      LINE_STYLE,
+    );
 
     CGA_GEOM.draw(p);
 
-    styled_line.draw(p);
+    styled.draw(p);
   };
 };
