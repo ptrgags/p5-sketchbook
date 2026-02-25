@@ -4,6 +4,7 @@ import { Point } from "../pga2d/Point.js";
 import { COdd } from "./COdd.js";
 import { CGA_MATCHERS } from "../test_helpers/cga_matchers.js";
 import { PGA_MATCHERS } from "../test_helpers/pga_matchers.js";
+import { CEven } from "./CEven.js";
 
 expect.extend(CGA_MATCHERS);
 expect.extend(PGA_MATCHERS);
@@ -44,6 +45,23 @@ describe("NullPoint", () => {
     // 12p + 13m
     const expected_vec = new COdd(-4, -3, 12, 13, 0, 0, 0, 0);
     const expected_point = new Point(-4, -3);
+    expect(result.vector).toBeCOdd(expected_vec);
+    expect(result.point).toBePoint(expected_point);
+  });
+
+  it("transform with even versor transforms point", () => {
+    const point = NullPoint.from_point(new Point(4, -3));
+    const rot180 = new CEven(0, 1, 0, 0, 0, 0, 0, 0);
+
+    const result = point.transform(rot180);
+
+    // we expect the point x = (-4, 3)
+    // x^2 = 4^2 + 3^2 = 25
+    // 1/2(x^2 - 1)p + 1/2(x^2 + 1)m
+    // = 1/2(24)p + 1/2(26)m
+    // = 12p + 13m
+    const expected_vec = new COdd(-4, 3, 12, 13, 0, 0, 0, 0);
+    const expected_point = new Point(-4, 3);
     expect(result.vector).toBeCOdd(expected_vec);
     expect(result.point).toBePoint(expected_point);
   });
