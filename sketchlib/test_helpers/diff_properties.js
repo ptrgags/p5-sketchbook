@@ -47,5 +47,5 @@ export function diff_float_property(
  */
 export function format_diff(diffs) {
   const diff_lines = diffs.join("\n");
-  return `Actual | expected\n${diff_lines}`;
+  return `Actual | Expected\n${diff_lines}`;
 }

@@ -6,9 +6,7 @@ import { Direction } from "../pga2d/Direction.js";
 import { PGA_MATCHERS } from "../test_helpers/pga_matchers.js";
 import { Circle } from "../primitives/Circle.js";
 import { Line } from "../pga2d/Line.js";
-import { COdd } from "./COdd.js";
 import { CGA_MATCHERS } from "../test_helpers/cga_matchers.js";
-import { CEven } from "./CEven.js";
 import { NullPoint } from "./NullPoint.js";
 
 expect.extend(PGA_MATCHERS);
@@ -52,11 +50,43 @@ describe("CVersor", () => {
       expect(result).toBeCline(circle);
     });
 
-    // fixes circle centered on line
-    // flips circle preserving radius
-    // fixes line of reflection
-    // fixes orthogonal line
-    // is an involution
+    it("flips circle preserving radius", () => {
+      const circle = Cline.from_circle(new Circle(new Point(3, 4), 3));
+      const reflection = CVersor.reflection(new Direction(1, 1));
+
+      const result = reflection.transform_cline(circle);
+
+      const expected = Cline.from_circle(new Circle(new Point(-4, -3), 3));
+      expect(result).toBeCline(expected);
+    });
+
+    it("flips normal of line of reflection", () => {
+      const line = Cline.from_line(new Line(1, 1, 0));
+      const reflection = CVersor.reflection(new Direction(1, 1));
+
+      const result = reflection.transform_cline(line);
+
+      const expected = Cline.from_line(new Line(-1, -1, 0));
+      expect(result).toBeCline(expected);
+    });
+
+    it("fixes orthogonal line", () => {
+      const line = Cline.from_line(new Line(1, -1, 0));
+      const reflection = CVersor.reflection(new Direction(1, 1));
+
+      const result = reflection.transform_cline(line);
+
+      expect(result).toBeCline(line);
+    });
+
+    it("is an involution", () => {
+      const reflection = CVersor.reflection(new Direction(3 / 5, 4 / 5));
+
+      const result = reflection.compose(reflection);
+
+      const expected = CVersor.IDENTITY;
+      expect(result).toEqual(expected);
+    });
   });
 
   describe("circle_inversion", () => {

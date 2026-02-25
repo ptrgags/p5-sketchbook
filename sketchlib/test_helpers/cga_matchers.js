@@ -59,8 +59,10 @@ export function diff_cline(diffs, received, expected) {
     return diffs;
   }
 
+  diffs.push("vector:");
   diff_codd(diffs, received.vector, expected.vector);
 
+  diffs.push("geometry:");
   if (
     received.primitive instanceof Line &&
     expected.primitive instanceof Line
