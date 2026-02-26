@@ -146,6 +146,25 @@ export class CVersor {
     return new CVersor(new CEven(scalar, 0, xp, 0, yp, 0, 0, 0));
   }
 
+  static hyperbolic(direction, factor) {
+    // exp(-ln(factor)/2 * normalize(direction) wedge m);
+    // See dilation() for some of the derivation, we get
+    // 1/2(sqrt(factor) + 1/sqrt(factor)) - 1/2(sqrt(factor) - 1/sqrt(factor)) (dx x + dy y) wedge m
+    // |-------------C------------------| - |---------------S----------------|
+    // C - S (dx xm + dy ym)
+    const sqrt_factor = Math.sqrt(factor);
+    const inv_sqrt = 1.0 / sqrt_factor;
+    const c = 0.5 * (sqrt_factor + inv_sqrt);
+    const s = 0.5 * (sqrt_factor - inv_sqrt);
+    const { x: dx, y: dy } = direction.normalize();
+
+    const scalar = c;
+    const xm = -s * dx;
+    const ym = -s * dy;
+
+    return new CVersor(new CEven(scalar, 0, 0, xm, 0, ym, 0, 0));
+  }
+
   /**
    * Invert the versor. Since these versors are represented
    * by unit multivectors, this can be done using
