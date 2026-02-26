@@ -10,6 +10,7 @@ import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { NullPoint } from "../sketchlib/cga2d/NullPoint.js";
 import { range } from "../sketchlib/range.js";
+import { mod } from "../sketchlib/mod.js";
 
 // Create a few shapes encoded in CGA
 const CIRCLE = Cline.from_circle(new Circle(new Point(250, 350), 50));
@@ -70,6 +71,15 @@ const POINTS2 = [...range(N)].map((x) => {
   return NullPoint.from_point(point);
 });
 
+const MAX_EXPONENT = 15;
+const PARABOLIC_STEP = new Direction(1, 0);
+const PARABOLIC_TILES = [...range(2 * MAX_EXPONENT + 1)].map((x) => {
+  const power = x - MAX_EXPONENT;
+  const offset = PARABOLIC_STEP.scale(power);
+  const parabolic = CVersor.parabolic(offset);
+  return parabolic.transform_cline(Cline.Y_AXIS);
+});
+
 export const sketch = (p) => {
   p.setup = () => {
     p.createCanvas(
@@ -116,15 +126,29 @@ export const sketch = (p) => {
     const para_screen = TO_SCREEN.compose(parabolic);
     const para_points = POINTS2.map((x) => para_screen.transform_point(x));
 
+    const para_tiles = PARABOLIC_TILES.map((x) => TO_SCREEN.transform_cline(x));
+
+    // Give the illusion of translating forever by drawing a whole bunch of tiles
+    const t_repeat = mod(2 * t, 1.0);
+    const para_illusion = CVersor.parabolic(PARABOLIC_STEP.scale(t_repeat));
+    const para_ill_screen = TO_SCREEN.compose(para_illusion);
+    const para_ill_tiles = PARABOLIC_TILES.map((x) =>
+      para_ill_screen.transform_cline(x),
+    );
+
     const styled = style(
       [
         BIG_UNIT_CIRCLE,
+        //...para_tiles,
         /*...swirled_points, ...hyp_points,*/ ...lox_points,
         ...para_points,
       ],
       SPIN_STYLE,
     );
-    const styled2 = style([...swirled_points, ...hyp_points], INVERTED_STYLE);
+    const styled2 = style(
+      [...swirled_points, ...hyp_points, ...para_ill_tiles],
+      INVERTED_STYLE,
+    );
 
     CGA_GEOM.draw(p);
     styled.draw(p);
