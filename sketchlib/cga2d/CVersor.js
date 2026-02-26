@@ -123,6 +123,30 @@ export class CVersor {
   }
 
   /**
+   * An elliptic Mobius transformation is a generalization of rotation.
+   * It swirls space around a point pair. Like a 2D vortex ring
+   *
+   * This method creates the simple case where the point pair is at opposite
+   * points of the unit circle.
+   * @param {Direction} direction Direction of flow at the origin, this will be normalized.
+   * @param {number} angle Angle of rotation, measured around one of the poles.
+   * @return {CVersor}
+   */
+  static elliptic(direction, angle) {
+    // exp(-angle/2 * normalize(direction) wedge p)
+    // = cos(-angle/2) + sin(-angle/2) (dx x + dy y) wedge p
+    // = cos(angle/2) - sin(angle/2) (dx xp + dy yp)
+    const c = Math.cos(angle / 2);
+    const s = Math.sin(angle / 2);
+    const { x: dx, y: dy } = direction.normalize();
+
+    const scalar = c;
+    const xp = -s * dx;
+    const yp = -s * dy;
+    return new CVersor(new CEven(scalar, 0, xp, 0, yp, 0, 0, 0));
+  }
+
+  /**
    * Invert the versor. Since these versors are represented
    * by unit multivectors, this can be done using
    * versor.reverse() rather than the inverse calculation

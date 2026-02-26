@@ -9,6 +9,7 @@ import { Style } from "../sketchlib/Style.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { NullPoint } from "../sketchlib/cga2d/NullPoint.js";
+import { range } from "../sketchlib/range.js";
 
 // Create a few shapes encoded in CGA
 const CIRCLE = Cline.from_circle(new Circle(new Point(250, 350), 50));
@@ -46,9 +47,25 @@ const INVERTED_GEOM = style([INVERTED_LINE, INVERTED_POINT], INVERTED_STYLE);
 
 const CGA_GEOM = group(ORIGINAL_GEOM, REFLECTED_GEOM, INVERTED_GEOM);
 
+// Map the unit circle to a circle at the center of the screen with radius 200 px
+// Anything I want to render on the unit circle needs to be conjugated by this.
 const TRANSLATE_CENTER = CVersor.translation(
   new Direction(WIDTH / 2, HEIGHT / 2),
 );
+const SCALE_UP = CVersor.dilation(200);
+const FLIP_Y = CVersor.reflection(Direction.DIR_Y);
+const TO_SCREEN = TRANSLATE_CENTER.compose(SCALE_UP).compose(FLIP_Y);
+
+const BIG_UNIT_CIRCLE = TO_SCREEN.transform_cline(Cline.UNIT_CIRCLE);
+
+const N = 40;
+const POINT_A = new Point(-2.0, 0);
+const POINT_B = new Point(2.0, 0);
+const POINTS = [...range(N)].map((i) => {
+  const t = i / (N - 1);
+  const point = Point.lerp(POINT_A, POINT_B, t);
+  return NullPoint.from_point(point);
+});
 
 export const sketch = (p) => {
   p.setup = () => {
@@ -64,18 +81,24 @@ export const sketch = (p) => {
     p.background(0);
 
     const t = p.frameCount / 500;
-    const rotation = CVersor.rotation(t * 2.0 * Math.PI);
+    const f = 3;
+    const angle = 2.0 * Math.PI * f * t;
+    /*
+    const rotation = CVersor.rotation(angle);
     const rotate_center = TRANSLATE_CENTER.conjugate(rotation);
     const spinning_line = rotate_center.transform_cline(LINE);
     const spinning_circle = rotate_center.transform_cline(INVERTED_LINE);
-    const spinning_point = rotate_center.transform_point(POINT);
-    const styled = style(
-      [spinning_line, spinning_circle, spinning_point],
-      SPIN_STYLE,
+    const spinning_point = rotate_center.transform_point(POINT);*/
+
+    const elliptic = CVersor.elliptic(Direction.DIR_Y, angle);
+    const elliptic_screen = TO_SCREEN.compose(elliptic);
+    const swirled_points = POINTS.map((x) =>
+      elliptic_screen.transform_point(x),
     );
 
-    CGA_GEOM.draw(p);
+    const styled = style([BIG_UNIT_CIRCLE, ...swirled_points], SPIN_STYLE);
 
+    CGA_GEOM.draw(p);
     styled.draw(p);
   };
 };
