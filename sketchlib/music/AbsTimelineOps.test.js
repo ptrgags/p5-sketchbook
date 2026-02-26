@@ -117,6 +117,31 @@ describe("AbsTimelineOps", () => {
       expect(result).toEqual(expected);
     });
 
+    it("with many intervals that meet exactly returns AbsSequential", () => {
+      const intervals = [
+        new AbsInterval(1, Rational.ONE, new Rational(2)),
+        new AbsInterval(2, new Rational(2), new Rational(3)),
+        new AbsInterval(3, new Rational(3), new Rational(4)),
+        new AbsInterval(4, new Rational(4), new Rational(5)),
+        new AbsInterval(5, new Rational(5), new Rational(6)),
+        new AbsInterval(6, new Rational(6), new Rational(7)),
+        new AbsInterval(7, new Rational(7), new Rational(8)),
+      ];
+
+      const result = AbsTimelineOps.from_intervals(intervals);
+
+      const expected = new AbsSequential(
+        new AbsInterval(1, Rational.ONE, new Rational(2)),
+        new AbsInterval(2, new Rational(2), new Rational(3)),
+        new AbsInterval(3, new Rational(3), new Rational(4)),
+        new AbsInterval(4, new Rational(4), new Rational(5)),
+        new AbsInterval(5, new Rational(5), new Rational(6)),
+        new AbsInterval(6, new Rational(6), new Rational(7)),
+        new AbsInterval(7, new Rational(7), new Rational(8)),
+      );
+      expect(result).toEqual(expected);
+    });
+
     it("with two intervals that are out of order returns AbsSequential in sorted order", () => {
       const intervals = [
         new AbsInterval(2, new Rational(2), new Rational(3)),
