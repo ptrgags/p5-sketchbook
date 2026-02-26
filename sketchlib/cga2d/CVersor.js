@@ -201,6 +201,37 @@ export class CVersor {
   }
 
   /**
+   * A parabolic Mobius transformation is a generalization of
+   * translation. It has a single pole and swirls points in circles
+   * away both in and out of this point, like a dipole
+   * @param {Direction} offset Offset vector. The direction determines the _attracting_ side of the dipole.
+   */
+  static parabolic(offset) {
+    // Let's take a translation and invert it in the unit circle
+    // p(1 - offset/2 inf)p
+    // = 1 - 1/2 p(offset inf)p
+    // offset is orthogonal to p, so p(offset) = -offset(p)
+    // = 1 + 1/2 offset (p inf p)
+    // = 1 + 1/2 offset (p (p + m) p)
+    // = 1 + 1/2 offset (ppp + pmp)
+    // = 1 + 1/2 offset (p - m)
+    // this simplifies to  1 - offset o, but here we want to expand the components.
+    // = 1 + 1/2 (dx x + dy y)(p - m)
+    // = 1 + 1/2 (dx xp -dx xm + dy yp - dy ym)
+    const { x, y } = offset;
+    const dx = x / 2;
+    const dy = y / 2;
+
+    const scalar = 1;
+    const xp = dx;
+    const xm = -dx;
+    const yp = dy;
+    const ym = -dy;
+    const versor = new CEven(scalar, 0, xp, xm, yp, ym, 0, 0);
+    return new CVersor(versor);
+  }
+
+  /**
    * Invert the versor. Since these versors are represented
    * by unit multivectors, this can be done using
    * versor.reverse() rather than the inverse calculation

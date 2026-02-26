@@ -58,12 +58,17 @@ const TO_SCREEN = TRANSLATE_CENTER.compose(SCALE_UP).compose(FLIP_Y);
 
 const BIG_UNIT_CIRCLE = TO_SCREEN.transform_cline(Cline.UNIT_CIRCLE);
 
-const N = 40;
 const POINTS = [
   new Point(-0.8, 0.2),
   new Point(-0.8, 0.0),
   new Point(-0.8, -0.2),
 ].map((x) => NullPoint.from_point(x));
+
+const N = 40;
+const POINTS2 = [...range(N)].map((x) => {
+  const point = Point.lerp(new Point(0, -0.8), new Point(0, 0.8), x / (N - 1));
+  return NullPoint.from_point(point);
+});
 
 export const sketch = (p) => {
   p.setup = () => {
@@ -107,8 +112,16 @@ export const sketch = (p) => {
     const lox_screen = TO_SCREEN.compose(lox);
     const lox_points = POINTS.map((x) => lox_screen.transform_point(x));
 
+    const parabolic = CVersor.parabolic(new Direction(100.0 * t - 100, 0));
+    const para_screen = TO_SCREEN.compose(parabolic);
+    const para_points = POINTS2.map((x) => para_screen.transform_point(x));
+
     const styled = style(
-      [BIG_UNIT_CIRCLE, /*...swirled_points, ...hyp_points,*/ ...lox_points],
+      [
+        BIG_UNIT_CIRCLE,
+        /*...swirled_points, ...hyp_points,*/ ...lox_points,
+        ...para_points,
+      ],
       SPIN_STYLE,
     );
     const styled2 = style([...swirled_points, ...hyp_points], INVERTED_STYLE);
