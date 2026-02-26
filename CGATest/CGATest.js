@@ -94,7 +94,7 @@ export const sketch = (p) => {
       elliptic_screen.transform_point(x),
     );
 
-    const min_factor = 1 / 100;
+    const min_factor = 1;
     const max_factor = 100;
     const factor_t = 0.5 + 0.5 * Math.sin(t * 2.0 * Math.PI);
     const factor =

@@ -123,6 +123,18 @@ export class CVersor {
   }
 
   /**
+   * For convenience, compose dilation and rotation
+   * @param {number} factor
+   * @param {number} angle
+   * @returns {CVersor}
+   */
+  static spiral(factor, angle) {
+    const scale = CVersor.dilation(factor);
+    const rot = CVersor.rotation(angle);
+    return scale.compose(rot);
+  }
+
+  /**
    * An elliptic Mobius transformation is a generalization of rotation.
    * It swirls space around a point pair. Like a 2D vortex ring
    *
@@ -146,6 +158,14 @@ export class CVersor {
     return new CVersor(new CEven(scalar, 0, xp, 0, yp, 0, 0, 0));
   }
 
+  /**
+   * Create a hyperbolic Mobius transform, i.e. a transformation
+   * that moves points along circular arcs from one point on the unit
+   * circle to the opposite point.
+   * @param {Direction} direction The direction of flow at the origin
+   * @param {number} factor positive number indicating the scale factor. 1 means identity, >1 means stretch in the flow direction, <1 means shrink (flow opposite the direction)
+   * @returns {CVersor}
+   */
   static hyperbolic(direction, factor) {
     // exp(-ln(factor)/2 * normalize(direction) wedge m);
     // See dilation() for some of the derivation, we get
@@ -163,6 +183,21 @@ export class CVersor {
     const ym = -s * dy;
 
     return new CVersor(new CEven(scalar, 0, 0, xm, 0, ym, 0, 0));
+  }
+
+  /**
+   * Create a loxodromic Mobius transformation
+   * as L = hyperbolic * elliptic
+   * @param {Direction} hyperbolic_dir The direction of the hyperbolic stretching. The rotation will be perpendicular to this.
+   * @param {number} factor Scale factor
+   * @param {number} angle Rotation angle
+   */
+  static loxodromic(hyperbolic_dir, factor, angle) {
+    const hyp = CVersor.hyperbolic(hyperbolic_dir, factor);
+    const ellip = CVersor.elliptic(hyperbolic_dir.rot90(), angle);
+    // These transformations are orthogonal, so we could compose them
+    // in either order.
+    return hyp.compose(ellip);
   }
 
   /**
