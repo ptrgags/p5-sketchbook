@@ -1,6 +1,8 @@
+import { CanvasMouseHandler } from "../sketchlib/CanvasMouseHandler.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { WIDTH, HEIGHT, SCREEN_CENTER } from "../sketchlib/dimensions.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { SCREEN_RECT } from "../sketchlib/Rectangle.js";
 import { ParabolicGridIllusion } from "./ParabolicGridIllusion.js";
 import { TranslationGridIllusion } from "./TranslationGridIllusion.js";
 
@@ -9,20 +11,24 @@ const SCALE_UP = CVersor.dilation(200);
 const FLIP_Y = CVersor.reflection(Direction.DIR_Y);
 const TO_SCREEN = TRANSLATE_CENTER.compose(SCALE_UP).compose(FLIP_Y);
 
+const MOUSE = new CanvasMouseHandler();
+
 export const sketch = (p) => {
   const grids = [
     new ParabolicGridIllusion(TO_SCREEN),
     new TranslationGridIllusion(TO_SCREEN),
   ];
-  const selected_index = 1;
+  let selected_index = 0;
 
   p.setup = () => {
-    p.createCanvas(
+    const canvas = p.createCanvas(
       WIDTH,
       HEIGHT,
       undefined,
       document.getElementById("sketch-canvas"),
-    );
+    ).elt;
+
+    MOUSE.setup(canvas);
   };
 
   p.draw = () => {
@@ -38,4 +44,13 @@ export const sketch = (p) => {
     grid.update(time_measures);
     grid.primitive.draw(p);
   };
+
+  MOUSE.mouse_released(p, (input) => {
+    if (!SCREEN_RECT.contains(input.mouse_coords)) {
+      return;
+    }
+
+    selected_index++;
+    selected_index %= 2;
+  });
 };
