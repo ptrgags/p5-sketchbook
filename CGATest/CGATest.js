@@ -15,7 +15,7 @@ import { mod } from "../sketchlib/mod.js";
 // Create a few shapes encoded in CGA
 const CIRCLE = Cline.from_circle(new Circle(new Point(250, 350), 50));
 const LINE = Cline.from_line(new Line(3 / 5, 4 / 5, 350));
-const POINT = NullPoint.from_point(new Point(250, 450));
+const POINT = NullPoint.from_point(new Point(350, 250));
 
 // A line is the fixed point of a transformation
 const REFLECT = LINE.vector.normalize();
@@ -50,12 +50,12 @@ const CGA_GEOM = group(ORIGINAL_GEOM, REFLECTED_GEOM, INVERTED_GEOM);
 
 // Map the unit circle to a circle at the center of the screen with radius 200 px
 // Anything I want to render on the unit circle needs to be conjugated by this.
-const TRANSLATE_CENTER = CVersor.translation(
-  new Direction(WIDTH / 2, HEIGHT / 2),
+const TRANSLATE_CIRCLE_CENTER = CVersor.translation(
+  new Direction(WIDTH / 2, HEIGHT - 200),
 );
 const SCALE_UP = CVersor.dilation(200);
 const FLIP_Y = CVersor.reflection(Direction.DIR_Y);
-const TO_SCREEN = TRANSLATE_CENTER.compose(SCALE_UP).compose(FLIP_Y);
+const TO_SCREEN = TRANSLATE_CIRCLE_CENTER.compose(SCALE_UP).compose(FLIP_Y);
 
 const BIG_UNIT_CIRCLE = TO_SCREEN.transform_cline(Cline.UNIT_CIRCLE);
 
@@ -96,12 +96,6 @@ export const sketch = (p) => {
     const t = p.frameCount / 500;
     const f = 3;
     const angle = 2.0 * Math.PI * f * t;
-    /*
-    const rotation = CVersor.rotation(angle);
-    const rotate_center = TRANSLATE_CENTER.conjugate(rotation);
-    const spinning_line = rotate_center.transform_cline(LINE);
-    const spinning_circle = rotate_center.transform_cline(INVERTED_LINE);
-    const spinning_point = rotate_center.transform_point(POINT);*/
 
     const elliptic = CVersor.elliptic(Direction.DIR_Y, angle);
     const elliptic_screen = TO_SCREEN.compose(elliptic);
