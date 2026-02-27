@@ -488,16 +488,86 @@ describe("CVersor", () => {
   });
 
   describe("loxodromic", () => {
-    // is same as H times E
-    // inverse is same as inverses of H, E
+    it("is the same as H * E", () => {
+      const hyp_dir = new Direction(3 / 5, 4 / 5);
+      const hyp = CVersor.hyperbolic(hyp_dir, 4);
+      const ellip = CVersor.elliptic(hyp_dir.rot90(), Math.PI / 4);
+
+      const he = hyp.compose(ellip);
+      const lox = CVersor.loxodromic(hyp_dir, 4, Math.PI / 4);
+
+      expect(he).toBeCVersor(lox);
+    });
+
+    it("inverse is the same as inv(S) * inv(R)", () => {
+      const hyp_dir = new Direction(3 / 5, 4 / 5);
+      const hyp = CVersor.hyperbolic(hyp_dir, 4);
+      const ellip = CVersor.elliptic(hyp_dir.rot90(), Math.PI / 4);
+
+      const inv_he = hyp.inv().compose(ellip.inv());
+      const inv_lox = CVersor.loxodromic(hyp_dir, 4, Math.PI / 4).inv();
+
+      expect(inv_he).toBeCVersor(inv_lox);
+    });
   });
 
   describe("parabolic", () => {
-    // Fixes origin
-    // moves inf in direction
-    // Moves point along axis
-    // Fixes circles tangent to origin in perpendicular direction
-    // Fixes line through origin in direction
+    it("fixes origin", () => {
+      const para = CVersor.parabolic(new Direction(3 / 5, 4 / 5));
+
+      const result = para.transform_point(NullPoint.ORIGIN);
+
+      expect(result).toEqual(NullPoint.ORIGIN);
+    });
+
+    it("moves inf in the given direction", () => {
+      const dir = new Direction(3 / 5, 4 / 5);
+      const para = CVersor.parabolic(new Direction(3 / 5, 4 / 5));
+
+      const result = para
+        .transform_point(NullPoint.INF)
+        .point.to_direction()
+        .normalize();
+
+      expect(result).toBeDirection(dir);
+    });
+
+    it("moves point along axis in opposite direction", () => {
+      const dir = new Direction(3 / 5, 4 / 5);
+      const para = CVersor.parabolic(dir);
+      // A point on the fixed line of the transformation
+      const point = NullPoint.from_point(dir.scale(0.5).to_point());
+
+      const transformed = para.transform_point(point);
+      const result = transformed.point.sub(point.point).normalize();
+
+      expect(result).toBeDirection(dir.neg());
+    });
+
+    it("Fixes line through origin parallel in direction", () => {
+      const dir = new Direction(3 / 5, 4 / 5);
+      const para = CVersor.parabolic(dir);
+      const orthog = dir.rot90();
+      const line = Cline.from_line(new Line(orthog.x, orthog.y, 0));
+
+      const result = para.transform_cline(line);
+
+      expect(result).toBeCline(line);
+    });
+
+    it("Fixes circle tangent to origin with diameter orthogonal to direction", () => {
+      const dir = new Direction(3 / 5, 4 / 5);
+      const para = CVersor.parabolic(dir);
+      const orthog = dir.rot90();
+      const radius = 2;
+      const circle = Cline.from_circle(
+        new Circle(orthog.scale(radius).to_point(), radius),
+      );
+
+      const result = para.transform_cline(circle);
+
+      expect(result).toBeCline(circle);
+    });
   });
 
   describe("inverse", () => {
