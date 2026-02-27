@@ -13,11 +13,12 @@ const TO_SCREEN = TRANSLATE_CENTER.compose(SCALE_UP).compose(FLIP_Y);
 
 const MOUSE = new CanvasMouseHandler();
 
+const GRIDS = [
+  new ParabolicGridIllusion(TO_SCREEN),
+  new TranslationGridIllusion(TO_SCREEN),
+];
+
 export const sketch = (p) => {
-  const grids = [
-    new ParabolicGridIllusion(TO_SCREEN),
-    new TranslationGridIllusion(TO_SCREEN),
-  ];
   let selected_index = 0;
 
   p.setup = () => {
@@ -40,17 +41,18 @@ export const sketch = (p) => {
     const BEATS_PER_MEASURE = 4;
     const time_measures = ((time_sec / SEC_PER_MIN) * BPM) / BEATS_PER_MEASURE;
 
-    const grid = grids[selected_index];
+    const grid = GRIDS[selected_index];
     grid.update(time_measures);
     grid.primitive.draw(p);
   };
 
+  // Swap the animations on mouse click.
   MOUSE.mouse_released(p, (input) => {
     if (!SCREEN_RECT.contains(input.mouse_coords)) {
       return;
     }
 
     selected_index++;
-    selected_index %= 2;
+    selected_index %= GRIDS.length;
   });
 };
