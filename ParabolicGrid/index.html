@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../libraries/p5.min.js"
+    ></script>
+    <script type="module">
+      import { sketch } from "./ParabolicGrid.js";
+      import "../sketchlib/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../styles/layout.css" />
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>Parabolic Grid (2026-02)</h1>
+      <div class="sketch">
+        <canvas id="sketch-canvas" width="500" height="700"></canvas>
+      </div>
+      <div class="description">
+        <p>
+          Parabolic
+          <a href="https://en.wikipedia.org/wiki/M%C3%B6bius_transformation"
+            >Möbius transformations</a
+          >
+          are the generalization of translations in conformal (angle-preserving)
+          geometry. There's a single pole, acting as both a source and a sink.
+          Points are repelled from one side, move along generalized circles and
+          are attracted to the other side.
+        </p>
+        <p>
+          In the animation above, I make use of two parabolic transformations.
+          The motion of the purple circles is analagous to translation in the x
+          direction. The motion of the green circles is analagous to translation
+          along the y-direction.
+        </p>
+        <p>
+          This sketch is continuing what I was doing in another repo,
+          <a href="https://github.com/ptrgags/math-notebook"
+            ><code>math-notebook</code></a
+          >, except this time, it's animated! I also am using
+          <a href="https://en.wikipedia.org/wiki/Conformal_geometric_algebra"
+            >Conformal Geometric Algebra</a
+          >
+          for the math instead of using complex numbers. The results on the
+          screen are equivalent; the only difference is how the shapes and
+          transformations are represented in the math/code.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,6 +1,10 @@
 // Links for all of the sketches. Links are added to the page in this order
 export const LINKS = [
   {
+    title: "Parabolic Grid",
+    year: "2026-02",
+  },
+  {
     title: "CGA Test",
     link: "./CGATest",
     is_lab: true,
