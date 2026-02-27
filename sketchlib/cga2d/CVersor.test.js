@@ -282,7 +282,18 @@ describe("CVersor", () => {
       expect(inv).toBeCVersor(neg_angle);
     });
 
-    // n-fold rotation repeated n times is identity
+    it("n-fold rotation repeated n times is identity", () => {
+      const N = 8;
+      const angle = (2 * Math.PI) / N;
+      const rot = CVersor.rotation(angle);
+
+      let result = CVersor.IDENTITY;
+      for (let i = 0; i < N; i++) {
+        result = result.compose(rot);
+      }
+
+      expect(result).toBeCVersor(CVersor.IDENTITY);
+    });
   });
 
   describe("dilation", () => {
@@ -362,18 +373,97 @@ describe("CVersor", () => {
   });
 
   describe("spiral", () => {
-    // is the same as S * R
-    // inverse is inv(S) * inv(R)
+    it("is the same as S * R", () => {
+      const scale = CVersor.dilation(4);
+      const rotation = CVersor.rotation(Math.PI / 4);
+
+      const sr = scale.compose(rotation);
+      const spiral = CVersor.spiral(4, Math.PI / 4);
+
+      expect(sr).toBeCVersor(spiral);
+    });
+
+    it("inverse is the same as inv(S) * inv(R)", () => {
+      const scale = CVersor.dilation(4);
+      const rotation = CVersor.rotation(Math.PI / 4);
+
+      const inv_sr = scale.inv().compose(rotation.inv());
+      const inv_spiral = CVersor.spiral(4, Math.PI / 4).inv();
+
+      expect(inv_sr).toBeCVersor(inv_spiral);
+    });
   });
 
   describe("hyperbolic", () => {
-    // Fixes source
-    // Fixes sink
-    // moves origin in direction specified
-    // inverse uses reciprocal scale factor
-    // fixes unit circle
-    // Fixes other circle through the poles
-    // fixes line through poles
+    it("fixes source point", () => {
+      const hyp = CVersor.hyperbolic(new Direction(3 / 5, 4 / 5), 2);
+      const source = NullPoint.from_point(new Point(-3 / 5, -4 / 5));
+
+      const result = hyp.transform_point(source);
+
+      expect(result).toBeNullPoint(source);
+    });
+
+    it("fixes sink point", () => {
+      const hyp = CVersor.hyperbolic(new Direction(3 / 5, 4 / 5), 2);
+      const sink = NullPoint.from_point(new Point(3 / 5, 4 / 5));
+
+      const result = hyp.transform_point(sink);
+
+      expect(result).toBeNullPoint(sink);
+    });
+
+    it("moves origin in direction specified", () => {
+      const dir = new Direction(3 / 5, 4 / 5);
+      const hyp = CVersor.hyperbolic(new Direction(3 / 5, 4 / 5), 2);
+
+      const transformed = hyp.transform_point(NullPoint.ORIGIN);
+      const result = transformed.point.to_direction().normalize();
+
+      expect(result).toBeDirection(dir);
+    });
+
+    it("inverse is hyperbolic with reciprocal scale factor", () => {
+      const hyp = CVersor.hyperbolic(new Direction(3 / 5, -4 / 5), 2);
+
+      const result = hyp.inv();
+
+      const expected = CVersor.hyperbolic(new Direction(3 / 5, -4 / 5), 1 / 2);
+      expect(result).toBeCVersor(expected);
+    });
+
+    it("fixes unit circle", () => {
+      const hyp = CVersor.hyperbolic(new Direction(3 / 5, -4 / 5), 2);
+
+      const result = hyp.transform_cline(Cline.UNIT_CIRCLE);
+
+      expect(result).toBeCline(Cline.UNIT_CIRCLE);
+    });
+
+    it("fixes line through the poles", () => {
+      const hyp = CVersor.hyperbolic(new Direction(3 / 5, -4 / 5), 2);
+      const line = Cline.from_line(new Line(4 / 5, 3 / 5, 0));
+
+      const result = hyp.transform_cline(line);
+
+      expect(result).toBeCline(line);
+    });
+
+    it("fixes other circle through the poles", () => {
+      const dir = new Direction(3 / 5, -4 / 5);
+      const orthog_dir = dir.rot90();
+      const hyp = CVersor.hyperbolic(dir, 2);
+
+      // Find a circle through the poles by taking the diameter of
+      // the circle and transforming it in the orthogonal direction
+      const line = Cline.from_line(new Line(orthog_dir.x, orthog_dir.y, 0));
+      const orthog_ellip = CVersor.elliptic(orthog_dir, Math.PI / 8);
+      const circle = orthog_ellip.transform_cline(line);
+
+      const result = hyp.transform_cline(circle);
+
+      expect(result).toBeCline(circle);
+    });
   });
 
   describe("elliptic", () => {
@@ -382,7 +472,19 @@ describe("CVersor", () => {
     // fixes south pole
     // fixes equator
     // fixes other latitude circle
-    // n-fold rotation repeated n times is identity
+
+    it("n-fold rotation repeated n times is identity", () => {
+      const N = 8;
+      const angle = (2 * Math.PI) / N;
+      const rot = CVersor.elliptic(new Direction(3 / 5, 4 / 5), angle);
+
+      let result = CVersor.IDENTITY;
+      for (let i = 0; i < N; i++) {
+        result = result.compose(rot);
+      }
+
+      expect(result).toBeCVersor(CVersor.IDENTITY);
+    });
   });
 
   describe("loxodromic", () => {
