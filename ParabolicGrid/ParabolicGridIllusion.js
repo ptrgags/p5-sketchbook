@@ -1,48 +1,10 @@
 import { Animated } from "../sketchlib/animation/Animated.js";
-import { LoopCurve } from "../sketchlib/animation/LoopCurve.js";
-import { make_param, ParamCurve } from "../sketchlib/animation/ParamCurve.js";
 import { Cline } from "../sketchlib/cga2d/Cline.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
-import { N1, N4 } from "../sketchlib/music/durations.js";
-import { Sequential, TimeInterval } from "../sketchlib/music/Timeline.js";
-import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
-import { Style } from "../sketchlib/Style.js";
-
-// We're going to alternate between applying an interpolated parabolic transform
-// in the X direction and in the Y direction. We do this 4 times per measure
-// before switching directions.
-const RAMP_T = make_param(0, 1, N4);
-const HOLD0 = new TimeInterval(ParamCurve.const_val(0), N1);
-const TIMELINE_X = new Sequential(
-  // Initial hold so you can see the grid
-  HOLD0,
-  // Animate in the X direction
-  RAMP_T,
-  RAMP_T,
-  RAMP_T,
-  RAMP_T,
-  // Hold so you can see the grid
-  HOLD0,
-  // Y direction animates
-  HOLD0,
-);
-const TIMELINE_Y = new Sequential(
-  // Initial hold
-  HOLD0,
-  // X direction animates
-  HOLD0,
-  // Pause
-  HOLD0,
-  // Y direction animates
-  RAMP_T,
-  RAMP_T,
-  RAMP_T,
-  RAMP_T,
-);
-const CURVE_X = LoopCurve.from_timeline(TIMELINE_X);
-const CURVE_Y = LoopCurve.from_timeline(TIMELINE_Y);
+import { STYLE_X, STYLE_Y } from "./styling.js";
+import { CURVE_X, CURVE_Y } from "./timing.js";
 
 const OFFSET_X = Direction.DIR_X;
 const OFFSET_Y = Direction.DIR_Y;
@@ -56,17 +18,6 @@ for (let i = -MAX_STEP; i <= MAX_STEP; i++) {
   X_TILES.push(transform_x.transform_cline(Cline.Y_AXIS));
   Y_TILES.push(transform_y.transform_cline(Cline.X_AXIS));
 }
-
-const STYLE_X = new Style({
-  // purple
-  stroke: new Oklch(0.6098, 0.1998, 313.41),
-  width: 4,
-});
-const STYLE_Y = new Style({
-  // light green
-  stroke: new Oklch(0.7136, 0.1707, 139.76),
-  width: 4,
-});
 
 /**
  * Animation of the flow of two parabolic transformations in orthogonal transformations.
