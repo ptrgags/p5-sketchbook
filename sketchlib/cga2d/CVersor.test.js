@@ -389,6 +389,53 @@ describe("CVersor", () => {
     });
   });
 
+  describe("commutative transformation pairs", () => {
+    it("rotation and dilation commute", () => {
+      const rotation = CVersor.rotation(Math.PI / 4);
+      const scale = CVersor.dilation(3);
+
+      const rs = rotation.compose(scale);
+      const sr = scale.compose(rotation);
+
+      expect(rs).toBeCVersor(sr);
+    });
+
+    it("elliptic and hyperbolic in orthogonal directions commute", () => {
+      const hyp_direction = new Direction(3 / 5, 4 / 5);
+      const ellip_direction = hyp_direction.rot90();
+
+      const ellip = CVersor.elliptic(ellip_direction, Math.PI / 4);
+      const hyp = CVersor.hyperbolic(hyp_direction, 3);
+
+      const eh = ellip.compose(hyp);
+      const he = hyp.compose(ellip);
+
+      expect(eh).toBeCVersor(he);
+    });
+
+    it("translations in orthogonal directions commute", () => {
+      const dir_x = new Direction(4, 2);
+      const x = CVersor.translation(dir_x);
+      const y = CVersor.translation(dir_x.rot90());
+
+      const xy = x.compose(y);
+      const yx = y.compose(x);
+
+      expect(xy).toBeCVersor(yx);
+    });
+
+    it("parabolic transformations in orthogonal directions commute", () => {
+      const dir_x = new Direction(4, 2);
+      const x = CVersor.parabolic(dir_x);
+      const y = CVersor.parabolic(dir_x.rot90());
+
+      const xy = x.compose(y);
+      const yx = y.compose(x);
+
+      expect(xy).toBeCVersor(yx);
+    });
+  });
+
   describe("conjugate", () => {
     it("a general line reflection is T(dist * normal) sandwich reflect(normal)", () => {
       // reflection defined explicitly
