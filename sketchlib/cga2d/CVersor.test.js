@@ -281,6 +281,8 @@ describe("CVersor", () => {
 
       expect(inv).toBeCVersor(neg_angle);
     });
+
+    // n-fold rotation repeated n times is identity
   });
 
   describe("dilation", () => {
@@ -359,6 +361,43 @@ describe("CVersor", () => {
     });
   });
 
+  describe("spiral", () => {
+    // is the same as S * R
+    // inverse is inv(S) * inv(R)
+  });
+
+  describe("hyperbolic", () => {
+    // Fixes source
+    // Fixes sink
+    // moves origin in direction specified
+    // inverse uses reciprocal scale factor
+    // fixes unit circle
+    // Fixes other circle through the poles
+    // fixes line through poles
+  });
+
+  describe("elliptic", () => {
+    // with point on equator moves along line
+    // fixes north pole
+    // fixes south pole
+    // fixes equator
+    // fixes other latitude circle
+    // n-fold rotation repeated n times is identity
+  });
+
+  describe("loxodromic", () => {
+    // is same as H times E
+    // inverse is same as inverses of H, E
+  });
+
+  describe("parabolic", () => {
+    // Fixes origin
+    // moves inf in direction
+    // Moves point along axis
+    // Fixes circles tangent to origin in perpendicular direction
+    // Fixes line through origin in direction
+  });
+
   describe("inverse", () => {
     it("a versor and its inverse compose to identity", () => {
       const translation = CVersor.translation(new Direction(1, 2));
@@ -371,6 +410,19 @@ describe("CVersor", () => {
 
       expect(v_inv).toBeCVersor(CVersor.IDENTITY);
       expect(inv_v).toBeCVersor(CVersor.IDENTITY);
+    });
+
+    it("Inverse of product is reversed product of inverses", () => {
+      const t = CVersor.translation(Direction.DIR_X);
+      const s = CVersor.elliptic(Direction.DIR_Y, Math.PI / 4);
+      const r = CVersor.dilation(4);
+
+      // We expect the group theory identity
+      // (TRS)^(-1) = S^(-1)R^(-1)T^(-1) to hold
+      const trs_inv = t.compose(r).compose(s).inv();
+      const product = s.inv().compose(r.inv()).compose(t.inv());
+
+      expect(trs_inv).toBeCVersor(product);
     });
   });
 
