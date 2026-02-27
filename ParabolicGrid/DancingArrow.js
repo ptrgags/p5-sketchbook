@@ -14,10 +14,14 @@ import { Style } from "../sketchlib/Style.js";
 // animate back and forth between x (0 radians) and y (pi/2 radians)
 const CURVE_ANGLE = LoopCurve.from_timeline(
   new Sequential(
-    new Hold(N1),
-    make_param(0, Math.PI / 2, N1),
-    new Hold(N1),
+    // start of loop or transition from y to x
     make_param(Math.PI / 2, 0, N1),
+    // x is animating, hold at 0
+    new Hold(N1),
+    // transition from x to y
+    make_param(0, Math.PI / 2, N1),
+    // y is animating, hold at pi/2
+    new Hold(N1),
   ),
 );
 
@@ -61,7 +65,11 @@ export class DancingArrow {
    */
   update(time) {
     const angle = CURVE_ANGLE.value(time);
-    const forward = Direction.from_angle(angle);
+
+    // The animations are plotted y-up using CGA transforms.
+    // This animation doesn't, so we need to flip y by reversing
+    // the angle.
+    const forward = Direction.from_angle(-angle);
 
     const offset = forward.scale(this.arrow_radius);
 
