@@ -1,7 +1,7 @@
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { WIDTH, HEIGHT, SCREEN_CENTER } from "../sketchlib/dimensions.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
-import { ParabolicGridIllusion } from "./ParabolicGridAnimation.js";
+import { ParabolicGridIllusion } from "./ParabolicGridIllusion.js";
 
 const TRANSLATE_CENTER = CVersor.translation(SCREEN_CENTER.to_direction());
 const SCALE_UP = CVersor.dilation(200);
