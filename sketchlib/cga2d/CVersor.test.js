@@ -467,11 +467,56 @@ describe("CVersor", () => {
   });
 
   describe("elliptic", () => {
-    // with point on equator moves along line
-    // fixes north pole
-    // fixes south pole
-    // fixes equator
-    // fixes other latitude circle
+    it("Moves origin along line in given direction", () => {
+      const dir = new Direction(-3 / 5, -4 / 5);
+      const ellip = CVersor.elliptic(dir, Math.PI / 4);
+
+      const result = ellip
+        .transform_point(NullPoint.ORIGIN)
+        .point.to_direction()
+        .normalize();
+
+      expect(result).toBeDirection(dir);
+    });
+
+    it("fixes poles", () => {
+      const dir = new Direction(-3 / 5, -4 / 5);
+      const ellip = CVersor.elliptic(dir, Math.PI / 4);
+      const pole1 = NullPoint.from_point(new Point(-4 / 5, 3 / 5));
+      const pole2 = NullPoint.from_point(new Point(4 / 5, -3 / 5));
+
+      const result1 = ellip.transform_point(pole1);
+      const result2 = ellip.transform_point(pole2);
+
+      expect(result1).toBeNullPoint(pole1);
+      expect(result2).toBeNullPoint(pole2);
+    });
+
+    it("fixes equator", () => {
+      const dir = new Direction(-3 / 5, -4 / 5);
+      const orthog = dir.rot90();
+      const ellip = CVersor.elliptic(dir, Math.PI / 4);
+      const equator = Cline.from_line(new Line(orthog.x, orthog.y, 0));
+
+      const result = ellip.transform_cline(equator);
+
+      expect(result).toBeCline(equator);
+    });
+
+    it("fixes circle of latitude", () => {
+      const dir = new Direction(-3 / 5, -4 / 5);
+      const orthog = dir.rot90();
+      const ellip = CVersor.elliptic(dir, Math.PI / 4);
+      const equator = Cline.from_line(new Line(orthog.x, orthog.y, 0));
+      // If you perform an orthogonal hyperbolic transform of the equator,
+      // it'll move it to a different "latitude" circle
+      const hyp = CVersor.hyperbolic(orthog, 4);
+      const orthog_circle = hyp.transform_cline(equator);
+
+      const result = ellip.transform_cline(orthog_circle);
+
+      expect(result).toBeCline(orthog_circle);
+    });
 
     it("n-fold rotation repeated n times is identity", () => {
       const N = 8;
