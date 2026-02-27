@@ -64,22 +64,24 @@ function fluctuate(
 }
 
 /**
- * Make one of the bounces in the animation.
+ * Anticipate and move into a bounce, like the ticking motion of an analog clock.
+ * This only handles the time leading up to the hit. Some adjustment is needed
+ * in the measure that follows.
  * @param {number} start_value Initial value
  * @param {number} stop_value Final value
  * @param {number} anticipate_amount How much to subtract from the start value in the anticipate
  * @param {Rational} anticipate_duration Duration for the anticipation duration
  * @param {Rational} act_duration Duration of the act duration
- * @param {boolean} start_at_rest If true, the easing at the start of the curve is more graceful
+ * @param {boolean} [start_at_rest=false] If true, the easing at the start of the curve is more graceful
  * @returns {TimeInterval<ParamCurve>[]}
  */
-function bounce(
+function tick(
   start_value,
   stop_value,
   anticipate_amount,
   anticipate_duration,
   act_duration,
-  start_at_rest,
+  start_at_rest = false,
 ) {
   const anticipate = make_param(
     start_value,
@@ -102,10 +104,10 @@ const CURVE_ANGLE = LoopCurve.from_timeline(
     // Measure 0 =====================================================
     // For the 4 quarter notes, we're going to move from 90 degrees to 0, but
     // in a choppy bouncing motion like the ticking of an analog clock
-    ...bounce(ANGLE_MAX, ANGLE_3_4, -ANGLE_SMALL, N16, new Rational(3, 16)),
-    ...bounce(ANGLE_3_4, ANGLE_HALF, -ANGLE_SMALL, N16, new Rational(3, 16)),
-    ...bounce(ANGLE_HALF, ANGLE_1_4, -ANGLE_SMALL, N16, new Rational(3, 16)),
-    ...bounce(ANGLE_1_4, 0, -ANGLE_SMALL, N16, new Rational(3, 16)),
+    ...tick(ANGLE_MAX, ANGLE_3_4, -ANGLE_SMALL, N16, new Rational(3, 16), true),
+    ...tick(ANGLE_3_4, ANGLE_HALF, -ANGLE_SMALL, N16, new Rational(3, 16)),
+    ...tick(ANGLE_HALF, ANGLE_1_4, -ANGLE_SMALL, N16, new Rational(3, 16)),
+    ...tick(ANGLE_1_4, 0, -ANGLE_SMALL, N16, new Rational(3, 16)),
     // Measure 1 =======================================================
     // We have to bounce from the previous measure's motion
     make_param(0, ANGLE_SMALL, N16, Ease.out_cubic),
@@ -115,10 +117,10 @@ const CURVE_ANGLE = LoopCurve.from_timeline(
     new Hold(new Rational(7, 8)),
     // Measure 2 ======================================================
     // Like Measure 0, but now we tick the other direction from 0 to 90 degrees
-    ...bounce(0, ANGLE_1_4, ANGLE_SMALL, N16, new Rational(3, 16)),
-    ...bounce(ANGLE_1_4, ANGLE_HALF, ANGLE_SMALL, N16, new Rational(3, 16)),
-    ...bounce(ANGLE_HALF, ANGLE_3_4, ANGLE_SMALL, N16, new Rational(3, 16)),
-    ...bounce(ANGLE_3_4, ANGLE_MAX, ANGLE_SMALL, N16, new Rational(3, 16)),
+    ...tick(0, ANGLE_1_4, ANGLE_SMALL, N16, new Rational(3, 16), true),
+    ...tick(ANGLE_1_4, ANGLE_HALF, ANGLE_SMALL, N16, new Rational(3, 16)),
+    ...tick(ANGLE_HALF, ANGLE_3_4, ANGLE_SMALL, N16, new Rational(3, 16)),
+    ...tick(ANGLE_3_4, ANGLE_MAX, ANGLE_SMALL, N16, new Rational(3, 16)),
     // Measure 3 ======================================================
     // Like Measure 1, but the other direction
     make_param(ANGLE_MAX, ANGLE_MAX - ANGLE_SMALL, N16, Ease.out_cubic),
