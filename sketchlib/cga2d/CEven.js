@@ -473,4 +473,5 @@ export class CEven {
   }
 }
 CEven.ZERO = Object.freeze(new CEven(0, 0, 0, 0, 0, 0, 0, 0));
+CEven.ONE = Object.freeze(new CEven(1, 0, 0, 0, 0, 0, 0, 0));
 CEven.IDENTITY = Object.freeze(new CEven(1, 0, 0, 0, 0, 0, 0, 0));

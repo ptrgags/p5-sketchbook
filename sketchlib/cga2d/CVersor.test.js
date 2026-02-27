@@ -9,6 +9,7 @@ import { Line } from "../pga2d/Line.js";
 import { CGA_MATCHERS } from "../test_helpers/cga_matchers.js";
 import { NullPoint } from "./NullPoint.js";
 import { COdd } from "./COdd.js";
+import { CEven } from "./CEven.js";
 
 expect.extend(PGA_MATCHERS);
 expect.extend(CGA_MATCHERS);
@@ -292,7 +293,13 @@ describe("CVersor", () => {
         result = result.compose(rot);
       }
 
-      expect(result).toBeCVersor(CVersor.IDENTITY);
+      // Since the angle is halved in the rotor definition, versor^N gives
+      // -1, which is equivalent to identity by homogeneity.
+      //
+      // See the corresponding test in the elliptic tests for a more detailed
+      // explanation
+      const expected = new CVersor(CEven.ONE.neg());
+      expect(result).toBeCVersor(expected);
     });
   });
 
@@ -528,7 +535,19 @@ describe("CVersor", () => {
         result = result.compose(rot);
       }
 
-      expect(result).toBeCVersor(CVersor.IDENTITY);
+      // Since a rotation is split in half to make the bread of a sandwich
+      // product, the versor is storing
+      // cos(2pi/N/2 * N) +  sin(2pi/N/2 * N) (dir wedge m)
+      // = cos(pi) + sin(pi) (dir wedge m)
+      // = -1 + 0
+      // It is applied to some multivector x as the sandwich
+      // (-1)x(-1) = x
+      // so it is indeed identity, just not written that way
+      //
+      // another way of expressing the same thing is it's _equivalent_ to
+      // identity up to a scale factor (i.e. homogeneity)
+      const expected = new CVersor(CEven.ONE.neg());
+      expect(result).toBeCVersor(expected);
     });
   });
 
