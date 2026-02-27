@@ -22,7 +22,7 @@ const ANGLE_3_4 = (3.0 * ANGLE_MAX) / 4.0;
 const ANGLE_HALF = ANGLE_MAX / 2;
 const ANGLE_1_4 = ANGLE_MAX / 4.0;
 const ANGLE_SMALL = Math.PI / 32;
-const EASE = Ease.in_out_cubic;
+const EASE = Ease.out_in_cubic;
 
 /**
  * Animate a fluctuation from a center value
@@ -66,8 +66,55 @@ function fluctuate(
 // animate back and forth between x (0 radians) and y (pi/2 radians)
 const CURVE_ANGLE = LoopCurve.from_timeline(
   new Sequential(
+    // Measure 0, beat 0 =====================================================
+    // anticipate
+    make_param(ANGLE_MAX, ANGLE_MAX + ANGLE_SMALL, N16, Ease.out_cubic),
+    make_param(
+      ANGLE_MAX + ANGLE_SMALL,
+      ANGLE_3_4,
+      new Rational(3, 16),
+      Ease.in_cubic,
+    ),
+    // Measure 0.1 ---------------------------------------------------------
+    // the bounce serves as an anticipation for the next hit
+    make_param(ANGLE_3_4, ANGLE_3_4 + ANGLE_SMALL, N16, Ease.out_cubic),
+    make_param(
+      ANGLE_3_4 + ANGLE_SMALL,
+      ANGLE_HALF,
+      new Rational(3, 16),
+      Ease.in_cubic,
+    ),
+    // Measure 0.2 --------------------------------------------------------
+    make_param(ANGLE_HALF, ANGLE_HALF + ANGLE_SMALL, N16, Ease.out_cubic),
+    make_param(
+      ANGLE_HALF + ANGLE_SMALL,
+      ANGLE_1_4,
+      new Rational(3, 16),
+      Ease.in_cubic,
+    ),
+    // Measure 0.3 -------------------------------------------------------
+    make_param(ANGLE_1_4, ANGLE_1_4 + ANGLE_SMALL, N16, Ease.out_cubic),
+    make_param(
+      ANGLE_1_4 + ANGLE_SMALL,
+      0,
+      new Rational(3, 16),
+      Ease.in_out_cubic,
+    ),
+    // Measure 1.0 =======================================================
+    // We have to bounce from the previous measure's motion
+    make_param(0, ANGLE_SMALL, N16, Ease.out_cubic),
+    // Come back to rest, as if damped
+    make_param(ANGLE_SMALL, 0, N16, Ease.in_out_cubic),
+    // Hold
+    new Hold(new Rational(7, 8)),
+    // Measure 2.0 ======================================================
+    make_param(0, ANGLE_MAX, N4, Ease.in_out_cubic),
+    // Measure 3.0 ======================================================
+    new Hold(N1),
+    /*
+  new Sequential(
     // start of loop or transition from y to x
-    make_param(ANGLE_MAX, ANGLE_3_4, N4, EASE),
+    make_param(ANGLE_MAX, ANGLE_3_4, N4),
     make_param(ANGLE_3_4, ANGLE_HALF, N4, EASE),
     make_param(ANGLE_HALF, ANGLE_1_4, N4, EASE),
     make_param(ANGLE_1_4, 0, N4, EASE),
@@ -76,13 +123,13 @@ const CURVE_ANGLE = LoopCurve.from_timeline(
     //
     // Fluctuations happen
     // ~|~..~~..~~..~~..~|~
-    new Hold(new Rational(3, 16)),
+    new Hold(new Rational(3, 16).sub(N32)),
     ...fluctuate(0, -ANGLE_SMALL, ANGLE_SMALL, N32, N16, N32),
     new Hold(N8),
     ...fluctuate(0, -2 * ANGLE_SMALL, 2 * ANGLE_SMALL, N32, N16, N32),
     new Hold(N8),
     ...fluctuate(0, -3 * ANGLE_SMALL, 3 * ANGLE_SMALL, N32, N16, N32),
-    new Hold(new Rational(3 / 16)),
+    new Hold(new Rational(3 / 16).add(N32)),
     // transition from x to y
     make_param(0, ANGLE_1_4, N4, EASE),
     make_param(ANGLE_1_4, ANGLE_HALF, N4, EASE),
@@ -90,6 +137,8 @@ const CURVE_ANGLE = LoopCurve.from_timeline(
     make_param(ANGLE_3_4, ANGLE_MAX, N4, EASE),
     // y is animating, hold at pi/2
     new Hold(N1),
+  ),
+  */
   ),
 );
 
