@@ -9,6 +9,7 @@ import { Line } from "../pga2d/Line.js";
 import { CGA_MATCHERS } from "../test_helpers/cga_matchers.js";
 import { NullPoint } from "./NullPoint.js";
 import { COdd } from "./COdd.js";
+import { CEven } from "./CEven.js";
 
 expect.extend(PGA_MATCHERS);
 expect.extend(CGA_MATCHERS);
@@ -281,6 +282,25 @@ describe("CVersor", () => {
 
       expect(inv).toBeCVersor(neg_angle);
     });
+
+    it("n-fold rotation repeated n times is identity", () => {
+      const N = 8;
+      const angle = (2 * Math.PI) / N;
+      const rot = CVersor.rotation(angle);
+
+      let result = CVersor.IDENTITY;
+      for (let i = 0; i < N; i++) {
+        result = result.compose(rot);
+      }
+
+      // Since the angle is halved in the rotor definition, versor^N gives
+      // -1, which is equivalent to identity by homogeneity.
+      //
+      // See the corresponding test in the elliptic tests for a more detailed
+      // explanation
+      const expected = new CVersor(CEven.ONE.neg());
+      expect(result).toBeCVersor(expected);
+    });
   });
 
   describe("dilation", () => {
@@ -359,6 +379,261 @@ describe("CVersor", () => {
     });
   });
 
+  describe("spiral", () => {
+    it("is the same as S * R", () => {
+      const scale = CVersor.dilation(4);
+      const rotation = CVersor.rotation(Math.PI / 4);
+
+      const sr = scale.compose(rotation);
+      const spiral = CVersor.spiral(4, Math.PI / 4);
+
+      expect(sr).toBeCVersor(spiral);
+    });
+
+    it("inverse is the same as inv(S) * inv(R)", () => {
+      const scale = CVersor.dilation(4);
+      const rotation = CVersor.rotation(Math.PI / 4);
+
+      const inv_sr = scale.inv().compose(rotation.inv());
+      const inv_spiral = CVersor.spiral(4, Math.PI / 4).inv();
+
+      expect(inv_sr).toBeCVersor(inv_spiral);
+    });
+  });
+
+  describe("hyperbolic", () => {
+    it("fixes source point", () => {
+      const hyp = CVersor.hyperbolic(new Direction(3 / 5, 4 / 5), 2);
+      const source = NullPoint.from_point(new Point(-3 / 5, -4 / 5));
+
+      const result = hyp.transform_point(source);
+
+      expect(result).toBeNullPoint(source);
+    });
+
+    it("fixes sink point", () => {
+      const hyp = CVersor.hyperbolic(new Direction(3 / 5, 4 / 5), 2);
+      const sink = NullPoint.from_point(new Point(3 / 5, 4 / 5));
+
+      const result = hyp.transform_point(sink);
+
+      expect(result).toBeNullPoint(sink);
+    });
+
+    it("moves origin in direction specified", () => {
+      const dir = new Direction(3 / 5, 4 / 5);
+      const hyp = CVersor.hyperbolic(new Direction(3 / 5, 4 / 5), 2);
+
+      const transformed = hyp.transform_point(NullPoint.ORIGIN);
+      const result = transformed.point.to_direction().normalize();
+
+      expect(result).toBeDirection(dir);
+    });
+
+    it("inverse is hyperbolic with reciprocal scale factor", () => {
+      const hyp = CVersor.hyperbolic(new Direction(3 / 5, -4 / 5), 2);
+
+      const result = hyp.inv();
+
+      const expected = CVersor.hyperbolic(new Direction(3 / 5, -4 / 5), 1 / 2);
+      expect(result).toBeCVersor(expected);
+    });
+
+    it("fixes unit circle", () => {
+      const hyp = CVersor.hyperbolic(new Direction(3 / 5, -4 / 5), 2);
+
+      const result = hyp.transform_cline(Cline.UNIT_CIRCLE);
+
+      expect(result).toBeCline(Cline.UNIT_CIRCLE);
+    });
+
+    it("fixes line through the poles", () => {
+      const hyp = CVersor.hyperbolic(new Direction(3 / 5, -4 / 5), 2);
+      const line = Cline.from_line(new Line(4 / 5, 3 / 5, 0));
+
+      const result = hyp.transform_cline(line);
+
+      expect(result).toBeCline(line);
+    });
+
+    it("fixes other circle through the poles", () => {
+      const dir = new Direction(3 / 5, -4 / 5);
+      const orthog_dir = dir.rot90();
+      const hyp = CVersor.hyperbolic(dir, 2);
+
+      // Find a circle through the poles by taking the diameter of
+      // the circle and transforming it in the orthogonal direction
+      const line = Cline.from_line(new Line(orthog_dir.x, orthog_dir.y, 0));
+      const orthog_ellip = CVersor.elliptic(orthog_dir, Math.PI / 8);
+      const circle = orthog_ellip.transform_cline(line);
+
+      const result = hyp.transform_cline(circle);
+
+      expect(result).toBeCline(circle);
+    });
+  });
+
+  describe("elliptic", () => {
+    it("Moves origin along line in given direction", () => {
+      const dir = new Direction(-3 / 5, -4 / 5);
+      const ellip = CVersor.elliptic(dir, Math.PI / 4);
+
+      const result = ellip
+        .transform_point(NullPoint.ORIGIN)
+        .point.to_direction()
+        .normalize();
+
+      expect(result).toBeDirection(dir);
+    });
+
+    it("fixes poles", () => {
+      const dir = new Direction(-3 / 5, -4 / 5);
+      const ellip = CVersor.elliptic(dir, Math.PI / 4);
+      const pole1 = NullPoint.from_point(new Point(-4 / 5, 3 / 5));
+      const pole2 = NullPoint.from_point(new Point(4 / 5, -3 / 5));
+
+      const result1 = ellip.transform_point(pole1);
+      const result2 = ellip.transform_point(pole2);
+
+      expect(result1).toBeNullPoint(pole1);
+      expect(result2).toBeNullPoint(pole2);
+    });
+
+    it("fixes equator", () => {
+      const dir = new Direction(-3 / 5, -4 / 5);
+      const orthog = dir.rot90();
+      const ellip = CVersor.elliptic(dir, Math.PI / 4);
+      const equator = Cline.from_line(new Line(orthog.x, orthog.y, 0));
+
+      const result = ellip.transform_cline(equator);
+
+      expect(result).toBeCline(equator);
+    });
+
+    it("fixes circle of latitude", () => {
+      const dir = new Direction(-3 / 5, -4 / 5);
+      const orthog = dir.rot90();
+      const ellip = CVersor.elliptic(dir, Math.PI / 4);
+      const equator = Cline.from_line(new Line(orthog.x, orthog.y, 0));
+      // If you perform an orthogonal hyperbolic transform of the equator,
+      // it'll move it to a different "latitude" circle
+      const hyp = CVersor.hyperbolic(orthog, 4);
+      const orthog_circle = hyp.transform_cline(equator);
+
+      const result = ellip.transform_cline(orthog_circle);
+
+      expect(result).toBeCline(orthog_circle);
+    });
+
+    it("n-fold rotation repeated n times is identity", () => {
+      const N = 8;
+      const angle = (2 * Math.PI) / N;
+      const rot = CVersor.elliptic(new Direction(3 / 5, 4 / 5), angle);
+
+      let result = CVersor.IDENTITY;
+      for (let i = 0; i < N; i++) {
+        result = result.compose(rot);
+      }
+
+      // Since a rotation is split in half to make the bread of a sandwich
+      // product, the versor is storing
+      // cos(2pi/N/2 * N) +  sin(2pi/N/2 * N) (dir wedge m)
+      // = cos(pi) + sin(pi) (dir wedge m)
+      // = -1 + 0
+      // It is applied to some multivector x as the sandwich
+      // (-1)x(-1) = x
+      // so it is indeed identity, just not written that way
+      //
+      // another way of expressing the same thing is it's _equivalent_ to
+      // identity up to a scale factor (i.e. homogeneity)
+      const expected = new CVersor(CEven.ONE.neg());
+      expect(result).toBeCVersor(expected);
+    });
+  });
+
+  describe("loxodromic", () => {
+    it("is the same as H * E", () => {
+      const hyp_dir = new Direction(3 / 5, 4 / 5);
+      const hyp = CVersor.hyperbolic(hyp_dir, 4);
+      const ellip = CVersor.elliptic(hyp_dir.rot90(), Math.PI / 4);
+
+      const he = hyp.compose(ellip);
+      const lox = CVersor.loxodromic(hyp_dir, 4, Math.PI / 4);
+
+      expect(he).toBeCVersor(lox);
+    });
+
+    it("inverse is the same as inv(S) * inv(R)", () => {
+      const hyp_dir = new Direction(3 / 5, 4 / 5);
+      const hyp = CVersor.hyperbolic(hyp_dir, 4);
+      const ellip = CVersor.elliptic(hyp_dir.rot90(), Math.PI / 4);
+
+      const inv_he = hyp.inv().compose(ellip.inv());
+      const inv_lox = CVersor.loxodromic(hyp_dir, 4, Math.PI / 4).inv();
+
+      expect(inv_he).toBeCVersor(inv_lox);
+    });
+  });
+
+  describe("parabolic", () => {
+    it("fixes origin", () => {
+      const para = CVersor.parabolic(new Direction(3 / 5, 4 / 5));
+
+      const result = para.transform_point(NullPoint.ORIGIN);
+
+      expect(result).toEqual(NullPoint.ORIGIN);
+    });
+
+    it("moves inf in the given direction", () => {
+      const dir = new Direction(3 / 5, 4 / 5);
+      const para = CVersor.parabolic(new Direction(3 / 5, 4 / 5));
+
+      const result = para
+        .transform_point(NullPoint.INF)
+        .point.to_direction()
+        .normalize();
+
+      expect(result).toBeDirection(dir);
+    });
+
+    it("moves point along axis in opposite direction", () => {
+      const dir = new Direction(3 / 5, 4 / 5);
+      const para = CVersor.parabolic(dir);
+      // A point on the fixed line of the transformation
+      const point = NullPoint.from_point(dir.scale(0.5).to_point());
+
+      const transformed = para.transform_point(point);
+      const result = transformed.point.sub(point.point).normalize();
+
+      expect(result).toBeDirection(dir.neg());
+    });
+
+    it("Fixes line through origin parallel in direction", () => {
+      const dir = new Direction(3 / 5, 4 / 5);
+      const para = CVersor.parabolic(dir);
+      const orthog = dir.rot90();
+      const line = Cline.from_line(new Line(orthog.x, orthog.y, 0));
+
+      const result = para.transform_cline(line);
+
+      expect(result).toBeCline(line);
+    });
+
+    it("Fixes circle tangent to origin with diameter orthogonal to direction", () => {
+      const dir = new Direction(3 / 5, 4 / 5);
+      const para = CVersor.parabolic(dir);
+      const orthog = dir.rot90();
+      const radius = 2;
+      const circle = Cline.from_circle(
+        new Circle(orthog.scale(radius).to_point(), radius),
+      );
+
+      const result = para.transform_cline(circle);
+
+      expect(result).toBeCline(circle);
+    });
+  });
+
   describe("inverse", () => {
     it("a versor and its inverse compose to identity", () => {
       const translation = CVersor.translation(new Direction(1, 2));
@@ -371,6 +646,19 @@ describe("CVersor", () => {
 
       expect(v_inv).toBeCVersor(CVersor.IDENTITY);
       expect(inv_v).toBeCVersor(CVersor.IDENTITY);
+    });
+
+    it("Inverse of product is reversed product of inverses", () => {
+      const t = CVersor.translation(Direction.DIR_X);
+      const s = CVersor.elliptic(Direction.DIR_Y, Math.PI / 4);
+      const r = CVersor.dilation(4);
+
+      // We expect the group theory identity
+      // (TRS)^(-1) = S^(-1)R^(-1)T^(-1) to hold
+      const trs_inv = t.compose(r).compose(s).inv();
+      const product = s.inv().compose(r.inv()).compose(t.inv());
+
+      expect(trs_inv).toBeCVersor(product);
     });
   });
 
@@ -386,6 +674,53 @@ describe("CVersor", () => {
       // (2, 1) --rot--> (-1, 2) --scale--> (-2, 4)
       const expected = NullPoint.from_point(new Point(-2, 4));
       expect(result).toBeNullPoint(expected);
+    });
+  });
+
+  describe("commutative transformation pairs", () => {
+    it("rotation and dilation commute", () => {
+      const rotation = CVersor.rotation(Math.PI / 4);
+      const scale = CVersor.dilation(3);
+
+      const rs = rotation.compose(scale);
+      const sr = scale.compose(rotation);
+
+      expect(rs).toBeCVersor(sr);
+    });
+
+    it("elliptic and hyperbolic in orthogonal directions commute", () => {
+      const hyp_direction = new Direction(3 / 5, 4 / 5);
+      const ellip_direction = hyp_direction.rot90();
+
+      const ellip = CVersor.elliptic(ellip_direction, Math.PI / 4);
+      const hyp = CVersor.hyperbolic(hyp_direction, 3);
+
+      const eh = ellip.compose(hyp);
+      const he = hyp.compose(ellip);
+
+      expect(eh).toBeCVersor(he);
+    });
+
+    it("translations in orthogonal directions commute", () => {
+      const dir_x = new Direction(4, 2);
+      const x = CVersor.translation(dir_x);
+      const y = CVersor.translation(dir_x.rot90());
+
+      const xy = x.compose(y);
+      const yx = y.compose(x);
+
+      expect(xy).toBeCVersor(yx);
+    });
+
+    it("parabolic transformations in orthogonal directions commute", () => {
+      const dir_x = new Direction(4, 2);
+      const x = CVersor.parabolic(dir_x);
+      const y = CVersor.parabolic(dir_x.rot90());
+
+      const xy = x.compose(y);
+      const yx = y.compose(x);
+
+      expect(xy).toBeCVersor(yx);
     });
   });
 
