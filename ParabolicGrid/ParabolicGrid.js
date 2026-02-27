@@ -38,6 +38,16 @@ const STYLE_Y = new Style({
   stroke: Color.BLUE,
 });
 
+const MAX_STEP = 15;
+const X_TILES = [];
+const Y_TILES = [];
+for (let i = -MAX_STEP; i <= MAX_STEP; i++) {
+  const transform_x = CVersor.parabolic(OFFSET_X.scale(i));
+  const transform_y = CVersor.parabolic(OFFSET_Y.scale(i));
+  X_TILES.push(transform_x.transform_cline(Cline.Y_AXIS));
+  Y_TILES.push(transform_y.transform_cline(Cline.X_AXIS));
+}
+
 export const sketch = (p) => {
   p.setup = () => {
     p.createCanvas(
@@ -65,10 +75,10 @@ export const sketch = (p) => {
     const para_x_screen = TO_SCREEN.compose(para_x);
     const para_y_screen = TO_SCREEN.compose(para_y);
 
-    const circle_x = para_x_screen.transform_cline(Cline.Y_AXIS);
-    const circle_y = para_y_screen.transform_cline(Cline.X_AXIS);
+    const x_tiles = X_TILES.map((x) => para_x_screen.transform_cline(x));
+    const y_tiles = Y_TILES.map((x) => para_y_screen.transform_cline(x));
 
-    const primitive = group(style(circle_x, STYLE_X), style(circle_y, STYLE_Y));
+    const primitive = group(style(x_tiles, STYLE_X), style(y_tiles, STYLE_Y));
     primitive.draw(p);
   };
 };
