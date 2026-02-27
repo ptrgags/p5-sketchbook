@@ -50,7 +50,7 @@ const STYLE_Y = new Style({
 /**
  * @implements {Animated}
  */
-export class ParabolicGridAnimation {
+export class ParabolicGridIllusion {
   /**
    * Constructor
    * @param {CVersor} to_screen Transformation from the unit circle to a larger screen space circle
