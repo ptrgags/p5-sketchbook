@@ -20,7 +20,7 @@ const GRIDS = [
   new TranslationGridIllusion(TO_SCREEN),
 ];
 
-const ARROW = new DancingArrow(new Circle(SCREEN_CENTER, 50));
+const ARROW = new DancingArrow(new Circle(SCREEN_CENTER, 16));
 
 export const sketch = (p) => {
   let selected_index = 0;
@@ -49,6 +49,7 @@ export const sketch = (p) => {
     grid.update(time_measures);
     grid.primitive.draw(p);
 
+    ARROW.update(time_measures);
     ARROW.primitive.draw(p);
   };
 
