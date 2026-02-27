@@ -1,3 +1,4 @@
+import { Animated } from "../sketchlib/animation/Animated.js";
 import { Cline } from "../sketchlib/cga2d/Cline.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
@@ -22,6 +23,14 @@ for (let i = -MAX_Y_STEP; i <= MAX_Y_STEP; i++) {
   Y_LINES.push(transform_y.transform_cline(Cline.X_AXIS));
 }
 
+/**
+ * Translation grid illusion, analagous to the parabolic case.
+ *
+ * The animation does a simiar illusion. Though this time, the hidden jump
+ * in lines happens just outside the bounds of the screen.
+ * @see ParabolicGridIllusion
+ * @implements {Animated}
+ */
 export class TranslationGridIllusion {
   /**
    * Constructor
