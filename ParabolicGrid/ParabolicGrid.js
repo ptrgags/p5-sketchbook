@@ -71,12 +71,11 @@ export const sketch = (p) => {
     const ty = CURVE_Y.value(time_measures);
     const para_x = CVersor.parabolic(OFFSET_X.scale(tx));
     const para_y = CVersor.parabolic(OFFSET_Y.scale(ty));
+    const para_total = para_x.compose(para_y);
+    const para_screen = TO_SCREEN.compose(para_total);
 
-    const para_x_screen = TO_SCREEN.compose(para_x);
-    const para_y_screen = TO_SCREEN.compose(para_y);
-
-    const x_tiles = X_TILES.map((x) => para_x_screen.transform_cline(x));
-    const y_tiles = Y_TILES.map((x) => para_y_screen.transform_cline(x));
+    const x_tiles = X_TILES.map((x) => para_screen.transform_cline(x));
+    const y_tiles = Y_TILES.map((x) => para_screen.transform_cline(x));
 
     const primitive = group(style(x_tiles, STYLE_X), style(y_tiles, STYLE_Y));
     primitive.draw(p);
