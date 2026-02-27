@@ -7,7 +7,6 @@ import { N1, N4 } from "../sketchlib/music/durations.js";
 import { Sequential, TimeInterval } from "../sketchlib/music/Timeline.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
-import { Primitive } from "../sketchlib/primitives/Primitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 
@@ -27,7 +26,7 @@ const CURVE_Y = LoopCurve.from_timeline(TIMELINE_Y);
 const OFFSET_X = Direction.DIR_X;
 const OFFSET_Y = Direction.DIR_Y;
 
-const MAX_STEP = 15;
+const MAX_STEP = 13;
 const X_TILES = [];
 const Y_TILES = [];
 for (let i = -MAX_STEP; i <= MAX_STEP; i++) {
