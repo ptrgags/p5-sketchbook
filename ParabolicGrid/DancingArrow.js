@@ -63,54 +63,67 @@ function fluctuate(
   return [anticipate, drop, followthrough];
 }
 
+/**
+ * Make one of the bounces in the animation.
+ * @param {number} start_value Initial value
+ * @param {number} stop_value Final value
+ * @param {number} anticipate_amount How much to subtract from the start value in the anticipate
+ * @param {Rational} anticipate_duration Duration for the anticipation duration
+ * @param {Rational} act_duration Duration of the act duration
+ * @param {boolean} start_at_rest If true, the easing at the start of the curve is more graceful
+ * @returns {TimeInterval<ParamCurve>[]}
+ */
+function bounce(
+  start_value,
+  stop_value,
+  anticipate_amount,
+  anticipate_duration,
+  act_duration,
+  start_at_rest,
+) {
+  const anticipate = make_param(
+    start_value,
+    start_value - anticipate_amount,
+    anticipate_duration,
+    start_at_rest ? Ease.in_out_cubic : Ease.out_cubic,
+  );
+  const act = make_param(
+    start_value - anticipate_amount,
+    stop_value,
+    act_duration,
+    Ease.in_cubic,
+  );
+  return [anticipate, act];
+}
+
 // animate back and forth between x (0 radians) and y (pi/2 radians)
 const CURVE_ANGLE = LoopCurve.from_timeline(
   new Sequential(
-    // Measure 0, beat 0 =====================================================
-    // anticipate
-    make_param(ANGLE_MAX, ANGLE_MAX + ANGLE_SMALL, N16, Ease.out_cubic),
-    make_param(
-      ANGLE_MAX + ANGLE_SMALL,
-      ANGLE_3_4,
-      new Rational(3, 16),
-      Ease.in_cubic,
-    ),
-    // Measure 0.1 ---------------------------------------------------------
-    // the bounce serves as an anticipation for the next hit
-    make_param(ANGLE_3_4, ANGLE_3_4 + ANGLE_SMALL, N16, Ease.out_cubic),
-    make_param(
-      ANGLE_3_4 + ANGLE_SMALL,
-      ANGLE_HALF,
-      new Rational(3, 16),
-      Ease.in_cubic,
-    ),
-    // Measure 0.2 --------------------------------------------------------
-    make_param(ANGLE_HALF, ANGLE_HALF + ANGLE_SMALL, N16, Ease.out_cubic),
-    make_param(
-      ANGLE_HALF + ANGLE_SMALL,
-      ANGLE_1_4,
-      new Rational(3, 16),
-      Ease.in_cubic,
-    ),
-    // Measure 0.3 -------------------------------------------------------
-    make_param(ANGLE_1_4, ANGLE_1_4 + ANGLE_SMALL, N16, Ease.out_cubic),
-    make_param(
-      ANGLE_1_4 + ANGLE_SMALL,
-      0,
-      new Rational(3, 16),
-      Ease.in_out_cubic,
-    ),
-    // Measure 1.0 =======================================================
+    // Measure 0 =====================================================
+    // For the 4 quarter notes, we're going to move from 90 degrees to 0, but
+    // in a choppy bouncing motion like the ticking of an analog clock
+    ...bounce(ANGLE_MAX, ANGLE_3_4, -ANGLE_SMALL, N16, new Rational(3, 16)),
+    ...bounce(ANGLE_3_4, ANGLE_HALF, -ANGLE_SMALL, N16, new Rational(3, 16)),
+    ...bounce(ANGLE_HALF, ANGLE_1_4, -ANGLE_SMALL, N16, new Rational(3, 16)),
+    ...bounce(ANGLE_1_4, 0, -ANGLE_SMALL, N16, new Rational(3, 16)),
+    // Measure 1 =======================================================
     // We have to bounce from the previous measure's motion
     make_param(0, ANGLE_SMALL, N16, Ease.out_cubic),
     // Come back to rest, as if damped
     make_param(ANGLE_SMALL, 0, N16, Ease.in_out_cubic),
     // Hold
     new Hold(new Rational(7, 8)),
-    // Measure 2.0 ======================================================
-    make_param(0, ANGLE_MAX, N4, Ease.in_out_cubic),
-    // Measure 3.0 ======================================================
-    new Hold(N1),
+    // Measure 2 ======================================================
+    // Like Measure 0, but now we tick the other direction from 0 to 90 degrees
+    ...bounce(0, ANGLE_1_4, ANGLE_SMALL, N16, new Rational(3, 16)),
+    ...bounce(ANGLE_1_4, ANGLE_HALF, ANGLE_SMALL, N16, new Rational(3, 16)),
+    ...bounce(ANGLE_HALF, ANGLE_3_4, ANGLE_SMALL, N16, new Rational(3, 16)),
+    ...bounce(ANGLE_3_4, ANGLE_MAX, ANGLE_SMALL, N16, new Rational(3, 16)),
+    // Measure 3 ======================================================
+    // Like Measure 1, but the other direction
+    make_param(ANGLE_MAX, ANGLE_MAX - ANGLE_SMALL, N16, Ease.out_cubic),
+    make_param(ANGLE_MAX - ANGLE_SMALL, ANGLE_MAX, N16, Ease.in_out_cubic),
+    new Hold(new Rational(7, 8)),
     /*
   new Sequential(
     // start of loop or transition from y to x
