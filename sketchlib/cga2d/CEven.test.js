@@ -28,6 +28,15 @@ describe("CEven", () => {
     expect(result).toBeCEven(expected);
   });
 
+  it("neg negates all components", () => {
+    const a = new CEven(1, 2, 3, 4, 5, 6, 7, 8);
+
+    const result = a.neg();
+
+    const expected = new CEven(-1, -2, -3, -4, -5, -6, -7, -8);
+    expect(result).toBeCEven(expected);
+  });
+
   it("computes dual", () => {
     const a = new CEven(1, 2, 3, 4, 5, 6, 7, 8);
 

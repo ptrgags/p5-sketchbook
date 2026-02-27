@@ -83,14 +83,14 @@ export class CEven {
    */
   neg() {
     return new CEven(
-      this.scalar,
+      -this.scalar,
       -this.xy,
       -this.xp,
       -this.xm,
       -this.yp,
       -this.ym,
       -this.pm,
-      this.xypm,
+      -this.xypm,
     );
   }
 
