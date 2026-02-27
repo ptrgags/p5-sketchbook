@@ -69,6 +69,26 @@ const STYLE_Y = new Style({
 });
 
 /**
+ * Animation of the flow of two parabolic transformations in orthogonal transformations.
+ *
+ * This operates by illusion, making use of two properties of this grid:
+ * - The grid is periodic. E.g. in the x direction
+ *   grid_line[i + 1] = parabolic * grid_line[i] for all integer i
+ *   and similarly for y
+ * - The pixels near the pole get completely covered after just a few
+ *   iterations of parabolic. So we don't have to render the countable infinity of grid lines,
+ *   just the ~20-30 most visible ones
+ *
+ * To do this, we precompute the grid lines once. Then we only need
+ * to animate lerp(identity, parabolic, t), t in [0, 1]. This allows the grid lines
+ * to flow between grid_lines[i] and grid_lines[i + 1], landing exactly on the next grid line
+ * when t = 1.
+ *
+ * Then we jump back to t = 0. For the majority of the grid lines, we're jumping exactly from
+ * grid line to grid line, so the jump is not noticeable! The only exception are the
+ * grid lines at the end of the iteration. But both of those are near the pole. Since the pixels
+ * get crowded there, you won't see any visual change!
+ *
  * @implements {Animated}
  */
 export class ParabolicGridIllusion {
