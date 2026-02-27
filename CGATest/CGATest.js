@@ -131,12 +131,7 @@ export const sketch = (p) => {
     );
 
     const styled = style(
-      [
-        BIG_UNIT_CIRCLE,
-        //...para_tiles,
-        /*...swirled_points, ...hyp_points,*/ ...lox_points,
-        ...para_points,
-      ],
+      [BIG_UNIT_CIRCLE, ...lox_points, ...para_points],
       SPIN_STYLE,
     );
     const styled2 = style(
