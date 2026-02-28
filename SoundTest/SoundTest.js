@@ -172,7 +172,7 @@ const GRID_BOUNDARY = new Rectangle(
   new Point(0, 300),
   new Direction(WIDTH, 200),
 );
-const GRID_MARGIN = new Direction(75, 40);
+const GRID_MARGIN = new Direction(20, 40);
 const [FIRST_BUTTON_POSITION, BUTTON_STRIDE] = MELODY_BUTTONS.compute_layout(
   GRID_BOUNDARY,
   MELODY_BUTTON_DIMENSIONS,
