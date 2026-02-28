@@ -44,6 +44,7 @@ import { A4, F6 } from "../sketchlib/music/pitches.js";
 import { minmax } from "../sketchlib/minmax.js";
 import { Note } from "../sketchlib/music/Music.js";
 import { AbsInterval } from "../sketchlib/music/AbsTimeline.js";
+import { SCORE_OCARINA_TRIO } from "./example_scores/ocarina_trio.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -56,6 +57,7 @@ const SOUND_MANIFEST = {
     binary_progression: SCORE_BINARY_CHORDS,
     chord_cascade: SCORE_ORGAN_CHORDS,
     pattern_test: SCORE_PATTERN_TEST,
+    ocarina_trio: SCORE_OCARINA_TRIO,
   },
 };
 
@@ -98,7 +100,7 @@ class MelodyButtonDescriptor {
   }
 }
 
-const MELODY_BUTTONS = new Grid(3, 2);
+const MELODY_BUTTONS = new Grid(3, 3);
 MELODY_BUTTONS.set(
   new Index2D(0, 0),
   new MelodyButtonDescriptor("layered_melody", "Layered Melody"),
@@ -106,6 +108,10 @@ MELODY_BUTTONS.set(
 MELODY_BUTTONS.set(
   new Index2D(0, 1),
   new MelodyButtonDescriptor("phase_scale", "Phase Scale"),
+);
+MELODY_BUTTONS.set(
+  new Index2D(0, 2),
+  new MelodyButtonDescriptor("ocarina_trio", "Ocarina Trio"),
 );
 MELODY_BUTTONS.set(
   new Index2D(1, 0),
