@@ -44,6 +44,7 @@ import { A4, F6 } from "../sketchlib/music/pitches.js";
 import { minmax } from "../sketchlib/minmax.js";
 import { Note } from "../sketchlib/music/Music.js";
 import { AbsInterval } from "../sketchlib/music/AbsTimeline.js";
+import { Rational } from "../sketchlib/Rational.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -345,12 +346,26 @@ class SoundScene {
     });
   }
 
+  /**
+   *
+   * @param {string} score_id
+   */
   change_score(score_id) {
     const score = SOUND_MANIFEST.scores[score_id];
 
     this.selected_melody = score_id;
     this.replace_instruments(score);
+
     this.sound.play_score(score_id);
+
+    // For debugging, uncomment and adjust these values
+    //const loop_start = new Rational(21);
+    //const duration = new Rational(2);
+    //this.sound.set_loop(loop_start, duration);
+
+    //const jump = new Rational(15);
+    //this.sound.jump_to(jump);
+
     this.export_button.disabled = false;
     this.export_gm_button.disabled = false;
   }

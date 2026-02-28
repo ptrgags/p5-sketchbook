@@ -248,13 +248,41 @@ export class SoundManager {
     }
 
     transport.position = 0;
-    transport.loop = true;
     transport.loopStart = "0:0";
     transport.loopEnd = to_tone_time(score.duration);
     transport.start("+0.1", "0:0");
 
     this.current_score = score_id;
     this.transport_playing = true;
+  }
+
+  /**
+   * Turn off looping on the timeline.
+   */
+  no_loop() {
+    const transport = this.tone.getTransport();
+    transport.loop = false;
+  }
+
+  /**
+   * Set the loop points on the transport
+   * @param {Rational} start_time Rational measures from the start of the score where the loop starts
+   * @param {Rational} duration How long the loop should be.
+   */
+  set_loop(start_time, duration) {
+    const transport = this.tone.getTransport();
+    transport.loopStart = to_tone_time(start_time);
+    transport.loopEnd = to_tone_time(start_time.add(duration));
+    transport.loop = true;
+  }
+
+  /**
+   * Jump to a specific time on the timeline.
+   * @param {Rational} time Time to jump to in measures from start
+   */
+  jump_to(time) {
+    const transport = this.tone.getTransport();
+    transport.position = to_tone_time(time);
   }
 
   /**
