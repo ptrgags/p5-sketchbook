@@ -246,14 +246,45 @@ export class SoundManager {
 
     for (const clip of AbsTimelineOps.iter_intervals(score)) {
       const start = to_tone_time(clip.start_time);
-      const end = to_tone_time(clip.end_time);
-      clip.value.material.start(start).stop(end);
+      clip.value.material.start(start);
     }
 
     transport.position = 0;
+    transport.loopStart = "0:0";
+    transport.loopEnd = to_tone_time(score.duration);
     transport.start("+0.1", "0:0");
+
     this.current_score = score_id;
     this.transport_playing = true;
+  }
+
+  /**
+   * Turn off looping on the timeline.
+   */
+  no_loop() {
+    const transport = this.tone.getTransport();
+    transport.loop = false;
+  }
+
+  /**
+   * Set the loop points on the transport
+   * @param {Rational} start_time Rational measures from the start of the score where the loop starts
+   * @param {Rational} duration How long the loop should be.
+   */
+  set_loop(start_time, duration) {
+    const transport = this.tone.getTransport();
+    transport.loopStart = to_tone_time(start_time);
+    transport.loopEnd = to_tone_time(start_time.add(duration));
+    transport.loop = true;
+  }
+
+  /**
+   * Jump to a specific time on the timeline.
+   * @param {Rational} time Time to jump to in measures from start
+   */
+  jump_to(time) {
+    const transport = this.tone.getTransport();
+    transport.position = to_tone_time(time);
   }
 
   /**
@@ -270,11 +301,9 @@ export class SoundManager {
     const now = this.tone.now() + A_LITTLE_BIT;
     for (const clip of AbsTimelineOps.iter_intervals(sfx_score)) {
       const start_time = to_tone_time(clip.start_time);
-      const end_time = to_tone_time(clip.end_time);
       const start_sec = now + this.tone.Time(start_time).toSeconds();
-      const end_sec = now + this.tone.Time(end_time).toSeconds();
       try {
-        clip.value.material.start(start_sec).stop(end_sec);
+        clip.value.material.start(start_sec);
       } catch (e) {
         console.error("scheduling error", e);
       }
