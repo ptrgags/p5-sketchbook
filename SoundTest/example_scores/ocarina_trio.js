@@ -282,7 +282,6 @@ const SOPRANO = new Melody(
 );
 
 export const SCORE_OCARINA_TRIO = new Score(
-  /*
   new Part("soprano", SOPRANO, {
     instrument_id: "channel0",
     midi_instrument: 80 - 1, // ocarina
@@ -293,7 +292,6 @@ export const SCORE_OCARINA_TRIO = new Score(
     midi_instrument: 80 - 1, // ocarina
     midi_channel: 1,
   }),
-  */
   new Part("bass", BASS, {
     instrument_id: "channel2",
     midi_instrument: 80 - 1, // ocarina

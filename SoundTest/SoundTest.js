@@ -44,6 +44,14 @@ import { minmax } from "../sketchlib/minmax.js";
 import { Note } from "../sketchlib/music/Music.js";
 import { AbsInterval } from "../sketchlib/music/AbsTimeline.js";
 import { SCORE_OCARINA_TRIO } from "./example_scores/ocarina_trio.js";
+import { Rational } from "../sketchlib/Rational.js";
+
+const DEBUG_LOOP = false;
+const LOOP_START = new Rational(14 * 4);
+const LOOP_DURATION = new Rational(4 * 4);
+
+const DEBUG_JUMP = false;
+const JUMP_POINT = LOOP_START;
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -362,13 +370,13 @@ class SoundScene {
 
     this.sound.play_score(score_id);
 
-    // For debugging, uncomment and adjust these values
-    //const loop_start = new Rational(21);
-    //const duration = new Rational(2);
-    //this.sound.set_loop(loop_start, duration);
+    if (DEBUG_LOOP) {
+      this.sound.set_loop(LOOP_START, LOOP_DURATION);
+    }
 
-    //const jump = new Rational(15);
-    //this.sound.jump_to(jump);
+    if (DEBUG_JUMP) {
+      this.sound.jump_to(JUMP_POINT);
+    }
 
     this.export_button.disabled = false;
     this.export_gm_button.disabled = false;
