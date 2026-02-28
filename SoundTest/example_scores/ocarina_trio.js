@@ -1,10 +1,12 @@
 import { N8 } from "../../sketchlib/music/durations.js";
-import { Melody } from "../../sketchlib/music/Music.js";
+import { P8 } from "../../sketchlib/music/intervals.js";
+import { map_pitch, Melody, Rest } from "../../sketchlib/music/Music.js";
 import { MusicPatterns } from "../../sketchlib/music/MusicPatterns.js";
 import { C4 } from "../../sketchlib/music/pitches.js";
 import { Rhythm } from "../../sketchlib/music/Rhythm.js";
 import { MIXOLYDIAN_MODE } from "../../sketchlib/music/scales.js";
 import { Part, Score } from "../../sketchlib/music/Score.js";
+import { Rational } from "../../sketchlib/Rational.js";
 
 const C4_MIXOLYDIAN = MIXOLYDIAN_MODE.to_scale(C4);
 
@@ -24,11 +26,29 @@ const INTRO1 = MusicPatterns.scale_melody(
 );
 
 const BASS = new Melody(INTRO1);
+const TENOR = new Melody(
+  new Rest(new Rational(4)),
+  map_pitch((p) => p + P8, BASS),
+);
+const SOPRANO = new Melody(
+  new Rest(new Rational(8)),
+  map_pitch((p) => p + 2 * P8, BASS),
+);
 
 export const SCORE_OCARINA_TRIO = new Score(
   new Part("bass", BASS, {
     instrument_id: "channel0",
     midi_instrument: 80 - 1, // ocarina
     midi_channel: 0,
+  }),
+  new Part("tenor", TENOR, {
+    instrument_id: "channel1",
+    midi_instrument: 80 - 1, // ocarina
+    midi_channel: 1,
+  }),
+  new Part("soprano", SOPRANO, {
+    instrument_id: "channel2",
+    midi_instrument: 80 - 1, // ocarina
+    midi_channel: 2,
   }),
 );
