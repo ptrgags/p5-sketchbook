@@ -224,26 +224,6 @@ const PATTERN_C3 = MusicPatterns.scale_melody(
   ],
 );
 
-/* TEMPLATE
-const PATTERN_B1 = MusicPatterns.scale_melody(
-  new Rhythm(
-    "",
-    N16,
-  ),
-  C4_MIXOLYDIAN,
-  [
-    // 0
-    
-    // 1
-    
-    // 2
-    
-    // 3,
-    
-  ],
-);
-*/
-
 const BASS = new Melody(
   INTRO1,
   INTRO2,
