@@ -66,4 +66,21 @@ export class ArcAngles {
   flip_y() {
     return new ArcAngles(-this.start_angle, -this.end_angle);
   }
+
+  /**
+   * Compute reduced angles from raw angles (e.g. from atan2) and the orientation
+   * of the arc
+   * @param {number} start_angle Start angle
+   * @param {number} end_angle End angle
+   * @param {number} direction +1 for CCW, -1 for clockwise
+   * @returns {ArcAngles}
+   */
+  static from_raw_angles(start_angle, end_angle, direction) {
+    const reduced_start = mod(start_angle, 2.0 * Math.PI);
+
+    const delta = mod(direction * (end_angle - start_angle), 2.0 * Math.PI);
+    const reduced_end = reduced_start + direction * delta;
+
+    return new ArcAngles(reduced_start, reduced_end);
+  }
 }

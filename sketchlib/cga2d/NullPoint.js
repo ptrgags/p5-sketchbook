@@ -23,12 +23,21 @@ export class NullPoint {
   constructor(vector) {
     this.vector = vector;
 
-    const o = ConformalBasis.get_o(vector.p, vector.m);
-
     /**
      * @type {Point | undefined}
      */
-    this.point = is_nearly(o, 0) ? undefined : new Point(vector.x, vector.y);
+    this.point = this.is_inf ? undefined : new Point(vector.x, vector.y);
+  }
+
+  /**
+   * Check if the point represents the point at infinity. This is nominally
+   * the null point inf, but this method checks more generally for any
+   * vector with 0 for the origin component.
+   * @type {boolean}
+   */
+  get is_inf() {
+    const o = ConformalBasis.get_o(this.vector.p, this.vector.m);
+    return is_nearly(o, 0);
   }
 
   /**
