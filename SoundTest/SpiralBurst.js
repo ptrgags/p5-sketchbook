@@ -44,12 +44,10 @@ const CURVE_PHASE = LoopCurve.from_timeline(
 );
 
 // Color parameters in Oklch color space
+const CURVE_LIGHTNESS = 0.7;
 
-// At the start of the burst, the lightness and chroma jump up,
+// At the start of the burst, the chroma jumps up,
 // then ramp down over the course of a measure
-const CURVE_LIGHTNESS = LoopCurve.from_timeline(
-  make_param(0.7, 0.7 /*0.1*/, N1),
-);
 const CURVE_CHROMA = LoopCurve.from_timeline(make_param(0.3, 0.05, N1));
 
 // The hue changes every quarter note as a step function
@@ -94,11 +92,10 @@ export class SpiralBurst {
   update(time) {
     const radius_scale = CURVE_RADIUS.value(time);
     const phase_shift = CURVE_PHASE.value(time);
-    const lightness = CURVE_LIGHTNESS.value(time);
     const chroma = CURVE_CHROMA.value(time);
     const hue = CURVE_HUE.value(time);
 
-    const color = new Oklch(lightness, chroma, hue);
+    const color = new Oklch(CURVE_LIGHTNESS, chroma, hue);
     const point_style = new Style({
       fill: color,
     });
