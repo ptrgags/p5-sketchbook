@@ -2,7 +2,9 @@ import { CanvasMouseHandler } from "../sketchlib/CanvasMouseHandler.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { WIDTH, HEIGHT, SCREEN_CENTER } from "../sketchlib/dimensions.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Circle } from "../sketchlib/primitives/Circle.js";
 import { SCREEN_RECT } from "../sketchlib/Rectangle.js";
+import { DancingArrow } from "./DancingArrow.js";
 import { ParabolicGridIllusion } from "./ParabolicGridIllusion.js";
 import { TranslationGridIllusion } from "./TranslationGridIllusion.js";
 
@@ -17,6 +19,8 @@ const GRIDS = [
   new ParabolicGridIllusion(TO_SCREEN),
   new TranslationGridIllusion(TO_SCREEN),
 ];
+
+const ARROW = new DancingArrow(new Circle(SCREEN_CENTER, 20));
 
 export const sketch = (p) => {
   let selected_index = 0;
@@ -44,6 +48,9 @@ export const sketch = (p) => {
     const grid = GRIDS[selected_index];
     grid.update(time_measures);
     grid.primitive.draw(p);
+
+    ARROW.update(time_measures);
+    ARROW.primitive.draw(p);
   };
 
   // Swap the animations on mouse click.
