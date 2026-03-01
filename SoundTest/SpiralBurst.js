@@ -14,25 +14,30 @@ import { N1, N4 } from "../sketchlib/music/durations.js";
 import { Sequential, TimeInterval } from "../sketchlib/music/Timeline.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Rational } from "../sketchlib/Rational.js";
+import { Ease } from "../sketchlib/Ease.js";
 
 const N = 10;
 const CENTER = new Point(WIDTH / 2, (3 * HEIGHT) / 4);
 const MAX_RADIUS = 50;
 
-const DURATION_SPIRAL = new Rational(15, 16);
-const DURATION_BURST = Rational.ONE.sub(DURATION_SPIRAL);
+const DURATION_SPIRAL = new Rational(7, 8);
+const DURATION_BURST = new Rational(3, 32);
+const DURATION_BOUNCE = new Rational(1, 32);
 
 const CURVE_RADIUS = LoopCurve.from_timeline(
   new Sequential(
-    make_param(0, 1, DURATION_BURST),
-    make_param(1, 0, DURATION_SPIRAL),
+    make_param(0.9, 0.1, DURATION_SPIRAL, Ease.in_out_cubic),
+    // In the last 16th note, burst outwards suddenly, bouncing back
+    make_param(0.1, 1.0, DURATION_BURST, Ease.out_cubic),
+    make_param(1.0, 0.9, DURATION_BOUNCE, Ease.in_cubic),
   ),
 );
+
 const CURVE_PHASE = LoopCurve.from_timeline(
   new Sequential(
-    // Hold the angle steady while bursting
-    new Hold(DURATION_BURST),
     make_param(0, 1, DURATION_SPIRAL),
+    // Hold the angle steady while bursting
+    new Hold(DURATION_BURST.add(DURATION_BOUNCE)),
   ),
 );
 
@@ -40,7 +45,9 @@ const CURVE_PHASE = LoopCurve.from_timeline(
 
 // At the start of the burst, the lightness and chroma jump up,
 // then ramp down over the course of a measure
-const CURVE_LIGHTNESS = LoopCurve.from_timeline(make_param(0.7, 0.1, N1));
+const CURVE_LIGHTNESS = LoopCurve.from_timeline(
+  make_param(0.7, 0.7 /*0.1*/, N1),
+);
 const CURVE_CHROMA = LoopCurve.from_timeline(make_param(0.3, 0.05, N1));
 
 // The hue changes every quarter note as a step function
@@ -56,13 +63,15 @@ const CURVE_HUE = LoopCurve.from_timeline(
 );
 
 export class SpiralBurst {
-  constructor() {
+  constructor(shift) {
     this.phases = new Array(N);
     this.radii = new Array(N);
     for (let i = 0; i < N; i++) {
       this.phases[i] = (2 * Math.PI * i) / N;
       this.radii[i] = MAX_RADIUS;
     }
+
+    this.shift = shift;
   }
 
   /**
@@ -71,7 +80,9 @@ export class SpiralBurst {
    * @return {GroupPrimitive} the primitives to render
    */
   render(time) {
-    const radius_scale = CURVE_RADIUS.value(time);
+    const radius_time = this.shift ? time - DURATION_BOUNCE.real : time;
+
+    const radius_scale = CURVE_RADIUS.value(radius_time);
     const phase_shift = CURVE_PHASE.value(time);
     const lightness = CURVE_LIGHTNESS.value(time);
     const chroma = CURVE_CHROMA.value(time);
@@ -86,11 +97,14 @@ export class SpiralBurst {
      * @type {GroupPrimitive[]}
      */
     const points = new Array(N);
+    const shift_dir = new Direction(50, 0);
     for (let i = 0; i < N; i++) {
       const angle = this.phases[i] + phase_shift * Math.PI;
       const radius = this.radii[i] * radius_scale;
       const offset = Direction.from_angle(angle).scale(radius);
-      const point = CENTER.add(offset);
+      const point = CENTER.add(offset).add(
+        shift_dir.scale(this.shift ? 1.0 : -1.0),
+      );
       points[i] = style(point, point_style);
     }
 

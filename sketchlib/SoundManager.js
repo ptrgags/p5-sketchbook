@@ -249,7 +249,7 @@ export class SoundManager {
       clip.value.material.start(start);
     }
 
-    transport.position = 0;
+    transport.loop = true;
     transport.loopStart = "0:0";
     transport.loopEnd = to_tone_time(score.duration);
     transport.start("+0.1", "0:0");

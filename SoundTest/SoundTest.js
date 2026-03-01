@@ -283,7 +283,8 @@ class SoundScene {
         INACTIVE_COLOR,
       ),
     };
-    this.spiral_burst = new SpiralBurst();
+    this.spiral_burst = new SpiralBurst(false);
+    this.spiral_burst2_electric_boogaloo = new SpiralBurst(true);
 
     this.mute_button.events.addEventListener(
       "change",
@@ -605,6 +606,8 @@ class SoundScene {
     const mute = this.mute_button.render();
     const melody_buttons = this.melody_buttons.map((x) => x.debug_render());
     const burst = this.spiral_burst.render(current_time);
+    const burst_boogaloo =
+      this.spiral_burst2_electric_boogaloo.render(current_time);
     const timeline = this.render_timeline(current_time);
 
     // TODO: this should be rewritten to use the Animated interface
@@ -618,6 +621,7 @@ class SoundScene {
       this.ocarinas.tenor.primitive,
       this.ocarinas.soprano.primitive,
       burst,
+      burst_boogaloo,
       mute,
     );
   }
