@@ -601,10 +601,10 @@ class SoundScene {
     this.ocarinas.bass.update(current_time);
     this.ocarinas.tenor.update(current_time);
     this.ocarinas.soprano.update(current_time);
+    this.spiral_burst.update(current_time);
 
     const mute = this.mute_button.render();
     const melody_buttons = this.melody_buttons.map((x) => x.debug_render());
-    const burst = this.spiral_burst.render(current_time);
     const timeline = this.render_timeline(current_time);
 
     // TODO: this should be rewritten to use the Animated interface
@@ -617,7 +617,7 @@ class SoundScene {
       this.ocarinas.bass.primitive,
       this.ocarinas.tenor.primitive,
       this.ocarinas.soprano.primitive,
-      burst,
+      this.spiral_burst.primitive,
       mute,
     );
   }

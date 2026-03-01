@@ -15,6 +15,8 @@ import { Sequential, TimeInterval } from "../sketchlib/music/Timeline.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Rational } from "../sketchlib/Rational.js";
 import { Ease } from "../sketchlib/Ease.js";
+import { Animated } from "../sketchlib/animation/Animated.js";
+import { Primitive } from "../sketchlib/primitives/Primitive.js";
 
 const N = 10;
 const CENTER = new Point(WIDTH / 2, (3 * HEIGHT) / 4);
@@ -62,6 +64,11 @@ const CURVE_HUE = LoopCurve.from_timeline(
   ),
 );
 
+/**
+ * Several points arranged in a circle that spiral inwards, then burst
+ * outwards on the beat. Essentially a visual metronome.
+ * @implements {Animated}
+ */
 export class SpiralBurst {
   constructor() {
     this.phases = new Array(N);
@@ -70,14 +77,21 @@ export class SpiralBurst {
       this.phases[i] = (2 * Math.PI * i) / N;
       this.radii[i] = MAX_RADIUS;
     }
+
+    /**
+     * The points that spiral in and out of the center.
+     * These are computed in update()
+     * @type {Primitive[]}
+     */
+    this.points = new Array(N).fill(GroupPrimitive.EMPTY);
+    this.primitive = new GroupPrimitive(this.points);
   }
 
   /**
-   * Render the circles that make up the burst
-   * @param {number} time current animation time
-   * @return {GroupPrimitive} the primitives to render
+   *
+   * @param {number} time
    */
-  render(time) {
+  update(time) {
     const radius_scale = CURVE_RADIUS.value(time);
     const phase_shift = CURVE_PHASE.value(time);
     const lightness = CURVE_LIGHTNESS.value(time);
@@ -89,19 +103,12 @@ export class SpiralBurst {
       fill: color,
     });
 
-    /**
-     * @type {GroupPrimitive[]}
-     */
-    const points = new Array(N);
-    const shift_dir = new Direction(50, 0);
     for (let i = 0; i < N; i++) {
       const angle = this.phases[i] + phase_shift * Math.PI;
       const radius = this.radii[i] * radius_scale;
       const offset = Direction.from_angle(angle).scale(radius);
       const point = CENTER.add(offset);
-      points[i] = style(point, point_style);
+      this.points[i] = style(point, point_style);
     }
-
-    return group(...points);
   }
 }
