@@ -50,6 +50,17 @@ export class Circle {
   }
 
   /**
+   * Get the angle the point makes with the horizontal if you were to draw
+   * an imaginary line from the circle center to the point
+   * @param {Point} point
+   * @returns {number} Angle in the range [-pi, pi] (i.e. the result of an atan2() call)
+   */
+  get_angle(point) {
+    const { x, y } = point.sub(this.center);
+    return Math.atan2(y, x);
+  }
+
+  /**
    * Create a circle through two points on opposite ends of the
    * circle's diameter
    * @param {Point} a first point
