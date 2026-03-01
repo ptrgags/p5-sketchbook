@@ -22,46 +22,6 @@ const ANGLE_3_4 = (3.0 * ANGLE_MAX) / 4.0;
 const ANGLE_HALF = ANGLE_MAX / 2;
 const ANGLE_1_4 = ANGLE_MAX / 4.0;
 const ANGLE_SMALL = Math.PI / 32;
-const EASE = Ease.out_in_cubic;
-
-/**
- * Animate a fluctuation from a center value
- * @param {number} center_value Value to hold at the start and end
- * @param {number} anticipate_value Value at the peak of the anticipation phase (opposite the direction of desired motion)
- * @param {number} followthrough_value Value at the peak of the followthrough phase (overshooting the center value)
- * @param {Rational} anticipate_duration How long to to wind up before the drop
- * @param {Rational} drop_duration How long the drop (the main forward motion... idk what to call that) is.
- * @param {Rational} followthrough_duration How long the followthrough should be
- * @returns {TimeInterval<ParamCurve>[]} [windup, drop, followthrough]. The curve will hit the center value at time anticipation_duration + 1/2 drop_duration
- */
-function fluctuate(
-  center_value,
-  anticipate_value,
-  followthrough_value,
-  anticipate_duration,
-  drop_duration,
-  followthrough_duration,
-) {
-  const anticipate = make_param(
-    center_value,
-    anticipate_value,
-    anticipate_duration,
-    Ease.in_out_cubic,
-  );
-  const drop = make_param(
-    anticipate_value,
-    followthrough_value,
-    drop_duration,
-    Ease.in_out_cubic,
-  );
-  const followthrough = make_param(
-    followthrough_value,
-    center_value,
-    followthrough_duration,
-    Ease.in_out_cubic,
-  );
-  return [anticipate, drop, followthrough];
-}
 
 /**
  * Anticipate and move into a bounce, like the ticking motion of an analog clock.
@@ -126,34 +86,6 @@ const CURVE_ANGLE = LoopCurve.from_timeline(
     make_param(ANGLE_MAX, ANGLE_MAX - ANGLE_SMALL, N16, Ease.out_cubic),
     make_param(ANGLE_MAX - ANGLE_SMALL, ANGLE_MAX, N16, Ease.in_out_cubic),
     new Hold(new Rational(7, 8)),
-    /*
-  new Sequential(
-    // start of loop or transition from y to x
-    make_param(ANGLE_MAX, ANGLE_3_4, N4),
-    make_param(ANGLE_3_4, ANGLE_HALF, N4, EASE),
-    make_param(ANGLE_HALF, ANGLE_1_4, N4, EASE),
-    make_param(ANGLE_1_4, 0, N4, EASE),
-    // x is animating, hold at 0
-    //  |x...x...x...x...| 1/16
-    //
-    // Fluctuations happen
-    // ~|~..~~..~~..~~..~|~
-    new Hold(new Rational(3, 16).sub(N32)),
-    ...fluctuate(0, -ANGLE_SMALL, ANGLE_SMALL, N32, N16, N32),
-    new Hold(N8),
-    ...fluctuate(0, -2 * ANGLE_SMALL, 2 * ANGLE_SMALL, N32, N16, N32),
-    new Hold(N8),
-    ...fluctuate(0, -3 * ANGLE_SMALL, 3 * ANGLE_SMALL, N32, N16, N32),
-    new Hold(new Rational(3 / 16).add(N32)),
-    // transition from x to y
-    make_param(0, ANGLE_1_4, N4, EASE),
-    make_param(ANGLE_1_4, ANGLE_HALF, N4, EASE),
-    make_param(ANGLE_HALF, ANGLE_3_4, N4, EASE),
-    make_param(ANGLE_3_4, ANGLE_MAX, N4, EASE),
-    // y is animating, hold at pi/2
-    new Hold(N1),
-  ),
-  */
   ),
 );
 
