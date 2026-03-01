@@ -1,20 +1,15 @@
 import { Animated } from "../sketchlib/animation/Animated.js";
 import { LoopCurve } from "../sketchlib/animation/LoopCurve.js";
-import {
-  Hold,
-  make_param,
-  ParamCurve,
-} from "../sketchlib/animation/ParamCurve.js";
+import { Hold, make_param } from "../sketchlib/animation/ParamCurve.js";
 import { Ease } from "../sketchlib/Ease.js";
-import { N1, N16, N32, N4, N8, N8D } from "../sketchlib/music/durations.js";
-import { Sequential, TimeInterval } from "../sketchlib/music/Timeline.js";
+import { N1, N16, N8D } from "../sketchlib/music/durations.js";
+import { Sequential } from "../sketchlib/music/Timeline.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { VectorPrimitive } from "../sketchlib/primitives/VectorPrimitive.js";
-import { Rational } from "../sketchlib/Rational.js";
 import { Style } from "../sketchlib/Style.js";
 
 const ANGLE_MAX = Math.PI / 2;
@@ -22,41 +17,6 @@ const ANGLE_3_4 = (3.0 * ANGLE_MAX) / 4.0;
 const ANGLE_HALF = ANGLE_MAX / 2;
 const ANGLE_1_4 = ANGLE_MAX / 4.0;
 const ANGLE_SMALL = Math.PI / 32;
-
-/**
- * Anticipate and move into a bounce, like the ticking motion of an analog clock.
- * This only handles the time leading up to the hit. Some adjustment is needed
- * in the measure that follows.
- * @param {number} start_value Initial value
- * @param {number} stop_value Final value
- * @param {number} anticipate_amount How much to subtract from the start value in the anticipate
- * @param {Rational} anticipate_duration Duration for the anticipation duration
- * @param {Rational} act_duration Duration of the act duration
- * @param {boolean} [start_at_rest=false] If true, the easing at the start of the curve is more graceful
- * @returns {TimeInterval<ParamCurve>[]}
- */
-function tick(
-  start_value,
-  stop_value,
-  anticipate_amount,
-  anticipate_duration,
-  act_duration,
-  start_at_rest = false,
-) {
-  const anticipate = make_param(
-    start_value,
-    start_value - anticipate_amount,
-    anticipate_duration,
-    start_at_rest ? Ease.in_out_cubic : Ease.out_cubic,
-  );
-  const act = make_param(
-    start_value - anticipate_amount,
-    stop_value,
-    act_duration,
-    Ease.in_cubic,
-  );
-  return [anticipate, act];
-}
 
 // animate back and forth between x (0 radians) and y (pi/2 radians)
 const CURVE_ANGLE = LoopCurve.from_timeline(
