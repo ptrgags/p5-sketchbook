@@ -6,7 +6,7 @@ import {
   ParamCurve,
 } from "../sketchlib/animation/ParamCurve.js";
 import { Ease } from "../sketchlib/Ease.js";
-import { N1, N16, N32, N4, N8 } from "../sketchlib/music/durations.js";
+import { N1, N16, N32, N4, N8, N8D } from "../sketchlib/music/durations.js";
 import { Sequential, TimeInterval } from "../sketchlib/music/Timeline.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
@@ -64,28 +64,44 @@ const CURVE_ANGLE = LoopCurve.from_timeline(
     // Measure 0 =====================================================
     // For the 4 quarter notes, we're going to move from 90 degrees to 0, but
     // in a choppy bouncing motion like the ticking of an analog clock
-    ...tick(ANGLE_MAX, ANGLE_3_4, -ANGLE_SMALL, N16, new Rational(3, 16), true),
-    ...tick(ANGLE_3_4, ANGLE_HALF, -ANGLE_SMALL, N16, new Rational(3, 16)),
-    ...tick(ANGLE_HALF, ANGLE_1_4, -ANGLE_SMALL, N16, new Rational(3, 16)),
-    ...tick(ANGLE_1_4, 0, -ANGLE_SMALL, N16, new Rational(3, 16)),
+    // beat 0 ----------------------------------------------------------
+    // since we're starting from a hold, inout instead of out for the anticipation
+    make_param(ANGLE_MAX, ANGLE_MAX + ANGLE_SMALL, N16, Ease.in_out_cubic),
+    // move to the next angle, making a sharp hit
+    make_param(ANGLE_MAX + ANGLE_SMALL, ANGLE_3_4, N8D, Ease.in_cubic),
+    // beat 1 ----------------------------------------------------------
+    // bounce back from sharp hit, which also serves as anticipation for the
+    // next bounce.
+    make_param(ANGLE_3_4, ANGLE_3_4 + ANGLE_SMALL, N16, Ease.out_cubic),
+    make_param(ANGLE_3_4 + ANGLE_SMALL, ANGLE_HALF, N8D, Ease.in_cubic),
+    // beat 2 ----------------------------------------------------------
+    // same thing
+    make_param(ANGLE_HALF, ANGLE_HALF + ANGLE_SMALL, N16, Ease.out_cubic),
+    make_param(ANGLE_HALF + ANGLE_SMALL, ANGLE_1_4, N8D, Ease.in_cubic),
+    // beat 3 ----------------------------------------------------------
+    make_param(ANGLE_1_4, ANGLE_1_4 + ANGLE_SMALL, N16, Ease.out_cubic),
+    // this time, land gracefully into the hold
+    make_param(ANGLE_1_4 + ANGLE_SMALL, 0, N8D, Ease.in_out_cubic),
     // Measure 1 =======================================================
-    // We have to bounce from the previous measure's motion
-    make_param(0, ANGLE_SMALL, N16, Ease.out_cubic),
-    // Come back to rest, as if damped
-    make_param(ANGLE_SMALL, 0, N16, Ease.in_out_cubic),
-    // Hold
-    new Hold(new Rational(7, 8)),
+    // Hold for the x direction
+    new Hold(N1),
     // Measure 2 ======================================================
-    // Like Measure 0, but now we tick the other direction from 0 to 90 degrees
-    ...tick(0, ANGLE_1_4, ANGLE_SMALL, N16, new Rational(3, 16), true),
-    ...tick(ANGLE_1_4, ANGLE_HALF, ANGLE_SMALL, N16, new Rational(3, 16)),
-    ...tick(ANGLE_HALF, ANGLE_3_4, ANGLE_SMALL, N16, new Rational(3, 16)),
-    ...tick(ANGLE_3_4, ANGLE_MAX, ANGLE_SMALL, N16, new Rational(3, 16)),
+    // Like Measure 0 but in the opposite direction
+    // beat 0 ---------------------------------------------------------
+    make_param(0, -ANGLE_SMALL, N16, Ease.in_out_cubic),
+    make_param(-ANGLE_SMALL, ANGLE_1_4, N8D, Ease.in_cubic),
+    // beat 1 ---------------------------------------------------------
+    make_param(ANGLE_1_4, ANGLE_1_4 - ANGLE_SMALL, N16, Ease.out_cubic),
+    make_param(ANGLE_1_4 - ANGLE_SMALL, ANGLE_HALF, N8D, Ease.in_cubic),
+    // beat 2 ---------------------------------------------------------
+    make_param(ANGLE_HALF, ANGLE_HALF - ANGLE_SMALL, N16, Ease.out_cubic),
+    make_param(ANGLE_HALF - ANGLE_SMALL, ANGLE_3_4, N8D, Ease.in_cubic),
+    // beat 3 ---------------------------------------------------------
+    make_param(ANGLE_3_4, ANGLE_3_4 - ANGLE_SMALL, N16, Ease.out_cubic),
+    make_param(ANGLE_3_4 - ANGLE_SMALL, ANGLE_MAX, N8D, Ease.in_out_cubic),
     // Measure 3 ======================================================
-    // Like Measure 1, but the other direction
-    make_param(ANGLE_MAX, ANGLE_MAX - ANGLE_SMALL, N16, Ease.out_cubic),
-    make_param(ANGLE_MAX - ANGLE_SMALL, ANGLE_MAX, N16, Ease.in_out_cubic),
-    new Hold(new Rational(7, 8)),
+    // Hold for the y direction
+    new Hold(N1),
   ),
 );
 
