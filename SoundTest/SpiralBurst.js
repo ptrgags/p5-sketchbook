@@ -28,9 +28,12 @@ const DURATION_BOUNCE = new Rational(1, 64);
 
 const CURVE_RADIUS = LoopCurve.from_timeline(
   new Sequential(
+    // Recover from the snappy hit at the start of the measure, then
+    // start moving inwards over the course of the measure
     make_param(1.0, 0.9, DURATION_BOUNCE, Ease.in_cubic),
     make_param(0.9, 0.1, DURATION_SPIRAL, Ease.in_out_cubic),
-    // In the last 16th note, burst outwards suddenly, bouncing back
+    // In the last 16th note, burst outwards suddenly in time for the
+    // downbeat of the next measure.
     make_param(0.1, 1.0, DURATION_BURST, Ease.out_cubic),
   ),
 );
