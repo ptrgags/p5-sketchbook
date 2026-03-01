@@ -44,18 +44,4 @@ export class Ease {
 
     return 1 - Math.pow(-2 * t + 2, 3) / 2;
   }
-
-  /**
-   * Inverse of in_out_cubic
-   * @param {number} t Time parameter
-   * @returns {number} Progress value
-   */
-  static out_in_cubic(t) {
-    // inverse computed by hand, see https://www.desmos.com/calculator/ssa3voq9vb
-    if (t < 0.5) {
-      return Math.cbrt(t / 4);
-    }
-
-    return 1 + Math.cbrt((t - 1) / 4);
-  }
 }
