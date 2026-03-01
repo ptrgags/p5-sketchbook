@@ -20,7 +20,7 @@ const GRIDS = [
   new TranslationGridIllusion(TO_SCREEN),
 ];
 
-const ARROW = new DancingArrow(new Circle(SCREEN_CENTER, 50 /*16*/));
+const ARROW = new DancingArrow(new Circle(SCREEN_CENTER, 20));
 
 export const sketch = (p) => {
   let selected_index = 0;

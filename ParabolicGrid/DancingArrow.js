@@ -65,7 +65,7 @@ const CURVE_ANGLE = LoopCurve.from_timeline(
   ),
 );
 
-const COLOR_FILL = new Oklch(0.7433, 0.1036, 181.06);
+const COLOR_FILL = new Oklch(0.7433, 0.1036, 95);
 const COLOR_DARKER = COLOR_FILL.adjust_lightness(-0.15);
 
 const STYLE_CIRCLE = new Style({
