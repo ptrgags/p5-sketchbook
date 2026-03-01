@@ -20,16 +20,16 @@ const N = 10;
 const CENTER = new Point(WIDTH / 2, (3 * HEIGHT) / 4);
 const MAX_RADIUS = 50;
 
-const DURATION_SPIRAL = new Rational(7, 8);
-const DURATION_BURST = new Rational(3, 32);
-const DURATION_BOUNCE = new Rational(1, 32);
+const DURATION_SPIRAL = new Rational(15, 16);
+const DURATION_BURST = new Rational(3, 64);
+const DURATION_BOUNCE = new Rational(1, 64);
 
 const CURVE_RADIUS = LoopCurve.from_timeline(
   new Sequential(
+    make_param(1.0, 0.9, DURATION_BOUNCE, Ease.in_cubic),
     make_param(0.9, 0.1, DURATION_SPIRAL, Ease.in_out_cubic),
     // In the last 16th note, burst outwards suddenly, bouncing back
     make_param(0.1, 1.0, DURATION_BURST, Ease.out_cubic),
-    make_param(1.0, 0.9, DURATION_BOUNCE, Ease.in_cubic),
   ),
 );
 
@@ -63,15 +63,13 @@ const CURVE_HUE = LoopCurve.from_timeline(
 );
 
 export class SpiralBurst {
-  constructor(shift) {
+  constructor() {
     this.phases = new Array(N);
     this.radii = new Array(N);
     for (let i = 0; i < N; i++) {
       this.phases[i] = (2 * Math.PI * i) / N;
       this.radii[i] = MAX_RADIUS;
     }
-
-    this.shift = shift;
   }
 
   /**
@@ -80,9 +78,7 @@ export class SpiralBurst {
    * @return {GroupPrimitive} the primitives to render
    */
   render(time) {
-    const radius_time = this.shift ? time - DURATION_BOUNCE.real : time;
-
-    const radius_scale = CURVE_RADIUS.value(radius_time);
+    const radius_scale = CURVE_RADIUS.value(time);
     const phase_shift = CURVE_PHASE.value(time);
     const lightness = CURVE_LIGHTNESS.value(time);
     const chroma = CURVE_CHROMA.value(time);
@@ -102,9 +98,7 @@ export class SpiralBurst {
       const angle = this.phases[i] + phase_shift * Math.PI;
       const radius = this.radii[i] * radius_scale;
       const offset = Direction.from_angle(angle).scale(radius);
-      const point = CENTER.add(offset).add(
-        shift_dir.scale(this.shift ? 1.0 : -1.0),
-      );
+      const point = CENTER.add(offset);
       points[i] = style(point, point_style);
     }
 
