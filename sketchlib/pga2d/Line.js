@@ -1,4 +1,5 @@
 import { is_nearly } from "../is_nearly.js";
+import { LinePrimitive } from "../primitives/LinePrimitive.js";
 import { Primitive } from "../primitives/Primitive.js";
 import { Direction } from "./Direction.js";
 import { Odd } from "./multivectors.js";
@@ -26,15 +27,6 @@ export class Line {
       const mag = Math.sqrt(mag_sqr);
       this.vec = new Odd(nx / mag, ny / mag, -d / mag, 0);
     }
-  }
-
-  /**
-   * Create a line from a vector object
-   * @param {Odd} vec
-   */
-  static from_vec(vec) {
-    const { x: nx, y: ny, o: d } = vec;
-    return new Line(nx, ny, -d);
   }
 
   /**
@@ -140,6 +132,28 @@ export class Line {
     const x2 = cx - RADIUS * tx;
     const y2 = cy - RADIUS * ty;
     p.line(x1, y1, x2, y2);
+  }
+
+  /**
+   * Create a line from a vector object
+   * @param {Odd} vec
+   */
+  static from_vec(vec) {
+    const { x: nx, y: ny, o: d } = vec;
+    return new Line(nx, ny, -d);
+  }
+
+  /**
+   * Construct a line from a line segment
+   * @param {LinePrimitive} segment
+   */
+  static from_segment(segment) {
+    const { a, b } = segment;
+    const dir = b.sub(a);
+    const normal = dir.rot90().normalize();
+    const dist = normal.dot(a.to_direction());
+
+    return new Line(normal.x, normal.y, dist);
   }
 }
 Line.X_AXIS = Object.freeze(new Line(0, 1, 0));

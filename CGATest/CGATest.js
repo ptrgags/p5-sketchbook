@@ -11,6 +11,10 @@ import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { NullPoint } from "../sketchlib/cga2d/NullPoint.js";
 import { range } from "../sketchlib/range.js";
 import { mod } from "../sketchlib/mod.js";
+import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
+import { ClineArc } from "../sketchlib/cga2d/ClineArc.js";
+import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
+import { ArcAngles } from "../sketchlib/ArcAngles.js";
 
 // Create a few shapes encoded in CGA
 const CIRCLE = Cline.from_circle(new Circle(new Point(250, 350), 50));
@@ -25,6 +29,18 @@ const REFLECTED_CIRCLE = CIRCLE.transform(REFLECT);
 const INVERT = CIRCLE.vector.normalize_o();
 const INVERTED_POINT = POINT.transform(INVERT);
 const INVERTED_LINE = LINE.transform(INVERT);
+
+const CHIP = [
+  ClineArc.from_segment(
+    new LinePrimitive(new Point(10, 10), new Point(10, 110)),
+  ),
+  ClineArc.from_segment(
+    new LinePrimitive(new Point(10, 110), new Point(110, 110)),
+  ),
+  ClineArc.from_arc(
+    new ArcPrimitive(new Point(10, 110), 100, new ArcAngles(0, Math.PI / 2)),
+  ),
+];
 
 const LINE_STYLE = new Style({
   stroke: Color.YELLOW,

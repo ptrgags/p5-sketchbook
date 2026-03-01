@@ -1,4 +1,5 @@
 import { ArcAngles } from "../ArcAngles.js";
+import { Direction } from "../pga2d/Direction.js";
 import { Point } from "../pga2d/Point.js";
 import { ArcPrimitive } from "../primitives/ArcPrimitive.js";
 import { Circle } from "../primitives/Circle.js";
@@ -11,6 +12,8 @@ import { CEven } from "./CEven.js";
 import { Cline } from "./Cline.js";
 import { COdd } from "./COdd.js";
 import { NullPoint } from "./NullPoint.js";
+import { lerp } from "../lerp.js";
+import { Line } from "../pga2d/Line.js";
 
 /**
  * Given the data for a cline arc that's known to be a finite circular arc,
@@ -145,5 +148,44 @@ export class ClineArc {
    */
   draw(p) {
     this.primitive.draw(p);
+  }
+
+  /**
+   * Construct from a line segment
+   * @param {LinePrimitive} segment
+   * @returns {ClineArc}
+   */
+  static from_segment(segment) {
+    const { a, b: c } = segment;
+    const midpoint = Point.lerp(a, c, 0.5);
+    const cline = Cline.from_line(Line.from_segment(segment));
+
+    return new ClineArc(
+      cline,
+      NullPoint.from_point(a),
+      NullPoint.from_point(midpoint),
+      NullPoint.from_point(c),
+    );
+  }
+
+  /**
+   * Construct from an ArcPrimitive
+   * @param {ArcPrimitive} arc
+   * @returns {ClineArc}
+   */
+  static from_arc(arc) {
+    const { center, radius, angles } = arc;
+    const { start_angle, end_angle } = angles;
+    const mid_angle = lerp(start_angle, end_angle, 0.5);
+    const a = center.add(Direction.from_angle(start_angle).scale(radius));
+    const b = center.add(Direction.from_angle(mid_angle).scale(radius));
+    const c = center.add(Direction.from_angle(end_angle).scale(radius));
+    const cline = Cline.from_circle(new Circle(center, radius));
+    return new ClineArc(
+      cline,
+      NullPoint.from_point(a),
+      NullPoint.from_point(b),
+      NullPoint.from_point(c),
+    );
   }
 }
