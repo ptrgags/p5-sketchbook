@@ -13,8 +13,9 @@ import { Ocarina } from "../sketchlib/music_vis/Ocarina.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 import { SCORE_OCARINA_TRIO } from "../SoundTest/example_scores/ocarina_trio.js";
-import { PlayedNotes } from "../SoundTest/PlayedNotes.js";
 import { AnimationGroup } from "../sketchlib/animation/AnimationGroup.js";
+import { PlayedNotes } from "../SoundTest/PlayedNotes.js";
+import { AbsTimelineOps } from "../sketchlib/music/AbsTimelineOps.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -69,6 +70,18 @@ const OCARINA_BOXES = group(
   ),
 );
 
+/**
+ * Get the played notes from the score.
+ * @returns {PlayedNotes[]}
+ */
+function compute_played_notes() {
+  return SCORE_OCARINA_TRIO.parts.map((part) => {
+    const abs_music = AbsTimelineOps.from_relative(part.music);
+    const intervals = [...AbsTimelineOps.iter_intervals(abs_music)];
+    return new PlayedNotes(intervals);
+  });
+}
+
 class SoundScene {
   /**
    * Constructor
@@ -81,10 +94,11 @@ class SoundScene {
 
     this.sound.play_score("ocarina_trio");
 
+    const [soprano_notes, tenor_notes, bass_notes] = compute_played_notes();
     this.ocarinas = new AnimationGroup(
-      new Ocarina(BASS_CONFIG),
-      new Ocarina(TENOR_CONFIG),
-      new Ocarina(SOPRANO_CONFIG),
+      new Ocarina(BASS_CONFIG, bass_notes),
+      new Ocarina(TENOR_CONFIG, tenor_notes),
+      new Ocarina(SOPRANO_CONFIG, soprano_notes),
     );
 
     // Schedule sound callbacks here
