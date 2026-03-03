@@ -30,20 +30,41 @@ const SOUND_MANIFEST = {
 //@ts-ignore
 const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
 
+const START_X = 25;
+const BOX_DIMENSIONS = new Direction(150, 150);
+const BOUNDING_BOXES = [
+  new Rectangle(new Point(START_X, 0), BOX_DIMENSIONS),
+  new Rectangle(new Point(START_X + BOX_DIMENSIONS.x, 0), BOX_DIMENSIONS),
+  new Rectangle(new Point(START_X + 2 * BOX_DIMENSIONS.x, 0), BOX_DIMENSIONS),
+];
+
+/**
+ * Scale a bounding box about its center, creating a smaller box
+ * @param {Rectangle} bounding_box
+ * @param {number} factor scale factor
+ * @returns {Rectangle}
+ */
+function smaller_box(bounding_box, factor) {
+  return Rectangle.from_center(
+    bounding_box.center,
+    bounding_box.dimensions.scale(factor),
+  );
+}
+
 const BASS_CONFIG = {
-  bounds: new Rectangle(new Point(0, 500), new Direction(200, 200)),
+  bounds: smaller_box(BOUNDING_BOXES[0], 0.9),
   // Orange
   color: new Oklch(0.6, 0.1, 60),
   octave: Ocarina.OCTAVE_BASS,
 };
 const TENOR_CONFIG = {
-  bounds: new Rectangle(new Point(200, 550), new Direction(150, 150)),
+  bounds: smaller_box(BOUNDING_BOXES[1], 0.8),
   // Purple
   color: new Oklch(0.5, 0.1, 300),
   octave: Ocarina.OCTAVE_TENOR,
 };
 const SOPRANO_CONFIG = {
-  bounds: new Rectangle(new Point(350, 700 - 112), new Direction(112, 112)),
+  bounds: smaller_box(BOUNDING_BOXES[2], 0.7),
   // Blue green
   color: new Oklch(0.6, 0.1, 213),
   octave: Ocarina.OCTAVE_SOPRANO,
@@ -54,18 +75,24 @@ const OCARINA_BOXES = group(
     new RectPrimitive(new Point(25, 0), new Direction(150, 150)),
     new Style({
       fill: BASS_CONFIG.color,
+      stroke: BASS_CONFIG.color.adjust_lightness(-0.2),
+      width: 4,
     }),
   ),
   style(
     new RectPrimitive(new Point(25 + 150, 0), new Direction(150, 150)),
     new Style({
       fill: TENOR_CONFIG.color,
+      stroke: TENOR_CONFIG.color.adjust_lightness(-0.2),
+      width: 4,
     }),
   ),
   style(
     new RectPrimitive(new Point(25 + 2 * 150, 0), new Direction(150, 150)),
     new Style({
       fill: SOPRANO_CONFIG.color,
+      stroke: SOPRANO_CONFIG.color.adjust_lightness(-0.2),
+      width: 4,
     }),
   ),
 );
