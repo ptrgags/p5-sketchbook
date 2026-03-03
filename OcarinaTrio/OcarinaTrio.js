@@ -16,6 +16,8 @@ import { SCORE_OCARINA_TRIO } from "../SoundTest/example_scores/ocarina_trio.js"
 import { AnimationGroup } from "../sketchlib/animation/AnimationGroup.js";
 import { PlayedNotes } from "../SoundTest/PlayedNotes.js";
 import { AbsTimelineOps } from "../sketchlib/music/AbsTimelineOps.js";
+import { PianoRollBackground } from "./PianoRollBackground.js";
+import { A3, F7 } from "../sketchlib/music/pitches.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -129,6 +131,10 @@ class SoundScene {
       new Ocarina(SOPRANO_CONFIG, soprano_notes),
     );
 
+    const y = 150;
+    const velocity = 100;
+    this.background = new PianoRollBackground(y, velocity, [A3, F7]);
+
     // Schedule sound callbacks here
     // this.sound.events.addEventListener('event', (e) => ...);
     this.mute_button.events.addEventListener(
@@ -143,6 +149,7 @@ class SoundScene {
     const time = this.sound.transport_time;
 
     this.ocarinas.update(time);
+    this.background.update(time);
 
     // state changes each frame go here
     // note that you can do this.sound.get_param(param_id) if the score
@@ -152,7 +159,12 @@ class SoundScene {
   render() {
     // Render stuff here
     const mute = this.mute_button.render();
-    return group(OCARINA_BOXES, this.ocarinas.primitive, mute);
+    return group(
+      OCARINA_BOXES,
+      this.background.primitive,
+      this.ocarinas.primitive,
+      mute,
+    );
   }
 
   /**
