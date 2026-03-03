@@ -81,6 +81,12 @@ class SoundScene {
 
     // Schedule sound callbacks here
     // this.sound.events.addEventListener('event', (e) => ...);
+    this.mute_button.events.addEventListener(
+      "change",
+      (/**@type {CustomEvent} */ e) => {
+        this.sound.toggle_sound(e.detail.sound_on);
+      },
+    );
   }
 
   update() {
