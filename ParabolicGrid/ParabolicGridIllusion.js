@@ -15,8 +15,8 @@ const Y_TILES = [];
 for (let i = -MAX_STEP; i <= MAX_STEP; i++) {
   const transform_x = CVersor.parabolic(OFFSET_X.scale(i));
   const transform_y = CVersor.parabolic(OFFSET_Y.scale(i));
-  X_TILES.push(transform_x.transform_cline(Cline.Y_AXIS));
-  Y_TILES.push(transform_y.transform_cline(Cline.X_AXIS));
+  X_TILES.push(transform_x.transform(Cline.Y_AXIS));
+  Y_TILES.push(transform_y.transform(Cline.X_AXIS));
 }
 
 /**
@@ -67,8 +67,8 @@ export class ParabolicGridIllusion {
     const para_total = para_x.compose(para_y);
     const para_screen = this.to_screen.compose(para_total);
 
-    const x_tiles = X_TILES.map((x) => para_screen.transform_cline(x));
-    const y_tiles = Y_TILES.map((x) => para_screen.transform_cline(x));
+    const x_tiles = X_TILES.map((x) => para_screen.transform(x));
+    const y_tiles = Y_TILES.map((x) => para_screen.transform(x));
     this.x_group.primitives = x_tiles;
     this.y_group.primitives = y_tiles;
   }

@@ -13,14 +13,14 @@ const MAX_X_STEP = 5;
 const X_LINES = [];
 for (let i = -MAX_X_STEP; i <= MAX_X_STEP; i++) {
   const transform_x = CVersor.translation(OFFSET_X.scale(i));
-  X_LINES.push(transform_x.transform_cline(Cline.Y_AXIS));
+  X_LINES.push(transform_x.transform(Cline.Y_AXIS));
 }
 
 const MAX_Y_STEP = 7;
 const Y_LINES = [];
 for (let i = -MAX_Y_STEP; i <= MAX_Y_STEP; i++) {
   const transform_y = CVersor.translation(OFFSET_Y.scale(i));
-  Y_LINES.push(transform_y.transform_cline(Cline.X_AXIS));
+  Y_LINES.push(transform_y.transform(Cline.X_AXIS));
 }
 
 /**
@@ -59,8 +59,8 @@ export class TranslationGridIllusion {
     const translate = CVersor.translation(offset);
     const para_screen = this.to_screen.compose(translate);
 
-    const x_tiles = X_LINES.map((x) => para_screen.transform_cline(x));
-    const y_tiles = Y_LINES.map((x) => para_screen.transform_cline(x));
+    const x_tiles = X_LINES.map((x) => para_screen.transform(x));
+    const y_tiles = Y_LINES.map((x) => para_screen.transform(x));
     this.x_group.primitives = x_tiles;
     this.y_group.primitives = y_tiles;
   }
