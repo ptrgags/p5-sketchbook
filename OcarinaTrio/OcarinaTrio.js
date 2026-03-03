@@ -93,6 +93,7 @@ class SoundScene {
     this.events = new EventTarget();
 
     this.sound.play_score("ocarina_trio");
+    this.sound.no_loop();
 
     const [soprano_notes, tenor_notes, bass_notes] = compute_played_notes();
     this.ocarinas = new AnimationGroup(
