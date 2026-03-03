@@ -149,21 +149,25 @@ export class PianoRoll {
     });
 
     /**
-     * @type {}
+     * @type {RectPrimitive[]}
      */
     this.rects = [];
     this.primitive = style(this.rects, note_style);
   }
 
+  /**
+   *
+   * @param {number} time
+   */
   update(time) {
     const t_max = (HEIGHT - this.y) * this.velocity;
 
     // Only render the notes currently on screen
-    const visible_rects = select_intervals(this.rects, time, t_max).map(
+    const visible_rects = select_intervals(this.all_rects, time, t_max).map(
       (x) => x.value,
     );
 
     this.rects.length = 0;
-    this.rects.splice(0, Infinity, visible_rects);
+    this.rects.splice(0, Infinity, ...visible_rects);
   }
 }

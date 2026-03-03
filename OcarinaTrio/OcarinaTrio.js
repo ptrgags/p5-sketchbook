@@ -18,6 +18,10 @@ import { PlayedNotes } from "../SoundTest/PlayedNotes.js";
 import { AbsTimelineOps } from "../sketchlib/music/AbsTimelineOps.js";
 import { PianoRollBackground } from "./PianoRollBackground.js";
 import { A3, F7 } from "../sketchlib/music/pitches.js";
+import { PianoRoll } from "./PianoRoll.js";
+import { AbsInterval } from "../sketchlib/music/AbsTimeline.js";
+import { Note } from "../sketchlib/music/Music.js";
+import { Rational } from "../sketchlib/Rational.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -101,13 +105,13 @@ const OCARINA_BOXES = group(
 
 /**
  * Get the played notes from the score.
- * @returns {PlayedNotes[]}
+ * @returns {AbsInterval<Note<number>>[][]}
  */
 function compute_played_notes() {
   return SCORE_OCARINA_TRIO.parts.map((part) => {
     const abs_music = AbsTimelineOps.from_relative(part.music);
     const intervals = [...AbsTimelineOps.iter_intervals(abs_music)];
-    return new PlayedNotes(intervals);
+    return intervals;
   });
 }
 
@@ -123,17 +127,45 @@ class SoundScene {
 
     this.sound.play_score("ocarina_trio");
     this.sound.no_loop();
+    this.sound.jump_to(new Rational(-3));
 
     const [soprano_notes, tenor_notes, bass_notes] = compute_played_notes();
     this.ocarinas = new AnimationGroup(
-      new Ocarina(BASS_CONFIG, bass_notes),
-      new Ocarina(TENOR_CONFIG, tenor_notes),
-      new Ocarina(SOPRANO_CONFIG, soprano_notes),
+      new Ocarina(BASS_CONFIG, new PlayedNotes(bass_notes)),
+      new Ocarina(TENOR_CONFIG, new PlayedNotes(tenor_notes)),
+      new Ocarina(SOPRANO_CONFIG, new PlayedNotes(soprano_notes)),
     );
 
     const y = 150;
     const velocity = 100;
-    this.background = new PianoRollBackground(y, velocity, [A3, F7]);
+    /**
+     * @type {[number, number]}
+     */
+    const pitch_range = [A3, F7];
+    this.background = new PianoRollBackground(y, velocity, pitch_range);
+    this.piano_rolls = new AnimationGroup(
+      new PianoRoll(
+        bass_notes,
+        y,
+        velocity,
+        pitch_range,
+        new Style({ fill: BASS_CONFIG.color }),
+      ),
+      new PianoRoll(
+        tenor_notes,
+        y,
+        velocity,
+        pitch_range,
+        new Style({ fill: TENOR_CONFIG.color }),
+      ),
+      new PianoRoll(
+        soprano_notes,
+        y,
+        velocity,
+        pitch_range,
+        new Style({ fill: SOPRANO_CONFIG.color }),
+      ),
+    );
 
     // Schedule sound callbacks here
     // this.sound.events.addEventListener('event', (e) => ...);
@@ -149,6 +181,7 @@ class SoundScene {
     const time = this.sound.transport_time;
 
     this.ocarinas.update(time);
+    this.piano_rolls.update(time);
     this.background.update(time);
 
     // state changes each frame go here
@@ -160,8 +193,9 @@ class SoundScene {
     // Render stuff here
     const mute = this.mute_button.render();
     return group(
-      OCARINA_BOXES,
       this.background.primitive,
+      this.piano_rolls.primitive,
+      OCARINA_BOXES,
       this.ocarinas.primitive,
       mute,
     );
