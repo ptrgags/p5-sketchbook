@@ -34,27 +34,35 @@ export class PianoRollBackground {
     const num_columns = max_pitch - min_pitch + 1;
     const column_width = WIDTH / num_columns;
 
+    // Draw a tall rectangle for each pitch
     const columns = [];
+    const pitch_lines = [];
     for (let i = min_pitch; i <= max_pitch; i++) {
       const x = (i - min_pitch) * column_width;
       const pitch_class = MIDIPitch.get_pitch_class(i);
+      const top_left = new Point(x, this.y);
       const rect = new RectPrimitive(
-        new Point(x, this.y),
+        top_left,
         new Direction(column_width, HEIGHT - this.y),
       );
       const style_index = COLUMN_STYLE_INDICES[pitch_class];
       const col_style = COLUMN_STYLES[style_index];
       columns.push(style(rect, col_style));
+
+      // also push a vertical line to separate the keys
+      pitch_lines.push(
+        new LinePrimitive(new Point(x, this.y), new Point(x, HEIGHT)),
+      );
     }
 
-    this.lines = style(
+    this.bar_lines = style(
       [],
       new Style({
         stroke: Color.WHITE,
         width: 2,
       }),
     );
-    this.primitive = group(...columns, this.lines);
+    this.primitive = group(...columns, ...pitch_lines, this.bar_lines);
   }
 
   /**
@@ -69,7 +77,7 @@ export class PianoRollBackground {
       lines.push(new LinePrimitive(new Point(0, y), new Point(WIDTH, y)));
     }
 
-    this.lines.primitives.length = 0;
-    this.lines.primitives.splice(0, Infinity, ...lines);
+    this.bar_lines.primitives.length = 0;
+    this.bar_lines.primitives.splice(0, Infinity, ...lines);
   }
 }
