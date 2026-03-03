@@ -13,6 +13,8 @@ import { Ocarina } from "../sketchlib/music_vis/Ocarina.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 import { SCORE_OCARINA_TRIO } from "../SoundTest/example_scores/ocarina_trio.js";
+import { PlayedNotes } from "../SoundTest/PlayedNotes.js";
+import { AnimationGroup } from "../sketchlib/animation/AnimationGroup.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -45,6 +47,7 @@ const SOPRANO_CONFIG = {
   color: new Oklch(0.6, 0.1, 213),
   octave: Ocarina.OCTAVE_SOPRANO,
 };
+const INACTIVE_COLOR = new Oklch(0.7, 0, 0);
 
 const OCARINA_BOXES = group(
   style(
@@ -67,6 +70,32 @@ const OCARINA_BOXES = group(
   ),
 );
 
+/**
+ * @typedef {Object} OcarinaConfig
+ * @property {Rectangle} bounds
+ * @property {number} octave
+ * @property {Oklch} color
+ */
+
+/**
+ *
+ * @param {OcarinaConfig} config
+ * @param {PlayedNotes} [notes]
+ * @returns {Ocarina}
+ */
+function make_ocarina(config, notes) {
+  if (!notes) {
+    return new Ocarina(
+      config.bounds,
+      new PlayedNotes([]),
+      config.octave,
+      INACTIVE_COLOR,
+    );
+  }
+
+  return new Ocarina(config.bounds, notes, config.octave, config.color);
+}
+
 class SoundScene {
   /**
    * Constructor
@@ -79,6 +108,12 @@ class SoundScene {
 
     this.sound.play_score("ocarina_trio");
 
+    this.ocarinas = new AnimationGroup(
+      make_ocarina(BASS_CONFIG),
+      make_ocarina(TENOR_CONFIG),
+      make_ocarina(SOPRANO_CONFIG),
+    );
+
     // Schedule sound callbacks here
     // this.sound.events.addEventListener('event', (e) => ...);
     this.mute_button.events.addEventListener(
@@ -90,6 +125,10 @@ class SoundScene {
   }
 
   update() {
+    const time = this.sound.transport_time;
+
+    this.ocarinas.update(time);
+
     // state changes each frame go here
     // note that you can do this.sound.get_param(param_id) if the score
     // has animations
@@ -98,7 +137,7 @@ class SoundScene {
   render() {
     // Render stuff here
     const mute = this.mute_button.render();
-    return group(OCARINA_BOXES, mute);
+    return group(OCARINA_BOXES, this.ocarinas.primitive, mute);
   }
 
   /**
