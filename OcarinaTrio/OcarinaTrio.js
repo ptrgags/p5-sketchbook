@@ -4,15 +4,68 @@ import { MouseInput } from "../sketchlib/MouseInput.js";
 import { MuteButton } from "../sketchlib/MuteButton.js";
 import { PlayButtonScene } from "../sketchlib/PlayButtonScene.js";
 import { SoundManager } from "../sketchlib/SoundManager.js";
+import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Oklch } from "../sketchlib/Oklch.js";
+import { Rectangle } from "../sketchlib/Rectangle.js";
+import { Ocarina } from "../sketchlib/music_vis/Ocarina.js";
+import { group, style } from "../sketchlib/primitives/shorthand.js";
+import { Style } from "../sketchlib/Style.js";
+import { SCORE_OCARINA_TRIO } from "../SoundTest/example_scores/ocarina_trio.js";
 
 const MOUSE = new CanvasMouseHandler();
 
 // Add scores here
 /**@type {import("../sketchlib/SoundManager.js").SoundManifest} */
-const SOUND_MANIFEST = {};
+const SOUND_MANIFEST = {
+  scores: {
+    ocarina_trio: SCORE_OCARINA_TRIO,
+  },
+};
 
 //@ts-ignore
 const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
+
+const BASS_CONFIG = {
+  bounds: new Rectangle(new Point(0, 500), new Direction(200, 200)),
+  // Orange
+  color: new Oklch(0.6, 0.1, 60),
+  octave: Ocarina.OCTAVE_BASS,
+};
+const TENOR_CONFIG = {
+  bounds: new Rectangle(new Point(200, 550), new Direction(150, 150)),
+  // Purple
+  color: new Oklch(0.5, 0.1, 300),
+  octave: Ocarina.OCTAVE_TENOR,
+};
+const SOPRANO_CONFIG = {
+  bounds: new Rectangle(new Point(350, 700 - 112), new Direction(112, 112)),
+  // Blue green
+  color: new Oklch(0.6, 0.1, 213),
+  octave: Ocarina.OCTAVE_SOPRANO,
+};
+
+const OCARINA_BOXES = group(
+  style(
+    new RectPrimitive(new Point(25, 0), new Direction(150, 150)),
+    new Style({
+      fill: BASS_CONFIG.color,
+    }),
+  ),
+  style(
+    new RectPrimitive(new Point(25 + 150, 0), new Direction(150, 150)),
+    new Style({
+      fill: TENOR_CONFIG.color,
+    }),
+  ),
+  style(
+    new RectPrimitive(new Point(25 + 2 * 150, 0), new Direction(150, 150)),
+    new Style({
+      fill: SOPRANO_CONFIG.color,
+    }),
+  ),
+);
 
 class SoundScene {
   /**
@@ -23,6 +76,8 @@ class SoundScene {
     this.sound = sound;
     this.mute_button = new MuteButton();
     this.events = new EventTarget();
+
+    this.sound.play_score("ocarina_trio");
 
     // Schedule sound callbacks here
     // this.sound.events.addEventListener('event', (e) => ...);
@@ -36,7 +91,8 @@ class SoundScene {
 
   render() {
     // Render stuff here
-    return this.mute_button.render();
+    const mute = this.mute_button.render();
+    return group(OCARINA_BOXES, mute);
   }
 
   /**
@@ -85,7 +141,7 @@ export const sketch = (p) => {
       HEIGHT,
       undefined,
       // @ts-ignore
-      document.getElementById("sketch-canvas")
+      document.getElementById("sketch-canvas"),
     ).elt;
 
     MOUSE.setup(canvas);
@@ -99,9 +155,7 @@ export const sketch = (p) => {
     p.background(0);
 
     scene.update();
-
-    const scene_primitive = scene.render();
-    scene_primitive.draw(p);
+    scene.render().draw(p);
   };
 
   MOUSE.mouse_pressed(p, (input) => {
