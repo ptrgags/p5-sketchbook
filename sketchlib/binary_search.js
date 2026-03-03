@@ -16,19 +16,11 @@ Object.freeze(CompareResult);
  * @param {T[]} arr
  * @param {number} key The value to search for
  * @param {function(T, number): CompareResult} compare Function that compares the value with the current key and returns either
- * @param {number} [start_index = 0]
- * @param {number} [end_index]
+ * @param {number} start_index First index in range (inclusive)
+ * @param {number} end_index Last index in range (inclusive)
  * @returns {[number, T] | undefined} Either (index, value) if a match was found, or undefined if there was no match
  */
-export function binary_search(arr, key, compare, start_index = 0, end_index) {
-  if (arr.length === 0) {
-    return undefined;
-  }
-
-  if (end_index === undefined) {
-    end_index = arr.length - 1;
-  }
-
+function binary_search_recursive(arr, key, compare, start_index, end_index) {
   if (end_index < start_index) {
     return undefined;
   }
@@ -55,10 +47,46 @@ export function binary_search(arr, key, compare, start_index = 0, end_index) {
 }
 
 /**
- *
- * @param {*} value
- * @param {*} key
- * @returns
+ * @template T
+ * @param {T[]} arr
+ * @param {number} key The value to search for
+ * @param {function(T, number): CompareResult} compare Function that compares the value with the current key and returns either
+ * @param {number} [start_index = 0]
+ * @param {number} [end_index]
+ * @returns {[number, T] | undefined} Either (index, value) if a match was found, or undefined if there was no match
+ */
+export function binary_search(arr, key, compare, start_index, end_index) {
+  if (arr.length === 0) {
+    // No values, short circuit
+    return undefined;
+  }
+
+  if (end_index === undefined) {
+    end_index = arr.length - 1;
+  }
+
+  // check the key against the start and end of the array and short-circuit
+  const start_result = compare(arr[0], key);
+  if (start_result === CompareResult.MATCH) {
+    return [0, arr[0]];
+  } else if (start_result === CompareResult.LEFT) {
+    return undefined;
+  }
+  const end_result = compare(arr.at(-1), key);
+  if (end_result === CompareResult.MATCH) {
+    return [arr.length - 1, arr.at(-1)];
+  } else if (start_result === CompareResult.RIGHT) {
+    return undefined;
+  }
+
+  return binary_search_recursive(arr, key, compare, start_index, end_index);
+}
+
+/**
+ * Compare integers for an exact match
+ * @param {number} value The current value
+ * @param {number} key The search key
+ * @returns {CompareResult}
  */
 export function compare_ints(value, key) {
   if (key === value) {
