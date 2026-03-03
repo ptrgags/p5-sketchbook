@@ -21,3 +21,13 @@ export const N8T = TRIPLET.mul(N8);
 export const N16T = TRIPLET.mul(N16);
 export const N32T = TRIPLET.mul(N32);
 export const N64T = TRIPLET.mul(N64);
+
+// Dotted notes are 1.5 times the length
+export const DOTTED = new Rational(3, 2);
+export const N1D = N1.mul(DOTTED);
+export const N2D = N2.mul(DOTTED);
+export const N4D = N4.mul(DOTTED);
+export const N8D = N8.mul(DOTTED);
+export const N16D = N16.mul(DOTTED);
+export const N32D = N32.mul(DOTTED);
+export const N64D = N64.mul(DOTTED);

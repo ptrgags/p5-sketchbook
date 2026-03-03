@@ -1,7 +1,7 @@
 import { MINOR7, MAJOR7, HALF_DIM7 } from "../../sketchlib/music/chords.js";
 import { ChordVoicing } from "../../sketchlib/music/ChordVoicing.js";
 import { N8T, N1 } from "../../sketchlib/music/durations.js";
-import { Melody } from "../../sketchlib/music/Music.js";
+import { Melody, Rest } from "../../sketchlib/music/Music.js";
 import { E4, D4, C4, B3, G4, C5 } from "../../sketchlib/music/pitches.js";
 import { Part, Score } from "../../sketchlib/music/Score.js";
 import { Rational } from "../../sketchlib/Rational.js";
@@ -53,6 +53,8 @@ for (let i = 0; i < 3; i++) {
 chords.push(
   block_chords.at(-1).to_harmony(N1),
   new ChordVoicing([C4, E4, G4, C5]).to_harmony(N1),
+  // Put a little space before the start of the next loop
+  new Rest(N1),
 );
 
 export const SCORE_ORGAN_CHORDS = new Score(
