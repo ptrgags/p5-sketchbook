@@ -1,19 +1,19 @@
-import { Animated } from "../sketchlib/animation/Animated.js";
-import { Color } from "../sketchlib/Color.js";
-import { MIDIPitch } from "../sketchlib/music/MIDIPitch.js";
-import { A, A4, F, F6 } from "../sketchlib/music/pitches.js";
-import { Oklch } from "../sketchlib/Oklch.js";
-import { Point } from "../sketchlib/pga2d/Point.js";
-import { BeziergonPrimitive } from "../sketchlib/primitives/BeziergonPrimitive.js";
-import { Circle } from "../sketchlib/primitives/Circle.js";
-import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
-import { group, style } from "../sketchlib/primitives/shorthand.js";
-import { ShowHidePrimitive } from "../sketchlib/primitives/ShowHidePrimitive.js";
-import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
-import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
-import { Rectangle } from "../sketchlib/Rectangle.js";
-import { Style } from "../sketchlib/Style.js";
-import { PlayedNotes } from "./PlayedNotes.js";
+import { Animated } from "../animation/Animated.js";
+import { Color } from "../Color.js";
+import { MIDIPitch } from "../music/MIDIPitch.js";
+import { A, A4, F, F6 } from "../music/pitches.js";
+import { Oklch } from "../Oklch.js";
+import { Point } from "../pga2d/Point.js";
+import { BeziergonPrimitive } from "../primitives/BeziergonPrimitive.js";
+import { Circle } from "../primitives/Circle.js";
+import { GroupPrimitive } from "../primitives/GroupPrimitive.js";
+import { group, style } from "../primitives/shorthand.js";
+import { ShowHidePrimitive } from "../primitives/ShowHidePrimitive.js";
+import { TextPrimitive } from "../primitives/TextPrimitive.js";
+import { TextStyle } from "../primitives/TextStyle.js";
+import { Rectangle } from "../Rectangle.js";
+import { Style } from "../Style.js";
+import { PlayedNotes } from "../../SoundTest/PlayedNotes.js";
 
 // See https://www.desmos.com/calculator/o222tjtle9 for a diagram of the
 // tone hole placement

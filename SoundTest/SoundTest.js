@@ -38,7 +38,7 @@ import { SCORE_LAYERED_MELODY } from "./example_scores/layered_melody.js";
 import { Part, Score } from "../sketchlib/music/Score.js";
 import { AbsTimelineOps } from "../sketchlib/music/AbsTimelineOps.js";
 import { PlayedNotes } from "./PlayedNotes.js";
-import { Ocarina } from "./Ocarina.js";
+import { Ocarina } from "../sketchlib/music_vis/Ocarina.js";
 import { RelTimelineOps } from "../sketchlib/music/RelTimelineOps.js";
 import { A4, F6 } from "../sketchlib/music/pitches.js";
 import { minmax } from "../sketchlib/minmax.js";
