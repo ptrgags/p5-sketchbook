@@ -150,7 +150,7 @@ const SOPRANO_OCARINA = {
   bounds: new Rectangle(new Point(350, 700 - 112), new Direction(112, 112)),
   // Blue green
   color: new Oklch(0.6, 0.1, 213),
-  octave: Ocarina.OCTAVE_BASS,
+  octave: Ocarina.OCTAVE_SOPRANO,
 };
 
 const INACTIVE_COLOR = new Oklch(0.7, 0, 0);
