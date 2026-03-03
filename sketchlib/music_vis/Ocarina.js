@@ -249,24 +249,32 @@ function position_body(bounding_rect) {
   return BeziergonPrimitive.interpolate_points(points_screeen);
 }
 
+const INACTIVE_COLOR = new Oklch(0.7, 0, 0);
+
+/**
+ * @typedef {Object} OcarinaConfig
+ * @property {Rectangle} bounds A bounding rectangle to determine the size of the ocarina on the screen
+ * @property {number} octave Octave number of the lowest A of the ocarina
+ * @property {Oklch} color Base color for the ocarina
+ */
+
 /**
  * @implements {Animated}
  */
 export class Ocarina {
   /**
    * Constructor
-   * @param {Rectangle} bounding_rect Bounding rectangle, usually a square
-   * @param {PlayedNotes} score_notes
-   * @param {number} start_octave Octave of the lowest note, an A4
-   * @param {Oklch} base_color Base color for drawing the ocarina
+   * @param {OcarinaConfig} config Config options
+   * @param {PlayedNotes} [notes] Notes the Ocarina will play. If not provided, the ocarina will be deactivated
    */
-  constructor(bounding_rect, score_notes, start_octave, base_color) {
-    this.score_notes = score_notes;
+  constructor(config, notes) {
+    const start_octave = config.octave;
+    this.notes = notes ?? new PlayedNotes([]);
     this.start_note = MIDIPitch.from_pitch_octave(A, start_octave);
     this.end_note = MIDIPitch.from_pitch_octave(F, start_octave + 2);
 
-    if (score_notes.pitch_range) {
-      const [min_pitch, max_pitch] = score_notes.pitch_range;
+    if (notes) {
+      const [min_pitch, max_pitch] = notes.pitch_range;
       if (min_pitch < this.start_note || max_pitch > this.end_note) {
         console.warn(
           "score_notes has pitches out of range, these will be ignored",
@@ -274,6 +282,7 @@ export class Ocarina {
       }
     }
 
+    const base_color = notes ? config.color : INACTIVE_COLOR;
     const color_dark = base_color.adjust_lightness(-0.4);
     const color_light = base_color.adjust_lightness(0.2);
 
@@ -292,16 +301,17 @@ export class Ocarina {
       stroke: color_light,
     });
 
-    const body = position_body(bounding_rect);
-    const tone_holes = position_tone_holes(bounding_rect);
+    const bounds = config.bounds;
+    const body = position_body(bounds);
+    const tone_holes = position_tone_holes(bounds);
     this.closed_holes = new ShowHidePrimitive(tone_holes, NO_HOLES);
 
     this.pitch_label = new TextPrimitive(
       "",
-      bounding_rect.position.add(bounding_rect.dimensions),
+      bounds.position.add(bounds.dimensions),
     );
 
-    const text_size = Math.max(12, bounding_rect.dimensions.y / 4);
+    const text_size = Math.max(12, bounds.dimensions.y / 4);
     const text_style = new TextStyle(text_size, "right", "bottom");
 
     this.primitive = group(
@@ -322,7 +332,7 @@ export class Ocarina {
    * @param {number} time
    */
   update(time) {
-    const pitch_set = this.score_notes.get_held_pitches(time);
+    const pitch_set = this.notes.get_held_pitches(time);
 
     if (pitch_set.size > 1) {
       throw new Error("polyphonic scores not supported");

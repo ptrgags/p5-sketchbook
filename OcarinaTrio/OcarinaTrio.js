@@ -47,7 +47,6 @@ const SOPRANO_CONFIG = {
   color: new Oklch(0.6, 0.1, 213),
   octave: Ocarina.OCTAVE_SOPRANO,
 };
-const INACTIVE_COLOR = new Oklch(0.7, 0, 0);
 
 const OCARINA_BOXES = group(
   style(
@@ -70,32 +69,6 @@ const OCARINA_BOXES = group(
   ),
 );
 
-/**
- * @typedef {Object} OcarinaConfig
- * @property {Rectangle} bounds
- * @property {number} octave
- * @property {Oklch} color
- */
-
-/**
- *
- * @param {OcarinaConfig} config
- * @param {PlayedNotes} [notes]
- * @returns {Ocarina}
- */
-function make_ocarina(config, notes) {
-  if (!notes) {
-    return new Ocarina(
-      config.bounds,
-      new PlayedNotes([]),
-      config.octave,
-      INACTIVE_COLOR,
-    );
-  }
-
-  return new Ocarina(config.bounds, notes, config.octave, config.color);
-}
-
 class SoundScene {
   /**
    * Constructor
@@ -109,9 +82,9 @@ class SoundScene {
     this.sound.play_score("ocarina_trio");
 
     this.ocarinas = new AnimationGroup(
-      make_ocarina(BASS_CONFIG),
-      make_ocarina(TENOR_CONFIG),
-      make_ocarina(SOPRANO_CONFIG),
+      new Ocarina(BASS_CONFIG),
+      new Ocarina(TENOR_CONFIG),
+      new Ocarina(SOPRANO_CONFIG),
     );
 
     // Schedule sound callbacks here
