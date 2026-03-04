@@ -44,18 +44,15 @@ const SOUND_MANIFEST = {
 const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
 
 class PendulumClockScene {
+  /**
+   *
+   * @param {SoundManager} sound
+   */
   constructor(sound) {
     this.sound = sound;
     this.clock = new Clock();
-    this.mute_button = new MuteButton();
+    this.mute_button = new MuteButton(sound);
     this.events = new EventTarget();
-
-    this.mute_button.events.addEventListener(
-      "change",
-      (/** @type {CustomEvent}*/ e) => {
-        this.sound.toggle_sound(e.detail.sound_on);
-      },
-    );
 
     this.next_available_second = -1;
 

@@ -8,6 +8,7 @@ import { group, style } from "./primitives/shorthand.js";
 import { Style } from "./Style.js";
 import { Rectangle } from "./Rectangle.js";
 import { ToggleButton, ToggleState } from "./ToggleButton.js";
+import { SoundManager } from "./SoundManager.js";
 
 const SOUND_ON = ToggleState.STATE_A;
 const SOUND_OFF = ToggleState.STATE_B;
@@ -72,6 +73,10 @@ const GROUP_MUTED = group(SPEAKER, SPEAKER_SLASH);
 const GROUP_UNMUTED = SPEAKER;
 
 export class MuteButton {
+  /**
+   * Constructor
+   * @param {SoundManager} sound
+   */
   constructor(sound) {
     this.sound_toggle = new ToggleButton(
       new Rectangle(
@@ -81,16 +86,12 @@ export class MuteButton {
       SOUND_ON,
     );
 
-    this.events = new EventTarget();
-
     this.sound_toggle.events.addEventListener(
       "toggle",
       (/**@type {CustomEvent}**/ e) => {
         const state = e.detail;
         const sound_on = state === SOUND_ON;
-        this.events.dispatchEvent(
-          new CustomEvent("change", { detail: { sound_on } }),
-        );
+        sound.toggle_sound(sound_on);
       },
     );
   }

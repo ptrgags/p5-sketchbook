@@ -133,7 +133,7 @@ class SoundScene {
    */
   constructor(sound) {
     this.sound = sound;
-    this.mute_button = new MuteButton();
+    this.mute_button = new MuteButton(sound);
     this.events = new EventTarget();
 
     this.sound.play_score("ocarina_trio");
@@ -175,15 +175,6 @@ class SoundScene {
         pitch_range,
         new Style({ fill: SOPRANO_CONFIG.color }),
       ),
-    );
-
-    // Schedule sound callbacks here
-    // this.sound.events.addEventListener('event', (e) => ...);
-    this.mute_button.events.addEventListener(
-      "change",
-      (/**@type {CustomEvent} */ e) => {
-        this.sound.toggle_sound(e.detail.sound_on);
-      },
     );
   }
 

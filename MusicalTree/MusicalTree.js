@@ -29,18 +29,10 @@ class SoundScene {
    */
   constructor(sound) {
     this.sound = sound;
-    this.mute_button = new MuteButton();
+    this.mute_button = new MuteButton(sound);
     this.events = new EventTarget();
 
     this.sound.play_score("tree");
-
-    // Schedule sound callbacks here
-    this.mute_button.events.addEventListener(
-      "change",
-      (/** @type {CustomEvent}*/ e) => {
-        this.sound.toggle_sound(e.detail.sound_on);
-      }
-    );
   }
 
   update() {
@@ -103,7 +95,7 @@ export const sketch = (p) => {
       HEIGHT,
       undefined,
       // @ts-ignore
-      document.getElementById("sketch-canvas")
+      document.getElementById("sketch-canvas"),
     ).elt;
 
     MOUSE.setup(canvas);
