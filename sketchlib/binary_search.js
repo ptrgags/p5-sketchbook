@@ -12,25 +12,35 @@ export const CompareResult = {
 Object.freeze(CompareResult);
 
 /**
+ * Internal recursive implementation
  * @template T
- * @param {T[]} arr Array of values, assumed to be in sorted order
+ * @param {T[]} arr Array of values, assumed to be in sorted order with at least one entry.
  * @param {number} key The value to search for
  * @param {function(T, number): number} compare Function that compares the value with the current key and returns either
- * @param {number} start_index First index in range (inclusive)
- * @param {number} end_index Last index in range (inclusive)
- * @returns {[number, T] | undefined} Either (index, value) if a match was found, or undefined if there was no match
+ * @param {number} [start_index = 0] First index in range (inclusive)
+ * @param {number} [end_index] Last index in range (inclusive)
+ * @returns {[number, T | undefined]} if there's a match, return (index, value). If the key was before the start, returns (-Infinity, undefined). If the key was after the end, returns (Infinity, undefined). If the key was in the gap between two elements, returns (prev_index, undefined)
  */
-function binary_search_recursive(arr, key, compare, start_index, end_index) {
+function binary_search_recursive(
+  arr,
+  key,
+  compare,
+  start_index = 0,
+  end_index,
+) {
+  if (end_index === undefined) {
+    end_index = arr.length - 1;
+  }
+
   if (end_index < start_index) {
-    return undefined;
+    return [undefined, undefined];
   }
 
   if (start_index === end_index) {
     const start_val = arr[start_index];
     const result = compare(arr[start_index], key);
-    return result === CompareResult.MATCH
-      ? [start_index, start_val]
-      : undefined;
+    const val = result === CompareResult.MATCH ? start_val : undefined;
+    return [start_index, val];
   }
 
   const mid_index = Math.floor((start_index + end_index) / 2);
@@ -40,29 +50,22 @@ function binary_search_recursive(arr, key, compare, start_index, end_index) {
   if (result === CompareResult.MATCH) {
     return [mid_index, val_mid];
   } else if (result === CompareResult.LEFT) {
-    return binary_search(arr, key, compare, start_index, mid_index);
+    return binary_search_recursive(arr, key, compare, start_index, mid_index);
   } else {
-    return binary_search(arr, key, compare, mid_index, end_index);
+    return binary_search_recursive(arr, key, compare, mid_index, end_index);
   }
 }
 
 /**
  * @template T
- * @param {T[]} arr
+ * @param {T[]} arr Array of values. The values must be sorted by key
  * @param {number} key The value to search for
  * @param {function(T, number): CompareResult} compare Function that compares the value with the current key and returns either
- * @param {number} [start_index = 0]
- * @param {number} [end_index]
  * @returns {[number, T] | undefined} Either (index, value) if a match was found, or undefined if there was no match
  */
-export function binary_search(arr, key, compare, start_index, end_index) {
+export function binary_search(arr, key, compare) {
   if (arr.length === 0) {
-    // No values, short circuit
     return undefined;
-  }
-
-  if (end_index === undefined) {
-    end_index = arr.length - 1;
   }
 
   // check the key against the start and end of the array and short-circuit
@@ -79,7 +82,7 @@ export function binary_search(arr, key, compare, start_index, end_index) {
     return undefined;
   }
 
-  return binary_search_recursive(arr, key, compare, start_index, end_index);
+  return binary_search_recursive(arr, key, compare);
 }
 
 /**
@@ -147,30 +150,59 @@ export function compare_intervals_end(interval, time) {
  * @returns {AbsInterval<T>[]} Selected intervals
  */
 export function binary_search_range(intervals, start_time, end_time) {
-  const start_result = binary_search(
+  if (end_time < start_time) {
+    throw new Error("end_time must be greater than or equal to start time");
+  }
+
+  if (intervals.length === 0) {
+    return [];
+  }
+
+  // Check if the query range is completely out of bounds and short-circuit
+  const t_start = intervals[0].start_time.real;
+  const t_end = intervals.at(-1).end_time.real;
+  if (start_time >= t_end || end_time <= t_start) {
+    return [];
+  }
+
+  // Check if we've selected the whole range and short-circuit
+  if (start_time <= t_start && end_time >= t_end) {
+    return intervals;
+  }
+
+  // selecting from left end of array
+  if (start_time <= t_start) {
+    const start_index = 0;
+
+    const [end_index] = binary_search_recursive(
+      intervals,
+      end_time,
+      compare_intervals_end,
+    );
+
+    return intervals.slice(start_index, end_index);
+  }
+
+  // selecting from right end of array
+  if (end_time >= t_end) {
+    const [start_index] = binary_search_recursive(
+      intervals,
+      start_time,
+      compare_intervals_start,
+    );
+    return intervals.slice(start_index);
+  }
+
+  // selecting from middle of array
+  const [start_index] = binary_search_recursive(
     intervals,
     start_time,
     compare_intervals_start,
   );
-  const end_result = binary_search(intervals, end_time, compare_intervals_end);
-
-  if (!start_result && !end_result) {
-    // nothing in the selected range
-    return [];
-  }
-
-  if (!start_result && end_result) {
-    const [end_index] = end_result;
-    return intervals.slice(0, end_index + 1);
-  }
-
-  if (start_result && !end_result) {
-    const [start_index] = start_result;
-    return intervals.slice(start_index);
-  }
-
-  const [start_index] = start_result;
-  const [end_index] = end_result;
-
-  return intervals.slice(start_index, end_index + 1);
+  const [end_index] = binary_search_recursive(
+    intervals,
+    end_time,
+    compare_intervals_end,
+  );
+  return intervals.slice(start_index, end_index);
 }

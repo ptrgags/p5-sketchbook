@@ -113,6 +113,23 @@ describe("binary_search", () => {
 });
 
 describe("binary_search_range", () => {
+  it("with empty array returns empty array", () => {
+    const intervals = [];
+
+    const result = binary_search_range(intervals, 0, 1);
+
+    const expected = [];
+    expect(result).toEqual(expected);
+  });
+
+  it("with end time before start time throws error", () => {
+    const intervals = [new AbsInterval(0, Rational.ZERO, Rational.ONE)];
+
+    expect(() => {
+      return binary_search_range(intervals, 3, 2);
+    }).toThrowError("end_time must be greater than or equal to start_time");
+  });
+
   describe("single interval", () => {
     it("with time range before interval returns empty array", () => {
       const intervals = [new AbsInterval(0, Rational.ZERO, Rational.ONE)];
