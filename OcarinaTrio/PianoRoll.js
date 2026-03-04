@@ -70,9 +70,17 @@ export class PianoRoll {
     const t_max = time + this.on_screen_duration;
 
     // Only render the notes currently on screen
+    //20.1294375
+    //25.6294375
     const visible_rects = binary_search_range(this.all_rects, time, t_max).map(
       (x) => x.value,
     );
+
+    if (time > 8 && visible_rects.length === 0) {
+      debugger;
+      const result = binary_search_range(this.all_rects, time, t_max);
+      console.log(result);
+    }
 
     this.rects.length = 0;
     this.rects.splice(0, Infinity, ...visible_rects);

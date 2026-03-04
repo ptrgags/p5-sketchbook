@@ -316,4 +316,21 @@ describe("binary_search_range", () => {
       expect(result).toEqual(expected);
     });
   });
+
+  it("handles corner case of backwards indices correctly", () => {
+    const interval1 = new AbsInterval(1, new Rational(1), new Rational(2));
+    const interval2 = new AbsInterval(2, new Rational(2), new Rational(3));
+    const interval3 = new AbsInterval(3, new Rational(3), new Rational(4));
+    const interval4 = new AbsInterval(4, new Rational(4), new Rational(5));
+    const intervals = [interval1, interval2, interval3, interval4];
+
+    const result = binary_search_range(intervals, -1, 2.5);
+    // [1, 2, 3, 4]
+    //  0  1     3    2.5 is greater than 2, so right
+    //  xxxx  2  3    mid = 2, left
+    //     1  2       end = 1, mid = 2, backwards indices
+
+    const expected = [interval1, interval2];
+    expect(result).toEqual(expected);
+  });
 });

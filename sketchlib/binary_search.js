@@ -33,7 +33,7 @@ function binary_search_recursive(
   }
 
   if (end_index < start_index) {
-    return [undefined, undefined];
+    return [end_index, undefined];
   }
 
   if (start_index === end_index) {
