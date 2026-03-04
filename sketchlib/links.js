@@ -33,11 +33,6 @@ export const LINKS = [
     year: "2025-11",
   },
   {
-    title: "Pendulum Clock",
-    is_lab: true,
-    year: "2025-05",
-  },
-  {
     title: "Double Spring",
     is_lab: true,
     year: "2016, 2025-04",
