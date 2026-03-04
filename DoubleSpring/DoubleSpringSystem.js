@@ -4,7 +4,7 @@ import { RingBuffer } from "../sketchlib/RingBuffer.js";
 import { GeneralizedCoordinates } from "../sketchlib/VectorSpace.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
-import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
+import { Rectangle } from "../sketchlib/primitives/Rectangle.js";
 import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
@@ -184,7 +184,7 @@ export class DoubleSpringSystem {
 
     const bob_height = origin.add(Y_METERS.scale(w1));
     const bob1_position = bob_height.add(X_METERS.scale(l1 + x1));
-    const bob1 = new RectPrimitive(
+    const bob1 = new Rectangle(
       bob1_position,
       new Direction(w1, w1).scale(PIXELS_PER_METER),
     );
@@ -198,7 +198,7 @@ export class DoubleSpringSystem {
 
     const rest_length2 = l1 + w1 + l2;
     const bob2_position = bob_height.add(X_METERS.scale(rest_length2 + x2));
-    const bob2 = new RectPrimitive(
+    const bob2 = new Rectangle(
       bob2_position,
       new Direction(w2, w2).scale(PIXELS_PER_METER),
     );

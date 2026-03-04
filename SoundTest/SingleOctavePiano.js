@@ -1,6 +1,6 @@
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Color } from "../sketchlib/Color.js";
-import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
+import { Rectangle } from "../sketchlib/primitives/Rectangle.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 import { Rectangle } from "../sketchlib/Rectangle.js";
@@ -13,7 +13,7 @@ const NUM_BLACK_KEYS = 5;
  * Given a bounding rectangle, make 7 evenly-spaced rectangles for the
  * white keys
  * @param {Rectangle} bounding_rect Bounding rectangle for the whole piano octave
- * @return {RectPrimitive[]} An array of 7 rectangle primitives for the white keys
+ * @return {Rectangle[]} An array of 7 rectangle primitives for the white keys
  */
 function make_white_keys(bounding_rect) {
   const { x: width, y: height } = bounding_rect.dimensions;
@@ -23,7 +23,7 @@ function make_white_keys(bounding_rect) {
 
   for (let i = 0; i < NUM_WHITE_KEYS; i++) {
     const offset = Direction.DIR_X.scale(i * key_dimensions.x);
-    result[i] = new RectPrimitive(
+    result[i] = new Rectangle(
       bounding_rect.position.add(offset),
       key_dimensions,
     );
@@ -34,7 +34,7 @@ function make_white_keys(bounding_rect) {
 /**
  * Given the bounds for a piano octave, make 5 rectangles for the black keys.
  * @param {Rectangle} bounding_rect Bounding rectangle for the whole piano octave
- * @returns {RectPrimitive[]} An array of 5 rectangle primitives for the black keys, positioned at their respective spots over the white keys
+ * @returns {Rectangle[]} An array of 5 rectangle primitives for the black keys, positioned at their respective spots over the white keys
  */
 function make_black_keys(bounding_rect) {
   const { x: width, y: height } = bounding_rect.dimensions;
@@ -46,10 +46,7 @@ function make_black_keys(bounding_rect) {
 
   return key_offsets.map((i) => {
     const offset = Direction.DIR_X.scale((i * width) / 28);
-    return new RectPrimitive(
-      bounding_rect.position.add(offset),
-      key_dimensions,
-    );
+    return new Rectangle(bounding_rect.position.add(offset), key_dimensions);
   });
 }
 

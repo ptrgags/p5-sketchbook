@@ -3,7 +3,7 @@ import { Point } from "../../sketchlib/pga2d/Point.js";
 import { Ease } from "../../sketchlib/Ease.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
-import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
+import { Rectangle } from "../../sketchlib/primitives/Rectangle.js";
 import { group, style, xform } from "../../sketchlib/primitives/shorthand.js";
 import { Transform } from "../../sketchlib/primitives/Transform.js";
 import { Style } from "../../sketchlib/Style.js";
@@ -148,7 +148,7 @@ class Door {
     this.lower_xform = new Transform(shut_offset);
     this.upper_xform = new Transform(shut_offset);
 
-    const background = new RectPrimitive(
+    const background = new Rectangle(
       Point.ORIGIN.add(this.shut_offset).add(
         Direction.DIR_Y.scale(-DOOR_HEIGHT),
       ),

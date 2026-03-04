@@ -3,7 +3,7 @@ import { Point } from "../sketchlib/pga2d/Point.js";
 import { WIDTH, HEIGHT, SCREEN_CENTER } from "../sketchlib/dimensions.js";
 import { Mask } from "../sketchlib/primitives/ClipMask.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
-import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
+import { Rectangle } from "../sketchlib/primitives/Rectangle.js";
 import { style } from "../sketchlib/primitives/shorthand.js";
 import { VectorTangle } from "../sketchlib/primitives/VectorTangle.js";
 import { Style } from "../sketchlib/Style.js";
@@ -81,22 +81,19 @@ const PANELS = style(
 );
 
 const QUARTERS_DIMENSIONS = new Direction(200, 200);
-const QUARTER_HITOMEZASHI = new RectPrimitive(
+const QUARTER_HITOMEZASHI = new Rectangle(
   new Point(100, 100),
   QUARTERS_DIMENSIONS,
 );
-const QUARTER_CIRCLE_FAN = new RectPrimitive(
+const QUARTER_CIRCLE_FAN = new Rectangle(
   new Point(300, 100),
   QUARTERS_DIMENSIONS,
 );
-const QUARTER_BRICK_WALL = new RectPrimitive(
+const QUARTER_BRICK_WALL = new Rectangle(
   new Point(300, 300),
   QUARTERS_DIMENSIONS,
 );
-const QUARTER_PEEK = new RectPrimitive(
-  new Point(100, 300),
-  QUARTERS_DIMENSIONS,
-);
+const QUARTER_PEEK = new Rectangle(new Point(100, 300), QUARTERS_DIMENSIONS);
 
 const STYLE_QUARTERS = new Style({
   stroke: PALETTE_CORAL[Values.LIGHT],

@@ -1,7 +1,7 @@
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Color } from "./Color.js";
 import { GroupPrimitive } from "./primitives/GroupPrimitive.js";
-import { RectPrimitive } from "./primitives/RectPrimitive.js";
+import { Rectangle } from "./primitives/Rectangle.js";
 import { style } from "./primitives/shorthand.js";
 import { Style } from "./Style.js";
 import { Rectangle } from "./Rectangle.js";
@@ -64,7 +64,7 @@ export class ToggleButton {
    * @returns {GroupPrimitive}
    */
   debug_render() {
-    const rect = new RectPrimitive(this.rect.position, this.rect.dimensions);
+    const rect = new Rectangle(this.rect.position, this.rect.dimensions);
 
     const button_style =
       this.toggle_state === ToggleState.STATE_A

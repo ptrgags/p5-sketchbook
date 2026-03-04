@@ -7,7 +7,7 @@ import { sec_to_frames } from "../sketchlib/Tween.js";
 import { Color } from "../sketchlib/Color.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
-import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
+import { Rectangle } from "../sketchlib/primitives/Rectangle.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 
@@ -144,7 +144,7 @@ export class MosaicGrid {
       const { i, j } = index;
       const offset = new Direction(j * SQUARE_SIZE, i * SQUARE_SIZE);
       const position = CORNER.add(offset);
-      const rect = new RectPrimitive(position, STRIDE);
+      const rect = new Rectangle(position, STRIDE);
       by_colors[color_index].push(rect);
     });
     const color_groups = by_colors.map((x, i) => {

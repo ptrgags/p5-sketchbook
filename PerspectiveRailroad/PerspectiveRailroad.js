@@ -1,7 +1,7 @@
 import { Style } from "../sketchlib/Style.js";
 import { Color } from "../sketchlib/Color.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
-import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
+import { Rectangle } from "../sketchlib/primitives/Rectangle.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Line } from "../sketchlib/pga2d/Line.js";
@@ -173,13 +173,13 @@ function railroad_ties(tie_bottoms, tie_thickness) {
 }
 
 function make_background() {
-  const sky_prim = new RectPrimitive(
+  const sky_prim = new Rectangle(
     new Point(0, 0),
     new Direction(WIDTH, VP_RAILS.y),
   );
   const sky = style(sky_prim, SKY_STYLE);
 
-  const ground_prim = new RectPrimitive(
+  const ground_prim = new Rectangle(
     new Point(0, VP_RAILS.y),
     new Direction(WIDTH, HEIGHT - VP_RAILS.y),
   );

@@ -1,7 +1,7 @@
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
-import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
+import { Rectangle } from "../sketchlib/primitives/Rectangle.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 import { Tween } from "../sketchlib/Tween.js";
@@ -64,8 +64,8 @@ export class PixelSwapPair {
     const b_position = this.tween_ba.get_value(frame);
     const a_position = this.tween_ab.get_value(frame);
 
-    const square_b = new RectPrimitive(b_position, this.pixel_dimensions);
-    const square_a = new RectPrimitive(a_position, this.pixel_dimensions);
+    const square_b = new Rectangle(b_position, this.pixel_dimensions);
+    const square_a = new Rectangle(a_position, this.pixel_dimensions);
 
     const group_b = style([square_b], this.style_b);
     const group_a = style([square_a], this.style_a);

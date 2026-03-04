@@ -1,10 +1,10 @@
-import { Direction } from "../../sketchlib/pga2d/Direction.js";
-import { Point } from "../../sketchlib/pga2d/Point.js";
+import { Direction } from "../pga2d/Direction.js";
+import { Point } from "../pga2d/Point.js";
 
 /**
  * Rectangle
  */
-export class RectPrimitive {
+export class Rectangle {
   /**
    * Constructor
    * @param {Point} position The top left corner of the rectangle as a Point
