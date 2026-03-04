@@ -76,12 +76,6 @@ export class PianoRoll {
       (x) => x.value,
     );
 
-    if (time > 8 && visible_rects.length === 0) {
-      debugger;
-      const result = binary_search_range(this.all_rects, time, t_max);
-      console.log(result);
-    }
-
     this.rects.length = 0;
     this.rects.splice(0, Infinity, ...visible_rects);
 
