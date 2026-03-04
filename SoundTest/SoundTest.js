@@ -45,6 +45,9 @@ import { Note } from "../sketchlib/music/Music.js";
 import { AbsInterval } from "../sketchlib/music/AbsTimeline.js";
 import { SCORE_OCARINA_TRIO } from "./example_scores/ocarina_trio.js";
 import { Rational } from "../sketchlib/Rational.js";
+import { MouseCallbacks } from "../sketchlib/input/MouseCallbacks.js";
+import { SoundScene } from "../sketchlib/scenes/SoundScene.js";
+import { AnimationGroup } from "../sketchlib/animation/AnimationGroup.js";
 
 const DEBUG_LOOP = false;
 const LOOP_START = new Rational(14 * 4);
@@ -250,7 +253,7 @@ async function import_midi_file(file_list) {
   return [fname, buffer];
 }
 
-class SoundScene {
+class SoundTestAnimation {
   /**
    * Constructor
    * @param {SoundManager} sound Reference to the sound manager
@@ -323,6 +326,7 @@ class SoundScene {
      */
     this.selected_melody = undefined;
 
+    // Need to store the buttons so we can access the callbacks
     this.melody_buttons = melodies.map_array((index, descriptor) => {
       const corner = index.to_world(FIRST_BUTTON_POSITION, BUTTON_STRIDE);
       const rectangle = new Rectangle(corner, MELODY_BUTTON_DIMENSIONS);
@@ -332,6 +336,21 @@ class SoundScene {
       });
       return button;
     });
+    this.button_group = new AnimationGroup(...this.melody_buttons);
+
+    this.timeline_prim = group();
+
+    this.primitive = group(
+      this.button_group.primitive,
+      BUTTON_LABELS,
+      this.piano.primitive,
+      this.timeline_prim,
+      CURSOR,
+      this.ocarinas.bass.primitive,
+      this.ocarinas.tenor.primitive,
+      this.ocarinas.soprano.primitive,
+      this.spiral_burst.primitive,
+    );
   }
 
   /**
@@ -531,71 +550,30 @@ class SoundScene {
     return xform(timeline, transform);
   }
 
-  render() {
-    const current_time = SOUND.transport_time;
+  /**
+   *
+   * @param {number} time
+   */
+  update(time) {
+    this.piano.update(time);
+    this.ocarinas.bass.update(time);
+    this.ocarinas.tenor.update(time);
+    this.ocarinas.soprano.update(time);
+    this.spiral_burst.update(time);
+    this.button_group.update(time);
 
-    // this should really go in update()
-    this.piano.update(current_time);
-    this.ocarinas.bass.update(current_time);
-    this.ocarinas.tenor.update(current_time);
-    this.ocarinas.soprano.update(current_time);
-    this.spiral_burst.update(current_time);
-
-    const mute = this.mute_button.render();
-    const melody_buttons = this.melody_buttons.map((x) => x.debug_render());
-    const timeline = this.render_timeline(current_time);
-
-    // TODO: this should be rewritten to use the Animated interface
-    return group(
-      ...melody_buttons,
-      BUTTON_LABELS,
-      this.piano.primitive,
-      timeline,
-      CURSOR,
-      this.ocarinas.bass.primitive,
-      this.ocarinas.tenor.primitive,
-      this.ocarinas.soprano.primitive,
-      this.spiral_burst.primitive,
-      mute,
+    this.timeline_prim.primitives.splice(
+      0,
+      Infinity,
+      this.render_timeline(time),
     );
   }
 
-  update() {}
-
   /**
-   *
-   * @param {MouseInput} input
+   * @type {MouseCallbacks[]}
    */
-  mouse_pressed(input) {
-    this.mute_button.mouse_pressed(input);
-    this.melody_buttons.forEach((x) => x.mouse_pressed(input.mouse_coords));
-  }
-
-  /**
-   *
-   * @param {MouseInput} input
-   */
-  mouse_moved(input) {
-    this.mute_button.mouse_moved(input);
-    this.melody_buttons.forEach((x) => x.mouse_moved(input.mouse_coords));
-  }
-
-  /**
-   *
-   * @param {MouseInput} input
-   */
-  mouse_dragged(input) {
-    this.mute_button.mouse_dragged(input);
-    this.melody_buttons.forEach((x) => x.mouse_moved(input.mouse_coords));
-  }
-
-  /**
-   *
-   * @param {MouseInput} input
-   */
-  mouse_released(input) {
-    this.mute_button.mouse_released(input);
-    this.melody_buttons.forEach((x) => x.mouse_released(input.mouse_coords));
+  get mouse_callbacks() {
+    return this.melody_buttons;
   }
 }
 
@@ -616,9 +594,12 @@ export const sketch = (p) => {
     ).elt;
 
     MOUSE.setup(canvas);
+    MOUSE.callbacks = scene.mouse_callbacks;
 
     scene.events.addEventListener("scene-change", () => {
-      scene = new SoundScene(SOUND, MELODY_BUTTONS);
+      const anim = new SoundTestAnimation(SOUND, MELODY_BUTTONS);
+      scene = new SoundScene(SOUND, anim);
+      MOUSE.callbacks = scene.mouse_callbacks;
     });
   };
 
@@ -626,24 +607,8 @@ export const sketch = (p) => {
     p.background(0);
 
     scene.update();
-
-    const scene_primitive = scene.render();
-    scene_primitive.draw(p);
+    scene.primitive.draw(p);
   };
 
-  MOUSE.mouse_pressed(p, (input) => {
-    scene.mouse_pressed(input);
-  });
-
-  MOUSE.mouse_moved(p, (input) => {
-    scene.mouse_moved(input);
-  });
-
-  MOUSE.mouse_released(p, (input) => {
-    scene.mouse_released(input);
-  });
-
-  MOUSE.mouse_dragged(p, (input) => {
-    scene.mouse_dragged(input);
-  });
+  MOUSE.configure_callbacks(p);
 };

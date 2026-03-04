@@ -12,7 +12,7 @@ export class SoundScene {
   /**
    * Constructor
    * @param {SoundManager} sound
-   * @param {Animated} animation The animation to display
+   * @param {Animated & {mouse_callbacks?: MouseCallbacks[]}} animation The animation to display
    */
   constructor(sound, animation) {
     this.sound = sound;
@@ -32,7 +32,12 @@ export class SoundScene {
    * @type {MouseCallbacks[]}
    */
   get mouse_callbacks() {
-    return [this.mute_button.mouse_callbacks];
+    const callbacks = [this.mute_button.mouse_callbacks];
+    if (this.animation.mouse_callbacks) {
+      callbacks.push(...this.animation.mouse_callbacks);
+    }
+
+    return callbacks;
   }
 
   update() {
