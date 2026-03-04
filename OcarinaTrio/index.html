@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../libraries/p5.min.js"
+    ></script>
+    <script src="https://unpkg.com/tone@15.0.4/build/Tone.js"></script>
+    <script type="module">
+      import { sketch } from "./OcarinaTrio.js";
+      import "../sketchlib/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../styles/layout.css" />
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>Ocarina Trio (2026-02/2026-03)</h1>
+      <div class="sketch">
+        <canvas id="sketch-canvas" width="500" height="700"></canvas>
+      </div>
+      <div class="description">
+        <p>
+        I wrote a round for three ocarinas (bass, tenor, and soprano). This
+        animation visualizes the notes, as well as accurate fingerings
+        for these instruments.
+        </p>
+        </p>
+        <details>
+          <summary>Changelog</summary>
+          <dl>
+            <dt>2026-03-04</dt>
+            <dd>
+                Initial version of animation.
+            </dd>
+            <dt>2026-02-28</dt>
+            <dd>
+              Transcribed the music for this animation into code in this
+              repo. This was originally on the Sound Test page before I
+              built the animation to go with it.
+            </dd>
+            <dt>2026-02-27</dt>
+            <dd>
+              Wrote the music for this animation in Renoise.
+            </dd>
+          </dl>
+        </details>
+      </div>
+    </div>
+  </body>
+</html>

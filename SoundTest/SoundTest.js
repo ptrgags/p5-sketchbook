@@ -38,7 +38,7 @@ import { SCORE_LAYERED_MELODY } from "./example_scores/layered_melody.js";
 import { Part, Score } from "../sketchlib/music/Score.js";
 import { AbsTimelineOps } from "../sketchlib/music/AbsTimelineOps.js";
 import { PlayedNotes } from "./PlayedNotes.js";
-import { Ocarina } from "./Ocarina.js";
+import { Ocarina } from "../sketchlib/music_vis/Ocarina.js";
 import { RelTimelineOps } from "../sketchlib/music/RelTimelineOps.js";
 import { minmax } from "../sketchlib/minmax.js";
 import { Note } from "../sketchlib/music/Music.js";
@@ -166,8 +166,6 @@ const SOPRANO_OCARINA = {
   octave: Ocarina.OCTAVE_SOPRANO,
 };
 
-const INACTIVE_COLOR = new Oklch(0.7, 0, 0);
-
 const GRID_BOUNDARY = new Rectangle(
   new Point(0, 300),
   new Direction(WIDTH, 200),
@@ -264,24 +262,9 @@ class SoundScene {
     this.events = new EventTarget();
     this.piano = new Piano(PIANO_BOUNDS, new PlayedNotes([]));
     this.ocarinas = {
-      bass: new Ocarina(
-        BASS_OCARINA.bounds,
-        PlayedNotes.EMPTY,
-        BASS_OCARINA.octave,
-        INACTIVE_COLOR,
-      ),
-      tenor: new Ocarina(
-        TENOR_OCARINA.bounds,
-        PlayedNotes.EMPTY,
-        TENOR_OCARINA.octave,
-        INACTIVE_COLOR,
-      ),
-      soprano: new Ocarina(
-        SOPRANO_OCARINA.bounds,
-        PlayedNotes.EMPTY,
-        SOPRANO_OCARINA.octave,
-        INACTIVE_COLOR,
-      ),
+      bass: new Ocarina(BASS_OCARINA),
+      tenor: new Ocarina(TENOR_OCARINA),
+      soprano: new Ocarina(SOPRANO_OCARINA),
     };
     this.spiral_burst = new SpiralBurst();
 
@@ -509,53 +492,15 @@ class SoundScene {
 
     this.piano = new Piano(PIANO_BOUNDS, assigned_notes.piano);
 
-    if (assigned_notes.bass_ocarina) {
-      this.ocarinas.bass = new Ocarina(
-        BASS_OCARINA.bounds,
-        assigned_notes.bass_ocarina,
-        BASS_OCARINA.octave,
-        BASS_OCARINA.color,
-      );
-    } else {
-      this.ocarinas.bass = new Ocarina(
-        BASS_OCARINA.bounds,
-        PlayedNotes.EMPTY,
-        BASS_OCARINA.octave,
-        INACTIVE_COLOR,
-      );
-    }
-
-    if (assigned_notes.tenor_ocarina) {
-      this.ocarinas.tenor = new Ocarina(
-        TENOR_OCARINA.bounds,
-        assigned_notes.tenor_ocarina,
-        TENOR_OCARINA.octave,
-        TENOR_OCARINA.color,
-      );
-    } else {
-      this.ocarinas.tenor = new Ocarina(
-        TENOR_OCARINA.bounds,
-        PlayedNotes.EMPTY,
-        TENOR_OCARINA.octave,
-        INACTIVE_COLOR,
-      );
-    }
-
-    if (assigned_notes.soprano_ocarina) {
-      this.ocarinas.soprano = new Ocarina(
-        SOPRANO_OCARINA.bounds,
-        assigned_notes.soprano_ocarina,
-        SOPRANO_OCARINA.octave,
-        SOPRANO_OCARINA.color,
-      );
-    } else {
-      this.ocarinas.soprano = new Ocarina(
-        SOPRANO_OCARINA.bounds,
-        PlayedNotes.EMPTY,
-        SOPRANO_OCARINA.octave,
-        INACTIVE_COLOR,
-      );
-    }
+    this.ocarinas.bass = new Ocarina(BASS_OCARINA, assigned_notes.bass_ocarina);
+    this.ocarinas.tenor = new Ocarina(
+      TENOR_OCARINA,
+      assigned_notes.tenor_ocarina,
+    );
+    this.ocarinas.soprano = new Ocarina(
+      SOPRANO_OCARINA,
+      assigned_notes.soprano_ocarina,
+    );
   }
 
   /**
