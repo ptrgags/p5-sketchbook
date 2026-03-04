@@ -5,7 +5,6 @@ import { AbsTimelineOps } from "../sketchlib/music/AbsTimelineOps.js";
 import { Note } from "../sketchlib/music/Music.js";
 import { A3, F7 } from "../sketchlib/music/pitches.js";
 import { Ocarina } from "../sketchlib/music_vis/Ocarina.js";
-import { MuteButton } from "../sketchlib/MuteButton.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
@@ -119,7 +118,6 @@ export class OcarinaAnimation {
    */
   constructor(sound) {
     this.sound = sound;
-    this.mute_button = new MuteButton(sound);
     this.events = new EventTarget();
 
     this.sound.play_score("ocarina_trio");

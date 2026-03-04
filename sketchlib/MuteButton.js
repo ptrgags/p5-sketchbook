@@ -100,11 +100,11 @@ export class MuteButton {
     );
 
     this.slash = new ShowHidePrimitive([SPEAKER_SLASH], [false]);
-    this.primitive = group(SPEAKER);
+    this.primitive = group(SPEAKER, this.slash);
   }
 
   update() {
-    this.slash.show_flags = [this.sound_toggle.toggle_state == SOUND_OFF];
+    this.slash.show_flags = [this.sound_toggle.toggle_state === SOUND_OFF];
   }
 
   /**
