@@ -22,27 +22,6 @@ export class Primitive {
    * @param {import("p5")} p the p5.js instance
    */
   draw(p) {}
-
-  /**
-   * Type predicate for this interface
-   * @param {any} x
-   * @returns {x is Primitive}
-   */
-  static is_primitive(x) {
-    return x.draw !== undefined;
-  }
-
-  /**
-   * Ensure that an array of objects all implement Primitive.
-   * This is to keep TypeScript happy
-   * @param {any[]} arr
-   * @returns {asserts arr is Primitive[]}
-   */
-  static assert_primitive_array(arr) {
-    if (!arr.every(Primitive.is_primitive)) {
-      throw new Error(`expected array of primitives, got ${arr}`);
-    }
-  }
 }
 
 /**
