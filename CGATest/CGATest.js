@@ -11,6 +11,7 @@ import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { NullPoint } from "../sketchlib/cga2d/NullPoint.js";
 import { range } from "../sketchlib/range.js";
 import { mod } from "../sketchlib/mod.js";
+import { Primitive } from "../sketchlib/primitives/Primitive.js";
 
 // Create a few shapes encoded in CGA
 const CIRCLE = Cline.from_circle(new Circle(new Point(250, 350), 50));
@@ -126,14 +127,17 @@ export const sketch = (p) => {
       para_ill_screen.transform(x),
     );
 
-    const styled = style(
-      [BIG_UNIT_CIRCLE, ...lox_points, ...para_points],
-      SPIN_STYLE,
-    );
-    const styled2 = style(
-      [...swirled_points, ...hyp_points, ...para_ill_tiles],
-      INVERTED_STYLE,
-    );
+    const spin_prims = [BIG_UNIT_CIRCLE, ...lox_points, ...para_points];
+    Primitive.assert_primitive_array(spin_prims);
+    const styled = style(spin_prims, SPIN_STYLE);
+
+    const inverted_prims = [
+      ...swirled_points,
+      ...hyp_points,
+      ...para_ill_tiles,
+    ];
+    Primitive.assert_primitive_array(inverted_prims);
+    const styled2 = style(inverted_prims, INVERTED_STYLE);
 
     CGA_GEOM.draw(p);
     styled.draw(p);

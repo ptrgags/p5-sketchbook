@@ -7,7 +7,7 @@ import { COdd } from "./COdd.js";
  * (i.e. can be drawn) but also can be transformed by a versor.
  * @interface ConformalPrimitive
  */
-export class ConformalPrimitive extends Primitive {
+export class ConformalPrimitive {
   /**
    * Transform this primitive to another one of
    * the same type.

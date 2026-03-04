@@ -2,6 +2,7 @@ import { Animated } from "../sketchlib/animation/Animated.js";
 import { Cline } from "../sketchlib/cga2d/Cline.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Primitive } from "../sketchlib/primitives/Primitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { STYLE_X, STYLE_Y } from "./styling.js";
 import { CURVE_X, CURVE_Y } from "./timing.js";
@@ -69,6 +70,8 @@ export class ParabolicGridIllusion {
 
     const x_tiles = X_TILES.map((x) => para_screen.transform(x));
     const y_tiles = Y_TILES.map((x) => para_screen.transform(x));
+    Primitive.assert_primitive_array(x_tiles);
+    Primitive.assert_primitive_array(y_tiles);
     this.x_group.primitives = x_tiles;
     this.y_group.primitives = y_tiles;
   }
