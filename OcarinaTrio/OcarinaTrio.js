@@ -76,9 +76,14 @@ const SOPRANO_CONFIG = {
   octave: Ocarina.OCTAVE_SOPRANO,
 };
 
+const BOX_MARGIN = new Direction(6, 6);
+
 const OCARINA_BOXES = group(
   style(
-    new RectPrimitive(new Point(25, 0), new Direction(150, 150)),
+    new RectPrimitive(
+      new Point(25, 0).add(BOX_MARGIN),
+      new Direction(150, 150).add(BOX_MARGIN.scale(-2)),
+    ),
     new Style({
       fill: BASS_CONFIG.color,
       stroke: BASS_CONFIG.color.adjust_lightness(-0.2),
@@ -86,7 +91,10 @@ const OCARINA_BOXES = group(
     }),
   ),
   style(
-    new RectPrimitive(new Point(25 + 150, 0), new Direction(150, 150)),
+    new RectPrimitive(
+      new Point(25 + 150, 0).add(BOX_MARGIN),
+      new Direction(150, 150).add(BOX_MARGIN.scale(-2)),
+    ),
     new Style({
       fill: TENOR_CONFIG.color,
       stroke: TENOR_CONFIG.color.adjust_lightness(-0.2),
@@ -94,7 +102,10 @@ const OCARINA_BOXES = group(
     }),
   ),
   style(
-    new RectPrimitive(new Point(25 + 2 * 150, 0), new Direction(150, 150)),
+    new RectPrimitive(
+      new Point(25 + 2 * 150, 0).add(BOX_MARGIN),
+      new Direction(150, 150).add(BOX_MARGIN.scale(-2)),
+    ),
     new Style({
       fill: SOPRANO_CONFIG.color,
       stroke: SOPRANO_CONFIG.color.adjust_lightness(-0.2),
