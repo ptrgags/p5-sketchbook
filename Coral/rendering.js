@@ -1,22 +1,21 @@
-import { Rect } from "./Rect.js";
 import { CoralTile } from "./CoralTile.js";
 import { CardinalDirection } from "../sketchlib/CardinalDirection.js";
 import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
-import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
+import { Rectangle } from "../sketchlib/primitives/Rectangle.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 
 /**
  * Render the boundaries and cross-bars of a quad to uncolored geometry
  *
- * @param {Rect} rect quad boundary
- * @returns {(RectPrimitive|LinePrimitive)[]} a list of computed primitives
+ * @param {Rectangle} rect quad boundary
+ * @returns {(Rectangle|LinePrimitive)[]} a list of computed primitives
  */
 export function render_quad(rect) {
   const { x, y } = rect.position;
   const { x: w, y: h } = rect.dimensions;
   return [
     // Boundary
-    new RectPrimitive(rect.position, rect.dimensions),
+    new Rectangle(rect.position, rect.dimensions),
     // Crossbars
     new LinePrimitive(new Point(x, y + h / 2), new Point(x + w, y + h / 2)),
     new LinePrimitive(new Point(x + w / 2, y), new Point(x + w / 2, y + h)),

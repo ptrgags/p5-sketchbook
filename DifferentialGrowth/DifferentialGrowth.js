@@ -1,14 +1,13 @@
-import { Rectangle } from "./rectangle.js";
 import { Quadtree } from "./quadtree.js";
 import { DifferentialPolyline } from "./DifferentialPolyline.js";
 import { Style } from "../sketchlib/Style.js";
-import { Vector2 } from "./Vector2.js";
 import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
 import { Color } from "../sketchlib/Color.js";
 import { KeywordRecognizer } from "../sketchlib/KeywordRecognizer.js";
+import { Rectangle } from "../sketchlib/primitives/Rectangle.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 
-const BOUNDS = new Rectangle(0, 0, WIDTH, HEIGHT);
-const QUADTREE = new Quadtree(BOUNDS);
+const QUADTREE = new Quadtree(Rectangle.SCREEN_RECT);
 
 const points = [];
 const points2 = [];
@@ -18,8 +17,8 @@ for (let i = 0; i < INITIAL_POINTS; i++) {
   const angle = (2.0 * Math.PI * i) / INITIAL_POINTS;
   const x = WIDTH / 2 + 50 * Math.cos(angle);
   const y = HEIGHT / 2 + 50 * Math.sin(angle);
-  points.push(new Vector2(x, y - OFFSET));
-  points2.push(new Vector2(x, y + OFFSET));
+  points.push(new Point(x, y - OFFSET));
+  points2.push(new Point(x, y + OFFSET));
 }
 
 const POLYLINE = new DifferentialPolyline(points, QUADTREE);
@@ -98,10 +97,10 @@ export const sketch = (p) => {
 
     if (show_ref_geometry) {
       const poly1 = POLYLINE.make_polyline(
-        STYLE_POLYLINE1.with_stroke(Color.WHITE)
+        STYLE_POLYLINE1.with_stroke(Color.WHITE),
       );
       const poly2 = POLYLINE2.make_polyline(
-        STYLE_POLYLINE2.with_stroke(Color.WHITE)
+        STYLE_POLYLINE2.with_stroke(Color.WHITE),
       );
       poly1.draw(p);
       poly2.draw(p);

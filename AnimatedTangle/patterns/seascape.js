@@ -15,7 +15,7 @@ import {
 import { mod } from "../../sketchlib/mod.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { BeziergonPrimitive } from "../../sketchlib/primitives/BeziergonPrimitive.js";
-import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
+import { Rectangle } from "../../sketchlib/primitives/Rectangle.js";
 import { Circle } from "../../sketchlib/primitives/Circle.js";
 import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
 import { Animated } from "../../sketchlib/animation/Animated.js";
@@ -50,7 +50,7 @@ const STYLE_SKY = new Style({
   fill: PALETTE_SKY[Values.MEDIUM],
 });
 const BACKGROUND = style(
-  new RectPrimitive(Point.ORIGIN, new Direction(500, 100)),
+  new Rectangle(Point.ORIGIN, new Direction(500, 100)),
   STYLE_SKY,
 );
 

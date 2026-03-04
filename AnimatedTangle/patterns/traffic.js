@@ -3,7 +3,7 @@ import { Point } from "../../sketchlib/pga2d/Point.js";
 import { Ease } from "../../sketchlib/Ease.js";
 import { Circle } from "../../sketchlib/primitives/Circle.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
-import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
+import { Rectangle } from "../../sketchlib/primitives/Rectangle.js";
 import { group, style, xform } from "../../sketchlib/primitives/shorthand.js";
 import { Transform } from "../../sketchlib/primitives/Transform.js";
 import { Style } from "../../sketchlib/Style.js";
@@ -36,11 +36,11 @@ const CURVE_POSITION = LoopCurve.from_timeline(TIMELINE_POSITION);
 const PLATFORM_WIDTH = 25;
 const PLATFORM_HEIGHT = 25;
 const TOP_HEIGHT = 15;
-const PLATFORM_TOP = new RectPrimitive(
+const PLATFORM_TOP = new Rectangle(
   Point.ORIGIN,
   new Direction(PLATFORM_WIDTH, TOP_HEIGHT),
 );
-const PLATFORM_SHADOW = new RectPrimitive(
+const PLATFORM_SHADOW = new Rectangle(
   new Point(0, TOP_HEIGHT),
   new Direction(PLATFORM_WIDTH, PLATFORM_HEIGHT - TOP_HEIGHT),
 );

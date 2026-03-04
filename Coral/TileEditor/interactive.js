@@ -1,8 +1,8 @@
 import { Direction } from "../../sketchlib/pga2d/Direction.js";
 import { Point } from "../../sketchlib/pga2d/Point.js";
 import { Flector } from "../../sketchlib/pga2d/versors.js";
+import { Rectangle } from "../../sketchlib/primitives/Rectangle.js";
 import { ControlPoint } from "../ControlPoint.js";
-import { Rect } from "../Rect.js";
 
 export const SELECT_RADIUS = 10;
 const SELECT_RADIUS_SQR = SELECT_RADIUS * SELECT_RADIUS;
@@ -12,8 +12,8 @@ export class InteractiveVertex {
   /**
    *
    * @param {ControlPoint} control_point
-   * @param {Rect} constraint
-   * @param {Rect} tile_quad
+   * @param {Rectangle} constraint
+   * @param {Rectangle} tile_quad
    */
   constructor(control_point, constraint, tile_quad) {
     this.control_point = control_point;
@@ -57,7 +57,7 @@ export class InteractiveTangent {
    *
    * @param {ControlPoint} control_point
    * @param {Direction} forward_direction
-   * @param {Rect} tile_quad
+   * @param {Rectangle} tile_quad
    */
   constructor(control_point, forward_direction, tile_quad) {
     // The forward direction serves as a constraint so we never have

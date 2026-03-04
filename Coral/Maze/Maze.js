@@ -1,6 +1,5 @@
 import { generate_maze } from "../../sketchlib/RandomDFSMaze.js";
 import { CoralTile } from "../CoralTile.js";
-import { Rect } from "../Rect.js";
 import {
   render_quad,
   render_tile_walls,
@@ -15,6 +14,8 @@ import {
 } from "../styles.js";
 import { Grid } from "../../sketchlib/Grid.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
+import { Rectangle } from "../../sketchlib/primitives/Rectangle.js";
+import { Point } from "../../sketchlib/pga2d/Point.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -27,7 +28,10 @@ const CELL_HEIGHT = HEIGHT / GRID_ROWS;
 const QUADS = new Grid(GRID_ROWS, GRID_COLS);
 QUADS.fill((index) => {
   const { i, j } = index;
-  return new Rect(j * CELL_WIDTH, i * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT);
+  return new Rectangle(
+    new Point(j * CELL_WIDTH, i * CELL_HEIGHT),
+    new directionalLight(CELL_WIDTH, CELL_HEIGHT),
+  );
 });
 
 const QUAD_PRIMS = QUADS.map_array((_, quad) => {

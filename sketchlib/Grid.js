@@ -1,7 +1,7 @@
-import { Rectangle } from "./Rectangle.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { CardinalDirection } from "./CardinalDirection.js";
+import { Rectangle } from "./primitives/Rectangle.js";
 
 /**
  * Iterate over a 2D range of values, performing an action at each step.

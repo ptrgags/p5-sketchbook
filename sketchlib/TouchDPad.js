@@ -3,7 +3,7 @@ import { Point } from "../sketchlib/pga2d/Point.js";
 import { CardinalDirection, to_direction } from "./CardinalDirection.js";
 import { GroupPrimitive } from "./primitives/GroupPrimitive.js";
 import { PolygonPrimitive } from "./primitives/PolygonPrimitive.js";
-import { RectPrimitive } from "./primitives/RectPrimitive.js";
+import { Rectangle } from "./primitives/Rectangle.js";
 import { group, style } from "./primitives/shorthand.js";
 import { VectorPrimitive } from "./primitives/VectorPrimitive.js";
 import { Style } from "./Style.js";
@@ -189,10 +189,7 @@ export class TouchDPad {
   }
 
   debug_render() {
-    const boundary = new RectPrimitive(
-      this.rect.position,
-      this.rect.dimensions,
-    );
+    const boundary = new Rectangle(this.rect.position, this.rect.dimensions);
     const center = this.rect.center;
     const half_dimensions = this.rect.dimensions.scale(0.5);
 

@@ -3,7 +3,7 @@ import { Point } from "../../sketchlib/pga2d/Point.js";
 import { Mask } from "../../sketchlib/primitives/ClipMask.js";
 import { ClipPrimitive } from "../../sketchlib/primitives/ClipPrimitive.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
-import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
+import { Rectangle } from "../../sketchlib/primitives/Rectangle.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
 import { Transform } from "../../sketchlib/primitives/Transform.js";
 import { Style } from "../../sketchlib/Style.js";
@@ -47,7 +47,7 @@ const STYLE_BACKGROUND = new Style({
   fill: PALETTE_CORAL[Values.MED_DARK],
 });
 const BRICK_BACKGROUND = style(
-  new RectPrimitive(PANEL_CORNER, PANEL_DIMENSIONS),
+  new Rectangle(PANEL_CORNER, PANEL_DIMENSIONS),
   STYLE_BACKGROUND,
 );
 
@@ -94,7 +94,7 @@ class Brick {
 
     // The brick is an unstyled rectangle. BrickWall will use this primitive
     // both for a drop shadow and a clip mask, hence the leaving it unstyled
-    this.primitive = new RectPrimitive(position, BRICK_DIMENSIONS);
+    this.primitive = new Rectangle(position, BRICK_DIMENSIONS);
   }
 
   /**

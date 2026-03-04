@@ -1,5 +1,8 @@
+import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
-import { Rectangle } from "./rectangle.js";
+import { Rectangle } from "../sketchlib/primitives/Rectangle.js";
+import { DifferentialNode } from "./DifferentialNode.js";
 
 /**
  * Get a bounding square around a circle
@@ -9,11 +12,18 @@ import { Rectangle } from "./rectangle.js";
 function get_bounding_square(circle) {
   const { x: cx, y: cy } = circle.center;
   const r = circle.radius;
-  return new Rectangle(cx - r, cy - r, 2 * r, 2 * r);
+  return new Rectangle(new Point(cx - r, cy - r), new Direction(2 * r, 2 * r));
 }
 
 const DEFAULT_CAPACITY = 10;
 
+/**
+ * Partition an array based on a predicate
+ * @template T
+ * @param {T[]} array
+ * @param {function(T): boolean} condition
+ * @returns {[T[], T[]]}, (true_values, false_valeus)
+ */
 function partition(array, condition) {
   const pass = [];
   const fail = [];
@@ -34,18 +44,35 @@ export class Quadtree {
    * @param {number} capacity
    */
   constructor(bounds, capacity = DEFAULT_CAPACITY) {
+    /**
+     * @type {Rectangle}
+     */
     this.bounds = bounds;
+    /**
+     * @type {number}
+     */
     this.capacity = capacity;
-    this.points = [];
+    /**
+     * @type {DifferentialNode[]}
+     */
+    this.nodes = [];
 
-    // children has either 0 or 4 children
-    // if 4 children, they are ordered by quadrant
-    // see rectangle.get_quadrant(point)
+    /**
+     * There are either 0 or 4 children. If 4, they are ordered by
+     * quadrant. See Rectangle.get_quadrant(point)
+     * @type {Quadtree[]}
+     */
     this.children = [];
   }
 
-  contains(point) {
-    return this.bounds.contains(point.position);
+  /**
+   * Check if a node is inside the quadtree tile
+   * @param {DifferentialNode} node Node to check
+   * @returns {boolean}
+   */
+  contains(node) {
+    const point = new Point(node.position.x, node.position.y);
+    return this.bounds.contains(point);
   }
 
   get is_leaf() {
@@ -53,7 +80,7 @@ export class Quadtree {
   }
 
   get is_empty() {
-    return this.points.length === 0;
+    return this.nodes.length === 0;
   }
 
   count_nodes() {
@@ -68,36 +95,40 @@ export class Quadtree {
     return sum;
   }
 
-  insert_point(point) {
-    if (!this.bounds.contains(point.position)) {
+  /**
+   * Insert a growth node
+   * @param {DifferentialNode} node
+   */
+  insert_node(node) {
+    if (!this.bounds.contains(node.position)) {
       throw new Error("OUT OF BOUNDS!");
     }
 
     if (this.is_leaf) {
-      point.quadtree_node = this;
-      this.points.push(point);
+      node.quadtree_node = this;
+      this.nodes.push(node);
 
-      if (this.points.length > this.capacity) {
+      if (this.nodes.length > this.capacity) {
         this.subdivide();
       }
     } else {
-      const quadrant = this.bounds.get_quadrant(point.position);
-      this.children[quadrant].insert_point(point);
+      const quadrant = this.bounds.get_quadrant(node.position);
+      this.children[quadrant].insert_node(node);
     }
   }
 
   subdivide() {
-    const children_bounds = this.bounds.subdivide();
+    const children_bounds = this.bounds.subdivide_quadrants();
     this.children = children_bounds.map((rect) => {
       return new Quadtree(rect, this.capacity);
     });
 
     // Move all points from this node to the children
-    for (const point of this.points) {
+    for (const point of this.nodes) {
       const quadrant = this.bounds.get_quadrant(point.position);
-      this.children[quadrant].insert_point(point);
+      this.children[quadrant].insert_node(point);
     }
-    this.points = [];
+    this.nodes = [];
   }
 
   // recursively redistribute dirty points
@@ -105,10 +136,10 @@ export class Quadtree {
     if (this.is_leaf) {
       // separate the dirty points and send them up the tree. Keep the clean points.
       const [dirty_points, clean_points] = partition(
-        this.points,
+        this.nodes,
         (x) => x.is_dirty,
       );
-      this.points = clean_points;
+      this.nodes = clean_points;
       return dirty_points;
     }
 
@@ -124,16 +155,16 @@ export class Quadtree {
     }
 
     const outside_parent_list = [];
-    for (const point of child_dirty_list) {
-      if (this.bounds.contains(point.position)) {
+    for (const node of child_dirty_list) {
+      if (this.bounds.contains(node.position)) {
         // point moved from one child to another,
         // redistribute the point.
-        point.is_dirty = false;
-        this.insert_point(point);
+        node.is_dirty = false;
+        this.insert_node(node);
       } else {
         // Point moved outside the parent, propagate
         // it up the tree
-        outside_parent_list.push(point);
+        outside_parent_list.push(node);
       }
     }
 
@@ -158,9 +189,14 @@ export class Quadtree {
     return points.filter((p) => circle.contains(p.position));
   }
 
+  /**
+   *
+   * @param {Rectangle} rectangle
+   * @returns {DifferentialNode[]}
+   */
   rectangle_query(rectangle) {
     if (this.is_leaf) {
-      return this.points.filter((p) => rectangle.contains(p.position));
+      return this.nodes.filter((p) => rectangle.contains(p.position));
     }
 
     const child_points = [];
@@ -177,7 +213,7 @@ export class Quadtree {
   draw(p) {
     this.bounds.draw(p);
 
-    for (const point of this.points) {
+    for (const point of this.nodes) {
       point.draw(p);
     }
 
