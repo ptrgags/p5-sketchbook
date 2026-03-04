@@ -189,12 +189,13 @@ describe("binary_search_range", () => {
       expect(result).toEqual(intervals);
     });
 
-    it("with zero range exactly at start returns the interval", () => {
+    it("with zero range exactly at start returns empty array", () => {
       const intervals = [new AbsInterval(0, Rational.ZERO, Rational.ONE)];
 
       const result = binary_search_range(intervals, 0, 0);
 
-      expect(result).toEqual(intervals);
+      const expected = [];
+      expect(result).toEqual(expected);
     });
 
     it("with zero range exactly at end returns empty array", () => {
@@ -238,10 +239,10 @@ describe("binary_search_range", () => {
       expect(result).toEqual(expected);
     });
 
-    it("with range exactly at boundary returns only second interval", () => {
+    it("with range exactly at boundary returns empty array", () => {
       const result = binary_search_range(intervals, 1, 1);
 
-      const expected = [interval2];
+      const expected = [];
       expect(result).toEqual(expected);
     });
   });

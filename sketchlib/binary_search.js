@@ -39,8 +39,14 @@ function binary_search_recursive(
   if (start_index === end_index) {
     const start_val = arr[start_index];
     const result = compare(arr[start_index], key);
+
+    // If we matched, we return (index, value). If we didn't match, then
+    // the key is between array entries. In that case, we want to return
+    // (index_before_gap, undefined)
     const val = result === CompareResult.MATCH ? start_val : undefined;
-    return [start_index, val];
+    const before_index =
+      result === CompareResult.LEFT ? start_index - 1 : start_index;
+    return [before_index, val];
   }
 
   const mid_index = Math.floor((start_index + end_index) / 2);
@@ -183,39 +189,51 @@ export function binary_search_range(intervals, start_time, end_time) {
     return intervals;
   }
 
-  // selecting from left end of array
-  if (start_time <= t_start) {
-    const start_index = 0;
+  let start_index;
+  let end_index;
 
-    const [end_index] = binary_search_recursive(
+  if (start_time <= t_start) {
+    // selecting from left end of array
+    start_index = 0;
+    [end_index] = binary_search_recursive(
       intervals,
       end_time,
       compare_intervals_end,
     );
-
-    return intervals.slice(start_index, end_index);
-  }
-
-  // selecting from right end of array
-  if (end_time >= t_end) {
-    const [start_index] = binary_search_recursive(
+  } else if (end_time >= t_end) {
+    // selecting from right end of array
+    let value;
+    [start_index, value] = binary_search_recursive(
       intervals,
       start_time,
       compare_intervals_start,
     );
-    return intervals.slice(start_index);
-  }
+    if (value === undefined) {
+      // We're in a gap between entries and start_index is the index before
+      // the gap, so add one
+      start_index++;
+    }
 
-  // selecting from middle of array
-  const [start_index] = binary_search_recursive(
-    intervals,
-    start_time,
-    compare_intervals_start,
-  );
-  const [end_index] = binary_search_recursive(
-    intervals,
-    end_time,
-    compare_intervals_end,
-  );
-  return intervals.slice(start_index, end_index);
+    end_index = intervals.length - 1;
+  } else {
+    // selecting from middle of array
+    let value;
+    [start_index, value] = binary_search_recursive(
+      intervals,
+      start_time,
+      compare_intervals_start,
+    );
+    if (value === undefined) {
+      // we're in a gap between entries and start_index is the index before
+      // this one, so add one
+      start_index++;
+    }
+
+    [end_index] = binary_search_recursive(
+      intervals,
+      end_time,
+      compare_intervals_end,
+    );
+  }
+  return intervals.slice(start_index, end_index + 1);
 }
