@@ -61,6 +61,29 @@ export class Rectangle {
   }
 
   /**
+   * Check if two rectangles intersect
+   * @param {Rectangle} other
+   * @returns {boolean} true if the rectangles overlap
+   */
+  intersects(other) {
+    const a_near = this.position;
+    const b_near = other.position;
+
+    const a_far = this.far_corner;
+    const b_far = other.far_corner;
+
+    if (a_near.x > b_far.x || b_near.x > a_far.x) {
+      return false;
+    }
+
+    if (a_near.y > b_far.y || b_near.y > a_far.y) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
    * Convert a position from UV coordinates to screen pixels
    * @param {Point} uv
    * @returns {Point}
@@ -85,6 +108,44 @@ export class Rectangle {
     const u = (x - this.position.x) / this.dimensions.x;
     const v = 1 - (y - this.position.y) / this.dimensions.y;
     return new Point(u, v);
+  }
+
+  /**
+   * Determine which of the 4 quadrants a point is in
+   * @param {Point} point A point to check
+   * @returns {number} The index 0-3 of the quadrant in the same order that subdivide() returns children
+   */
+  get_quadrant(point) {
+    const { x: cx, y: cy } = this.center;
+
+    let x_bit = 0;
+    if (point.x >= cx) {
+      x_bit = 1;
+    }
+
+    let y_bit = 0;
+    if (point.y >= cy) {
+      y_bit = 1;
+    }
+
+    return (x_bit << 1) | y_bit;
+  }
+
+  /**
+   *
+   * @returns {Rectangle[]}
+   */
+  subdivide_quadrants() {
+    const { x, y } = this.position;
+    const center = this.center;
+    const half_dims = this.dimensions.scale(0.5);
+
+    return [
+      new Rectangle(this.position, half_dims),
+      new Rectangle(new Point(x, center.y), half_dims),
+      new Rectangle(new Point(center.x, y), half_dims),
+      new Rectangle(center, half_dims),
+    ];
   }
 
   /**
