@@ -1,5 +1,4 @@
 import { fix_mouse_coords } from "../../sketchlib/fix_mouse_coords.js";
-import { Rect } from "../Rect.js";
 import { CoralTile } from "../CoralTile.js";
 import { InteractiveTangent, InteractiveVertex } from "./interactive.js";
 import { find_splines } from "../find_splines.js";
@@ -21,11 +20,17 @@ import { CardinalDirection } from "../../sketchlib/CardinalDirection.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
 import { Circle } from "../../sketchlib/primitives/Circle.js";
 import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
+import { Rectangle } from "../../sketchlib/primitives/Rectangle.js";
+import { Point } from "../../sketchlib/pga2d/Point.js";
+import { Direction } from "../../sketchlib/pga2d/Direction.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
 
-const BIG_QUAD = new Rect(0, HEIGHT / 2 - WIDTH / 2, WIDTH, WIDTH);
+const BIG_QUAD = new Rectangle(
+  new Point(0, HEIGHT / 2 - WIDTH / 2),
+  new Direction(WIDTH, WIDTH),
+);
 const SMALL_QUADS = BIG_QUAD.subdivide_grid(4);
 
 // prettier-ignore

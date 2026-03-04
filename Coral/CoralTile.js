@@ -1,9 +1,9 @@
 import { ControlPoint } from "./ControlPoint.js";
-import { Rect } from "./Rect.js";
 import { FlagSet } from "../sketchlib/FlagSet.js";
 import { CardinalDirection } from "../sketchlib/CardinalDirection.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Rectangle } from "../sketchlib/primitives/Rectangle.js";
 
 const DIR_LEFT = Direction.DIR_X.neg();
 const DIR_RIGHT = Direction.DIR_X;
@@ -24,7 +24,7 @@ Object.freeze(Quadrant);
 export class CoralTile {
   /**
    *
-   * @param {Rect} quad
+   * @param {Rectangle} quad
    * @param {FlagSet} connection_flags
    * @param {ControlPoint[]} [control_points]
    */
@@ -66,17 +66,17 @@ export class CoralTile {
     }
 
     const se_vertex_constraint = connects_down
-      ? new Rect(0.5, 0, 0.5, 0)
-      : new Rect(0.5, 0, 0, 0.5);
+      ? new Rectangle(new Point(0.5, 0), new Direction(0.5, 0))
+      : new Rectangle(new Point(0.5, 0), new Direction(0, 0.5));
     const ne_vertex_constraint = connects_right
-      ? new Rect(1, 0.5, 0, 0.5)
-      : new Rect(0.5, 0.5, 0.5, 0);
+      ? new Rectangle(new Point(1, 0.5), new Direction(0, 0.5))
+      : new Rectangle(new Point(0.5, 0.5), new Direction(0.5, 0));
     const nw_vertex_constraint = connects_up
-      ? new Rect(0, 1, 0.5, 0)
-      : new Rect(0.5, 0.5, 0, 0.5);
+      ? new Rectangle(new Point(0, 1), new Direction(0.5, 0))
+      : new Rectangle(new Point(0.5, 0.5), new Direction(0, 0.5));
     const sw_vertex_constraint = connects_left
-      ? new Rect(0, 0, 0, 0.5)
-      : new Rect(0, 0.5, 0.5, 0);
+      ? new Rectangle(new Point(0, 0), new Direction(0, 0.5))
+      : new Rectangle(new Point(0, 0.5), new Direction(0.5, 0));
     this.vertex_constraints = [
       se_vertex_constraint,
       ne_vertex_constraint,
@@ -105,7 +105,7 @@ export class CoralTile {
 
   /**
    *
-   * @returns {[ControlPoint, Rect, Direction][]} (control point, vertex constraint, tangent constraint)
+   * @returns {[ControlPoint, Rectangle, Direction][]} (control point, vertex constraint, tangent constraint)
    */
   get_constraints() {
     // control point, vertex constraint, tangent constraint
@@ -135,7 +135,7 @@ export class CoralTile {
   /**
    *
    * @param {object} json
-   * @param {Rect} quad
+   * @param {Rectangle} quad
    * @returns {CoralTile}
    */
   static parse_json(json, quad) {
