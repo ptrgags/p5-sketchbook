@@ -1,3 +1,4 @@
+import { make_stripes } from "../AnimatedTangle/patterns/stripes.js";
 import { Animated } from "../sketchlib/animation/Animated.js";
 import { Color } from "../sketchlib/Color.js";
 import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
@@ -12,8 +13,8 @@ import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 
 const COLUMN_STYLES = [
-  new Style({ fill: new Oklch(1.0, 0, 0, 0.5) }),
-  new Style({ fill: new Oklch(0.5, 0, 0, 0.5) }),
+  new Style({ fill: new Oklch(0.3, 0, 0) }),
+  new Style({ fill: new Oklch(0.2, 0, 0) }),
 ];
 const COLUMN_STYLE_INDICES = [0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0];
 
@@ -55,6 +56,14 @@ export class PianoRollBackground {
       );
     }
 
+    this.beat_lines = style(
+      [],
+      new Style({
+        stroke: new Oklch(0.8, 0, 0),
+        width: 2,
+      }),
+    );
+
     this.bar_lines = style(
       [],
       new Style({
@@ -62,7 +71,12 @@ export class PianoRollBackground {
         width: 2,
       }),
     );
-    this.primitive = group(...columns, ...pitch_lines, this.bar_lines);
+    this.primitive = group(
+      ...columns,
+      ...pitch_lines,
+      this.beat_lines,
+      this.bar_lines,
+    );
   }
 
   /**
@@ -79,5 +93,17 @@ export class PianoRollBackground {
 
     this.bar_lines.primitives.length = 0;
     this.bar_lines.primitives.splice(0, Infinity, ...lines);
+
+    const beat_lines = [];
+    // t is an integer, mod(t, 1) gives [0, 1]
+    // mod(4t, 1) gives [0, 1] but 4 times as often
+    const t_first_beat_line = 1.0 - mod(4 * time, 1.0);
+    const y_first_beat_line = this.y + (this.velocity / 4) * t_first_beat_line;
+    for (let y = y_first_beat_line; y < HEIGHT; y += this.velocity / 4) {
+      beat_lines.push(new LinePrimitive(new Point(0, y), new Point(WIDTH, y)));
+    }
+
+    this.beat_lines.primitives.length = 0;
+    this.beat_lines.primitives.splice(0, Infinity, ...beat_lines);
   }
 }

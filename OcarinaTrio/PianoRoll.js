@@ -1,11 +1,5 @@
 import { Animated } from "../sketchlib/animation/Animated.js";
-import {
-  binary_search,
-  binary_search_range,
-  compare_intervals_end,
-  compare_intervals_start,
-  CompareResult,
-} from "../sketchlib/binary_search.js";
+import { binary_search_range } from "../sketchlib/binary_search.js";
 import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
 import { AbsInterval } from "../sketchlib/music/AbsTimeline.js";
 import { Note } from "../sketchlib/music/Music.js";
@@ -13,7 +7,6 @@ import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
-import { style } from "../sketchlib/primitives/shorthand.js";
 import { Transform } from "../sketchlib/primitives/Transform.js";
 import { Style } from "../sketchlib/Style.js";
 
@@ -70,8 +63,6 @@ export class PianoRoll {
     const t_max = time + this.on_screen_duration;
 
     // Only render the notes currently on screen
-    //20.1294375
-    //25.6294375
     const visible_rects = binary_search_range(this.all_rects, time, t_max).map(
       (x) => x.value,
     );

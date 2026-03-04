@@ -137,7 +137,7 @@ class SoundScene {
     );
 
     const y = 150;
-    const velocity = 100;
+    const velocity = 200;
     /**
      * @type {[number, number]}
      */
