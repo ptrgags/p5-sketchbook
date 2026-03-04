@@ -189,51 +189,34 @@ export function binary_search_range(intervals, start_time, end_time) {
     return intervals;
   }
 
-  let start_index;
-  let end_index;
+  // Use binary search 1-2 times to find the range of indices whose intervals
+  // overlap nontrivially with the query range
+  let start_index = 0;
+  let end_index = intervals.length - 1;
 
-  if (start_time <= t_start) {
-    // selecting from left end of array
-    start_index = 0;
-    [end_index] = binary_search_recursive(
-      intervals,
-      end_time,
-      compare_intervals_end,
-    );
-  } else if (end_time >= t_end) {
-    // selecting from right end of array
-    let value;
-    [start_index, value] = binary_search_recursive(
+  if (start_time > t_start) {
+    let start_val;
+    [start_index, start_val] = binary_search_recursive(
       intervals,
       start_time,
       compare_intervals_start,
     );
-    if (value === undefined) {
-      // We're in a gap between entries and start_index is the index before
-      // the gap, so add one
-      start_index++;
-    }
 
-    end_index = intervals.length - 1;
-  } else {
-    // selecting from middle of array
-    let value;
-    [start_index, value] = binary_search_recursive(
-      intervals,
-      start_time,
-      compare_intervals_start,
-    );
-    if (value === undefined) {
-      // we're in a gap between entries and start_index is the index before
-      // this one, so add one
-      start_index++;
-    }
-
-    [end_index] = binary_search_recursive(
-      intervals,
-      end_time,
-      compare_intervals_end,
-    );
+    // if the start time is in a gap between entries, the index before the
+    // gap is returned, and we want the one after that.
+    start_index = start_val === undefined ? start_index + 1 : start_index;
   }
+
+  if (end_time < t_end) {
+    [end_index] = binary_search_recursive(
+      intervals,
+      end_time,
+      compare_intervals_end,
+    );
+
+    // even if we fell into a gap, the index returned is the one before
+    // the gap, which is exactly what we need here.
+  }
+
   return intervals.slice(start_index, end_index + 1);
 }
