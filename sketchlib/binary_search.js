@@ -50,13 +50,20 @@ function binary_search_recursive(
   if (result === CompareResult.MATCH) {
     return [mid_index, val_mid];
   } else if (result === CompareResult.LEFT) {
-    return binary_search_recursive(arr, key, compare, start_index, mid_index);
+    return binary_search_recursive(
+      arr,
+      key,
+      compare,
+      start_index,
+      mid_index - 1,
+    );
   } else {
-    return binary_search_recursive(arr, key, compare, mid_index, end_index);
+    return binary_search_recursive(arr, key, compare, mid_index + 1, end_index);
   }
 }
 
 /**
+ * Search through an array in O(lg n) time
  * @template T
  * @param {T[]} arr Array of values. The values must be sorted by key
  * @param {number} key The value to search for
@@ -78,11 +85,17 @@ export function binary_search(arr, key, compare) {
   const end_result = compare(arr.at(-1), key);
   if (end_result === CompareResult.MATCH) {
     return [arr.length - 1, arr.at(-1)];
-  } else if (start_result === CompareResult.RIGHT) {
+  } else if (end_result === CompareResult.RIGHT) {
     return undefined;
   }
 
-  return binary_search_recursive(arr, key, compare);
+  // the recursive call returns (index, value | undefined), but we want
+  // (index, value) | undefined
+  const result = binary_search_recursive(arr, key, compare);
+  if (result[1] === undefined) {
+    return undefined;
+  }
+  return result;
 }
 
 /**
@@ -151,7 +164,7 @@ export function compare_intervals_end(interval, time) {
  */
 export function binary_search_range(intervals, start_time, end_time) {
   if (end_time < start_time) {
-    throw new Error("end_time must be greater than or equal to start time");
+    throw new Error("end_time must be greater than or equal to start_time");
   }
 
   if (intervals.length === 0) {
