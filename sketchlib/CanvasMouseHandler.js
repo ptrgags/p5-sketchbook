@@ -3,6 +3,7 @@ import { prevent_mobile_scroll } from "./prevent_mobile_scroll.js";
 import { MouseInCanvas, MouseInput, MousePressed } from "./MouseInput.js";
 import { SCREEN_RECT } from "./Rectangle.js";
 import { MouseCallbacks } from "./input/MouseCallbacks.js";
+
 /**
  * @typedef {function(MouseInput):void} MouseCallback
  */
@@ -19,6 +20,57 @@ export class CanvasMouseHandler {
      * @type {HTMLCanvasElement}
      */
     this.canvas = undefined;
+
+    // Arrays of callbacks
+    /**
+     * @type {MouseCallback[]}
+     */
+    this.pressed_callbacks = [];
+    /**
+     * @type {MouseCallback[]}
+     */
+    this.released_callbacks = [];
+    /**
+     * @type {MouseCallback[]}
+     */
+    this.moved_callbacks = [];
+    /**
+     * @type {MouseCallback[]}
+     */
+    this.dragged_callbacks = [];
+  }
+
+  /**
+   * @param {MouseCallbacks[]} value
+   */
+  set callbacks(value) {
+    this.pressed_callbacks.length = 0;
+    this.released_callbacks.length = 0;
+    this.moved_callbacks.length = 0;
+    this.dragged_callbacks.length = 0;
+    for (const callback_set of value) {
+      if (callback_set.mouse_pressed) {
+        this.pressed_callbacks.push((input) =>
+          callback_set.mouse_pressed(input),
+        );
+      }
+
+      if (callback_set.mouse_released) {
+        this.released_callbacks.push((input) =>
+          callback_set.mouse_released(input),
+        );
+      }
+
+      if (callback_set.mouse_moved) {
+        this.moved_callbacks.push((input) => callback_set.mouse_moved(input));
+      }
+
+      if (callback_set.mouse_dragged) {
+        this.dragged_callbacks.push((input) =>
+          callback_set.mouse_dragged(input),
+        );
+      }
+    }
   }
 
   /**
@@ -144,21 +196,21 @@ export class CanvasMouseHandler {
   /**
    * Configure many callbacks at once
    * @param {import("p5")} p p5 library
-   * @param {MouseCallbacks[]} callbacks Collection of objects, each with at least one callback
    */
-  configure_callbacks(p, callbacks) {
-    for (const callback_set of callbacks) {
-      if (callback_set.mouse_pressed) {
-        this.mouse_pressed(p, callback_set.mouse_pressed);
-      }
+  configure_callbacks(p) {
+    this.mouse_pressed(p, (input) => {
+      this.pressed_callbacks.forEach((x) => x(input));
+    });
+    this.mouse_released(p, (input) => {
+      this.released_callbacks.forEach((x) => x(input));
+    });
 
-      if (callback_set.mouse_released) {
-        this.mouse_released(p, callback_set.mouse_released);
-      }
+    this.mouse_moved(p, (input) => {
+      this.moved_callbacks.forEach((x) => x(input));
+    });
 
-      if (callback_set.mouse_dragged) {
-        this.mouse_dragged(p, callback_set.mouse_dragged);
-      }
-    }
+    this.mouse_dragged(p, (input) => {
+      this.dragged_callbacks.forEach((x) => x(input));
+    });
   }
 }

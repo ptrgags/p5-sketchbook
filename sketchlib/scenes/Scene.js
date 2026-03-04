@@ -18,7 +18,7 @@ export class Scene {
    * p5 mouse events.
    * @type {MouseCallbacks[]}
    */
-  get mouse_events() {
+  get mouse_callbacks() {
     throw new Error("not implemented");
   }
 }

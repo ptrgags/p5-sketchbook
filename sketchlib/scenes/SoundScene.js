@@ -1,5 +1,5 @@
 import { Animated } from "../animation/Animated.js";
-import { MouseInput } from "../MouseInput.js";
+import { MouseCallbacks } from "../input/MouseCallbacks.js";
 import { MuteButton } from "../MuteButton.js";
 import { group } from "../primitives/shorthand.js";
 import { SoundManager } from "../SoundManager.js";
@@ -26,6 +26,13 @@ export class SoundScene {
       this.animation.primitive,
       this.mute_button.primitive,
     );
+  }
+
+  /**
+   * @type {MouseCallbacks[]}
+   */
+  get mouse_callbacks() {
+    return [this.mute_button.mouse_callbacks];
   }
 
   update() {

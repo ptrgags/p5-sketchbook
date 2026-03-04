@@ -11,6 +11,7 @@ import { ToggleButton, ToggleState } from "./ToggleButton.js";
 import { SoundManager } from "./SoundManager.js";
 import { ShowHidePrimitive } from "./primitives/ShowHidePrimitive.js";
 import { Animated } from "./animation/Animated.js";
+import { MouseCallbacks } from "./input/MouseCallbacks.js";
 
 const SOUND_ON = ToggleState.STATE_A;
 const SOUND_OFF = ToggleState.STATE_B;
@@ -106,19 +107,10 @@ export class MuteButton {
     this.slash.show_flags = [this.sound_toggle.toggle_state == SOUND_OFF];
   }
 
-  mouse_pressed(input) {
-    this.sound_toggle.mouse_pressed(input.mouse_coords);
-  }
-
-  mouse_moved(input) {
-    this.sound_toggle.mouse_moved(input.mouse_coords);
-  }
-
-  mouse_dragged(input) {
-    this.sound_toggle.mouse_dragged(input.mouse_coords);
-  }
-
-  mouse_released(input) {
-    this.sound_toggle.mouse_released(input.mouse_coords);
+  /**
+   * @type {MouseCallbacks}
+   */
+  get mouse_callbacks() {
+    return this.sound_toggle.mouse_callbacks;
   }
 }

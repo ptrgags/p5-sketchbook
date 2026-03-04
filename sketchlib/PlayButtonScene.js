@@ -36,7 +36,7 @@ export class PlayButtonScene {
   /**
    * @type {MouseCallbacks[]}
    */
-  get mouse_events() {
+  get mouse_callbacks() {
     return [this.play_button.mouse_callbacks];
   }
 }
