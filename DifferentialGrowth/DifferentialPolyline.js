@@ -9,6 +9,9 @@ import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Quadtree } from "./quadtree.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
+import { Style } from "../sketchlib/Style.js";
+import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
 
 const MAX_EDGE_LENGTH = 150;
 
@@ -21,18 +24,22 @@ const MAX_FORCE = 20;
 // Attraction between neighboring points is modeled like springs.
 const ATTRACTION_MIN_DISTANCE = 20;
 
-// Temporary accumulators since vectors are added in-place
-const TEMP_DESIRED_VELOCITY = new Vector2();
-const TEMP_STEERING_FORCE = new Vector2();
-const TEMP_TOTAL_FORCE = new Vector2();
-const TEMP_REPULSION = new Vector2();
-const TEMP_BA = new Vector2();
-const TEMP_BC = new Vector2();
+/**
+ * Compute a steering force
+ * See https://natureofcode.com/autonomous-agents/#vehicles-and-steering
+ * @param {Direction} desired_velocity Desired velocity
+ * @param {Direction} velocity Current velocity
+ * @param {number} max_force Max magnitude of force vector
+ * @returns {Direction} Steering force
+ */
+function steering_force(desired_velocity, velocity, max_force) {
+  return desired_velocity.sub(velocity).limit_length(max_force);
+}
 
 export class DifferentialPolyline {
   /**
    *
-   * @param {Vector2[]} positions_array
+   * @param {Point[]} positions_array
    * @param {Quadtree} quadtree
    */
   constructor(positions_array, quadtree) {
@@ -44,7 +51,7 @@ export class DifferentialPolyline {
 
     this.quadtree = quadtree;
     for (const node of this.nodes) {
-      this.quadtree.insert_point(node);
+      this.quadtree.insert_node(node);
     }
   }
 
@@ -67,19 +74,14 @@ export class DifferentialPolyline {
       const b = this.nodes[i].position;
       const c = this.nodes[(i + 1) % this.nodes.length].position;
 
-      TEMP_BA.clone_from(a);
-      TEMP_BA.sub(b);
-      TEMP_BA.normalize();
-
-      TEMP_BC.clone_from(c);
-      TEMP_BC.sub(b);
-      TEMP_BC.normalize();
+      const ba = a.sub(b).normalize();
+      const bc = c.sub(b).normalize();
 
       // The angle between two vectors is between 0 and 180 degrees.
       // angles >= 90 aren't too bad
       // angles < 90 get more and more pinched. I'm leaving the exact
       // threshold as a parameter
-      const cos_angle = Vector2.dot(TEMP_BA, TEMP_BC);
+      const cos_angle = ba.dot(bc);
       if (cos_angle > PINCH_THRESHOLD) {
         split_points.push(i);
       }
@@ -91,6 +93,11 @@ export class DifferentialPolyline {
     }
   }
 
+  /**
+   * Add a new point at the given index of the array at the midpoint of the
+   * adjacent indices
+   * @param {number} index
+   */
   add_point(index) {
     if (index < 0 || index >= this.nodes.length) {
       throw new Error("OUT OF BOUNDS");
@@ -98,14 +105,11 @@ export class DifferentialPolyline {
 
     const before = this.nodes[index];
     const after = this.nodes[(index + 1) % this.nodes.length];
-    const midpoint = new Vector2();
-    midpoint.clone_from(before.position);
-    midpoint.add(after.position);
-    midpoint.scale(0.5);
+    const midpoint = Point.lerp(before.position, after.position, 0.5);
 
-    const point = new DifferentialNode(midpoint);
-    this.nodes.splice(index + 1, 0, point);
-    this.quadtree.insert_point(point);
+    const node = new DifferentialNode(midpoint);
+    this.nodes.splice(index + 1, 0, node);
+    this.quadtree.insert_node(node);
   }
 
   add_random_point() {
@@ -113,36 +117,42 @@ export class DifferentialPolyline {
     this.add_point(index);
   }
 
-  compute_attraction(total_force, node, neighbor_index) {
+  /**
+   *
+   * @param {DifferentialNode} node
+   * @param {number} neighbor_index
+   * @returns {Direction}
+   */
+  compute_attraction(node, neighbor_index) {
     const start = node;
     const end = this.nodes[neighbor_index];
 
     // r = end - start
-    TEMP_DESIRED_VELOCITY.clone_from(end.position);
-    TEMP_DESIRED_VELOCITY.sub(start.position);
+    let desired_velocity = end.position.sub(start.position);
 
     // Only apply attraction if the points get far apart
-    const distance = TEMP_DESIRED_VELOCITY.get_length();
-    if (distance < ATTRACTION_MIN_DISTANCE) {
-      return;
+    const distance_sqr = desired_velocity.mag_sqr();
+    if (distance_sqr < ATTRACTION_MIN_DISTANCE * ATTRACTION_MIN_DISTANCE) {
+      return Direction.ZERO;
     }
 
-    TEMP_DESIRED_VELOCITY.limit(MAX_SPEED);
+    desired_velocity = desired_velocity.limit_length(MAX_SPEED);
 
-    TEMP_STEERING_FORCE.clone_from(TEMP_DESIRED_VELOCITY);
-    TEMP_STEERING_FORCE.sub(node.velocity);
-    TEMP_STEERING_FORCE.limit(MAX_FORCE);
-
-    total_force.add(TEMP_STEERING_FORCE);
+    return steering_force(desired_velocity, node.velocity, MAX_FORCE);
   }
 
-  compute_repulsion(total_force, node) {
+  /**
+   *
+   * @param {DifferentialNode} node
+   * @returns {Direction}
+   */
+  compute_repulsion(node) {
     const circle = new Circle(node.position, NEARBY_RADIUS);
     const nearby_points = this.quadtree.circle_query(circle);
 
     let count = 0;
     // desired repulsion velocity is the average direction "away" from neighbor points
-    TEMP_DESIRED_VELOCITY.set_zero();
+    let desired_velocity = Direction.ZERO;
     for (const nearby_point of nearby_points) {
       if (nearby_point === node) {
         continue;
@@ -150,72 +160,74 @@ export class DifferentialPolyline {
 
       // r = point - nearby_point
       // we want r_dir = normalize(r)
-      TEMP_REPULSION.clone_from(node.position);
-      TEMP_REPULSION.sub(nearby_point.position);
-      TEMP_REPULSION.normalize();
+      const repulsion = node.position.sub(nearby_point.position).normalize();
 
       // update sum and count
-      TEMP_DESIRED_VELOCITY.add(TEMP_REPULSION);
+      desired_velocity = desired_velocity.add(repulsion);
+      count++;
     }
 
     // We don't actually need to compute the average, just set the magnitude
     // to the max speed
     if (count > 0) {
-      TEMP_DESIRED_VELOCITY.set_magnitude(MAX_SPEED);
+      desired_velocity = desired_velocity.set_length(MAX_SPEED);
     }
 
-    TEMP_STEERING_FORCE.clone_from(TEMP_DESIRED_VELOCITY);
-    TEMP_STEERING_FORCE.sub(node.velocity);
-    TEMP_STEERING_FORCE.limit(MAX_FORCE);
-
-    total_force.add(TEMP_STEERING_FORCE);
+    return steering_force(desired_velocity, node.velocity, MAX_FORCE);
   }
 
-  compute_containment(total_force, node) {
+  /**
+   *
+   * @param {DifferentialNode} node
+   * @returns {Direction} direction representing the steering force
+   */
+  compute_containment(node) {
     // Stay within a circular boundary
-    const BOUNDARY_CENTER = new Vector2(WIDTH / 2, HEIGHT / 2);
+    const BOUNDARY_CENTER = new Point(WIDTH / 2, HEIGHT / 2);
     const BOUNDARY_RADIUS = 150;
 
-    TEMP_DESIRED_VELOCITY.clone_from(node.position);
-    TEMP_DESIRED_VELOCITY.sub(BOUNDARY_CENTER);
-    const distance = TEMP_DESIRED_VELOCITY.get_length();
-
-    if (distance <= BOUNDARY_RADIUS) {
-      return;
+    let desired_velocity = node.position.sub(BOUNDARY_CENTER).neg();
+    const distance_sqr = desired_velocity.mag_sqr();
+    if (distance_sqr <= BOUNDARY_RADIUS * BOUNDARY_RADIUS) {
+      return Direction.ZERO;
     }
 
-    TEMP_DESIRED_VELOCITY.scale(-1);
-
-    // TODO: I see a pattern here.
-    TEMP_STEERING_FORCE.clone_from(TEMP_DESIRED_VELOCITY);
-    TEMP_STEERING_FORCE.sub(node.velocity);
-    TEMP_STEERING_FORCE.limit(MAX_FORCE);
-    total_force.add(TEMP_STEERING_FORCE);
+    return steering_force(desired_velocity, node.velocity, MAX_FORCE);
   }
 
+  /**
+   *
+   * @param {DifferentialNode} node
+   * @param {number} index
+   * @param {number} delta_time
+   * @returns
+   */
   compute_forces(node, index, delta_time) {
     // fixed nodes do not move
     if (node.fixed) {
       return;
     }
 
-    TEMP_TOTAL_FORCE.set_zero();
-    this.compute_attraction(
-      TEMP_TOTAL_FORCE,
+    const attraction_prev = this.compute_attraction(
       node,
       mod(index - 1, this.nodes.length),
     );
-    this.compute_attraction(
-      TEMP_TOTAL_FORCE,
+    const attraction_next = this.compute_attraction(
       node,
       (index + 1) % this.nodes.length,
     );
-    this.compute_repulsion(TEMP_TOTAL_FORCE, node);
-    //this.compute_containment(TEMP_TOTAL_FORCE, node);
+    const repulsion = this.compute_repulsion(node);
+    //this.compute_containment(node);
 
-    node.apply_forces(TEMP_TOTAL_FORCE, delta_time);
+    const net_force = attraction_prev.add(attraction_next).add(repulsion);
+
+    node.apply_forces(net_force, delta_time);
   }
 
+  /**
+   *
+   * @param {number} delta_time
+   */
   update(delta_time) {
     for (let i = 0; i < this.nodes.length; i++) {
       const node = this.nodes[i];
@@ -225,15 +237,22 @@ export class DifferentialPolyline {
     }
   }
 
+  /**
+   * Make a beziergon curve
+   * @param {Style} line_style
+   * @returns {GroupPrimitive} Styled beziergon
+   */
   make_curve(line_style) {
-    const positions = this.nodes.map(
-      (node) => new Point(node.position.x, node.position.y),
-    );
-
+    const positions = this.nodes.map((node) => node.position);
     const beziergon = BeziergonPrimitive.interpolate_points(positions);
     return style(beziergon, line_style);
   }
 
+  /**
+   * Make a polygon for debugging
+   * @param {Style} line_style
+   * @returns {GroupPrimitive} Styled polyline
+   */
   make_polyline(line_style) {
     const vertices = this.nodes.map(
       (x) => new Point(x.position.x, x.position.y),
