@@ -1,6 +1,7 @@
 import { Animated } from "../sketchlib/animation/Animated.js";
 import {
   binary_search,
+  binary_search_range,
   compare_intervals_end,
   compare_intervals_start,
   CompareResult,
@@ -13,42 +14,6 @@ import { Point } from "../sketchlib/pga2d/Point.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
-
-/**
- * @template T
- * @param {AbsInterval<T>[]} intervals
- * @param {number} start_time
- * @param {number} end_time
- * @returns {AbsInterval<T>[]}
- */
-function select_intervals(intervals, start_time, end_time) {
-  const start_result = binary_search(
-    intervals,
-    start_time,
-    compare_intervals_start,
-  );
-  const end_result = binary_search(intervals, end_time, compare_intervals_end);
-
-  if (!start_result && !end_result) {
-    // nothing in the selected range
-    return [];
-  }
-
-  if (!start_result && end_result) {
-    const [end_index] = end_result;
-    return intervals.slice(0, end_index + 1);
-  }
-
-  if (start_result && !end_result) {
-    const [start_index] = start_result;
-    return intervals.slice(start_index);
-  }
-
-  const [start_index] = start_result;
-  const [end_index] = end_result;
-
-  return intervals.slice(start_index, end_index + 1);
-}
 
 /**
  * @implements {Animated}
@@ -98,7 +63,7 @@ export class PianoRoll {
     const t_max = time + this.on_screen_duration;
 
     // Only render the notes currently on screen
-    const visible_rects = select_intervals(this.all_rects, time, t_max).map(
+    const visible_rects = binary_search_range(this.all_rects, time, t_max).map(
       (x) => x.value,
     );
 

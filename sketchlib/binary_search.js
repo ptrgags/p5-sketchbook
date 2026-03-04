@@ -13,9 +13,9 @@ Object.freeze(CompareResult);
 
 /**
  * @template T
- * @param {T[]} arr
+ * @param {T[]} arr Array of values, assumed to be in sorted order
  * @param {number} key The value to search for
- * @param {function(T, number): CompareResult} compare Function that compares the value with the current key and returns either
+ * @param {function(T, number): number} compare Function that compares the value with the current key and returns either
  * @param {number} start_index First index in range (inclusive)
  * @param {number} end_index Last index in range (inclusive)
  * @returns {[number, T] | undefined} Either (index, value) if a match was found, or undefined if there was no match
@@ -136,4 +136,41 @@ export function compare_intervals_end(interval, time) {
   }
 
   return CompareResult.MATCH;
+}
+
+/**
+ * Use binary search to select a range of intervals
+ * @template T
+ * @param {AbsInterval<T>[]} intervals Intervals to search through. The intervals must be in sorted order by start time. There can be gaps in between, but the intervals may not overlap
+ * @param {number} start_time Start time
+ * @param {number} end_time End time
+ * @returns {AbsInterval<T>[]} Selected intervals
+ */
+export function binary_search_range(intervals, start_time, end_time) {
+  const start_result = binary_search(
+    intervals,
+    start_time,
+    compare_intervals_start,
+  );
+  const end_result = binary_search(intervals, end_time, compare_intervals_end);
+
+  if (!start_result && !end_result) {
+    // nothing in the selected range
+    return [];
+  }
+
+  if (!start_result && end_result) {
+    const [end_index] = end_result;
+    return intervals.slice(0, end_index + 1);
+  }
+
+  if (start_result && !end_result) {
+    const [start_index] = start_result;
+    return intervals.slice(start_index);
+  }
+
+  const [start_index] = start_result;
+  const [end_index] = end_result;
+
+  return intervals.slice(start_index, end_index + 1);
 }
