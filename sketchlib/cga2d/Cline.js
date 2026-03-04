@@ -5,6 +5,8 @@ import { Circle } from "../primitives/Circle.js";
 import { COdd } from "./COdd.js";
 import { CEven } from "./CEven.js";
 import { ConformalBasis } from "./ConformalBasis.js";
+import { Primitive } from "../primitives/Primitive.js";
+import { ConformalPrimitive } from "./ConfomalPrimitive.js";
 
 /**
  * Compute a cline primitive
@@ -51,6 +53,8 @@ function compute_primitive(vector) {
 
 /**
  * Generalized Circle. This includes circles, lines and null points
+ * @implements {Primitive}
+ * @implements {ConformalPrimitive}
  */
 export class Cline {
   /**
@@ -78,6 +82,7 @@ export class Cline {
   /**
    *
    * @param {COdd | CEven} versor
+   * @returns {Cline}
    */
   transform(versor) {
     const vec = versor.unit_sandwich_odd(this.vector);

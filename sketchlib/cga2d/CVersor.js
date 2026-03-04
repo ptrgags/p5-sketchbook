@@ -1,8 +1,7 @@
 import { Direction } from "../pga2d/Direction.js";
 import { CEven } from "./CEven.js";
-import { Cline } from "./Cline.js";
 import { COdd } from "./COdd.js";
-import { NullPoint } from "./NullPoint.js";
+import { ConformalPrimitive } from "./ConfomalPrimitive.js";
 
 export class CVersor {
   /**
@@ -264,19 +263,12 @@ export class CVersor {
   }
 
   /**
-   * Transform a Cline object
-   * @param {Cline} cline
+   * Transform a transformable object
+   * @param {ConformalPrimitive} transformable
+   * @returns {ConformalPrimitive}
    */
-  transform_cline(cline) {
-    return cline.transform(this.versor);
-  }
-
-  /**
-   * Transform a Null Point object
-   * @param {NullPoint} point
-   */
-  transform_point(point) {
-    return point.transform(this.versor);
+  transform(transformable) {
+    return transformable.transform(this.versor);
   }
 }
 /**
