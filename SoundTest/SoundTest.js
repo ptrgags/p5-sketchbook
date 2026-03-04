@@ -258,7 +258,7 @@ class SoundScene {
    */
   constructor(sound, melodies) {
     this.sound = sound;
-    this.mute_button = new MuteButton();
+    this.mute_button = new MuteButton(sound);
     this.events = new EventTarget();
     this.piano = new Piano(PIANO_BOUNDS, new PlayedNotes([]));
     this.ocarinas = {
@@ -267,13 +267,6 @@ class SoundScene {
       soprano: new Ocarina(SOPRANO_OCARINA),
     };
     this.spiral_burst = new SpiralBurst();
-
-    this.mute_button.events.addEventListener(
-      "change",
-      (/** @type {CustomEvent}*/ e) => {
-        this.sound.toggle_sound(e.detail.sound_on);
-      },
-    );
 
     // This button is disabled until a score is selected.
     this.export_button = expect_element("export_clips", HTMLButtonElement);
