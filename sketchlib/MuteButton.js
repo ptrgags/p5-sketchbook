@@ -9,6 +9,8 @@ import { Style } from "./Style.js";
 import { Rectangle } from "./Rectangle.js";
 import { ToggleButton, ToggleState } from "./ToggleButton.js";
 import { SoundManager } from "./SoundManager.js";
+import { ShowHidePrimitive } from "./primitives/ShowHidePrimitive.js";
+import { Animated } from "./animation/Animated.js";
 
 const SOUND_ON = ToggleState.STATE_A;
 const SOUND_OFF = ToggleState.STATE_B;
@@ -69,9 +71,10 @@ const SPEAKER_SLASH = style(
   ),
   new Style({ stroke: Color.RED }),
 );
-const GROUP_MUTED = group(SPEAKER, SPEAKER_SLASH);
-const GROUP_UNMUTED = SPEAKER;
 
+/**
+ * @implements {Animated}
+ */
 export class MuteButton {
   /**
    * Constructor
@@ -94,12 +97,13 @@ export class MuteButton {
         sound.toggle_sound(sound_on);
       },
     );
+
+    this.slash = new ShowHidePrimitive([SPEAKER_SLASH], [false]);
+    this.primitive = group(SPEAKER);
   }
 
-  render() {
-    return this.sound_toggle.toggle_state == SOUND_OFF
-      ? GROUP_MUTED
-      : GROUP_UNMUTED;
+  update() {
+    this.slash.show_flags = [this.sound_toggle.toggle_state == SOUND_OFF];
   }
 
   mouse_pressed(input) {

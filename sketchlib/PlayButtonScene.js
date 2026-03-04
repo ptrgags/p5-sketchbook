@@ -1,6 +1,18 @@
+import { Animated } from "./animation/Animated.js";
+import { MouseCallbacks } from "./input/MouseCallbacks.js";
 import { PlayButton } from "./PlayButton.js";
+import { Scene } from "./scenes/Scene.js";
+import { SoundManager } from "./SoundManager.js";
 
+/**
+ * @implements {Scene}
+ * @implements {Animated}
+ */
 export class PlayButtonScene {
+  /**
+   * Constructor
+   * @param {SoundManager} sound
+   */
   constructor(sound) {
     this.sound = sound;
     this.play_button = new PlayButton();
@@ -13,30 +25,18 @@ export class PlayButtonScene {
       const change_of_scene = new CustomEvent("scene-change");
       this.events.dispatchEvent(change_of_scene);
     });
+
+    this.primitive = this.play_button.primitive;
   }
 
-  update() {}
-
-  render() {
-    return this.play_button.render();
+  update() {
+    this.play_button.update();
   }
 
-  mouse_pressed(input) {
-    this.play_button.mouse_pressed(input);
-  }
-
-  mouse_moved(input) {
-    this.play_button.mouse_moved(input);
-  }
-
-  mouse_dragged(input) {
-    this.play_button.mouse_dragged(input);
-  }
-
-  mouse_released(input) {
-    // Only release the mouse when we're ready for it.
-    if (!this.sound.init_requested) {
-      this.play_button.mouse_released(input);
-    }
+  /**
+   * @type {MouseCallbacks[]}
+   */
+  get mouse_events() {
+    return [this.play_button.mouse_callbacks];
   }
 }

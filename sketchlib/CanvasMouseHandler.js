@@ -2,6 +2,7 @@ import { fix_mouse_coords } from "./fix_mouse_coords.js";
 import { prevent_mobile_scroll } from "./prevent_mobile_scroll.js";
 import { MouseInCanvas, MouseInput, MousePressed } from "./MouseInput.js";
 import { SCREEN_RECT } from "./Rectangle.js";
+import { MouseCallbacks } from "./input/MouseCallbacks.js";
 /**
  * @typedef {function(MouseInput):void} MouseCallback
  */
@@ -38,7 +39,7 @@ export class CanvasMouseHandler {
    * as usual
    *
    * Note that this assumes the default canvas dimensions of WIDTH and HEIGHT
-   * @param {any} p the p5.js element
+   * @param {import("p5")} p the p5.js element
    * @param {MouseCallback} callback The callback to call when the mouse is pressed on the canvas
    */
   mouse_pressed(p, callback) {
@@ -52,7 +53,7 @@ export class CanvasMouseHandler {
       const input = new MouseInput(
         mouse,
         MousePressed.PRESSED,
-        MouseInCanvas.IN_CANVAS
+        MouseInCanvas.IN_CANVAS,
       );
       callback(input);
     };
@@ -60,7 +61,7 @@ export class CanvasMouseHandler {
 
   /**
    * Similar to mouse_pressed but for the mouse released event
-   * @param {any} p the p5.js element
+   * @param {import("p5")} p the p5.js element
    *
    * @param {MouseCallback} callback The callback to call when the mouse is pressed on the canvas
    */
@@ -79,7 +80,7 @@ export class CanvasMouseHandler {
       const input = new MouseInput(
         mouse,
         MousePressed.NOT_PRESSED,
-        in_canvas_state
+        in_canvas_state,
       );
       callback(input);
     };
@@ -90,7 +91,7 @@ export class CanvasMouseHandler {
    * - If the mouse is hovering over the canvas, prevent the default behavior
    * - Always call the callback, but include the in-canvas state
    *
-   * @param {any} p the p5.js element
+   * @param {import("p5")} p the p5.js element
    * @param {MouseCallback} callback The callback to call when the mouse is moved on the canvas
    */
   mouse_moved(p, callback) {
@@ -108,7 +109,7 @@ export class CanvasMouseHandler {
       const input = new MouseInput(
         mouse,
         MousePressed.NOT_PRESSED,
-        in_canvas_state
+        in_canvas_state,
       );
       callback(input);
     };
@@ -116,7 +117,7 @@ export class CanvasMouseHandler {
 
   /**
    * Similar to mouse_moved, but now the mouse is pressed
-   * @param {any} p the p5.js element
+   * @param {import("p5")} p the p5.js element
    * @param {MouseCallback} callback The callback to call when the mouse is dragged on the canvas
    */
   mouse_dragged(p, callback) {
@@ -134,9 +135,30 @@ export class CanvasMouseHandler {
       const input = new MouseInput(
         mouse,
         MousePressed.PRESSED,
-        in_canvas_state
+        in_canvas_state,
       );
       callback(input);
     };
+  }
+
+  /**
+   * Configure many callbacks at once
+   * @param {import("p5")} p p5 library
+   * @param {MouseCallbacks[]} callbacks Collection of objects, each with at least one callback
+   */
+  configure_callbacks(p, callbacks) {
+    for (const callback_set of callbacks) {
+      if (callback_set.mouse_pressed) {
+        this.mouse_pressed(p, callback_set.mouse_pressed);
+      }
+
+      if (callback_set.mouse_released) {
+        this.mouse_released(p, callback_set.mouse_released);
+      }
+
+      if (callback_set.mouse_dragged) {
+        this.mouse_dragged(p, callback_set.mouse_dragged);
+      }
+    }
   }
 }

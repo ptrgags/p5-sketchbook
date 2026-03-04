@@ -6,6 +6,9 @@ import { group, style } from "./primitives/shorthand.js";
 import { Style } from "./Style.js";
 import { SCREEN_RECT } from "./Rectangle.js";
 import { TouchButton } from "./TouchButton.js";
+import { MouseCallbacks } from "./input/MouseCallbacks.js";
+import { MouseInput } from "./MouseInput.js";
+import { Animated } from "./animation/Animated.js";
 
 const TRIANGLE_WIDTH = 200;
 const PLAY_TRIANGLE = new PolygonPrimitive(
@@ -18,33 +21,28 @@ const PLAY_TRIANGLE = new PolygonPrimitive(
 );
 const PLAY_GROUP = style(PLAY_TRIANGLE, new Style({ stroke: Color.WHITE }));
 
+/**
+ * @implements {Animated}
+ */
 export class PlayButton {
   constructor() {
     this.button = new TouchButton(SCREEN_RECT);
+
+    this.primitive = group(this.button.primitive, PLAY_GROUP);
   }
 
   get events() {
     return this.button.events;
   }
 
-  render() {
-    const button_back = this.button.debug_render();
-    return group(button_back, PLAY_GROUP);
+  update() {
+    this.button.update();
   }
 
-  mouse_pressed(input) {
-    this.button.mouse_pressed(input.mouse_coords);
-  }
-
-  mouse_moved(input) {
-    this.button.mouse_dragged(input.mouse_coords);
-  }
-
-  mouse_dragged(input) {
-    this.button.mouse_dragged(input.mouse_coords);
-  }
-
-  mouse_released(input) {
-    this.button.mouse_released(input.mouse_coords);
+  /**
+   * @type {MouseCallbacks}
+   */
+  get mouse_callbacks() {
+    return this.button;
   }
 }
