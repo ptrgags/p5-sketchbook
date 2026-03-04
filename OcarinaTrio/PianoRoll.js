@@ -11,8 +11,10 @@ import { AbsInterval } from "../sketchlib/music/AbsTimeline.js";
 import { Note } from "../sketchlib/music/Music.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
+import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { style } from "../sketchlib/primitives/shorthand.js";
+import { Transform } from "../sketchlib/primitives/Transform.js";
 import { Style } from "../sketchlib/Style.js";
 
 /**
@@ -39,9 +41,10 @@ export class PianoRoll {
     this.all_rects = notes.map((interval) => {
       const pitch = interval.value.pitch;
       const x = (pitch - min_pitch) * column_width;
+      const y = interval.start_time.real * velocity;
       const height = interval.duration.real * velocity;
       const rect = new RectPrimitive(
-        new Point(x, this.y),
+        new Point(x, y),
         new Direction(column_width, height),
       );
 
@@ -52,7 +55,11 @@ export class PianoRoll {
      * @type {RectPrimitive[]}
      */
     this.rects = [];
-    this.primitive = style(this.rects, note_style);
+    this.translation = new Transform(Direction.ZERO);
+    this.primitive = new GroupPrimitive(this.rects, {
+      style: note_style,
+      transform: this.translation,
+    });
   }
 
   /**
@@ -63,11 +70,16 @@ export class PianoRoll {
     const t_max = time + this.on_screen_duration;
 
     // Only render the notes currently on screen
-    const visible_rects = binary_search_range(this.all_rects, time, t_max).map(
+    const visible_rects = this.all_rects.map(
       (x) => x.value,
-    );
+    ); /*binary_search_range(this.all_rects, time, t_max).map(
+      (x) => x.value,
+    );*/
 
     this.rects.length = 0;
     this.rects.splice(0, Infinity, ...visible_rects);
+
+    const distance_traveled = time * this.velocity;
+    this.translation.translation = new Direction(0, this.y - distance_traveled);
   }
 }
