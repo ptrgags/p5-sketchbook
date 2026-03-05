@@ -136,6 +136,16 @@ export class GroupPrimitive {
   }
 
   /**
+   * Replace all the primitives with a new set. This is helpful for animations
+   * where the animation changes each frame, but we need a constant primitive
+   * to contain them.
+   * @param  {...Primitive} primitives New primitives
+   */
+  replace(...primitives) {
+    this.primitives.splice(0, Infinity, ...primitives);
+  }
+
+  /**
    * Draw a group primitive. This will always push a new drawing state, apply
    * any settings, and pop at the end.
    * @param {import("p5")} p p5.js library
