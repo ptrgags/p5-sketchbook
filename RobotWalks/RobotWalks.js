@@ -34,6 +34,7 @@ export const sketch = (p) => {
     ).elt;
 
     MOUSE.setup(canvas);
+    MOUSE.callbacks = [TOUCH_LEFT, TOUCH_RIGHT];
 
     DPAD.setup();
 
@@ -78,23 +79,5 @@ export const sketch = (p) => {
     DPAD.key_released(code);
   };
 
-  MOUSE.mouse_pressed(p, (input) => {
-    TOUCH_LEFT.mouse_pressed(input.mouse_coords);
-    TOUCH_RIGHT.mouse_pressed(input.mouse_coords);
-  });
-
-  MOUSE.mouse_moved(p, (input) => {
-    TOUCH_LEFT.mouse_moved(input.mouse_coords);
-    TOUCH_RIGHT.mouse_moved(input.mouse_coords);
-  });
-
-  MOUSE.mouse_released(p, (input) => {
-    TOUCH_LEFT.mouse_released(input.mouse_coords);
-    TOUCH_RIGHT.mouse_released(input.mouse_coords);
-  });
-
-  MOUSE.mouse_dragged(p, (input) => {
-    TOUCH_LEFT.mouse_dragged(input.mouse_coords);
-    TOUCH_RIGHT.mouse_dragged(input.mouse_coords);
-  });
+  MOUSE.configure_callbacks(p);
 };
