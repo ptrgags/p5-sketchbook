@@ -108,10 +108,11 @@ class Hitomezashi {
     this.primitive = style(GroupPrimitive.EMPTY, STYLE_STITCHES);
   }
 
+  /**
+   *
+   * @param {number} time
+   */
   update(time) {
-    const primitive = this.primitive;
-    primitive.primitives.length = 0;
-
     // For the stitch animation we animate    [0, end-->
     // for the unstitch animation we animate  start-->, end]
     // so we need two curves, one per variable
@@ -123,7 +124,7 @@ class Hitomezashi {
 
     // Use render_between to slice out a portion of the path
     const prim = STITCH_PATH.render_between(start, end);
-    primitive.primitives.push(prim);
+    this.primitive.replace(prim);
   }
 }
 

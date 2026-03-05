@@ -57,11 +57,8 @@ export class AnimatedStripes {
     this.spacing = spacing;
     this.dimensions = dimensions;
 
-    /**
-     * @type {GroupPrimitive}
-     */
-    this.primitive = make_stripes(center, dir_forward, spacing, dimensions, 0);
-    this.lines_array = this.primitive.primitives;
+    const stripes = make_stripes(center, dir_forward, spacing, dimensions, 0);
+    this.primitive = group(stripes);
   }
 
   /**
@@ -76,7 +73,6 @@ export class AnimatedStripes {
       this.dimensions,
       mod(time, 1.0),
     );
-    this.lines_array.length = 0;
-    this.lines_array.push(...new_stripes);
+    this.primitive.replace(new_stripes);
   }
 }
