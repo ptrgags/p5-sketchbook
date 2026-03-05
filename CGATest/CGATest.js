@@ -13,6 +13,7 @@ import { range } from "../sketchlib/range.js";
 import { mod } from "../sketchlib/mod.js";
 import { IFS } from "../sketchlib/cga2d/IFS.js";
 import { AnimatedSierpinski } from "./AnimatedSierpinski.js";
+import { ProgressivePrimitive } from "../sketchlib/primitives/ProgressivePrimitive.js";
 
 // Create a few shapes encoded in CGA
 const CIRCLE = Cline.from_circle(new Circle(new Point(250, 350), 50));
@@ -88,9 +89,12 @@ const SIERPINSKI_IFS = new IFS([
   CVersor.translation(new Direction(0.5, 0.5)).compose(SHRINK),
   CVersor.translation(new Direction(0, -0.5)).compose(SHRINK),
 ]);
-const SIERPINSKI_TILES = SIERPINSKI_IFS.iterate(6).map((xform) => {
-  return TO_SCREEN.compose(xform).transform(Cline.UNIT_CIRCLE);
-});
+const SIERPINSKI_TILES = new ProgressivePrimitive(
+  SIERPINSKI_IFS.iterate(6).map((xform) => {
+    return TO_SCREEN.compose(xform).transform(Cline.UNIT_CIRCLE);
+  }),
+  1,
+);
 
 const SIERPINSKI = new AnimatedSierpinski(TO_SCREEN);
 
@@ -141,11 +145,10 @@ export const sketch = (p) => {
     );
 
     const slice_t = Math.max((p.frameCount - 60 * 5) / 4, 0);
-    const index = Math.round(slice_t);
+    SIERPINSKI_TILES.update(slice_t);
 
-    const partial_tiles = SIERPINSKI_TILES.slice(0, index);
     const styled = style(
-      [BIG_UNIT_CIRCLE, ...lox_points, ...para_points, ...partial_tiles],
+      [BIG_UNIT_CIRCLE, ...lox_points, ...para_points, SIERPINSKI_TILES],
       SPIN_STYLE,
     );
     const styled2 = style(
