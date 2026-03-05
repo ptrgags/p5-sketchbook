@@ -338,16 +338,20 @@ class SoundTestAnimation {
     this.button_group = new AnimationGroup(...this.melody_buttons);
 
     this.timeline_prim = group();
+    this.ocarina_prims = group(
+      this.ocarinas.bass.primitive,
+      this.ocarinas.tenor.primitive,
+      this.ocarinas.soprano.primitive,
+    );
+    this.piano_prim = group();
 
     this.primitive = group(
       this.button_group.primitive,
       BUTTON_LABELS,
-      this.piano.primitive,
+      this.piano_prim,
       this.timeline_prim,
       CURSOR,
-      this.ocarinas.bass.primitive,
-      this.ocarinas.tenor.primitive,
-      this.ocarinas.soprano.primitive,
+      this.ocarina_prims,
       this.spiral_burst.primitive,
     );
   }
@@ -511,6 +515,16 @@ class SoundTestAnimation {
     this.ocarinas.soprano = new Ocarina(
       SOPRANO_OCARINA,
       assigned_notes.soprano_ocarina,
+    );
+
+    // Update the primitives
+    this.piano_prim.primitives.splice(0, Infinity, this.piano.primitive);
+    this.ocarina_prims.primitives.splice(
+      0,
+      Infinity,
+      this.ocarinas.bass.primitive,
+      this.ocarinas.tenor.primitive,
+      this.ocarinas.soprano.primitive,
     );
   }
 
