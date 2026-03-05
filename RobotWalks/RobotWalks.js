@@ -1,9 +1,9 @@
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { DirectionalPad } from "../sketchlib/DirectionalPad.js";
 import { ArcRobot, N_VALUES } from "./ArcRobot.js";
-import { TouchButton } from "../sketchlib/TouchButton.js";
+import { TouchButton } from "../sketchlib/input/TouchButton.js";
 import { Rectangle } from "../sketchlib/Rectangle.js";
-import { CanvasMouseHandler } from "../sketchlib/CanvasMouseHandler.js";
+import { CanvasMouseHandler } from "../sketchlib/input/CanvasMouseHandler.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 
@@ -34,6 +34,7 @@ export const sketch = (p) => {
     ).elt;
 
     MOUSE.setup(canvas);
+    MOUSE.callbacks = [TOUCH_LEFT, TOUCH_RIGHT];
 
     DPAD.setup();
 
@@ -78,23 +79,5 @@ export const sketch = (p) => {
     DPAD.key_released(code);
   };
 
-  MOUSE.mouse_pressed(p, (input) => {
-    TOUCH_LEFT.mouse_pressed(input.mouse_coords);
-    TOUCH_RIGHT.mouse_pressed(input.mouse_coords);
-  });
-
-  MOUSE.mouse_moved(p, (input) => {
-    TOUCH_LEFT.mouse_moved(input.mouse_coords);
-    TOUCH_RIGHT.mouse_moved(input.mouse_coords);
-  });
-
-  MOUSE.mouse_released(p, (input) => {
-    TOUCH_LEFT.mouse_released(input.mouse_coords);
-    TOUCH_RIGHT.mouse_released(input.mouse_coords);
-  });
-
-  MOUSE.mouse_dragged(p, (input) => {
-    TOUCH_LEFT.mouse_dragged(input.mouse_coords);
-    TOUCH_RIGHT.mouse_dragged(input.mouse_coords);
-  });
+  MOUSE.configure_callbacks(p);
 };

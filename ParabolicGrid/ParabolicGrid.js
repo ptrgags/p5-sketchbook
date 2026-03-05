@@ -1,12 +1,12 @@
-import { CanvasMouseHandler } from "../sketchlib/CanvasMouseHandler.js";
+import { CanvasMouseHandler } from "../sketchlib/input/CanvasMouseHandler.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { WIDTH, HEIGHT, SCREEN_CENTER } from "../sketchlib/dimensions.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
-import { SCREEN_RECT } from "../sketchlib/Rectangle.js";
 import { DancingArrow } from "./DancingArrow.js";
 import { ParabolicGridIllusion } from "./ParabolicGridIllusion.js";
 import { TranslationGridIllusion } from "./TranslationGridIllusion.js";
+import { MouseInCanvas } from "../sketchlib/input/MouseInput.js";
 
 const TRANSLATE_CENTER = CVersor.translation(SCREEN_CENTER.to_direction());
 const SCALE_UP = CVersor.dilation(200);
@@ -55,7 +55,7 @@ export const sketch = (p) => {
 
   // Swap the animations on mouse click.
   MOUSE.mouse_released(p, (input) => {
-    if (!SCREEN_RECT.contains(input.mouse_coords)) {
+    if (input.in_canvas !== MouseInCanvas.IN_CANVAS) {
       return;
     }
 

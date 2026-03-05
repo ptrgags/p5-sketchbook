@@ -1,11 +1,12 @@
-import { Point } from "../sketchlib/pga2d/Point.js";
-import { Color } from "./Color.js";
-import { GroupPrimitive } from "./primitives/GroupPrimitive.js";
-import { RectPrimitive } from "./primitives/RectPrimitive.js";
-import { style } from "./primitives/shorthand.js";
-import { Style } from "./Style.js";
-import { Rectangle } from "./Rectangle.js";
+import { Point } from "../pga2d/Point.js";
+import { Color } from "../Color.js";
+import { GroupPrimitive } from "../primitives/GroupPrimitive.js";
+import { RectPrimitive } from "../primitives/RectPrimitive.js";
+import { style } from "../primitives/shorthand.js";
+import { Style } from "../Style.js";
+import { Rectangle } from "../Rectangle.js";
 import { ButtonState, TouchButton } from "./TouchButton.js";
+import { MouseCallbacks } from "./MouseCallbacks.js";
 
 /**
  * One of the states of the toggle button, since we don't know the
@@ -71,38 +72,13 @@ export class ToggleButton {
         ? Style.DEFAULT_FILL
         : new Style({ fill: Color.MAGENTA });
 
-    return style(rect, { button_style });
+    return style(rect, button_style);
   }
 
   /**
-   * Mouse pressed handler
-   * @param {Point} mouse_coords The mouse coords from the event
+   * @type {MouseCallbacks}
    */
-  mouse_pressed(mouse_coords) {
-    this.button.mouse_pressed(mouse_coords);
-  }
-
-  /**
-   * Mouse released handler
-   * @param {Point} mouse_coords The mouse coords from the event
-   */
-  mouse_released(mouse_coords) {
-    this.button.mouse_released(mouse_coords);
-  }
-
-  /**
-   * Mouse moved handler
-   * @param {Point} mouse_coords The mouse coords from the event
-   */
-  mouse_moved(mouse_coords) {
-    this.button.mouse_moved(mouse_coords);
-  }
-
-  /**
-   * Mouse dragged handler
-   * @param {Point} mouse_coords The mouse coords from the event
-   */
-  mouse_dragged(mouse_coords) {
-    this.button.mouse_dragged(mouse_coords);
+  get mouse_callbacks() {
+    return this.button;
   }
 }

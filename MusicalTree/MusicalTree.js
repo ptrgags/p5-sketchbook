@@ -1,15 +1,15 @@
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { group } from "../sketchlib/primitives/shorthand.js";
-import { CanvasMouseHandler } from "../sketchlib/CanvasMouseHandler.js";
-import { MouseInput } from "../sketchlib/MouseInput.js";
-import { MuteButton } from "../sketchlib/MuteButton.js";
-import { PlayButtonScene } from "../sketchlib/PlayButtonScene.js";
+import { CanvasMouseHandler } from "../sketchlib/input/CanvasMouseHandler.js";
+import { PlayButtonScene } from "../sketchlib/scenes/PlayButtonScene.js";
 import { SoundManager } from "../sketchlib/SoundManager.js";
 import { AnimatedTurtleTree } from "./AnimatedTurtleTree.js";
-
-const MOUSE = new CanvasMouseHandler();
+import { Animated } from "../sketchlib/animation/Animated.js";
+import { SoundScene } from "../sketchlib/scenes/SoundScene.js";
 
 const ANIMATION = new AnimatedTurtleTree(7);
+
+const MOUSE = new CanvasMouseHandler();
 
 // Add scores here
 /**@type {import("../sketchlib/SoundManager.js").SoundManifest} */
@@ -22,63 +22,27 @@ const SOUND_MANIFEST = {
 //@ts-ignore
 const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
 
-class SoundScene {
+/**
+ * @implements {Animated}
+ */
+class MusicalTreeAnimation {
   /**
    * Constructor
    * @param {SoundManager} sound Reference to the sound manager
    */
   constructor(sound) {
-    this.sound = sound;
-    this.mute_button = new MuteButton(sound);
-    this.events = new EventTarget();
+    sound.play_score("tree");
+    sound.no_loop();
 
-    this.sound.play_score("tree");
-  }
-
-  update() {
-    // state changes each frame go here
-    // note that you can do this.sound.get_param(param_id) if the score
-    // has animations
-  }
-
-  render() {
-    const current_time = SOUND.transport_time;
-
-    const mute = this.mute_button.render();
-    const animation = ANIMATION.render(current_time);
-    return group(animation, mute);
+    this.primitive = group(ANIMATION.render(0));
   }
 
   /**
    *
-   * @param {MouseInput} input
+   * @param {number} time
    */
-  mouse_pressed(input) {
-    this.mute_button.mouse_pressed(input);
-  }
-
-  /**
-   *
-   * @param {MouseInput} input
-   */
-  mouse_moved(input) {
-    this.mute_button.mouse_moved(input);
-  }
-
-  /**
-   *
-   * @param {MouseInput} input
-   */
-  mouse_dragged(input) {
-    this.mute_button.mouse_dragged(input);
-  }
-
-  /**
-   *
-   * @param {MouseInput} input
-   */
-  mouse_released(input) {
-    this.mute_button.mouse_released(input);
+  update(time) {
+    this.primitive.primitives.splice(0, Infinity, ANIMATION.render(time));
   }
 }
 
@@ -99,9 +63,11 @@ export const sketch = (p) => {
     ).elt;
 
     MOUSE.setup(canvas);
+    MOUSE.callbacks = scene.mouse_callbacks;
 
     scene.events.addEventListener("scene-change", () => {
-      scene = new SoundScene(SOUND);
+      scene = new SoundScene(SOUND, new MusicalTreeAnimation(SOUND));
+      MOUSE.callbacks = scene.mouse_callbacks;
     });
   };
 
@@ -109,24 +75,8 @@ export const sketch = (p) => {
     p.background(0);
 
     scene.update();
-
-    const scene_primitive = scene.render();
-    scene_primitive.draw(p);
+    scene.primitive.draw(p);
   };
 
-  MOUSE.mouse_pressed(p, (input) => {
-    scene.mouse_pressed(input);
-  });
-
-  MOUSE.mouse_moved(p, (input) => {
-    scene.mouse_moved(input);
-  });
-
-  MOUSE.mouse_released(p, (input) => {
-    scene.mouse_released(input);
-  });
-
-  MOUSE.mouse_dragged(p, (input) => {
-    scene.mouse_dragged(input);
-  });
+  MOUSE.configure_callbacks(p);
 };

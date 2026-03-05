@@ -2,24 +2,37 @@ import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { CanvasMouseHandler } from "../sketchlib/input/CanvasMouseHandler.js";
 import { PlayButtonScene } from "../sketchlib/scenes/PlayButtonScene.js";
 import { SoundManager } from "../sketchlib/SoundManager.js";
-import { SCORE_OCARINA_TRIO } from "../SoundTest/example_scores/ocarina_trio.js";
-import { SoundScene } from "../sketchlib/scenes/SoundScene.js";
-import { OcarinaAnimation } from "./OcarinaAnimation.js";
-import { Scene } from "../sketchlib/scenes/Scene.js";
+import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { Animated } from "../sketchlib/animation/Animated.js";
+import { SoundScene } from "../sketchlib/scenes/SoundScene.js";
+import { MouseCallbacks } from "../sketchlib/input/MouseCallbacks.js";
 
 const MOUSE = new CanvasMouseHandler();
 
 // Add scores here
 /**@type {import("../sketchlib/SoundManager.js").SoundManifest} */
-const SOUND_MANIFEST = {
-  scores: {
-    ocarina_trio: SCORE_OCARINA_TRIO,
-  },
-};
+const SOUND_MANIFEST = {};
 
 //@ts-ignore
 const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
+
+/**
+ * @implements {Animated}
+ */
+class TEMPLATEAnimation {
+  constructor() {
+    this.primitive = GroupPrimitive.EMPTY;
+  }
+
+  /**
+   * @type {MouseCallbacks[]}
+   */
+  get mouse_callbacks() {
+    return [];
+  }
+
+  update() {}
+}
 
 /**
  *
@@ -40,9 +53,8 @@ export const sketch = (p) => {
     MOUSE.setup(canvas);
     MOUSE.callbacks = scene.mouse_callbacks;
 
-    scene.events.addEventListener("scene-change", async () => {
-      await SOUND.init();
-      scene = new SoundScene(SOUND, new OcarinaAnimation(SOUND));
+    scene.events.addEventListener("scene-change", () => {
+      scene = new SoundScene(SOUND, new TEMPLATEAnimation());
       MOUSE.callbacks = scene.mouse_callbacks;
     });
   };
