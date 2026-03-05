@@ -13,6 +13,7 @@ import { Sequential } from "../sketchlib/music/Timeline.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { group } from "../sketchlib/primitives/shorthand.js";
 import { Rational } from "../sketchlib/Rational.js";
+import { whole_fract } from "../sketchlib/whole_fract.js";
 
 const SHRINK_FACTOR = 0.5;
 const A_TRANSLATION = new Direction(-0.5, -0.5);
@@ -45,6 +46,7 @@ function interpolate_ts(offset, scale) {
 const sierpinski_a = interpolate_ts(A_TRANSLATION, SHRINK_FACTOR);
 const sierpinski_b = interpolate_ts(B_TRANSLATION, SHRINK_FACTOR);
 const sierpinski_c = interpolate_ts(C_TRANSLATION, SHRINK_FACTOR);
+const SIERPINSKI_FUNCTIONS = [sierpinski_a, sierpinski_b, sierpinski_c];
 
 const SIERPINSKI_IFS = new IFS([
   sierpinski_a(1),
@@ -73,6 +75,10 @@ const CURVE_C = LoopCurve.from_timeline(
     make_param(0, 1, new Rational(1, 3)),
   ),
 );
+const CURVE_INFINITE_LOOP = LoopCurve.from_timeline(
+  make_param(0, 3, new Rational(1)),
+);
+
 const CURVE_DISPLAY_FULL_ITER = LoopCurve.from_timeline(
   new Sequential(
     make_param(1, 1, new Rational(2, 3)),
@@ -101,6 +107,9 @@ export class AnimatedSierpinski {
         return xform.transform(Cline.UNIT_CIRCLE);
       });
     }
+    this.full_fractal = this.iter_prims
+      .at(-1)
+      .map((x) => to_screen.transform(x));
 
     this.primitive = group();
   }
@@ -109,18 +118,33 @@ export class AnimatedSierpinski {
     const iter_index = Math.min(Math.floor(time), this.iter_prims.length - 1);
     const full_iteration = this.iter_prims[iter_index];
 
-    const t_a = CURVE_A.value(time);
-    const t_b = CURVE_B.value(time);
-    const t_c = CURVE_C.value(time);
+    if (time < MAX_ITERS) {
+      const t_a = CURVE_A.value(time);
+      const t_b = CURVE_B.value(time);
+      const t_c = CURVE_C.value(time);
 
-    const xform_a = this.to_screen.compose(sierpinski_a(t_a));
-    const xform_b = this.to_screen.compose(sierpinski_b(t_b));
-    const xform_c = this.to_screen.compose(sierpinski_c(t_c));
+      const xform_a = this.to_screen.compose(sierpinski_a(t_a));
+      const xform_b = this.to_screen.compose(sierpinski_b(t_b));
+      const xform_c = this.to_screen.compose(sierpinski_c(t_c));
 
-    const prims_a = full_iteration.map((x) => xform_a.transform(x));
-    const prims_b = full_iteration.map((x) => xform_b.transform(x));
-    const prims_c = full_iteration.map((x) => xform_c.transform(x));
+      const prims_a = full_iteration.map((x) => xform_a.transform(x));
+      const prims_b = full_iteration.map((x) => xform_b.transform(x));
+      const prims_c = full_iteration.map((x) => xform_c.transform(x));
 
-    this.primitive.regroup(...prims_c, ...prims_b, ...prims_a);
+      this.primitive.regroup(...prims_c, ...prims_b, ...prims_a);
+    } else {
+      // once we hit the limit of what we can render, we want to render
+      // less. So we render only the full iteration and a scaled copy
+      // based on the current transform
+
+      const param = CURVE_INFINITE_LOOP.value(time);
+      const [xform_index, xform_t] = whole_fract(param);
+
+      const full_xform = this.to_screen.compose(
+        SIERPINSKI_FUNCTIONS[xform_index](xform_t),
+      );
+      const prims = full_iteration.map((x) => full_xform.transform(x));
+      this.primitive.regroup(...this.full_fractal, ...prims);
+    }
   }
 }
