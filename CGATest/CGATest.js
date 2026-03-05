@@ -11,6 +11,10 @@ import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { NullPoint } from "../sketchlib/cga2d/NullPoint.js";
 import { range } from "../sketchlib/range.js";
 import { mod } from "../sketchlib/mod.js";
+import { IFS } from "../sketchlib/cga2d/IFS.js";
+import { AnimatedSierpinski } from "./AnimatedSierpinski.js";
+import { ProgressivePrimitive } from "../sketchlib/primitives/ProgressivePrimitive.js";
+import { Oklch } from "../sketchlib/Oklch.js";
 
 // Create a few shapes encoded in CGA
 const CIRCLE = Cline.from_circle(new Circle(new Point(250, 350), 50));
@@ -80,6 +84,29 @@ const PARABOLIC_TILES = [...range(2 * MAX_EXPONENT + 1)].map((x) => {
   return parabolic.transform(Cline.Y_AXIS);
 });
 
+const SHRINK = CVersor.dilation(0.5);
+const SIERPINSKI_IFS = new IFS([
+  CVersor.translation(new Direction(-0.5, 0.5)).compose(SHRINK),
+  CVersor.translation(new Direction(0.5, 0.5)).compose(SHRINK),
+  CVersor.translation(new Direction(0, -0.5)).compose(SHRINK),
+]);
+const SIERPINSKI_TILES = new ProgressivePrimitive(
+  SIERPINSKI_IFS.iterate(6).map((xform) => {
+    return TO_SCREEN.compose(xform).transform(Cline.UNIT_CIRCLE);
+  }),
+  1,
+);
+
+const SIERPINSKI = new AnimatedSierpinski(TO_SCREEN);
+const STYLED_SIERPINSKI = style(
+  SIERPINSKI.primitive,
+  new Style({
+    fill: new Oklch(0.7676, 0.1381, 82.79),
+    width: 2,
+    stroke: new Oklch(0.66, 0.1381, 72.11),
+  }),
+);
+
 export const sketch = (p) => {
   p.setup = () => {
     p.createCanvas(
@@ -126,8 +153,11 @@ export const sketch = (p) => {
       para_ill_screen.transform(x),
     );
 
+    const slice_t = Math.max((p.frameCount - 60 * 5) / 4, 0);
+    SIERPINSKI_TILES.update(slice_t);
+
     const styled = style(
-      [BIG_UNIT_CIRCLE, ...lox_points, ...para_points],
+      [BIG_UNIT_CIRCLE, ...lox_points, ...para_points, SIERPINSKI_TILES],
       SPIN_STYLE,
     );
     const styled2 = style(
@@ -138,5 +168,8 @@ export const sketch = (p) => {
     CGA_GEOM.draw(p);
     styled.draw(p);
     styled2.draw(p);
+
+    SIERPINSKI.update(p.frameCount / 60);
+    STYLED_SIERPINSKI.draw(p);
   };
 };
