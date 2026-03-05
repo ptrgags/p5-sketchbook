@@ -229,7 +229,7 @@ export class OcarinaAnimation {
       this.piano_rolls.primitive,
       OCARINA_BOXES,
       this.ocarinas.primitive,
-      this.gates,
+      //this.gates,
     );
   }
 
