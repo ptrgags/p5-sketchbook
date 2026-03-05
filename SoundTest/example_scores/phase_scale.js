@@ -17,21 +17,28 @@ const phase_c = parse_cycle(
   [0, 1, 2, 3, 4, 5, 4, 3, 2, 1],
 );
 
+const SCALE3 = make_scale(MINOR_PENTATONIC, C3);
 // lcm(6, 8, 10) = 120 eighth notes duration total
 const total_duration = new Rational(120, 8);
-const phase_part_scale = new Harmony(
-  Melody.from_loop(phase_a, total_duration),
-  Melody.from_loop(phase_b, total_duration),
-  Melody.from_loop(phase_c, total_duration),
-);
 
-const SCALE3 = make_scale(MINOR_PENTATONIC, C3);
-const phase_part_midi = map_pitch(SCALE3, phase_part_scale);
+const part_a = map_pitch(SCALE3, Melody.from_loop(phase_a, total_duration));
+const part_b = map_pitch(SCALE3, Melody.from_loop(phase_b, total_duration));
+const part_c = map_pitch(SCALE3, Melody.from_loop(phase_c, total_duration));
 
 export const SCORE_PHASE_SCALE = new Score(
-  new Part("phase", phase_part_midi, {
+  new Part("phase1", part_a, {
     instrument_id: "poly",
     midi_instrument: 10 - 1, // glockenspiel,
     midi_channel: 0,
+  }),
+  new Part("phase2", part_b, {
+    instrument_id: "poly",
+    midi_instrument: 10 - 1, // glockenspiel,
+    midi_channel: 1,
+  }),
+  new Part("phase3", part_c, {
+    instrument_id: "poly",
+    midi_instrument: 10 - 1, // glockenspiel,
+    midi_channel: 2,
   }),
 );
