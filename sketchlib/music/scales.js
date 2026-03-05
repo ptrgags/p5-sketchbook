@@ -40,10 +40,10 @@ export const MIXOLYDIAN_MODE = MAJOR_SCALE.mode(4);
 export const AEOLIAN_MODE = NATURAL_MINOR_SCALE;
 export const LOCRIAN_MODE = MAJOR_SCALE.mode(6);
 
-export const MAJOR_PENTATONIC = [P1, M2, M3, P5, M6];
-export const MINOR_PENTATONIC = [P1, m3, P4, P5, m7];
+export const MAJOR_PENTATONIC = new ScaleQuality([P1, M2, M3, P5, M6]);
+export const MINOR_PENTATONIC = new ScaleQuality([P1, m3, P4, P5, m7]);
 
-export const DOUBLE_HARMONIC = [P1, m2, m3, P4, P5, m6, m7];
+export const DOUBLE_HARMONIC = new ScaleQuality([P1, m2, m3, P4, P5, m6, m7]);
 
 /**
  * Make a function that maps scale degree -> pitch for a particular scale and root note

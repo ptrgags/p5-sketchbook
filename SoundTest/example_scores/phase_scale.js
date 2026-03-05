@@ -1,29 +1,35 @@
-import {
-  parse_cycle,
-  Harmony,
-  Melody,
-  map_pitch,
-} from "../../sketchlib/music/Music.js";
+import { N8 } from "../../sketchlib/music/durations.js";
+import { Melody } from "../../sketchlib/music/Music.js";
+import { MusicPatterns } from "../../sketchlib/music/MusicPatterns.js";
 import { C3 } from "../../sketchlib/music/pitches.js";
-import { make_scale, MINOR_PENTATONIC } from "../../sketchlib/music/scales.js";
+import { Rhythm } from "../../sketchlib/music/Rhythm.js";
+import { MINOR_PENTATONIC } from "../../sketchlib/music/scales.js";
 import { Part, Score } from "../../sketchlib/music/Score.js";
 import { Rational } from "../../sketchlib/Rational.js";
 
-// Three scales initially the same, but with different lengths
-const phase_a = parse_cycle(new Rational(6, 8), [0, 1, 2, 3, 2, 1]);
-const phase_b = parse_cycle(Rational.ONE, [0, 1, 2, 3, 4, 3, 2, 1]);
-const phase_c = parse_cycle(
-  new Rational(10, 8),
+// Three scales are initially the same, but have different lengths
+const SCALE = MINOR_PENTATONIC.to_scale(C3);
+const phase_a = MusicPatterns.scale_melody(
+  new Rhythm("xxxxxx", N8),
+  SCALE,
+  [0, 1, 2, 3, 2, 1],
+);
+const phase_b = MusicPatterns.scale_melody(
+  new Rhythm("xxxxxxxx", N8),
+  SCALE,
+  [0, 1, 2, 3, 4, 3, 2, 1],
+);
+const phase_c = MusicPatterns.scale_melody(
+  new Rhythm("xxxxxxxxxx", N8),
+  SCALE,
   [0, 1, 2, 3, 4, 5, 4, 3, 2, 1],
 );
 
-const SCALE3 = make_scale(MINOR_PENTATONIC, C3);
 // lcm(6, 8, 10) = 120 eighth notes duration total
 const total_duration = new Rational(120, 8);
-
-const part_a = map_pitch(SCALE3, Melody.from_loop(phase_a, total_duration));
-const part_b = map_pitch(SCALE3, Melody.from_loop(phase_b, total_duration));
-const part_c = map_pitch(SCALE3, Melody.from_loop(phase_c, total_duration));
+const part_a = Melody.from_loop(phase_a, total_duration);
+const part_b = Melody.from_loop(phase_b, total_duration);
+const part_c = Melody.from_loop(phase_c, total_duration);
 
 export const SCORE_PHASE_SCALE = new Score(
   new Part("phase1", part_a, {
