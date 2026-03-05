@@ -26,7 +26,7 @@ const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
  * @param {import("p5")} p
  */
 export const sketch = (p) => {
-  /** @type {Animated & Scene} */
+  /** @type {PlayButtonScene | SoundScene} */
   let scene = new PlayButtonScene(SOUND);
   p.setup = () => {
     const canvas = p.createCanvas(
@@ -50,7 +50,7 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    scene.update(p.frameCount);
+    scene.update();
     scene.primitive.draw(p);
   };
 

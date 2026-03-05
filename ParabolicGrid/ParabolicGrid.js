@@ -6,6 +6,7 @@ import { Circle } from "../sketchlib/primitives/Circle.js";
 import { DancingArrow } from "./DancingArrow.js";
 import { ParabolicGridIllusion } from "./ParabolicGridIllusion.js";
 import { TranslationGridIllusion } from "./TranslationGridIllusion.js";
+import { MouseInCanvas } from "../sketchlib/input/MouseInput.js";
 
 const TRANSLATE_CENTER = CVersor.translation(SCREEN_CENTER.to_direction());
 const SCALE_UP = CVersor.dilation(200);
@@ -54,7 +55,7 @@ export const sketch = (p) => {
 
   // Swap the animations on mouse click.
   MOUSE.mouse_released(p, (input) => {
-    if (!input.in_canvas) {
+    if (input.in_canvas !== MouseInCanvas.IN_CANVAS) {
       return;
     }
 
