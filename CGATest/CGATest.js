@@ -12,6 +12,7 @@ import { NullPoint } from "../sketchlib/cga2d/NullPoint.js";
 import { range } from "../sketchlib/range.js";
 import { mod } from "../sketchlib/mod.js";
 import { IFS } from "../sketchlib/cga2d/IFS.js";
+import { AnimatedSierpinski } from "./AnimatedSierpinski.js";
 
 // Create a few shapes encoded in CGA
 const CIRCLE = Cline.from_circle(new Circle(new Point(250, 350), 50));
@@ -91,6 +92,8 @@ const SIERPINSKI_TILES = [...SIERPINSKI_IFS.iterate(6)].map((xform) => {
   return TO_SCREEN.compose(xform).transform(Cline.UNIT_CIRCLE);
 });
 
+const SIERPINSKI = new AnimatedSierpinski(TO_SCREEN);
+
 export const sketch = (p) => {
   p.setup = () => {
     p.createCanvas(
@@ -139,9 +142,9 @@ export const sketch = (p) => {
 
     const index = Math.round(p.frameCount / 10);
 
-    const partial_tiles = SIERPINSKI_TILES.slice(0, index);
+    //const partial_tiles = SIERPINSKI_TILES.slice(0, index);
     const styled = style(
-      [BIG_UNIT_CIRCLE, ...lox_points, ...para_points, ...partial_tiles],
+      [BIG_UNIT_CIRCLE, ...lox_points, ...para_points /*...partial_tiles*/],
       SPIN_STYLE,
     );
     const styled2 = style(
@@ -152,5 +155,7 @@ export const sketch = (p) => {
     CGA_GEOM.draw(p);
     styled.draw(p);
     styled2.draw(p);
+
+    SIERPINSKI.primitive.draw(p);
   };
 };
