@@ -88,7 +88,7 @@ const SIERPINSKI_IFS = new IFS([
   CVersor.translation(new Direction(0.5, 0.5)).compose(SHRINK),
   CVersor.translation(new Direction(0, -0.5)).compose(SHRINK),
 ]);
-const SIERPINSKI_TILES = [...SIERPINSKI_IFS.iterate(6)].map((xform) => {
+const SIERPINSKI_TILES = SIERPINSKI_IFS.iterate(6).map((xform) => {
   return TO_SCREEN.compose(xform).transform(Cline.UNIT_CIRCLE);
 });
 

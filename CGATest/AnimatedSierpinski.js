@@ -103,7 +103,7 @@ export class AnimatedSierpinski {
     this.iter_prims = new Array(MAX_ITERS + 1);
     this.iter_prims[0] = [Cline.UNIT_CIRCLE];
     for (let i = 1; i <= MAX_ITERS; i++) {
-      this.iter_prims[i] = [...SIERPINSKI_IFS.iterate(i)].map((xform) => {
+      this.iter_prims[i] = SIERPINSKI_IFS.iterate(i).map((xform) => {
         return xform.transform(Cline.UNIT_CIRCLE);
       });
     }

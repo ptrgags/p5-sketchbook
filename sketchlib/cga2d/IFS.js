@@ -32,7 +32,13 @@ export class IFS {
     this.xforms = xforms;
   }
 
-  *iterate(depth) {
-    yield* naive_dfs(CVersor.IDENTITY, this.xforms, depth);
+  /**
+   * Iterate up to a given depth, returning an xform for every leaf of the
+   * DFS tree
+   * @param {number} depth
+   * @returns {CVersor[]}
+   */
+  iterate(depth) {
+    return [...naive_dfs(CVersor.IDENTITY, this.xforms, depth)];
   }
 }
