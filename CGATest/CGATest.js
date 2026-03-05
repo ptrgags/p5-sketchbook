@@ -87,7 +87,7 @@ const SIERPINSKI_IFS = new IFS([
   CVersor.translation(new Direction(0.5, -0.5)).compose(SHRINK),
   CVersor.translation(new Direction(0, 0.5)).compose(SHRINK),
 ]);
-const SIERPINSKI_TILES = [...SIERPINSKI_IFS.iterate(5)].map((xform) => {
+const SIERPINSKI_TILES = [...SIERPINSKI_IFS.iterate(6)].map((xform) => {
   return TO_SCREEN.compose(xform).transform(Cline.UNIT_CIRCLE);
 });
 
@@ -137,8 +137,11 @@ export const sketch = (p) => {
       para_ill_screen.transform(x),
     );
 
+    const index = Math.round(p.frameCount / 10);
+
+    const partial_tiles = SIERPINSKI_TILES.slice(0, index);
     const styled = style(
-      [BIG_UNIT_CIRCLE, ...lox_points, ...para_points, ...SIERPINSKI_TILES],
+      [BIG_UNIT_CIRCLE, ...lox_points, ...para_points, ...partial_tiles],
       SPIN_STYLE,
     );
     const styled2 = style(
