@@ -1,5 +1,6 @@
 import { Animated } from "../sketchlib/animation/Animated.js";
 import { AnimationGroup } from "../sketchlib/animation/AnimationGroup.js";
+import { Color } from "../sketchlib/Color.js";
 import { AbsInterval } from "../sketchlib/music/AbsTimeline.js";
 import { AbsTimelineOps } from "../sketchlib/music/AbsTimelineOps.js";
 import { Note } from "../sketchlib/music/Music.js";
@@ -8,8 +9,10 @@ import { Ocarina } from "../sketchlib/music_vis/Ocarina.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
+import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
-import { group, style } from "../sketchlib/primitives/shorthand.js";
+import { group, style, xform } from "../sketchlib/primitives/shorthand.js";
+import { Transform } from "../sketchlib/primitives/Transform.js";
 import { Rectangle } from "../sketchlib/Rectangle.js";
 import { SoundManager } from "../sketchlib/SoundManager.js";
 import { Style } from "../sketchlib/Style.js";
@@ -100,12 +103,61 @@ const OCARINA_BOXES = group(
  * Get the played notes from the score.
  * @returns {AbsInterval<Note<number>>[][]}
  */
-function compute_played_notes() {
+function get_intervals() {
   return SCORE_OCARINA_TRIO.parts.map((part) => {
     const abs_music = AbsTimelineOps.from_relative(part.music);
     const intervals = [...AbsTimelineOps.iter_intervals(abs_music)];
     return intervals;
   });
+}
+
+/**
+ * Take a sequence of intervals, and merge the time intervals that are
+ * immediately adjacent
+ * @param {AbsInterval<Note<Number>>[]} intervals
+ * @returns {AbsInterval<number>[]} merged intervals. The value is always 1, since only the times matter.
+ */
+function make_gate_signal(intervals) {
+  const result = [];
+  let start_time = intervals[0].start_time;
+  let end_time = intervals[0].end_time;
+  for (const interval of intervals) {
+    if (interval.start_time.equals(end_time)) {
+      // Merge two adjacent time intervals
+      end_time = interval.end_time;
+    } else {
+      // There's a gap before the next interval, so flush the previous
+      // one
+      result.push(new AbsInterval(1, start_time, end_time));
+      start_time = interval.start_time;
+      end_time = interval.end_time;
+    }
+  }
+  // flush the last interval
+  result.push(new AbsInterval(1, start_time, end_time));
+  return result;
+}
+
+const GATE_VELOCITY = 100;
+/**
+ * Take the result from make_gate_signal and make rectangles to visualize it.
+ * This is temporary, I have some ideas for a more elaborate visualization, but
+ * one step at a time.
+ * @param {AbsInterval<number>[]} intervals
+ * @param {number} y
+ * @returns {GroupPrimitive}
+ */
+function render_gate(intervals, y) {
+  const HEIGHT = 10;
+  const rects = [];
+  for (const interval of intervals) {
+    const x = interval.start_time.real * GATE_VELOCITY;
+    const width = interval.duration.real * GATE_VELOCITY;
+    rects.push(
+      new RectPrimitive(new Point(x, y), new Direction(width, HEIGHT)),
+    );
+  }
+  return group(...rects);
 }
 
 /**
@@ -123,12 +175,23 @@ export class OcarinaAnimation {
     this.sound.play_score("ocarina_trio");
     this.sound.no_loop();
 
-    const [soprano_notes, tenor_notes, bass_notes] = compute_played_notes();
+    const [soprano_intervals, tenor_intervals, bass_intervals] =
+      get_intervals();
     this.ocarinas = new AnimationGroup(
-      new Ocarina(BASS_CONFIG, new PlayedNotes(bass_notes)),
-      new Ocarina(TENOR_CONFIG, new PlayedNotes(tenor_notes)),
-      new Ocarina(SOPRANO_CONFIG, new PlayedNotes(soprano_notes)),
+      new Ocarina(BASS_CONFIG, new PlayedNotes(bass_intervals)),
+      new Ocarina(TENOR_CONFIG, new PlayedNotes(tenor_intervals)),
+      new Ocarina(SOPRANO_CONFIG, new PlayedNotes(soprano_intervals)),
     );
+
+    const bass_gate = render_gate(make_gate_signal(bass_intervals), 0);
+    const tenor_gate = render_gate(make_gate_signal(tenor_intervals), 10);
+    const soprano_gate = render_gate(make_gate_signal(soprano_intervals), 20);
+    this.gates = new GroupPrimitive([bass_gate, tenor_gate, soprano_gate], {
+      transform: new Transform(Direction.ZERO),
+      style: new Style({
+        fill: Color.RED,
+      }),
+    });
 
     const y = 150;
     const velocity = 200;
@@ -139,21 +202,21 @@ export class OcarinaAnimation {
     this.background = new PianoRollBackground(y, velocity, pitch_range);
     this.piano_rolls = new AnimationGroup(
       new PianoRoll(
-        bass_notes,
+        bass_intervals,
         y,
         velocity,
         pitch_range,
         new Style({ fill: BASS_CONFIG.color }),
       ),
       new PianoRoll(
-        tenor_notes,
+        tenor_intervals,
         y,
         velocity,
         pitch_range,
         new Style({ fill: TENOR_CONFIG.color }),
       ),
       new PianoRoll(
-        soprano_notes,
+        soprano_intervals,
         y,
         velocity,
         pitch_range,
@@ -166,6 +229,7 @@ export class OcarinaAnimation {
       this.piano_rolls.primitive,
       OCARINA_BOXES,
       this.ocarinas.primitive,
+      this.gates,
     );
   }
 
@@ -175,6 +239,9 @@ export class OcarinaAnimation {
     this.ocarinas.update(time);
     this.piano_rolls.update(time);
     this.background.update(time);
+
+    const x = time * GATE_VELOCITY;
+    this.gates.transform.translation = new Direction(-x, 150);
   }
 
   render() {}
