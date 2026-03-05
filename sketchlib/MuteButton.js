@@ -7,7 +7,7 @@ import { PolygonPrimitive } from "./primitives/PolygonPrimitive.js";
 import { group, style } from "./primitives/shorthand.js";
 import { Style } from "./Style.js";
 import { Rectangle } from "./Rectangle.js";
-import { ToggleButton, ToggleState } from "./ToggleButton.js";
+import { ToggleButton, ToggleState } from "./input/ToggleButton.js";
 import { SoundManager } from "./SoundManager.js";
 import { ShowHidePrimitive } from "./primitives/ShowHidePrimitive.js";
 import { Animated } from "./animation/Animated.js";

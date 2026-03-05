@@ -22,7 +22,7 @@ import { Oklch } from "../sketchlib/Oklch.js";
 import { PlayButtonScene } from "../sketchlib/scenes/PlayButtonScene.js";
 import { Rectangle } from "../sketchlib/Rectangle.js";
 import { SoundManager } from "../sketchlib/SoundManager.js";
-import { TouchButton } from "../sketchlib/TouchButton.js";
+import { TouchButton } from "../sketchlib/input/TouchButton.js";
 import { Piano } from "./Piano.js";
 import { SpiralBurst } from "./SpiralBurst.js";
 import { expect_element } from "../sketchlib/dom/expect_element.js";

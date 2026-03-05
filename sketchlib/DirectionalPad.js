@@ -6,7 +6,7 @@ import { DirectionInput } from "./DirectionInput.js";
 import { KeyboardDPad } from "./KeyboardDPad.js";
 import { MouseInput } from "./input/MouseInput.js";
 import { Rectangle } from "./Rectangle.js";
-import { TouchDPad } from "./TouchDPad.js";
+import { TouchDPad } from "./input/TouchDPad.js";
 
 const DPAD_DIMENSIONS = new Direction(200, 200);
 const MARGIN = 10;

@@ -1,12 +1,12 @@
-import { Point } from "../sketchlib/pga2d/Point.js";
-import { Color } from "./Color.js";
-import { RectPrimitive } from "./primitives/RectPrimitive.js";
-import { style } from "./primitives/shorthand.js";
-import { Style } from "./Style.js";
-import { Rectangle } from "./Rectangle.js";
-import { Animated } from "./animation/Animated.js";
-import { MouseCallbacks } from "./input/MouseCallbacks.js";
-import { MouseInput } from "./input/MouseInput.js";
+import { Point } from "../pga2d/Point.js";
+import { Color } from "../Color.js";
+import { RectPrimitive } from "../primitives/RectPrimitive.js";
+import { style } from "../primitives/shorthand.js";
+import { Style } from "../Style.js";
+import { Rectangle } from "../Rectangle.js";
+import { Animated } from "../animation/Animated.js";
+import { MouseCallbacks } from "./MouseCallbacks.js";
+import { MouseInput } from "./MouseInput.js";
 
 /**
  * @enum {number}

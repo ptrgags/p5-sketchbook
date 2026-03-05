@@ -1,12 +1,12 @@
-import { Point } from "../sketchlib/pga2d/Point.js";
-import { Color } from "./Color.js";
-import { GroupPrimitive } from "./primitives/GroupPrimitive.js";
-import { RectPrimitive } from "./primitives/RectPrimitive.js";
-import { style } from "./primitives/shorthand.js";
-import { Style } from "./Style.js";
-import { Rectangle } from "./Rectangle.js";
-import { ButtonState, TouchButton } from "./TouchButton.js";
-import { MouseCallbacks } from "./input/MouseCallbacks.js";
+import { Point } from "../pga2d/Point.js";
+import { Color } from "../Color.js";
+import { GroupPrimitive } from "../primitives/GroupPrimitive.js";
+import { RectPrimitive } from "../primitives/RectPrimitive.js";
+import { style } from "../primitives/shorthand.js";
+import { Style } from "../Style.js";
+import { Rectangle } from "../Rectangle.js";
+import { ButtonState, TouchButton } from "../TouchButton.js";
+import { MouseCallbacks } from "./MouseCallbacks.js";
 
 /**
  * One of the states of the toggle button, since we don't know the

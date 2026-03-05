@@ -1,6 +1,6 @@
 import { Animated } from "../animation/Animated.js";
 import { MouseCallbacks } from "../input/MouseCallbacks.js";
-import { PlayButton } from "../PlayButton.js";
+import { PlayButton } from "../input/PlayButton.js";
 import { Scene } from "./Scene.js";
 import { SoundManager } from "../SoundManager.js";
 

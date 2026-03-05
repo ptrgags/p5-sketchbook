@@ -1,13 +1,13 @@
-import { Point } from "../sketchlib/pga2d/Point.js";
-import { Color } from "./Color.js";
-import { HEIGHT, WIDTH } from "./dimensions.js";
-import { PolygonPrimitive } from "./primitives/PolygonPrimitive.js";
-import { group, style } from "./primitives/shorthand.js";
-import { Style } from "./Style.js";
-import { SCREEN_RECT } from "./Rectangle.js";
+import { Point } from "../pga2d/Point.js";
+import { Color } from "../Color.js";
+import { HEIGHT, WIDTH } from "../dimensions.js";
+import { PolygonPrimitive } from "../primitives/PolygonPrimitive.js";
+import { group, style } from "../primitives/shorthand.js";
+import { Style } from "../Style.js";
+import { SCREEN_RECT } from "../Rectangle.js";
 import { TouchButton } from "./TouchButton.js";
-import { MouseCallbacks } from "./input/MouseCallbacks.js";
-import { Animated } from "./animation/Animated.js";
+import { MouseCallbacks } from "./MouseCallbacks.js";
+import { Animated } from "../animation/Animated.js";
 
 const TRIANGLE_WIDTH = 200;
 const PLAY_TRIANGLE = new PolygonPrimitive(
