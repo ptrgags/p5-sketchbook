@@ -1,4 +1,3 @@
-import { MouseCallbacks } from "../input/MouseCallbacks.js";
 import { GroupPrimitive } from "../primitives/GroupPrimitive.js";
 import { group } from "../primitives/shorthand.js";
 import { Animated } from "./Animated.js";
