@@ -91,8 +91,7 @@ export class PianoRollBackground {
       lines.push(new LinePrimitive(new Point(0, y), new Point(WIDTH, y)));
     }
 
-    this.bar_lines.primitives.length = 0;
-    this.bar_lines.primitives.splice(0, Infinity, ...lines);
+    this.bar_lines.replace(...lines);
 
     const beat_lines = [];
     // t is an integer, mod(t, 1) gives [0, 1]
@@ -103,7 +102,6 @@ export class PianoRollBackground {
       beat_lines.push(new LinePrimitive(new Point(0, y), new Point(WIDTH, y)));
     }
 
-    this.beat_lines.primitives.length = 0;
-    this.beat_lines.primitives.splice(0, Infinity, ...beat_lines);
+    this.beat_lines.replace(...beat_lines);
   }
 }

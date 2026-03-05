@@ -46,12 +46,8 @@ export class PianoRoll {
       return new AbsInterval(rect, interval.start_time, interval.end_time);
     });
 
-    /**
-     * @type {RectPrimitive[]}
-     */
-    this.rects = [];
     this.translation = new Transform(Direction.ZERO);
-    const rects = new GroupPrimitive(this.rects, {
+    this.rects = new GroupPrimitive(this.rects, {
       style: note_style,
       transform: this.translation,
     });
@@ -63,7 +59,7 @@ export class PianoRoll {
           new Direction(WIDTH, HEIGHT - this.y),
         ),
       ),
-      rects,
+      this.rects,
     );
   }
 
@@ -79,8 +75,7 @@ export class PianoRoll {
       (x) => x.value,
     );
 
-    this.rects.length = 0;
-    this.rects.splice(0, Infinity, ...visible_rects);
+    this.rects.replace(...visible_rects);
 
     const distance_traveled = time * this.velocity;
     this.translation.translation = new Direction(0, this.y - distance_traveled);
