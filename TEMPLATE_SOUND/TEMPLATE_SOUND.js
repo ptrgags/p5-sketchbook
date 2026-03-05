@@ -1,6 +1,6 @@
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { CanvasMouseHandler } from "../sketchlib/CanvasMouseHandler.js";
-import { PlayButtonScene } from "../sketchlib/PlayButtonScene.js";
+import { PlayButtonScene } from "../sketchlib/scenes/PlayButtonScene.js";
 import { SoundManager } from "../sketchlib/SoundManager.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { Animated } from "../sketchlib/animation/Animated.js";
