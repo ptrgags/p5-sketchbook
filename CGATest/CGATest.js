@@ -156,6 +156,7 @@ export const sketch = (p) => {
     styled.draw(p);
     styled2.draw(p);
 
+    SIERPINSKI.update(p.frameCount / 60);
     SIERPINSKI.primitive.draw(p);
   };
 };
