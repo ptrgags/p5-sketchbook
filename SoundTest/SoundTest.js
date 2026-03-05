@@ -16,7 +16,6 @@ import {
   MIDIExportFormat,
   score_to_midi,
 } from "../sketchlib/midi/score_to_midi.js";
-import { MouseInput } from "../sketchlib/MouseInput.js";
 import { render_score } from "../sketchlib/music/render_score.js";
 import { MuteButton } from "../sketchlib/MuteButton.js";
 import { Oklch } from "../sketchlib/Oklch.js";
