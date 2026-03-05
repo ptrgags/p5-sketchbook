@@ -1,6 +1,7 @@
 import { Animated } from "../sketchlib/animation/Animated.js";
 import { AnimationGroup } from "../sketchlib/animation/AnimationGroup.js";
 import { Color } from "../sketchlib/Color.js";
+import { mod } from "../sketchlib/mod.js";
 import { AbsInterval } from "../sketchlib/music/AbsTimeline.js";
 import { AbsTimelineOps } from "../sketchlib/music/AbsTimelineOps.js";
 import { Note } from "../sketchlib/music/Music.js";
@@ -9,6 +10,7 @@ import { Ocarina } from "../sketchlib/music_vis/Ocarina.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
+import { BezierPrimitive } from "../sketchlib/primitives/BezierPrimitive.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { group, style, xform } from "../sketchlib/primitives/shorthand.js";
@@ -160,6 +162,13 @@ function render_gate(intervals, y) {
   return group(...rects);
 }
 
+const BEZIER = new BezierPrimitive(
+  new Point(25, 25),
+  new Point(25, 400),
+  new Point(300, 25),
+  new Point(300, 400),
+);
+
 /**
  * @implements {Animated}
  */
@@ -224,12 +233,21 @@ export class OcarinaAnimation {
       ),
     );
 
+    this.dashed_bezier = style(
+      [],
+      new Style({
+        stroke: Color.RED,
+        width: 8,
+      }),
+    );
+
     this.primitive = group(
       this.background.primitive,
       this.piano_rolls.primitive,
       OCARINA_BOXES,
       this.ocarinas.primitive,
       //this.gates,
+      this.dashed_bezier,
     );
   }
 
@@ -242,6 +260,15 @@ export class OcarinaAnimation {
 
     const x = time * GATE_VELOCITY;
     this.gates.transform.translation = new Direction(-x, 150);
+
+    const dashes = [];
+    for (let t = mod(time, 1); t < 1; t += 0.2) {
+      const t_start = t;
+      const t_end = Math.min(t + 0.1, 1);
+      dashes.push(BEZIER.render_between(t_start, t_end));
+    }
+
+    this.dashed_bezier.regroup(...dashes);
   }
 
   render() {}
