@@ -14,6 +14,7 @@ import { mod } from "../sketchlib/mod.js";
 import { IFS } from "../sketchlib/cga2d/IFS.js";
 import { AnimatedSierpinski } from "./AnimatedSierpinski.js";
 import { ProgressivePrimitive } from "../sketchlib/primitives/ProgressivePrimitive.js";
+import { Oklch } from "../sketchlib/Oklch.js";
 
 // Create a few shapes encoded in CGA
 const CIRCLE = Cline.from_circle(new Circle(new Point(250, 350), 50));
@@ -97,6 +98,14 @@ const SIERPINSKI_TILES = new ProgressivePrimitive(
 );
 
 const SIERPINSKI = new AnimatedSierpinski(TO_SCREEN);
+const STYLED_SIERPINSKI = style(
+  SIERPINSKI.primitive,
+  new Style({
+    fill: new Oklch(0.7676, 0.1381, 82.79),
+    width: 2,
+    stroke: new Oklch(0.66, 0.1381, 72.11),
+  }),
+);
 
 export const sketch = (p) => {
   p.setup = () => {
@@ -161,6 +170,6 @@ export const sketch = (p) => {
     styled2.draw(p);
 
     SIERPINSKI.update(p.frameCount / 60);
-    SIERPINSKI.primitive.draw(p);
+    STYLED_SIERPINSKI.draw(p);
   };
 };
