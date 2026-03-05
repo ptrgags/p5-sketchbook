@@ -3,7 +3,7 @@ import { DirectionalPad } from "../sketchlib/DirectionalPad.js";
 import { ArcRobot, N_VALUES } from "./ArcRobot.js";
 import { TouchButton } from "../sketchlib/TouchButton.js";
 import { Rectangle } from "../sketchlib/Rectangle.js";
-import { CanvasMouseHandler } from "../sketchlib/CanvasMouseHandler.js";
+import { CanvasMouseHandler } from "../sketchlib/input/CanvasMouseHandler.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 

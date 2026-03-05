@@ -10,7 +10,7 @@ import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
 import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
 import { Transform } from "../sketchlib/primitives/Transform.js";
 import { Style } from "../sketchlib/Style.js";
-import { CanvasMouseHandler } from "../sketchlib/CanvasMouseHandler.js";
+import { CanvasMouseHandler } from "../sketchlib/input/CanvasMouseHandler.js";
 import { encode_midi_file } from "../sketchlib/midi/encode_midi.js";
 import {
   MIDIExportFormat,

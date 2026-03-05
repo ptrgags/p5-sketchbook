@@ -1,4 +1,4 @@
-import { CanvasMouseHandler } from "../sketchlib/CanvasMouseHandler.js";
+import { CanvasMouseHandler } from "../sketchlib/input/CanvasMouseHandler.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { WIDTH, HEIGHT, SCREEN_CENTER } from "../sketchlib/dimensions.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";

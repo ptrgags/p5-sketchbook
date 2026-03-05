@@ -6,7 +6,7 @@ import { Style } from "./Style.js";
 import { Rectangle } from "./Rectangle.js";
 import { Animated } from "./animation/Animated.js";
 import { MouseCallbacks } from "./input/MouseCallbacks.js";
-import { MouseInput } from "./MouseInput.js";
+import { MouseInput } from "./input/MouseInput.js";
 
 /**
  * @enum {number}

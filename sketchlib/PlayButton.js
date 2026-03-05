@@ -7,7 +7,7 @@ import { Style } from "./Style.js";
 import { SCREEN_RECT } from "./Rectangle.js";
 import { TouchButton } from "./TouchButton.js";
 import { MouseCallbacks } from "./input/MouseCallbacks.js";
-import { MouseInput } from "./MouseInput.js";
+import { MouseInput } from "./input/MouseInput.js";
 import { Animated } from "./animation/Animated.js";
 
 const TRIANGLE_WIDTH = 200;

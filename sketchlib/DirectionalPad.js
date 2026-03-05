@@ -4,7 +4,7 @@ import { HEIGHT } from "./dimensions.js";
 import { GroupPrimitive } from "./primitives/GroupPrimitive.js";
 import { DirectionInput } from "./DirectionInput.js";
 import { KeyboardDPad } from "./KeyboardDPad.js";
-import { MouseInput } from "./MouseInput.js";
+import { MouseInput } from "./input/MouseInput.js";
 import { Rectangle } from "./Rectangle.js";
 import { TouchDPad } from "./TouchDPad.js";
 

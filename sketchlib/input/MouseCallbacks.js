@@ -1,4 +1,4 @@
-import { MouseInput } from "../MouseInput.js";
+import { MouseInput } from "./MouseInput.js";
 
 /**
  * Mouse callback events. An object implementing this interface

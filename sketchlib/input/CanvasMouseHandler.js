@@ -1,8 +1,8 @@
-import { fix_mouse_coords } from "./fix_mouse_coords.js";
-import { prevent_mobile_scroll } from "./prevent_mobile_scroll.js";
+import { fix_mouse_coords } from "../fix_mouse_coords.js";
+import { prevent_mobile_scroll } from "../prevent_mobile_scroll.js";
 import { MouseInCanvas, MouseInput, MousePressed } from "./MouseInput.js";
-import { SCREEN_RECT } from "./Rectangle.js";
-import { MouseCallbacks } from "./input/MouseCallbacks.js";
+import { SCREEN_RECT } from "../Rectangle.js";
+import { MouseCallbacks } from "./MouseCallbacks.js";
 
 /**
  * @typedef {function(MouseInput):void} MouseCallback

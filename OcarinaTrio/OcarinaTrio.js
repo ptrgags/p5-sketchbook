@@ -1,5 +1,5 @@
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
-import { CanvasMouseHandler } from "../sketchlib/CanvasMouseHandler.js";
+import { CanvasMouseHandler } from "../sketchlib/input/CanvasMouseHandler.js";
 import { PlayButtonScene } from "../sketchlib/scenes/PlayButtonScene.js";
 import { SoundManager } from "../sketchlib/SoundManager.js";
 import { SCORE_OCARINA_TRIO } from "../SoundTest/example_scores/ocarina_trio.js";

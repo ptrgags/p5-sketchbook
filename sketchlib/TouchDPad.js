@@ -8,7 +8,7 @@ import { group, style } from "./primitives/shorthand.js";
 import { VectorPrimitive } from "./primitives/VectorPrimitive.js";
 import { Style } from "./Style.js";
 import { DirectionInput } from "./DirectionInput.js";
-import { MouseInCanvas, MouseInput } from "./MouseInput.js";
+import { MouseInCanvas, MouseInput } from "./input/MouseInput.js";
 import { Rectangle } from "./Rectangle.js";
 import { Oklch } from "./Oklch.js";
 import { Color } from "./Color.js";
