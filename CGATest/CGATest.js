@@ -11,6 +11,7 @@ import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { NullPoint } from "../sketchlib/cga2d/NullPoint.js";
 import { range } from "../sketchlib/range.js";
 import { mod } from "../sketchlib/mod.js";
+import { IFS } from "../sketchlib/cga2d/IFS.js";
 
 // Create a few shapes encoded in CGA
 const CIRCLE = Cline.from_circle(new Circle(new Point(250, 350), 50));
@@ -80,6 +81,16 @@ const PARABOLIC_TILES = [...range(2 * MAX_EXPONENT + 1)].map((x) => {
   return parabolic.transform(Cline.Y_AXIS);
 });
 
+const SHRINK = CVersor.dilation(0.5);
+const SIERPINSKI_IFS = new IFS([
+  CVersor.translation(new Direction(-0.5, -0.5)).compose(SHRINK),
+  CVersor.translation(new Direction(0.5, -0.5)).compose(SHRINK),
+  CVersor.translation(new Direction(0, 0.5)).compose(SHRINK),
+]);
+const SIERPINSKI_TILES = [...SIERPINSKI_IFS.iterate(5)].map((xform) => {
+  return TO_SCREEN.compose(xform).transform(Cline.UNIT_CIRCLE);
+});
+
 export const sketch = (p) => {
   p.setup = () => {
     p.createCanvas(
@@ -127,7 +138,7 @@ export const sketch = (p) => {
     );
 
     const styled = style(
-      [BIG_UNIT_CIRCLE, ...lox_points, ...para_points],
+      [BIG_UNIT_CIRCLE, ...lox_points, ...para_points, ...SIERPINSKI_TILES],
       SPIN_STYLE,
     );
     const styled2 = style(
