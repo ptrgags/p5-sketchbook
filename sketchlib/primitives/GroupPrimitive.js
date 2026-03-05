@@ -141,7 +141,7 @@ export class GroupPrimitive {
    * to contain them.
    * @param  {...Primitive} primitives New primitives
    */
-  replace(...primitives) {
+  regroup(...primitives) {
     this.primitives.splice(0, Infinity, ...primitives);
   }
 

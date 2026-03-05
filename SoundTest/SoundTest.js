@@ -518,8 +518,8 @@ class SoundTestAnimation {
     );
 
     // Update the primitives
-    this.piano_prim.replace(this.piano.primitive);
-    this.ocarina_prims.replace(
+    this.piano_prim.regroup(this.piano.primitive);
+    this.ocarina_prims.regroup(
       this.ocarinas.bass.primitive,
       this.ocarinas.tenor.primitive,
       this.ocarinas.soprano.primitive,
@@ -573,7 +573,7 @@ class SoundTestAnimation {
     this.spiral_burst.update(time);
     this.button_group.update(time);
 
-    this.timeline_prim.replace(this.render_timeline(time));
+    this.timeline_prim.regroup(this.render_timeline(time));
   }
 
   /**

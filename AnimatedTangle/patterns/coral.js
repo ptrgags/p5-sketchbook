@@ -249,7 +249,7 @@ class SwayingCoral {
     this.polyps.forEach((x) => x.update(time));
 
     // Re-draw the coral
-    this.colored_coral.replace(this.tree.render());
+    this.colored_coral.regroup(this.tree.render());
   }
 }
 

@@ -42,7 +42,7 @@ class MusicalTreeAnimation {
    * @param {number} time
    */
   update(time) {
-    this.primitive.replace(ANIMATION.render(time));
+    this.primitive.regroup(ANIMATION.render(time));
   }
 }
 

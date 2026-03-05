@@ -73,6 +73,6 @@ export class AnimatedStripes {
       this.dimensions,
       mod(time, 1.0),
     );
-    this.primitive.replace(new_stripes);
+    this.primitive.regroup(new_stripes);
   }
 }

@@ -75,7 +75,7 @@ export class PianoRoll {
       (x) => x.value,
     );
 
-    this.rects.replace(...visible_rects);
+    this.rects.regroup(...visible_rects);
 
     const distance_traveled = time * this.velocity;
     this.translation.translation = new Direction(0, this.y - distance_traveled);

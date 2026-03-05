@@ -124,7 +124,7 @@ class Hitomezashi {
 
     // Use render_between to slice out a portion of the path
     const prim = STITCH_PATH.render_between(start, end);
-    this.primitive.replace(prim);
+    this.primitive.regroup(prim);
   }
 }
 
