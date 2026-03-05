@@ -5,7 +5,7 @@ import { RectPrimitive } from "../primitives/RectPrimitive.js";
 import { style } from "../primitives/shorthand.js";
 import { Style } from "../Style.js";
 import { Rectangle } from "../Rectangle.js";
-import { ButtonState, TouchButton } from "../TouchButton.js";
+import { ButtonState, TouchButton } from "./TouchButton.js";
 import { MouseCallbacks } from "./MouseCallbacks.js";
 
 /**

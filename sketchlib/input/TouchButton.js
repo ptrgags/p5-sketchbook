@@ -1,4 +1,3 @@
-import { Point } from "../pga2d/Point.js";
 import { Color } from "../Color.js";
 import { RectPrimitive } from "../primitives/RectPrimitive.js";
 import { style } from "../primitives/shorthand.js";
