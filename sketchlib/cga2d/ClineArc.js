@@ -3,7 +3,6 @@ import { Direction } from "../pga2d/Direction.js";
 import { Point } from "../pga2d/Point.js";
 import { ArcPrimitive } from "../primitives/ArcPrimitive.js";
 import { Circle } from "../primitives/Circle.js";
-import { GroupPrimitive } from "../primitives/GroupPrimitive.js";
 import { LinePrimitive } from "../primitives/LinePrimitive.js";
 import { Primitive } from "../primitives/Primitive.js";
 import { Ray } from "../primitives/Ray.js";
@@ -14,6 +13,37 @@ import { COdd } from "./COdd.js";
 import { NullPoint } from "./NullPoint.js";
 import { lerp } from "../lerp.js";
 import { Line } from "../pga2d/Line.js";
+
+/**
+ * Pair of rays. This mainly exists for type safety, else a GroupPrimitive
+ * would have been fine.
+ * @implements {Primitive}
+ */
+export class RayPair {
+  /**
+   * Constructor
+   * @param {Ray} ray_a
+   * @param {Ray} ray_b
+   */
+  constructor(ray_a, ray_b) {
+    this.ray_a = ray_a;
+    this.ray_b = ray_b;
+  }
+
+  /**
+   *
+   * @param {RayPair} other
+   * @returns {boolean}
+   */
+  equals(other) {
+    return this.ray_a.equals(other.ray_a) && this.ray_b.equals(other.ray_b);
+  }
+
+  draw(p) {
+    this.ray_a.draw(p);
+    this.ray_b.draw(p);
+  }
+}
 
 /**
  * Given the data for a cline arc that's known to be a finite circular arc,
@@ -43,7 +73,7 @@ function classify_circle_geometry(circle, a, b, c) {
  * @param {NullPoint} a First point
  * @param {NullPoint} b Second point
  * @param {NullPoint} c Third point
- * @returns {Ray | GroupPrimitive | LinePrimitive}
+ * @returns {Ray | RayPair | LinePrimitive}
  */
 function classify_line_geometry(a, b, c) {
   if (a.is_inf) {
@@ -64,7 +94,7 @@ function classify_line_geometry(a, b, c) {
     // a -> inf -> c
     // but on the screen it looks like 2 rays inf <- a   c -> inf
     const to_infinity = c.point.sub(a.point);
-    return group(
+    return new RayPair(
       new Ray(a.point, to_infinity.neg()),
       new Ray(c.point, to_infinity),
     );
@@ -87,7 +117,7 @@ function classify_line_geometry(a, b, c) {
   // either way,  on the screen it looks like two rays at a and c pointing
   // away from each other.
   const ac = c.point.sub(a.point);
-  return group(new Ray(a.point, ac.neg()), new Ray(c.point, ac));
+  return new RayPair(new Ray(a.point, ac.neg()), new Ray(c.point, ac));
 }
 
 /**
@@ -140,6 +170,33 @@ export class ClineArc {
     const b = this.b.transform(versor);
     const c = this.c.transform(versor);
     return new ClineArc(cline, a, b, c);
+  }
+
+  /**
+   *
+   * @param {ClineArc} other
+   * @returns {boolean}
+   */
+  equals(other) {
+    if (!this.cline.equals(other.cline)) {
+      return false;
+    }
+
+    const a = this.primitive;
+    const b = other.primitive;
+
+    if (a instanceof LinePrimitive && b instanceof LinePrimitive) {
+      return a.equals(b);
+    } else if (a instanceof ArcPrimitive && b instanceof ArcPrimitive) {
+      return a.equals(b);
+    } else if (a instanceof Ray && b instanceof Ray) {
+      return a.equals(b);
+    } else if (a instanceof RayPair && b instanceof RayPair) {
+      return a.equals(b);
+    }
+
+    // not the same primitive type, definitely not equal
+    return false;
   }
 
   /**

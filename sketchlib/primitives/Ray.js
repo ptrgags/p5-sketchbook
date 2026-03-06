@@ -19,6 +19,17 @@ export class Ray {
   }
 
   /**
+   *
+   * @param {Ray} other
+   * @returns {boolean}
+   */
+  equals(other) {
+    return (
+      this.start.equals(other.start) && this.direction.equals(other.direction)
+    );
+  }
+
+  /**
    * Draw the ray
    * @param {import("p5")} p P5 library
    */
