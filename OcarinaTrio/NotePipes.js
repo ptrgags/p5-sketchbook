@@ -17,21 +17,27 @@ const STYLE_PIPE_INTERIOR = new Style({
   width: 8,
 });
 
-// TODO: These might be backwards...
-const ANGLES_QUADRANT4 = new ArcAngles(0, Math.PI / 2);
-const ANGLES_QUADRANT3 = new ArcAngles(Math.PI / 2, Math.PI);
-const ANGLES_QUADRANT2 = new ArcAngles(Math.PI, (3 * Math.PI) / 2);
-const ANGLES_QUADRANT1 = new ArcAngles((3 * Math.PI) / 2, 2 * Math.PI);
+// Remember, angles are measured _clockwise_
+const ANGLES_QUADRANT1 = new ArcAngles(0, Math.PI / 2);
+const ANGLES_QUADRANT2 = new ArcAngles(Math.PI / 2, Math.PI);
+const ANGLES_QUADRANT3 = new ArcAngles(Math.PI, (3 * Math.PI) / 2);
+const ANGLES_QUADRANT4 = new ArcAngles((3 * Math.PI) / 2, 2 * Math.PI);
 const BEND_RADIUS = 25;
+// Important, these segments have to be defined in the direction of the flow
+// for the animation to look correct.
 const PIPE_SEGMENTS_BASS = [
   new LinePrimitive(new Point(100, 0), new Point(100, 75)),
-  new ArcPrimitive(new Point(125, 75), BEND_RADIUS, ANGLES_QUADRANT3),
+  new ArcPrimitive(new Point(125, 75), BEND_RADIUS, ANGLES_QUADRANT2.reverse()),
   new LinePrimitive(new Point(125, 100), new Point(150, 100)),
-  new ArcPrimitive(new Point(150, 125), BEND_RADIUS, ANGLES_QUADRANT1),
+  new ArcPrimitive(new Point(150, 125), BEND_RADIUS, ANGLES_QUADRANT4),
   new LinePrimitive(new Point(175, 125), new Point(175, 150)),
-  new ArcPrimitive(new Point(150, 150), BEND_RADIUS, ANGLES_QUADRANT4),
-  new LinePrimitive(new Point(125, 175), new Point(150, 175)),
-  new ArcPrimitive(new Point(125, 200), BEND_RADIUS, ANGLES_QUADRANT2),
+  new ArcPrimitive(new Point(150, 150), BEND_RADIUS, ANGLES_QUADRANT1),
+  new LinePrimitive(new Point(150, 175), new Point(125, 175)),
+  new ArcPrimitive(
+    new Point(125, 200),
+    BEND_RADIUS,
+    ANGLES_QUADRANT3.reverse(),
+  ),
   new LinePrimitive(new Point(100, 200), new Point(100, 250)),
 ];
 
@@ -58,7 +64,7 @@ export class NotePipes {
   }
 
   update(time) {
-    const velocity = 20;
+    const velocity = 100;
     const dashes = [
       [0, 100],
       [125, 200],

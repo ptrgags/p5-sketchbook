@@ -74,4 +74,12 @@ export class ArcAngles {
   flip_y() {
     return new ArcAngles(-this.start_angle, -this.end_angle);
   }
+
+  /**
+   * Reverse the orientation of the arc angles by swapping start and end
+   * @returns {ArcAngles}
+   */
+  reverse() {
+    return new ArcAngles(this.end_angle, this.start_angle);
+  }
 }
