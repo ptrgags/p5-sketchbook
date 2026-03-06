@@ -7,7 +7,16 @@
  */
 export class ArcLength {
   /**
-   * Get the arc line at
+   * Get the total arc length. This must be
+   * the same as get_arc_length(1)
+   * @type {number}
+   */
+  get arc_length() {
+    throw new Error("not implemented");
+  }
+
+  /**
+   * Get the arc line at a given t value
    * @param {number} t Time value in [0, 1]
    * @returns {number} The arc length
    */

@@ -50,6 +50,14 @@ export class ArcAngles {
   }
 
   /**
+   * Get the absolute angle subtended by this arc
+   * @type {number}
+   */
+  get angle() {
+    return Math.abs(this.start_angle - this.end_angle);
+  }
+
+  /**
    * Get the direction from start to end
    * @type {number} +1 for positive direction, -1 for negative, 0 for a 0 angle that has no direction
    */

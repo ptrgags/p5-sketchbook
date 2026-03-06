@@ -72,7 +72,7 @@ export class LinePrimitive {
   /**
    * @type {number}
    */
-  get length() {
+  get arc_length() {
     return this.b.dist(this.a);
   }
 
@@ -83,7 +83,7 @@ export class LinePrimitive {
    * @returns {number}
    */
   get_arc_length(t) {
-    return t * this.length;
+    return t * this.arc_length;
   }
 
   /**
@@ -93,6 +93,6 @@ export class LinePrimitive {
    * @returns {number}
    */
   get_t(arc_length) {
-    return arc_length / this.length;
+    return arc_length / this.arc_length;
   }
 }
