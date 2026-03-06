@@ -1,10 +1,12 @@
 import { Direction } from "../../sketchlib/pga2d/Direction.js";
 import { Point } from "../../sketchlib/pga2d/Point.js";
+import { ArcLength } from "./ArcLength.js";
 import { PartialPrimitive } from "./Primitive.js";
 
 /**
  * Line segment
  * @implements {PartialPrimitive}
+ * @implements {ArcLength}
  */
 export class LinePrimitive {
   /**
@@ -60,11 +62,37 @@ export class LinePrimitive {
 
   /**
    * Get a tangent direction at time t
-   * @param {number} _t Interpolation factor in [0, 1] (not used, but part of PartialPrimitive interface)
    * @returns {Direction} Unit direction along the curve at time t
    */
-  get_tangent(_t) {
+  get_tangent() {
     // For a line, the direction is constant
     return this.b.sub(this.a).normalize();
+  }
+
+  /**
+   * @type {number}
+   */
+  get arc_length() {
+    return this.b.dist(this.a);
+  }
+
+  /**
+   * For a line segment, the arc length is just a percentage
+   * of |b - a|
+   * @param {number} t
+   * @returns {number}
+   */
+  get_arc_length(t) {
+    return t * this.arc_length;
+  }
+
+  /**
+   * For a line segment, the t value is just the percentage
+   * of the total length, i.e. arc_length / |b - a|
+   * @param {number} arc_length
+   * @returns {number}
+   */
+  get_t(arc_length) {
+    return arc_length / this.arc_length;
   }
 }

@@ -50,6 +50,14 @@ export class ArcAngles {
   }
 
   /**
+   * Get the absolute angle subtended by this arc
+   * @type {number}
+   */
+  get angle() {
+    return Math.abs(this.start_angle - this.end_angle);
+  }
+
+  /**
    * Get the direction from start to end
    * @type {number} +1 for positive direction, -1 for negative, 0 for a 0 angle that has no direction
    */
@@ -65,5 +73,13 @@ export class ArcAngles {
    */
   flip_y() {
     return new ArcAngles(-this.start_angle, -this.end_angle);
+  }
+
+  /**
+   * Reverse the orientation of the arc angles by swapping start and end
+   * @returns {ArcAngles}
+   */
+  reverse() {
+    return new ArcAngles(this.end_angle, this.start_angle);
   }
 }
