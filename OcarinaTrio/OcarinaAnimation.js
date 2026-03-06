@@ -282,6 +282,7 @@ export class OcarinaAnimation {
     this.ocarinas.update(time);
     this.piano_rolls.update(time);
     this.background.update(time);
+    this.pipes.update(time);
 
     const x = time * GATE_VELOCITY;
     this.gates.transform.translation = new Direction(-x, 150);

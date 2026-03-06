@@ -18,7 +18,7 @@ export class ArcLength {
   /**
    * Get the arc line at a given t value
    * @param {number} t Time value in [0, 1]
-   * @returns {number} The arc length
+   * @returns {number} The corresponding arc length
    */
   get_arc_length(t) {
     throw new Error("not implemented");
@@ -28,6 +28,7 @@ export class ArcLength {
    * Given an arc length relative to the start of the curve,
    * get the t value.
    * @param {number} arc_length Arc length between in [0, this.get_arc_length(1)]
+   * @returns {number} The corresponding t value
    */
   get_t(arc_length) {
     throw new Error("not implemented");

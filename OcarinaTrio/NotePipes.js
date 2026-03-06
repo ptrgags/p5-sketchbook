@@ -6,6 +6,7 @@ import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
 import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
+import { DashedPath } from "./DashedPath.js";
 
 const STYLE_PIPE_WALLS = new Style({
   stroke: Color.from_hex_code("#666666"),
@@ -38,13 +39,32 @@ const PIPE_WALLS = style(PIPE_SEGMENTS_BASS, STYLE_PIPE_WALLS);
 const PIPE_INTERIOR = style(PIPE_SEGMENTS_BASS, STYLE_PIPE_INTERIOR);
 const PIPES = group(PIPE_WALLS, PIPE_INTERIOR);
 
+const STYLE_DASHES = new Style({
+  stroke: Color.RED,
+  width: 8,
+});
+
 /**
  * @implements {Animated}
  */
 export class NotePipes {
   constructor() {
-    this.primitive = PIPES;
+    this.bass_dashes = new DashedPath(PIPE_SEGMENTS_BASS);
+
+    this.primitive = group(
+      PIPES,
+      style(this.bass_dashes.primitive, STYLE_DASHES),
+    );
   }
 
-  update(time) {}
+  update(time) {
+    const velocity = 20;
+    const dashes = [
+      [0, 100],
+      [125, 200],
+      [225, 275],
+      [300, 400],
+    ].map((x) => [x[0] + velocity * time, x[1] + velocity * time]);
+    this.bass_dashes.update_dashes(dashes);
+  }
 }

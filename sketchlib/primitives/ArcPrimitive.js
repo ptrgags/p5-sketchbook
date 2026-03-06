@@ -3,6 +3,7 @@ import { Point } from "../../sketchlib/pga2d/Point.js";
 import { ArcAngles } from "../ArcAngles.js";
 import { ArcLength } from "./ArcLength.js";
 import { PartialPrimitive } from "./Primitive.js";
+import { lerp } from "../lerp.js";
 
 /**
  * Circular arc primitive defined as a circle and start and stop angles
