@@ -150,55 +150,6 @@ function get_intervals() {
 }
 
 /**
- * Take a sequence of intervals, and merge the time intervals that are
- * immediately adjacent
- * @param {AbsInterval<Note<Number>>[]} intervals
- * @returns {AbsInterval<number>[]} merged intervals. The value is always 1, since only the times matter.
- */
-function make_gate_signal(intervals) {
-  const result = [];
-  let start_time = intervals[0].start_time;
-  let end_time = intervals[0].end_time;
-  for (const interval of intervals) {
-    if (interval.start_time.equals(end_time)) {
-      // Merge two adjacent time intervals
-      end_time = interval.end_time;
-    } else {
-      // There's a gap before the next interval, so flush the previous
-      // one
-      result.push(new AbsInterval(1, start_time, end_time));
-      start_time = interval.start_time;
-      end_time = interval.end_time;
-    }
-  }
-  // flush the last interval
-  result.push(new AbsInterval(1, start_time, end_time));
-  return result;
-}
-
-const GATE_VELOCITY = 100;
-/**
- * Take the result from make_gate_signal and make rectangles to visualize it.
- * This is temporary, I have some ideas for a more elaborate visualization, but
- * one step at a time.
- * @param {AbsInterval<number>[]} intervals
- * @param {number} y
- * @returns {GroupPrimitive}
- */
-function render_gate(intervals, y) {
-  const HEIGHT = 10;
-  const rects = [];
-  for (const interval of intervals) {
-    const x = interval.start_time.real * GATE_VELOCITY;
-    const width = interval.duration.real * GATE_VELOCITY;
-    rects.push(
-      new RectPrimitive(new Point(x, y), new Direction(width, HEIGHT)),
-    );
-  }
-  return group(...rects);
-}
-
-/**
  * @implements {Animated}
  */
 export class OcarinaAnimation {
@@ -221,17 +172,11 @@ export class OcarinaAnimation {
       new Ocarina(SOPRANO_CONFIG, new PlayedNotes(soprano_intervals)),
     );
 
-    const bass_gate = render_gate(make_gate_signal(bass_intervals), 0);
-    const tenor_gate = render_gate(make_gate_signal(tenor_intervals), 10);
-    const soprano_gate = render_gate(make_gate_signal(soprano_intervals), 20);
-    this.gates = new GroupPrimitive([bass_gate, tenor_gate, soprano_gate], {
-      transform: new Transform(Direction.ZERO),
-      style: new Style({
-        fill: Color.RED,
-      }),
-    });
-
-    this.pipes = new NotePipes();
+    const pipe_velocity = 100;
+    this.pipes = new NotePipes(
+      [bass_intervals, tenor_intervals, soprano_intervals],
+      pipe_velocity,
+    );
 
     const y = 450;
     const velocity = 200;
@@ -283,9 +228,6 @@ export class OcarinaAnimation {
     this.piano_rolls.update(time);
     this.background.update(time);
     this.pipes.update(time);
-
-    const x = time * GATE_VELOCITY;
-    this.gates.transform.translation = new Direction(-x, 150);
   }
 
   render() {}

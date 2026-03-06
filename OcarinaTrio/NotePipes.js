@@ -1,6 +1,8 @@
 import { Animated } from "../sketchlib/animation/Animated.js";
 import { ArcAngles } from "../sketchlib/ArcAngles.js";
 import { Color } from "../sketchlib/Color.js";
+import { AbsInterval } from "../sketchlib/music/AbsTimeline.js";
+import { Note } from "../sketchlib/music/Music.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
 import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
@@ -51,11 +53,48 @@ const STYLE_DASHES = new Style({
 });
 
 /**
+ * Take a sequence of intervals, and merge the time intervals that are
+ * immediately adjacent
+ * @param {AbsInterval<Note<number>>[]} intervals
+ * @returns {AbsInterval<number>[]} merged intervals. The value is always 1, since only the times matter.
+ */
+function make_gate_signal(intervals) {
+  const result = [];
+  let start_time = intervals[0].start_time;
+  let end_time = intervals[0].end_time;
+  for (const interval of intervals) {
+    if (interval.start_time.equals(end_time)) {
+      // Merge two adjacent time intervals
+      end_time = interval.end_time;
+    } else {
+      // There's a gap before the next interval, so flush the previous
+      // one
+      result.push(new AbsInterval(1, start_time, end_time));
+      start_time = interval.start_time;
+      end_time = interval.end_time;
+    }
+  }
+  // flush the last interval
+  result.push(new AbsInterval(1, start_time, end_time));
+  return result;
+}
+
+const VELOCITY = 100;
+
+/**
  * @implements {Animated}
  */
 export class NotePipes {
-  constructor() {
+  /**
+   *
+   * @param {AbsInterval<Note<number>>[][]} intervals
+   * @param {number} velocity speed of the notes through the pipe in px/unit time
+   */
+  constructor(intervals, velocity) {
     this.bass_dashes = new DashedPath(PIPE_SEGMENTS_BASS);
+    this.velocity = velocity;
+
+    this.gate_signals = intervals.map(make_gate_signal);
 
     this.primitive = group(
       PIPES,
@@ -64,13 +103,20 @@ export class NotePipes {
   }
 
   update(time) {
-    const velocity = 100;
-    const dashes = [
-      [0, 100],
-      [125, 200],
-      [225, 275],
-      [300, 400],
-    ].map((x) => [x[0] + velocity * time, x[1] + velocity * time]);
-    this.bass_dashes.update_dashes(dashes);
+    const [bass_gate] = this.gate_signals;
+
+    const total_bass_length = this.bass_dashes.arc_length;
+    /**
+     * @type {[number, number][]}
+     */
+    const arc_lengths = bass_gate.map((interval) => {
+      const start_s =
+        total_bass_length + (interval.start_time.real - time) * this.velocity;
+      const end_s =
+        total_bass_length + (interval.end_time.real - time) * this.velocity;
+      return [start_s, end_s];
+    });
+
+    this.bass_dashes.update_dashes(arc_lengths);
   }
 }
