@@ -43,8 +43,22 @@ const PIPE_SEGMENTS_BASS = [
   new LinePrimitive(new Point(100, 200), new Point(100, 250)),
 ];
 
-const PIPE_WALLS = style(PIPE_SEGMENTS_BASS, STYLE_PIPE_WALLS);
-const PIPE_INTERIOR = style(PIPE_SEGMENTS_BASS, STYLE_PIPE_INTERIOR);
+// since the end result will change anyway, keep the other pipes simple for now
+const PIPE_SEGMENTS_TENOR = [
+  new LinePrimitive(new Point(250, 0), new Point(250, 255)),
+];
+const PIPE_SEGMENTS_SOPRANO = [
+  new LinePrimitive(new Point(400, 0), new Point(400, 255)),
+];
+
+const PIPE_WALLS = style(
+  [...PIPE_SEGMENTS_BASS, ...PIPE_SEGMENTS_TENOR, ...PIPE_SEGMENTS_SOPRANO],
+  STYLE_PIPE_WALLS,
+);
+const PIPE_INTERIOR = style(
+  [...PIPE_SEGMENTS_BASS, ...PIPE_SEGMENTS_TENOR, ...PIPE_SEGMENTS_SOPRANO],
+  STYLE_PIPE_INTERIOR,
+);
 const PIPES = group(PIPE_WALLS, PIPE_INTERIOR);
 
 const STYLE_DASHES = new Style({
@@ -79,8 +93,6 @@ function make_gate_signal(intervals) {
   return result;
 }
 
-const VELOCITY = 100;
-
 /**
  * @implements {Animated}
  */
@@ -92,6 +104,8 @@ export class NotePipes {
    */
   constructor(intervals, velocity) {
     this.bass_dashes = new DashedPath(PIPE_SEGMENTS_BASS);
+    this.tenor_dashes = new DashedPath(PIPE_SEGMENTS_TENOR);
+    this.soprano_dashes = new DashedPath(PIPE_SEGMENTS_SOPRANO);
     this.velocity = velocity;
 
     this.gate_signals = intervals.map(make_gate_signal);
@@ -99,17 +113,23 @@ export class NotePipes {
     this.primitive = group(
       PIPES,
       style(this.bass_dashes.primitive, STYLE_DASHES),
+      style(this.tenor_dashes.primitive, STYLE_DASHES),
+      style(this.soprano_dashes.primitive, STYLE_DASHES),
     );
   }
 
-  update(time) {
-    const [bass_gate] = this.gate_signals;
-
-    const total_bass_length = this.bass_dashes.arc_length;
+  /**
+   *
+   * @param {DashedPath} dashes
+   * @param {AbsInterval<number>[]} gate_signal
+   * @param {number} time
+   */
+  update_dashes(dashes, gate_signal, time) {
+    const total_bass_length = dashes.arc_length;
     /**
      * @type {[number, number][]}
      */
-    const arc_lengths = bass_gate.map((interval) => {
+    const arc_lengths = gate_signal.map((interval) => {
       const start_s =
         total_bass_length + (interval.start_time.real - time) * this.velocity;
       const end_s =
@@ -117,6 +137,13 @@ export class NotePipes {
       return [start_s, end_s];
     });
 
-    this.bass_dashes.update_dashes(arc_lengths);
+    dashes.update_dashes(arc_lengths);
+  }
+
+  update(time) {
+    const [bass_gate, tenor_gate, soprano_gate] = this.gate_signals;
+    this.update_dashes(this.bass_dashes, bass_gate, time);
+    this.update_dashes(this.tenor_dashes, tenor_gate, time);
+    this.update_dashes(this.soprano_dashes, soprano_gate, time);
   }
 }
