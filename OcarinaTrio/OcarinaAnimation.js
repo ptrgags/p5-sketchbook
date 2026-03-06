@@ -1,6 +1,7 @@
 import { Animated } from "../sketchlib/animation/Animated.js";
 import { AnimationGroup } from "../sketchlib/animation/AnimationGroup.js";
 import { Color } from "../sketchlib/Color.js";
+import { WIDTH } from "../sketchlib/dimensions.js";
 import { AbsInterval } from "../sketchlib/music/AbsTimeline.js";
 import { AbsTimelineOps } from "../sketchlib/music/AbsTimelineOps.js";
 import { Note } from "../sketchlib/music/Music.js";
@@ -10,6 +11,7 @@ import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
+import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { group, style, xform } from "../sketchlib/primitives/shorthand.js";
 import { Transform } from "../sketchlib/primitives/Transform.js";
@@ -21,12 +23,13 @@ import { PlayedNotes } from "../SoundTest/PlayedNotes.js";
 import { PianoRoll } from "./PianoRoll.js";
 import { PianoRollBackground } from "./PianoRollBackground.js";
 
-const START_X = 25;
+const BOX_ORIGIN = new Point(25, 275);
 const BOX_DIMENSIONS = new Direction(150, 150);
+const BOX_STRIDE = Direction.DIR_X.scale(BOX_DIMENSIONS.x);
 const BOUNDING_BOXES = [
-  new Rectangle(new Point(START_X, 0), BOX_DIMENSIONS),
-  new Rectangle(new Point(START_X + BOX_DIMENSIONS.x, 0), BOX_DIMENSIONS),
-  new Rectangle(new Point(START_X + 2 * BOX_DIMENSIONS.x, 0), BOX_DIMENSIONS),
+  new Rectangle(BOX_ORIGIN, BOX_DIMENSIONS),
+  new Rectangle(BOX_ORIGIN.add(BOX_STRIDE), BOX_DIMENSIONS),
+  new Rectangle(BOX_ORIGIN.add(BOX_STRIDE.scale(2)), BOX_DIMENSIONS),
 ];
 
 /**
@@ -66,7 +69,7 @@ const BOX_MARGIN = new Direction(6, 6);
 const OCARINA_BOXES = group(
   style(
     new RectPrimitive(
-      new Point(25, 0).add(BOX_MARGIN),
+      BOX_ORIGIN.add(BOX_MARGIN),
       new Direction(150, 150).add(BOX_MARGIN.scale(-2)),
     ),
     new Style({
@@ -77,7 +80,7 @@ const OCARINA_BOXES = group(
   ),
   style(
     new RectPrimitive(
-      new Point(25 + 150, 0).add(BOX_MARGIN),
+      BOX_ORIGIN.add(BOX_STRIDE).add(BOX_MARGIN),
       new Direction(150, 150).add(BOX_MARGIN.scale(-2)),
     ),
     new Style({
@@ -88,7 +91,7 @@ const OCARINA_BOXES = group(
   ),
   style(
     new RectPrimitive(
-      new Point(25 + 2 * 150, 0).add(BOX_MARGIN),
+      BOX_ORIGIN.add(BOX_STRIDE.scale(2)).add(BOX_MARGIN),
       new Direction(150, 150).add(BOX_MARGIN.scale(-2)),
     ),
     new Style({
@@ -97,6 +100,40 @@ const OCARINA_BOXES = group(
       width: 4,
     }),
   ),
+);
+
+const STYLE_NOZZLES = new Style({
+  fill: Color.from_hex_code("#666666"),
+  stroke: Color.from_hex_code("#222222"),
+  width: 4,
+});
+const INPUT_NOZZLE_SHAPE = new PolygonPrimitive(
+  [
+    new Point(25, 425),
+    new Point(0, 450),
+    new Point(WIDTH, 450),
+    new Point(475, 425),
+  ],
+  true,
+);
+const INPUT_NOZZLE = style(INPUT_NOZZLE_SHAPE, STYLE_NOZZLES);
+const OUTPUT_NOZZLE = new PolygonPrimitive(
+  [
+    new Point(0, 25),
+    new Point(50, 25),
+    new Point(25 + 12, 0),
+    new Point(25 - 12, 0),
+  ],
+  true,
+);
+// one nozzle per instrument
+const OUTPUT_NOZZLES = style(
+  [
+    xform(OUTPUT_NOZZLE, new Transform(new Direction(75, 250))),
+    xform(OUTPUT_NOZZLE, new Transform(new Direction(225, 250))),
+    xform(OUTPUT_NOZZLE, new Transform(new Direction(375, 250))),
+  ],
+  STYLE_NOZZLES,
 );
 
 /**
@@ -193,7 +230,7 @@ export class OcarinaAnimation {
       }),
     });
 
-    const y = 150;
+    const y = 450;
     const velocity = 200;
     /**
      * @type {[number, number]}
@@ -227,6 +264,8 @@ export class OcarinaAnimation {
     this.primitive = group(
       this.background.primitive,
       this.piano_rolls.primitive,
+      INPUT_NOZZLE,
+      OUTPUT_NOZZLES,
       OCARINA_BOXES,
       this.ocarinas.primitive,
       //this.gates,
