@@ -43,6 +43,57 @@ describe("Circle", () => {
     });
   });
 
+  describe("get_angle", () => {
+    it("with point at center returns 0", () => {
+      const circle = new Circle(new Point(3, -4), 5);
+
+      const result = circle.get_angle(circle.center);
+
+      const expected = 0;
+      expect(result).toBeCloseTo(expected);
+    });
+
+    it("with point to the right of center returns angle of 0", () => {
+      const circle = new Circle(new Point(3, -4), 5);
+      const right_of_center = new Point(4, -4);
+
+      const result = circle.get_angle(right_of_center);
+
+      const expected = 0;
+      expect(result).toBeCloseTo(expected);
+    });
+
+    it("with point to the left of center returns pi or -pi", () => {
+      const circle = new Circle(new Point(3, -4), 5);
+      const left_of_center = new Point(1, -4);
+
+      const result = Math.abs(circle.get_angle(left_of_center));
+
+      const expected = Math.PI;
+      expect(result).toBeCloseTo(expected);
+    });
+
+    it("with point below center returns negative angle", () => {
+      const circle = new Circle(new Point(3, -4), 5);
+      const point = new Point(1, -6);
+
+      const result = circle.get_angle(point);
+
+      const expected = (-3 * Math.PI) / 4;
+      expect(result).toBeCloseTo(expected);
+    });
+
+    it("with point above center returns positive angle", () => {
+      const circle = new Circle(new Point(3, -4), 5);
+      const point = new Point(6, -1);
+
+      const result = circle.get_angle(point);
+
+      const expected = Math.PI / 4;
+      expect(result).toBeCloseTo(expected);
+    });
+  });
+
   describe("from_two_points", () => {
     it("with identical points returns degenerate circle", () => {
       const a = new Point(1, 2);
