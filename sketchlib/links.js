@@ -1,8 +1,12 @@
 // Links for all of the sketches. Links are added to the page in this order
 export const LINKS = [
   {
+    title: "Ocarina Trio",
+    year: "2026-02/2026-03",
+  },
+  {
     title: "Parabolic Grid",
-    year: "2026-02",
+    year: "2026-02/2026-03",
   },
   {
     title: "CGA Test",
@@ -27,11 +31,6 @@ export const LINKS = [
   {
     title: "Robot Walks",
     year: "2025-11",
-  },
-  {
-    title: "Pendulum Clock",
-    is_lab: true,
-    year: "2025-05",
   },
   {
     title: "Double Spring",

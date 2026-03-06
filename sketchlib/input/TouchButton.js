@@ -1,9 +1,11 @@
-import { Point } from "../sketchlib/pga2d/Point.js";
-import { Color } from "./Color.js";
-import { RectPrimitive } from "./primitives/RectPrimitive.js";
-import { style } from "./primitives/shorthand.js";
-import { Style } from "./Style.js";
-import { Rectangle } from "./Rectangle.js";
+import { Color } from "../Color.js";
+import { RectPrimitive } from "../primitives/RectPrimitive.js";
+import { style } from "../primitives/shorthand.js";
+import { Style } from "../Style.js";
+import { Rectangle } from "../Rectangle.js";
+import { Animated } from "../animation/Animated.js";
+import { MouseCallbacks } from "./MouseCallbacks.js";
+import { MouseInput } from "./MouseInput.js";
 
 /**
  * @enum {number}
@@ -16,6 +18,8 @@ export const ButtonState = {
 
 /**
  * A virtual button represented as a rectangle on screen.
+ * @implements {Animated}
+ * @implements {MouseCallbacks}
  */
 export class TouchButton {
   /**
@@ -34,6 +38,12 @@ export class TouchButton {
      * @type {EventTarget}
      */
     this.events = new EventTarget();
+
+    const rect_prim = new RectPrimitive(
+      this.rect.position,
+      this.rect.dimensions,
+    );
+    this.primitive = style(rect_prim, this.style);
   }
 
   /**
@@ -43,7 +53,11 @@ export class TouchButton {
     return this.state === ButtonState.PRESSED;
   }
 
-  get_debug_style() {
+  update() {
+    this.primitive.style = this.style;
+  }
+
+  get style() {
     switch (this.state) {
       case ButtonState.IDLE:
         return Style.DEFAULT_STROKE;
@@ -52,12 +66,6 @@ export class TouchButton {
       case ButtonState.PRESSED:
         return Style.DEFAULT_STROKE.with_fill(Color.BLUE);
     }
-  }
-
-  debug_render() {
-    const rect = new RectPrimitive(this.rect.position, this.rect.dimensions);
-
-    return style(rect, this.get_debug_style());
   }
 
   /**
@@ -78,10 +86,10 @@ export class TouchButton {
 
   /**
    * Mouse pressed handler
-   * @param {Point} mouse_coords The mouse coords from the event
+   * @param {MouseInput} input
    */
-  mouse_pressed(mouse_coords) {
-    if (!this.rect.contains(mouse_coords)) {
+  mouse_pressed(input) {
+    if (!this.rect.contains(input.mouse_coords)) {
       this.transition(ButtonState.IDLE);
       return;
     }
@@ -91,10 +99,10 @@ export class TouchButton {
 
   /**
    * Mouse released handler
-   * @param {Point} mouse_coords The mouse coords from the event
+   * @param {MouseInput} input
    */
-  mouse_released(mouse_coords) {
-    if (!this.rect.contains(mouse_coords)) {
+  mouse_released(input) {
+    if (!this.rect.contains(input.mouse_coords)) {
       this.transition(ButtonState.IDLE);
       return;
     }
@@ -108,10 +116,10 @@ export class TouchButton {
 
   /**
    * Mouse moved handler
-   * @param {Point} mouse_coords The mouse coords from the event
+   * @param {MouseInput} input
    */
-  mouse_moved(mouse_coords) {
-    if (!this.rect.contains(mouse_coords)) {
+  mouse_moved(input) {
+    if (!this.rect.contains(input.mouse_coords)) {
       this.transition(ButtonState.IDLE);
       return;
     }
@@ -123,10 +131,10 @@ export class TouchButton {
 
   /**
    * Mouse dragged handler
-   * @param {Point} mouse_coords The mouse coords from the event
+   * @param {MouseInput} input
    */
-  mouse_dragged(mouse_coords) {
-    if (!this.rect.contains(mouse_coords)) {
+  mouse_dragged(input) {
+    if (!this.rect.contains(input.mouse_coords)) {
       this.transition(ButtonState.IDLE);
       return;
     }

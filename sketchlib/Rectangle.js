@@ -39,6 +39,16 @@ export class Rectangle {
     const y_max = y_min + height;
     return x >= x_min && x < x_max && y >= y_min && y < y_max;
   }
+
+  /**
+   * Compute a rectangle from a center point and the dimensions
+   * @param {Point} center The center of the
+   * @param {Direction} dimensions
+   * @returns {Rectangle}
+   */
+  static from_center(center, dimensions) {
+    return new Rectangle(center.add(dimensions.scale(-0.5)), dimensions);
+  }
 }
 
 /**

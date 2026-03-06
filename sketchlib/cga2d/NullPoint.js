@@ -4,6 +4,7 @@ import { Primitive } from "../primitives/Primitive.js";
 import { CEven } from "./CEven.js";
 import { COdd } from "./COdd.js";
 import { ConformalBasis } from "./ConformalBasis.js";
+import { ConformalPrimitive } from "./ConfomalPrimitive.js";
 
 /**
  * Null point in 2D CGA (circle with radius 0),
@@ -14,6 +15,7 @@ import { ConformalBasis } from "./ConformalBasis.js";
  * P = x + 1/2 x^2 inf + o  in (inf, o) basis
  * P = x + 1/2(x^2 - 1) p + 1/2(x^2 + 1) m   in (p, m) basis
  * @implements {Primitive}
+ * @implements {ConformalPrimitive}
  */
 export class NullPoint {
   /**

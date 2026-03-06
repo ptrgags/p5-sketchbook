@@ -6,6 +6,7 @@ import { C4 } from "../../sketchlib/music/pitches.js";
 import { Rhythm } from "../../sketchlib/music/Rhythm.js";
 import { MIXOLYDIAN_MODE } from "../../sketchlib/music/scales.js";
 import { Part, Score } from "../../sketchlib/music/Score.js";
+import { Gap } from "../../sketchlib/music/Timeline.js";
 import { Rational } from "../../sketchlib/Rational.js";
 
 const C4_MIXOLYDIAN = MIXOLYDIAN_MODE.to_scale(C4);
@@ -224,7 +225,12 @@ const PATTERN_C3 = MusicPatterns.scale_melody(
   ],
 );
 
+// Add a few measures of initial delay so we can show the notes scrolling before
+// they reach the ocarina.
+const INITIAL_DELAY = new Rational(3);
+
 const BASS = new Melody(
+  new Gap(INITIAL_DELAY),
   INTRO1,
   INTRO2,
   // Section A: Stuff

@@ -1,23 +1,17 @@
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
-import { group } from "../sketchlib/primitives/shorthand.js";
 import { CanvasMouseHandler } from "../sketchlib/input/CanvasMouseHandler.js";
 import { PlayButtonScene } from "../sketchlib/scenes/PlayButtonScene.js";
 import { SoundManager } from "../sketchlib/SoundManager.js";
-import { AnimatedTurtleTree } from "./AnimatedTurtleTree.js";
+import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { Animated } from "../sketchlib/animation/Animated.js";
 import { SoundScene } from "../sketchlib/scenes/SoundScene.js";
-
-const ANIMATION = new AnimatedTurtleTree(7);
+import { MouseCallbacks } from "../sketchlib/input/MouseCallbacks.js";
 
 const MOUSE = new CanvasMouseHandler();
 
 // Add scores here
 /**@type {import("../sketchlib/SoundManager.js").SoundManifest} */
-const SOUND_MANIFEST = {
-  scores: {
-    tree: ANIMATION.score,
-  },
-};
+const SOUND_MANIFEST = {};
 
 //@ts-ignore
 const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
@@ -25,25 +19,19 @@ const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
 /**
  * @implements {Animated}
  */
-class MusicalTreeAnimation {
-  /**
-   * Constructor
-   * @param {SoundManager} sound Reference to the sound manager
-   */
-  constructor(sound) {
-    sound.play_score("tree");
-    sound.no_loop();
-
-    this.primitive = group(ANIMATION.render(0));
+class TEMPLATEAnimation {
+  constructor() {
+    this.primitive = GroupPrimitive.EMPTY;
   }
 
   /**
-   *
-   * @param {number} time
+   * @type {MouseCallbacks[]}
    */
-  update(time) {
-    this.primitive.regroup(ANIMATION.render(time));
+  get mouse_callbacks() {
+    return [];
   }
+
+  update() {}
 }
 
 /**
@@ -66,7 +54,7 @@ export const sketch = (p) => {
     MOUSE.callbacks = scene.mouse_callbacks;
 
     scene.events.addEventListener("scene-change", () => {
-      scene = new SoundScene(SOUND, new MusicalTreeAnimation(SOUND));
+      scene = new SoundScene(SOUND, new TEMPLATEAnimation());
       MOUSE.callbacks = scene.mouse_callbacks;
     });
   };

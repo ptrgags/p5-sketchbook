@@ -7,7 +7,11 @@ import { PolygonPrimitive } from "./primitives/PolygonPrimitive.js";
 import { group, style } from "./primitives/shorthand.js";
 import { Style } from "./Style.js";
 import { Rectangle } from "./Rectangle.js";
-import { ToggleButton, ToggleState } from "./ToggleButton.js";
+import { ToggleButton, ToggleState } from "./input/ToggleButton.js";
+import { SoundManager } from "./SoundManager.js";
+import { ShowHidePrimitive } from "./primitives/ShowHidePrimitive.js";
+import { Animated } from "./animation/Animated.js";
+import { MouseCallbacks } from "./input/MouseCallbacks.js";
 
 const SOUND_ON = ToggleState.STATE_A;
 const SOUND_OFF = ToggleState.STATE_B;
@@ -68,10 +72,15 @@ const SPEAKER_SLASH = style(
   ),
   new Style({ stroke: Color.RED }),
 );
-const GROUP_MUTED = group(SPEAKER, SPEAKER_SLASH);
-const GROUP_UNMUTED = SPEAKER;
 
+/**
+ * @implements {Animated}
+ */
 export class MuteButton {
+  /**
+   * Constructor
+   * @param {SoundManager} sound
+   */
   constructor(sound) {
     this.sound_toggle = new ToggleButton(
       new Rectangle(
@@ -81,39 +90,27 @@ export class MuteButton {
       SOUND_ON,
     );
 
-    this.events = new EventTarget();
-
     this.sound_toggle.events.addEventListener(
       "toggle",
       (/**@type {CustomEvent}**/ e) => {
         const state = e.detail;
         const sound_on = state === SOUND_ON;
-        this.events.dispatchEvent(
-          new CustomEvent("change", { detail: { sound_on } }),
-        );
+        sound.toggle_sound(sound_on);
       },
     );
+
+    this.slash = new ShowHidePrimitive([SPEAKER_SLASH], [false]);
+    this.primitive = group(SPEAKER, this.slash);
   }
 
-  render() {
-    return this.sound_toggle.toggle_state == SOUND_OFF
-      ? GROUP_MUTED
-      : GROUP_UNMUTED;
+  update() {
+    this.slash.show_flags = [this.sound_toggle.toggle_state === SOUND_OFF];
   }
 
-  mouse_pressed(input) {
-    this.sound_toggle.mouse_pressed(input.mouse_coords);
-  }
-
-  mouse_moved(input) {
-    this.sound_toggle.mouse_moved(input.mouse_coords);
-  }
-
-  mouse_dragged(input) {
-    this.sound_toggle.mouse_dragged(input.mouse_coords);
-  }
-
-  mouse_released(input) {
-    this.sound_toggle.mouse_released(input.mouse_coords);
+  /**
+   * @type {MouseCallbacks}
+   */
+  get mouse_callbacks() {
+    return this.sound_toggle.mouse_callbacks;
   }
 }

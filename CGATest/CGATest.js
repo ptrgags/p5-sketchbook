@@ -15,6 +15,10 @@ import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
 import { ClineArc } from "../sketchlib/cga2d/ClineArc.js";
 import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
 import { ArcAngles } from "../sketchlib/ArcAngles.js";
+import { IFS } from "../sketchlib/cga2d/IFS.js";
+import { AnimatedSierpinski } from "./AnimatedSierpinski.js";
+import { ProgressivePrimitive } from "../sketchlib/primitives/ProgressivePrimitive.js";
+import { Oklch } from "../sketchlib/Oklch.js";
 
 // Create a few shapes encoded in CGA
 const CIRCLE = Cline.from_circle(new Circle(new Point(250, 350), 50));
@@ -77,7 +81,7 @@ const SCALE_UP = CVersor.dilation(200);
 const FLIP_Y = CVersor.reflection(Direction.DIR_Y);
 const TO_SCREEN = TRANSLATE_CIRCLE_CENTER.compose(SCALE_UP).compose(FLIP_Y);
 
-const BIG_UNIT_CIRCLE = TO_SCREEN.transform_cline(Cline.UNIT_CIRCLE);
+const BIG_UNIT_CIRCLE = TO_SCREEN.transform(Cline.UNIT_CIRCLE);
 
 const POINTS = [
   new Point(-0.8, 0.2),
@@ -97,8 +101,31 @@ const PARABOLIC_TILES = [...range(2 * MAX_EXPONENT + 1)].map((x) => {
   const power = x - MAX_EXPONENT;
   const offset = PARABOLIC_STEP.scale(power);
   const parabolic = CVersor.parabolic(offset);
-  return parabolic.transform_cline(Cline.Y_AXIS);
+  return parabolic.transform(Cline.Y_AXIS);
 });
+
+const SHRINK = CVersor.dilation(0.5);
+const SIERPINSKI_IFS = new IFS([
+  CVersor.translation(new Direction(-0.5, 0.5)).compose(SHRINK),
+  CVersor.translation(new Direction(0.5, 0.5)).compose(SHRINK),
+  CVersor.translation(new Direction(0, -0.5)).compose(SHRINK),
+]);
+const SIERPINSKI_TILES = new ProgressivePrimitive(
+  SIERPINSKI_IFS.iterate(6).map((xform) => {
+    return TO_SCREEN.compose(xform).transform(Cline.UNIT_CIRCLE);
+  }),
+  1,
+);
+
+const SIERPINSKI = new AnimatedSierpinski(TO_SCREEN);
+const STYLED_SIERPINSKI = style(
+  SIERPINSKI.primitive,
+  new Style({
+    fill: new Oklch(0.7676, 0.1381, 82.79),
+    width: 2,
+    stroke: new Oklch(0.66, 0.1381, 72.11),
+  }),
+);
 
 export const sketch = (p) => {
   p.setup = () => {
@@ -119,9 +146,7 @@ export const sketch = (p) => {
 
     const elliptic = CVersor.elliptic(Direction.DIR_Y, angle);
     const elliptic_screen = TO_SCREEN.compose(elliptic);
-    const swirled_points = POINTS.map((x) =>
-      elliptic_screen.transform_point(x),
-    );
+    const swirled_points = POINTS.map((x) => elliptic_screen.transform(x));
 
     const min_factor = 1;
     const max_factor = 100;
@@ -130,28 +155,29 @@ export const sketch = (p) => {
       Math.pow(min_factor, 1.0 - factor_t) * Math.pow(max_factor, factor_t);
     const hyperbolic = CVersor.hyperbolic(Direction.DIR_X, factor);
     const hyp_screen = TO_SCREEN.compose(hyperbolic);
-    const hyp_points = POINTS.map((x) => hyp_screen.transform_point(x));
+    const hyp_points = POINTS.map((x) => hyp_screen.transform(x));
 
     const lox = elliptic.compose(hyperbolic);
     const lox_screen = TO_SCREEN.compose(lox);
-    const lox_points = POINTS.map((x) => lox_screen.transform_point(x));
+    const lox_points = POINTS.map((x) => lox_screen.transform(x));
 
     const parabolic = CVersor.parabolic(new Direction(100.0 * t - 100, 0));
     const para_screen = TO_SCREEN.compose(parabolic);
-    const para_points = POINTS2.map((x) => para_screen.transform_point(x));
-
-    const para_tiles = PARABOLIC_TILES.map((x) => TO_SCREEN.transform_cline(x));
+    const para_points = POINTS2.map((x) => para_screen.transform(x));
 
     // Give the illusion of translating forever by drawing a whole bunch of tiles
     const t_repeat = mod(2 * t, 1.0);
     const para_illusion = CVersor.parabolic(PARABOLIC_STEP.scale(t_repeat));
     const para_ill_screen = TO_SCREEN.compose(para_illusion);
     const para_ill_tiles = PARABOLIC_TILES.map((x) =>
-      para_ill_screen.transform_cline(x),
+      para_ill_screen.transform(x),
     );
 
+    const slice_t = Math.max((p.frameCount - 60 * 5) / 4, 0);
+    SIERPINSKI_TILES.update(slice_t);
+
     const styled = style(
-      [BIG_UNIT_CIRCLE, ...lox_points, ...para_points],
+      [BIG_UNIT_CIRCLE, ...lox_points, ...para_points, SIERPINSKI_TILES],
       SPIN_STYLE,
     );
     const styled2 = style(
@@ -162,5 +188,8 @@ export const sketch = (p) => {
     CGA_GEOM.draw(p);
     styled.draw(p);
     styled2.draw(p);
+
+    SIERPINSKI.update(p.frameCount / 60);
+    STYLED_SIERPINSKI.draw(p);
   };
 };

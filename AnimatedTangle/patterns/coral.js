@@ -154,8 +154,7 @@ class SwayingCoral {
 
     // Save a reference for modifying the group when the tree
     // refreshes
-    const colored_coral = style(this.tree.render(), STYLE_CORAL);
-    this.coral_slot = colored_coral.primitives;
+    this.colored_coral = style(this.tree.render(), STYLE_CORAL);
 
     // For coral nodes that sway, we need some hinges to help calculate the
     // position over time
@@ -224,7 +223,11 @@ class SwayingCoral {
     });
 
     const polyp_primitives = group(...this.polyps.map((x) => x.primitive));
-    this.primitive = group(styled_stripes, colored_coral, polyp_primitives);
+    this.primitive = group(
+      styled_stripes,
+      this.colored_coral,
+      polyp_primitives,
+    );
   }
 
   /**
@@ -246,7 +249,7 @@ class SwayingCoral {
     this.polyps.forEach((x) => x.update(time));
 
     // Re-draw the coral
-    this.coral_slot.splice(0, Infinity, this.tree.render());
+    this.colored_coral.regroup(this.tree.render());
   }
 }
 
