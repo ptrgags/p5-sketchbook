@@ -5,7 +5,7 @@ import { GeneralizedCoordinates } from "../sketchlib/VectorSpace.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
-import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
+import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
@@ -62,8 +62,8 @@ function render_horizontal_spring(position, dimensions, num_coils, line_style) {
     const b = a.add(delta_x.scale(0.5)).add(delta_y);
     const c = a.add(delta_x);
 
-    const diag_down = new LinePrimitive(a, b);
-    const diag_up = new LinePrimitive(b, c);
+    const diag_down = new LineSegment(a, b);
+    const diag_up = new LineSegment(b, c);
     wires.push(diag_down, diag_up);
   }
   return style(wires, line_style);
@@ -137,8 +137,8 @@ export class DoubleSpringSystem {
     const phase1 = [];
     const phase2 = [];
     for (let i = 0; i < states.length - 1; i++) {
-      const line1 = new LinePrimitive(points1[i], points1[i + 1]);
-      const line2 = new LinePrimitive(points2[i], points2[i + 1]);
+      const line1 = new LineSegment(points1[i], points1[i + 1]);
+      const line2 = new LineSegment(points2[i], points2[i + 1]);
 
       phase1.push(line1);
       phase2.push(line2);
@@ -162,8 +162,8 @@ export class DoubleSpringSystem {
     const v_dir = Direction.DIR_Y.scale(-v_scale);
 
     const primitives = [
-      new LinePrimitive(origin.add(x_dir.neg()), origin.add(x_dir)),
-      new LinePrimitive(origin.add(v_dir.neg()), origin.add(v_dir)),
+      new LineSegment(origin.add(x_dir.neg()), origin.add(x_dir)),
+      new LineSegment(origin.add(v_dir.neg()), origin.add(v_dir)),
     ];
 
     return style(primitives, STYLE_AXIS);
@@ -179,8 +179,8 @@ export class DoubleSpringSystem {
     const { rest_length: l1, bob_width: w1 } = this.spring1;
     const { rest_length: l2, bob_width: w2 } = this.spring2;
 
-    const wall = new LinePrimitive(origin, origin.add(Y_METERS.scale(w1)));
-    const floor = new LinePrimitive(origin, origin.add(X_METERS.scale(4)));
+    const wall = new LineSegment(origin, origin.add(Y_METERS.scale(w1)));
+    const floor = new LineSegment(origin, origin.add(X_METERS.scale(4)));
 
     const bob_height = origin.add(Y_METERS.scale(w1));
     const bob1_position = bob_height.add(X_METERS.scale(l1 + x1));
