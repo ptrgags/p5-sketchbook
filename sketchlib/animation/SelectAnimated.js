@@ -17,7 +17,7 @@ export class SelectAnimated {
     this.index = 0;
 
     this.primitive = group();
-    this.#update_primitive();
+    this.update_primitive();
   }
 
   /**
@@ -38,7 +38,7 @@ export class SelectAnimated {
    */
   select(index) {
     this.index = index;
-    this.#update_primitive();
+    this.update_primitive();
   }
 
   /**
@@ -46,7 +46,7 @@ export class SelectAnimated {
    */
   next() {
     this.index++;
-    this.#update_primitive();
+    this.update_primitive();
   }
 
   /**
@@ -54,10 +54,10 @@ export class SelectAnimated {
    */
   prev() {
     this.index--;
-    this.#update_primitive();
+    this.update_primitive();
   }
 
-  #update_primitive() {
+  update_primitive() {
     const primitive = this.selected_animation?.primitive;
     if (primitive) {
       this.primitive.regroup(primitive);
