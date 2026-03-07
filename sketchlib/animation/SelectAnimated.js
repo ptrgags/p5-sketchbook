@@ -1,9 +1,10 @@
 import { mod } from "../mod.js";
-import { GroupPrimitive } from "../primitives/GroupPrimitive.js";
 import { group } from "../primitives/shorthand.js";
 import { Animated } from "./Animated.js";
 
 /**
+ * A container for Animated that only shows one at a time. It acts like a
+ * cyclical array
  * @implements {Animated}
  */
 export class SelectAnimated {
@@ -20,6 +21,7 @@ export class SelectAnimated {
   }
 
   /**
+   * Get the currently selected animation, or undefined if the list was empty
    * @type {Animated | undefined}
    */
   get selected_animation() {
