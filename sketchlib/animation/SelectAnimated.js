@@ -56,9 +56,12 @@ export class SelectAnimated {
   }
 
   #update_primitive() {
-    const primitive =
-      this.selected_animation?.primitive ?? GroupPrimitive.EMPTY;
-    this.primitive.regroup(primitive);
+    const primitive = this.selected_animation?.primitive;
+    if (primitive) {
+      this.primitive.regroup(primitive);
+    } else {
+      this.primitive.regroup();
+    }
   }
 
   /**
