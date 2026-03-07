@@ -2,6 +2,8 @@ import { Point } from "../sketchlib/pga2d/Point.js";
 import { Cline } from "../sketchlib/cga2d/Cline.js";
 import { Color } from "../sketchlib/Color.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
+import { Line } from "../sketchlib/pga2d/Line.js";
+import { Circle } from "../sketchlib/primitives/Circle.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
@@ -17,21 +19,14 @@ import { SelectAnimated } from "../sketchlib/animation/SelectAnimated.js";
 import { CGA_BASICS } from "./cga_basics.js";
 import { CanvasMouseHandler } from "../sketchlib/input/CanvasMouseHandler.js";
 import { MouseInCanvas } from "../sketchlib/input/MouseInput.js";
+import { BIG_UNIT_CIRCLE, TO_SCREEN } from "./common.js";
+import { AnimationGroup } from "../sketchlib/animation/AnimationGroup.js";
+import { SIERPINSKI_TILES } from "./progressive_sierpinski.js";
+import { Clock } from "./Clock.js";
 
 const SPIN_STYLE = new Style({
   stroke: new Color(0, 255, 127),
 });
-
-// Map the unit circle to a circle at the center of the screen with radius 200 px
-// Anything I want to render on the unit circle needs to be conjugated by this.
-const TRANSLATE_CIRCLE_CENTER = CVersor.translation(
-  new Direction(WIDTH / 2, HEIGHT - 200),
-);
-const SCALE_UP = CVersor.dilation(200);
-const FLIP_Y = CVersor.reflection(Direction.DIR_Y);
-const TO_SCREEN = TRANSLATE_CIRCLE_CENTER.compose(SCALE_UP).compose(FLIP_Y);
-
-const BIG_UNIT_CIRCLE = TO_SCREEN.transform(Cline.UNIT_CIRCLE);
 
 const POINTS = [
   new Point(-0.8, 0.2),
@@ -54,32 +49,17 @@ const PARABOLIC_TILES = [...range(2 * MAX_EXPONENT + 1)].map((x) => {
   return parabolic.transform(Cline.Y_AXIS);
 });
 
-const SHRINK = CVersor.dilation(0.5);
-const SIERPINSKI_IFS = new IFS([
-  CVersor.translation(new Direction(-0.5, 0.5)).compose(SHRINK),
-  CVersor.translation(new Direction(0.5, 0.5)).compose(SHRINK),
-  CVersor.translation(new Direction(0, -0.5)).compose(SHRINK),
-]);
-const SIERPINSKI_TILES = new ProgressivePrimitive(
-  SIERPINSKI_IFS.iterate(6).map((xform) => {
-    return TO_SCREEN.compose(xform).transform(Cline.UNIT_CIRCLE);
-  }),
-  1,
-);
-
-const SIERPINSKI = new AnimatedSierpinski(TO_SCREEN);
-const STYLED_SIERPINSKI = style(
-  SIERPINSKI.primitive,
-  new Style({
-    fill: new Oklch(0.7676, 0.1381, 82.79),
-    width: 2,
-    stroke: new Oklch(0.66, 0.1381, 72.11),
-  }),
+const SIERPINSKI = new AnimationGroup(
+  SIERPINSKI_TILES,
+  new AnimatedSierpinski(TO_SCREEN),
 );
 
 const ANIMATIONS = new SelectAnimated([CGA_BASICS, SIERPINSKI]);
 
 const MOUSE = new CanvasMouseHandler();
+
+const CLOCK = new Clock();
+const BPM = 128;
 
 export const sketch = (p) => {
   p.setup = () => {
@@ -129,10 +109,9 @@ export const sketch = (p) => {
       para_ill_screen.transform(x),
     );
 
-    const slice_t = Math.max((p.frameCount - 60 * 5) / 4, 0);
-    SIERPINSKI_TILES.update(slice_t);
+    const t_measures = CLOCK.get_elapsed_measures(BPM);
 
-    ANIMATIONS.update(t);
+    ANIMATIONS.update(t_measures);
     ANIMATIONS.primitive.draw(p);
 
     const styled = style(
@@ -146,9 +125,6 @@ export const sketch = (p) => {
 
     styled.draw(p);
     styled2.draw(p);
-
-    SIERPINSKI.update(p.frameCount / 60);
-    STYLED_SIERPINSKI.draw(p);
   };
 
   MOUSE.mouse_released(p, (input) => {
