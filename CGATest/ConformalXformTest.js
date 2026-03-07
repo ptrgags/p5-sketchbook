@@ -6,13 +6,18 @@ import { Color } from "../sketchlib/Color.js";
 import { mod } from "../sketchlib/mod.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
-import { Primitive } from "../sketchlib/primitives/Primitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { range } from "../sketchlib/range.js";
 import { Style } from "../sketchlib/Style.js";
 
+const STYLE_UNIT_CIRCLE = new Style({
+  stroke: Color.from_hex_code("#007f00"),
+  width: 4,
+});
+
 const STYLE_PARABOLIC = new Style({
   stroke: Color.from_hex_code("#ff7f00"),
+  width: 2,
 });
 
 const STYLE_LOX = new Style({
@@ -55,12 +60,23 @@ export class ConformalXformTest {
   constructor(to_screen) {
     this.to_screen = to_screen;
 
+    const unit_circle = to_screen.transform(Cline.UNIT_CIRCLE);
+
     this.parabolic_lines = style([], STYLE_PARABOLIC);
     this.points = style([], STYLE_POINTS);
     this.lox_points = style([], STYLE_LOX);
-    this.primitive = group(this.parabolic_lines, this.points, this.lox_points);
+    this.primitive = group(
+      style(unit_circle, STYLE_UNIT_CIRCLE),
+      this.parabolic_lines,
+      this.points,
+      this.lox_points,
+    );
   }
 
+  /**
+   *
+   * @param {number} time
+   */
   update(time) {
     // slow down time since the animation is too fast
     const t = time / 8;
