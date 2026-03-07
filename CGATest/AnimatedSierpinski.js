@@ -62,7 +62,7 @@ const SIERPINSKI_IFS = new IFS([
   sierpinski_c(1),
 ]);
 
-const MAX_ITERS = 5;
+export const MAX_ITERS = 5;
 
 const CURVE_A = LoopCurve.from_timeline(
   new Sequential(
@@ -85,13 +85,6 @@ const CURVE_C = LoopCurve.from_timeline(
 );
 const CURVE_INFINITE_LOOP = LoopCurve.from_timeline(
   make_param(0, 3, new Rational(1)),
-);
-
-const CURVE_DISPLAY_FULL_ITER = LoopCurve.from_timeline(
-  new Sequential(
-    make_param(1, 1, new Rational(2, 3)),
-    make_param(0, 0, new Rational(1, 3)),
-  ),
 );
 
 /**
