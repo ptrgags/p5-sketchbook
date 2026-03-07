@@ -2,7 +2,7 @@ import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Color } from "./Color.js";
 import { WIDTH } from "./dimensions.js";
-import { LineSegment } from "./primitives/LinePrimitive.js";
+import { LineSegment } from "./primitives/LineSegment.js";
 import { PolygonPrimitive } from "./primitives/PolygonPrimitive.js";
 import { group, style } from "./primitives/shorthand.js";
 import { Style } from "./Style.js";

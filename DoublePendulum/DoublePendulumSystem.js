@@ -6,7 +6,7 @@ import { PI, TAU } from "../sketchlib/math_consts.js";
 import { mod } from "../sketchlib/mod.js";
 import { Color } from "../sketchlib/Color.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
-import { LineSegment } from "../sketchlib/primitives/LinePrimitive.js";
+import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { style } from "../sketchlib/primitives/shorthand.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
 import { Point } from "../sketchlib/pga2d/Point.js";

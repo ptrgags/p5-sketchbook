@@ -20,7 +20,7 @@ import { Color } from "../../sketchlib/Color.js";
 import { CardinalDirection } from "../../sketchlib/CardinalDirection.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
 import { Circle } from "../../sketchlib/primitives/Circle.js";
-import { LineSegment } from "../../sketchlib/primitives/LinePrimitive.js";
+import { LineSegment } from "../../sketchlib/primitives/LineSegment.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;

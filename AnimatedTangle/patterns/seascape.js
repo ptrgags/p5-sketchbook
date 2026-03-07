@@ -17,7 +17,7 @@ import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { BeziergonPrimitive } from "../../sketchlib/primitives/BeziergonPrimitive.js";
 import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
 import { Circle } from "../../sketchlib/primitives/Circle.js";
-import { LineSegment } from "../../sketchlib/primitives/LinePrimitive.js";
+import { LineSegment } from "../../sketchlib/primitives/LineSegment.js";
 import { Animated } from "../../sketchlib/animation/Animated.js";
 
 const STYLE_MOUNTAINS = new Style({

@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { AnimatedPath } from "./AnimatedPath.js";
-import { LineSegment } from "../primitives/LinePrimitive.js";
+import { LineSegment } from "../primitives/LineSegment.js";
 import { Point } from "../../sketchlib/pga2d/Point.js";
 import { GroupPrimitive } from "../primitives/GroupPrimitive.js";
 import { group } from "../primitives/shorthand.js";

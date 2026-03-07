@@ -2,7 +2,7 @@ import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { ArcAngles } from "../sketchlib/ArcAngles.js";
 import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
-import { LineSegment } from "../sketchlib/primitives/LinePrimitive.js";
+import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { Tween } from "../sketchlib/Tween.js";
 
 /**

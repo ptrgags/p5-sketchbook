@@ -1,7 +1,7 @@
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Motor } from "../sketchlib/pga2d/versors.js";
 import { Color } from "./Color.js";
-import { LineSegment } from "./primitives/LinePrimitive.js";
+import { LineSegment } from "./primitives/LineSegment.js";
 import { group, style } from "./primitives/shorthand.js";
 import { Style } from "./Style.js";
 

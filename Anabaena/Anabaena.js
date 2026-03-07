@@ -11,7 +11,7 @@ import { Style } from "../sketchlib/Style.js";
 import { Color } from "../sketchlib/Color.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
-import { LineSegment } from "../sketchlib/primitives/LinePrimitive.js";
+import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { VectorPrimitive } from "../sketchlib/primitives/VectorPrimitive.js";
 
 const INITIAL_POSITION = new Point(WIDTH / 2, HEIGHT - 50);

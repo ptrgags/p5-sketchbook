@@ -3,7 +3,7 @@ import { Point } from "../../sketchlib/pga2d/Point.js";
 import { Motor } from "../../sketchlib/pga2d/versors.js";
 import { mod } from "../../sketchlib/mod.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
-import { LineSegment } from "../../sketchlib/primitives/LinePrimitive.js";
+import { LineSegment } from "../../sketchlib/primitives/LineSegment.js";
 import { group } from "../../sketchlib/primitives/shorthand.js";
 import { Animated } from "../../sketchlib/animation/Animated.js";
 
