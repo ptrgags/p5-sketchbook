@@ -10,15 +10,23 @@ import { ConformalPrimitive } from "../sketchlib/cga2d/ConfomalPrimitive.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { IFS } from "../sketchlib/cga2d/IFS.js";
 import { Sequential } from "../sketchlib/music/Timeline.js";
+import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
-import { group } from "../sketchlib/primitives/shorthand.js";
+import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Rational } from "../sketchlib/Rational.js";
+import { Style } from "../sketchlib/Style.js";
 import { whole_fract } from "../sketchlib/whole_fract.js";
 
 const SHRINK_FACTOR = 0.5;
 const A_TRANSLATION = new Direction(-0.5, -0.5);
 const B_TRANSLATION = new Direction(0.5, -0.5);
 const C_TRANSLATION = new Direction(0, 0.5);
+
+const STYLE_SIERPINSKI = new Style({
+  fill: new Oklch(0.7676, 0.1381, 82.79),
+  width: 2,
+  stroke: new Oklch(0.66, 0.1381, 72.11),
+});
 
 /**
  *
@@ -111,7 +119,7 @@ export class AnimatedSierpinski {
       .at(-1)
       .map((x) => to_screen.transform(x));
 
-    this.primitive = group();
+    this.primitive = style([], STYLE_SIERPINSKI);
   }
 
   update(time) {
