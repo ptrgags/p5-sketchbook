@@ -11,7 +11,6 @@ import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { NullPoint } from "../sketchlib/cga2d/NullPoint.js";
 import { range } from "../sketchlib/range.js";
 import { mod } from "../sketchlib/mod.js";
-import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
 import { ClineArc } from "../sketchlib/cga2d/ClineArc.js";
 import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
 import { ArcAngles } from "../sketchlib/ArcAngles.js";
@@ -19,20 +18,19 @@ import { IFS } from "../sketchlib/cga2d/IFS.js";
 import { AnimatedSierpinski } from "./AnimatedSierpinski.js";
 import { ProgressivePrimitive } from "../sketchlib/primitives/ProgressivePrimitive.js";
 import { Oklch } from "../sketchlib/Oklch.js";
+import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 
 // Create a few shapes encoded in CGA
 const CIRCLE = Cline.from_circle(new Circle(new Point(250, 350), 50));
 const LINE = Cline.from_line(new Line(3 / 5, 4 / 5, 350));
 const POINT = NullPoint.from_point(new Point(350, 250));
 const CHIP = [
+  ClineArc.from_segment(new LineSegment(new Point(10, 10), new Point(10, 110))),
   ClineArc.from_segment(
-    new LinePrimitive(new Point(10, 10), new Point(10, 110)),
-  ),
-  ClineArc.from_segment(
-    new LinePrimitive(new Point(10, 110), new Point(110, 110)),
+    new LineSegment(new Point(10, 110), new Point(110, 110)),
   ),
   ClineArc.from_arc(
-    new ArcPrimitive(new Point(10, 110), 100, new ArcAngles(0, Math.PI / 2)),
+    new ArcPrimitive(new Point(10, 110), 100, new ArcAngles(0, -Math.PI / 2)),
   ),
 ];
 
