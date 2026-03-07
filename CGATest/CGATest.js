@@ -2,8 +2,6 @@ import { Point } from "../sketchlib/pga2d/Point.js";
 import { Cline } from "../sketchlib/cga2d/Cline.js";
 import { Color } from "../sketchlib/Color.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
-import { Line } from "../sketchlib/pga2d/Line.js";
-import { Circle } from "../sketchlib/primitives/Circle.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
@@ -11,64 +9,18 @@ import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { NullPoint } from "../sketchlib/cga2d/NullPoint.js";
 import { range } from "../sketchlib/range.js";
 import { mod } from "../sketchlib/mod.js";
-import { ClineArc } from "../sketchlib/cga2d/ClineArc.js";
-import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
-import { ArcAngles } from "../sketchlib/ArcAngles.js";
 import { IFS } from "../sketchlib/cga2d/IFS.js";
 import { AnimatedSierpinski } from "./AnimatedSierpinski.js";
 import { ProgressivePrimitive } from "../sketchlib/primitives/ProgressivePrimitive.js";
 import { Oklch } from "../sketchlib/Oklch.js";
-import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
+import { SelectAnimated } from "../sketchlib/animation/SelectAnimated.js";
+import { CGA_BASICS } from "./cga_basics.js";
+import { CanvasMouseHandler } from "../sketchlib/input/CanvasMouseHandler.js";
+import { MouseInCanvas } from "../sketchlib/input/MouseInput.js";
 
-// Create a few shapes encoded in CGA
-const CIRCLE = Cline.from_circle(new Circle(new Point(250, 350), 50));
-const LINE = Cline.from_line(new Line(3 / 5, 4 / 5, 350));
-const POINT = NullPoint.from_point(new Point(350, 250));
-const CHIP = [
-  ClineArc.from_segment(new LineSegment(new Point(10, 10), new Point(10, 110))),
-  ClineArc.from_segment(
-    new LineSegment(new Point(10, 110), new Point(110, 110)),
-  ),
-  ClineArc.from_arc(
-    new ArcPrimitive(new Point(10, 110), 100, new ArcAngles(0, -Math.PI / 2)),
-  ),
-];
-
-// A line is the fixed point of a transformation
-const REFLECT = LINE.vector.normalize();
-const REFLECTED_POINT = POINT.transform(REFLECT);
-const REFLECTED_CIRCLE = CIRCLE.transform(REFLECT);
-const REFLECTED_CHIP = CHIP.map((x) => x.transform(REFLECT));
-
-const INVERT = CIRCLE.vector.normalize_o();
-const INVERTED_POINT = POINT.transform(INVERT);
-const INVERTED_LINE = LINE.transform(INVERT);
-const INVERTED_CHIP = CHIP.map((x) => x.transform(INVERT));
-
-const LINE_STYLE = new Style({
-  stroke: Color.YELLOW,
-});
-const REFLECTED_STYLE = new Style({
-  stroke: Color.CYAN,
-});
-const INVERTED_STYLE = new Style({
-  stroke: new Color(255, 127, 0),
-});
 const SPIN_STYLE = new Style({
   stroke: new Color(0, 255, 127),
 });
-
-const ORIGINAL_GEOM = style([CIRCLE, POINT, LINE, ...CHIP], LINE_STYLE);
-const REFLECTED_GEOM = style(
-  [REFLECTED_POINT, REFLECTED_CIRCLE, ...REFLECTED_CHIP],
-  REFLECTED_STYLE,
-);
-const INVERTED_GEOM = style(
-  [INVERTED_LINE, INVERTED_POINT, ...INVERTED_CHIP],
-  INVERTED_STYLE,
-);
-
-const CGA_GEOM = group(ORIGINAL_GEOM, REFLECTED_GEOM, INVERTED_GEOM);
 
 // Map the unit circle to a circle at the center of the screen with radius 200 px
 // Anything I want to render on the unit circle needs to be conjugated by this.
@@ -125,14 +77,20 @@ const STYLED_SIERPINSKI = style(
   }),
 );
 
+const ANIMATIONS = new SelectAnimated([CGA_BASICS, SIERPINSKI]);
+
+const MOUSE = new CanvasMouseHandler();
+
 export const sketch = (p) => {
   p.setup = () => {
-    p.createCanvas(
+    const canvas = p.createCanvas(
       WIDTH,
       HEIGHT,
       undefined,
       document.getElementById("sketch-canvas"),
-    );
+    ).elt;
+
+    MOUSE.setup(canvas);
   };
 
   p.draw = () => {
@@ -174,20 +132,30 @@ export const sketch = (p) => {
     const slice_t = Math.max((p.frameCount - 60 * 5) / 4, 0);
     SIERPINSKI_TILES.update(slice_t);
 
+    ANIMATIONS.update(t);
+    ANIMATIONS.primitive.draw(p);
+
     const styled = style(
       [BIG_UNIT_CIRCLE, ...lox_points, ...para_points, SIERPINSKI_TILES],
       SPIN_STYLE,
     );
     const styled2 = style(
       [...swirled_points, ...hyp_points, ...para_ill_tiles],
-      INVERTED_STYLE,
+      SPIN_STYLE,
     );
 
-    CGA_GEOM.draw(p);
     styled.draw(p);
     styled2.draw(p);
 
     SIERPINSKI.update(p.frameCount / 60);
     STYLED_SIERPINSKI.draw(p);
   };
+
+  MOUSE.mouse_released(p, (input) => {
+    if (input.in_canvas !== MouseInCanvas.IN_CANVAS) {
+      return;
+    }
+
+    ANIMATIONS.next();
+  });
 };
