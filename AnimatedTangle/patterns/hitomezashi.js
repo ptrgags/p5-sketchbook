@@ -1,7 +1,7 @@
 import { Direction } from "../../sketchlib/pga2d/Direction.js";
 import { Point } from "../../sketchlib/pga2d/Point.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
-import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
+import { LineSegment } from "../../sketchlib/primitives/LineSegment.js";
 import { style } from "../../sketchlib/primitives/shorthand.js";
 import { Random } from "../../sketchlib/random.js";
 import { Style } from "../../sketchlib/Style.js";
@@ -40,7 +40,7 @@ for (let i = 0; i < NUM_COLS; i++) {
     const a = column_origin.add(Y_STEP.scale(j));
     const b = column_origin.add(Y_STEP.scale(j + 1));
 
-    const stitch = new LinePrimitive(a, b);
+    const stitch = new LineSegment(a, b);
     column_stitches.push(stitch);
   }
   VERTICAL_PATHS.push(column_stitches);
@@ -55,7 +55,7 @@ for (let i = 0; i < NUM_ROWS; i++) {
     const a = row_origin.add(X_STEP.scale(j));
     const b = row_origin.add(X_STEP.scale(j + 1));
 
-    const stitch = new LinePrimitive(a, b);
+    const stitch = new LineSegment(a, b);
     row_stitches.push(stitch);
   }
   HORIZONTAL_PATHS.push(row_stitches);

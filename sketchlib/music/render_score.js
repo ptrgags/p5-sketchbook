@@ -3,7 +3,7 @@ import { C4, C5 } from "./pitches.js";
 import { Color } from "../Color.js";
 import { Primitive } from "../primitives/Primitive.js";
 import { GroupPrimitive } from "../primitives/GroupPrimitive.js";
-import { LinePrimitive } from "../primitives/LinePrimitive.js";
+import { LineSegment } from "../primitives/LineSegment.js";
 import { RectPrimitive } from "../primitives/RectPrimitive.js";
 import { group, style } from "../primitives/shorthand.js";
 import { Point } from "../../sketchlib/pga2d/Point.js";
@@ -131,7 +131,7 @@ export function render_music(
   const measure_lines = new Array(whole_measures);
   for (let i = 0; i < whole_measures; i++) {
     const x = i * measure_dimensions.x;
-    measure_lines[i] = new LinePrimitive(
+    measure_lines[i] = new LineSegment(
       offset.add(Direction.DIR_X.scale(x)),
       offset.add(new Direction(x, measure_dimensions.y)),
     );
