@@ -11,7 +11,7 @@ import { Style } from "../sketchlib/Style.js";
 import { Color } from "../sketchlib/Color.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
-import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
+import { LineSegment } from "../sketchlib/primitives/LinePrimitive.js";
 import { VectorPrimitive } from "../sketchlib/primitives/VectorPrimitive.js";
 
 const INITIAL_POSITION = new Point(WIDTH / 2, HEIGHT - 50);
@@ -212,7 +212,7 @@ class AnabaenaCatenula {
       const start = Point.lerp(prev, curr, 0.15);
       const end = Point.lerp(prev, curr, 0.85);
 
-      const cell = new LinePrimitive(start, end);
+      const cell = new LineSegment(start, end);
       const cell_list = symbol === "s" || symbol === "S" ? s_cells : l_cells;
       cell_list.push(cell);
 

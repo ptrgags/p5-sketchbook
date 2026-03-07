@@ -6,7 +6,7 @@ import { PI, TAU } from "../sketchlib/math_consts.js";
 import { mod } from "../sketchlib/mod.js";
 import { Color } from "../sketchlib/Color.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
-import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
+import { LineSegment } from "../sketchlib/primitives/LinePrimitive.js";
 import { style } from "../sketchlib/primitives/shorthand.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
@@ -156,14 +156,14 @@ export class DoublePendulumSystem {
 
       // If we looped around the boundary, don't draw the line
       if (Math.abs(a1.x - b1.x) < 0.8 * TAU) {
-        const line1 = new LinePrimitive(a1, b1);
+        const line1 = new LineSegment(a1, b1);
         phase1.push(line1);
       }
 
       const a2 = points2[i];
       const b2 = points2[i + 1];
       if (Math.abs(a2.x - b2.x) < 0.8 * TAU) {
-        const line2 = new LinePrimitive(a2, b2);
+        const line2 = new LineSegment(a2, b2);
         phase2.push(line2);
       }
     }
@@ -183,8 +183,8 @@ export class DoublePendulumSystem {
     const theta_dot_dir = Direction.DIR_Y.scale(-theta_dot_scale);
 
     const primitives = [
-      new LinePrimitive(origin.sub(theta_dir), origin.add(theta_dir)),
-      new LinePrimitive(origin.sub(theta_dot_dir), origin.add(theta_dot_dir)),
+      new LineSegment(origin.sub(theta_dir), origin.add(theta_dir)),
+      new LineSegment(origin.sub(theta_dot_dir), origin.add(theta_dot_dir)),
     ];
 
     return style(primitives, STYLE_AXIS);
@@ -216,8 +216,8 @@ export class DoublePendulumSystem {
       const [prev1, prev2] = positions[i];
       const [curr1, curr2] = positions[i + 1];
 
-      const line1 = new LinePrimitive(prev1, curr1);
-      const line2 = new LinePrimitive(prev2, curr2);
+      const line1 = new LineSegment(prev1, curr1);
+      const line2 = new LineSegment(prev2, curr2);
 
       history1.push(line1);
       history2.push(line2);
@@ -239,8 +239,8 @@ export class DoublePendulumSystem {
       theta2,
     );
 
-    const arm1 = new LinePrimitive(origin, bob_position1);
-    const arm2 = new LinePrimitive(bob_position1, bob_position2);
+    const arm1 = new LineSegment(origin, bob_position1);
+    const arm2 = new LineSegment(bob_position1, bob_position2);
 
     const bob1 = new Circle(
       bob_position1,

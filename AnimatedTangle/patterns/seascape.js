@@ -17,7 +17,7 @@ import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { BeziergonPrimitive } from "../../sketchlib/primitives/BeziergonPrimitive.js";
 import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
 import { Circle } from "../../sketchlib/primitives/Circle.js";
-import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
+import { LineSegment } from "../../sketchlib/primitives/LinePrimitive.js";
 import { Animated } from "../../sketchlib/animation/Animated.js";
 
 const STYLE_MOUNTAINS = new Style({
@@ -62,7 +62,7 @@ const SUN_RAYS_OUTER_RADIUS = 20;
 const SUN_RAY_LINES = Direction.roots_of_unity(12).map((dir) => {
   const start = SUN_CENTER.add(dir.scale(SUN_RAYS_INNER_RADIUS));
   const end = SUN_CENTER.add(dir.scale(SUN_RAYS_OUTER_RADIUS));
-  return new LinePrimitive(start, end);
+  return new LineSegment(start, end);
 });
 
 const STYLE_SUN_LINES = new Style({

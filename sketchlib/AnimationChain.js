@@ -1,7 +1,7 @@
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Motor } from "../sketchlib/pga2d/versors.js";
 import { Color } from "./Color.js";
-import { LinePrimitive } from "./primitives/LinePrimitive.js";
+import { LineSegment } from "./primitives/LinePrimitive.js";
 import { group, style } from "./primitives/shorthand.js";
 import { Style } from "./Style.js";
 
@@ -153,7 +153,7 @@ export class AnimationChain {
     const lines = new Array(this.joints.length - 1);
     const positions = this.get_positions();
     for (let i = 0; i < lines.length; i++) {
-      lines[i] = new LinePrimitive(positions[i], positions[i + 1]);
+      lines[i] = new LineSegment(positions[i], positions[i + 1]);
     }
     const spine_group = style(lines, SPINE_STYLE);
 

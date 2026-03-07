@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { AnimatedPath } from "./AnimatedPath.js";
-import { LinePrimitive } from "../primitives/LinePrimitive.js";
+import { LineSegment } from "../primitives/LinePrimitive.js";
 import { Point } from "../../sketchlib/pga2d/Point.js";
 import { GroupPrimitive } from "../primitives/GroupPrimitive.js";
 import { group } from "../primitives/shorthand.js";
@@ -14,10 +14,10 @@ const B = new Point(1, 0);
 const C = new Point(1, 1);
 const D = new Point(0, 1);
 
-const AB = new LinePrimitive(A, B);
-const BC = new LinePrimitive(B, C);
-const CD = new LinePrimitive(C, D);
-const DA = new LinePrimitive(D, A);
+const AB = new LineSegment(A, B);
+const BC = new LineSegment(B, C);
+const CD = new LineSegment(C, D);
+const DA = new LineSegment(D, A);
 
 function make_path() {
   // walk around a square when t is in [1, 5]
@@ -144,7 +144,7 @@ describe("AnimatedPath", () => {
 
       const result = path.render(2.5);
 
-      const half_bc = new LinePrimitive(B, new Point(1, 0.5));
+      const half_bc = new LineSegment(B, new Point(1, 0.5));
       const expected = group(AB, half_bc);
       expect(result).toEqual(expected);
     });

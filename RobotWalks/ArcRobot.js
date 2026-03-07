@@ -9,7 +9,7 @@ import { RobotCommand, ROOTS_OF_UNITY } from "./RobotCommand.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
-import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
+import { LineSegment } from "../sketchlib/primitives/LinePrimitive.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 
@@ -115,7 +115,7 @@ export class ArcRobot {
 
     /**
      * List of line segments the robot has already traversed, in pixels
-     * @type {LinePrimitive[]}
+     * @type {LineSegment[]}
      */
     this.polyline_history = [];
     /**
@@ -289,7 +289,7 @@ export class ArcRobot {
 
     const styled_position = style(pos, POINT_STYLE);
 
-    const orientation_line = new LinePrimitive(pos, step_forward);
+    const orientation_line = new LineSegment(pos, step_forward);
     const styled_orientation = style(orientation_line, YELLOW_LINES);
 
     if (this.current_arc) {

@@ -3,7 +3,7 @@ import { Point } from "../../sketchlib/pga2d/Point.js";
 import { Motor } from "../../sketchlib/pga2d/versors.js";
 import { mod } from "../../sketchlib/mod.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
-import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
+import { LineSegment } from "../../sketchlib/primitives/LinePrimitive.js";
 import { group } from "../../sketchlib/primitives/shorthand.js";
 import { Animated } from "../../sketchlib/animation/Animated.js";
 
@@ -34,7 +34,7 @@ export function make_stripes(center, dir_forward, spacing, dimensions, phase) {
   for (let i = 0; i < num_stripes; i++) {
     const start = corner.add(forward_stride.scale(i + phase));
     const end = start.add(right_stride);
-    lines.push(new LinePrimitive(start, end));
+    lines.push(new LineSegment(start, end));
   }
 
   return group(...lines);

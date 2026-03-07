@@ -1,7 +1,7 @@
 import { Rect } from "./Rect.js";
 import { CoralTile } from "./CoralTile.js";
 import { CardinalDirection } from "../sketchlib/CardinalDirection.js";
-import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
+import { LineSegment } from "../sketchlib/primitives/LinePrimitive.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 
@@ -9,7 +9,7 @@ import { Point } from "../sketchlib/pga2d/Point.js";
  * Render the boundaries and cross-bars of a quad to uncolored geometry
  *
  * @param {Rect} rect quad boundary
- * @returns {(RectPrimitive|LinePrimitive)[]} a list of computed primitives
+ * @returns {(RectPrimitive|LineSegment)[]} a list of computed primitives
  */
 export function render_quad(rect) {
   const { x, y } = rect.position;
@@ -18,8 +18,8 @@ export function render_quad(rect) {
     // Boundary
     new RectPrimitive(rect.position, rect.dimensions),
     // Crossbars
-    new LinePrimitive(new Point(x, y + h / 2), new Point(x + w, y + h / 2)),
-    new LinePrimitive(new Point(x + w / 2, y), new Point(x + w / 2, y + h)),
+    new LineSegment(new Point(x, y + h / 2), new Point(x + w, y + h / 2)),
+    new LineSegment(new Point(x + w / 2, y), new Point(x + w / 2, y + h)),
   ];
 }
 
@@ -35,7 +35,7 @@ const CONNECT_POINTS = [
  * neighboring tiles that are connected.
  *
  * @param {CoralTile} tile The tile to render
- * @returns {LinePrimitive[]} The lines representing the connections between tiles
+ * @returns {LineSegment[]} The lines representing the connections between tiles
  */
 export function render_tile_connections(tile) {
   const quad = tile.quad;
@@ -49,7 +49,7 @@ export function render_tile_connections(tile) {
 
     const connect_point = quad.uv_to_world(CONNECT_POINTS[i]);
 
-    primitives.push(new LinePrimitive(center, connect_point));
+    primitives.push(new LineSegment(center, connect_point));
   }
 
   return primitives;
@@ -66,7 +66,7 @@ const WALLS = [
  * Render the walls of a maze (walls on sides of grid cells with no connections)
  *
  * @param {CoralTile} tile The tile to render
- * @returns {LinePrimitive[]} The lines representing wall segments.
+ * @returns {LineSegment[]} The lines representing wall segments.
  */
 export function render_tile_walls(tile) {
   const quad = tile.quad;
@@ -79,7 +79,7 @@ export function render_tile_walls(tile) {
 
     const [start, end] = WALLS[i];
     primitives.push(
-      new LinePrimitive(quad.uv_to_world(start), quad.uv_to_world(end)),
+      new LineSegment(quad.uv_to_world(start), quad.uv_to_world(end)),
     );
   }
   return primitives;

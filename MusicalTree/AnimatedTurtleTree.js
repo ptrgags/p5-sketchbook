@@ -11,7 +11,7 @@ import { is_nearly } from "../sketchlib/is_nearly.js";
 import { lerp } from "../sketchlib/lerp.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
-import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
+import { LineSegment } from "../sketchlib/primitives/LinePrimitive.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
@@ -130,7 +130,7 @@ class TreePrimitiveBuilder {
 
     const end = this.turtle.position;
 
-    this.lines.push(new LinePrimitive(start, end));
+    this.lines.push(new LineSegment(start, end));
     this.save_state();
   }
 
@@ -421,7 +421,7 @@ export class AnimatedTurtleTree {
      */
     this.score = undefined;
     /**
-     * @type {LinePrimitive[]}
+     * @type {LineSegment[]}
      */
     this.lines = [];
     /**
@@ -485,7 +485,7 @@ export class AnimatedTurtleTree {
     if (!is_nearly(fract_lines, 0.0)) {
       const partial_line = this.lines[whole_lines];
       const endpoint = Point.lerp(partial_line.a, partial_line.b, fract_lines);
-      const interpolated = new LinePrimitive(partial_line.a, endpoint);
+      const interpolated = new LineSegment(partial_line.a, endpoint);
       tree = style([...visible_lines, interpolated], STYLE_TREE);
     } else {
       tree = style(visible_lines, STYLE_TREE);
