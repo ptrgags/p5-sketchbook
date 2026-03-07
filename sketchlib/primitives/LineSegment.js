@@ -28,6 +28,14 @@ export class LineSegment {
   }
 
   /**
+   *
+   * @param {LineSegment} other
+   */
+  equals(other) {
+    return this.a.equals(other.a) && this.b.equals(other.b);
+  }
+
+  /**
    * Render a partial version of the primitive
    * @param {number} t Interpolation factor in [0, 1]
    * @returns {LineSegment}

@@ -1,22 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { Primitive } from "../primitives/Primitive.js";
-import { Animated } from "./Animated.js";
+import { Animated, StaticAnimation } from "./Animated.js";
 import { GroupPrimitive } from "../primitives/GroupPrimitive.js";
 import { SelectAnimated } from "./SelectAnimated.js";
 import { Point } from "../pga2d/Point.js";
 import { group } from "../primitives/shorthand.js";
-
-/**
- * Stub out the Animated interface
- * @param {Primitive} primitive
- * @returns {Animated}
- */
-function stub_animated(primitive) {
-  return {
-    primitive,
-    update: () => {},
-  };
-}
 
 /**
  * Mock an animated for testing the update method. update sets
@@ -53,8 +41,8 @@ describe("SelectAnimated", () => {
       const prim_a = new Point(1, 2);
       const prim_b = new Point(3, 4);
       const select = new SelectAnimated([
-        stub_animated(prim_a),
-        stub_animated(prim_b),
+        new StaticAnimation(prim_a),
+        new StaticAnimation(prim_b),
       ]);
 
       const result = select.primitive;
@@ -67,8 +55,8 @@ describe("SelectAnimated", () => {
       const prim_a = new Point(1, 2);
       const prim_b = new Point(3, 4);
       const select = new SelectAnimated([
-        stub_animated(prim_a),
-        stub_animated(prim_b),
+        new StaticAnimation(prim_a),
+        new StaticAnimation(prim_b),
       ]);
 
       select.select(1);
@@ -96,9 +84,9 @@ describe("SelectAnimated", () => {
 
   describe("select", () => {
     it("with negative index wraps correctly", () => {
-      const anim_a = stub_animated(new Point(1, 2));
-      const anim_b = stub_animated(new Point(3, 4));
-      const anim_c = stub_animated(new Point(4, 5));
+      const anim_a = new StaticAnimation(new Point(1, 2));
+      const anim_b = new StaticAnimation(new Point(3, 4));
+      const anim_c = new StaticAnimation(new Point(4, 5));
       const select = new SelectAnimated([anim_a, anim_b, anim_c]);
 
       select.select(-2);
@@ -109,9 +97,9 @@ describe("SelectAnimated", () => {
     });
 
     it("with index out of range wraps correctly", () => {
-      const anim_a = stub_animated(new Point(1, 2));
-      const anim_b = stub_animated(new Point(3, 4));
-      const anim_c = stub_animated(new Point(4, 5));
+      const anim_a = new StaticAnimation(new Point(1, 2));
+      const anim_b = new StaticAnimation(new Point(3, 4));
+      const anim_c = new StaticAnimation(new Point(4, 5));
       const select = new SelectAnimated([anim_a, anim_b, anim_c]);
 
       select.select(5);
@@ -122,9 +110,9 @@ describe("SelectAnimated", () => {
     });
 
     it("with in-range returns correct animation", () => {
-      const anim_a = stub_animated(new Point(1, 2));
-      const anim_b = stub_animated(new Point(3, 4));
-      const anim_c = stub_animated(new Point(4, 5));
+      const anim_a = new StaticAnimation(new Point(1, 2));
+      const anim_b = new StaticAnimation(new Point(3, 4));
+      const anim_c = new StaticAnimation(new Point(4, 5));
       const select = new SelectAnimated([anim_a, anim_b, anim_c]);
 
       select.select(2);
@@ -137,9 +125,9 @@ describe("SelectAnimated", () => {
 
   describe("next/prev", () => {
     it("next advances to the next animation", () => {
-      const anim_a = stub_animated(new Point(1, 2));
-      const anim_b = stub_animated(new Point(3, 4));
-      const anim_c = stub_animated(new Point(4, 5));
+      const anim_a = new StaticAnimation(new Point(1, 2));
+      const anim_b = new StaticAnimation(new Point(3, 4));
+      const anim_c = new StaticAnimation(new Point(4, 5));
       const select = new SelectAnimated([anim_a, anim_b, anim_c]);
 
       select.next();
@@ -150,9 +138,9 @@ describe("SelectAnimated", () => {
     });
 
     it("next loops at the end of the list", () => {
-      const anim_a = stub_animated(new Point(1, 2));
-      const anim_b = stub_animated(new Point(3, 4));
-      const anim_c = stub_animated(new Point(4, 5));
+      const anim_a = new StaticAnimation(new Point(1, 2));
+      const anim_b = new StaticAnimation(new Point(3, 4));
+      const anim_c = new StaticAnimation(new Point(4, 5));
       const select = new SelectAnimated([anim_a, anim_b, anim_c]);
       select.select(2);
 
@@ -164,9 +152,9 @@ describe("SelectAnimated", () => {
     });
 
     it("prev advances to the previous value", () => {
-      const anim_a = stub_animated(new Point(1, 2));
-      const anim_b = stub_animated(new Point(3, 4));
-      const anim_c = stub_animated(new Point(4, 5));
+      const anim_a = new StaticAnimation(new Point(1, 2));
+      const anim_b = new StaticAnimation(new Point(3, 4));
+      const anim_c = new StaticAnimation(new Point(4, 5));
       const select = new SelectAnimated([anim_a, anim_b, anim_c]);
       select.select(2);
 
@@ -178,9 +166,9 @@ describe("SelectAnimated", () => {
     });
 
     it("prev loops at the start of the list", () => {
-      const anim_a = stub_animated(new Point(1, 2));
-      const anim_b = stub_animated(new Point(3, 4));
-      const anim_c = stub_animated(new Point(4, 5));
+      const anim_a = new StaticAnimation(new Point(1, 2));
+      const anim_b = new StaticAnimation(new Point(3, 4));
+      const anim_c = new StaticAnimation(new Point(4, 5));
       const select = new SelectAnimated([anim_a, anim_b, anim_c]);
 
       select.prev();
