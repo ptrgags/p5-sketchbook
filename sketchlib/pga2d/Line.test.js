@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { Line } from "./Line";
 import { Point } from "./Point";
 import { PGA_MATCHERS } from "../test_helpers/pga_matchers";
+import { LineSegment } from "../primitives/LineSegment.js";
 
 expect.extend(PGA_MATCHERS);
 
@@ -44,7 +45,24 @@ describe("Line", () => {
   });
 
   describe("from_segment", () => {
-    // throws for start = end
-    // computes line with normal 90 degrees to the left of the tangent
+    it("with start = end throws", () => {
+      const point = new Point(3, -4);
+      const segment = new LineSegment(point, point);
+
+      expect(() => {
+        return Line.from_segment(segment);
+      }).toThrowError("line segment must have two different end points");
+    });
+
+    it("computes line with normal 90 degrees in the positive direction of the tangent", () => {
+      const a = new Point(-1, 1);
+      const b = new Point(1, -1);
+      const segment = new LineSegment(a, b);
+
+      const result = Line.from_segment(segment);
+
+      const expected = new Line(1, 1, 0);
+      expect(result).toBeLine(expected);
+    });
   });
 });

@@ -29,7 +29,7 @@ describe("ClineArc", () => {
 
       const result = arc.primitive;
 
-      const expected = new LineSegment(a.point, c.point);
+      const expected = new LineSegment(new Point(-1, 1), new Point(1, -1));
       expect(result).toBeLineSegment(expected);
     });
 
@@ -84,7 +84,7 @@ describe("ClineArc", () => {
       // make a 3/4 circle arc clockwise from 6 o'clock
       const a = NullPoint.from_point(new Point(3, -6));
       const b = NullPoint.from_point(new Point(-2, -1));
-      const c = NullPoint.from_point(new Point(3, 4));
+      const c = NullPoint.from_point(new Point(8, -1));
       const arc = new ClineArc(Cline.from_circle(circle), a, b, c);
 
       const result = arc.primitive;
@@ -92,7 +92,7 @@ describe("ClineArc", () => {
       const expected = new ArcPrimitive(
         circle.center,
         5,
-        new ArcAngles(-Math.PI / 2, -2 * Math.PI),
+        new ArcAngles((3 * Math.PI) / 2, 0),
       );
       expect(result).toBeArc(expected);
     });

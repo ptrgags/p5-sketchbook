@@ -149,6 +149,10 @@ export class Line {
    */
   static from_segment(segment) {
     const { a, b } = segment;
+    if (a.equals(b)) {
+      throw new Error("line segment must have two different end points");
+    }
+
     const dir = b.sub(a);
     const normal = dir.rot90().normalize();
     const dist = normal.dot(a.to_direction());

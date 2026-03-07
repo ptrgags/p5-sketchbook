@@ -107,7 +107,7 @@ function classify_line_geometry(a, b, c) {
   const in_order = ab.dot(bc) > 0.0;
 
   if (in_order) {
-    return new LineSegment(a.point, b.point);
+    return new LineSegment(a.point, c.point);
   }
 
   // If we got here, we have a case where the line segment goes through
