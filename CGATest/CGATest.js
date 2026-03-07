@@ -4,12 +4,26 @@ import { SelectAnimated } from "../sketchlib/animation/SelectAnimated.js";
 import { CGA_BASICS } from "./cga_basics.js";
 import { CanvasMouseHandler } from "../sketchlib/input/CanvasMouseHandler.js";
 import { MouseInCanvas } from "../sketchlib/input/MouseInput.js";
-import { TO_SCREEN } from "./common.js";
 import { AnimationGroup } from "../sketchlib/animation/AnimationGroup.js";
 import { SIERPINSKI_TILES } from "./progressive_sierpinski.js";
 import { Clock } from "./Clock.js";
 import { ConformalXformTest } from "./ConformalXformTest.js";
 import { NachoSpaceship } from "./NachoSpaceship.js";
+import { CVersor } from "../sketchlib/cga2d/CVersor.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Cline } from "../sketchlib/cga2d/Cline.js";
+
+// Map the unit circle to a circle at the center of the screen with radius 200 px
+// Anything I want to render on the unit circle needs to be conjugated by this.
+const TRANSLATE_CIRCLE_CENTER = CVersor.translation(
+  new Direction(WIDTH / 2, HEIGHT / 2),
+);
+const SCALE_UP = CVersor.dilation(200);
+const FLIP_Y = CVersor.reflection(Direction.DIR_Y);
+export const TO_SCREEN =
+  TRANSLATE_CIRCLE_CENTER.compose(SCALE_UP).compose(FLIP_Y);
+
+export const BIG_UNIT_CIRCLE = TO_SCREEN.transform(Cline.UNIT_CIRCLE);
 
 const ANIMATIONS = new SelectAnimated([
   CGA_BASICS,
