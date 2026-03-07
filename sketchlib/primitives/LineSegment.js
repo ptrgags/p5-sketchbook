@@ -29,7 +29,7 @@ export class LineSegment {
 
   /**
    *
-   * @param {LinePrimitive} other
+   * @param {LineSegment} other
    */
   equals(other) {
     return this.a.equals(other.a) && this.b.equals(other.b);

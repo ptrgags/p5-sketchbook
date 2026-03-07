@@ -1,5 +1,5 @@
 import { is_nearly } from "../is_nearly.js";
-import { LinePrimitive } from "../primitives/LinePrimitive.js";
+import { LineSegment } from "../primitives/LineSegment.js";
 import { Primitive } from "../primitives/Primitive.js";
 import { Direction } from "./Direction.js";
 import { Odd } from "./multivectors.js";
@@ -145,7 +145,7 @@ export class Line {
 
   /**
    * Construct a line from a line segment
-   * @param {LinePrimitive} segment
+   * @param {LineSegment} segment
    */
   static from_segment(segment) {
     const { a, b } = segment;

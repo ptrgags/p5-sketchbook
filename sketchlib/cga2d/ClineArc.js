@@ -3,7 +3,6 @@ import { Direction } from "../pga2d/Direction.js";
 import { Point } from "../pga2d/Point.js";
 import { ArcPrimitive } from "../primitives/ArcPrimitive.js";
 import { Circle } from "../primitives/Circle.js";
-import { LinePrimitive } from "../primitives/LinePrimitive.js";
 import { Primitive } from "../primitives/Primitive.js";
 import { Ray } from "../primitives/Ray.js";
 import { group } from "../primitives/shorthand.js";
@@ -13,6 +12,7 @@ import { COdd } from "./COdd.js";
 import { NullPoint } from "./NullPoint.js";
 import { lerp } from "../lerp.js";
 import { Line } from "../pga2d/Line.js";
+import { LineSegment } from "../primitives/LineSegment.js";
 
 /**
  * Pair of rays. This mainly exists for type safety, else a GroupPrimitive
@@ -73,7 +73,7 @@ function classify_circle_geometry(circle, a, b, c) {
  * @param {NullPoint} a First point
  * @param {NullPoint} b Second point
  * @param {NullPoint} c Third point
- * @returns {Ray | RayPair | LinePrimitive}
+ * @returns {Ray | RayPair | LineSegment}
  */
 function classify_line_geometry(a, b, c) {
   if (a.is_inf) {
@@ -107,7 +107,7 @@ function classify_line_geometry(a, b, c) {
   const in_order = ab.dot(bc) > 0.0;
 
   if (in_order) {
-    return new LinePrimitive(a.point, b.point);
+    return new LineSegment(a.point, b.point);
   }
 
   // If we got here, we have a case where the line segment goes through
@@ -185,7 +185,7 @@ export class ClineArc {
     const a = this.primitive;
     const b = other.primitive;
 
-    if (a instanceof LinePrimitive && b instanceof LinePrimitive) {
+    if (a instanceof LineSegment && b instanceof LineSegment) {
       return a.equals(b);
     } else if (a instanceof ArcPrimitive && b instanceof ArcPrimitive) {
       return a.equals(b);
@@ -209,7 +209,7 @@ export class ClineArc {
 
   /**
    * Construct from a line segment
-   * @param {LinePrimitive} segment
+   * @param {LineSegment} segment
    * @returns {ClineArc}
    */
   static from_segment(segment) {
