@@ -42,4 +42,9 @@ describe("Line", () => {
     const expected = new Point(1.5, -0.5);
     expect(result).toBePoint(expected);
   });
+
+  describe("from_segment", () => {
+    // throws for start = end
+    // computes line with normal 90 degrees to the left of the tangent
+  });
 });

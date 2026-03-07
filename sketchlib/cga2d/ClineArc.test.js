@@ -10,7 +10,20 @@ import { CGA_MATCHERS } from "../test_helpers/cga_matchers.js";
 expect.extend(CGA_MATCHERS);
 
 describe("ClineArc", () => {
-  describe("primitive", () => {});
+  describe("primitive", () => {
+    // with 3 collinear points in order produces a line segment
+    // with 3 collinear points out of order produces a ray pair
+    // with infinity at the end produces a ray
+    // with infinity in the middle produces a ray pair
+    // with 3 noncollinear points produces a circular arc
+  });
+
+  describe("transform", () => {
+    // with translation shifts a circle
+    // with elliptic turns circular arc into ray
+    // with elliptic turns semicircle into double ray
+  });
+
   describe("from_segment", () => {
     it("with segment computes correct cline arc", () => {
       const segment = new LinePrimitive(new Point(1, 1), new Point(1, -1));
@@ -26,5 +39,8 @@ describe("ClineArc", () => {
       expect(result).toBeClineArc(expected);
     });
   });
-  describe("from_arc", () => {});
+
+  describe("from_arc", () => {
+    // with arc produces correct cline arc
+  });
 });

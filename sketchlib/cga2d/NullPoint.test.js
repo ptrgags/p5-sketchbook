@@ -71,4 +71,6 @@ describe("NullPoint", () => {
 
     expect(result).toBeUndefined();
   });
+
+  describe("is_inf", () => {});
 });
