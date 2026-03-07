@@ -2,7 +2,6 @@ import { ArcAngles } from "../sketchlib/ArcAngles.js";
 import { ClineArc } from "../sketchlib/cga2d/ClineArc.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { Color } from "../sketchlib/Color.js";
-import { is_nearly } from "../sketchlib/is_nearly.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
