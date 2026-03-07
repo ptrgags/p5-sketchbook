@@ -9,8 +9,10 @@ import { AnimationGroup } from "../sketchlib/animation/AnimationGroup.js";
 import { SIERPINSKI_TILES } from "./progressive_sierpinski.js";
 import { Clock } from "./Clock.js";
 import { ConformalXformTest } from "./ConformalXformTest.js";
+import { NachoSpaceship } from "./NachoSpaceship.js";
 
 const ANIMATIONS = new SelectAnimated([
+  new NachoSpaceship(TO_SCREEN),
   CGA_BASICS,
   new ConformalXformTest(TO_SCREEN),
   new AnimationGroup(SIERPINSKI_TILES, new AnimatedSierpinski(TO_SCREEN)),
