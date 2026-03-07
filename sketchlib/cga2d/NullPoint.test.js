@@ -72,5 +72,24 @@ describe("NullPoint", () => {
     expect(result).toBeUndefined();
   });
 
-  describe("is_inf", () => {});
+  describe("is_inf", () => {
+    it("with INF returns true", () => {
+      const result = NullPoint.INF.is_inf;
+
+      expect(result).toBe(true);
+    });
+
+    it("with origin returns false", () => {
+      const result = NullPoint.ORIGIN.is_inf;
+
+      expect(result).toBe(false);
+    });
+
+    it("with finite point returns false", () => {
+      const point = NullPoint.from_point(new Point(3, -2));
+      const result = point.is_inf;
+
+      expect(result).toBe(false);
+    });
+  });
 });
