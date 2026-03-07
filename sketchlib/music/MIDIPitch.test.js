@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { MIDIPitch } from "./MIDIPitch.js";
 import { B, C, C4, CS, CS7, D, D5, E, E5, F_1 } from "./pitches.js";
 
-describe("MiIDIPitch", () => {
+describe("MIDIPitch", () => {
   describe("get_pitch_class", () => {
     it("throws for negative pitch", () => {
       expect(() => {
@@ -48,8 +48,10 @@ describe("MiIDIPitch", () => {
       expect(result).toBe(4);
     });
 
-    it("F-1 is octave 0", () => {
+    it("F-1 is octave -1", () => {
       const result = MIDIPitch.get_octave(F_1);
+
+      expect(result).toBe(-1);
     });
   });
 

@@ -39,7 +39,7 @@ export class MIDIPitch {
     }
 
     // Taking C4 = pitch 60, that means that midi note 0 corresponds to
-    // C_1
+    // C-1
     return Math.floor(midi_pitch / 12) - 1;
   }
 
