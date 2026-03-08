@@ -6,7 +6,7 @@ import { KeyboardDPad } from "./KeyboardDPad.js";
 import { MouseInput } from "./input/MouseInput.js";
 import { Rectangle } from "./Rectangle.js";
 import { TouchDPad } from "./input/TouchDPad.js";
-import { group } from "./primitives/shorthand.js";
+import { Primitive } from "./primitives/Primitive.js";
 
 const DPAD_DIMENSIONS = new Direction(200, 200);
 const MARGIN = 10;
@@ -32,7 +32,7 @@ export class DirectionalPad {
       return this.touch_dpad.render();
     }
 
-    return group();
+    return Primitive.EMPTY;
   }
 
   get direction() {
