@@ -15,12 +15,12 @@ function trace_group(group) {
   const has_transform = group.transform !== undefined;
 
   let total_push_pop = 1;
+  let total_prims = 0;
   const children = [];
   for (const child of group.primitives) {
     const trace = trace_primitive(child);
-    if ("total_push_pop" in trace) {
-      total_push_pop += trace.total_push_pop;
-    }
+    total_push_pop += trace.total_push_pop ?? 0;
+    total_prims += trace.total_prims ?? 1;
     children.push(trace);
   }
 
@@ -30,6 +30,7 @@ function trace_group(group) {
     has_text_style,
     has_transform,
     total_push_pop,
+    total_prims,
     children: children,
   };
 }
@@ -43,14 +44,18 @@ function trace_mask(mask) {
   if (mask instanceof Mask) {
     const children = [];
     let total_push_pop = 0;
+    let total_prims = 0;
     for (const child of mask.primitives) {
       const trace = trace_primitive(child);
-      ((total_push_pop += trace.total_push_pop ?? 0), children.push(trace));
+      total_push_pop += trace.total_push_pop ?? 0;
+      total_prims += trace.total_prims ?? 1;
+      children.push(trace);
     }
 
     return {
       mask_type: mask.constructor.name,
       total_push_pop,
+      total_prims,
       children,
     };
   }
@@ -71,9 +76,11 @@ function trace_clip(clip_prim) {
 
   const total_push_pop =
     1 + (child.total_push_pop ?? 0) + (mask.total_push_pop ?? 0);
+  const total_prims = (child.total_prims ?? 1) + (mask.total_prims ?? 1);
   return {
     type: "clip",
     total_push_pop,
+    total_prims,
     child,
     mask,
   };
@@ -86,11 +93,13 @@ function trace_clip(clip_prim) {
  */
 function trace_vector_tangle(tangle) {
   let total_push_pop = 0;
+  let total_prims = 0;
 
   let decoration;
   if (tangle.decoration) {
     decoration = trace_primitive(tangle.decoration);
     total_push_pop += decoration.total_push_pop ?? 0;
+    total_prims = decoration.total_prims ?? 1;
   }
 
   const panels = [];
@@ -98,10 +107,13 @@ function trace_vector_tangle(tangle) {
   for (const [mask, primitive] of tangle.subdivisions) {
     const child = trace_primitive(primitive);
     const panel_push_pop = child.total_push_pop ?? 0;
+    const panel_prims = child.total_prims ?? 1;
     total_push_pop += 1 + panel_push_pop;
+    total_prims += panel_prims;
     panels.push({
       clip_type: mask.constructor.name,
       total_push_pop: panel_push_pop,
+      total_prims: panel_prims,
       child,
     });
   }
@@ -109,6 +121,7 @@ function trace_vector_tangle(tangle) {
   return {
     type: "vector-tangle",
     total_push_pop,
+    total_prims,
     decoration,
     panels,
   };

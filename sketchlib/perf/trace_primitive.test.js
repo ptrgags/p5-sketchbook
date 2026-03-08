@@ -45,6 +45,7 @@ describe("trace_primitive", () => {
         has_text_style: false,
         has_transform: false,
         total_push_pop: 1,
+        total_prims: 0,
         children: [],
       };
       expect(result).toEqual(expected);
@@ -61,6 +62,7 @@ describe("trace_primitive", () => {
         has_text_style: false,
         has_transform: false,
         total_push_pop: 1,
+        total_prims: 2,
         children: [
           {
             type: "primitive",
@@ -86,6 +88,7 @@ describe("trace_primitive", () => {
         has_transform: false,
         has_text_style: false,
         total_push_pop: 1,
+        total_prims: 1,
         children: [
           {
             type: "primitive",
@@ -107,6 +110,7 @@ describe("trace_primitive", () => {
         has_transform: true,
         has_text_style: false,
         total_push_pop: 1,
+        total_prims: 1,
         children: [
           {
             type: "primitive",
@@ -131,6 +135,7 @@ describe("trace_primitive", () => {
         has_transform: false,
         has_text_style: true,
         total_push_pop: 1,
+        total_prims: 1,
         children: [
           {
             type: "primitive",
@@ -162,6 +167,7 @@ describe("trace_primitive", () => {
         // 1 for the top level group, plus one for each
         // child that does a push/pop thing
         total_push_pop: 4,
+        total_prims: 6,
         children: [
           {
             type: "group",
@@ -169,6 +175,7 @@ describe("trace_primitive", () => {
             has_text_style: false,
             has_transform: false,
             total_push_pop: 1,
+            total_prims: 2,
             children: [
               { type: "primitive", prim_type: "Point" },
               { type: "primitive", prim_type: "Point" },
@@ -180,6 +187,7 @@ describe("trace_primitive", () => {
             has_text_style: false,
             has_transform: false,
             total_push_pop: 1,
+            total_prims: 1,
             children: [{ type: "primitive", prim_type: "Point" }],
           },
           {
@@ -188,9 +196,11 @@ describe("trace_primitive", () => {
             mask: {
               mask_type: "Mask",
               children: [{ type: "primitive", prim_type: "Circle" }],
+              total_prims: 1,
               total_push_pop: 0,
             },
             total_push_pop: 1,
+            total_prims: 2,
           },
           { type: "primitive", prim_type: "Point" },
         ],
@@ -208,6 +218,7 @@ describe("trace_primitive", () => {
       const expected = {
         type: "vector-tangle",
         total_push_pop: 1,
+        total_prims: 0,
         panels: [],
         decoration: {
           type: "group",
@@ -215,6 +226,7 @@ describe("trace_primitive", () => {
           has_text_style: false,
           has_transform: false,
           total_push_pop: 1,
+          total_prims: 0,
           children: [],
         },
       };
@@ -229,11 +241,9 @@ describe("trace_primitive", () => {
       const expected = {
         type: "vector-tangle",
         total_push_pop: 0,
+        total_prims: 1,
         panels: [],
-        decoration: {
-          type: "primitive",
-          prim_type: "Point",
-        },
+        decoration: { type: "primitive", prim_type: "Point" },
       };
       expect(result).toEqual(expected);
     });
@@ -252,22 +262,26 @@ describe("trace_primitive", () => {
         // 1 for the group inside the first panel
         // 1 for the decoration empty group
         total_push_pop: 4,
+        total_prims: 2,
         panels: [
           {
             clip_type: "Mask",
             total_push_pop: 1,
+            total_prims: 1,
             child: {
               type: "group",
               has_style: false,
               has_text_style: false,
               has_transform: false,
               total_push_pop: 1,
+              total_prims: 1,
               children: [{ type: "primitive", prim_type: "Point" }],
             },
           },
           {
             clip_type: "InvMask",
             total_push_pop: 0,
+            total_prims: 1,
             child: {
               type: "primitive",
               prim_type: "Point",
@@ -280,6 +294,7 @@ describe("trace_primitive", () => {
           has_text_style: false,
           has_transform: false,
           total_push_pop: 1,
+          total_prims: 0,
           children: [],
         },
       };
@@ -301,9 +316,11 @@ describe("trace_primitive", () => {
         mask: {
           mask_type: "Mask",
           total_push_pop: 0,
+          total_prims: 1,
           children: [{ type: "primitive", prim_type: "Circle" }],
         },
         total_push_pop: 1,
+        total_prims: 2,
         child: {
           type: "primitive",
           prim_type: "Point",
@@ -323,9 +340,11 @@ describe("trace_primitive", () => {
       const expected = {
         type: "clip",
         total_push_pop: 2,
+        total_prims: 3,
         mask: {
           mask_type: "Mask",
           total_push_pop: 0,
+          total_prims: 1,
           children: [
             {
               type: "primitive",
@@ -339,6 +358,7 @@ describe("trace_primitive", () => {
           has_text_style: false,
           has_transform: false,
           total_push_pop: 1,
+          total_prims: 2,
           children: [
             { type: "primitive", prim_type: "Point" },
             { type: "primitive", prim_type: "Point" },
@@ -363,9 +383,11 @@ describe("trace_primitive", () => {
         type: "clip",
         // 1 + 2 from the groups inside the mask
         total_push_pop: 3,
+        total_prims: 4,
         mask: {
           mask_type: "Mask",
           total_push_pop: 2,
+          total_prims: 3,
           children: [
             {
               type: "group",
@@ -373,6 +395,7 @@ describe("trace_primitive", () => {
               has_text_style: false,
               has_transform: false,
               total_push_pop: 1,
+              total_prims: 2,
               children: [
                 { type: "primitive", prim_type: "Point" },
                 { type: "primitive", prim_type: "Point" },
@@ -384,6 +407,7 @@ describe("trace_primitive", () => {
               has_text_style: false,
               has_transform: false,
               total_push_pop: 1,
+              total_prims: 1,
               children: [{ type: "primitive", prim_type: "Point" }],
             },
           ],
