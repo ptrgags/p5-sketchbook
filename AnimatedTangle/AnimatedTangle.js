@@ -23,7 +23,7 @@ import { AnimationGroup } from "../sketchlib/animation/AnimationGroup.js";
 import { DebugCoordinates } from "./DebugCoordinates.js";
 import { DebugGrid } from "./DebugGrid.js";
 import { KeywordRecognizer } from "../sketchlib/KeywordRecognizer.js";
-import { primitive_trace } from "../sketchlib/perf/primitive_trace.js";
+import { trace_primitive } from "../sketchlib/perf/trace_primitive.js";
 
 /**
  * Shorthand for making arrays of points
@@ -172,7 +172,7 @@ const SLASH = new KeywordRecognizer();
 
 // /trace logs a trace of the scene for investigating performance issues.
 SLASH.register(["Slash", "KeyT", "KeyR", "KeyA", "KeyC", "KeyE"], () => {
-  const trace = primitive_trace(TANGLE);
+  const trace = trace_primitive(TANGLE);
   console.log(trace);
 });
 

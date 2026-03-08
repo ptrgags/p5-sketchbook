@@ -16,7 +16,7 @@ function trace_group(group) {
   let total_push_pop = 1;
   const children = [];
   for (const child of group.primitives) {
-    const trace = primitive_trace(child);
+    const trace = trace_primitive(child);
     if ("total_push_pop" in trace) {
       total_push_pop += trace.total_push_pop;
     }
@@ -39,7 +39,7 @@ function trace_group(group) {
  * @returns {object}
  */
 function trace_clip(clip_prim) {
-  const child = primitive_trace(clip_prim.primitive);
+  const child = trace_primitive(clip_prim.primitive);
 
   const total_push_pop = 1 + (child.total_push_pop ?? 0);
   return {
@@ -57,13 +57,13 @@ function trace_clip(clip_prim) {
  */
 function trace_vector_tangle(tangle) {
   const decoration = tangle.decoration
-    ? primitive_trace(tangle.decoration)
+    ? trace_primitive(tangle.decoration)
     : undefined;
 
   const children = [];
   let total_push_pop = 0;
   for (const [mask, primitive] of tangle.subdivisions) {
-    const child = primitive_trace(primitive);
+    const child = trace_primitive(primitive);
     const panel_push_pop = child.total_push_pop ?? 0;
     total_push_pop += 1 + panel_push_pop;
     children.push({
@@ -87,7 +87,7 @@ function trace_vector_tangle(tangle) {
  * @param {Primitive} primitive
  * @returns {object}
  */
-export function primitive_trace(primitive) {
+export function trace_primitive(primitive) {
   if (primitive instanceof GroupPrimitive) {
     return trace_group(primitive);
   } else if (primitive instanceof ClipPrimitive) {
