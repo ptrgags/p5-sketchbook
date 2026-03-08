@@ -56,18 +56,21 @@ function trace_clip(clip_prim) {
  * @returns {object}
  */
 function trace_vector_tangle(tangle) {
-  const decoration = tangle.decoration
-    ? trace_primitive(tangle.decoration)
-    : undefined;
-
-  const children = [];
   let total_push_pop = 0;
+
+  let decoration;
+  if (tangle.decoration) {
+    decoration = trace_primitive(tangle.decoration);
+    total_push_pop += decoration.total_push_pop ?? 0;
+  }
+
+  const panels = [];
+
   for (const [mask, primitive] of tangle.subdivisions) {
     const child = trace_primitive(primitive);
     const panel_push_pop = child.total_push_pop ?? 0;
     total_push_pop += 1 + panel_push_pop;
-    children.push({
-      type: "tangle-panel",
+    panels.push({
       clip_type: mask.constructor.name,
       total_push_pop: panel_push_pop,
       child,
@@ -78,7 +81,7 @@ function trace_vector_tangle(tangle) {
     type: "vector-tangle",
     total_push_pop,
     decoration,
-    children,
+    panels,
   };
 }
 
