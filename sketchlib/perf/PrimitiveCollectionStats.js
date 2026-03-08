@@ -6,7 +6,7 @@ import { Primitive } from "../primitives/Primitive.js";
  */
 export class RenderStats {
   /**
-   * The total
+   * A string identifying the type of collection. Like "group" or "clip"
    * @type {string}
    */
   get type() {
@@ -30,7 +30,7 @@ export class RenderStats {
   }
 
   /**
-   * Get the number of simple primitives in this
+   * Get the number of simple primitives in this collection (not counting collections)
    * @type {number}
    */
   get simple_prim_count() {
@@ -55,7 +55,7 @@ export class RenderStats {
 
 /**
  * Interface for a Primitive that contains
- * other stats
+ * other stats. Used to help implement trace_primitive()
  * @interface PrimitiveCollectionStats
  */
 export class PrimitiveCollectionStats {
@@ -87,9 +87,10 @@ export class PrimitiveCollectionStats {
   }
 
   /**
-   *
-   * @param {RenderStats & {mask: RenderStats}} result
-   * @param {ClipMask} mask
+   * Like aggregate, but updates stats.mask instead of stats.children. This
+   * is used for ClipPrimitive and VectorTangle
+   * @param {RenderStats & {mask: RenderStats}} result Stats object to update. It must have an additional mask field
+   * @param {ClipMask} mask The mask. Note that all masks implement PrimitiveCollectionStats
    */
   static aggregate_mask(result, mask) {
     const mask_stats = mask.render_stats;
