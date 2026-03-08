@@ -22,6 +22,8 @@ import { DOORS } from "./patterns/doors.js";
 import { AnimationGroup } from "../sketchlib/animation/AnimationGroup.js";
 import { DebugCoordinates } from "./DebugCoordinates.js";
 import { DebugGrid } from "./DebugGrid.js";
+import { KeywordRecognizer } from "../sketchlib/KeywordRecognizer.js";
+import { primitive_trace } from "../sketchlib/perf/primitive_trace.js";
 
 /**
  * Shorthand for making arrays of points
@@ -166,6 +168,14 @@ const BACKGROUND_STRIPES = style(
 const COORDS = new DebugCoordinates();
 const DEBUG_GRID = new DebugGrid(100, 25);
 
+const SLASH = new KeywordRecognizer();
+
+// /trace logs a trace of the scene for investigating performance issues.
+SLASH.register(["Slash", "KeyT", "KeyR", "KeyA", "KeyC", "KeyE"], () => {
+  const trace = primitive_trace(TANGLE);
+  console.log(trace);
+});
+
 export const sketch = (p) => {
   p.setup = () => {
     p.createCanvas(
@@ -191,5 +201,9 @@ export const sketch = (p) => {
     DEBUG_GRID.draw(p);
     COORDS.draw(p);
     */
+  };
+
+  p.keyReleased = (/** @type {KeyboardEvent} */ e) => {
+    SLASH.input(e.code);
   };
 };
