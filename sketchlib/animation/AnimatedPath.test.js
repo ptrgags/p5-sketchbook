@@ -2,10 +2,10 @@ import { describe, it, expect } from "vitest";
 import { AnimatedPath } from "./AnimatedPath.js";
 import { LineSegment } from "../primitives/LineSegment.js";
 import { Point } from "../../sketchlib/pga2d/Point.js";
-import { GroupPrimitive } from "../primitives/GroupPrimitive.js";
 import { group } from "../primitives/shorthand.js";
 import { PGA_MATCHERS } from "../test_helpers/pga_matchers.js";
 import { Direction } from "../../sketchlib/pga2d/Direction.js";
+import { Primitive } from "../primitives/Primitive.js";
 
 expect.extend(PGA_MATCHERS);
 
@@ -131,12 +131,12 @@ describe("AnimatedPath", () => {
   });
 
   describe("render", () => {
-    it("with time less than start returns empty group", () => {
+    it("with time less than start returns empty primitive", () => {
       const path = make_path();
 
       const result = path.render(-1);
 
-      expect(result).toEqual(GroupPrimitive.EMPTY);
+      expect(result).toEqual(Primitive.EMPTY);
     });
 
     it("with time in between start and end returns partial path", () => {
@@ -160,28 +160,28 @@ describe("AnimatedPath", () => {
   });
 
   describe("render_between", () => {
-    it("with time_a > time_b returns empty group", () => {
+    it("with time_a > time_b returns empty primitive", () => {
       const path = make_path();
 
       const result = path.render_between(10, 5);
 
-      expect(result).toBe(GroupPrimitive.EMPTY);
+      expect(result).toBe(Primitive.EMPTY);
     });
 
-    it("with time_a === time_b returns empty group", () => {
+    it("with time_a === time_b returns empty primitive", () => {
       const path = make_path();
 
       const result = path.render_between(3, 3);
 
-      expect(result).toEqual(GroupPrimitive.EMPTY);
+      expect(result).toEqual(Primitive.EMPTY);
     });
 
-    it("with both times before start returns empty group", () => {
+    it("with both times before start returns empty primitive", () => {
       const path = make_path();
 
       const result = path.render_between(0, 0.5);
 
-      expect(result).toEqual(GroupPrimitive.EMPTY);
+      expect(result).toEqual(Primitive.EMPTY);
     });
 
     it("with time_a before start returns path up to time_b", () => {
@@ -202,12 +202,12 @@ describe("AnimatedPath", () => {
       expect(result).toEqual(expected);
     });
 
-    it("with both times after end returns empty path", () => {
+    it("with both times after end returns empty primitive", () => {
       const path = make_path();
 
       const result = path.render_between(8, 10);
 
-      expect(result).toEqual(GroupPrimitive.EMPTY);
+      expect(result).toEqual(Primitive.EMPTY);
     });
   });
 });

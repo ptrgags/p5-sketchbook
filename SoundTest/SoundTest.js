@@ -47,6 +47,7 @@ import { Rational } from "../sketchlib/Rational.js";
 import { MouseCallbacks } from "../sketchlib/input/MouseCallbacks.js";
 import { SoundScene } from "../sketchlib/scenes/SoundScene.js";
 import { AnimationGroup } from "../sketchlib/animation/AnimationGroup.js";
+import { Primitive } from "../sketchlib/primitives/Primitive.js";
 
 const DEBUG_LOOP = false;
 const LOOP_START = new Rational(14 * 4);
@@ -187,7 +188,7 @@ const [FIRST_BUTTON_POSITION, BUTTON_STRIDE] = MELODY_BUTTONS.compute_layout(
 function make_button_labels(buttons) {
   const primitives = buttons.map_array((index, descriptor) => {
     if (!descriptor) {
-      return GroupPrimitive.EMPTY;
+      return Primitive.EMPTY;
     }
     const offset = FIRST_BUTTON_POSITION.add(MELODY_BUTTON_CENTER_OFFSET);
     const position_world = index.to_world(offset, BUTTON_STRIDE);
@@ -552,7 +553,7 @@ class SoundTestAnimation {
 
   render_timeline(time) {
     if (this.selected_melody === undefined) {
-      return GroupPrimitive.EMPTY;
+      return Primitive.EMPTY;
     }
 
     const x = time * MEASURE_DIMENSIONS.x;
