@@ -76,7 +76,7 @@ export class PrimitiveCollectionStats {
       if (PrimitiveCollectionStats.has_stats(child)) {
         const child_stats = child.render_stats;
         result.push_pop_count += child_stats.push_pop_count;
-        result.simple_prim_count += child_stats.push_pop_count;
+        result.simple_prim_count += child_stats.simple_prim_count;
         result.children.push(child_stats);
       } else {
         // no additional push pops

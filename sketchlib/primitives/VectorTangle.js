@@ -17,10 +17,10 @@ export class VectorTangle {
    * Constructor
    * @param {[ClipMask, Primitive][]} subdivisions List of (mask, primitive) pairs that divide the
    * shape into multiple regions
-   * @param {Primitive} [decoration=GroupPrimitive.EMPTY] Optional decoration to draw over top of the subdivisions.
+   * @param {Primitive} [decoration] Optional decoration to draw over top of the subdivisions.
    * This can be used for outlining the regions, or adding some artistic embelishments.
    */
-  constructor(subdivisions, decoration = GroupPrimitive.EMPTY) {
+  constructor(subdivisions, decoration) {
     this.subdivisions = subdivisions;
     this.decoration = decoration;
   }
@@ -36,7 +36,7 @@ export class VectorTangle {
       child.draw(p);
       p.pop();
     }
-    this.decoration.draw(p);
+    this.decoration?.draw(p);
   }
 
   /**
@@ -49,10 +49,6 @@ export class VectorTangle {
       simple_prim_count: 0,
       children: [],
     };
-
-    if (this.decoration) {
-      PrimitiveCollectionStats.aggregate(stats, this.decoration);
-    }
 
     for (const [mask, primitive] of this.subdivisions) {
       // Each panel is reported as a separate stat object
@@ -72,6 +68,10 @@ export class VectorTangle {
       stats.children.push(panel_stats);
       stats.push_pop_count += panel_stats.push_pop_count;
       stats.simple_prim_count += panel_stats.simple_prim_count;
+    }
+
+    if (this.decoration) {
+      PrimitiveCollectionStats.aggregate(stats, this.decoration);
     }
 
     return stats;

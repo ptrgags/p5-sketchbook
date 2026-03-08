@@ -76,9 +76,7 @@ export class Mask {
       children: [],
     };
 
-    for (const child of this.primitives) {
-      PrimitiveCollectionStats.aggregate(stats, child);
-    }
+    PrimitiveCollectionStats.aggregate(stats, ...this.primitives);
 
     return stats;
   }
@@ -128,9 +126,7 @@ export class InvMask {
       children: [],
     };
 
-    for (const child of this.primitives) {
-      PrimitiveCollectionStats.aggregate(stats, child);
-    }
+    PrimitiveCollectionStats.aggregate(stats, ...this.primitives);
 
     return stats;
   }

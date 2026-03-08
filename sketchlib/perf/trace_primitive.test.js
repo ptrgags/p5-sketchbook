@@ -55,10 +55,7 @@ describe("trace_primitive", () => {
 
       const expected = {
         type: "group",
-        has_style: false,
-        has_text_style: false,
-        has_transform: false,
-        push_pop_count: 1,
+        push_pop_count: 0,
         simple_prim_count: 2,
         children: ["Point", "Circle"],
       };
@@ -134,20 +131,12 @@ describe("trace_primitive", () => {
 
       const expected = {
         type: "group",
-        has_style: false,
-        has_text_style: false,
-        has_transform: false,
-        // 1 for the top level group, plus one for each
-        // child that does a push/pop thing
-        push_pop_count: 4,
+        push_pop_count: 2,
         simple_prim_count: 6,
         children: [
           {
             type: "group",
-            has_style: false,
-            has_text_style: false,
-            has_transform: false,
-            push_pop_count: 1,
+            push_pop_count: 0,
             simple_prim_count: 2,
             children: ["Point", "Point"],
           },
@@ -162,9 +151,9 @@ describe("trace_primitive", () => {
           },
           {
             type: "clip",
-            child: "Circle",
+            children: ["Circle"],
             mask: {
-              mask_type: "Mask",
+              type: "mask",
               children: ["Circle"],
               simple_prim_count: 1,
               push_pop_count: 0,
@@ -187,18 +176,9 @@ describe("trace_primitive", () => {
 
       const expected = {
         type: "vector-tangle",
-        push_pop_count: 1,
+        push_pop_count: 0,
         simple_prim_count: 0,
-        panels: [],
-        decoration: {
-          type: "group",
-          has_style: false,
-          has_text_style: false,
-          has_transform: false,
-          push_pop_count: 1,
-          simple_prim_count: 0,
-          children: [],
-        },
+        children: [],
       };
       expect(result).toEqual(expected);
     });
@@ -212,8 +192,7 @@ describe("trace_primitive", () => {
         type: "vector-tangle",
         push_pop_count: 0,
         simple_prim_count: 1,
-        panels: [],
-        decoration: "Point",
+        children: ["Point"],
       };
       expect(result).toEqual(expected);
     });
@@ -231,39 +210,41 @@ describe("trace_primitive", () => {
         // 2 panels
         // 1 for the group inside the first panel
         // 1 for the decoration empty group
-        push_pop_count: 4,
-        simple_prim_count: 2,
-        panels: [
+        push_pop_count: 2,
+        simple_prim_count: 4,
+        children: [
           {
-            clip_type: "Mask",
+            type: "tangle-panel",
             push_pop_count: 1,
-            simple_prim_count: 1,
-            child: {
-              type: "group",
-              has_style: false,
-              has_text_style: false,
-              has_transform: false,
-              push_pop_count: 1,
+            simple_prim_count: 2,
+            mask: {
+              type: "mask",
+              push_pop_count: 0,
               simple_prim_count: 1,
-              children: ["Point"],
+              children: ["Circle"],
             },
+            children: [
+              {
+                type: "group",
+                push_pop_count: 0,
+                simple_prim_count: 1,
+                children: ["Point"],
+              },
+            ],
           },
           {
-            clip_type: "InvMask",
-            push_pop_count: 0,
-            simple_prim_count: 1,
-            child: "Point",
+            type: "tangle-panel",
+            push_pop_count: 1,
+            simple_prim_count: 2,
+            mask: {
+              type: "inv-mask",
+              push_pop_count: 0,
+              simple_prim_count: 1,
+              children: ["Circle"],
+            },
+            children: ["Point"],
           },
         ],
-        decoration: {
-          type: "group",
-          has_style: false,
-          has_text_style: false,
-          has_transform: false,
-          push_pop_count: 1,
-          simple_prim_count: 0,
-          children: [],
-        },
       };
       expect(result).toEqual(expected);
     });
@@ -281,14 +262,14 @@ describe("trace_primitive", () => {
       const expected = {
         type: "clip",
         mask: {
-          mask_type: "Mask",
+          type: "mask",
           push_pop_count: 0,
           simple_prim_count: 1,
           children: ["Circle"],
         },
         push_pop_count: 1,
         simple_prim_count: 2,
-        child: "Point",
+        children: ["Point"],
       };
       expect(result).toEqual(expected);
     });
@@ -306,20 +287,22 @@ describe("trace_primitive", () => {
         push_pop_count: 2,
         simple_prim_count: 3,
         mask: {
-          mask_type: "Mask",
+          type: "mask",
           push_pop_count: 0,
           simple_prim_count: 1,
           children: ["Circle"],
         },
-        child: {
-          type: "group",
-          has_style: true,
-          has_text_style: false,
-          has_transform: false,
-          push_pop_count: 1,
-          simple_prim_count: 2,
-          children: ["Point", "Point"],
-        },
+        children: [
+          {
+            type: "group",
+            has_style: true,
+            has_text_style: false,
+            has_transform: false,
+            push_pop_count: 1,
+            simple_prim_count: 2,
+            children: ["Point", "Point"],
+          },
+        ],
       };
       expect(result).toEqual(expected);
     });
@@ -338,11 +321,11 @@ describe("trace_primitive", () => {
       const expected = {
         type: "clip",
         // 1 + 2 from the groups inside the mask
-        push_pop_count: 3,
+        push_pop_count: 2,
         simple_prim_count: 4,
         mask: {
-          mask_type: "Mask",
-          push_pop_count: 2,
+          type: "mask",
+          push_pop_count: 1,
           simple_prim_count: 3,
           children: [
             {
@@ -356,16 +339,13 @@ describe("trace_primitive", () => {
             },
             {
               type: "group",
-              has_style: false,
-              has_text_style: false,
-              has_transform: false,
-              push_pop_count: 1,
+              push_pop_count: 0,
               simple_prim_count: 1,
               children: ["Point"],
             },
           ],
         },
-        child: "Circle",
+        children: ["Circle"],
       };
       expect(result).toEqual(expected);
     });

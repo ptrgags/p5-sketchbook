@@ -14,7 +14,7 @@ import { group } from "../primitives/shorthand.js";
 class MockAnimated {
   constructor() {
     this.time = 0;
-    this.primitive = GroupPrimitive.EMPTY;
+    this.primitive = group();
   }
 
   /**
@@ -33,7 +33,7 @@ describe("SelectAnimated", () => {
 
       const result = select.primitive;
 
-      const expected = GroupPrimitive.EMPTY;
+      const expected = group();
       expect(result).toEqual(expected);
     });
 

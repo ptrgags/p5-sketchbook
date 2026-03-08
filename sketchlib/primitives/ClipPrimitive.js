@@ -39,7 +39,8 @@ export class ClipPrimitive {
   get render_stats() {
     const stats = {
       type: "clip",
-      push_pop_count: 0,
+      // a clip mask always pushes before drawing the clip mask
+      push_pop_count: 1,
       simple_prim_count: 0,
       children: [],
       mask: undefined,
