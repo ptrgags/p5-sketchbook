@@ -3,6 +3,7 @@ import { in_bounds } from "../sketchlib/in_bounds.js";
 import { PentagGrid } from "./PentagGrid.js";
 import { PentagArcType } from "./PentagCell.js";
 import { PentagIndex } from "./PentagIndex.js";
+import { configure_sketch } from "../sketchlib/configure_sketch.js";
 
 /**
  * An artistic tiling using pentagons. Not regular pentagons, but
@@ -206,9 +207,8 @@ const state = {
 };
 
 export const sketch = (p) => {
-  let canvas;
   p.setup = () => {
-    canvas = p.createCanvas(WIDTH, HEIGHT).elt;
+    configure_sketch(p);
   };
 
   p.draw = () => {
@@ -261,7 +261,7 @@ export const sketch = (p) => {
   p.mouseMoved = () => {
     // p5.js doesn't account for my CSS that scales the canvas while keeping
     // aspect ratio
-    const { x, y } = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
+    const { x, y } = fix_mouse_coords(p.canvas, p.mouseX, p.mouseY);
 
     if (!in_bounds(x, y, WIDTH, HEIGHT)) {
       state.mouse_cell = undefined;

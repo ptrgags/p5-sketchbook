@@ -1,3 +1,4 @@
+import { configure_sketch } from "../sketchlib/configure_sketch.js";
 import { Polar } from "../sketchlib/Polar.js";
 
 const MAX_LENGTH = 200;
@@ -42,13 +43,13 @@ function draw_rib(p, parent, rib) {
     parent.y,
     -parent.x,
     UNIT_LENGTH * RIB_SCALE * tip.y,
-    UNIT_LENGTH * RIB_SCALE * -tip.x
+    UNIT_LENGTH * RIB_SCALE * -tip.x,
   );
   p.line(
     parent.y,
     -parent.x,
     UNIT_LENGTH * RIB_SCALE * -tip.y,
-    UNIT_LENGTH * RIB_SCALE * -tip.x
+    UNIT_LENGTH * RIB_SCALE * -tip.x,
   );
 }
 
@@ -58,7 +59,7 @@ export const sketch = (p) => {
   const ribs = [];
 
   p.setup = () => {
-    p.createCanvas(500, 700);
+    configure_sketch(p);
 
     ribs.push(new Rib(0, GROWTH_RATE));
   };

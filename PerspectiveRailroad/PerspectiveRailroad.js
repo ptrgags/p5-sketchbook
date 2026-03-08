@@ -6,6 +6,7 @@ import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Line } from "../sketchlib/pga2d/Line.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { configure_sketch } from "../sketchlib/configure_sketch.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -307,7 +308,7 @@ const ANIMATED_RAILS = make_rails();
 export const sketch = (p) => {
   let animation_finished = false;
   p.setup = () => {
-    p.createCanvas(WIDTH, HEIGHT);
+    configure_sketch(p);
 
     BACKGROUND.draw(p);
   };

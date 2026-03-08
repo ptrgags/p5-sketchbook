@@ -8,6 +8,7 @@ import { ParabolicGridIllusion } from "./ParabolicGridIllusion.js";
 import { TranslationGridIllusion } from "./TranslationGridIllusion.js";
 import { MouseInCanvas } from "../sketchlib/input/MouseInput.js";
 import { SelectAnimated } from "../sketchlib/animation/SelectAnimated.js";
+import { configure_sketch } from "../sketchlib/configure_sketch.js";
 
 const TRANSLATE_CENTER = CVersor.translation(SCREEN_CENTER.to_direction());
 const SCALE_UP = CVersor.dilation(200);
@@ -25,14 +26,9 @@ const ARROW = new DancingArrow(new Circle(SCREEN_CENTER, 20));
 
 export const sketch = (p) => {
   p.setup = () => {
-    const canvas = p.createCanvas(
-      WIDTH,
-      HEIGHT,
-      undefined,
-      document.getElementById("sketch-canvas"),
-    ).elt;
+    configure_sketch(p);
 
-    MOUSE.setup(canvas);
+    MOUSE.setup(p.canvas);
   };
 
   p.draw = () => {

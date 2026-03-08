@@ -6,6 +6,7 @@ import { Rectangle } from "../sketchlib/Rectangle.js";
 import { CanvasMouseHandler } from "../sketchlib/input/CanvasMouseHandler.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
+import { configure_sketch } from "../sketchlib/configure_sketch.js";
 
 const MOUSE = new CanvasMouseHandler();
 const DPAD = new DirectionalPad();
@@ -26,14 +27,9 @@ export const sketch = (p) => {
   }
 
   p.setup = () => {
-    const canvas = p.createCanvas(
-      WIDTH,
-      HEIGHT,
-      undefined,
-      document.getElementById("sketch-canvas"),
-    ).elt;
+    configure_sketch(p);
 
-    MOUSE.setup(canvas);
+    MOUSE.setup(p.canvas);
     MOUSE.callbacks = [TOUCH_LEFT, TOUCH_RIGHT];
 
     DPAD.setup();

@@ -1,3 +1,4 @@
+import { configure_sketch } from "../sketchlib/configure_sketch.js";
 import { PhyllotaxisPalette } from "../sketchlib/PhyllotaxisPalette.js";
 import { FountainPen, FountainPenCase } from "./FountainPenCase.js";
 
@@ -45,7 +46,7 @@ function simulate(length) {
     make_pens(),
     PALETTE,
     PEN_CAPACITY,
-    PEN_COUNT
+    PEN_COUNT,
   );
   for (let i = 0; i < length; i++) {
     result[i] = pen_case;
@@ -60,7 +61,7 @@ export const sketch = (p) => {
   const history = simulate(HISTORY_LENGTH);
 
   p.setup = () => {
-    p.createCanvas(500, 700);
+    configure_sketch(p);
 
     // Only render the background once
     p.background(0);
@@ -90,7 +91,7 @@ export const sketch = (p) => {
         column_offset + j * SQUARE_SIZE,
         row * SQUARE_SIZE,
         SQUARE_SIZE,
-        SQUARE_SIZE
+        SQUARE_SIZE,
       );
     }
   };

@@ -21,6 +21,7 @@ import { CardinalDirection } from "../../sketchlib/CardinalDirection.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
 import { Circle } from "../../sketchlib/primitives/Circle.js";
 import { LineSegment } from "../../sketchlib/primitives/LineSegment.js";
+import { configure_sketch } from "../../sketchlib/configure_sketch.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -158,7 +159,7 @@ export const sketch = (p) => {
   let splines;
 
   p.setup = () => {
-    canvas = p.createCanvas(500, 700).elt;
+    configure_sketch(p);
     document.getElementById("export").addEventListener("click", (e) => {
       const tileset = serialize_tileset(TILES);
       you_wouldnt_download_a_json(tileset, "coral_tiles.json");

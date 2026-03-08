@@ -1,3 +1,4 @@
+import { configure_sketch } from "../sketchlib/configure_sketch.js";
 import { PrimroseTile, TILE_WIDTH, TILE_HEIGHT } from "./PrimroseTile.js";
 
 const HEIGHT = TILE_HEIGHT;
@@ -61,7 +62,7 @@ function draw_tiling(p, depth) {
 
 export const sketch = (p) => {
   p.setup = () => {
-    p.createCanvas(500, 700);
+    configure_sketch(p);
     tile = new PrimroseTile(p);
   };
 

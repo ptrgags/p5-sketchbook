@@ -11,6 +11,7 @@ import { NachoSpaceship } from "./NachoSpaceship.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { ProgressiveSierpinski } from "./ProgressiveSierpinski.js";
+import { configure_sketch } from "../sketchlib/configure_sketch.js";
 
 // Map the unit circle to a circle at the center of the screen with radius 200 px
 // Anything I want to render on the unit circle needs to be conjugated by this.
@@ -38,14 +39,8 @@ const BPM = 128;
 
 export const sketch = (p) => {
   p.setup = () => {
-    const canvas = p.createCanvas(
-      WIDTH,
-      HEIGHT,
-      undefined,
-      document.getElementById("sketch-canvas"),
-    ).elt;
-
-    MOUSE.setup(canvas);
+    configure_sketch(p);
+    MOUSE.setup(p.canvas);
   };
 
   p.draw = () => {

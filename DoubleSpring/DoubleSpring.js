@@ -3,6 +3,7 @@ import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { group } from "../sketchlib/primitives/shorthand.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { DoubleSpringSystem, Spring } from "./DoubleSpringSystem.js";
+import { configure_sketch } from "../sketchlib/configure_sketch.js";
 
 const N = 5;
 const HISTORY_SIZE = 100;
@@ -55,12 +56,7 @@ const DELTA_TIME = 0.01;
 
 export const sketch = (p) => {
   p.setup = () => {
-    p.createCanvas(
-      WIDTH,
-      HEIGHT,
-      undefined,
-      document.getElementById("sketch-canvas"),
-    );
+    configure_sketch(p);
   };
 
   p.draw = () => {

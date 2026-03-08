@@ -3,6 +3,7 @@ import { Color } from "../sketchlib/Color.js";
 import { fix_mouse_coords } from "../sketchlib/fix_mouse_coords.js";
 import { InteractiveMosaic } from "./InteractiveMosaic.js";
 import { prevent_mobile_scroll } from "../sketchlib/prevent_mobile_scroll.js";
+import { configure_sketch } from "../sketchlib/configure_sketch.js";
 
 //const INITIAL_COLORS = ["#231f20", "#bb4430", "#7ebdc2", "#f3dfa2"];
 // clouds, sky, grass, dirt
@@ -46,13 +47,8 @@ export const sketch = (p) => {
   }
 
   p.setup = () => {
-    canvas = p.createCanvas(
-      WIDTH,
-      HEIGHT,
-      undefined,
-      document.getElementById("sketch-canvas")
-    ).elt;
-    prevent_mobile_scroll(canvas);
+    configure_sketch(p);
+    prevent_mobile_scroll(p.canvas);
 
     init_color_pickers();
     init_image_save_button();
@@ -66,7 +62,7 @@ export const sketch = (p) => {
   };
 
   p.mousePressed = () => {
-    const mouse = fix_mouse_coords(canvas, p.mouseX, p.mouseY);
+    const mouse = fix_mouse_coords(p.canvas, p.mouseX, p.mouseY);
     mosaic.mouse_press(mouse);
   };
 

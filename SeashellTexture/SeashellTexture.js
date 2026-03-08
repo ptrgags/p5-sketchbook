@@ -1,3 +1,4 @@
+import { configure_sketch } from "../sketchlib/configure_sketch.js";
 import { SeashellParameters } from "./SeashellParameters.js";
 
 /**
@@ -127,7 +128,7 @@ export const sketch = (p) => {
   };
 
   p.setup = () => {
-    p.createCanvas(W, H);
+    configure_sketch(p);
 
     initial_conditions(state);
     p.background(0);

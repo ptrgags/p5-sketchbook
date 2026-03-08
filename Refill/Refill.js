@@ -2,6 +2,7 @@ import { fix_mouse_coords } from "../sketchlib/fix_mouse_coords.js";
 import { in_bounds } from "../sketchlib/in_bounds.js";
 import { Index2D, Grid } from "../sketchlib/Grid.js";
 import { METER_WIDTH, METER_HEIGHT, Meter } from "./Meter.js";
+import { configure_sketch } from "../sketchlib/configure_sketch.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -31,8 +32,10 @@ export const sketch = (p) => {
   };
 
   p.setup = () => {
-    canvas = p.createCanvas(WIDTH, HEIGHT).elt;
+    configure_sketch(p);
     init_meters(state.meters);
+
+    canvas = p.canvas;
   };
 
   p.draw = () => {

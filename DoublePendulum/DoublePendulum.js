@@ -2,6 +2,7 @@ import { Point } from "../sketchlib/pga2d/Point.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { group } from "../sketchlib/primitives/shorthand.js";
 import { DoublePendulumSystem, Pendulum } from "./DoublePendulumSystem.js";
+import { configure_sketch } from "../sketchlib/configure_sketch.js";
 
 const BOB_MASS = 1.0;
 const BOB_LENGTH = 0.9;
@@ -24,12 +25,7 @@ const THETA_DOT_SCALE = 6;
 
 export const sketch = (p) => {
   p.setup = () => {
-    p.createCanvas(
-      WIDTH,
-      HEIGHT,
-      undefined,
-      document.getElementById("sketch-canvas"),
-    );
+    configure_sketch(p);
   };
 
   p.draw = () => {

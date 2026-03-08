@@ -6,6 +6,7 @@ import { Vector2 } from "./Vector2.js";
 import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
 import { Color } from "../sketchlib/Color.js";
 import { KeywordRecognizer } from "../sketchlib/KeywordRecognizer.js";
+import { configure_sketch } from "../sketchlib/configure_sketch.js";
 
 const BOUNDS = new Rectangle(0, 0, WIDTH, HEIGHT);
 const QUADTREE = new Quadtree(BOUNDS);
@@ -49,7 +50,7 @@ export const sketch = (p) => {
   let show_ref_geometry = false;
   let simulation_step = 0;
   p.setup = () => {
-    p.createCanvas(WIDTH, HEIGHT);
+    configure_sketch(p);
     p.background(128);
 
     document.getElementById("toggle-ref-geom").addEventListener("click", () => {
@@ -98,10 +99,10 @@ export const sketch = (p) => {
 
     if (show_ref_geometry) {
       const poly1 = POLYLINE.make_polyline(
-        STYLE_POLYLINE1.with_stroke(Color.WHITE)
+        STYLE_POLYLINE1.with_stroke(Color.WHITE),
       );
       const poly2 = POLYLINE2.make_polyline(
-        STYLE_POLYLINE2.with_stroke(Color.WHITE)
+        STYLE_POLYLINE2.with_stroke(Color.WHITE),
       );
       poly1.draw(p);
       poly2.draw(p);
