@@ -53,3 +53,4 @@ export class SimpleGroupPrimitive {
     return stats;
   }
 }
+SimpleGroupPrimitive.EMPTY = Object.freeze(new SimpleGroupPrimitive());

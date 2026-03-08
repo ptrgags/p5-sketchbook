@@ -1,8 +1,4 @@
-import { ClipMask, Mask } from "../primitives/ClipMask.js";
-import { ClipPrimitive } from "../primitives/ClipPrimitive.js";
-import { GroupPrimitive } from "../primitives/GroupPrimitive.js";
 import { Primitive } from "../primitives/Primitive.js";
-import { VectorTangle } from "../primitives/VectorTangle.js";
 import {
   PrimitiveCollectionStats,
   RenderStats,

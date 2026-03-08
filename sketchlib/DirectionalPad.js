@@ -1,12 +1,12 @@
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { HEIGHT } from "./dimensions.js";
-import { GroupPrimitive } from "./primitives/GroupPrimitive.js";
 import { DirectionInput } from "./DirectionInput.js";
 import { KeyboardDPad } from "./KeyboardDPad.js";
 import { MouseInput } from "./input/MouseInput.js";
 import { Rectangle } from "./Rectangle.js";
 import { TouchDPad } from "./input/TouchDPad.js";
+import { group } from "./primitives/shorthand.js";
 
 const DPAD_DIMENSIONS = new Direction(200, 200);
 const MARGIN = 10;
@@ -32,7 +32,7 @@ export class DirectionalPad {
       return this.touch_dpad.render();
     }
 
-    return GroupPrimitive.EMPTY;
+    return group();
   }
 
   get direction() {

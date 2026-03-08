@@ -2,10 +2,10 @@ import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { CanvasMouseHandler } from "../sketchlib/input/CanvasMouseHandler.js";
 import { PlayButtonScene } from "../sketchlib/scenes/PlayButtonScene.js";
 import { SoundManager } from "../sketchlib/SoundManager.js";
-import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { Animated } from "../sketchlib/animation/Animated.js";
 import { SoundScene } from "../sketchlib/scenes/SoundScene.js";
 import { MouseCallbacks } from "../sketchlib/input/MouseCallbacks.js";
+import { group } from "../sketchlib/primitives/shorthand.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -21,7 +21,7 @@ const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
  */
 class TEMPLATEAnimation {
   constructor() {
-    this.primitive = GroupPrimitive.EMPTY;
+    this.primitive = group();
   }
 
   /**

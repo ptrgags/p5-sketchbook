@@ -195,4 +195,3 @@ export class GroupPrimitive {
     return stats;
   }
 }
-GroupPrimitive.EMPTY = Object.freeze(new GroupPrimitive([]));

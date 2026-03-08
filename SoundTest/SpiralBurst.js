@@ -2,7 +2,7 @@ import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
-import { group, style } from "../sketchlib/primitives/shorthand.js";
+import { style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 import { LoopCurve } from "../sketchlib/animation/LoopCurve.js";
 import {
@@ -84,7 +84,7 @@ export class SpiralBurst {
      * These are computed in update()
      * @type {Primitive[]}
      */
-    this.points = new Array(N).fill(GroupPrimitive.EMPTY);
+    this.points = new Array(N).fill(Primitive.EMPTY);
     this.primitive = new GroupPrimitive(this.points);
   }
 

@@ -32,9 +32,37 @@ describe("trace_primitive", () => {
     expect(result).toEqual(expected);
   });
 
+  describe("simple group", () => {
+    it("with empty simple group returns correct stats", () => {
+      const result = trace_primitive(group());
+
+      const expected = {
+        type: "group",
+        push_pop_count: 0,
+        simple_prim_count: 0,
+        children: [],
+      };
+      expect(result).toEqual(expected);
+    });
+
+    it("with simple group returns correct stats", () => {
+      const result = trace_primitive(
+        group(new Point(3, 4), new Circle(new Point(5, 6), 10)),
+      );
+
+      const expected = {
+        type: "group",
+        push_pop_count: 0,
+        simple_prim_count: 2,
+        children: ["Point", "Circle"],
+      };
+      expect(result).toEqual(expected);
+    });
+  });
+
   describe("group primitive", () => {
     it("with empty group computes correct stats", () => {
-      const result = trace_primitive(GroupPrimitive.EMPTY);
+      const result = trace_primitive(new GroupPrimitive([]));
 
       const expected = {
         type: "group",
