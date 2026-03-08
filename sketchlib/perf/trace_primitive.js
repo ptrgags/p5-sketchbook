@@ -141,8 +141,5 @@ export function trace_primitive(primitive) {
     return trace_vector_tangle(primitive);
   }
 
-  return {
-    type: "primitive",
-    prim_type: primitive.constructor.name,
-  };
+  return primitive.constructor.name;
 }
