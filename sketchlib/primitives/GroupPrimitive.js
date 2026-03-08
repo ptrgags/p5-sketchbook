@@ -1,4 +1,8 @@
 import { is_nearly } from "../is_nearly.js";
+import {
+  PrimitiveCollectionStats,
+  RenderStats,
+} from "../perf/PrimitiveCollectionStats.js";
 import { Style } from "../Style.js";
 import { Primitive } from "./Primitive.js";
 import { TextStyle } from "./TextStyle.js";
@@ -111,6 +115,7 @@ function apply_transform(p, transform) {
  * Note: GroupPrimitive can be nested, but the most specific settings will
  * be applied.
  * @implements {Primitive}
+ * @implements {PrimitiveCollectionStats}
  */
 export class GroupPrimitive {
   /**
@@ -169,6 +174,25 @@ export class GroupPrimitive {
     }
 
     p.pop();
+  }
+
+  /**
+   * @type {RenderStats}
+   */
+  get render_stats() {
+    const stats = {
+      type: "group",
+      has_style: this.style !== undefined,
+      has_text_style: this.text_style !== undefined,
+      has_transform: this.transform !== undefined,
+      push_pop_count: 1,
+      simple_prim_count: 0,
+      children: [],
+    };
+
+    PrimitiveCollectionStats.aggregate(stats, ...this.primitives);
+
+    return stats;
   }
 }
 GroupPrimitive.EMPTY = Object.freeze(new GroupPrimitive([]));

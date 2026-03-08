@@ -30,28 +30,26 @@ export class SimpleGroupPrimitive {
   }
 
   /**
+   * Replace all the primitives with a new set. This is helpful for animations
+   * where the animation changes each frame, but we need a constant primitive
+   * to contain them.
+   * @param  {...Primitive} primitives New primitives
+   */
+  regroup(...primitives) {
+    this.children.splice(0, Infinity, ...primitives);
+  }
+
+  /**
    * @type {RenderStats}
    */
   get render_stats() {
-    const children = [];
-    let push_pop_count = 0;
-    let simple_prim_count = 0;
-    for (const child of this.children) {
-      if (PrimitiveCollectionStats.has_stats(child)) {
-        const child_stats = child.render_stats;
-        push_pop_count += child_stats.push_pop_count;
-        simple_prim_count += child_stats.simple_prim_count;
-        children.push(child_stats);
-      } else {
-        children.push(child.constructor.name);
-      }
-    }
-
-    return {
+    const stats = {
       type: "group",
-      push_pop_count,
-      simple_prim_count,
-      children,
+      push_pop_count: 0,
+      simple_prim_count: 0,
+      children: [],
     };
+    PrimitiveCollectionStats.aggregate(stats, ...this.children);
+    return stats;
   }
 }

@@ -1,9 +1,14 @@
+import {
+  PrimitiveCollectionStats,
+  RenderStats,
+} from "../perf/PrimitiveCollectionStats.js";
 import { ClipMask } from "./ClipMask.js";
 import { Primitive } from "./Primitive.js";
 
 /**
  * Primitive clipped by a mask
  * @implements {Primitive}
+ * @implements {PrimitiveCollectionStats}
  */
 export class ClipPrimitive {
   /**
@@ -25,5 +30,24 @@ export class ClipPrimitive {
     this.mask.clip(p);
     this.primitive.draw(p);
     p.pop();
+  }
+
+  /**
+   * Aggregate stats of the children
+   * @type {RenderStats}
+   */
+  get render_stats() {
+    const stats = {
+      type: "clip",
+      push_pop_count: 0,
+      simple_prim_count: 0,
+      children: [],
+      mask: undefined,
+    };
+
+    PrimitiveCollectionStats.aggregate_mask(stats, this.mask);
+    PrimitiveCollectionStats.aggregate(stats, this.primitive);
+
+    return stats;
   }
 }
