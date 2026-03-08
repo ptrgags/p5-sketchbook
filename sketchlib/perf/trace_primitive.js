@@ -1,3 +1,4 @@
+import { ClipMask, Mask } from "../primitives/ClipMask.js";
 import { ClipPrimitive } from "../primitives/ClipPrimitive.js";
 import { GroupPrimitive } from "../primitives/GroupPrimitive.js";
 import { Primitive } from "../primitives/Primitive.js";
@@ -35,18 +36,46 @@ function trace_group(group) {
 
 /**
  *
+ * @param {ClipMask} mask
+ * @returns {object}
+ */
+function trace_mask(mask) {
+  if (mask instanceof Mask) {
+    const children = [];
+    let total_push_pop = 0;
+    for (const child of mask.primitives) {
+      const trace = trace_primitive(child);
+      ((total_push_pop += trace.total_push_pop ?? 0), children.push(trace));
+    }
+
+    return {
+      mask_type: mask.constructor.name,
+      total_push_pop,
+      children,
+    };
+  }
+
+  return {
+    mask_type: mask.constructor.name,
+  };
+}
+
+/**
+ *
  * @param {ClipPrimitive} clip_prim
  * @returns {object}
  */
 function trace_clip(clip_prim) {
   const child = trace_primitive(clip_prim.primitive);
+  const mask = trace_mask(clip_prim.mask);
 
-  const total_push_pop = 1 + (child.total_push_pop ?? 0);
+  const total_push_pop =
+    1 + (child.total_push_pop ?? 0) + (mask.total_push_pop ?? 0);
   return {
     type: "clip",
-    clip_type: clip_prim.mask.constructor.name,
     total_push_pop,
     child,
+    mask,
   };
 }
 

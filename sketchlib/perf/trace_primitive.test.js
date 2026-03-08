@@ -185,7 +185,11 @@ describe("trace_primitive", () => {
           {
             type: "clip",
             child: { type: "primitive", prim_type: "Circle" },
-            clip_type: "Mask",
+            mask: {
+              mask_type: "Mask",
+              children: [{ type: "primitive", prim_type: "Circle" }],
+              total_push_pop: 0,
+            },
             total_push_pop: 1,
           },
           { type: "primitive", prim_type: "Point" },
@@ -294,7 +298,11 @@ describe("trace_primitive", () => {
 
       const expected = {
         type: "clip",
-        clip_type: "Mask",
+        mask: {
+          mask_type: "Mask",
+          total_push_pop: 0,
+          children: [{ type: "primitive", prim_type: "Circle" }],
+        },
         total_push_pop: 1,
         child: {
           type: "primitive",
@@ -314,8 +322,17 @@ describe("trace_primitive", () => {
 
       const expected = {
         type: "clip",
-        clip_type: "Mask",
         total_push_pop: 2,
+        mask: {
+          mask_type: "Mask",
+          total_push_pop: 0,
+          children: [
+            {
+              type: "primitive",
+              prim_type: "Circle",
+            },
+          ],
+        },
         child: {
           type: "group",
           has_style: true,
@@ -326,6 +343,54 @@ describe("trace_primitive", () => {
             { type: "primitive", prim_type: "Point" },
             { type: "primitive", prim_type: "Point" },
           ],
+        },
+      };
+      expect(result).toEqual(expected);
+    });
+
+    it("with group in mask aggregates stats", () => {
+      const prim = new ClipPrimitive(
+        new Mask(
+          style([new Point(1, 2), new Point(3, 4)], STYLE),
+          group(new Point(3, 2)),
+        ),
+        new Circle(Point.ORIGIN, 500),
+      );
+
+      const result = trace_primitive(prim);
+
+      const expected = {
+        type: "clip",
+        // 1 + 2 from the groups inside the mask
+        total_push_pop: 3,
+        mask: {
+          mask_type: "Mask",
+          total_push_pop: 2,
+          children: [
+            {
+              type: "group",
+              has_style: true,
+              has_text_style: false,
+              has_transform: false,
+              total_push_pop: 1,
+              children: [
+                { type: "primitive", prim_type: "Point" },
+                { type: "primitive", prim_type: "Point" },
+              ],
+            },
+            {
+              type: "group",
+              has_style: false,
+              has_text_style: false,
+              has_transform: false,
+              total_push_pop: 1,
+              children: [{ type: "primitive", prim_type: "Point" }],
+            },
+          ],
+        },
+        child: {
+          type: "primitive",
+          prim_type: "Circle",
         },
       };
       expect(result).toEqual(expected);
