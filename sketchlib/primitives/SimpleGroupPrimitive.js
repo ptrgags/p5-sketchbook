@@ -19,14 +19,8 @@ export class SimpleGroupPrimitive {
     this.children = children;
   }
 
-  /**
-   * Draw the primitives. This does not push/pop
-   * @param {import("p5")} p
-   */
-  draw(p) {
-    for (const child of this.children) {
-      child.draw(p);
-    }
+  *[Symbol.iterator]() {
+    yield* this.children;
   }
 
   /**
@@ -37,6 +31,16 @@ export class SimpleGroupPrimitive {
    */
   regroup(...primitives) {
     this.children.splice(0, Infinity, ...primitives);
+  }
+
+  /**
+   * Draw the primitives. This does not push/pop
+   * @param {import("p5")} p
+   */
+  draw(p) {
+    for (const child of this.children) {
+      child.draw(p);
+    }
   }
 
   /**
