@@ -59,6 +59,9 @@ export class LayerPrimitive {
       throw new Error("every instance must have the same length as settings");
     }
 
+    /**
+     * @type {Primitive[]}
+     */
     this.groups = settings.map((x, i) => {
       const prims = instances.map((x) => x.layers[i]);
 
