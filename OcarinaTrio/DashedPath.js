@@ -44,6 +44,17 @@ function find_overlaps(
   const [segment_start, segment_end] = segment_intervals[segment_index];
   const [interval_start, interval_end] = intervals[interval_index];
 
+  // the query interval is empty or backwards, ignore it and move on
+  if (interval_end <= interval_start) {
+    return find_overlaps(
+      overlaps,
+      segment_intervals,
+      segment_index,
+      intervals,
+      interval_index + 1,
+    );
+  }
+
   // the query interval corresponds to a later segment,
   // so advance one segment and retry
   if (interval_start > segment_end) {
@@ -118,6 +129,7 @@ export class DashedPath {
   update_dashes(arc_lengths) {
     // If there are no segments or query intervals, there's nothing to render!
     if (this.segments.length === 0 || arc_lengths.length === 0) {
+      this.primitive.regroup();
       return;
     }
 
