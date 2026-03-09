@@ -23,6 +23,10 @@ import {
   Values,
 } from "../theme_colors.js";
 import { AnimatedStripes } from "./stripes.js";
+import {
+  LayerPrimitive,
+  RenderLayers,
+} from "../../sketchlib/primitives/LayerPrimitive.js";
 
 const STRIPE_CENTER = new Point(200, 650);
 const STRIPE_SPACING = 60;
@@ -135,6 +139,7 @@ const STYLE_DOOR = new Style({
 
 /**
  * @implements {Animated}
+ * @implements {RenderLayers}
  */
 class Door {
   /**
@@ -154,6 +159,14 @@ class Door {
       ),
       new Direction(DOOR_WIDTH, 2 * DOOR_HEIGHT),
     );
+
+    this.layers = [
+      background,
+      xform(LOWER_DOOR, this.lower_xform),
+      xform(UPPER_DOOR, this.upper_xform),
+    ];
+
+    this.primitive = group(...this.layers);
 
     this.primitive = group(
       style(background, STYLE_DOOR_BACKGROUND),
@@ -191,7 +204,13 @@ class Doors {
       new Door(new Direction(225, 675), 1.5),
     ];
 
-    this.primitive = group(BARBER_POLE, ...this.doors.map((x) => x.primitive));
+    const door_layers = new LayerPrimitive(this.doors, [
+      STYLE_DOOR_BACKGROUND,
+      STYLE_DOOR,
+      STYLE_DOOR,
+    ]);
+
+    this.primitive = group(BARBER_POLE, door_layers);
   }
 
   update(time) {
