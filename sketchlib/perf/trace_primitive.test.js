@@ -13,6 +13,7 @@ import { TextPrimitive } from "../primitives/TextPrimitive.js";
 import { ClipPrimitive } from "../primitives/ClipPrimitive.js";
 import { InvMask, Mask } from "../primitives/ClipMask.js";
 import { VectorTangle } from "../primitives/VectorTangle.js";
+import { LayerPrimitive } from "../primitives/LayerPrimitive.js";
 
 const STYLE = new Style({
   stroke: Color.RED,
@@ -377,5 +378,41 @@ describe("trace_primitive", () => {
       };
       expect(result).toEqual(expected);
     });
+  });
+
+  it("with layer primitive aggregates child layers", () => {
+    const prim = new LayerPrimitive(
+      [
+        { layers: [new Point(3, 4), new Circle(new Point(1, 1), 10)] },
+        { layers: [new Point(1, 2), new Point(1, 1)] },
+      ],
+      [undefined, new Style({})],
+    );
+
+    const result = trace_primitive(prim);
+
+    const expected = {
+      type: "layers",
+      push_pop_count: 1,
+      simple_prim_count: 4,
+      children: [
+        {
+          type: "group",
+          children: ["Point", "Point"],
+          push_pop_count: 0,
+          simple_prim_count: 2,
+        },
+        {
+          type: "group",
+          has_style: true,
+          has_transform: false,
+          has_text_style: false,
+          children: ["Circle", "Point"],
+          push_pop_count: 1,
+          simple_prim_count: 2,
+        },
+      ],
+    };
+    expect(result).toEqual(expected);
   });
 });
