@@ -22,6 +22,10 @@ import {
   PALETTE_SKY,
   Values,
 } from "../theme_colors.js";
+import {
+  LayerPrimitive,
+  RenderLayers,
+} from "../../sketchlib/primitives/LayerPrimitive.js";
 
 const HALF_DIST = 300;
 const HALF_DURATION = new Rational(2);
@@ -60,6 +64,7 @@ const PHASES = new Array(NUM_PLATFORMS).fill(0).map((_, i) => {
 
 /**
  * @implements {Animated}
+ * @implements {RenderLayers}
  */
 class TrafficLane {
   /**
@@ -74,28 +79,12 @@ class TrafficLane {
       return new Transform(center_offset.add(Direction.DIR_X.scale(dx)));
     });
 
-    this.primitive = group(...this.style_primitives());
-  }
+    this.layers = [
+      group(...this.transforms.map((x) => xform(PLATFORM_TOP, x))),
+      group(...this.transforms.map((x) => xform(PLATFORM_SHADOW, x))),
+    ];
 
-  *style_primitives() {
-    // We have n blocks and 2 styles to apply. Somewhat surprisingly,
-    // styling each layer individually requires the least amount of
-    // saving/restoring the graphics state. See
-    // https://github.com/ptrgags/p5-sketchbook/issues/149#issuecomment-3738218567
-
-    for (const transform of this.transforms) {
-      const background = new GroupPrimitive(PLATFORM_TOP, {
-        style: STYLE_TOP,
-        transform,
-      });
-
-      const foreground = new GroupPrimitive(PLATFORM_SHADOW, {
-        style: STYLE_SHADOW,
-        transform,
-      });
-      yield background;
-      yield foreground;
-    }
+    this.primitive = group(...this.layers);
   }
 
   /**
@@ -117,4 +106,10 @@ const LANES = [
   new Direction(100, 175),
 ].map((x) => new TrafficLane(x));
 
+// Use this for update(t)
 export const TRAFFIC = new AnimationGroup(...LANES);
+// use this for rendering
+export const TRAFFIC_LAYERS = new LayerPrimitive(LANES, [
+  STYLE_TOP,
+  STYLE_SHADOW,
+]);

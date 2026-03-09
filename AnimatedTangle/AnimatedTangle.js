@@ -15,7 +15,7 @@ import { EYE } from "./patterns/peek.js";
 import { make_stripes } from "./patterns/stripes.js";
 import { PALETTE_CORAL, PALETTE_NAVY, Values } from "./theme_colors.js";
 import { HITOMEZASHI } from "./patterns/hitomezashi.js";
-import { TRAFFIC } from "./patterns/traffic.js";
+import { TRAFFIC, TRAFFIC_LAYERS } from "./patterns/traffic.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { BRICKS } from "./patterns/brick_wall.js";
 import { DOORS } from "./patterns/doors.js";
@@ -128,7 +128,7 @@ const QUARTERS = new VectorTangle(
 const TANGLE = new VectorTangle(
   [
     [new Mask(PANEL_LANDSCAPE), SEASCAPE.primitive],
-    [new Mask(PANEL_TRAFFIC), TRAFFIC.primitive],
+    [new Mask(PANEL_TRAFFIC), TRAFFIC_LAYERS],
     [new Mask(PANEL_QUARTERS), QUARTERS],
     [new Mask(PANEL_CORAL), SWAYING_CORAL.primitive],
     [new Mask(PANEL_DOORS), DOORS.primitive],
