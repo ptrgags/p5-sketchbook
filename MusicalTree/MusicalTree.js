@@ -6,6 +6,7 @@ import { SoundManager } from "../sketchlib/SoundManager.js";
 import { AnimatedTurtleTree } from "./AnimatedTurtleTree.js";
 import { Animated } from "../sketchlib/animation/Animated.js";
 import { SoundScene } from "../sketchlib/scenes/SoundScene.js";
+import { configure_sketch } from "../sketchlib/configure_sketch.js";
 
 const ANIMATION = new AnimatedTurtleTree(7);
 
@@ -46,23 +47,12 @@ class MusicalTreeAnimation {
   }
 }
 
-/**
- *
- * @param {import("p5")} p
- */
 export const sketch = (p) => {
   /** @type {PlayButtonScene | SoundScene} */
   let scene = new PlayButtonScene(SOUND);
   p.setup = () => {
-    const canvas = p.createCanvas(
-      WIDTH,
-      HEIGHT,
-      undefined,
-      // @ts-ignore
-      document.getElementById("sketch-canvas"),
-    ).elt;
-
-    MOUSE.setup(canvas);
+    configure_sketch(p);
+    MOUSE.setup(p.canvas);
     MOUSE.callbacks = scene.mouse_callbacks;
 
     scene.events.addEventListener("scene-change", () => {

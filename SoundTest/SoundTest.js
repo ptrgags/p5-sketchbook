@@ -48,6 +48,7 @@ import { MouseCallbacks } from "../sketchlib/input/MouseCallbacks.js";
 import { SoundScene } from "../sketchlib/scenes/SoundScene.js";
 import { AnimationGroup } from "../sketchlib/animation/AnimationGroup.js";
 import { Primitive } from "../sketchlib/primitives/Primitive.js";
+import { configure_sketch } from "../sketchlib/configure_sketch.js";
 
 const DEBUG_LOOP = false;
 const LOOP_START = new Rational(14 * 4);
@@ -585,23 +586,13 @@ class SoundTestAnimation {
   }
 }
 
-/**
- *
- * @param {import("p5")} p
- */
 export const sketch = (p) => {
   /** @type {PlayButtonScene | SoundScene} */
   let scene = new PlayButtonScene(SOUND);
   p.setup = () => {
-    const canvas = p.createCanvas(
-      WIDTH,
-      HEIGHT,
-      undefined,
-      // @ts-ignore
-      document.getElementById("sketch-canvas"),
-    ).elt;
+    configure_sketch(p);
 
-    MOUSE.setup(canvas);
+    MOUSE.setup(p.canvas);
     MOUSE.callbacks = scene.mouse_callbacks;
 
     scene.events.addEventListener("scene-change", () => {

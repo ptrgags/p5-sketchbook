@@ -6,6 +6,7 @@ import { Animated } from "../sketchlib/animation/Animated.js";
 import { SoundScene } from "../sketchlib/scenes/SoundScene.js";
 import { MouseCallbacks } from "../sketchlib/input/MouseCallbacks.js";
 import { group } from "../sketchlib/primitives/shorthand.js";
+import { configure_sketch } from "../sketchlib/configure_sketch.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -34,23 +35,13 @@ class TEMPLATEAnimation {
   update() {}
 }
 
-/**
- *
- * @param {import("p5")} p
- */
 export const sketch = (p) => {
   /** @type {PlayButtonScene | SoundScene} */
   let scene = new PlayButtonScene(SOUND);
   p.setup = () => {
-    const canvas = p.createCanvas(
-      WIDTH,
-      HEIGHT,
-      undefined,
-      // @ts-ignore
-      document.getElementById("sketch-canvas"),
-    ).elt;
+    configure_sketch(p);
 
-    MOUSE.setup(canvas);
+    MOUSE.setup(p.canvas);
     MOUSE.callbacks = scene.mouse_callbacks;
 
     scene.events.addEventListener("scene-change", () => {

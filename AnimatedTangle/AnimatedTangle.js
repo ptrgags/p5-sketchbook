@@ -24,6 +24,7 @@ import { DebugCoordinates } from "./DebugCoordinates.js";
 import { DebugGrid } from "./DebugGrid.js";
 import { KeywordRecognizer } from "../sketchlib/KeywordRecognizer.js";
 import { trace_primitive } from "../sketchlib/perf/trace_primitive.js";
+import { configure_sketch } from "../sketchlib/configure_sketch.js";
 
 /**
  * Shorthand for making arrays of points
@@ -178,12 +179,7 @@ SLASH.register(["Slash", "KeyT", "KeyR", "KeyA", "KeyC", "KeyE"], () => {
 
 export const sketch = (p) => {
   p.setup = () => {
-    p.createCanvas(
-      WIDTH,
-      HEIGHT,
-      undefined,
-      document.getElementById("sketch-canvas"),
-    );
+    configure_sketch(p);
   };
 
   p.draw = () => {

@@ -1,13 +1,8 @@
-import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
+import { configure_sketch } from "../sketchlib/configure_sketch.js";
 
 export const sketch = (p) => {
   p.setup = () => {
-    p.createCanvas(
-      WIDTH,
-      HEIGHT,
-      undefined,
-      document.getElementById("sketch-canvas")
-    );
+    configure_sketch(p);
   };
 
   p.draw = () => {

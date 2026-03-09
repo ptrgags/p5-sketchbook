@@ -1,5 +1,6 @@
 import { Primordium } from "./Primordium.js";
 import { Petal } from "./Petal.js";
+import { configure_sketch } from "../sketchlib/configure_sketch.js";
 
 // How many frames before the next primordium is created
 const PRIMORDIUM_CREATION_PERIOD = 10;
@@ -25,7 +26,7 @@ function draw_petal(p, petal) {
     petal.control_tip.x,
     petal.control_tip.y,
     petal.tip.x,
-    petal.tip.y
+    petal.tip.y,
   );
   p.bezierVertex(
     petal.control_tip.x,
@@ -33,7 +34,7 @@ function draw_petal(p, petal) {
     petal.control_ccw.x,
     petal.control_ccw.y,
     petal.side_ccw.x,
-    petal.side_ccw.y
+    petal.side_ccw.y,
   );
   p.endShape(p.CLOSE);
   p.pop();
@@ -66,7 +67,7 @@ export const sketch = (p) => {
   let primordia_count = 0;
 
   p.setup = () => {
-    p.createCanvas(500, 700);
+    configure_sketch(p);
   };
 
   p.draw = () => {
@@ -95,7 +96,7 @@ export const sketch = (p) => {
         p.frameCount,
         PRIMORDIUM_MIN_SIZE,
         PRIMORDIUM_SPEED,
-        PRIMORDIUM_GROWTH_RATE
+        PRIMORDIUM_GROWTH_RATE,
       );
       primordia.push(primordium);
       primordia_count++;

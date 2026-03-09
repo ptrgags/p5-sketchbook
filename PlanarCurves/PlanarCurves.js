@@ -1,5 +1,6 @@
 import { Parameters } from "./parameters.js";
 import { signed_random } from "./curvature.js";
+import { configure_sketch } from "../sketchlib/configure_sketch.js";
 
 const PARAMETERS = Parameters.RANDOM_WALK;
 const CURVES = new Array(PARAMETERS.num_curves);
@@ -62,14 +63,14 @@ function init_curves() {
       position,
       angle,
       PARAMETERS.palette.colors[i],
-      PARAMETERS.curvature_func
+      PARAMETERS.curvature_func,
     );
   }
 }
 
 export const sketch = (p) => {
   p.setup = () => {
-    const canvas = p.createCanvas(500, 700);
+    configure_sketch(p);
     init_curves();
   };
 

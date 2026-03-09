@@ -15,6 +15,7 @@ import {
 } from "../styles.js";
 import { Grid } from "../../sketchlib/Grid.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
+import { configure_sketch } from "../../sketchlib/configure_sketch.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -145,7 +146,7 @@ export const sketch = (p) => {
   }
 
   p.setup = () => {
-    p.createCanvas(WIDTH, HEIGHT);
+    configure_sketch(p);
 
     update_maze();
 

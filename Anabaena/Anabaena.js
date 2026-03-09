@@ -13,6 +13,7 @@ import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { VectorPrimitive } from "../sketchlib/primitives/VectorPrimitive.js";
+import { configure_sketch } from "../sketchlib/configure_sketch.js";
 
 const INITIAL_POSITION = new Point(WIDTH / 2, HEIGHT - 50);
 const MIN_BEND_ANGLE = (7 * Math.PI) / 8;
@@ -244,8 +245,8 @@ export const sketch = (p) => {
   let mouse = INITIAL_POSITION;
   let show_arrows = false;
   p.setup = () => {
-    canvas = p.createCanvas(WIDTH, HEIGHT).elt;
-    prevent_mobile_scroll(canvas);
+    configure_sketch(p);
+    prevent_mobile_scroll(p.canvas);
 
     const checkbox = document.getElementById("arrows");
     checkbox.addEventListener("change", (e) => {

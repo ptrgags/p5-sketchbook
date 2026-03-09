@@ -1,3 +1,4 @@
+import { configure_sketch } from "../sketchlib/configure_sketch.js";
 import { Growth } from "./Growth.js";
 
 const WIDTH = 500;
@@ -45,7 +46,7 @@ export const sketch = (p) => {
 
   let flower_color;
   p.setup = () => {
-    p.createCanvas(WIDTH, HEIGHT);
+    configure_sketch(p);
     flower_color = p.random(FLOWER_COLORS);
   };
 
@@ -68,7 +69,7 @@ export const sketch = (p) => {
       START_X * SPACING,
       START_Y * SPACING,
       START_X * SPACING,
-      (START_Y + 2) * SPACING
+      (START_Y + 2) * SPACING,
     );
 
     GROWTH.draw(p, SPACING, STEM_COLOR, flower_color);
@@ -81,13 +82,13 @@ export const sketch = (p) => {
       (FLOWERPOT.x + 1) * SPACING,
       FLOWERPOT.y * SPACING,
       (FLOWERPOT.width - 2) * SPACING,
-      FLOWERPOT.height * SPACING
+      FLOWERPOT.height * SPACING,
     );
     p.rect(
       FLOWERPOT.x * SPACING,
       FLOWERPOT.y * SPACING,
       FLOWERPOT.width * SPACING,
-      SPACING
+      SPACING,
     );
 
     p.pop();

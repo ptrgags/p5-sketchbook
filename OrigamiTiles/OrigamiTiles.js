@@ -1,3 +1,4 @@
+import { configure_sketch } from "../sketchlib/configure_sketch.js";
 import { griderator } from "../sketchlib/Grid.js";
 
 // How many triangle tiles I made SVG files for
@@ -99,7 +100,7 @@ export const sketch = (p) => {
   };
 
   p.setup = () => {
-    p.createCanvas(500, 700);
+    configure_sketch(p);
     p.background(200);
 
     // The image is square, but I want to fit it into a trading card frame.
@@ -116,7 +117,7 @@ export const sketch = (p) => {
         i * TILE_SIZE + 1,
         j * TILE_SIZE + 1,
         TILE_SIZE - 2,
-        TILE_SIZE - 2
+        TILE_SIZE - 2,
       );
 
       if ((i + j) % 2 == 0) {
@@ -124,14 +125,14 @@ export const sketch = (p) => {
           i * TILE_SIZE,
           j * TILE_SIZE,
           (i + 1) * TILE_SIZE,
-          (j + 1) * TILE_SIZE
+          (j + 1) * TILE_SIZE,
         );
       } else {
         p.line(
           (i + 1) * TILE_SIZE,
           j * TILE_SIZE,
           i * TILE_SIZE,
-          (j + 1) * TILE_SIZE
+          (j + 1) * TILE_SIZE,
         );
       }
     });

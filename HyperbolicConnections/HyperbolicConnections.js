@@ -3,6 +3,7 @@ import { Palette } from "./palette.js";
 import { Boundary, PAIR_COUNT } from "./boundaries.js";
 import { VERTEX_SHADER, FRAGMENT_SHADER } from "./shaders.js";
 import { prevent_mobile_scroll } from "../sketchlib/prevent_mobile_scroll.js";
+import { configure_sketch } from "../sketchlib/configure_sketch.js";
 
 // The boundary pattern is generated randomly in chunks of the same
 // color. This is the largest number of boundary point pairs generated
@@ -23,7 +24,7 @@ const MAX_CHUNK_LENGTH = 8;
 //const PALETTE = new Palette("https://coolors.co/007f5f-2b9348-55a630-80b918-aacc00-bfd200-d4d700-dddf00-eeef20-ffff3f")
 // blues
 const PALETTE = new Palette(
-  "https://coolors.co/000000-7400b8-6930c3-5e60ce-5390d9-4ea8de-48bfe3-56cfe1-64dfdf-72efdd-80ffdb"
+  "https://coolors.co/000000-7400b8-6930c3-5e60ce-5390d9-4ea8de-48bfe3-56cfe1-64dfdf-72efdd-80ffdb",
 );
 // maroon and blue
 //const PALETTE = new Palette("https://coolors.co/780000-c1121f-fdf0d5-003049-669bbc");
@@ -72,12 +73,12 @@ export const sketch = (p) => {
     console.log("Making sketch for boundary");
     boundary.print();
 
-    canvas = p.createCanvas(500, 700, p.WEBGL).elt;
-    prevent_mobile_scroll(canvas);
+    configure_sketch(p);
+    prevent_mobile_scroll(p.canvas);
 
     poincare_shader = p.createShader(
       VERTEX_SHADER,
-      FRAGMENT_SHADER(PAIR_COUNT)
+      FRAGMENT_SHADER(PAIR_COUNT),
     );
     p.shader(poincare_shader);
     set_uniforms(poincare_shader, geometry);

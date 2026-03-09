@@ -11,6 +11,7 @@ import { Tilemap } from "./Tilemap.js";
 import { Viewport } from "./Viewport.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
+import { configure_sketch } from "../sketchlib/configure_sketch.js";
 
 const TILE_SIZE = 16;
 const TILE_SCALE = 2;
@@ -87,7 +88,7 @@ export const sketch = (p) => {
   };
 
   p.setup = () => {
-    canvas = p.createCanvas(WIDTH, HEIGHT).elt;
+    configure_sketch(p);
 
     parse_resources(RESOURCE_MANIFEST, p5_resources, resources);
 
@@ -108,7 +109,7 @@ export const sketch = (p) => {
 
     p.noSmooth();
 
-    MOUSE.setup(canvas);
+    MOUSE.setup(p.canvas);
     DPAD.setup();
   };
 

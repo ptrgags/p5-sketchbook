@@ -1,3 +1,4 @@
+import { configure_sketch } from "../sketchlib/configure_sketch.js";
 import { Polar } from "../sketchlib/Polar.js";
 import { ModPolynomial } from "./ModPolynomial.js";
 
@@ -103,7 +104,7 @@ export const sketch = (p) => {
   }
 
   p.setup = () => {
-    p.createCanvas(WIDTH, HEIGHT);
+    configure_sketch(p);
 
     // Configure the UI elements in the HTML page
     polynomial_div.innerText = poly.to_string();

@@ -1,3 +1,5 @@
+import { configure_sketch } from "../sketchlib/configure_sketch.js";
+
 const MASK_WIDTH = 500;
 const MASK_HEIGHT = 700;
 
@@ -122,7 +124,7 @@ export const sketch = (p) => {
   };
 
   p.setup = () => {
-    p.createCanvas(MASK_WIDTH, MASK_HEIGHT);
+    configure_sketch(p);
 
     document.getElementById("regen").addEventListener("click", () => {
       dirty = true;
