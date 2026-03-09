@@ -3,7 +3,6 @@ import {
   RenderStats,
 } from "../perf/PrimitiveCollectionStats.js";
 import { ClipMask } from "./ClipMask.js";
-import { GroupPrimitive } from "./GroupPrimitive.js";
 import { Primitive } from "./Primitive.js";
 
 /**
