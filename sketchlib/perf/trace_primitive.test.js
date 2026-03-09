@@ -70,7 +70,7 @@ describe("trace_primitive", () => {
         has_style: false,
         has_text_style: false,
         has_transform: false,
-        push_pop_count: 1,
+        push_pop_count: 0,
         simple_prim_count: 0,
         children: [],
       };
@@ -78,12 +78,18 @@ describe("trace_primitive", () => {
     });
 
     it("with group with primitives but no styles returns correct stats", () => {
-      const prim = group(new Point(1, 3), new Circle(new Point(1, 2), 1));
+      const prim = new GroupPrimitive([
+        new Point(1, 3),
+        new Circle(new Point(1, 2), 1),
+      ]);
 
       const result = trace_primitive(prim);
 
       const expected = {
         type: "group",
+        has_style: false,
+        has_transform: false,
+        has_text_style: false,
         push_pop_count: 0,
         simple_prim_count: 2,
         children: ["Point", "Circle"],
@@ -101,7 +107,7 @@ describe("trace_primitive", () => {
         has_style: true,
         has_transform: false,
         has_text_style: false,
-        push_pop_count: 1,
+        push_pop_count: 0,
         simple_prim_count: 1,
         children: ["Point"],
       };
@@ -138,7 +144,7 @@ describe("trace_primitive", () => {
         has_style: false,
         has_transform: false,
         has_text_style: true,
-        push_pop_count: 1,
+        push_pop_count: 0,
         simple_prim_count: 1,
         children: ["TextPrimitive"],
       };
@@ -160,7 +166,7 @@ describe("trace_primitive", () => {
 
       const expected = {
         type: "group",
-        push_pop_count: 2,
+        push_pop_count: 1,
         simple_prim_count: 6,
         children: [
           {
@@ -174,7 +180,7 @@ describe("trace_primitive", () => {
             has_style: true,
             has_text_style: false,
             has_transform: false,
-            push_pop_count: 1,
+            push_pop_count: 0,
             simple_prim_count: 1,
             children: ["Point"],
           },
@@ -313,7 +319,7 @@ describe("trace_primitive", () => {
 
       const expected = {
         type: "clip",
-        push_pop_count: 2,
+        push_pop_count: 1,
         simple_prim_count: 3,
         mask: {
           type: "mask",
@@ -327,7 +333,7 @@ describe("trace_primitive", () => {
             has_style: true,
             has_text_style: false,
             has_transform: false,
-            push_pop_count: 1,
+            push_pop_count: 0,
             simple_prim_count: 2,
             children: ["Point", "Point"],
           },
@@ -349,12 +355,11 @@ describe("trace_primitive", () => {
 
       const expected = {
         type: "clip",
-        // 1 + 2 from the groups inside the mask
-        push_pop_count: 2,
+        push_pop_count: 1,
         simple_prim_count: 4,
         mask: {
           type: "mask",
-          push_pop_count: 1,
+          push_pop_count: 0,
           simple_prim_count: 3,
           children: [
             {
@@ -362,7 +367,7 @@ describe("trace_primitive", () => {
               has_style: true,
               has_text_style: false,
               has_transform: false,
-              push_pop_count: 1,
+              push_pop_count: 0,
               simple_prim_count: 2,
               children: ["Point", "Point"],
             },
@@ -393,7 +398,7 @@ describe("trace_primitive", () => {
 
     const expected = {
       type: "layers",
-      push_pop_count: 1,
+      push_pop_count: 0,
       simple_prim_count: 4,
       children: [
         {
@@ -408,7 +413,7 @@ describe("trace_primitive", () => {
           has_transform: false,
           has_text_style: false,
           children: ["Circle", "Point"],
-          push_pop_count: 1,
+          push_pop_count: 0,
           simple_prim_count: 2,
         },
       ],

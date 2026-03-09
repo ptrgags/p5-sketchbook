@@ -1,9 +1,20 @@
 import { Direction } from "../../sketchlib/pga2d/Direction.js";
 import { Point } from "../../sketchlib/pga2d/Point.js";
+import { Color } from "../Color.js";
+import { Style } from "../Style.js";
 import { Primitive } from "./Primitive.js";
 
 const SCLERA_COLOR = 255;
 const PUPIL_COLOR = 0;
+
+const STYLE_SCLERA = new Style({
+  fill: Color.WHITE,
+  stroke: Color.BLACK,
+});
+
+const STYLE_PUPIL = new Style({
+  fill: Color.BLACK,
+});
 
 /**
  * Everything is better with googly eyes, so let's make it a full-fledged
@@ -54,16 +65,11 @@ export class GooglyEye {
    * @param {import("p5")} p The p5.js library
    */
   draw(p) {
-    p.push();
-    p.noStroke();
-    // Draw the white of the eye
-    p.fill(SCLERA_COLOR);
-    p.stroke(0);
+    STYLE_SCLERA.apply(p);
     p.circle(this.position.x, this.position.y, 2 * this.sclera_radius);
 
     // Draw the pupil
-    p.fill(PUPIL_COLOR);
+    STYLE_PUPIL.apply(p);
     p.circle(this.pupil_center.x, this.pupil_center.y, 2 * this.pupil_radius);
-    p.pop();
   }
 }
