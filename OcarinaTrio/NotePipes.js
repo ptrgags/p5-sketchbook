@@ -5,7 +5,7 @@ import { AbsInterval } from "../sketchlib/music/AbsTimeline.js";
 import { Note } from "../sketchlib/music/Music.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
-import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
+import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 import { DashedPath } from "./DashedPath.js";
@@ -28,27 +28,27 @@ const BEND_RADIUS = 25;
 // Important, these segments have to be defined in the direction of the flow
 // for the animation to look correct.
 const PIPE_SEGMENTS_BASS = [
-  new LinePrimitive(new Point(100, 0), new Point(100, 75)),
+  new LineSegment(new Point(100, 0), new Point(100, 75)),
   new ArcPrimitive(new Point(125, 75), BEND_RADIUS, ANGLES_QUADRANT2.reverse()),
-  new LinePrimitive(new Point(125, 100), new Point(150, 100)),
+  new LineSegment(new Point(125, 100), new Point(150, 100)),
   new ArcPrimitive(new Point(150, 125), BEND_RADIUS, ANGLES_QUADRANT4),
-  new LinePrimitive(new Point(175, 125), new Point(175, 150)),
+  new LineSegment(new Point(175, 125), new Point(175, 150)),
   new ArcPrimitive(new Point(150, 150), BEND_RADIUS, ANGLES_QUADRANT1),
-  new LinePrimitive(new Point(150, 175), new Point(125, 175)),
+  new LineSegment(new Point(150, 175), new Point(125, 175)),
   new ArcPrimitive(
     new Point(125, 200),
     BEND_RADIUS,
     ANGLES_QUADRANT3.reverse(),
   ),
-  new LinePrimitive(new Point(100, 200), new Point(100, 250)),
+  new LineSegment(new Point(100, 200), new Point(100, 250)),
 ];
 
 // since the end result will change anyway, keep the other pipes simple for now
 const PIPE_SEGMENTS_TENOR = [
-  new LinePrimitive(new Point(250, 0), new Point(250, 255)),
+  new LineSegment(new Point(250, 0), new Point(250, 255)),
 ];
 const PIPE_SEGMENTS_SOPRANO = [
-  new LinePrimitive(new Point(400, 0), new Point(400, 255)),
+  new LineSegment(new Point(400, 0), new Point(400, 255)),
 ];
 
 const PIPE_WALLS = style(
