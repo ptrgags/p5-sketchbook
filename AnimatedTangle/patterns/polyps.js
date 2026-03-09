@@ -15,6 +15,10 @@ import {
 import { Sequential } from "../../sketchlib/music/Timeline.js";
 import { Rational } from "../../sketchlib/Rational.js";
 import { PALETTE_CORAL, PALETTE_NAVY, Values } from "../theme_colors.js";
+import {
+  LayerPrimitive,
+  RenderLayers,
+} from "../../sketchlib/primitives/LayerPrimitive.js";
 
 const TENTACLE_MIN = 10;
 const TENTACLE_MAX = 30;
@@ -81,6 +85,7 @@ const STYLE_TENTACLE_CIRCLES = new Style({
 
 /**
  * @implements {Animated}
+ * @implements {RenderLayers}
  */
 export class Polyp {
   /**
@@ -105,12 +110,14 @@ export class Polyp {
       return new Circle(position, TENTACLE_CIRCLE_RADIUS);
     });
 
-    this.primitive = group(
-      style(this.mouth_back, STYLE_MOUTH_BACK),
-      style(this.mouth_front, STYLE_MOUTH_FRONT),
-      style(this.tentacle_lines, STYLE_TENTACLE_LINES),
-      style(this.tentacle_circles, STYLE_TENTACLE_CIRCLES),
-    );
+    this.layers = [
+      this.mouth_back,
+      this.mouth_front,
+      group(...this.tentacle_lines),
+      group(...this.tentacle_circles),
+    ];
+
+    this.primitive = group(...this.layers);
   }
 
   update_position(position) {
@@ -141,5 +148,20 @@ export class Polyp {
       this.tentacle_circles[i].center = tentacle_end;
       this.tentacle_lines[i].b = tentacle_end;
     });
+  }
+
+  /**
+   * Take a collection of Polyp and reorganize the layers for more efficient
+   * rendering, and also apply the styles
+   * @param {Polyp[]} polyps
+   * @returns {LayerPrimitive}
+   */
+  static uncollate(polyps) {
+    return new LayerPrimitive(polyps, [
+      STYLE_MOUTH_BACK,
+      STYLE_MOUTH_FRONT,
+      STYLE_TENTACLE_LINES,
+      STYLE_TENTACLE_CIRCLES,
+    ]);
   }
 }
