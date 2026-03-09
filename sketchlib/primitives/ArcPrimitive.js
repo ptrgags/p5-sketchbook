@@ -2,8 +2,9 @@ import { Direction } from "../../sketchlib/pga2d/Direction.js";
 import { Point } from "../../sketchlib/pga2d/Point.js";
 import { ArcAngles } from "../ArcAngles.js";
 import { ArcLength } from "./ArcLength.js";
-import { PartialPrimitive } from "./Primitive.js";
 import { lerp } from "../lerp.js";
+import { is_nearly } from "../is_nearly.js";
+import { PartialPrimitive } from "./Primitive.js";
 
 /**
  * Circular arc primitive defined as a circle and start and stop angles
@@ -43,6 +44,19 @@ export class ArcPrimitive {
 
     // Note: p5 is y-down so we need to flip the angles
     p.arc(x, y, diameter, diameter, start_angle, end_angle, p.OPEN);
+  }
+
+  /**
+   *
+   * @param {ArcPrimitive} other
+   * @returns {boolean}
+   */
+  equals(other) {
+    return (
+      this.center.equals(other.center) &&
+      is_nearly(this.radius, other.radius) &&
+      this.angles.equals(other.angles)
+    );
   }
 
   /**

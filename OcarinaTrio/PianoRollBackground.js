@@ -7,7 +7,7 @@ import { MIDIPitch } from "../sketchlib/music/MIDIPitch.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
-import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
+import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
@@ -52,7 +52,7 @@ export class PianoRollBackground {
 
       // also push a vertical line to separate the keys
       pitch_lines.push(
-        new LinePrimitive(new Point(x, this.y), new Point(x, HEIGHT)),
+        new LineSegment(new Point(x, this.y), new Point(x, HEIGHT)),
       );
     }
 
@@ -88,7 +88,7 @@ export class PianoRollBackground {
     const t_first_line = 1.0 - mod(time, 1.0);
     const y_first_line = this.y + this.velocity * t_first_line;
     for (let y = y_first_line; y < HEIGHT; y += this.velocity) {
-      lines.push(new LinePrimitive(new Point(0, y), new Point(WIDTH, y)));
+      lines.push(new LineSegment(new Point(0, y), new Point(WIDTH, y)));
     }
 
     this.bar_lines.regroup(...lines);
@@ -99,7 +99,7 @@ export class PianoRollBackground {
     const t_first_beat_line = 1.0 - mod(4 * time, 1.0);
     const y_first_beat_line = this.y + (this.velocity / 4) * t_first_beat_line;
     for (let y = y_first_beat_line; y < HEIGHT; y += this.velocity / 4) {
-      beat_lines.push(new LinePrimitive(new Point(0, y), new Point(WIDTH, y)));
+      beat_lines.push(new LineSegment(new Point(0, y), new Point(WIDTH, y)));
     }
 
     this.beat_lines.regroup(...beat_lines);

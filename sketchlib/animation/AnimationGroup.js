@@ -1,4 +1,5 @@
 import { GroupPrimitive } from "../primitives/GroupPrimitive.js";
+import { Primitive } from "../primitives/Primitive.js";
 import { group } from "../primitives/shorthand.js";
 import { Animated } from "./Animated.js";
 
@@ -16,7 +17,7 @@ export class AnimationGroup {
     this.children = children;
 
     if (children.length === 0) {
-      this.primitive = GroupPrimitive.EMPTY;
+      this.primitive = Primitive.EMPTY;
     } else if (children.length === 1) {
       this.primtiive = children[0].primitive;
     } else {

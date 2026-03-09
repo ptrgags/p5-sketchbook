@@ -80,7 +80,7 @@ export class Cline {
   }
 
   /**
-   *
+   * Transform this cline with a versor, producing a new versor
    * @param {COdd | CEven} versor
    * @returns {Cline}
    */

@@ -7,6 +7,7 @@ import { DancingArrow } from "./DancingArrow.js";
 import { ParabolicGridIllusion } from "./ParabolicGridIllusion.js";
 import { TranslationGridIllusion } from "./TranslationGridIllusion.js";
 import { MouseInCanvas } from "../sketchlib/input/MouseInput.js";
+import { SelectAnimated } from "../sketchlib/animation/SelectAnimated.js";
 
 const TRANSLATE_CENTER = CVersor.translation(SCREEN_CENTER.to_direction());
 const SCALE_UP = CVersor.dilation(200);
@@ -15,16 +16,14 @@ const TO_SCREEN = TRANSLATE_CENTER.compose(SCALE_UP).compose(FLIP_Y);
 
 const MOUSE = new CanvasMouseHandler();
 
-const GRIDS = [
+const GRIDS = new SelectAnimated([
   new ParabolicGridIllusion(TO_SCREEN),
   new TranslationGridIllusion(TO_SCREEN),
-];
+]);
 
 const ARROW = new DancingArrow(new Circle(SCREEN_CENTER, 20));
 
 export const sketch = (p) => {
-  let selected_index = 0;
-
   p.setup = () => {
     const canvas = p.createCanvas(
       WIDTH,
@@ -45,9 +44,8 @@ export const sketch = (p) => {
     const BEATS_PER_MEASURE = 4;
     const time_measures = ((time_sec / SEC_PER_MIN) * BPM) / BEATS_PER_MEASURE;
 
-    const grid = GRIDS[selected_index];
-    grid.update(time_measures);
-    grid.primitive.draw(p);
+    GRIDS.update(time_measures);
+    GRIDS.primitive.draw(p);
 
     ARROW.update(time_measures);
     ARROW.primitive.draw(p);
@@ -59,7 +57,6 @@ export const sketch = (p) => {
       return;
     }
 
-    selected_index++;
-    selected_index %= GRIDS.length;
+    GRIDS.next();
   });
 };

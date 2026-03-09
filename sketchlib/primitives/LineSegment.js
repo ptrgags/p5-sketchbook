@@ -1,5 +1,5 @@
-import { Direction } from "../../sketchlib/pga2d/Direction.js";
-import { Point } from "../../sketchlib/pga2d/Point.js";
+import { Direction } from "../pga2d/Direction.js";
+import { Point } from "../pga2d/Point.js";
 import { ArcLength } from "./ArcLength.js";
 import { PartialPrimitive } from "./Primitive.js";
 
@@ -8,7 +8,7 @@ import { PartialPrimitive } from "./Primitive.js";
  * @implements {PartialPrimitive}
  * @implements {ArcLength}
  */
-export class LinePrimitive {
+export class LineSegment {
   /**
    * Constructor
    * @param {Point} a The start point
@@ -30,25 +30,33 @@ export class LinePrimitive {
   }
 
   /**
+   *
+   * @param {LineSegment} other
+   */
+  equals(other) {
+    return this.a.equals(other.a) && this.b.equals(other.b);
+  }
+
+  /**
    * Render a partial version of the primitive
    * @param {number} t Interpolation factor in [0, 1]
-   * @returns {LinePrimitive}
+   * @returns {LineSegment}
    */
   render_partial(t) {
     const b = Point.lerp(this.a, this.b, t);
-    return new LinePrimitive(this.a, b);
+    return new LineSegment(this.a, b);
   }
 
   /**
    * Render a partial version of the primitive between the two given times
    * @param {number} t_start start t value in [0, 1]
    * @param {number} t_end end t value in [0, 1]
-   * @returns {LinePrimitive}
+   * @returns {LineSegment}
    */
   render_between(t_start, t_end) {
     const a = Point.lerp(this.a, this.b, t_start);
     const b = Point.lerp(this.a, this.b, t_end);
-    return new LinePrimitive(a, b);
+    return new LineSegment(a, b);
   }
 
   /**
