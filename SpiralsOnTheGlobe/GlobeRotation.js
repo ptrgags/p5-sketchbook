@@ -6,11 +6,16 @@ import { NullPoint } from "../sketchlib/cga2d/NullPoint.js";
 import { Color } from "../sketchlib/Color.js";
 import { mod } from "../sketchlib/mod.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Primitive } from "../sketchlib/primitives/Primitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 
 /**
+ * Rotate the globe a quarter turn CCW around the z axis (through the poles)
+ * as t goes from [0, 1]. This is a regular rotation.
  *
+ * Fixes o, inf
+ * cycles +x -> +y -> -x -> -y -> +x
  * @param {number} t
  * @returns {CVersor}
  */
@@ -20,7 +25,10 @@ function rotate_z(t) {
 }
 
 /**
+ * Rotate the globe a quarter turn CCW around the x axis as t goes from [0, 1]
  *
+ * This fixes +x, -x
+ * and cycles o -> +y -> inf -> -y -> o
  * @param {number} t
  * @returns {CVersor}
  */
@@ -30,7 +38,10 @@ function rotate_x(t) {
 }
 
 /**
+ * Rotate the globe a quarter turn CCW around the y-axis as t goes from [0, 1]
  *
+ * This fixes +y, -y
+ * and cycles o -> -x -> inf -> +x -> o
  * @param {number} t
  * @returns {CVersor}
  */
@@ -38,6 +49,10 @@ function rotate_y(t) {
   const angle = 0.5 * Math.PI * t;
   return CVersor.elliptic(Direction.DIR_X.neg(), angle);
 }
+
+const X = rotate_x(1);
+const Y = rotate_y(1);
+const Z = rotate_z(1);
 
 /**
  * Rotate the globe in quarter turns over the course of 6 measures.
@@ -48,33 +63,38 @@ function rotate_y(t) {
 function rotate_globe(t) {
   t = mod(t, 6);
 
+  // start with the key points
+  // [+x, -x, +y, -y, inf, o]
+
+  // x^-t
+  // this maps the points to [+x, -x, o, inf, +y, -y]
   if (t < 1) {
-    return rotate_x(t);
+    return rotate_x(-t);
   }
 
-  const x = rotate_x(1);
+  // z^-t * x^-1
+  // this maps points to [-y, +y, o, inf, +x, -x]
+  const x = X.inv();
   if (t < 2) {
-    return rotate_z(t).compose(x);
+    return rotate_z(-t).compose(x);
   }
 
-  const z = rotate_z(1);
-  const zx = z.compose(x);
+  const zx = Z.inv().compose(X);
   if (t < 3) {
-    return rotate_y(t).compose(zx);
+    return rotate_y(-t).compose(zx);
   }
 
-  const y = rotate_y(1);
-  const yxz = y.compose(zx);
+  const yxz = Y.inv().compose(zx);
   if (t < 4) {
     return rotate_x(t).compose(yxz);
   }
 
-  const xyxz = x.compose(yxz);
+  const xyxz = X.compose(yxz);
   if (t < 5) {
     return rotate_z(t).compose(xyxz);
   }
 
-  const zxyxz = z.compose(xyxz);
+  const zxyxz = Z.compose(xyxz);
   return rotate_y(t).compose(zxyxz);
 }
 
@@ -112,7 +132,14 @@ export class GlobeRotation {
     const south_pole = xform.transform(NullPoint.ORIGIN);
     const north_pole = xform.transform(NullPoint.INF);
     const equator = xform.transform(Cline.UNIT_CIRCLE);
-    const prime_meridian = xform.transform(ClineArc.PRIME_MERIDIAN);
+    let prime_meridian;
+
+    try {
+      prime_meridian = xform.transform(ClineArc.PRIME_MERIDIAN);
+    } catch (e) {
+      console.error("inf problem", e);
+      prime_meridian = Primitive.EMPTY;
+    }
 
     this.poles.regroup(south_pole, north_pole);
     this.parallels.regroup(equator);

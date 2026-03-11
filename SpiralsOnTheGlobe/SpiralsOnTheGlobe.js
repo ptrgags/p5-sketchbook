@@ -53,5 +53,6 @@ export const sketch = (p) => {
 
   MOUSE.mouse_released(p, () => {
     ANIMATIONS.next();
+    CLOCK.reset();
   });
 };
