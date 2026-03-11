@@ -4,6 +4,7 @@ import { ClineArc } from "../sketchlib/cga2d/ClineArc.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { NullPoint } from "../sketchlib/cga2d/NullPoint.js";
 import { Color } from "../sketchlib/Color.js";
+import { is_nearly } from "../sketchlib/is_nearly.js";
 import { mod } from "../sketchlib/mod.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Primitive } from "../sketchlib/primitives/Primitive.js";
@@ -54,6 +55,9 @@ const X = rotate_x(1);
 const Y = rotate_y(1);
 const Z = rotate_z(1);
 
+const YZX = Y.compose(Z).compose(X);
+console.log(YZX);
+
 /**
  * Rotate the globe in quarter turns over the course of 6 measures.
  * This does a full loop of the globe
@@ -69,22 +73,22 @@ function rotate_globe(t) {
   // x^-t
   // this maps the points to [+x, -x, o, inf, +y, -y]
   if (t < 1) {
-    return rotate_x(-t);
+    return rotate_x(t);
   }
 
   // z^-t * x^-1
   // this maps points to [-y, +y, o, inf, +x, -x]
-  const x = X.inv();
+  const x = X;
   if (t < 2) {
-    return rotate_z(-t).compose(x);
+    return rotate_z(t).compose(x);
   }
 
-  const zx = Z.inv().compose(X);
+  const zx = Z.compose(X);
   if (t < 3) {
-    return rotate_y(-t).compose(zx);
+    return rotate_y(t).compose(zx);
   }
 
-  const yxz = Y.inv().compose(zx);
+  const yxz = Y.compose(zx);
   if (t < 4) {
     return rotate_x(t).compose(yxz);
   }
@@ -133,6 +137,11 @@ export class GlobeRotation {
     const north_pole = xform.transform(NullPoint.INF);
     const equator = xform.transform(Cline.UNIT_CIRCLE);
     let prime_meridian;
+
+    if (is_nearly(mod(t, 1.0), 0, 0.01)) {
+      //@ts-ignore
+      console.log(rotate_globe(t).transform(NullPoint.ORIGIN).point.toString());
+    }
 
     try {
       prime_meridian = xform.transform(ClineArc.PRIME_MERIDIAN);
