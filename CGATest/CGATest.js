@@ -5,12 +5,13 @@ import { CGA_BASICS } from "./cga_basics.js";
 import { CanvasMouseHandler } from "../sketchlib/input/CanvasMouseHandler.js";
 import { MouseInCanvas } from "../sketchlib/input/MouseInput.js";
 import { AnimationGroup } from "../sketchlib/animation/AnimationGroup.js";
-import { Clock } from "./Clock.js";
+import { Clock } from "../sketchlib/animation/Clock.js";
 import { ConformalXformTest } from "./ConformalXformTest.js";
 import { NachoSpaceship } from "./NachoSpaceship.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { ProgressiveSierpinski } from "./ProgressiveSierpinski.js";
+import { Tempo } from "../sketchlib/music/Tempo.js";
 
 // Map the unit circle to a circle at the center of the screen with radius 200 px
 // Anything I want to render on the unit circle needs to be conjugated by this.
@@ -51,7 +52,8 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    const t_measures = CLOCK.get_elapsed_measures(BPM);
+    const t_seconds = CLOCK.elapsed_time;
+    const t_measures = Tempo.sec_to_measures(t_seconds, BPM);
 
     ANIMATIONS.update(t_measures);
     ANIMATIONS.primitive.draw(p);
