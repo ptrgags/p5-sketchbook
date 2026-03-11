@@ -1,9 +1,13 @@
+import { Clock } from "../sketchlib/animation/Clock.js";
 import { SelectAnimated } from "../sketchlib/animation/SelectAnimated.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { CanvasMouseHandler } from "../sketchlib/input/CanvasMouseHandler.js";
+import { mod } from "../sketchlib/mod.js";
+import { Tempo } from "../sketchlib/music/Tempo.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { ExpandCollapseParallels } from "./ExpandCollapseParallels.js";
+import { GlobeRotation } from "./GlobeRotation.js";
 import { ScaleParallels } from "./ScaleParallels.js";
 
 // Map the unit circle to a circle at the center of the screen with radius 200 px
@@ -20,9 +24,11 @@ const MAX_POWER = 5;
 const ANIMATIONS = new SelectAnimated([
   new ExpandCollapseParallels(SCALE_FACTOR, MAX_POWER, TO_SCREEN),
   new ScaleParallels(SCALE_FACTOR, MAX_POWER, TO_SCREEN),
+  new GlobeRotation(TO_SCREEN),
 ]);
 
 const MOUSE = new CanvasMouseHandler();
+const CLOCK = new Clock();
 
 export const sketch = (p) => {
   p.setup = () => {
@@ -39,7 +45,7 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    const t = p.frameCount / 60;
+    const t = Tempo.sec_to_measures(CLOCK.elapsed_time, 128);
 
     ANIMATIONS.update(t);
     ANIMATIONS.primitive.draw(p);
