@@ -246,3 +246,21 @@ export class ClineArc {
     );
   }
 }
+/**
+ * The Prime Meridian is an arc from the south
+ * pole, through the equator at (0, 0) longitude/latitude,
+ * and to the north pole at infinity.
+ *
+ * In a stereographic projection from the north pole
+ * with (0, 0) mapped to +x, this arc looks like a ray
+ * origin -> +x -> inf
+ * @type {Readonly<ClineArc>}
+ */
+ClineArc.PRIME_MERIDIAN = Object.freeze(
+  new ClineArc(
+    Cline.X_AXIS,
+    NullPoint.ORIGIN,
+    NullPoint.from_point(new Point(1, 0)),
+    NullPoint.INF,
+  ),
+);
