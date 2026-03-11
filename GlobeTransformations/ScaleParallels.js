@@ -30,14 +30,14 @@ export class ScaleParallels {
   constructor(scale_factor, max_power, to_screen) {
     this.scale_factor = scale_factor;
     this.to_screen = to_screen;
+
+    // compute the parallels relative to the unit circle, we'll
+    // scale to screen after transforming these
     const scale = CVersor.dilation(scale_factor);
     const iterator = new PowerIterator(scale);
     this.parallels = iterator.iterate(-max_power, max_power).map((x) => {
       return x.transform(Cline.UNIT_CIRCLE);
     });
-    this.parallels_screen = this.parallels.map((parallel) =>
-      to_screen.transform(parallel),
-    );
 
     this.primitive = group();
   }
@@ -51,6 +51,6 @@ export class ScaleParallels {
       return xform.transform(x);
     });
 
-    this.primitive.regroup(...this.parallels_screen, ...transformed_parallels);
+    this.primitive.regroup(...transformed_parallels);
   }
 }
