@@ -6,6 +6,7 @@ import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
+import { ExpandCollapseParallels } from "./ExpandCollapseParallels.js";
 
 // Map the unit circle to a circle at the center of the screen with radius 200 px
 // Anything I want to render on the unit circle needs to be conjugated by this.
@@ -16,14 +17,7 @@ const SCALE_UP = CVersor.dilation(200);
 const FLIP_Y = CVersor.reflection(Direction.DIR_Y);
 const TO_SCREEN = TRANSLATE_CIRCLE_CENTER.compose(SCALE_UP).compose(FLIP_Y);
 
-const hyp = CVersor.dilation(2);
-const iter = new PowerIterator(hyp);
-
-const PARALLELS = iter.iterate(-3, 3).map((x) => {
-  const full_xform = TO_SCREEN.compose(x);
-  return full_xform.transform(Cline.UNIT_CIRCLE);
-});
-const GEOM = style(PARALLELS, new Style({ stroke: Color.RED }));
+const EXPAND_COLLAPSE = new ExpandCollapseParallels(2, 5, TO_SCREEN);
 
 export const sketch = (p) => {
   p.setup = () => {
@@ -38,6 +32,12 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    GEOM.draw(p);
+    const t = p.frameCount / 60;
+
+    EXPAND_COLLAPSE.update(t);
+
+    EXPAND_COLLAPSE.primitive.draw(p);
+
+    //GEOM.draw(p);
   };
 };
