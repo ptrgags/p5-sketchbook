@@ -15,6 +15,52 @@ expect.extend(PGA_MATCHERS);
 expect.extend(CGA_MATCHERS);
 
 describe("CVersor", () => {
+  describe("pow", () => {
+    it("with 0 returns identity", () => {
+      const versor = CVersor.rotation(Math.PI / 4);
+
+      const result = versor.pow(0);
+
+      const expected = CVersor.IDENTITY;
+      expect(result).toBe(expected);
+    });
+
+    it("with 1 returns the versor", () => {
+      const versor = CVersor.rotation(Math.PI / 4);
+
+      const result = versor.pow(1);
+
+      expect(result).toBe(versor);
+    });
+
+    it("with positive power returns the versor iterated that many times", () => {
+      const versor = CVersor.rotation(Math.PI / 4);
+
+      const result = versor.pow(3);
+
+      const expected = CVersor.rotation((3 * Math.PI) / 4);
+      expect(result).toBeCVersor(expected);
+    });
+
+    it("with -1 returns the inverse", () => {
+      const versor = CVersor.rotation(Math.PI / 4);
+
+      const result = versor.pow(-1);
+
+      const expected = versor.inv();
+      expect(result).toBeCVersor(expected);
+    });
+
+    it("with negative power returns the inverse iterated that many times", () => {
+      const versor = CVersor.rotation(Math.PI / 4);
+
+      const result = versor.pow(-3);
+
+      const expected = CVersor.rotation(-(3 * Math.PI) / 4);
+      expect(result).toBeCVersor(expected);
+    });
+  });
+
   describe("reflection", () => {
     it("reflects point over line", () => {
       const point = NullPoint.from_point(new Point(1, -2));
