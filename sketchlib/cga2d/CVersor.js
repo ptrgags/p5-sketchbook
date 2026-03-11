@@ -13,6 +13,41 @@ export class CVersor {
   }
 
   /**
+   * Raise a versor to a power by repeated
+   * multiplication
+   * @param {number} k The power
+   * @returns {CVersor}
+   */
+  pow(k) {
+    if (k === 0) {
+      return CVersor.IDENTITY;
+    }
+
+    if (k === 1) {
+      return this;
+    }
+
+    if (k === -1) {
+      return this.inv();
+    }
+
+    // Iterate v^0, v, v^2, v^3... v^k
+    // or v^0, v^-1, v^-2, ..., v^-k
+    // returning the last value
+
+    /**
+     * @type {CEven | COdd}
+     */
+    let result = CEven.IDENTITY;
+    let step = k > 0 ? this.versor : this.versor.reverse();
+    const iterations = Math.abs(k);
+    for (let i = 0; i < iterations; i++) {
+      result = step.gp(result);
+    }
+    return new CVersor(result);
+  }
+
+  /**
    * Check if two versors are equal
    * @param {CVersor} other
    * @returns {boolean}
