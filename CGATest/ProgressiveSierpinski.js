@@ -1,3 +1,4 @@
+import { Animated } from "../sketchlib/animation/Animated.js";
 import { Cline } from "../sketchlib/cga2d/Cline.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { IFS } from "../sketchlib/cga2d/IFS.js";
@@ -19,6 +20,9 @@ const STYLE_CIRCLES = new Style({
   stroke: Color.GREEN,
 });
 
+/**
+ * @implements {Animated}
+ */
 export class ProgressiveSierpinski {
   /**
    *

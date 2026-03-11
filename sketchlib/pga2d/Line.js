@@ -144,6 +144,14 @@ export class Line {
   }
 
   /**
+   * Compute a line through the origin with the given normal
+   * @param {Direction} normal The normal direction
+   */
+  static thru_origin(normal) {
+    return new Line(normal.x, normal.y, 0);
+  }
+
+  /**
    * Construct a line from a line segment
    * @param {LineSegment} segment
    */
