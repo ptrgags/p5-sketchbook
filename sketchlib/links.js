@@ -1,7 +1,7 @@
 // Links for all of the sketches. Links are added to the page in this order
 export const LINKS = [
   {
-    title: "Globe Transformations",
+    title: "Spirals on the Globe",
     is_lab: true,
     year: "2026-03",
   },
