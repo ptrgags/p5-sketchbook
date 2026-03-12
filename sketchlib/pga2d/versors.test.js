@@ -1,11 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { Motor, Flector } from "./versors";
-import { PGA_MATCHERS } from "../test_helpers/pga_matchers";
 import { Point } from "./Point";
 import { Line } from "./Line";
 import { Direction } from "./Direction";
-
-expect.extend(PGA_MATCHERS);
 
 // Numeric values are computed using kingdon, see my other repo math-notebook
 

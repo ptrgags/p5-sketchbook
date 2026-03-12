@@ -1,9 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { Point } from "../pga2d/Point.js";
 import { Circle } from "./Circle.js";
-import { GEOMETRY_MATCHERS } from "../test_helpers/geometry_matchers.js";
-
-expect.extend(GEOMETRY_MATCHERS);
 
 describe("Circle", () => {
   describe("contains", () => {

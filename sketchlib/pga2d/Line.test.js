@@ -1,10 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { Line } from "./Line";
 import { Point } from "./Point";
-import { PGA_MATCHERS } from "../test_helpers/pga_matchers";
 import { LineSegment } from "../primitives/LineSegment.js";
-
-expect.extend(PGA_MATCHERS);
 
 describe("Line", () => {
   it("constructor normalizes Euclidean line", () => {

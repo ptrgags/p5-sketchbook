@@ -2,12 +2,7 @@ import { describe, it, expect } from "vitest";
 import { NullPoint } from "./NullPoint.js";
 import { Point } from "../pga2d/Point.js";
 import { COdd } from "./COdd.js";
-import { CGA_MATCHERS } from "../test_helpers/cga_matchers.js";
-import { PGA_MATCHERS } from "../test_helpers/pga_matchers.js";
 import { CEven } from "./CEven.js";
-
-expect.extend(CGA_MATCHERS);
-expect.extend(PGA_MATCHERS);
 
 describe("NullPoint", () => {
   it("from_point with origin computes correct primitive", () => {

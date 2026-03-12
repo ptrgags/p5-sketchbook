@@ -3,9 +3,6 @@ import { CVersor } from "./CVersor.js";
 import { Direction } from "../pga2d/Direction.js";
 import { PowerIterator } from "./PowerIterator.js";
 import { expect_arrays } from "../test_helpers/expect_arrays.js";
-import { CGA_MATCHERS } from "../test_helpers/cga_matchers.js";
-
-expect.extend(CGA_MATCHERS);
 
 function expect_versors(result, expected) {
   expect(result).toBeCVersor(expected);

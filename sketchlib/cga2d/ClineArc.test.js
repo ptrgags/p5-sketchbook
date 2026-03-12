@@ -4,18 +4,13 @@ import { ClineArc, RayPair } from "./ClineArc.js";
 import { Cline } from "./Cline.js";
 import { Line } from "../pga2d/Line.js";
 import { NullPoint } from "./NullPoint.js";
-import { CGA_MATCHERS } from "../test_helpers/cga_matchers.js";
 import { LineSegment } from "../primitives/LineSegment.js";
 import { ArcPrimitive } from "../primitives/ArcPrimitive.js";
 import { ArcAngles } from "../ArcAngles.js";
 import { Circle } from "../primitives/Circle.js";
 import { CVersor } from "./CVersor.js";
 import { Direction } from "../pga2d/Direction.js";
-import { GEOMETRY_MATCHERS } from "../test_helpers/geometry_matchers.js";
 import { Ray } from "../primitives/Ray.js";
-
-expect.extend(CGA_MATCHERS);
-expect.extend(GEOMETRY_MATCHERS);
 
 describe("ClineArc", () => {
   describe("primitive", () => {
