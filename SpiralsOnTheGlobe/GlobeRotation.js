@@ -6,7 +6,6 @@ import { NullPoint } from "../sketchlib/cga2d/NullPoint.js";
 import { PowerIterator } from "../sketchlib/cga2d/PowerIterator.js";
 import { TransformationSequence } from "../sketchlib/cga2d/TransformationSequence.js";
 import { Color } from "../sketchlib/Color.js";
-import { is_nearly } from "../sketchlib/is_nearly.js";
 import { mod } from "../sketchlib/mod.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Primitive } from "../sketchlib/primitives/Primitive.js";
@@ -68,13 +67,15 @@ const STYLE_POLES = new Style({
 
 const STYLE_PARALLELS = new Style({
   stroke: Color.RED,
+  width: 2,
 });
 
 const STYLE_MERIDIANS = new Style({
   stroke: Color.YELLOW,
+  width: 2,
 });
 
-const PARALLEL_ITERATOR = new PowerIterator(CVersor.dilation(2));
+const PARALLEL_ITERATOR = new PowerIterator(CVersor.dilation(1.5));
 const PARALLELS = PARALLEL_ITERATOR.iterate(-5, 5).map((x) =>
   x.transform(Cline.UNIT_CIRCLE),
 );
