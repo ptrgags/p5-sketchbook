@@ -3,12 +3,9 @@ import { SelectAnimated } from "../sketchlib/animation/SelectAnimated.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { CanvasMouseHandler } from "../sketchlib/input/CanvasMouseHandler.js";
-import { mod } from "../sketchlib/mod.js";
 import { Tempo } from "../sketchlib/music/Tempo.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
-import { ExpandCollapseParallels } from "./ExpandCollapseParallels.js";
 import { GlobeRotation } from "./GlobeRotation.js";
-import { ScaleParallels } from "./ScaleParallels.js";
 
 // Map the unit circle to a circle at the center of the screen with radius 200 px
 // Anything I want to render on the unit circle needs to be conjugated by this.
