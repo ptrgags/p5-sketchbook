@@ -114,9 +114,14 @@ export class ConformalXformTest {
     const hyp_screen = this.to_screen.compose(hyperbolic);
     const hyp_points = hyp_screen.transform(THREE_POINTS);
 
-    const parabolic = CVersor.parabolic(new Direction(100.0 * t - 100, 0));
+    const parabolic = slerp_parabolic(
+      Direction.DIR_X.scale(-100),
+      Direction.DIR_X.scale(100),
+      t,
+    );
     const para_screen = this.to_screen.compose(parabolic);
     const para_points = para_screen.transform(PARABOLIC_POINTS);
+
     this.points.regroup(swirled_points, hyp_points, para_points);
 
     const lox = elliptic.compose(hyperbolic);
