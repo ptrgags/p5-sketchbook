@@ -1,5 +1,6 @@
 import { ArcAngles } from "../sketchlib/ArcAngles.js";
 import { ClineArc } from "../sketchlib/cga2d/ClineArc.js";
+import { CTile } from "../sketchlib/cga2d/CTile.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { Color } from "../sketchlib/Color.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
@@ -16,7 +17,7 @@ const POINT_A = Point.ORIGIN;
 const POINT_B = POINT_A.add(DIR_45.scale(0.5));
 const POINT_C = POINT_A.add(DIR_135.scale(0.5));
 
-const NACHO = [
+const NACHO = new CTile(
   ClineArc.from_segment(new LineSegment(POINT_A, POINT_B)),
   ClineArc.from_arc(
     new ArcPrimitive(
@@ -26,7 +27,7 @@ const NACHO = [
     ),
   ),
   ClineArc.from_segment(new LineSegment(POINT_C, POINT_A)),
-];
+);
 
 /**
  *
@@ -61,8 +62,7 @@ export class NachoSpaceship {
    */
   update(time) {
     const xform = this.to_screen.compose(rotate_globe(time));
-
-    const transformed_nacho = NACHO.map((x) => xform.transform(x));
-    this.primitive.regroup(...transformed_nacho);
+    const transformed_nacho = xform.transform(NACHO);
+    this.primitive.regroup(transformed_nacho);
   }
 }

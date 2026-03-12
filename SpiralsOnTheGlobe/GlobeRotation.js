@@ -8,11 +8,9 @@ import { NullPoint } from "../sketchlib/cga2d/NullPoint.js";
 import { PowerIterator } from "../sketchlib/cga2d/PowerIterator.js";
 import { TransformationSequence } from "../sketchlib/cga2d/TransformationSequence.js";
 import { Color } from "../sketchlib/Color.js";
-import { mod } from "../sketchlib/mod.js";
 import { N1 } from "../sketchlib/music/durations.js";
 import { Sequential } from "../sketchlib/music/Timeline.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
-import { Primitive } from "../sketchlib/primitives/Primitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 
