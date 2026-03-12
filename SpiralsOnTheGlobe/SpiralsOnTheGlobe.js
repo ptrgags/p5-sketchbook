@@ -22,9 +22,11 @@ const TO_SCREEN = TRANSLATE_CIRCLE_CENTER.compose(SCALE_UP).compose(FLIP_Y);
 const SCALE_FACTOR = 2;
 const MAX_POWER = 5;
 const ANIMATIONS = new SelectAnimated([
+  new GlobeRotation(TO_SCREEN),
+  /*
   new ExpandCollapseParallels(SCALE_FACTOR, MAX_POWER, TO_SCREEN),
   new ScaleParallels(SCALE_FACTOR, MAX_POWER, TO_SCREEN),
-  new GlobeRotation(TO_SCREEN),
+  */
 ]);
 
 const MOUSE = new CanvasMouseHandler();
@@ -52,7 +54,9 @@ export const sketch = (p) => {
   };
 
   MOUSE.mouse_released(p, () => {
+    /*
     ANIMATIONS.next();
     CLOCK.reset();
+    */
   });
 };
