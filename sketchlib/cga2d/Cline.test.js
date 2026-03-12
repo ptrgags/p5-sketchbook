@@ -2,13 +2,8 @@ import { describe, it, expect } from "vitest";
 import { Point } from "../pga2d/Point.js";
 import { Cline } from "./Cline.js";
 import { COdd } from "./COdd.js";
-import { CGA_MATCHERS } from "../test_helpers/cga_matchers.js";
-import { PGA_MATCHERS } from "../test_helpers/pga_matchers.js";
 import { Line } from "../pga2d/Line.js";
 import { Circle } from "../primitives/Circle.js";
-
-expect.extend(CGA_MATCHERS);
-expect.extend(PGA_MATCHERS);
 
 describe("Cline", () => {
   it("from_line with x-axis computes correct line", () => {

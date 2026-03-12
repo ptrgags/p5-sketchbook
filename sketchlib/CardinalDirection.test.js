@@ -4,10 +4,7 @@ import {
   opposite,
   to_direction,
 } from "./CardinalDirection.js";
-import { PGA_MATCHERS } from "./test_helpers/pga_matchers.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
-
-expect.extend(PGA_MATCHERS);
 
 describe("CardinalDirection", () => {
   it("LEFT and RIGHT are opposites", () => {

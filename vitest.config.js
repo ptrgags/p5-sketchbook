@@ -5,5 +5,6 @@ export default defineConfig({
     expect: {
       requireAssertions: true,
     },
+    setupFiles: ["./sketchlib/test_helpers/setup.js"],
   },
 });

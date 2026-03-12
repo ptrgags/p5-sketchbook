@@ -3,16 +3,11 @@ import { Cline } from "./Cline.js";
 import { Point } from "../pga2d/Point.js";
 import { CVersor } from "./CVersor.js";
 import { Direction } from "../pga2d/Direction.js";
-import { PGA_MATCHERS } from "../test_helpers/pga_matchers.js";
 import { Circle } from "../primitives/Circle.js";
 import { Line } from "../pga2d/Line.js";
-import { CGA_MATCHERS } from "../test_helpers/cga_matchers.js";
 import { NullPoint } from "./NullPoint.js";
 import { COdd } from "./COdd.js";
 import { CEven } from "./CEven.js";
-
-expect.extend(PGA_MATCHERS);
-expect.extend(CGA_MATCHERS);
 
 describe("CVersor", () => {
   describe("pow", () => {
