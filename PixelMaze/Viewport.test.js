@@ -1,12 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { Viewport } from "./Viewport";
-import { PGA_MATCHERS } from "../sketchlib/test_helpers/pga_matchers";
 import { Sprite } from "./Sprite";
 import { ImageFrames } from "./ImageFrames";
 import { Direction } from "../sketchlib/pga2d/Direction";
 import { Point } from "../sketchlib/pga2d/Point";
-
-expect.extend(PGA_MATCHERS);
 
 // More padding on the left/right than top/bottom
 const MARGIN = new Direction(16, 8);

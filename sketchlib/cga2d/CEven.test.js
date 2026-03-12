@@ -1,9 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { CGA_MATCHERS } from "../test_helpers/cga_matchers.js";
 import { CEven } from "./CEven.js";
 import { COdd } from "./COdd.js";
-
-expect.extend(CGA_MATCHERS);
 
 // These tests are checked against the kingdon GA library
 // see math-notebook

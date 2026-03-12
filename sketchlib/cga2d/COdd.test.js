@@ -1,9 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { CGA_MATCHERS } from "../test_helpers/cga_matchers.js";
 import { COdd } from "./COdd.js";
 import { CEven } from "./CEven.js";
-
-expect.extend(CGA_MATCHERS);
 
 describe("COdd", () => {
   it("add computes sum", () => {

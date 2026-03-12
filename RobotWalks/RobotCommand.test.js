@@ -1,9 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { PGA_MATCHERS } from "../sketchlib/test_helpers/pga_matchers";
 import { RobotCommand } from "./RobotCommand";
 import { Direction } from "../sketchlib/pga2d/Direction";
-
-expect.extend(PGA_MATCHERS);
 
 describe("RobotCommand", () => {
   const N = 5;

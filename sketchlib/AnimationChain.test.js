@@ -1,9 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { AnimationChain, Joint } from "./AnimationChain";
-import { PGA_MATCHERS } from "./test_helpers/pga_matchers";
 import { Point } from "../sketchlib/pga2d/Point";
-
-expect.extend(PGA_MATCHERS);
 
 describe("Joint", () => {
   it("constraint_follow with the same point throws", () => {

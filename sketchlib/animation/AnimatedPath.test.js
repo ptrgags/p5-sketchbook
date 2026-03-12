@@ -3,11 +3,8 @@ import { AnimatedPath } from "./AnimatedPath.js";
 import { LineSegment } from "../primitives/LineSegment.js";
 import { Point } from "../../sketchlib/pga2d/Point.js";
 import { group } from "../primitives/shorthand.js";
-import { PGA_MATCHERS } from "../test_helpers/pga_matchers.js";
 import { Direction } from "../../sketchlib/pga2d/Direction.js";
 import { Primitive } from "../primitives/Primitive.js";
-
-expect.extend(PGA_MATCHERS);
 
 const A = new Point(0, 0);
 const B = new Point(1, 0);
