@@ -1,5 +1,6 @@
 import { ArcAngles } from "../sketchlib/ArcAngles.js";
 import { ClineArc } from "../sketchlib/cga2d/ClineArc.js";
+import { CNode } from "../sketchlib/cga2d/CNode.js";
 import { CTile } from "../sketchlib/cga2d/CTile.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { Color } from "../sketchlib/Color.js";
@@ -51,9 +52,9 @@ export class NachoSpaceship {
    * @param {CVersor} to_screen
    */
   constructor(to_screen) {
-    this.to_screen = to_screen;
-
-    this.primitive = style([], STYLE_SPACESHIP);
+    // primitive will be set in update();
+    this.root = new CNode(to_screen);
+    this.primitive = style([this.root], STYLE_SPACESHIP);
   }
 
   /**
@@ -61,8 +62,8 @@ export class NachoSpaceship {
    * @param {number} time
    */
   update(time) {
-    const xform = this.to_screen.compose(rotate_globe(time));
+    const xform = rotate_globe(time);
     const transformed_nacho = xform.transform(NACHO);
-    this.primitive.regroup(transformed_nacho);
+    this.root.primitive = transformed_nacho;
   }
 }
