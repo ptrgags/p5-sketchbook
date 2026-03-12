@@ -5,7 +5,6 @@ import { ArcPrimitive } from "../primitives/ArcPrimitive.js";
 import { Circle } from "../primitives/Circle.js";
 import { Primitive } from "../primitives/Primitive.js";
 import { Ray } from "../primitives/Ray.js";
-import { group } from "../primitives/shorthand.js";
 import { CEven } from "./CEven.js";
 import { Cline } from "./Cline.js";
 import { COdd } from "./COdd.js";
@@ -156,7 +155,12 @@ export class ClineArc {
     this.b = b;
     this.c = c;
 
-    this.primitive = classify_geometry(this.cline, this.a, this.b, this.c);
+    try {
+      this.primitive = classify_geometry(this.cline, this.a, this.b, this.c);
+    } catch (e) {
+      console.error("inf problem", e);
+      this.primitive = Primitive.EMPTY;
+    }
   }
 
   /**
