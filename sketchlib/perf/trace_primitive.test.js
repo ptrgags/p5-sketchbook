@@ -14,6 +14,9 @@ import { ClipPrimitive } from "../primitives/ClipPrimitive.js";
 import { InvMask, Mask } from "../primitives/ClipMask.js";
 import { VectorTangle } from "../primitives/VectorTangle.js";
 import { LayerPrimitive } from "../primitives/LayerPrimitive.js";
+import { CTile } from "../cga2d/CTile.js";
+import { NullPoint } from "../cga2d/NullPoint.js";
+import { Cline } from "../cga2d/Cline.js";
 
 const STYLE = new Style({
   stroke: Color.RED,
@@ -415,6 +418,31 @@ describe("trace_primitive", () => {
           children: ["Circle", "Point"],
           push_pop_count: 0,
           simple_prim_count: 2,
+        },
+      ],
+    };
+    expect(result).toEqual(expected);
+  });
+
+  it("with conformal tile aggregates child primitives", () => {
+    const tile = new CTile(
+      NullPoint.ORIGIN,
+      new CTile(Cline.UNIT_CIRCLE, Cline.X_AXIS),
+    );
+
+    const result = trace_primitive(tile);
+
+    const expected = {
+      type: "ctile",
+      push_pop_count: 0,
+      simple_prim_count: 3,
+      children: [
+        "NullPoint",
+        {
+          type: "ctile",
+          push_pop_count: 0,
+          simple_prim_count: 2,
+          children: ["Cline", "Cline"],
         },
       ],
     };
