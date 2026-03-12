@@ -6,7 +6,9 @@ import {
   ParamCurve,
 } from "../sketchlib/animation/ParamCurve.js";
 import { Cline } from "../sketchlib/cga2d/Cline.js";
+import { CNode } from "../sketchlib/cga2d/CNode.js";
 import { ConformalPrimitive } from "../sketchlib/cga2d/ConfomalPrimitive.js";
+import { CTile } from "../sketchlib/cga2d/CTile.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { IFS } from "../sketchlib/cga2d/IFS.js";
 import { Sequential } from "../sketchlib/music/Timeline.js";
@@ -96,23 +98,23 @@ export class AnimatedSierpinski {
    * @param {CVersor} to_screen
    */
   constructor(to_screen) {
-    this.to_screen = to_screen;
-
     /**
-     * @type {ConformalPrimitive[][]}
+     * @type {ConformalPrimitive[]}
      */
     this.iter_prims = new Array(MAX_ITERS + 1);
-    this.iter_prims[0] = [Cline.UNIT_CIRCLE];
+    this.iter_prims[0] = Cline.UNIT_CIRCLE;
     for (let i = 1; i <= MAX_ITERS; i++) {
-      this.iter_prims[i] = SIERPINSKI_IFS.iterate(i).map((xform) => {
-        return xform.transform(Cline.UNIT_CIRCLE);
-      });
+      this.iter_prims[i] = new CNode(
+        SIERPINSKI_IFS.iterate(i),
+        Cline.UNIT_CIRCLE,
+      );
     }
-    this.full_fractal = this.iter_prims
-      .at(-1)
-      .map((x) => to_screen.transform(x));
+    this.full_fractal = this.iter_prims.at(-1);
 
-    this.primitive = style([], STYLE_SIERPINSKI);
+    // primitives to render get added here
+    this.tile = new CTile();
+    this.root = new CNode(to_screen, this.tile);
+    this.primitive = style([this.root], STYLE_SIERPINSKI);
   }
 
   update(time) {
@@ -124,15 +126,18 @@ export class AnimatedSierpinski {
       const t_b = CURVE_B.value(time);
       const t_c = CURVE_C.value(time);
 
-      const xform_a = this.to_screen.compose(sierpinski_a(t_a));
-      const xform_b = this.to_screen.compose(sierpinski_b(t_b));
-      const xform_c = this.to_screen.compose(sierpinski_c(t_c));
+      const xform_a = sierpinski_a(t_a);
+      const xform_b = sierpinski_b(t_b);
+      const xform_c = sierpinski_c(t_c);
 
-      const prims_a = full_iteration.map((x) => xform_a.transform(x));
-      const prims_b = full_iteration.map((x) => xform_b.transform(x));
-      const prims_c = full_iteration.map((x) => xform_c.transform(x));
+      const prims_a = xform_a.transform(full_iteration);
+      const prims_b = xform_b.transform(full_iteration);
+      const prims_c = xform_c.transform(full_iteration);
 
-      this.primitive.regroup(...prims_c, ...prims_b, ...prims_a);
+      this.tile.regroup(prims_c, prims_b, prims_a);
+      // TODO: need a better way to detect if children change...
+      // this feels similar to Redux state management
+      this.root.primitive = this.tile;
     } else {
       // once we hit the limit of what we can render, we want to render
       // less. So we render only the full iteration and a scaled copy
@@ -141,11 +146,10 @@ export class AnimatedSierpinski {
       const param = CURVE_INFINITE_LOOP.value(time);
       const [xform_index, xform_t] = whole_fract(param);
 
-      const full_xform = this.to_screen.compose(
-        SIERPINSKI_FUNCTIONS[xform_index](xform_t),
-      );
-      const prims = full_iteration.map((x) => full_xform.transform(x));
-      this.primitive.regroup(...this.full_fractal, ...prims);
+      const xform = SIERPINSKI_FUNCTIONS[xform_index](xform_t);
+      const shrunken = xform.transform(full_iteration);
+      this.tile.regroup(this.full_fractal, shrunken);
+      this.root.primitive = this.tile;
     }
   }
 }

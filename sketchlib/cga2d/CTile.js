@@ -23,6 +23,14 @@ export class CTile {
   }
 
   /**
+   * Replace all the primitives in place
+   * @param  {...ConformalPrimitive} children
+   */
+  regroup(...children) {
+    this.children.splice(0, Infinity, ...children);
+  }
+
+  /**
    * Transform all the children by a transformation
    * @param {COdd | CEven} versor
    */
