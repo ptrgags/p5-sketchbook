@@ -3,6 +3,7 @@ import { Cline } from "../sketchlib/cga2d/Cline.js";
 import { ClineArc } from "../sketchlib/cga2d/ClineArc.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { NullPoint } from "../sketchlib/cga2d/NullPoint.js";
+import { PowerIterator } from "../sketchlib/cga2d/PowerIterator.js";
 import { TransformationSequence } from "../sketchlib/cga2d/TransformationSequence.js";
 import { Color } from "../sketchlib/Color.js";
 import { is_nearly } from "../sketchlib/is_nearly.js";
@@ -73,6 +74,18 @@ const STYLE_MERIDIANS = new Style({
   stroke: Color.YELLOW,
 });
 
+const PARALLEL_ITERATOR = new PowerIterator(CVersor.dilation(2));
+const PARALLELS = PARALLEL_ITERATOR.iterate(-5, 5).map((x) =>
+  x.transform(Cline.UNIT_CIRCLE),
+);
+
+const MERIDIAN_ITERATOR = new PowerIterator(
+  CVersor.rotation((2 * Math.PI) / 16),
+);
+const MERIDIANS = MERIDIAN_ITERATOR.iterate(0, 15).map((x) => {
+  return x.transform(ClineArc.PRIME_MERIDIAN);
+});
+
 /**
  * @implements {Animated}
  */
@@ -87,7 +100,7 @@ export class GlobeRotation {
     this.poles = style([], STYLE_POLES);
     this.parallels = style([], STYLE_PARALLELS);
     this.meridians = style([], STYLE_MERIDIANS);
-    this.primitive = group(this.poles, this.parallels, this.meridians);
+    this.primitive = group(this.parallels, this.meridians, this.poles);
   }
 
   /**
@@ -101,18 +114,18 @@ export class GlobeRotation {
     const xform = this.to_screen.compose(globe_xform);
     const south_pole = xform.transform(NullPoint.ORIGIN);
     const north_pole = xform.transform(NullPoint.INF);
-    const equator = xform.transform(Cline.UNIT_CIRCLE);
-    let prime_meridian;
-
-    try {
-      prime_meridian = xform.transform(ClineArc.PRIME_MERIDIAN);
-    } catch (e) {
-      console.error("inf problem", e);
-      prime_meridian = Primitive.EMPTY;
-    }
+    const parallels = PARALLELS.map((p) => xform.transform(p));
+    const meridians = MERIDIANS.map((m) => {
+      try {
+        return xform.transform(m);
+      } catch (e) {
+        console.error("inf problem", e);
+        return Primitive.EMPTY;
+      }
+    });
 
     this.poles.regroup(south_pole, north_pole);
-    this.parallels.regroup(equator);
-    this.meridians.regroup(prime_meridian);
+    this.parallels.regroup(...parallels);
+    this.meridians.regroup(...meridians);
   }
 }
