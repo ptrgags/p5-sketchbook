@@ -1,7 +1,9 @@
 import { Animated } from "../sketchlib/animation/Animated.js";
 import { Cline } from "../sketchlib/cga2d/Cline.js";
+import { CTile } from "../sketchlib/cga2d/CTile.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { NullPoint } from "../sketchlib/cga2d/NullPoint.js";
+import { PowerIterator } from "../sketchlib/cga2d/PowerIterator.js";
 import { Color } from "../sketchlib/Color.js";
 import { mod } from "../sketchlib/mod.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
@@ -33,21 +35,36 @@ const POINTS = [
   new Point(-0.8, 0.0),
   new Point(-0.8, -0.2),
 ].map((x) => NullPoint.from_point(x));
+const THREE_POINTS = new CTile(...POINTS);
 
 const N = 40;
 const POINTS2 = [...range(N)].map((x) => {
   const point = Point.lerp(new Point(0, -0.8), new Point(0, 0.8), x / (N - 1));
   return NullPoint.from_point(point);
 });
+const PARABOLIC_POINTS = new CTile(...POINTS2);
 
+const PARABOLIC_ITERATOR = new PowerIterator(
+  CVersor.parabolic(Direction.DIR_X),
+);
 const MAX_EXPONENT = 15;
-const PARABOLIC_STEP = Direction.DIR_X;
-const PARABOLIC_TILES = [...range(2 * MAX_EXPONENT + 1)].map((x) => {
-  const power = x - MAX_EXPONENT;
-  const offset = PARABOLIC_STEP.scale(power);
-  const parabolic = CVersor.parabolic(offset);
-  return parabolic.transform(Cline.Y_AXIS);
-});
+const PARABOLIC_CIRCLES = PARABOLIC_ITERATOR.iterate(
+  -MAX_EXPONENT,
+  MAX_EXPONENT,
+).map((x) => x.transform(Cline.Y_AXIS));
+const PARABOLIC_SCALLOP = new CTile(...PARABOLIC_CIRCLES);
+
+/**
+ *
+ * @param {Direction} offset_a
+ * @param {Direction} offset_b
+ * @param {number} t
+ * @returns {CVersor}
+ */
+function slerp_parabolic(offset_a, offset_b, t) {
+  const offset = Direction.lerp(offset_a, offset_b, t);
+  return CVersor.parabolic(offset);
+}
 
 /**
  * @implements {Animated}
@@ -86,7 +103,7 @@ export class ConformalXformTest {
 
     const elliptic = CVersor.elliptic(Direction.DIR_Y, angle);
     const elliptic_screen = this.to_screen.compose(elliptic);
-    const swirled_points = POINTS.map((x) => elliptic_screen.transform(x));
+    const swirled_points = elliptic_screen.transform(THREE_POINTS);
 
     const min_factor = 1;
     const max_factor = 100;
@@ -95,25 +112,27 @@ export class ConformalXformTest {
       Math.pow(min_factor, 1.0 - factor_t) * Math.pow(max_factor, factor_t);
     const hyperbolic = CVersor.hyperbolic(Direction.DIR_X, factor);
     const hyp_screen = this.to_screen.compose(hyperbolic);
-    const hyp_points = POINTS.map((x) => hyp_screen.transform(x));
+    const hyp_points = hyp_screen.transform(THREE_POINTS);
 
     const parabolic = CVersor.parabolic(new Direction(100.0 * t - 100, 0));
     const para_screen = this.to_screen.compose(parabolic);
-    const para_points = POINTS2.map((x) => para_screen.transform(x));
-    this.points.regroup(...swirled_points, ...hyp_points, ...para_points);
+    const para_points = para_screen.transform(PARABOLIC_POINTS);
+    this.points.regroup(swirled_points, hyp_points, para_points);
 
     const lox = elliptic.compose(hyperbolic);
     const lox_screen = this.to_screen.compose(lox);
-    const lox_points = POINTS.map((x) => lox_screen.transform(x));
-    this.lox_points.regroup(...lox_points);
+    const lox_points = lox_screen.transform(THREE_POINTS);
+    this.lox_points.regroup(lox_points);
 
     // Give the illusion of translating forever by drawing a whole bunch of tiles
     const t_repeat = mod(2 * t, 1.0);
-    const para_illusion = CVersor.parabolic(PARABOLIC_STEP.scale(t_repeat));
-    const para_ill_screen = this.to_screen.compose(para_illusion);
-    const para_ill_tiles = PARABOLIC_TILES.map((x) =>
-      para_ill_screen.transform(x),
+    const para_illusion = slerp_parabolic(
+      Direction.ZERO,
+      Direction.DIR_X,
+      t_repeat,
     );
-    this.parabolic_lines.regroup(...para_ill_tiles);
+    const para_ill_screen = this.to_screen.compose(para_illusion);
+    const scallop = para_ill_screen.transform(PARABOLIC_SCALLOP);
+    this.parabolic_lines.regroup(scallop);
   }
 }
