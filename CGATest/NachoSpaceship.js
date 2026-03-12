@@ -61,14 +61,8 @@ export class NachoSpaceship {
    */
   update(time) {
     const xform = this.to_screen.compose(rotate_globe(time));
-    try {
-      const transformed_nacho = NACHO.map((x) => xform.transform(x));
-      this.primitive.regroup(...transformed_nacho);
-    } catch (e) {
-      // sometimes one of the points gets sent to infinity and it causes
-      // issues... will investigate later.
-      console.error(e);
-      this.primitive.regroup();
-    }
+
+    const transformed_nacho = NACHO.map((x) => xform.transform(x));
+    this.primitive.regroup(...transformed_nacho);
   }
 }
