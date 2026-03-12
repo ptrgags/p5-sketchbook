@@ -12,7 +12,7 @@ const OFFSET_X = Direction.DIR_X;
 const OFFSET_Y = Direction.DIR_Y;
 
 const X_ITER = new PowerIterator(CVersor.parabolic(OFFSET_X));
-const Y_ITER = new PowerIterator(CVersor.parabolic(OFFSET_X));
+const Y_ITER = new PowerIterator(CVersor.parabolic(OFFSET_Y));
 
 const MAX_STEP = 13;
 const X_PARTS = X_ITER.iterate(-MAX_STEP, MAX_STEP).map((x) =>
