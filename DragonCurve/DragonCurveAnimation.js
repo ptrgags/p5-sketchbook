@@ -1,6 +1,6 @@
 import { Animated } from "../sketchlib/animation/Animated.js";
 import { LoopCurve } from "../sketchlib/animation/LoopCurve.js";
-import { Hold, make_param } from "../sketchlib/animation/ParamCurve.js";
+import { make_param } from "../sketchlib/animation/ParamCurve.js";
 import { ArcAngles } from "../sketchlib/ArcAngles.js";
 import { Cline } from "../sketchlib/cga2d/Cline.js";
 import { ClineArc } from "../sketchlib/cga2d/ClineArc.js";
@@ -10,8 +10,6 @@ import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { IFS } from "../sketchlib/cga2d/IFS.js";
 import { StyledNode } from "../sketchlib/cga2d/StyledNode.js";
 import { StyledTile } from "../sketchlib/cga2d/StyledTile.js";
-import { N1 } from "../sketchlib/music/durations.js";
-import { Sequential } from "../sketchlib/music/Timeline.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
@@ -22,6 +20,7 @@ import { Rational } from "../sketchlib/Rational.js";
 import { Style } from "../sketchlib/Style.js";
 import { StyleRuns } from "../sketchlib/styling/StyleRuns.js";
 import { whole_fract } from "../sketchlib/whole_fract.js";
+import { clamp } from "../sketchlib/clamp.js";
 
 // make a vortex shape across the diagonal of the (signed) unit square using
 // 4 circular arcs + another circle in the center
@@ -111,13 +110,11 @@ const PREFIXES = range(MAX_ITERS + 1)
   .toArray()
   .map((depth) => DRAGON_IFS.iterate(depth));
 
-const INTRO_TIME = N1;
 const CURVE_ITERATION = LoopCurve.from_timeline(
-  new Sequential(
-    new Hold(INTRO_TIME),
-    make_param(0, MAX_ITERS + 1, new Rational(MAX_ITERS + 1)),
-    new Hold(N1),
-  ),
+  // negative index: intro portion
+  // index in [0, MAX_ITERS - 1]: animate from iteration i -> i + 1
+  // index > MAX_ITERS: outro portion
+  make_param(-1, MAX_ITERS + 1, new Rational(MAX_ITERS + 2)),
 );
 
 /**
@@ -148,7 +145,10 @@ export class DragonCurveAnimation {
     this.primitive = new CNode(to_screen, this.fractal_prefixes);
   }
 
-  #current_iteration = 0;
+  /**
+   * @type {number}
+   */
+  #current_iteration = undefined;
   /**
    * Update the transformations for the current iteration only as needed,
    * not every frame.
@@ -160,7 +160,9 @@ export class DragonCurveAnimation {
     }
 
     this.#current_iteration = iteration;
-    const prefixes = PREFIXES[iteration] ?? PREFIXES.at(-1);
+
+    const index = clamp(iteration, 0, PREFIXES.length - 1);
+    const prefixes = PREFIXES[index];
     this.fractal_prefixes.update_transforms(...prefixes);
   }
 
@@ -173,7 +175,7 @@ export class DragonCurveAnimation {
     this.#update_iteration(iteration);
 
     // While animating the fractal, update the fan out animation
-    if (iteration < MAX_ITERS) {
+    if (iteration >= 0 && iteration < MAX_ITERS) {
       const xform_a = dragon_a(t);
       const xform_b = dragon_b(t);
       this.fan_out.update_transforms(xform_a, xform_b);
@@ -181,9 +183,9 @@ export class DragonCurveAnimation {
 
     // We'll always render the parent transformation, but the
     // fan out animation is not shown in the intro/outtro
-    if (time < INTRO_TIME.real || iteration >= MAX_ITERS) {
+    if (iteration < 0 || iteration >= MAX_ITERS) {
       this.visible.regroup(this.parent);
-    } else if (iteration < MAX_ITERS) {
+    } else {
       this.visible.regroup(this.parent, this.fan_out);
     }
   }
