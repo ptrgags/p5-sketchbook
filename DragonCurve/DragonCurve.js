@@ -5,7 +5,7 @@ import { Tempo } from "../sketchlib/music/Tempo.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
 import { DragonCurveAnimation } from "./DragonCurveAnimation.js";
 
-const TO_SCREEN = CVersor.to_screen(new Circle(SCREEN_CENTER, 200));
+const TO_SCREEN = CVersor.to_screen(new Circle(SCREEN_CENTER, 150));
 const ANIMATION = new DragonCurveAnimation(TO_SCREEN);
 const CLOCK = new Clock();
 
