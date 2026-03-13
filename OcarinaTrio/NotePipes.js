@@ -67,6 +67,46 @@ const STYLE_DASHES = new Style({
 });
 
 /**
+ *
+ * @param {AbsInterval<number>[]} intervals
+ * @returns {Generator<AbsInterval<number>>}
+ */
+function* merge_gate(intervals) {
+  if (intervals.length === 0) {
+    return;
+  }
+
+  if (intervals.length === 1) {
+    yield intervals[0];
+    return;
+  }
+
+  let current = intervals[0];
+  for (let i = 1; i < intervals.length - 1; i++) {
+    const interval = intervals[i];
+
+    // If the intervals meet at the end points, merge the intervals
+    if (interval.start_time.equals(current.end_time)) {
+      current = new AbsInterval(1, current.start_time, interval.end_time);
+      continue;
+    }
+
+    yield current;
+    current = interval;
+  }
+
+  // for the last interval we need to flush everything
+  const interval = intervals.at(-1);
+  if (interval.start_time.equals(current.end_time)) {
+    current = new AbsInterval(1, current.start_time, interval.end_time);
+    yield current;
+  } else {
+    yield current;
+    yield interval;
+  }
+}
+
+/**
  * Take a sequence of intervals, and merge the time intervals that are
  * immediately adjacent
  *
@@ -76,36 +116,17 @@ const STYLE_DASHES = new Style({
  * @returns {AbsInterval<number>[]} merged intervals. The value is always 1, since only the times matter.
  */
 export function make_gate_signal(intervals) {
-  if (intervals.length === 0) {
-    return [];
-  }
+  const unmerged = intervals.map(
+    (x) => new AbsInterval(1, x.start_time, x.end_time),
+  );
 
-  for (let i = 1; i < intervals.length; i++) {
-    if (intervals[i - 1].end_time.gt(intervals[i].start_time)) {
+  for (let i = 1; i < unmerged.length; i++) {
+    if (unmerged[i - 1].end_time.gt(unmerged[i].start_time)) {
       throw new Error("intervals must not overlap in time");
     }
   }
 
-  const result = [];
-  let start_time = intervals[0].start_time;
-  let end_time = intervals[0].end_time;
-  for (let i = 1; i < intervals.length; i++) {
-    const interval = intervals[i];
-    if (interval.start_time.equals(end_time)) {
-      // Merge two adjacent time intervals
-      end_time = interval.end_time;
-    } else {
-      // There's a gap before the next interval, so flush the previous
-      // one
-      result.push(new AbsInterval(1, start_time, end_time));
-      start_time = interval.start_time;
-      end_time = interval.end_time;
-    }
-  }
-
-  // flush the last interval
-  result.push(new AbsInterval(1, start_time, end_time));
-  return result;
+  return merge_gate(unmerged).toArray();
 }
 
 /**

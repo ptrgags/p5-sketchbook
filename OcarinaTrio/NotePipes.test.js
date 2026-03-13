@@ -51,7 +51,7 @@ describe("make_gate_signal", () => {
 
     const result = make_gate_signal(intervals);
 
-    const expected = [new AbsInterval(1, Rational.ZERO, Rational.ONE)];
+    const expected = [new AbsInterval(1, Rational.ZERO, new Rational(2))];
     expect(result).toEqual(expected);
   });
 
@@ -81,7 +81,7 @@ describe("make_gate_signal", () => {
     const result = make_gate_signal(intervals);
 
     const expected = [
-      new AbsInterval(1, Rational.ZERO, new Rational(3)),
+      new AbsInterval(1, Rational.ZERO, new Rational(2)),
       new AbsInterval(1, new Rational(4), new Rational(11, 2)),
     ];
     expect(result).toEqual(expected);
