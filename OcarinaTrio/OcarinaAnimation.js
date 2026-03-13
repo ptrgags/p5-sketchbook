@@ -171,7 +171,7 @@ export class OcarinaAnimation {
       new Ocarina(SOPRANO_CONFIG, new PlayedNotes(soprano_intervals)),
     );
 
-    const pipe_velocity = 100;
+    const pipe_velocity = 300;
     this.pipes = new NotePipes(
       [bass_intervals, tenor_intervals, soprano_intervals],
       pipe_velocity,
