@@ -27,5 +27,7 @@ export function midi_to_score(midi) {
     }
   }
 
+  console.log("split points: ", builder.section_start_times);
+
   return [builder.build(), builder.tempo_markings];
 }
