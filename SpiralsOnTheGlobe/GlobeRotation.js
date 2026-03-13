@@ -6,6 +6,7 @@ import { ClineArc } from "../sketchlib/cga2d/ClineArc.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { NullPoint } from "../sketchlib/cga2d/NullPoint.js";
 import { PowerIterator } from "../sketchlib/cga2d/PowerIterator.js";
+import { StyledTile } from "../sketchlib/cga2d/StyledTile.js";
 import { TransformationSequence } from "../sketchlib/cga2d/TransformationSequence.js";
 import { Color } from "../sketchlib/Color.js";
 import { N1 } from "../sketchlib/music/durations.js";
@@ -13,6 +14,7 @@ import { Sequential } from "../sketchlib/music/Timeline.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
+import { StyleRuns } from "../sketchlib/styling/StyleRuns.js";
 
 /**
  * Rotate the globe a quarter turn CCW around the z axis (through the poles)
@@ -66,11 +68,14 @@ const STYLE_POLES = new Style({
   fill: Color.from_hex_code("#7f00ff"),
 });
 
-const STYLE_PARALLELS = new Style({
+const STYLE_NORTH_HEMISPHERE = new Style({
   stroke: Color.RED,
   width: 2,
 });
-
+const STYLE_SOUTH_HEMISPHERE = new Style({
+  stroke: Color.from_hex_code("#ff7f00"),
+  width: 2,
+});
 const STYLE_EQUATOR = new Style({
   stroke: Color.CYAN,
   width: 4,
@@ -86,10 +91,17 @@ const STYLE_PRIME_MERIDIAN = new Style({
   width: 4,
 });
 
+const PARALLEL_MAX_ITERS = 5;
 const PARALLEL_ITERATOR = new PowerIterator(CVersor.dilation(1.5));
-const PARALLELS = PARALLEL_ITERATOR.iterate(-5, 5).map((x) =>
-  x.transform(Cline.UNIT_CIRCLE),
-);
+const PARALLELS = PARALLEL_ITERATOR.iterate(
+  -PARALLEL_MAX_ITERS,
+  PARALLEL_MAX_ITERS,
+).map((x) => x.transform(Cline.UNIT_CIRCLE));
+const STYLE_RUNS_PARALLELS = new StyleRuns([
+  [PARALLEL_MAX_ITERS, STYLE_SOUTH_HEMISPHERE],
+  [1, STYLE_EQUATOR],
+  [PARALLEL_MAX_ITERS, STYLE_NORTH_HEMISPHERE],
+]);
 
 const MERIDIAN_ITERATOR = new PowerIterator(
   CVersor.rotation((2 * Math.PI) / 16),
@@ -127,13 +139,11 @@ export class GlobeRotation {
     this.to_screen = to_screen;
 
     this.poles = style([], STYLE_POLES);
-    this.parallels = style([], STYLE_PARALLELS);
-    this.equator = style([], STYLE_EQUATOR);
+    this.parallels = new StyledTile([], STYLE_RUNS_PARALLELS);
     this.meridians = style([], STYLE_MERIDIANS);
     this.prime_meridian = style([], STYLE_PRIME_MERIDIAN);
     this.primitive = group(
       this.parallels,
-      this.equator,
       this.meridians,
       this.prime_meridian,
       this.poles,
@@ -152,13 +162,11 @@ export class GlobeRotation {
     const south_pole = xform.transform(NullPoint.ORIGIN);
     const north_pole = xform.transform(NullPoint.INF);
     const parallels = PARALLELS.map((p) => xform.transform(p));
-    const equator = xform.transform(Cline.UNIT_CIRCLE);
     const meridians = MERIDIANS.map((m) => xform.transform(m));
     const prime_meridian = xform.transform(ClineArc.PRIME_MERIDIAN);
 
     this.poles.regroup(south_pole, north_pole);
     this.parallels.regroup(...parallels);
-    this.equator.regroup(equator);
     this.meridians.regroup(...meridians);
     this.prime_meridian.regroup(prime_meridian);
   }
