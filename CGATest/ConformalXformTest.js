@@ -1,9 +1,11 @@
 import { Animated } from "../sketchlib/animation/Animated.js";
 import { Cline } from "../sketchlib/cga2d/Cline.js";
+import { CNode } from "../sketchlib/cga2d/CNode.js";
 import { CTile } from "../sketchlib/cga2d/CTile.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { NullPoint } from "../sketchlib/cga2d/NullPoint.js";
 import { PowerIterator } from "../sketchlib/cga2d/PowerIterator.js";
+import { StyledTile } from "../sketchlib/cga2d/StyledTile.js";
 import { Color } from "../sketchlib/Color.js";
 import { mod } from "../sketchlib/mod.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
@@ -52,7 +54,7 @@ const PARABOLIC_CIRCLES = PARABOLIC_ITERATOR.iterate(
   -MAX_EXPONENT,
   MAX_EXPONENT,
 ).map((x) => x.transform(Cline.Y_AXIS));
-const PARABOLIC_SCALLOP = new CTile(...PARABOLIC_CIRCLES);
+const PARABOLIC_SCALLOP = new StyledTile(PARABOLIC_CIRCLES, STYLE_PARABOLIC);
 
 /**
  *
@@ -66,6 +68,8 @@ function slerp_parabolic(offset_a, offset_b, t) {
   return CVersor.parabolic(offset);
 }
 
+const STYLED_CIRCLE = new StyledTile([Cline.UNIT_CIRCLE], STYLE_UNIT_CIRCLE);
+
 /**
  * @implements {Animated}
  */
@@ -77,16 +81,26 @@ export class ConformalXformTest {
   constructor(to_screen) {
     this.to_screen = to_screen;
 
-    const unit_circle = to_screen.transform(Cline.UNIT_CIRCLE);
+    const unit_circle = to_screen.transform(STYLED_CIRCLE);
 
-    this.parabolic_lines = style([], STYLE_PARABOLIC);
-    this.points = style([], STYLE_POINTS);
-    this.lox_points = style([], STYLE_LOX);
-    this.primitive = group(
-      style(unit_circle, STYLE_UNIT_CIRCLE),
-      this.parabolic_lines,
-      this.points,
-      this.lox_points,
+    // the scallop animation and the parabolic points animate differently,
+    // so we need two transformation nodes.
+    this.scallop_node = new CNode(CVersor.IDENTITY, PARABOLIC_SCALLOP);
+    this.parabolic_point_node = new CNode(CVersor.IDENTITY, PARABOLIC_POINTS);
+
+    // temporary until I implement StyleNode
+    const temp_styled_points = new StyledTile([THREE_POINTS], STYLE_POINTS);
+    const temp_styled_lox = new StyledTile([THREE_POINTS], STYLE_LOX);
+
+    this.point_node = new CNode(CVersor.IDENTITY, temp_styled_points);
+    this.lox_node = new CNode(CVersor.IDENTITY, temp_styled_lox);
+
+    this.primitive = new CTile(
+      unit_circle,
+      new CNode(
+        to_screen,
+        new CTile(this.scallop_node, this.point_node, this.lox_node),
+      ),
     );
   }
 
@@ -100,10 +114,7 @@ export class ConformalXformTest {
 
     const f = 3;
     const angle = 2.0 * Math.PI * f * t;
-
     const elliptic = CVersor.elliptic(Direction.DIR_Y, angle);
-    const elliptic_screen = this.to_screen.compose(elliptic);
-    const swirled_points = elliptic_screen.transform(THREE_POINTS);
 
     const min_factor = 1;
     const max_factor = 100;
@@ -111,23 +122,19 @@ export class ConformalXformTest {
     const factor =
       Math.pow(min_factor, 1.0 - factor_t) * Math.pow(max_factor, factor_t);
     const hyperbolic = CVersor.hyperbolic(Direction.DIR_X, factor);
-    const hyp_screen = this.to_screen.compose(hyperbolic);
-    const hyp_points = hyp_screen.transform(THREE_POINTS);
+
+    this.point_node.update_transforms(elliptic, hyperbolic);
+
+    // Show the loxodromic transformation L = E * H = H * E
+    const lox = elliptic.compose(hyperbolic);
+    this.lox_node.update_transforms(lox);
 
     const parabolic = slerp_parabolic(
       Direction.DIR_X.scale(-100),
       Direction.DIR_X.scale(100),
       t,
     );
-    const para_screen = this.to_screen.compose(parabolic);
-    const para_points = para_screen.transform(PARABOLIC_POINTS);
-
-    this.points.regroup(swirled_points, hyp_points, para_points);
-
-    const lox = elliptic.compose(hyperbolic);
-    const lox_screen = this.to_screen.compose(lox);
-    const lox_points = lox_screen.transform(THREE_POINTS);
-    this.lox_points.regroup(lox_points);
+    this.parabolic_point_node.update_transforms(parabolic);
 
     // Give the illusion of translating forever by drawing a whole bunch of tiles
     const t_repeat = mod(2 * t, 1.0);
@@ -136,8 +143,6 @@ export class ConformalXformTest {
       Direction.DIR_X,
       t_repeat,
     );
-    const para_ill_screen = this.to_screen.compose(para_illusion);
-    const scallop = para_ill_screen.transform(PARABOLIC_SCALLOP);
-    this.parabolic_lines.regroup(scallop);
+    this.scallop_node.update_transforms(para_illusion);
   }
 }
