@@ -69,10 +69,13 @@ const STYLE_DASHES = new Style({
 /**
  * Take a sequence of intervals, and merge the time intervals that are
  * immediately adjacent
+ *
+ * Exposed for unit testing to investigate a bug
+ * @private
  * @param {AbsInterval<Note<number>>[]} intervals
  * @returns {AbsInterval<number>[]} merged intervals. The value is always 1, since only the times matter.
  */
-function make_gate_signal(intervals) {
+export function make_gate_signal(intervals) {
   const result = [];
   let start_time = intervals[0].start_time;
   let end_time = intervals[0].end_time;
