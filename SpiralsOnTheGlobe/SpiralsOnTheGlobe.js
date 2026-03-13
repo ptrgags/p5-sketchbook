@@ -1,22 +1,15 @@
 import { Clock } from "../sketchlib/animation/Clock.js";
 import { SelectAnimated } from "../sketchlib/animation/SelectAnimated.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
-import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
+import { WIDTH, HEIGHT, SCREEN_CENTER } from "../sketchlib/dimensions.js";
 import { CanvasMouseHandler } from "../sketchlib/input/CanvasMouseHandler.js";
 import { Tempo } from "../sketchlib/music/Tempo.js";
-import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Circle } from "../sketchlib/primitives/Circle.js";
 import { ExpandCollapseParallels } from "./ExpandCollapseParallels.js";
 import { GlobeRotation } from "./GlobeRotation.js";
 import { ScaleParallels } from "./ScaleParallels.js";
 
-// Map the unit circle to a circle at the center of the screen with radius 200 px
-// Anything I want to render on the unit circle needs to be conjugated by this.
-const TRANSLATE_CIRCLE_CENTER = CVersor.translation(
-  new Direction(WIDTH / 2, HEIGHT / 2),
-);
-const SCALE_UP = CVersor.dilation(200);
-const FLIP_Y = CVersor.reflection(Direction.DIR_Y);
-const TO_SCREEN = TRANSLATE_CIRCLE_CENTER.compose(SCALE_UP).compose(FLIP_Y);
+const TO_SCREEN = CVersor.to_screen(new Circle(SCREEN_CENTER, 200));
 
 const SCALE_FACTOR = 2;
 const MAX_POWER = 5;
