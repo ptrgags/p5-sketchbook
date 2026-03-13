@@ -3,6 +3,7 @@ import { ArcAngles } from "../sketchlib/ArcAngles.js";
 import { Color } from "../sketchlib/Color.js";
 import { AbsInterval } from "../sketchlib/music/AbsTimeline.js";
 import { Note } from "../sketchlib/music/Music.js";
+import { Oklch } from "../sketchlib/Oklch.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
@@ -61,10 +62,14 @@ const PIPE_INTERIOR = style(
 );
 const PIPES = group(PIPE_WALLS, PIPE_INTERIOR);
 
-const STYLE_DASHES = new Style({
-  stroke: Color.RED,
-  width: 8,
-});
+/**
+ *
+ * @param {Oklch} color
+ * @returns {Style}
+ */
+function fluid_style(color) {
+  return new Style({ stroke: color, width: 8 });
+}
 
 /**
  *
@@ -136,9 +141,10 @@ export class NotePipes {
   /**
    * Constructor
    * @param {AbsInterval<Note<number>>[][]} intervals
+   * @param {Oklch[]} colors
    * @param {number} velocity speed of the notes through the pipe in px/unit time
    */
-  constructor(intervals, velocity) {
+  constructor(intervals, colors, velocity) {
     this.bass_dashes = new DashedPath(PIPE_SEGMENTS_BASS);
     this.tenor_dashes = new DashedPath(PIPE_SEGMENTS_TENOR);
     this.soprano_dashes = new DashedPath(PIPE_SEGMENTS_SOPRANO);
@@ -146,11 +152,13 @@ export class NotePipes {
 
     this.gate_signals = intervals.map(make_gate_signal);
 
+    const [bass_color, tenor_color, soprano_color] = colors;
+
     this.primitive = group(
       PIPES,
-      style(this.bass_dashes.primitive, STYLE_DASHES),
-      style(this.tenor_dashes.primitive, STYLE_DASHES),
-      style(this.soprano_dashes.primitive, STYLE_DASHES),
+      style(this.bass_dashes.primitive, fluid_style(bass_color)),
+      style(this.tenor_dashes.primitive, fluid_style(tenor_color)),
+      style(this.soprano_dashes.primitive, fluid_style(soprano_color)),
     );
   }
 

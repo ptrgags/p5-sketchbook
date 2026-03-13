@@ -174,6 +174,7 @@ export class OcarinaAnimation {
     const pipe_velocity = 300;
     this.pipes = new NotePipes(
       [bass_intervals, tenor_intervals, soprano_intervals],
+      [BASS_CONFIG.color, TENOR_CONFIG.color, SOPRANO_CONFIG.color],
       pipe_velocity,
     );
 
