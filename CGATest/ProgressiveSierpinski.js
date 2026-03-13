@@ -21,16 +21,16 @@ const STYLE_CIRCLES = new Style({
 
 export class ProgressiveSierpinski {
   /**
-   *
-   * @param {CVersor} to_screen
+   * Constructor
+   * @param {CVersor} to_screen Transformation from the unit circle to where it will appear on the screen.
    */
   constructor(to_screen) {
-    this.progress = new ProgressivePrimitive(
-      SIERPINSKI_IFS.iterate(6).map((xform) => {
-        return to_screen.compose(xform).transform(Cline.UNIT_CIRCLE);
-      }),
-      1,
-    );
+    // Unlike other CGA animations, this one computes all the geometry once
+    // up front and passes the primitives to ProgressivePrimitive
+    const sierpinski_circles = SIERPINSKI_IFS.iterate(6).map((xform) => {
+      return to_screen.compose(xform).transform(Cline.UNIT_CIRCLE);
+    });
+    this.progress = new ProgressivePrimitive(sierpinski_circles, 1);
 
     this.primitive = style(this.progress, STYLE_CIRCLES);
   }
