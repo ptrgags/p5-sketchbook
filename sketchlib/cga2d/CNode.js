@@ -1,6 +1,7 @@
 import { CEven } from "./CEven.js";
 import { COdd } from "./COdd.js";
 import { ConformalPrimitive } from "./ConfomalPrimitive.js";
+import { CTile } from "./CTile.js";
 import { CVersor } from "./CVersor.js";
 
 /**
@@ -48,13 +49,26 @@ export class CNode {
   }
 
   /**
+   * Apply the transformations to the children, returning a flat array
+   * @returns {ConformalPrimitive[]}
+   */
+  bake() {
+    return this.transforms.map((x) => x.transform(this.primitive));
+  }
+
+  /**
+   * For convenience, take the output of bake() and turn it into a CTile
+   * @returns {CTile}
+   */
+  bake_tile() {
+    return new CTile(...this.bake());
+  }
+
+  /**
    * Transform the primitive once for each primitive
    * @param {import("p5")} p
    */
   draw(p) {
-    for (const xform of this.transforms) {
-      const transformed = xform.transform(this.primitive);
-      transformed.draw(p);
-    }
+    this.bake().map((x) => x.draw(p));
   }
 }
