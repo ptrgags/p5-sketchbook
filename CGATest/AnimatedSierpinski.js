@@ -1,10 +1,6 @@
 import { Animated } from "../sketchlib/animation/Animated.js";
 import { LoopCurve } from "../sketchlib/animation/LoopCurve.js";
-import {
-  Hold,
-  make_param,
-  ParamCurve,
-} from "../sketchlib/animation/ParamCurve.js";
+import { Hold, make_param } from "../sketchlib/animation/ParamCurve.js";
 import { Cline } from "../sketchlib/cga2d/Cline.js";
 import { ConformalPrimitive } from "../sketchlib/cga2d/ConfomalPrimitive.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
@@ -12,7 +8,7 @@ import { IFS } from "../sketchlib/cga2d/IFS.js";
 import { Sequential } from "../sketchlib/music/Timeline.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
-import { group, style } from "../sketchlib/primitives/shorthand.js";
+import { style } from "../sketchlib/primitives/shorthand.js";
 import { Rational } from "../sketchlib/Rational.js";
 import { Style } from "../sketchlib/Style.js";
 import { whole_fract } from "../sketchlib/whole_fract.js";

@@ -3,6 +3,8 @@ import { LoopCurve } from "../sketchlib/animation/LoopCurve.js";
 import { Hold, make_param } from "../sketchlib/animation/ParamCurve.js";
 import { Cline } from "../sketchlib/cga2d/Cline.js";
 import { ClineArc } from "../sketchlib/cga2d/ClineArc.js";
+import { CNode } from "../sketchlib/cga2d/CNode.js";
+import { CTile } from "../sketchlib/cga2d/CTile.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { NullPoint } from "../sketchlib/cga2d/NullPoint.js";
 import { PowerIterator } from "../sketchlib/cga2d/PowerIterator.js";
@@ -12,7 +14,6 @@ import { Color } from "../sketchlib/Color.js";
 import { N1 } from "../sketchlib/music/durations.js";
 import { Sequential } from "../sketchlib/music/Timeline.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
-import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 import { StyleRuns } from "../sketchlib/styling/StyleRuns.js";
 
@@ -124,6 +125,7 @@ const STYLE_RUNS_MERIDIANS = new StyleRuns([
 const PARALLELS = new StyledTile(PARALLEL_CLINES, STYLE_RUNS_PARALLELS);
 const MERIDIANS = new StyledTile(MERIDIAN_ARCS, STYLE_RUNS_MERIDIANS);
 const POLES = new StyledTile([NullPoint.ORIGIN, NullPoint.INF], STYLE_POLES);
+const GEOMETRY = new CTile(PARALLELS, MERIDIANS, POLES);
 
 const CURVE_GLOBE_T = LoopCurve.from_timeline(
   new Sequential(
@@ -151,10 +153,8 @@ export class GlobeRotation {
    * @param {CVersor} to_screen
    */
   constructor(to_screen) {
-    this.to_screen = to_screen;
-
-    // TODO: Once we have CNode, this can be replaced with CNode(to_screen)
-    this.primitive = group();
+    this.rotate_node = new CNode(CVersor.IDENTITY, GEOMETRY);
+    this.primitive = new CNode(to_screen, this.rotate_node);
   }
 
   /**
@@ -164,12 +164,6 @@ export class GlobeRotation {
   update(time) {
     const globe_t = CURVE_GLOBE_T.value(time);
     const globe_xform = ROTATE_GLOBE.value(globe_t);
-    const xform = this.to_screen.compose(globe_xform);
-
-    const poles = xform.transform(POLES);
-    const parallels = xform.transform(PARALLELS);
-    const meridians = xform.transform(MERIDIANS);
-
-    this.primitive.regroup(parallels, meridians, poles);
+    this.rotate_node.update_transforms(globe_xform);
   }
 }
