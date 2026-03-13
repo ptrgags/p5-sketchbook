@@ -66,13 +66,18 @@ const ARC4 = new ArcPrimitive(
   new ArcAngles(Math.PI / 4, (-3 * Math.PI) / 4),
 );
 
-const DECORATED_TILE = new CTile(
+const VORTEX = new CTile(
   Cline.from_circle(new Circle(Point.ORIGIN, 0.25)),
   ClineArc.from_arc(ARC1),
   ClineArc.from_arc(ARC2),
   ClineArc.from_arc(ARC3),
   ClineArc.from_arc(ARC4),
 );
+
+const SPIN_ANGULAR_FREQUENCY = 2 * Math.PI;
+function spin(t) {
+  return CVersor.rotation(SPIN_ANGULAR_FREQUENCY * t);
+}
 
 const STYLE_PARENT = new Style({
   stroke: Color.WHITE,
@@ -138,32 +143,29 @@ export class DragonCurveAnimation {
    * @param {CVersor} to_screen
    */
   constructor(to_screen) {
-    // we only need to update the local shape
-    this.local_animation = new StyledNode(
-      CVersor.IDENTITY,
-      STYLE_RUNS,
-      DECORATED_TILE,
-    );
+    this.spin = new CNode(CVersor.IDENTITY, VORTEX);
+
+    // we only need to animate faning out the shape with the A and B transformations,
+    // we then instance this with various prefixes
+    this.fan_out = new StyledNode(CVersor.IDENTITY, STYLE_RUNS, this.spin);
     // fractal transformations from the IFS will go here
-    this.fractal_node = new CNode(CVersor.IDENTITY, this.local_animation);
+    this.fractal_node = new CNode(CVersor.IDENTITY, this.fan_out);
     this.primitive = new CNode(to_screen, this.fractal_node);
   }
 
   update(time) {
+    this.spin.update_transforms(spin(time));
+
     const [iteration, t] = whole_fract(CURVE_ITERATION.value(time));
     if (iteration < MAX_ITERS) {
       const xform_a = dragon_a(t);
       const xform_b = dragon_b(t);
-      this.local_animation.update_transforms(
-        CVersor.IDENTITY,
-        xform_a,
-        xform_b,
-      );
-      this.local_animation.styles = STYLE_RUNS;
+      this.fan_out.update_transforms(CVersor.IDENTITY, xform_a, xform_b);
+      this.fan_out.styles = STYLE_RUNS;
       this.fractal_node.update_transforms(...PREFIXES[iteration]);
     } else {
-      this.local_animation.update_transforms(CVersor.IDENTITY);
-      this.local_animation.styles = STYLE_PARENT;
+      this.fan_out.update_transforms(CVersor.IDENTITY);
+      this.fan_out.styles = STYLE_PARENT;
       this.fractal_node.update_transforms(...PREFIXES.at(-1));
     }
   }
