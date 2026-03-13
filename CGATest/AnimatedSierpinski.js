@@ -1,18 +1,15 @@
 import { Animated } from "../sketchlib/animation/Animated.js";
 import { LoopCurve } from "../sketchlib/animation/LoopCurve.js";
-import {
-  Hold,
-  make_param,
-  ParamCurve,
-} from "../sketchlib/animation/ParamCurve.js";
+import { Hold, make_param } from "../sketchlib/animation/ParamCurve.js";
 import { Cline } from "../sketchlib/cga2d/Cline.js";
+import { CNode } from "../sketchlib/cga2d/CNode.js";
 import { ConformalPrimitive } from "../sketchlib/cga2d/ConfomalPrimitive.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { IFS } from "../sketchlib/cga2d/IFS.js";
 import { Sequential } from "../sketchlib/music/Timeline.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
-import { group, style } from "../sketchlib/primitives/shorthand.js";
+import { style } from "../sketchlib/primitives/shorthand.js";
 import { Rational } from "../sketchlib/Rational.js";
 import { Style } from "../sketchlib/Style.js";
 import { whole_fract } from "../sketchlib/whole_fract.js";
@@ -62,8 +59,6 @@ const SIERPINSKI_IFS = new IFS([
   sierpinski_c(1),
 ]);
 
-export const MAX_ITERS = 5;
-
 const CURVE_A = LoopCurve.from_timeline(
   new Sequential(
     make_param(0, 1, new Rational(1, 3)),
@@ -87,6 +82,20 @@ const CURVE_INFINITE_LOOP = LoopCurve.from_timeline(
   make_param(0, 3, new Rational(1)),
 );
 
+export const MAX_ITERS = 5;
+/**
+ * Pre-compute the full iterations. The animation will transform the result.
+ * @type {ConformalPrimitive[]}
+ */
+const ITER_PRIMS = new Array(MAX_ITERS + 1);
+ITER_PRIMS[0] = Cline.UNIT_CIRCLE;
+for (let i = 1; i <= MAX_ITERS; i++) {
+  ITER_PRIMS[i] = new CNode(
+    SIERPINSKI_IFS.iterate(i),
+    Cline.UNIT_CIRCLE,
+  ).bake_tile();
+}
+
 /**
  * @implements {Animated}
  */
@@ -98,54 +107,39 @@ export class AnimatedSierpinski {
   constructor(to_screen) {
     this.to_screen = to_screen;
 
-    /**
-     * @type {ConformalPrimitive[][]}
-     */
-    this.iter_prims = new Array(MAX_ITERS + 1);
-    this.iter_prims[0] = [Cline.UNIT_CIRCLE];
-    for (let i = 1; i <= MAX_ITERS; i++) {
-      this.iter_prims[i] = SIERPINSKI_IFS.iterate(i).map((xform) => {
-        return xform.transform(Cline.UNIT_CIRCLE);
-      });
-    }
-    this.full_fractal = this.iter_prims
-      .at(-1)
-      .map((x) => to_screen.transform(x));
-
-    this.primitive = style([], STYLE_SIERPINSKI);
+    // The animation will swap out both transformations and primitives
+    this.root = new CNode(CVersor.IDENTITY, ConformalPrimitive.EMPTY);
+    this.primitive = style([new CNode(to_screen, this.root)], STYLE_SIERPINSKI);
   }
 
   update(time) {
-    const iter_index = Math.min(Math.floor(time), this.iter_prims.length - 1);
-    const full_iteration = this.iter_prims[iter_index];
+    // Get the latest iteration that fully rendered, this is what we'll transform.
+    const iter_index = Math.min(Math.floor(time), ITER_PRIMS.length - 1);
+    this.root.primitive = ITER_PRIMS[iter_index];
 
     if (time < MAX_ITERS) {
+      // Take the current iteration and apply the animated transforms
+      // A(t), B(T), C(T) to it, one by one until we reach the next iteration.
       const t_a = CURVE_A.value(time);
       const t_b = CURVE_B.value(time);
       const t_c = CURVE_C.value(time);
 
-      const xform_a = this.to_screen.compose(sierpinski_a(t_a));
-      const xform_b = this.to_screen.compose(sierpinski_b(t_b));
-      const xform_c = this.to_screen.compose(sierpinski_c(t_c));
+      const xform_a = sierpinski_a(t_a);
+      const xform_b = sierpinski_b(t_b);
+      const xform_c = sierpinski_c(t_c);
 
-      const prims_a = full_iteration.map((x) => xform_a.transform(x));
-      const prims_b = full_iteration.map((x) => xform_b.transform(x));
-      const prims_c = full_iteration.map((x) => xform_c.transform(x));
-
-      this.primitive.regroup(...prims_c, ...prims_b, ...prims_a);
+      // since we shrink in the order A, B, C, render in the reverse order
+      // so the smallest circles are on top.
+      this.root.update_transforms(xform_c, xform_b, xform_a);
     } else {
       // once we hit the limit of what we can render, we want to render
       // less. So we render only the full iteration and a scaled copy
-      // based on the current transform
-
+      // (either A(t), B(t), or C(t) depending on the animation time)
       const param = CURVE_INFINITE_LOOP.value(time);
       const [xform_index, xform_t] = whole_fract(param);
+      const xform = SIERPINSKI_FUNCTIONS[xform_index](xform_t);
 
-      const full_xform = this.to_screen.compose(
-        SIERPINSKI_FUNCTIONS[xform_index](xform_t),
-      );
-      const prims = full_iteration.map((x) => full_xform.transform(x));
-      this.primitive.regroup(...this.full_fractal, ...prims);
+      this.root.update_transforms(CVersor.IDENTITY, xform);
     }
   }
 }

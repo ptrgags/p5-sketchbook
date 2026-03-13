@@ -1,10 +1,11 @@
 import { Animated } from "../sketchlib/animation/Animated.js";
 import { Cline } from "../sketchlib/cga2d/Cline.js";
+import { CNode } from "../sketchlib/cga2d/CNode.js";
 import { CTile } from "../sketchlib/cga2d/CTile.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { PowerIterator } from "../sketchlib/cga2d/PowerIterator.js";
+import { StyledTile } from "../sketchlib/cga2d/StyledTile.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
-import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { STYLE_X, STYLE_Y } from "./styling.js";
 import { CURVE_X, CURVE_Y } from "./timing.js";
 
@@ -22,8 +23,9 @@ const Y_PARTS = Y_ITER.iterate(-MAX_STEP, MAX_STEP).map((x) =>
   x.transform(Cline.X_AXIS),
 );
 
-const X_SCALLOP = new CTile(...X_PARTS);
-const Y_SCALLOP = new CTile(...Y_PARTS);
+const X_SCALLOP = new StyledTile(X_PARTS, STYLE_X);
+const Y_SCALLOP = new StyledTile(Y_PARTS, STYLE_Y);
+const SCALLOPS = new CTile(X_SCALLOP, Y_SCALLOP);
 
 /**
  * Animation of the flow of two parabolic transformations in orthogonal transformations.
@@ -54,11 +56,8 @@ export class ParabolicGridIllusion {
    * @param {CVersor} to_screen Transformation from the unit circle to a larger screen space circle
    */
   constructor(to_screen) {
-    this.to_screen = to_screen;
-
-    this.x_group = style([], STYLE_X);
-    this.y_group = style([], STYLE_Y);
-    this.primitive = group(this.x_group, this.y_group);
+    this.parabolic_node = new CNode(CVersor.IDENTITY, SCALLOPS);
+    this.primitive = new CNode(to_screen, this.parabolic_node);
   }
 
   /**
@@ -71,9 +70,6 @@ export class ParabolicGridIllusion {
     const para_x = CVersor.parabolic(OFFSET_X.scale(tx));
     const para_y = CVersor.parabolic(OFFSET_Y.scale(ty));
     const para_total = para_x.compose(para_y);
-    const para_screen = this.to_screen.compose(para_total);
-
-    this.x_group.regroup(para_screen.transform(X_SCALLOP));
-    this.y_group.regroup(para_screen.transform(Y_SCALLOP));
+    this.parabolic_node.update_transforms(para_total);
   }
 }
