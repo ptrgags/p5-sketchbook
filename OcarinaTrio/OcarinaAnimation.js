@@ -10,7 +10,6 @@ import { Ocarina } from "../sketchlib/music_vis/Ocarina.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
-import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { group, style, xform } from "../sketchlib/primitives/shorthand.js";
@@ -217,7 +216,6 @@ export class OcarinaAnimation {
       OUTPUT_NOZZLES,
       OCARINA_BOXES,
       this.ocarinas.primitive,
-      //this.gates,
     );
   }
 
@@ -227,7 +225,7 @@ export class OcarinaAnimation {
     this.ocarinas.update(time);
     this.piano_rolls.update(time);
     this.background.update(time);
-    this.pipes.update(3.5);
+    this.pipes.update(time);
   }
 
   render() {}

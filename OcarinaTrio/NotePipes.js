@@ -72,14 +72,25 @@ const STYLE_DASHES = new Style({
  *
  * Exposed for unit testing to investigate a bug
  * @private
- * @param {AbsInterval<Note<number>>[]} intervals
+ * @param {AbsInterval<Note<number>>[]} intervals intervals in sorted order by start time
  * @returns {AbsInterval<number>[]} merged intervals. The value is always 1, since only the times matter.
  */
 export function make_gate_signal(intervals) {
+  if (intervals.length === 0) {
+    return [];
+  }
+
+  for (let i = 1; i < intervals.length; i++) {
+    if (intervals[i - 1].end_time.gt(intervals[i].start_time)) {
+      throw new Error("intervals must not overlap in time");
+    }
+  }
+
   const result = [];
   let start_time = intervals[0].start_time;
   let end_time = intervals[0].end_time;
-  for (const interval of intervals) {
+  for (let i = 1; i < intervals.length; i++) {
+    const interval = intervals[i];
     if (interval.start_time.equals(end_time)) {
       // Merge two adjacent time intervals
       end_time = interval.end_time;
@@ -91,6 +102,7 @@ export function make_gate_signal(intervals) {
       end_time = interval.end_time;
     }
   }
+
   // flush the last interval
   result.push(new AbsInterval(1, start_time, end_time));
   return result;
@@ -101,7 +113,7 @@ export function make_gate_signal(intervals) {
  */
 export class NotePipes {
   /**
-   *
+   * Constructor
    * @param {AbsInterval<Note<number>>[][]} intervals
    * @param {number} velocity speed of the notes through the pipe in px/unit time
    */
