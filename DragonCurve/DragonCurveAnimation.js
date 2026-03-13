@@ -59,7 +59,7 @@ function dragon_a(t) {
 }
 function dragon_b(t) {
   const scale = CVersor.dilation(Math.pow(SCALE_FACTOR, t));
-  const rotation = CVersor.rotation(TURN_ANGLE * t);
+  const rotation = CVersor.rotation(-TURN_ANGLE * t);
   const rs = rotation.compose(scale);
   return TRANSLATION_B.conjugate(rs);
 }
@@ -91,6 +91,6 @@ export class DragonCurveAnimation {
     const xform_a = dragon_a(t);
     const xform_b = dragon_b(t);
 
-    this.local_animation.update_transforms(xform_a, xform_b);
+    this.local_animation.update_transforms(CVersor.IDENTITY, xform_a, xform_b);
   }
 }
