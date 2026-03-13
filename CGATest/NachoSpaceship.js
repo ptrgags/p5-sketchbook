@@ -1,7 +1,8 @@
 import { ArcAngles } from "../sketchlib/ArcAngles.js";
 import { ClineArc } from "../sketchlib/cga2d/ClineArc.js";
-import { CTile } from "../sketchlib/cga2d/CTile.js";
+import { CNode } from "../sketchlib/cga2d/CNode.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
+import { StyledTile } from "../sketchlib/cga2d/StyledTile.js";
 import { Color } from "../sketchlib/Color.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
@@ -17,16 +18,23 @@ const POINT_A = Point.ORIGIN;
 const POINT_B = POINT_A.add(DIR_45.scale(0.5));
 const POINT_C = POINT_A.add(DIR_135.scale(0.5));
 
-const NACHO = new CTile(
-  ClineArc.from_segment(new LineSegment(POINT_A, POINT_B)),
-  ClineArc.from_arc(
-    new ArcPrimitive(
-      Point.ORIGIN,
-      0.5,
-      new ArcAngles(Math.PI / 4, (3 * Math.PI) / 4),
+const STYLE_SPACESHIP = new Style({
+  stroke: Color.from_hex_code("#ffaf00"),
+  width: 3,
+});
+const NACHO = new StyledTile(
+  [
+    ClineArc.from_segment(new LineSegment(POINT_A, POINT_B)),
+    ClineArc.from_arc(
+      new ArcPrimitive(
+        Point.ORIGIN,
+        0.5,
+        new ArcAngles(Math.PI / 4, (3 * Math.PI) / 4),
+      ),
     ),
-  ),
-  ClineArc.from_segment(new LineSegment(POINT_C, POINT_A)),
+    ClineArc.from_segment(new LineSegment(POINT_C, POINT_A)),
+  ],
+  STYLE_SPACESHIP,
 );
 
 /**
@@ -40,11 +48,6 @@ function rotate_globe(t) {
   return CVersor.elliptic(Direction.DIR_Y.neg(), angle);
 }
 
-const STYLE_SPACESHIP = new Style({
-  stroke: Color.from_hex_code("#ffaf00"),
-  width: 3,
-});
-
 export class NachoSpaceship {
   /**
    * Constructor
@@ -53,7 +56,10 @@ export class NachoSpaceship {
   constructor(to_screen) {
     this.to_screen = to_screen;
 
-    this.primitive = style([], STYLE_SPACESHIP);
+    this.rotate_node = new CNode(CVersor.IDENTITY, NACHO);
+    this.primitive = new CNode(to_screen, this.rotate_node);
+
+    style([], STYLE_SPACESHIP);
   }
 
   /**
@@ -61,8 +67,7 @@ export class NachoSpaceship {
    * @param {number} time
    */
   update(time) {
-    const xform = this.to_screen.compose(rotate_globe(time));
-    const transformed_nacho = xform.transform(NACHO);
-    this.primitive.regroup(transformed_nacho);
+    const xform = rotate_globe(time);
+    this.rotate_node.update_transforms(xform);
   }
 }
