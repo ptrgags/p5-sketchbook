@@ -1,4 +1,8 @@
+import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
+import { DragonCurveAnimation } from "./DragonCurveAnimation.js";
+
+const ANIMATION = DragonCurveAnimation(CVersor.IDENTITY);
 
 export const sketch = (p) => {
   p.setup = () => {
@@ -6,7 +10,7 @@ export const sketch = (p) => {
       WIDTH,
       HEIGHT,
       undefined,
-      document.getElementById("sketch-canvas")
+      document.getElementById("sketch-canvas"),
     );
   };
 
