@@ -23,6 +23,14 @@ export class CTile {
   }
 
   /**
+   * Swap out the children
+   * @param  {...ConformalPrimitive} children
+   */
+  regroup(...children) {
+    this.children = children;
+  }
+
+  /**
    * Transform all the children by a transformation
    * @param {COdd | CEven} versor
    */
