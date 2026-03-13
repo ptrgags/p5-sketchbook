@@ -5,6 +5,7 @@ import { CTile } from "../sketchlib/cga2d/CTile.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { NullPoint } from "../sketchlib/cga2d/NullPoint.js";
 import { PowerIterator } from "../sketchlib/cga2d/PowerIterator.js";
+import { StyledNode } from "../sketchlib/cga2d/StyledNode.js";
 import { StyledTile } from "../sketchlib/cga2d/StyledTile.js";
 import { Color } from "../sketchlib/Color.js";
 import { mod } from "../sketchlib/mod.js";
@@ -13,6 +14,7 @@ import { Point } from "../sketchlib/pga2d/Point.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { range } from "../sketchlib/range.js";
 import { Style } from "../sketchlib/Style.js";
+import { StyleRuns } from "../sketchlib/styling/StyleRuns.js";
 
 const STYLE_UNIT_CIRCLE = new Style({
   stroke: Color.from_hex_code("#007f00"),
@@ -27,10 +29,13 @@ const STYLE_PARABOLIC = new Style({
 const STYLE_LOX = new Style({
   fill: Color.from_hex_code("#7f00ff"),
 });
-
 const STYLE_POINTS = new Style({
   fill: Color.from_hex_code("#007f00"),
 });
+const STYLE_RUNS_POINTS = new StyleRuns([
+  [2, STYLE_POINTS], // hyperbolic and elliptic in green
+  [1, STYLE_LOX], // loxodromic in purple
+]);
 
 const POINTS = [
   new Point(-0.8, 0.2),
@@ -87,20 +92,15 @@ export class ConformalXformTest {
     // so we need two transformation nodes.
     this.scallop_node = new CNode(CVersor.IDENTITY, PARABOLIC_SCALLOP);
     this.parabolic_point_node = new CNode(CVersor.IDENTITY, PARABOLIC_POINTS);
-
-    // temporary until I implement StyleNode
-    const temp_styled_points = new StyledTile([THREE_POINTS], STYLE_POINTS);
-    const temp_styled_lox = new StyledTile([THREE_POINTS], STYLE_LOX);
-
-    this.point_node = new CNode(CVersor.IDENTITY, temp_styled_points);
-    this.lox_node = new CNode(CVersor.IDENTITY, temp_styled_lox);
+    this.points_node = new StyledNode(
+      CVersor.IDENTITY,
+      STYLE_RUNS_POINTS,
+      THREE_POINTS,
+    );
 
     this.primitive = new CTile(
       unit_circle,
-      new CNode(
-        to_screen,
-        new CTile(this.scallop_node, this.point_node, this.lox_node),
-      ),
+      new CNode(to_screen, new CTile(this.scallop_node, this.points_node)),
     );
   }
 
@@ -123,11 +123,9 @@ export class ConformalXformTest {
       Math.pow(min_factor, 1.0 - factor_t) * Math.pow(max_factor, factor_t);
     const hyperbolic = CVersor.hyperbolic(Direction.DIR_X, factor);
 
-    this.point_node.update_transforms(elliptic, hyperbolic);
-
-    // Show the loxodromic transformation L = E * H = H * E
+    // loxodromic is a combination of elliptic and hyperbolic transforms
     const lox = elliptic.compose(hyperbolic);
-    this.lox_node.update_transforms(lox);
+    this.points_node.update_transforms(elliptic, hyperbolic, lox);
 
     const parabolic = slerp_parabolic(
       Direction.DIR_X.scale(-100),
