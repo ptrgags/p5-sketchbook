@@ -8,7 +8,6 @@ import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
-import { style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 
 const DIR_45 = Direction.from_angle(Math.PI / 4);
@@ -58,8 +57,6 @@ export class NachoSpaceship {
 
     this.rotate_node = new CNode(CVersor.IDENTITY, NACHO);
     this.primitive = new CNode(to_screen, this.rotate_node);
-
-    style([], STYLE_SPACESHIP);
   }
 
   /**
