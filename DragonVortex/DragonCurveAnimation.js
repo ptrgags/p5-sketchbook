@@ -1,6 +1,6 @@
 import { Animated } from "../sketchlib/animation/Animated.js";
 import { LoopCurve } from "../sketchlib/animation/LoopCurve.js";
-import { make_param } from "../sketchlib/animation/ParamCurve.js";
+import { Hold, make_param } from "../sketchlib/animation/ParamCurve.js";
 import { ArcAngles } from "../sketchlib/ArcAngles.js";
 import { Cline } from "../sketchlib/cga2d/Cline.js";
 import { ClineArc } from "../sketchlib/cga2d/ClineArc.js";
@@ -21,6 +21,8 @@ import { Style } from "../sketchlib/Style.js";
 import { StyleRuns } from "../sketchlib/styling/StyleRuns.js";
 import { whole_fract } from "../sketchlib/whole_fract.js";
 import { clamp } from "../sketchlib/clamp.js";
+import { N1 } from "../sketchlib/music/durations.js";
+import { Sequential } from "../sketchlib/music/Timeline.js";
 
 // make a vortex shape across the diagonal of the (signed) unit square using
 // 4 circular arcs + another circle in the center
@@ -111,10 +113,12 @@ const PREFIXES = range(MAX_ITERS + 1)
   .map((depth) => DRAGON_IFS.iterate(depth));
 
 const CURVE_ITERATION = LoopCurve.from_timeline(
-  // negative index: intro portion
-  // index in [0, MAX_ITERS - 1]: animate from iteration i -> i + 1
-  // index > MAX_ITERS: outro portion
-  make_param(-1, MAX_ITERS + 1, new Rational(MAX_ITERS + 2)),
+  new Sequential( // negative index: intro portion
+    // index in [0, MAX_ITERS - 1]: animate from iteration i -> i + 1
+    // index > MAX_ITERS: outro portion
+    make_param(-1, MAX_ITERS + 1, new Rational(MAX_ITERS + 2)),
+    new Hold(N1),
+  ),
 );
 
 /**
