@@ -35,12 +35,15 @@ const UNIT_SQUARE = new CTile(
 
 const STYLE_PARENT = new Style({
   stroke: Color.WHITE,
+  width: 2,
 });
 const STYLE_CHILD_A = new Style({
   stroke: Color.RED,
+  width: 2,
 });
 const STYLE_CHILD_B = new Style({
   stroke: Color.BLUE,
+  width: 2,
 });
 const STYLE_RUNS = StyleRuns.from_styles([
   STYLE_PARENT,
@@ -72,7 +75,7 @@ function dragon_b(t) {
 
 const DRAGON_IFS = new IFS([dragon_a(1), dragon_b(1)]);
 
-const MAX_ITERS = 5;
+const MAX_ITERS = 9;
 const PREFIXES = range(MAX_ITERS + 1)
   .toArray()
   .map((depth) => DRAGON_IFS.iterate(depth));
@@ -115,7 +118,12 @@ export class DragonCurveAnimation {
         xform_a,
         xform_b,
       );
+      this.local_animation.styles = STYLE_RUNS;
       this.fractal_node.update_transforms(...PREFIXES[iteration]);
+    } else {
+      this.local_animation.update_transforms(CVersor.IDENTITY);
+      this.local_animation.styles = STYLE_PARENT;
+      this.fractal_node.update_transforms(...PREFIXES.at(-1));
     }
   }
 }
