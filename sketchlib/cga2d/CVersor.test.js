@@ -675,6 +675,25 @@ describe("CVersor", () => {
     });
   });
 
+  describe("to_screen", () => {
+    it("with unit circle returns flip y", () => {
+      const result = CVersor.to_screen(Circle.UNIT_CIRCLE);
+
+      expect(result).toBeCVersor(CVersor.FLIP_Y);
+    });
+
+    it("with other circle returns correct transformations", () => {
+      const circle = new Circle(new Point(3, -4), 5);
+
+      const result = CVersor.to_screen(circle);
+
+      const translation = CVersor.translation(new Direction(3, -4));
+      const scale = CVersor.dilation(5);
+      const expected = translation.compose(scale).compose(CVersor.FLIP_Y);
+      expect(result).toEqual(expected);
+    });
+  });
+
   describe("inverse", () => {
     it("a versor and its inverse compose to identity", () => {
       const translation = CVersor.translation(new Direction(1, 2));

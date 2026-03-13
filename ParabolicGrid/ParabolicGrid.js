@@ -9,11 +9,7 @@ import { TranslationGridIllusion } from "./TranslationGridIllusion.js";
 import { MouseInCanvas } from "../sketchlib/input/MouseInput.js";
 import { SelectAnimated } from "../sketchlib/animation/SelectAnimated.js";
 
-const TRANSLATE_CENTER = CVersor.translation(SCREEN_CENTER.to_direction());
-const SCALE_UP = CVersor.dilation(200);
-const FLIP_Y = CVersor.reflection(Direction.DIR_Y);
-const TO_SCREEN = TRANSLATE_CENTER.compose(SCALE_UP).compose(FLIP_Y);
-
+const TO_SCREEN = CVersor.to_screen(new Circle(SCREEN_CENTER, 200));
 const MOUSE = new CanvasMouseHandler();
 
 const GRIDS = new SelectAnimated([
