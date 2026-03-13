@@ -13,30 +13,19 @@ import { Color } from "../sketchlib/Color.js";
 import { mod } from "../sketchlib/mod.js";
 import { N1 } from "../sketchlib/music/durations.js";
 import { Sequential } from "../sketchlib/music/Timeline.js";
+import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
-import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { range } from "../sketchlib/range.js";
 import { Rational } from "../sketchlib/Rational.js";
 import { Style } from "../sketchlib/Style.js";
 import { StyleRuns } from "../sketchlib/styling/StyleRuns.js";
 import { whole_fract } from "../sketchlib/whole_fract.js";
 
-const A = new Point(-1, -1);
-const B = new Point(1, -1);
-const C = new Point(1, 1);
-const D = new Point(-1, 1);
-
-// (signed) unit square, [-1, 1] in both directions.
-const UNIT_SQUARE = new CTile(
-  ClineArc.from_segment(new LineSegment(A, B)),
-  ClineArc.from_segment(new LineSegment(B, C)),
-  ClineArc.from_segment(new LineSegment(C, D)),
-  ClineArc.from_segment(new LineSegment(D, A)),
-);
-
+// make a vortex shape across the diagonal of the (signed) unit square using
+// 4 circular arcs + another circle in the center
 const BOTTOM_LEFT = new Point(-1, -1);
 const TOP_RIGHT = new Point(1, 1);
 const QUARTER = Point.lerp(BOTTOM_LEFT, TOP_RIGHT, 0.25);
@@ -65,7 +54,6 @@ const ARC4 = new ArcPrimitive(
   CIRCLE4.radius,
   new ArcAngles(Math.PI / 4, (-3 * Math.PI) / 4),
 );
-
 const VORTEX = new CTile(
   Cline.from_circle(new Circle(Point.ORIGIN, 0.25)),
   ClineArc.from_arc(ARC1),
@@ -80,16 +68,18 @@ function spin(t) {
 }
 
 const STYLE_PARENT = new Style({
-  stroke: Color.WHITE,
+  stroke: new Oklch(0.9, 0, 0),
   width: 2,
 });
 const STYLE_CHILD_A = new Style({
-  stroke: Color.RED,
-  width: 2,
+  // cinnamon red
+  stroke: new Oklch(0.6, 0.1389, 17.63),
+  width: 4,
 });
 const STYLE_CHILD_B = new Style({
-  stroke: Color.BLUE,
-  width: 2,
+  // mint green
+  stroke: new Oklch(0.8, 0.1, 176.8),
+  width: 4,
 });
 const STYLE_RUNS = StyleRuns.from_styles([
   STYLE_PARENT,
