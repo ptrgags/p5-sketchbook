@@ -11,11 +11,11 @@ import { ConformalPrimitive } from "./ConfomalPrimitive.js";
 export class StyledTile {
   /**
    * Constructor
-   * @param {ConformalPrimitive[]} children
+   * @param {ConformalPrimitive | ConformalPrimitive[]} children
    * @param {Style | Style[] | StyleRuns} styles If a single style, it will be applyed to everything. If a
    */
   constructor(children, styles) {
-    this.children = children;
+    this.children = Array.isArray(children) ? children : [children];
 
     /**
      * @type {Style | StyleRuns}

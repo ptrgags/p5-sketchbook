@@ -9,6 +9,7 @@ import { CTile } from "../sketchlib/cga2d/CTile.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { IFS } from "../sketchlib/cga2d/IFS.js";
 import { StyledNode } from "../sketchlib/cga2d/StyledNode.js";
+import { StyledTile } from "../sketchlib/cga2d/StyledTile.js";
 import { N1 } from "../sketchlib/music/durations.js";
 import { Sequential } from "../sketchlib/music/Timeline.js";
 import { Oklch } from "../sketchlib/Oklch.js";
@@ -132,45 +133,58 @@ export class DragonCurveAnimation {
 
     // The parent iteration is always rendered in a constant color, and
     // the transformations are updated more slowly than for the children.
-    this.parent = new StyledNode(CVersor.IDENTITY, STYLE_PARENT, this.spin);
+    this.parent = new StyledTile(this.spin, STYLE_PARENT);
 
     // animate faning out the shape with the A and B transformations,
     // we then instance this with various prefixes
     this.fan_out = new StyledNode(CVersor.IDENTITY, STYLE_RUNS, this.spin);
-    // fractal transformations from the IFS will go here
-    this.fractal_node = new CNode(CVersor.IDENTITY, this.fan_out);
 
-    this.root = new CTile();
-    this.primitive = new CNode(to_screen, this.root);
+    // this will contain either [parent] or [parent, fan_out] depending on
+    // where we are in the animation
+    this.visible = new CTile(this.parent);
+
+    // The fractal transformations apply to everything visible
+    this.fractal_prefixes = new CNode(CVersor.IDENTITY, this.visible);
+    this.primitive = new CNode(to_screen, this.fractal_prefixes);
+  }
+
+  #current_iteration = 0;
+  /**
+   * Update the transformations for the current iteration only as needed,
+   * not every frame.
+   * @param {number} iteration
+   */
+  #update_iteration(iteration) {
+    if (iteration === this.#current_iteration) {
+      return;
+    }
+
+    this.#current_iteration = iteration;
+    const prefixes = PREFIXES[iteration] ?? PREFIXES.at(-1);
+    this.fractal_prefixes.update_transforms(...prefixes);
   }
 
   update(time) {
-    // The vortex is always spinning
+    // The vortex is always spinning 🌀
     this.spin.update_transforms(spin(time));
 
+    // Update the fractal transformations if needed
     const [iteration, t] = whole_fract(CURVE_ITERATION.value(time));
+    this.#update_iteration(iteration);
 
-    if (time < INTRO_TIME.real) {
-      // For the intro, just render the spinning vortex
-      this.parent.update_transforms(CVersor.IDENTITY);
-      this.root.regroup(this.parent);
-    } else if (iteration < MAX_ITERS) {
-      // While animating the fractal, render the current parent and the
-      // fan out animation together
-      const prefixes = PREFIXES[iteration];
-      this.parent.update_transforms(...prefixes);
-
+    // While animating the fractal, update the fan out animation
+    if (iteration < MAX_ITERS) {
       const xform_a = dragon_a(t);
       const xform_b = dragon_b(t);
       this.fan_out.update_transforms(xform_a, xform_b);
-      this.fan_out.styles = STYLE_RUNS;
-      this.fractal_node.update_transforms(...prefixes);
+    }
 
-      this.root.regroup(this.parent, this.fractal_node);
-    } else {
-      // For the outro, render the deepest iteration
-      this.parent.update_transforms(...PREFIXES.at(-1));
-      this.root.regroup(this.parent);
+    // We'll always render the parent transformation, but the
+    // fan out animation is not shown in the intro/outtro
+    if (time < INTRO_TIME.real || iteration >= MAX_ITERS) {
+      this.visible.regroup(this.parent);
+    } else if (iteration < MAX_ITERS) {
+      this.visible.regroup(this.parent, this.fan_out);
     }
   }
 }
