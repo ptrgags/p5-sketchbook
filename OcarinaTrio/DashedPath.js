@@ -83,20 +83,26 @@ function find_overlaps(
   // push an inteval
   const overlap_start = Math.max(segment_start, interval_start);
   const overlap_end = Math.min(segment_end, interval_end);
-  overlaps.push([
-    segment_index,
-    overlap_start - segment_start,
-    overlap_end - segment_start,
-  ]);
+  // skip trivial overlaps
+  if (overlap_start < overlap_end) {
+    overlaps.push([
+      segment_index,
+      overlap_start - segment_start,
+      overlap_end - segment_start,
+    ]);
+  }
 
-  // we're done with this segment, so advance the segment.
-  // but the query interval may overlap more segments, so keep going.
+  // advance one or both of the lists depending on which has more time
+  // after the end.
+  const advance_segments = segment_end <= interval_end;
+  const advance_interval = interval_end <= segment_end;
+
   return find_overlaps(
     overlaps,
     segment_intervals,
-    segment_index + 1,
+    segment_index + Number(advance_segments),
     intervals,
-    interval_index,
+    interval_index + Number(advance_interval),
   );
 }
 
