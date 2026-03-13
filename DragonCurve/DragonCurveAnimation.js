@@ -1,6 +1,8 @@
 import { Animated } from "../sketchlib/animation/Animated.js";
 import { LoopCurve } from "../sketchlib/animation/LoopCurve.js";
 import { Hold, make_param } from "../sketchlib/animation/ParamCurve.js";
+import { ArcAngles } from "../sketchlib/ArcAngles.js";
+import { Cline } from "../sketchlib/cga2d/Cline.js";
 import { ClineArc } from "../sketchlib/cga2d/ClineArc.js";
 import { CNode } from "../sketchlib/cga2d/CNode.js";
 import { CTile } from "../sketchlib/cga2d/CTile.js";
@@ -13,6 +15,8 @@ import { N1 } from "../sketchlib/music/durations.js";
 import { Sequential } from "../sketchlib/music/Timeline.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
+import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
+import { Circle } from "../sketchlib/primitives/Circle.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { range } from "../sketchlib/range.js";
 import { Rational } from "../sketchlib/Rational.js";
@@ -31,6 +35,43 @@ const UNIT_SQUARE = new CTile(
   ClineArc.from_segment(new LineSegment(B, C)),
   ClineArc.from_segment(new LineSegment(C, D)),
   ClineArc.from_segment(new LineSegment(D, A)),
+);
+
+const BOTTOM_LEFT = new Point(-1, -1);
+const TOP_RIGHT = new Point(1, 1);
+const QUARTER = Point.lerp(BOTTOM_LEFT, TOP_RIGHT, 0.25);
+const THREE_QUARTERS = Point.lerp(BOTTOM_LEFT, TOP_RIGHT, 0.75);
+const CIRCLE1 = Circle.from_two_points(BOTTOM_LEFT, THREE_QUARTERS);
+const CIRCLE2 = Circle.from_two_points(THREE_QUARTERS, TOP_RIGHT);
+const CIRCLE3 = Circle.from_two_points(TOP_RIGHT, QUARTER);
+const CIRCLE4 = Circle.from_two_points(QUARTER, BOTTOM_LEFT);
+const ARC1 = new ArcPrimitive(
+  CIRCLE1.center,
+  CIRCLE1.radius,
+  new ArcAngles((-3 * Math.PI) / 4, Math.PI / 4),
+);
+const ARC2 = new ArcPrimitive(
+  CIRCLE2.center,
+  CIRCLE2.radius,
+  new ArcAngles((5 * Math.PI) / 4, Math.PI / 4),
+);
+const ARC3 = new ArcPrimitive(
+  CIRCLE3.center,
+  CIRCLE3.radius,
+  new ArcAngles(Math.PI / 4, (5 * Math.PI) / 4),
+);
+const ARC4 = new ArcPrimitive(
+  CIRCLE4.center,
+  CIRCLE4.radius,
+  new ArcAngles(Math.PI / 4, (-3 * Math.PI) / 4),
+);
+
+const DECORATED_TILE = new CTile(
+  Cline.from_circle(new Circle(Point.ORIGIN, 0.25)),
+  ClineArc.from_arc(ARC1),
+  ClineArc.from_arc(ARC2),
+  ClineArc.from_arc(ARC3),
+  ClineArc.from_arc(ARC4),
 );
 
 const STYLE_PARENT = new Style({
@@ -101,7 +142,7 @@ export class DragonCurveAnimation {
     this.local_animation = new StyledNode(
       CVersor.IDENTITY,
       STYLE_RUNS,
-      UNIT_SQUARE,
+      DECORATED_TILE,
     );
     // fractal transformations from the IFS will go here
     this.fractal_node = new CNode(CVersor.IDENTITY, this.local_animation);
