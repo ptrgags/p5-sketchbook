@@ -1,4 +1,6 @@
 import { Animated } from "../sketchlib/animation/Animated.js";
+import { LoopCurve } from "../sketchlib/animation/LoopCurve.js";
+import { Hold, make_param } from "../sketchlib/animation/ParamCurve.js";
 import { ClineArc } from "../sketchlib/cga2d/ClineArc.js";
 import { CNode } from "../sketchlib/cga2d/CNode.js";
 import { CTile } from "../sketchlib/cga2d/CTile.js";
@@ -7,11 +9,16 @@ import { IFS } from "../sketchlib/cga2d/IFS.js";
 import { StyledNode } from "../sketchlib/cga2d/StyledNode.js";
 import { Color } from "../sketchlib/Color.js";
 import { mod } from "../sketchlib/mod.js";
+import { N1 } from "../sketchlib/music/durations.js";
+import { Sequential } from "../sketchlib/music/Timeline.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
+import { range } from "../sketchlib/range.js";
+import { Rational } from "../sketchlib/Rational.js";
 import { Style } from "../sketchlib/Style.js";
 import { StyleRuns } from "../sketchlib/styling/StyleRuns.js";
+import { whole_fract } from "../sketchlib/whole_fract.js";
 
 const A = new Point(-1, -1);
 const B = new Point(1, -1);
@@ -65,6 +72,19 @@ function dragon_b(t) {
 
 const DRAGON_IFS = new IFS([dragon_a(1), dragon_b(1)]);
 
+const MAX_ITERS = 5;
+const PREFIXES = range(MAX_ITERS + 1)
+  .toArray()
+  .map((depth) => DRAGON_IFS.iterate(depth));
+
+const CURVE_ITERATION = LoopCurve.from_timeline(
+  new Sequential(
+    new Hold(N1),
+    make_param(0, MAX_ITERS + 1, new Rational(MAX_ITERS + 1)),
+    new Hold(N1),
+  ),
+);
+
 /**
  * @implements {Animated}
  */
@@ -86,10 +106,16 @@ export class DragonCurveAnimation {
   }
 
   update(time) {
-    const t = mod(time, 1);
-    const xform_a = dragon_a(t);
-    const xform_b = dragon_b(t);
-
-    this.local_animation.update_transforms(CVersor.IDENTITY, xform_a, xform_b);
+    const [iteration, t] = whole_fract(CURVE_ITERATION.value(time));
+    if (iteration < MAX_ITERS) {
+      const xform_a = dragon_a(t);
+      const xform_b = dragon_b(t);
+      this.local_animation.update_transforms(
+        CVersor.IDENTITY,
+        xform_a,
+        xform_b,
+      );
+      this.fractal_node.update_transforms(...PREFIXES[iteration]);
+    }
   }
 }
