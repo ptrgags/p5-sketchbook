@@ -9,8 +9,6 @@ import { CTile } from "../sketchlib/cga2d/CTile.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { IFS } from "../sketchlib/cga2d/IFS.js";
 import { StyledNode } from "../sketchlib/cga2d/StyledNode.js";
-import { Color } from "../sketchlib/Color.js";
-import { mod } from "../sketchlib/mod.js";
 import { N1 } from "../sketchlib/music/durations.js";
 import { Sequential } from "../sketchlib/music/Timeline.js";
 import { Oklch } from "../sketchlib/Oklch.js";
@@ -116,9 +114,10 @@ const PREFIXES = range(MAX_ITERS + 1)
   .toArray()
   .map((depth) => DRAGON_IFS.iterate(depth));
 
+const INTRO_TIME = N1;
 const CURVE_ITERATION = LoopCurve.from_timeline(
   new Sequential(
-    new Hold(N1),
+    new Hold(INTRO_TIME),
     make_param(0, MAX_ITERS + 1, new Rational(MAX_ITERS + 1)),
     new Hold(N1),
   ),
@@ -144,16 +143,25 @@ export class DragonCurveAnimation {
   }
 
   update(time) {
+    // The vortex is always spinning
     this.spin.update_transforms(spin(time));
 
     const [iteration, t] = whole_fract(CURVE_ITERATION.value(time));
-    if (iteration < MAX_ITERS) {
+
+    if (time < INTRO_TIME.real) {
+      // For the intro, just render the spinning vortex
+      this.fan_out.update_transforms(CVersor.IDENTITY);
+      this.fan_out.styles = STYLE_PARENT;
+      this.fractal_node.update_transforms(CVersor.IDENTITY);
+    } else if (iteration < MAX_ITERS) {
+      // While animating the fractal, render the current parent,
       const xform_a = dragon_a(t);
       const xform_b = dragon_b(t);
       this.fan_out.update_transforms(CVersor.IDENTITY, xform_a, xform_b);
       this.fan_out.styles = STYLE_RUNS;
       this.fractal_node.update_transforms(...PREFIXES[iteration]);
     } else {
+      // For the outro, render the deepest iteration spinning
       this.fan_out.update_transforms(CVersor.IDENTITY);
       this.fan_out.styles = STYLE_PARENT;
       this.fractal_node.update_transforms(...PREFIXES.at(-1));
