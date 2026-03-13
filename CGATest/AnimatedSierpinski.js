@@ -4,7 +4,6 @@ import { Hold, make_param } from "../sketchlib/animation/ParamCurve.js";
 import { Cline } from "../sketchlib/cga2d/Cline.js";
 import { CNode } from "../sketchlib/cga2d/CNode.js";
 import { ConformalPrimitive } from "../sketchlib/cga2d/ConfomalPrimitive.js";
-import { CTile } from "../sketchlib/cga2d/CTile.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { IFS } from "../sketchlib/cga2d/IFS.js";
 import { Sequential } from "../sketchlib/music/Timeline.js";
@@ -60,8 +59,6 @@ const SIERPINSKI_IFS = new IFS([
   sierpinski_c(1),
 ]);
 
-export const MAX_ITERS = 5;
-
 const CURVE_A = LoopCurve.from_timeline(
   new Sequential(
     make_param(0, 1, new Rational(1, 3)),
@@ -85,6 +82,20 @@ const CURVE_INFINITE_LOOP = LoopCurve.from_timeline(
   make_param(0, 3, new Rational(1)),
 );
 
+export const MAX_ITERS = 5;
+/**
+ * Pre-compute the full iterations. The animation will transform the result.
+ * @type {ConformalPrimitive[]}
+ */
+const ITER_PRIMS = new Array(MAX_ITERS + 1);
+ITER_PRIMS[0] = Cline.UNIT_CIRCLE;
+for (let i = 1; i <= MAX_ITERS; i++) {
+  ITER_PRIMS[i] = new CNode(
+    SIERPINSKI_IFS.iterate(i),
+    Cline.UNIT_CIRCLE,
+  ).bake_tile();
+}
+
 /**
  * @implements {Animated}
  */
@@ -96,18 +107,6 @@ export class AnimatedSierpinski {
   constructor(to_screen) {
     this.to_screen = to_screen;
 
-    /**
-     * @type {ConformalPrimitive[]}
-     */
-    this.iter_prims = new Array(MAX_ITERS + 1);
-    this.iter_prims[0] = Cline.UNIT_CIRCLE;
-    for (let i = 1; i <= MAX_ITERS; i++) {
-      this.iter_prims[i] = new CNode(
-        SIERPINSKI_IFS.iterate(i),
-        Cline.UNIT_CIRCLE,
-      ).bake_tile();
-    }
-
     // The animation will swap out both transformations and primitives
     this.root = new CNode(CVersor.IDENTITY, ConformalPrimitive.EMPTY);
     this.primitive = style([new CNode(to_screen, this.root)], STYLE_SIERPINSKI);
@@ -115,8 +114,8 @@ export class AnimatedSierpinski {
 
   update(time) {
     // Get the latest iteration that fully rendered, this is what we'll transform.
-    const iter_index = Math.min(Math.floor(time), this.iter_prims.length - 1);
-    this.root.primitive = this.iter_prims[iter_index];
+    const iter_index = Math.min(Math.floor(time), ITER_PRIMS.length - 1);
+    this.root.primitive = ITER_PRIMS[iter_index];
 
     if (time < MAX_ITERS) {
       // Take the current iteration and apply the animated transforms
@@ -129,6 +128,8 @@ export class AnimatedSierpinski {
       const xform_b = sierpinski_b(t_b);
       const xform_c = sierpinski_c(t_c);
 
+      // since we shrink in the order A, B, C, render in the reverse order
+      // so the smallest circles are on top.
       this.root.update_transforms(xform_c, xform_b, xform_a);
     } else {
       // once we hit the limit of what we can render, we want to render
