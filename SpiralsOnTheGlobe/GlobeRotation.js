@@ -93,22 +93,37 @@ const STYLE_PRIME_MERIDIAN = new Style({
 
 const PARALLEL_MAX_ITERS = 5;
 const PARALLEL_ITERATOR = new PowerIterator(CVersor.dilation(1.5));
-const PARALLELS = PARALLEL_ITERATOR.iterate(
+const PARALLEL_CLINES = PARALLEL_ITERATOR.iterate(
   -PARALLEL_MAX_ITERS,
   PARALLEL_MAX_ITERS,
 ).map((x) => x.transform(Cline.UNIT_CIRCLE));
+
+// Color the equator differently so it stands out. Also color the
+// hemispheres different colors so you can tell which way is up.
 const STYLE_RUNS_PARALLELS = new StyleRuns([
   [PARALLEL_MAX_ITERS, STYLE_SOUTH_HEMISPHERE],
   [1, STYLE_EQUATOR],
   [PARALLEL_MAX_ITERS, STYLE_NORTH_HEMISPHERE],
 ]);
 
+const MERIDIAN_COUNT = 16;
 const MERIDIAN_ITERATOR = new PowerIterator(
-  CVersor.rotation((2 * Math.PI) / 16),
+  CVersor.rotation((2 * Math.PI) / MERIDIAN_COUNT),
 );
-const MERIDIANS = MERIDIAN_ITERATOR.iterate(0, 15).map((x) => {
-  return x.transform(ClineArc.PRIME_MERIDIAN);
-});
+const MERIDIAN_ARCS = MERIDIAN_ITERATOR.iterate(0, MERIDIAN_COUNT - 1).map(
+  (x) => {
+    return x.transform(ClineArc.PRIME_MERIDIAN);
+  },
+);
+// Color the prime meridian differently so it stands out
+const STYLE_RUNS_MERIDIANS = new StyleRuns([
+  [1, STYLE_PRIME_MERIDIAN],
+  [MERIDIAN_COUNT - 1, STYLE_MERIDIANS],
+]);
+
+const PARALLELS = new StyledTile(PARALLEL_CLINES, STYLE_RUNS_PARALLELS);
+const MERIDIANS = new StyledTile(MERIDIAN_ARCS, STYLE_RUNS_MERIDIANS);
+const POLES = new StyledTile([NullPoint.ORIGIN, NullPoint.INF], STYLE_POLES);
 
 const CURVE_GLOBE_T = LoopCurve.from_timeline(
   new Sequential(
@@ -138,16 +153,8 @@ export class GlobeRotation {
   constructor(to_screen) {
     this.to_screen = to_screen;
 
-    this.poles = style([], STYLE_POLES);
-    this.parallels = new StyledTile([], STYLE_RUNS_PARALLELS);
-    this.meridians = style([], STYLE_MERIDIANS);
-    this.prime_meridian = style([], STYLE_PRIME_MERIDIAN);
-    this.primitive = group(
-      this.parallels,
-      this.meridians,
-      this.prime_meridian,
-      this.poles,
-    );
+    // TODO: Once we have CNode, this can be replaced with CNode(to_screen)
+    this.primitive = group();
   }
 
   /**
@@ -157,17 +164,12 @@ export class GlobeRotation {
   update(time) {
     const globe_t = CURVE_GLOBE_T.value(time);
     const globe_xform = ROTATE_GLOBE.value(globe_t);
-
     const xform = this.to_screen.compose(globe_xform);
-    const south_pole = xform.transform(NullPoint.ORIGIN);
-    const north_pole = xform.transform(NullPoint.INF);
-    const parallels = PARALLELS.map((p) => xform.transform(p));
-    const meridians = MERIDIANS.map((m) => xform.transform(m));
-    const prime_meridian = xform.transform(ClineArc.PRIME_MERIDIAN);
 
-    this.poles.regroup(south_pole, north_pole);
-    this.parallels.regroup(...parallels);
-    this.meridians.regroup(...meridians);
-    this.prime_meridian.regroup(prime_meridian);
+    const poles = xform.transform(POLES);
+    const parallels = xform.transform(PARALLELS);
+    const meridians = xform.transform(MERIDIANS);
+
+    this.primitive.regroup(parallels, meridians, poles);
   }
 }
