@@ -1,8 +1,7 @@
 // Links for all of the sketches. Links are added to the page in this order
 export const LINKS = [
   {
-    title: "Dragon Curve",
-    is_lab: true,
+    title: "Dragon Vortex",
     year: "2026-03",
   },
   {
