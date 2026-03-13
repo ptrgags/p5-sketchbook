@@ -79,11 +79,7 @@ const STYLE_CHILD_B = new Style({
   stroke: new Oklch(0.8, 0.1, 176.8),
   width: 4,
 });
-const STYLE_RUNS = StyleRuns.from_styles([
-  STYLE_PARENT,
-  STYLE_CHILD_A,
-  STYLE_CHILD_B,
-]);
+const STYLE_RUNS = StyleRuns.from_styles([STYLE_CHILD_A, STYLE_CHILD_B]);
 
 // both transformations map the unit square's diagonal
 // to one of its sides. 2/(2sqrt(2)) = 1/sqrt(2)
@@ -134,12 +130,18 @@ export class DragonCurveAnimation {
   constructor(to_screen) {
     this.spin = new CNode(CVersor.IDENTITY, VORTEX);
 
-    // we only need to animate faning out the shape with the A and B transformations,
+    // The parent iteration is always rendered in a constant color, and
+    // the transformations are updated more slowly than for the children.
+    this.parent = new StyledNode(CVersor.IDENTITY, STYLE_PARENT, this.spin);
+
+    // animate faning out the shape with the A and B transformations,
     // we then instance this with various prefixes
     this.fan_out = new StyledNode(CVersor.IDENTITY, STYLE_RUNS, this.spin);
     // fractal transformations from the IFS will go here
     this.fractal_node = new CNode(CVersor.IDENTITY, this.fan_out);
-    this.primitive = new CNode(to_screen, this.fractal_node);
+
+    this.root = new CTile();
+    this.primitive = new CNode(to_screen, this.root);
   }
 
   update(time) {
@@ -150,21 +152,25 @@ export class DragonCurveAnimation {
 
     if (time < INTRO_TIME.real) {
       // For the intro, just render the spinning vortex
-      this.fan_out.update_transforms(CVersor.IDENTITY);
-      this.fan_out.styles = STYLE_PARENT;
-      this.fractal_node.update_transforms(CVersor.IDENTITY);
+      this.parent.update_transforms(CVersor.IDENTITY);
+      this.root.regroup(this.parent);
     } else if (iteration < MAX_ITERS) {
-      // While animating the fractal, render the current parent,
+      // While animating the fractal, render the current parent and the
+      // fan out animation together
+      const prefixes = PREFIXES[iteration];
+      this.parent.update_transforms(...prefixes);
+
       const xform_a = dragon_a(t);
       const xform_b = dragon_b(t);
-      this.fan_out.update_transforms(CVersor.IDENTITY, xform_a, xform_b);
+      this.fan_out.update_transforms(xform_a, xform_b);
       this.fan_out.styles = STYLE_RUNS;
-      this.fractal_node.update_transforms(...PREFIXES[iteration]);
+      this.fractal_node.update_transforms(...prefixes);
+
+      this.root.regroup(this.parent, this.fractal_node);
     } else {
-      // For the outro, render the deepest iteration spinning
-      this.fan_out.update_transforms(CVersor.IDENTITY);
-      this.fan_out.styles = STYLE_PARENT;
-      this.fractal_node.update_transforms(...PREFIXES.at(-1));
+      // For the outro, render the deepest iteration
+      this.parent.update_transforms(...PREFIXES.at(-1));
+      this.root.regroup(this.parent);
     }
   }
 }
