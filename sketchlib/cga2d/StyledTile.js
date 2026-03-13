@@ -20,12 +20,9 @@ export class StyledTile {
     /**
      * @type {Style | StyleRuns}
      */
-    this.styles = undefined;
-    if (Array.isArray(styles)) {
-      this.styles = StyleRuns.from_styles(styles);
-    } else {
-      this.styles = styles;
-    }
+    this.styles = Array.isArray(styles)
+      ? StyleRuns.from_styles(styles)
+      : styles;
   }
 
   /**

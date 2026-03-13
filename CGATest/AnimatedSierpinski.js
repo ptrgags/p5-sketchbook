@@ -6,10 +6,10 @@ import { CNode } from "../sketchlib/cga2d/CNode.js";
 import { ConformalPrimitive } from "../sketchlib/cga2d/ConfomalPrimitive.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { IFS } from "../sketchlib/cga2d/IFS.js";
+import { StyledNode } from "../sketchlib/cga2d/StyledNode.js";
 import { Sequential } from "../sketchlib/music/Timeline.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
-import { style } from "../sketchlib/primitives/shorthand.js";
 import { Rational } from "../sketchlib/Rational.js";
 import { Style } from "../sketchlib/Style.js";
 import { whole_fract } from "../sketchlib/whole_fract.js";
@@ -109,7 +109,7 @@ export class AnimatedSierpinski {
 
     // The animation will swap out both transformations and primitives
     this.root = new CNode(CVersor.IDENTITY, ConformalPrimitive.EMPTY);
-    this.primitive = style([new CNode(to_screen, this.root)], STYLE_SIERPINSKI);
+    this.primitive = new StyledNode(to_screen, STYLE_SIERPINSKI, this.root);
   }
 
   update(time) {
