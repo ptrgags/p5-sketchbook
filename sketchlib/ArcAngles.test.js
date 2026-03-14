@@ -82,12 +82,32 @@ describe("ArcAngles", () => {
     });
   });
 
+  describe("angle", () => {
+    it("with arc computes central angle", () => {
+      const angles = new ArcAngles(-Math.PI / 4, Math.PI / 2);
+
+      const result = angles.angle;
+
+      const expected = (3 * Math.PI) / 4;
+      expect(result).toEqual(expected);
+    });
+  });
+
   it("flip_y negates angles", () => {
     const angles = new ArcAngles(-Math.PI / 3, Math.PI / 4);
 
     const result = angles.flip_y();
 
     const expected = new ArcAngles(Math.PI / 3, -Math.PI / 4);
+    expect(result.equals(expected)).toBe(true);
+  });
+
+  it("reverse swaps angles", () => {
+    const angles = new ArcAngles(-Math.PI / 3, Math.PI / 4);
+
+    const result = angles.reverse();
+
+    const expected = new ArcAngles(Math.PI / 4, -Math.PI / 3);
     expect(result.equals(expected)).toBe(true);
   });
 
