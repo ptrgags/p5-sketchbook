@@ -7,10 +7,10 @@ import {
 export class DashedTree {
   /**
    * Constructor
-   * @param {PartialPrimitive & ArcLength} segment
-   * @param {DashedTree[]} [children=[]]
+   * @param {PartialPrimitive & ArcLength} segment The path for this node of the tree.
+   * @param {...DashedTree} children
    */
-  constructor(segment, children = []) {
+  constructor(segment, ...children) {
     this.segment = segment;
     this.children = children;
 
@@ -59,7 +59,7 @@ export class DashedTree {
     const overlap_end = Math.min(this.end_length, dash_end);
     if (overlap_start < overlap_end) {
       const t_start = this.segment.get_t(overlap_start - this.start_length);
-      const t_end = this.segment.get_t(overlap_end - this.end_length);
+      const t_end = this.segment.get_t(overlap_end - this.start_length);
       const dash = this.segment.render_between(t_start, t_end);
       output.push(dash);
     }
@@ -87,7 +87,7 @@ export class DashedTree {
   compute_dashes(arc_lengths) {
     if (this.start_length === undefined) {
       throw new Error(
-        "start_length undefined... did you forget to call measure_lengths()",
+        "measure_lengths() must be called before compute_dashes()",
       );
     }
 
