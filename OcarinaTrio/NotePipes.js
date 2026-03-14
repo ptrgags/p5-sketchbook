@@ -46,10 +46,24 @@ const PIPE_SEGMENTS_BASS = [
 
 // since the end result will change anyway, keep the other pipes simple for now
 const PIPE_SEGMENTS_TENOR = [
-  new LineSegment(new Point(250, 0), new Point(250, 255)),
+  new LineSegment(new Point(300, 0), new Point(300, 50)),
+  new ArcPrimitive(new Point(275, 50), BEND_RADIUS, ANGLES_QUADRANT1),
+  new ArcPrimitive(
+    new Point(275, 100),
+    BEND_RADIUS,
+    ANGLES_QUADRANT3.reverse(),
+  ),
+  new LineSegment(new Point(250, 100), new Point(250, 255)),
 ];
+
 const PIPE_SEGMENTS_SOPRANO = [
-  new LineSegment(new Point(400, 0), new Point(400, 255)),
+  new LineSegment(new Point(500, 100), new Point(425, 100)),
+  new ArcPrimitive(
+    new Point(425, 125),
+    BEND_RADIUS,
+    ANGLES_QUADRANT3.reverse(),
+  ),
+  new LineSegment(new Point(400, 125), new Point(400, 250)),
 ];
 
 const PIPE_WALLS = style(
