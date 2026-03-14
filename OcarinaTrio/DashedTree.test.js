@@ -26,6 +26,7 @@ const POINT_C = new Point(3, 0);
 const POINT_D = new Point(6, 0);
 const POINT_E = new Point(2, 2);
 const POINT_F = new Point(4, 2);
+const POINT_G = new Point(5, 2);
 
 /**
  * @returns {DashedTree}
@@ -39,12 +40,31 @@ function make_tree() {
     ),
     new DashedTree(
       new LineSegment(POINT_B, POINT_E),
-      new DashedTree(new LineSegment(POINT_E, POINT_F)),
+      new DashedTree(
+        new LineSegment(POINT_E, POINT_F),
+        new DashedTree(new LineSegment(POINT_F, POINT_G)),
+      ),
     ),
   );
 }
 
 describe("DashedTree", () => {
+  it("iter_segments returns all paths in preorder", () => {
+    const tree = make_tree();
+
+    const result = tree.iter_segments().toArray();
+
+    const expected = [
+      new LineSegment(POINT_A, POINT_B),
+      new LineSegment(POINT_B, POINT_C),
+      new LineSegment(POINT_C, POINT_D),
+      new LineSegment(POINT_B, POINT_E),
+      new LineSegment(POINT_E, POINT_F),
+      new LineSegment(POINT_F, POINT_G),
+    ];
+    expect(result).toEqual(expected);
+  });
+
   describe("compute_dashes", () => {
     it("without calling measure_lengths first throws error", () => {
       const tree = make_tree();
@@ -98,6 +118,7 @@ describe("DashedTree", () => {
         new LineSegment(POINT_C, POINT_D),
         new LineSegment(POINT_B, POINT_E),
         new LineSegment(POINT_E, POINT_F),
+        new LineSegment(POINT_F, POINT_G),
       ];
       expect(result).toEqual(expected);
     });

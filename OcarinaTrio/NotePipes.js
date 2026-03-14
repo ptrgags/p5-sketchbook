@@ -6,10 +6,12 @@ import { Note } from "../sketchlib/music/Music.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
+import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 import { DashedPath } from "./DashedPath.js";
+import { DashedTree } from "./DashedTree.js";
 
 const STYLE_PIPE_WALLS = new Style({
   stroke: Color.from_hex_code("#666666"),
@@ -26,6 +28,22 @@ const ANGLES_QUADRANT2 = new ArcAngles(Math.PI / 2, Math.PI);
 const ANGLES_QUADRANT3 = new ArcAngles(Math.PI, (3 * Math.PI) / 2);
 const ANGLES_QUADRANT4 = new ArcAngles((3 * Math.PI) / 2, 2 * Math.PI);
 const BEND_RADIUS = 25;
+
+const PIPE_TREE_BASS = new DashedTree(
+  new LineSegment(new Point(100, 250), new Point(100, 200)),
+  new DashedTree(
+    new ArcPrimitive(new Point(125, 200), BEND_RADIUS, ANGLES_QUADRANT3),
+  ),
+  new DashedTree(
+    new ArcPrimitive(
+      new Point(75, 200),
+      BEND_RADIUS,
+      ANGLES_QUADRANT4.reverse(),
+    ),
+  ),
+);
+PIPE_TREE_BASS.measure_lengths();
+
 // Important, these segments have to be defined in the direction of the flow
 // for the animation to look correct.
 const PIPE_SEGMENTS_BASS = [
@@ -55,6 +73,10 @@ const PIPE_SEGMENTS_TENOR = [
   ),
   new LineSegment(new Point(250, 100), new Point(250, 255)),
 ];
+const PIPE_TREE_TENOR = new DashedTree(
+  new LineSegment(new Point(200, 255), new Point(250, 100)),
+);
+PIPE_TREE_TENOR.measure_lengths();
 
 const PIPE_SEGMENTS_SOPRANO = [
   new LineSegment(new Point(500, 100), new Point(425, 100)),
@@ -65,15 +87,19 @@ const PIPE_SEGMENTS_SOPRANO = [
   ),
   new LineSegment(new Point(400, 125), new Point(400, 250)),
 ];
+const PIPE_TREE_SOPRANO = new DashedTree(
+  new LineSegment(new Point(400, 250), new Point(400, 125)),
+);
+PIPE_TREE_SOPRANO.measure_lengths();
 
-const PIPE_WALLS = style(
-  [...PIPE_SEGMENTS_BASS, ...PIPE_SEGMENTS_TENOR, ...PIPE_SEGMENTS_SOPRANO],
-  STYLE_PIPE_WALLS,
-);
-const PIPE_INTERIOR = style(
-  [...PIPE_SEGMENTS_BASS, ...PIPE_SEGMENTS_TENOR, ...PIPE_SEGMENTS_SOPRANO],
-  STYLE_PIPE_INTERIOR,
-);
+const ALL_PIPES = [
+  ...PIPE_TREE_BASS.iter_segments(),
+  ...PIPE_TREE_TENOR.iter_segments(),
+  ...PIPE_TREE_SOPRANO.iter_segments(),
+];
+
+const PIPE_WALLS = style(ALL_PIPES, STYLE_PIPE_WALLS);
+const PIPE_INTERIOR = style(ALL_PIPES, STYLE_PIPE_INTERIOR);
 const PIPES = group(PIPE_WALLS, PIPE_INTERIOR);
 
 /**
@@ -159,49 +185,57 @@ export class NotePipes {
    * @param {number} velocity speed of the notes through the pipe in px/unit time
    */
   constructor(intervals, colors, velocity) {
-    this.bass_dashes = new DashedPath(PIPE_SEGMENTS_BASS);
-    this.tenor_dashes = new DashedPath(PIPE_SEGMENTS_TENOR);
-    this.soprano_dashes = new DashedPath(PIPE_SEGMENTS_SOPRANO);
     this.velocity = velocity;
 
     this.gate_signals = intervals.map(make_gate_signal);
 
     const [bass_color, tenor_color, soprano_color] = colors;
 
+    this.bass_dashes = style([], fluid_style(bass_color));
+    this.tenor_dashes = style([], fluid_style(tenor_color));
+    this.soprano_dashes = style([], fluid_style(soprano_color));
+
     this.primitive = group(
       PIPES,
-      style(this.bass_dashes.primitive, fluid_style(bass_color)),
-      style(this.tenor_dashes.primitive, fluid_style(tenor_color)),
-      style(this.soprano_dashes.primitive, fluid_style(soprano_color)),
+      this.bass_dashes,
+      this.tenor_dashes,
+      this.soprano_dashes,
     );
   }
 
   /**
    *
-   * @param {DashedPath} dashes
+   * @param {GroupPrimitive} output
+   * @param {DashedTree} dashes
    * @param {AbsInterval<number>[]} gate_signal
    * @param {number} time
    */
-  update_dashes(dashes, gate_signal, time) {
-    const total_bass_length = dashes.arc_length;
+  update_dashes(output, dashes, gate_signal, time) {
     /**
      * @type {[number, number][]}
      */
     const arc_lengths = gate_signal.map((interval) => {
-      const start_s =
-        total_bass_length + (interval.start_time.real - time) * this.velocity;
-      const end_s =
-        total_bass_length + (interval.end_time.real - time) * this.velocity;
+      // the notes flow upwards through the pipes which is the opposite
+      // direction that the notes are listed in the score, hence swapping
+      // start/end time
+      const start_s = (time - interval.end_time.real) * this.velocity;
+      const end_s = (time - interval.start_time.real) * this.velocity;
       return [start_s, end_s];
     });
+    arc_lengths.reverse();
 
-    dashes.update_dashes(arc_lengths);
+    output.regroup(...dashes.compute_dashes(arc_lengths));
   }
 
   update(time) {
     const [bass_gate, tenor_gate, soprano_gate] = this.gate_signals;
-    this.update_dashes(this.bass_dashes, bass_gate, time);
-    this.update_dashes(this.tenor_dashes, tenor_gate, time);
-    this.update_dashes(this.soprano_dashes, soprano_gate, time);
+    this.update_dashes(this.bass_dashes, PIPE_TREE_BASS, bass_gate, time);
+    this.update_dashes(this.tenor_dashes, PIPE_TREE_TENOR, tenor_gate, time);
+    this.update_dashes(
+      this.soprano_dashes,
+      PIPE_TREE_SOPRANO,
+      soprano_gate,
+      time,
+    );
   }
 }

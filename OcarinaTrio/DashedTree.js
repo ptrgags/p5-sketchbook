@@ -25,6 +25,19 @@ export class DashedTree {
   }
 
   /**
+   * Iterate over all the segements. This is helpful for
+   * rendering the outline of the pipe as a separate primitive.
+   * @returns {Generator<PartialPrimitive & ArcLength>}
+   */
+  *iter_segments() {
+    yield this.segment;
+
+    for (const child of this.children) {
+      yield* child.iter_segments();
+    }
+  }
+
+  /**
    * After the tree is constructed, call this method
    * on the root to compute the cumulative arc lengths
    * needed for
