@@ -5,8 +5,6 @@ import { SoundManager } from "../sketchlib/SoundManager.js";
 import { SCORE_OCARINA_TRIO } from "../SoundTest/example_scores/ocarina_trio.js";
 import { SoundScene } from "../sketchlib/scenes/SoundScene.js";
 import { OcarinaAnimation } from "./OcarinaAnimation.js";
-import { Scene } from "../sketchlib/scenes/Scene.js";
-import { Animated } from "../sketchlib/animation/Animated.js";
 
 const MOUSE = new CanvasMouseHandler();
 

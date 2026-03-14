@@ -1,12 +1,15 @@
 import { Direction } from "../../sketchlib/pga2d/Direction.js";
 import { Point } from "../../sketchlib/pga2d/Point.js";
 import { ArcAngles } from "../ArcAngles.js";
+import { ArcLength } from "./ArcLength.js";
+import { lerp } from "../lerp.js";
 import { is_nearly } from "../is_nearly.js";
-import { PartialPrimitive, Primitive } from "./Primitive.js";
+import { PartialPrimitive } from "./Primitive.js";
 
 /**
  * Circular arc primitive defined as a circle and start and stop angles
  * @implements {PartialPrimitive}
+ * @implements {ArcLength}
  */
 export class ArcPrimitive {
   /**
@@ -113,5 +116,30 @@ export class ArcPrimitive {
     // though there are two options depending on the direction of the arc
     const normal = Direction.from_angle(angle).scale(this.radius);
     return this.angles.direction < 0 ? normal.rot270() : normal.rot90();
+  }
+
+  /**
+   *
+   */
+  get arc_length() {
+    return this.angles.angle * this.radius;
+  }
+
+  /**
+   * For an arc primitive, the arc length i
+   * @param {number} t
+   * @returns number
+   */
+  get_arc_length(t) {
+    return t * this.arc_length;
+  }
+
+  /**
+   *
+   * @param {number} arc_length
+   * @returns
+   */
+  get_t(arc_length) {
+    return arc_length / this.arc_length;
   }
 }
