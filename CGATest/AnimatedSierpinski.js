@@ -105,8 +105,6 @@ export class AnimatedSierpinski {
    * @param {CVersor} to_screen
    */
   constructor(to_screen) {
-    this.to_screen = to_screen;
-
     // The animation will swap out both transformations and primitives
     this.root = new CNode(CVersor.IDENTITY, ConformalPrimitive.EMPTY);
     this.primitive = new StyledNode(to_screen, STYLE_SIERPINSKI, this.root);
