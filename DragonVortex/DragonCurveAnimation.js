@@ -81,7 +81,10 @@ const STYLE_CHILD_B = new Style({
   stroke: new Oklch(0.8, 0.1, 176.8),
   width: 4,
 });
-const STYLE_RUNS = StyleRuns.from_styles([STYLE_CHILD_A, STYLE_CHILD_B]);
+const STYLE_RUNS = new StyleRuns([
+  [1, STYLE_CHILD_A],
+  [2, STYLE_CHILD_B],
+]);
 
 // both transformations map the unit square's diagonal
 // to one of its sides. 2/(2sqrt(2)) = 1/sqrt(2)
@@ -91,6 +94,7 @@ const SCALE_FACTOR = Math.SQRT1_2;
 const TURN_ANGLE = Math.PI / 4;
 const TRANSLATION_A = CVersor.translation(new Direction(-1, -1));
 const TRANSLATION_B = CVersor.translation(new Direction(1, 1));
+const TRANSLATION_C = CVersor.translation(new Direction(1, -1));
 
 function dragon_a(t) {
   const scale = CVersor.dilation(Math.pow(SCALE_FACTOR, t));
@@ -105,7 +109,14 @@ function dragon_b(t) {
   return TRANSLATION_B.conjugate(rs);
 }
 
-const DRAGON_IFS = new IFS([dragon_a(1), dragon_b(1)]);
+function dragon_c(t) {
+  const scale = CVersor.dilation(Math.pow(SCALE_FACTOR, t));
+  const rotation = CVersor.rotation(-TURN_ANGLE * t);
+  const rs = rotation.compose(scale);
+  return TRANSLATION_C.conjugate(rs);
+}
+
+const DRAGON_IFS = new IFS([dragon_a(1), dragon_b(1), dragon_c(1)]);
 
 const MAX_ITERS = 9;
 const PREFIXES = range(MAX_ITERS + 1)
@@ -171,6 +182,8 @@ export class DragonCurveAnimation {
   }
 
   update(time) {
+    time = 20;
+
     // The vortex is always spinning 🌀
     this.spin.update_transforms(spin(time));
 
@@ -182,7 +195,8 @@ export class DragonCurveAnimation {
     if (iteration >= 0 && iteration < MAX_ITERS) {
       const xform_a = dragon_a(t);
       const xform_b = dragon_b(t);
-      this.fan_out.update_transforms(xform_a, xform_b);
+      const xform_c = dragon_c(t);
+      this.fan_out.update_transforms(xform_a, xform_b, xform_c);
     }
 
     // We'll always render the parent transformation, but the
