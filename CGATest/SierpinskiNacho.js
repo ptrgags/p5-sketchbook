@@ -1,6 +1,5 @@
 import { ArcAngles } from "../sketchlib/ArcAngles.js";
 import { ClineArc } from "../sketchlib/cga2d/ClineArc.js";
-import { CNode } from "../sketchlib/cga2d/CNode.js";
 import { CTile } from "../sketchlib/cga2d/CTile.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { Color } from "../sketchlib/Color.js";
@@ -36,7 +35,10 @@ const nacho_b = hyperbolic_to_point(new Direction(RADIUS_A, 0));
 const nacho_c = hyperbolic_to_point(new Direction(0, RADIUS_A));
 const NACHO_FUNCTIONS = [nacho_a, nacho_b, nacho_c];
 
-const STYLE_NACHO = new Style({ stroke: Color.from_hex_code("#ff7f00") });
+const STYLE_NACHO = new Style({
+  stroke: Color.from_hex_code("#ff7f00"),
+  width: 2,
+});
 const NACHO = new CTile(
   ClineArc.from_segment(new LineSegment(Point.ORIGIN, new Point(1, 0))),
   ClineArc.from_arc(
@@ -45,24 +47,9 @@ const NACHO = new CTile(
   ClineArc.from_segment(new LineSegment(new Point(0, 1), Point.ORIGIN)),
 );
 
-const NACHO_FRACTAL = new FractalPrefixAnimation(
+export const NACHO_FRACTAL = new FractalPrefixAnimation(
   NACHO_FUNCTIONS,
   MAX_ITERS,
   NACHO,
   STYLE_NACHO,
 );
-
-export class SierpinskiNacho {
-  /**
-   * Constructor
-   * @param {CVersor} to_screen
-   */
-  constructor(to_screen) {
-    this.fractal = NACHO_FRACTAL;
-    this.primitive = new CNode(to_screen, NACHO_FRACTAL.primitive);
-  }
-
-  update(time) {
-    this.fractal.update(time);
-  }
-}

@@ -57,7 +57,7 @@ function bake_iterations(xform_funcs, max_iters, tile) {
   const ifs = new IFS(xform_funcs.map((f) => f(1)));
   const primitives = new Array(max_iters + 1);
   primitives[0] = tile;
-  for (let i = 1; i < max_iters; i++) {
+  for (let i = 1; i <= max_iters; i++) {
     primitives[i] = new CNode(ifs.iterate(i), tile).bake_tile();
   }
 
@@ -108,6 +108,10 @@ export class FractalPrefixAnimation {
         const interpolated = this.xform_funcs[i](t);
         return interpolated;
       });
+
+      // Since usually we're shrinking the transform, it looks
+      // best if the current transformation is drawn on top
+      transformations.reverse();
 
       this.primitive.update_transforms(...transformations);
     } else {
