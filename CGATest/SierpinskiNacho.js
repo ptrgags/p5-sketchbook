@@ -10,6 +10,7 @@ import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { Style } from "../sketchlib/Style.js";
 import { MAX_ITERS } from "./AnimatedSierpinski.js";
 import { FractalPrefixAnimation } from "./FractalPrefixAnimation.js";
+import { FractalSuffixAnimation } from "./FractalSuffixAnimation.js";
 
 /**
  * Hyperbolic mobius map that moves the origin to a specific point inside the unit circle
@@ -48,6 +49,13 @@ const NACHO = new CTile(
 );
 
 export const NACHO_FRACTAL = new FractalPrefixAnimation(
+  NACHO_FUNCTIONS,
+  MAX_ITERS,
+  NACHO,
+  STYLE_NACHO,
+);
+
+export const NACHO_SUFFIX = new FractalSuffixAnimation(
   NACHO_FUNCTIONS,
   MAX_ITERS,
   NACHO,
