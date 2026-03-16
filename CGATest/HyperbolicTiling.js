@@ -127,7 +127,7 @@ const STYLE_B = new Style({ stroke: Color.BLUE });
 const EACH_XFORM = new CNode([RP, E2, EQ], MOTIF).bake_tile();
 
 const BACKGROUND = new StyledTile(
-  [Cline.UNIT_CIRCLE, ROOT_TILE, MOTIF, EACH_XFORM],
+  [Cline.UNIT_CIRCLE /*ROOT_TILE*/, MOTIF, EACH_XFORM],
   STYLE_BG,
 );
 const RING0 = new StyledTile(START_TILE, STYLE_A);
@@ -137,18 +137,21 @@ const RING0 = new StyledTile(START_TILE, STYLE_A);
 const TO_ADJACENT = ROTATE_SEVENFOLD.map((x) => x.conjugate(E2));
 const RING1 = new StyledNode(TO_ADJACENT, STYLE_B, START_TILE);
 
-// now we step into the an adjacent tile using E2
-// so now we need to do E2 sandwich TO_ADJACENT to get the transformations.
-const TO_ADJACENT_RING1 = TO_ADJACENT.map((x) => E2.conjugate(x));
+const TO_ADJACENT_RING1 = ROTATE_SEVENFOLD.map((x) => E2.conjugate(x));
 // we only want to visit tiles we haven't seen before, so we're only going to
 // need a subset of these
 // adj(0) points back to the parent, we don't want that
 // adj(1) after rotation points to the clockwise sibling, we don't want that
-// adj(2, 3, 4, 5) are unvisited, use these!
+// adj(2) is unvisited, use this
+// adj(3)
+// adj(5) is new... but it's also the first descendant of our sibling tile, so skip this one
 // adj(6) points to the CCW sibling, we don't that one
-const XFORMS_RING2 = TO_ADJACENT_RING1.slice(0);
-// Nope... this isn't the right set of transformations...
-const RING2 = new StyledNode(XFORMS_RING2, STYLE_A, MOTIF);
+const XFORMS_RING2 = TO_ADJACENT_RING1.slice(2, 5);
+// Now repeat those transforms around the circle
+const XFORMS_RING2_REPEATED = ROTATE_SEVENFOLD.flatMap((x) => {
+  return XFORMS_RING2.map((y) => x.compose(y));
+});
+const RING2 = new StyledNode(XFORMS_RING2_REPEATED, STYLE_A, START_TILE);
 
 const SCENE = new CTile(BACKGROUND, RING0, RING1, RING2);
 
