@@ -153,8 +153,16 @@ const XFORMS_RING2_REPEATED = ROTATE_SEVENFOLD.flatMap((x) => {
 });
 const RING2 = new StyledNode(XFORMS_RING2_REPEATED, STYLE_A, START_TILE);
 
-const SCENE = new CTile(BACKGROUND, RING0, RING1, RING2);
+// for the first tile of ring 7, we need 7 neighbors, and we already have
+// 2 parent tiles + 2 siblings, so we need 3 more. Though one will be shared
+// with the neighbor tile, so we only actually need 2 here.
+const TO_ADJACENT_RING3_1 = ROTATE_SEVENFOLD.map((x) =>
+  TO_ADJACENT_RING1[0].conjugate(x),
+);
+const XFORMS_RING3_1 = TO_ADJACENT_RING3_1[0];
+const RING3 = new StyledNode(XFORMS_RING3_1, STYLE_B, START_TILE);
 
+const SCENE = new CTile(BACKGROUND, RING0, RING1, RING2, RING3);
 const TO_SCREEN = CVersor.to_screen(new Circle(new Point(250, 350), 250));
 
 export const HYPERBOLIC_TILING_EXPERIMENT = new StaticAnimation(
