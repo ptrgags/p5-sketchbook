@@ -39,6 +39,12 @@ function compute_edge_circle(p, q) {
   return new Circle(new Point(center, 0), radius);
 }
 
+/**
+ *
+ * @param {number} p How many sides does the centeral (hyperbolic) polygon have?
+ * @param {number} q How many polygons meet at each vertex?
+ * @returns
+ */
 function make_tiling(p, q) {
   if (p < 3) {
     throw new Error("p must be at least 3");
