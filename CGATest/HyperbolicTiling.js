@@ -10,6 +10,7 @@ import { CNode } from "../sketchlib/cga2d/CNode.js";
 import { CTile } from "../sketchlib/cga2d/CTile.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { PowerIterator } from "../sketchlib/cga2d/PowerIterator.js";
+import { StyledNode } from "../sketchlib/cga2d/StyledNode.js";
 import { StyledTile } from "../sketchlib/cga2d/StyledTile.js";
 import { Color } from "../sketchlib/Color.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
@@ -109,19 +110,36 @@ const E2 = ROTATIONS.arc_elliptic;
 const EQ = ROTATIONS.vertex_elliptic;
 
 const ROT_ITER = new PowerIterator(RP);
+const ROTATE_SEVENFOLD = ROT_ITER.iterate(0, 6);
 const ROOT_TILE = new CNode(
-  ROT_ITER.iterate(0, 7),
+  ROTATE_SEVENFOLD,
   Cline.from_circle(circle),
 ).bake_tile();
 
 const MOTIF = Cline.from_circle(new Circle(new Point(0.2, 0), 0.05));
 
-const SCENE = new StyledTile(
-  [Cline.UNIT_CIRCLE, ROOT_TILE, MOTIF],
-  new Style({
-    stroke: Color.RED,
-  }),
+const START_TILE = Cline.from_circle(new Circle(Point.ORIGIN, 0.2));
+
+const STYLE_BG = new Style({ stroke: Color.WHITE });
+const STYLE_A = new Style({ stroke: Color.RED });
+const STYLE_B = new Style({ stroke: Color.BLUE });
+
+const EACH_XFORM = new CNode([RP, E2, EQ], MOTIF).bake_tile();
+
+const BACKGROUND = new StyledTile(
+  [Cline.UNIT_CIRCLE, MOTIF, EACH_XFORM],
+  STYLE_BG,
 );
+const RING0 = new StyledTile(START_TILE, STYLE_A);
+
+const RING1 = new StyledNode(
+  ROTATE_SEVENFOLD.map((x) => x.conjugate(E2)),
+  STYLE_B,
+  START_TILE,
+);
+
+const SCENE = new CTile(BACKGROUND, RING0, RING1);
+
 const TO_SCREEN = CVersor.to_screen(new Circle(new Point(250, 350), 250));
 
 export const HYPERBOLIC_TILING_EXPERIMENT = new StaticAnimation(
