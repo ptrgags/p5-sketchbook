@@ -4,12 +4,17 @@
 //
 // here I'm translating that math to CGA transformations
 
+import { StaticAnimation } from "../sketchlib/animation/Animated.js";
 import { Cline } from "../sketchlib/cga2d/Cline.js";
+import { CNode } from "../sketchlib/cga2d/CNode.js";
 import { CTile } from "../sketchlib/cga2d/CTile.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
+import { PowerIterator } from "../sketchlib/cga2d/PowerIterator.js";
+import { StyledTile } from "../sketchlib/cga2d/StyledTile.js";
+import { Color } from "../sketchlib/Color.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
-import { FractalPrefixAnimation } from "./FractalPrefixAnimation.js";
+import { Style } from "../sketchlib/Style.js";
 
 /**
  * Compute a circle with the following properties:
@@ -94,8 +99,31 @@ function make_tiling(p, q) {
   return groups;
 }
 
-const TILING_6_4 = make_tiling(6, 4);
+// R_p = p-fold rotation around the center of the unit circle
+// E_2 = 2-fold elliptic around the center of the arc surrounding the tile
 
-const MOTIF = Cline.from_circle(new Circle(new Point(0.25, 0), 0.1));
+const circle = compute_edge_circle(7, 3);
+const ROTATIONS = make_tiling(7, 3).corner_rotation_group;
+const RP = ROTATIONS.rotate_center;
+const E2 = ROTATIONS.arc_elliptic;
+const EQ = ROTATIONS.vertex_elliptic;
 
-// how to animate mirror tilings? can't lerp clines or cline arcs
+const ROT_ITER = new PowerIterator(RP);
+const ROOT_TILE = new CNode(
+  ROT_ITER.iterate(0, 7),
+  Cline.from_circle(circle),
+).bake_tile();
+
+const MOTIF = Cline.from_circle(new Circle(new Point(0.2, 0), 0.05));
+
+const SCENE = new StyledTile(
+  [Cline.UNIT_CIRCLE, ROOT_TILE, MOTIF],
+  new Style({
+    stroke: Color.RED,
+  }),
+);
+const TO_SCREEN = CVersor.to_screen(new Circle(new Point(250, 350), 250));
+
+export const HYPERBOLIC_TILING_EXPERIMENT = new StaticAnimation(
+  TO_SCREEN.transform(SCENE),
+);
