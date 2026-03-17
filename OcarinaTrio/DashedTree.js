@@ -1,13 +1,70 @@
+import { isArray } from "tone";
 import { ArcLength } from "../sketchlib/primitives/ArcLength.js";
 import {
   PartialPrimitive,
   Primitive,
 } from "../sketchlib/primitives/Primitive.js";
 
+/**
+ * @typedef {PartialPrimitive & ArcLength} Segment
+ * @typedef {(Segment | SegmentTree)[]} SegmentTree
+ */
+
+/**
+ * I really want SegmentTree to be an array matching
+ * the informal grammar:
+ *
+ * SegmentTree = [Segment+,  SegmentTree?]
+ *
+ * i.e. one or more segments, optionally followed by a
+ * sub-array of the same type. But that's not easy to
+ * express with types... so this method checks the structure.
+ *
+ * In the spirit of Parse, Don't Validate (https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/),
+ * this restructures the tree so flat paths become nested pairs. E.g.
+ * parsed it becomes
+ *
+ * ParsedTree = [Segment] | [Segment, ParsedTree]
+ *
+ * @param {SegmentTree} segments
+ * @returns {SegmentTree}
+ */
+function parse_segment_tree(segments) {
+  if (segments.length === 0) {
+    throw new Error("segments must have at least one segment");
+  }
+
+  const [first, ...rest] = segments;
+
+  if (Array.isArray(first)) {
+    throw new Error("each branch must start with a segment");
+  }
+
+  const branch_index = rest.findIndex(Array.isArray);
+  if (branch_index === -1) {
+    // the list is a flat list of segments, nest them
+    // like [a, [b, [c]]]
+  }
+
+  // This segment tree branches, so we need to check:
+  // 1. the array is a valid SegmentTree
+  // 2. there are no entries after the array
+  const array = /** @type {SegmentTree} */ (rest[branch_index]);
+  const after = rest.slice(branch_index + 1);
+
+  if (after.length > 0) {
+    throw new Error("if a subarray is provided, it must be the last entry");
+  }
+}
+
+/**
+ * A tree of path segments that can be drawn as dashed lines
+ * with arc lengths measured from the root of the tree
+ */
 export class DashedTree {
   /**
    * Constructor
-   * @param {PartialPrimitive & ArcLength} segment The path for this node of the tree.
+   * @param {Segment} segment The path for this node of the tree.
    * @param {...DashedTree} children
    */
   constructor(segment, ...children) {
@@ -27,7 +84,7 @@ export class DashedTree {
   /**
    * Iterate over all the segements. This is helpful for
    * rendering the outline of the pipe as a separate primitive.
-   * @returns {Generator<PartialPrimitive & ArcLength>}
+   * @returns {Generator<Segment>}
    */
   *iter_segments() {
     yield this.segment;
@@ -112,5 +169,25 @@ export class DashedTree {
     this.#compute_dashes_recursive(overlaps, arc_lengths, 0);
 
     return overlaps;
+  }
+
+  /**
+   *
+   * @param {SegmentTree} segments
+   * @returns {DashedTree}
+   */
+  static from_segments(segments) {
+    parse_segment_tree(segments);
+
+    const [segment, second, ...rest] = segments;
+
+    if (Array.isArray(second)) {
+      const children = DashedTree.from_segments([second, ...rest]);
+      return new DashedTree(
+        //
+        /** @type {Segment} */ (segment),
+        children,
+      );
+    }
   }
 }
