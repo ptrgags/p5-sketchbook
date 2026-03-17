@@ -49,7 +49,28 @@ export const PIPE_TREE_TENOR = DashedTree.from_segments([
   make_arc(275, 250, 2, 1),
   new LineSegment(new Point(275, 225), new Point(450, 225)),
   ...COMMON_SEGMENTS,
+  [
+    make_arc(225, 125, 3, -1),
+    new LineSegment(new Point(225, 100), new Point(175, 100)),
+  ],
+  [new LineSegment(new Point(250, 125), new Point(250, 0))],
+  [
+    make_arc(275, 125, 2, 1),
+    new LineSegment(new Point(275, 100), new Point(300, 100)),
+    [
+      make_arc(300, 75, 0, -1),
+      new LineSegment(new Point(325, 75), new Point(325, 0)),
+    ],
+    [
+      new LineSegment(new Point(300, 100), new Point(350, 100)),
+      [
+        make_arc(350, 75, 0, -1),
+        new LineSegment(new Point(375, 75), new Point(375, 0)),
+      ],
+    ],
+  ],
 ]);
+
 export const PIPE_TREE_SOPRANO = DashedTree.from_segments([
   make_arc(425, 250, 2, 1),
   new LineSegment(new Point(425, 225), new Point(450, 225)),
