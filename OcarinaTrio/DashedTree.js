@@ -1,4 +1,3 @@
-import { isArray, start } from "tone";
 import { ArcLength } from "../sketchlib/primitives/ArcLength.js";
 import {
   PartialPrimitive,

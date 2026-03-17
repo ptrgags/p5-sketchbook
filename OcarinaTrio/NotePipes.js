@@ -28,94 +28,68 @@ const ANGLES_QUADRANT3 = new ArcAngles(Math.PI, (3 * Math.PI) / 2);
 const ANGLES_QUADRANT4 = new ArcAngles((3 * Math.PI) / 2, 2 * Math.PI);
 const BEND_RADIUS = 25;
 
-const PIPE_TREE_BASS = new DashedTree(
+const PIPE_TREE_BASS = DashedTree.from_segments([
   new LineSegment(new Point(100, 250), new Point(100, 200)),
-  new DashedTree(
+  [
     new ArcPrimitive(new Point(125, 200), BEND_RADIUS, ANGLES_QUADRANT3),
-    new DashedTree(
-      new LineSegment(new Point(125, 175), new Point(150, 175)),
-      new DashedTree(
-        new ArcPrimitive(
-          new Point(150, 150),
-          BEND_RADIUS,
-          ANGLES_QUADRANT1.reverse(),
-        ),
-        new DashedTree(
-          new LineSegment(new Point(175, 150), new Point(175, 125)),
-          new DashedTree(
-            new ArcPrimitive(
-              new Point(150, 125),
-              BEND_RADIUS,
-              ANGLES_QUADRANT4.reverse(),
-            ),
-            new DashedTree(
-              new LineSegment(new Point(150, 100), new Point(125, 100)),
-              new DashedTree(
-                new ArcPrimitive(
-                  new Point(125, 75),
-                  BEND_RADIUS,
-                  ANGLES_QUADRANT2,
-                ),
-                new DashedTree(
-                  new LineSegment(new Point(100, 75), new Point(100, 0)),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
+    new LineSegment(new Point(125, 175), new Point(150, 175)),
+    new ArcPrimitive(
+      new Point(150, 150),
+      BEND_RADIUS,
+      ANGLES_QUADRANT1.reverse(),
     ),
-  ),
-  new DashedTree(
+    new LineSegment(new Point(175, 150), new Point(175, 125)),
+    new ArcPrimitive(
+      new Point(150, 125),
+      BEND_RADIUS,
+      ANGLES_QUADRANT4.reverse(),
+    ),
+    new LineSegment(new Point(150, 100), new Point(125, 100)),
+    new ArcPrimitive(new Point(125, 75), BEND_RADIUS, ANGLES_QUADRANT2),
+    new LineSegment(new Point(100, 75), new Point(100, 0)),
+  ],
+  [
     new ArcPrimitive(
       new Point(75, 200),
       BEND_RADIUS,
       ANGLES_QUADRANT4.reverse(),
     ),
-    new DashedTree(
-      new ArcPrimitive(new Point(75, 150), BEND_RADIUS, ANGLES_QUADRANT2),
-      new DashedTree(new LineSegment(new Point(50, 150), new Point(50, 0))),
-    ),
-  ),
-);
+    new ArcPrimitive(new Point(75, 150), BEND_RADIUS, ANGLES_QUADRANT2),
+    new LineSegment(new Point(50, 150), new Point(50, 0)),
+  ],
+]);
 
-const PIPE_TREE_TENOR = new DashedTree(
+const PIPE_TREE_TENOR = DashedTree.from_segments([
   new LineSegment(new Point(250, 255), new Point(250, 100)),
-  new DashedTree(
+  [
     new ArcPrimitive(new Point(275, 100), BEND_RADIUS, ANGLES_QUADRANT3),
-    new DashedTree(
-      new ArcPrimitive(
-        new Point(275, 50),
-        BEND_RADIUS,
-        ANGLES_QUADRANT1.reverse(),
-      ),
-      new DashedTree(new LineSegment(new Point(300, 50), new Point(300, 0))),
+    new ArcPrimitive(
+      new Point(275, 50),
+      BEND_RADIUS,
+      ANGLES_QUADRANT1.reverse(),
     ),
-  ),
-  new DashedTree(new LineSegment(new Point(250, 100), new Point(250, 0))),
-);
+    new LineSegment(new Point(300, 50), new Point(300, 0)),
+  ],
+  [new LineSegment(new Point(250, 100), new Point(250, 0))],
+]);
 
-const PIPE_TREE_SOPRANO = new DashedTree(
+const PIPE_TREE_SOPRANO = DashedTree.from_segments([
   new LineSegment(new Point(400, 250), new Point(400, 175)),
-  new DashedTree(
+  [
     new LineSegment(new Point(400, 175), new Point(400, 125)),
-    new DashedTree(
-      new ArcPrimitive(new Point(425, 125), BEND_RADIUS, ANGLES_QUADRANT3),
-      new DashedTree(new LineSegment(new Point(425, 100), new Point(500, 100))),
-    ),
-  ),
-  new DashedTree(
+    new ArcPrimitive(new Point(425, 125), BEND_RADIUS, ANGLES_QUADRANT3),
+    new LineSegment(new Point(425, 100), new Point(500, 100)),
+  ],
+  [
     new ArcPrimitive(
       new Point(375, 175),
       BEND_RADIUS,
       ANGLES_QUADRANT4.reverse(),
     ),
-    new DashedTree(
-      new ArcPrimitive(new Point(375, 125), BEND_RADIUS, ANGLES_QUADRANT2),
-      new DashedTree(new LineSegment(new Point(350, 125), new Point(350, 0))),
-    ),
-  ),
-);
+    new ArcPrimitive(new Point(375, 125), BEND_RADIUS, ANGLES_QUADRANT2),
+    new LineSegment(new Point(350, 125), new Point(350, 0)),
+  ],
+]);
 
 PIPE_TREE_BASS.measure_lengths();
 PIPE_TREE_TENOR.measure_lengths();
