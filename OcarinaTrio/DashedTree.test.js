@@ -296,19 +296,7 @@ describe("DashedTree", () => {
 
       expect(() => {
         return DashedTree.from_segments(segments);
-      }).toThrowError("first segment must not branch");
-    });
-
-    it("with entry after array throws error", () => {
-      const segment_a = new LineSegment(new Point(0, 0), new Point(1, 0));
-      const segment_b = new LineSegment(new Point(1, 0), new Point(2, 0));
-      const segment_c = new LineSegment(new Point(2, 0), new Point(3, 0));
-      const segment_d = new LineSegment(new Point(3, 0), new Point(4, 0));
-      const segments = [segment_a, [segment_b, segment_c], segment_d];
-
-      expect(() => {
-        return DashedTree.from_segments(segments);
-      }).toThrowError("can't add a segment after branching");
+      }).toThrowError("at least one segment must be provided");
     });
 
     it("with single segment returns single node", () => {
@@ -321,7 +309,7 @@ describe("DashedTree", () => {
       expect(result).toEqual(expected);
     });
 
-    it("with sequence of segments returns linked list of DahsedTree", () => {
+    it("with sequence of segments returns linked list", () => {
       const segment_a = new LineSegment(new Point(0, 0), new Point(1, 0));
       const segment_b = new LineSegment(new Point(1, 0), new Point(2, 0));
       const segment_c = new LineSegment(new Point(2, 0), new Point(3, 0));
@@ -336,7 +324,7 @@ describe("DashedTree", () => {
       expect(result).toEqual(expected);
     });
 
-    it("with branched segments returns tree", () => {
+    it("with chain in subarray returns linked list", () => {
       const segment_a = new LineSegment(new Point(0, 0), new Point(1, 0));
       const segment_b = new LineSegment(new Point(1, 0), new Point(2, 0));
       const segment_c = new LineSegment(new Point(2, 0), new Point(3, 0));
@@ -346,8 +334,60 @@ describe("DashedTree", () => {
 
       const expected = new DashedTree(
         segment_a,
+        new DashedTree(segment_b, new DashedTree(segment_c)),
+      );
+      expect(result).toEqual(expected);
+    });
+
+    it("with branched segments returns tree", () => {
+      const segment_a = new LineSegment(new Point(0, 0), new Point(1, 0));
+      const segment_b = new LineSegment(new Point(1, 0), new Point(2, 0));
+      const segment_c = new LineSegment(new Point(2, 0), new Point(3, 0));
+      const segments = [segment_a, [segment_b], [segment_c]];
+
+      const result = DashedTree.from_segments(segments);
+
+      const expected = new DashedTree(
+        segment_a,
         new DashedTree(segment_b),
         new DashedTree(segment_c),
+      );
+      expect(result).toEqual(expected);
+    });
+
+    it("with segment after array throws", () => {
+      const segment_a = new LineSegment(new Point(0, 0), new Point(1, 0));
+      const segment_b = new LineSegment(new Point(1, 0), new Point(2, 0));
+      const segment_c = new LineSegment(new Point(2, 0), new Point(3, 0));
+      const segments = [segment_a, [segment_b], segment_c];
+
+      expect(() => {
+        return DashedTree.from_segments(segments);
+      }).toThrow("branches must all be arrays");
+    });
+
+    it("with nested chains builds correct tree", () => {
+      const segment_a = new LineSegment(new Point(0, 0), new Point(1, 0));
+      const segment_b = new LineSegment(new Point(1, 0), new Point(2, 0));
+      const segment_c = new LineSegment(new Point(2, 0), new Point(3, 0));
+      const segment_d = new LineSegment(new Point(3, 0), new Point(4, 0));
+      const segment_e = new LineSegment(new Point(4, 0), new Point(5, 0));
+      const segments = [
+        segment_a,
+        [segment_b, [segment_c], [segment_d]],
+        [segment_e],
+      ];
+
+      const result = DashedTree.from_segments(segments);
+
+      const expected = new DashedTree(
+        segment_a,
+        new DashedTree(
+          segment_b,
+          new DashedTree(segment_c),
+          new DashedTree(segment_d),
+        ),
+        new DashedTree(segment_e),
       );
       expect(result).toEqual(expected);
     });

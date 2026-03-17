@@ -1,4 +1,4 @@
-import { isArray } from "tone";
+import { isArray, start } from "tone";
 import { ArcLength } from "../sketchlib/primitives/ArcLength.js";
 import {
   PartialPrimitive,
@@ -9,53 +9,6 @@ import {
  * @typedef {PartialPrimitive & ArcLength} Segment
  * @typedef {(Segment | SegmentTree)[]} SegmentTree
  */
-
-/**
- * I really want SegmentTree to be an array matching
- * the informal grammar:
- *
- * SegmentTree = [Segment+,  SegmentTree?]
- *
- * i.e. one or more segments, optionally followed by a
- * sub-array of the same type. But that's not easy to
- * express with types... so this method checks the structure.
- *
- * In the spirit of Parse, Don't Validate (https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/),
- * this restructures the tree so flat paths become nested pairs. E.g.
- * parsed it becomes
- *
- * ParsedTree = [Segment] | [Segment, ParsedTree]
- *
- * @param {SegmentTree} segments
- * @returns {SegmentTree}
- */
-function parse_segment_tree(segments) {
-  if (segments.length === 0) {
-    throw new Error("segments must have at least one segment");
-  }
-
-  const [first, ...rest] = segments;
-
-  if (Array.isArray(first)) {
-    throw new Error("each branch must start with a segment");
-  }
-
-  const branch_index = rest.findIndex(Array.isArray);
-  if (branch_index === -1) {
-    // the list is a flat list of segments, nest them
-    // like [a, [b, [c]]]
-  }
-
-  // This segment tree branches, so we need to check:
-  // 1. the array is a valid SegmentTree
-  // 2. there are no entries after the array
-  const array = /** @type {SegmentTree} */ (rest[branch_index]);
-  const after = rest.slice(branch_index + 1);
-
-  if (after.length > 0) {
-    throw new Error("if a subarray is provided, it must be the last entry");
-  }
-}
 
 /**
  * A tree of path segments that can be drawn as dashed lines
@@ -172,22 +125,59 @@ export class DashedTree {
   }
 
   /**
+   * Make a chain of segments above a tree
+   * @param {Segment[]} segments
+   * @param {DashedTree[]} children
+   * @returns {DashedTree}
+   */
+  static #make_chain(segments, children) {
+    const [first, ...rest] = segments;
+    if (rest.length === 0) {
+      return new DashedTree(first, ...children);
+    }
+
+    return new DashedTree(first, DashedTree.#make_chain(rest, children));
+  }
+
+  /**
    *
-   * @param {SegmentTree} segments
+   * @param {SegmentTree} segments An array of the form [segments+, branch_arrays*]. segments are of type Segment, branch_arrays are arrays of the recursive type
    * @returns {DashedTree}
    */
   static from_segments(segments) {
-    parse_segment_tree(segments);
+    // the segments array is of the form
+    // [chain_segments+, branch_arrays*]
+    // where chain_segments is one or more Segment
+    // and branch_arrays are one or more SegmentTree
+    const branch_index = segments.findIndex(Array.isArray);
 
-    const [segment, second, ...rest] = segments;
-
-    if (Array.isArray(second)) {
-      const children = DashedTree.from_segments([second, ...rest]);
-      return new DashedTree(
-        //
-        /** @type {Segment} */ (segment),
-        children,
-      );
+    /**
+     * @type {Segment[]}
+     */
+    let chain;
+    /**
+     * @type {SegmentTree[]}
+     */
+    let branches;
+    if (branch_index === -1) {
+      chain = /**@type {Segment[]} */ (segments);
+      branches = [];
+    } else {
+      // Up to the first array, segments are interpreted as a chain
+      chain = /** @type {Segment[]} */ (segments.slice(0, branch_index));
+      // Everything else is arrays
+      branches = /**@type {SegmentTree[]} */ (segments.slice(branch_index));
     }
+
+    if (chain.length === 0) {
+      throw new Error("at least one segment must be provided");
+    }
+
+    if (!branches.every(Array.isArray)) {
+      throw new Error("branches must all be arrays");
+    }
+
+    const children = branches.map(DashedTree.from_segments);
+    return DashedTree.#make_chain(chain, children);
   }
 }
