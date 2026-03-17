@@ -9,7 +9,9 @@ import { Point } from "../sketchlib/pga2d/Point.js";
 // 0   1   2   3   4   5   6
 //
 //         E ----- F - G      2
+//         |
 //         |                  1
+//         |
 // A ----- B - C --------- D  0  y
 //
 // cumulative arc length from A at:
@@ -168,14 +170,112 @@ describe("DashedTree", () => {
       expect(result).toEqual(expected);
     });
 
-    it("more tests", () => {});
-    // with dash overlapping start returns partial interval
-    // with dash overlapping end of one branch returns only that interval
-    // with dash overlapping end of both branches returns both overlaps
-    // with dash exactly matching first interval returns that interval
-    // with dash exactly matching interval in a branch returns that interval and corresponding overlaps
-    // with dash straddling segments returns correct overlaps
-    // with dashes with gap returns correct overlaps
-    // with multiple intervals overlapping the same segment returns correct overlaps
+    it("with dash overlapping start returns partial interval", () => {
+      const tree = make_tree();
+      tree.measure_lengths();
+
+      const result = tree.compute_dashes([[-1, 1]]);
+
+      const expected = [new LineSegment(new Point(0, 0), new Point(1, 0))];
+      expect(result).toEqual(expected);
+    });
+
+    it("with dash overlapping end of one branch returns only that interval", () => {
+      const tree = make_tree();
+      tree.measure_lengths();
+
+      const result = tree.compute_dashes([[6.5, 10]]);
+
+      const expected = [new LineSegment(new Point(4.5, 2), POINT_G)];
+      expect(result).toEqual(expected);
+    });
+
+    it("with dash overlapping end of both branches returns both overlaps", () => {
+      const tree = make_tree();
+      tree.measure_lengths();
+
+      const result = tree.compute_dashes([[5, 10]]);
+
+      const expected = [
+        new LineSegment(new Point(5, 0), POINT_D),
+        new LineSegment(new Point(3, 2), POINT_F),
+        new LineSegment(POINT_F, POINT_G),
+      ];
+      expect(result).toEqual(expected);
+    });
+
+    it("with dash exactly matching first interval returns that interval", () => {
+      const tree = make_tree();
+      tree.measure_lengths();
+
+      const result = tree.compute_dashes([[0, 2]]);
+
+      const expected = [new LineSegment(POINT_A, POINT_B)];
+      expect(result).toEqual(expected);
+    });
+
+    it("with dash exactly matching interval in a branch returns that interval and corresponding overlaps", () => {
+      const tree = make_tree();
+      tree.measure_lengths();
+
+      const result = tree.compute_dashes([[2, 3]]);
+
+      const expected = [
+        new LineSegment(POINT_B, POINT_C),
+        new LineSegment(POINT_B, new Point(2, 1)),
+      ];
+      expect(result).toEqual(expected);
+    });
+
+    it("with dash straddling segments returns correct overlaps", () => {
+      const tree = make_tree();
+      tree.measure_lengths();
+
+      const result = tree.compute_dashes([[1, 2.5]]);
+
+      const expected = [
+        new LineSegment(new Point(1, 0), POINT_B),
+        new LineSegment(POINT_B, new Point(2.5, 0)),
+        new LineSegment(POINT_B, new Point(2, 0.5)),
+      ];
+      expect(result).toEqual(expected);
+    });
+
+    it("with dashes with gap returns correct overlaps", () => {
+      const tree = make_tree();
+      tree.measure_lengths();
+
+      const result = tree.compute_dashes([
+        [-1, 1],
+        [4, 5],
+      ]);
+
+      const expected = [
+        new LineSegment(POINT_A, new Point(1, 0)),
+        new LineSegment(new Point(4, 0), new Point(5, 0)),
+        new LineSegment(POINT_E, new Point(3, 2)),
+      ];
+      expect(result).toEqual(expected);
+    });
+
+    it("with multiple intervals overlapping the same segment returns correct overlaps", () => {
+      const tree = make_tree();
+      tree.measure_lengths();
+
+      const result = tree.compute_dashes([
+        [3, 4],
+        [5, 6],
+      ]);
+
+      const expected = [
+        // bottom branch
+        new LineSegment(POINT_C, new Point(4, 0)),
+        new LineSegment(new Point(5, 0), POINT_D),
+        // top branch
+        new LineSegment(new Point(2, 1), POINT_E),
+        new LineSegment(new Point(3, 2), POINT_F),
+      ];
+      expect(result).toEqual(expected);
+    });
   });
 });
