@@ -184,8 +184,7 @@ export class BezierPrimitive {
     //       = -3q^2 a + 3(-2qp + q^2) b + 3(-p^2 + 2qp) c + 3p^2 d
     // substitute back in p and q
     //       = -3(1-t)^2 a + 3((1-t)^2 - 2(1-t)t) b + 3(2(1-t)t - t^2) c + 3t^2 d
-    // since we only care about a unit tangent, we can divide by 3
-    //       = -(1-t)^2 a + ((1-t)^2 - 2(1-t)t) b + (2(1-t)t - t^2) c + t^2 d
+    // every term is a multiple of 3, so we can apply that to the final coordinates.
 
     const s = 1 - t;
     const coeff_a = -s * s;
@@ -200,7 +199,9 @@ export class BezierPrimitive {
 
     const x = coeff_a * ax + coeff_b * bx + coeff_c * cx + coeff_d * dx;
     const y = coeff_a * ay + coeff_b * by + coeff_c * cy + coeff_d * dy;
-    return new Direction(x, y);
+
+    // factor in those coefficients of 3s that we ignored.
+    return new Direction(3 * x, 3 * y);
   }
 
   get_tangent(t) {
