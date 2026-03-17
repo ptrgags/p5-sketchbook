@@ -11,6 +11,11 @@ import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 import { DashedTree } from "./DashedTree.js";
+import {
+  PIPE_TREE_BASS,
+  PIPE_TREE_SOPRANO,
+  PIPE_TREE_TENOR,
+} from "./pipe_network.js";
 
 const STYLE_PIPE_WALLS = new Style({
   stroke: Color.from_hex_code("#666666"),
@@ -28,6 +33,7 @@ const ANGLES_QUADRANT3 = new ArcAngles(Math.PI, (3 * Math.PI) / 2);
 const ANGLES_QUADRANT4 = new ArcAngles((3 * Math.PI) / 2, 2 * Math.PI);
 const BEND_RADIUS = 25;
 
+/*
 const PIPE_TREE_BASS = DashedTree.from_segments([
   new LineSegment(new Point(100, 250), new Point(100, 200)),
   [
@@ -94,6 +100,7 @@ const PIPE_TREE_SOPRANO = DashedTree.from_segments([
 PIPE_TREE_BASS.measure_lengths();
 PIPE_TREE_TENOR.measure_lengths();
 PIPE_TREE_SOPRANO.measure_lengths();
+*/
 
 const ALL_PIPES = [
   ...PIPE_TREE_BASS.iter_segments(),
