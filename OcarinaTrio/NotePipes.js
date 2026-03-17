@@ -6,6 +6,7 @@ import { Note } from "../sketchlib/music/Music.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
+import { BezierPrimitive } from "../sketchlib/primitives/BezierPrimitive.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
@@ -46,7 +47,15 @@ const PIPE_TREE_BASS = DashedTree.from_segments([
     ),
     new LineSegment(new Point(150, 100), new Point(125, 100)),
     new ArcPrimitive(new Point(125, 75), BEND_RADIUS, ANGLES_QUADRANT2),
-    new LineSegment(new Point(100, 75), new Point(100, 0)),
+    [
+      new LineSegment(new Point(100, 75), new Point(100, 0)),
+      new BezierPrimitive(
+        new Point(100, 0),
+        new Point(50, 25),
+        new Point(200, 200),
+        new Point(400, 100),
+      ),
+    ],
   ],
   [
     new ArcPrimitive(

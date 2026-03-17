@@ -1,10 +1,41 @@
 import { Point } from "../../sketchlib/pga2d/Point.js";
+import { PiecewiseLinear } from "../animation/PiecewiseLinear.js";
 import { Direction } from "../pga2d/Direction.js";
-import { PartialPrimitive, Primitive } from "./Primitive.js";
+import { ArcLength } from "./ArcLength.js";
+import { PartialPrimitive } from "./Primitive.js";
+
+/**
+ * Compute approximated arc length
+ * @param {BezierPrimitive} bezier Bezier curve
+ * @returns {{
+ *  arc_length_table: PiecewiseLinear,
+ *  time_table: PiecewiseLinear
+ * }} forward and inverse time <-> arc length tables
+ */
+function make_arc_length_table(bezier) {
+  const n = 100;
+  const dt = 1 / n;
+  const table = new Array(n + 1);
+  let arc_length = 0;
+  for (let i = 0; i < n; i++) {
+    const t = i * dt;
+    table[i] = [t, arc_length];
+    const tangent = bezier.get_tangent_unnormalized(t);
+    arc_length += tangent.mag();
+    table[i + 1] = [t, arc_length];
+  }
+  table[n] = [1, arc_length];
+
+  return {
+    arc_length_table: new PiecewiseLinear(table),
+    time_table: new PiecewiseLinear(table.map(([t, s]) => [s, t])),
+  };
+}
 
 /**
  * Cubic Bezier curve
  * @implements {PartialPrimitive}
+ * @implements {ArcLength}
  */
 export class BezierPrimitive {
   /**
@@ -144,7 +175,7 @@ export class BezierPrimitive {
     return new Point(x, y);
   }
 
-  get_tangent(t) {
+  get_tangent_unnormalized(t) {
     // B(t) = (1-t)^3 a + 3 (1-t)^2 t b + 3 (1-t) t^2 c + t^3 d
     // let p(t) = t, p'(t) = 1
     //     q(t) = 1 - t, q'(t) = -1
@@ -169,7 +200,46 @@ export class BezierPrimitive {
 
     const x = coeff_a * ax + coeff_b * bx + coeff_c * cx + coeff_d * dx;
     const y = coeff_a * ay + coeff_b * by + coeff_c * cy + coeff_d * dy;
-    return new Direction(x, y).normalize();
+    return new Direction(x, y);
+  }
+
+  get_tangent(t) {
+    return this.get_tangent_unnormalized(t).normalize();
+  }
+
+  /**
+   * Lookup table for computing time -> arc length
+   * @type {PiecewiseLinear}
+   */
+  #arc_length_lut = undefined;
+  /**
+   * Lookup table for arc_length -> time
+   * @type {PiecewiseLinear}
+   */
+  #time_lut = undefined;
+
+  #make_tables_if_needed() {
+    if (!this.#arc_length_lut) {
+      const { arc_length_table, time_table } = make_arc_length_table(this);
+      this.#arc_length_lut = arc_length_table;
+      this.#time_lut = time_table;
+    }
+  }
+
+  get arc_length() {
+    this.#make_tables_if_needed();
+
+    return this.#arc_length_lut.value(1);
+  }
+
+  get_arc_length(t) {
+    this.#make_tables_if_needed();
+    return this.#arc_length_lut.value(t);
+  }
+
+  get_t(arc_length) {
+    this.#make_tables_if_needed();
+    return this.#time_lut.value(arc_length);
   }
 
   /**
