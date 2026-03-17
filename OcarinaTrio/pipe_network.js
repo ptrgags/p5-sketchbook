@@ -40,9 +40,21 @@ const COMMON_SEGMENTS = [
   new LineSegment(new Point(250, 175), new Point(250, 125)),
 ];
 
-export const PIPE_TREE_BASS = DashedTree.from_segments(COMMON_SEGMENTS);
-export const PIPE_TREE_TENOR = DashedTree.from_segments(COMMON_SEGMENTS);
-export const PIPE_TREE_SOPRANO = DashedTree.from_segments(COMMON_SEGMENTS);
+export const PIPE_TREE_BASS = DashedTree.from_segments([
+  make_arc(125, 250, 2, 1),
+  new LineSegment(new Point(125, 225), new Point(450, 225)),
+  ...COMMON_SEGMENTS,
+]);
+export const PIPE_TREE_TENOR = DashedTree.from_segments([
+  make_arc(275, 250, 2, 1),
+  new LineSegment(new Point(275, 225), new Point(450, 225)),
+  ...COMMON_SEGMENTS,
+]);
+export const PIPE_TREE_SOPRANO = DashedTree.from_segments([
+  make_arc(425, 250, 2, 1),
+  new LineSegment(new Point(425, 225), new Point(450, 225)),
+  ...COMMON_SEGMENTS,
+]);
 
 PIPE_TREE_BASS.measure_lengths();
 PIPE_TREE_TENOR.measure_lengths();
