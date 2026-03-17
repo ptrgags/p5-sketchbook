@@ -4,10 +4,11 @@ import { diff_float_property, format_diff } from "./diff_properties.js";
 import { Cline } from "../cga2d/Cline.js";
 import { Line } from "../pga2d/Line.js";
 import { Circle } from "../primitives/Circle.js";
-import { diff_circle } from "./geometry_matchers.js";
+import { diff_circle, diff_ray } from "./geometry_matchers.js";
 import { diff_line, diff_point } from "./pga_matchers.js";
 import { NullPoint } from "../cga2d/NullPoint.js";
 import { CVersor } from "../cga2d/CVersor.js";
+import { ClineArc, RayPair } from "../cga2d/ClineArc.js";
 
 const EVEN_PROPERTIES = ["scalar", "xy", "xp", "xm", "yp", "ym", "pm", "xypm"];
 function diff_ceven(diffs, received, expected) {
@@ -94,6 +95,32 @@ export function diff_null_point(diffs, received, expected) {
   return diffs;
 }
 
+export function diff_cline_arc(diffs, received, expected) {
+  if (!(received instanceof ClineArc)) {
+    diffs.push(`expected ClineArc, got ${received}`);
+    return diffs;
+  }
+
+  diff_cline(diffs, received.cline, expected.cline);
+  diff_null_point(diffs, received.a, expected.a);
+  diff_null_point(diffs, received.b, expected.b);
+  diff_null_point(diffs, received.c, expected.c);
+
+  return diffs;
+}
+
+export function diff_ray_pair(diffs, received, expected) {
+  if (!(received instanceof RayPair)) {
+    diffs.push(`expected RayPair, got ${received}`);
+    return diffs;
+  }
+
+  diff_ray(diffs, received.ray_a, expected.ray_a);
+  diff_ray(diffs, received.ray_a, expected.ray_a);
+
+  return diffs;
+}
+
 export const CGA_MATCHERS = {
   toBeCEven(received, expected) {
     return {
@@ -123,6 +150,18 @@ export const CGA_MATCHERS = {
     return {
       pass: received.equals(expected),
       message: () => format_diff(diff_null_point([], received, expected)),
+    };
+  },
+  toBeClineArc(received, expected) {
+    return {
+      pass: received.equals(expected),
+      message: () => format_diff(diff_cline_arc([], received, expected)),
+    };
+  },
+  toBeRayPair(received, expected) {
+    return {
+      pass: received.equals(expected),
+      message: () => format_diff(diff_ray_pair([], received, expected)),
     };
   },
 };

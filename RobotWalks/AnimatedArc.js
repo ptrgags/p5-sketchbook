@@ -2,7 +2,7 @@ import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { ArcAngles } from "../sketchlib/ArcAngles.js";
 import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
-import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
+import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { Tween } from "../sketchlib/Tween.js";
 
 /**
@@ -31,9 +31,9 @@ export class AnimatedArc {
 
     /**
      * A line from the start point to the end point, mainly for debugging.
-     * @type {LinePrimitive}
+     * @type {LineSegment}
      */
-    this.line_primitive = new LinePrimitive(
+    this.line_primitive = new LineSegment(
       center.add(Direction.from_angle(angles.start_angle).scale(radius)),
       center.add(Direction.from_angle(angles.end_angle).scale(radius)),
     );

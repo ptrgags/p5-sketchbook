@@ -1,3 +1,7 @@
+import {
+  PrimitiveCollectionStats,
+  RenderStats,
+} from "../perf/PrimitiveCollectionStats.js";
 import { Primitive } from "./Primitive.js";
 
 /**
@@ -9,6 +13,7 @@ import { Primitive } from "./Primitive.js";
  * primitives
  *
  * @interface ClipMask
+ * @implements {PrimitiveCollectionStats}
  */
 export class ClipMask {
   /**
@@ -17,6 +22,11 @@ export class ClipMask {
    */
   clip(p) {
     throw new Error("Not implemented: clip(p)");
+  }
+
+  /** @type {RenderStats} */
+  get render_stats() {
+    throw new Error("not implemented");
   }
 }
 
@@ -28,6 +38,7 @@ export class ClipMask {
  * pixels are rendered. Filled primitives are usually best
  *
  * @implements {ClipMask}
+ * @implements {PrimitiveCollectionStats}
  */
 export class Mask {
   /**
@@ -52,6 +63,23 @@ export class Mask {
     }
     p.endClip();
   }
+
+  /**
+   * Aggregate stats of the children
+   * @type {RenderStats}
+   */
+  get render_stats() {
+    const stats = {
+      type: "mask",
+      push_pop_count: 0,
+      simple_prim_count: 0,
+      children: [],
+    };
+
+    PrimitiveCollectionStats.aggregate(stats, ...this.primitives);
+
+    return stats;
+  }
 }
 
 /**
@@ -60,8 +88,20 @@ export class Mask {
  * NOT (union of primitives)
  *
  * @implements {ClipMask}
+ * @implements {PrimitiveCollectionStats}
  */
-export class InvMask extends Mask {
+export class InvMask {
+  /**
+   * Constructor
+   * @param  {...Primitive} primitives The primitives to render. They will be
+   * implicitly UNIONed together, then inverted. None of the primitives or their descendants
+   * can be a ClipPrimitive or VectorTangle, or you will end up nesting
+   * beginClip/endClip blocks. This is {@link https://github.com/processing/p5.js/blob/main/src/core/p5.Renderer.js#L107 | disallowed by p5.js}
+   */
+  constructor(...primitives) {
+    this.primitives = primitives;
+  }
+
   /**
    * Set the clip path as NOT(union of primitives)
    * @param {import("p5")} p p5.js instance
@@ -72,6 +112,23 @@ export class InvMask extends Mask {
       child.draw(p);
     }
     p.endClip();
+  }
+
+  /**
+   * Aggregate stats of the children
+   * @type {RenderStats}
+   */
+  get render_stats() {
+    const stats = {
+      type: "inv-mask",
+      push_pop_count: 0,
+      simple_prim_count: 0,
+      children: [],
+    };
+
+    PrimitiveCollectionStats.aggregate(stats, ...this.primitives);
+
+    return stats;
   }
 }
 
@@ -102,5 +159,22 @@ export class IntersectionMask {
     for (const mask of this.masks) {
       mask.clip(p);
     }
+  }
+
+  /**
+   * Aggregate stats of the children
+   * @type {RenderStats}
+   */
+  get render_stats() {
+    const stats = {
+      type: "intersection-mask",
+      push_pop_count: 0,
+      simple_prim_count: 0,
+      children: [],
+    };
+
+    PrimitiveCollectionStats.aggregate(stats, ...this.masks);
+
+    return stats;
   }
 }

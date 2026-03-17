@@ -2,12 +2,7 @@ import { describe, it, expect } from "vitest";
 import { NullPoint } from "./NullPoint.js";
 import { Point } from "../pga2d/Point.js";
 import { COdd } from "./COdd.js";
-import { CGA_MATCHERS } from "../test_helpers/cga_matchers.js";
-import { PGA_MATCHERS } from "../test_helpers/pga_matchers.js";
 import { CEven } from "./CEven.js";
-
-expect.extend(CGA_MATCHERS);
-expect.extend(PGA_MATCHERS);
 
 describe("NullPoint", () => {
   it("from_point with origin computes correct primitive", () => {
@@ -70,5 +65,26 @@ describe("NullPoint", () => {
     const result = NullPoint.INF.point;
 
     expect(result).toBeUndefined();
+  });
+
+  describe("is_inf", () => {
+    it("with INF returns true", () => {
+      const result = NullPoint.INF.is_inf;
+
+      expect(result).toBe(true);
+    });
+
+    it("with origin returns false", () => {
+      const result = NullPoint.ORIGIN.is_inf;
+
+      expect(result).toBe(false);
+    });
+
+    it("with finite point returns false", () => {
+      const point = NullPoint.from_point(new Point(3, -2));
+      const result = point.is_inf;
+
+      expect(result).toBe(false);
+    });
   });
 });

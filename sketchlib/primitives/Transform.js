@@ -12,4 +12,8 @@ export class Transform {
   constructor(translation) {
     this.translation = translation;
   }
+
+  apply(p) {
+    p.translate(this.translation.x, this.translation.y);
+  }
 }

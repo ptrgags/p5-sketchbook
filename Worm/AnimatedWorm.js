@@ -5,7 +5,7 @@ import { AnimationChain, Joint } from "../sketchlib/AnimationChain.js";
 import { is_nearly } from "../sketchlib/is_nearly.js";
 import { BeziergonPrimitive } from "../sketchlib/primitives/BeziergonPrimitive.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
-import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
+import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
@@ -137,7 +137,7 @@ export class AnimatedWorm {
     const lines = new Array(this.chain.length - 1);
     const positions = this.chain.get_positions();
     for (let i = 0; i < lines.length; i++) {
-      lines[i] = new LinePrimitive(positions[i], positions[i + 1]);
+      lines[i] = new LineSegment(positions[i], positions[i + 1]);
     }
     const spine_group = style(lines, SPINE_STYLE);
     const centers_group = style(positions, CENTER_STYLE);

@@ -29,3 +29,19 @@ export class Animated {
     throw new Error("not implemented");
   }
 }
+
+/**
+ * Adapter for Primitive -> Animated for an animation that doesn't
+ * @implements {Animated}
+ */
+export class StaticAnimation {
+  /**
+   * Constructor
+   * @param {Primitive} primitive
+   */
+  constructor(primitive) {
+    this.primitive = primitive;
+  }
+
+  update() {}
+}

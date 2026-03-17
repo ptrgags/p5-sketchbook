@@ -1,12 +1,12 @@
 import { Direction } from "../../sketchlib/pga2d/Direction.js";
 import { Point } from "../../sketchlib/pga2d/Point.js";
-import { GroupPrimitive } from "../primitives/GroupPrimitive.js";
 import { PartialPrimitive, Primitive } from "../primitives/Primitive.js";
 import { group } from "../primitives/shorthand.js";
 import { Tween } from "../Tween.js";
 import { whole_fract } from "../whole_fract.js";
 import { clamp } from "../clamp.js";
 import { is_nearly } from "../is_nearly.js";
+import { SimpleGroupPrimitive } from "../primitives/SimpleGroupPrimitive.js";
 
 /**
  * Collection of primitives that can be chained together to form a path
@@ -26,7 +26,7 @@ export class AnimatedPath {
     /**
      * Full path for rendering the trajectory underneath the animated
      * path (if desired)
-     * @type {GroupPrimitive}
+     * @type {SimpleGroupPrimitive}
      */
     this.trajectory = group(...segments);
   }
@@ -85,7 +85,7 @@ export class AnimatedPath {
    */
   render(time) {
     if (time < this.tween.start_time) {
-      return GroupPrimitive.EMPTY;
+      return Primitive.EMPTY;
     }
 
     const [arc_index, t] = whole_fract(this.tween.get_value(time));
@@ -148,7 +148,7 @@ export class AnimatedPath {
     time_b = clamp(time_b, this.tween.start_time, this.tween.end_time);
 
     if (time_a >= time_b) {
-      return GroupPrimitive.EMPTY;
+      return Primitive.EMPTY;
     }
 
     const [arc_a, t_a] = whole_fract(this.tween.get_value(time_a));
@@ -161,7 +161,7 @@ export class AnimatedPath {
     const children = [...this.render_range(arc_a, t_a, arc_b, t_b)];
 
     if (children.length === 0) {
-      return GroupPrimitive.EMPTY;
+      return Primitive.EMPTY;
     }
 
     if (children.length === 1) {

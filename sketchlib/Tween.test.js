@@ -1,6 +1,5 @@
 import { describe, it, expect } from "vitest";
 import { frames_to_sec, sec_to_frames, Tween } from "./Tween.js";
-import { PGA_MATCHERS } from "./test_helpers/pga_matchers.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Ease } from "./Ease.js";
@@ -12,8 +11,6 @@ function make_tween() {
   const duration = 3;
   return Tween.scalar(start_value, end_value, start_time, duration);
 }
-
-expect.extend(PGA_MATCHERS);
 
 describe("Tween", () => {
   it("end_time computes the correct time", () => {

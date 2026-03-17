@@ -1,7 +1,7 @@
 import { Animated } from "../sketchlib/animation/Animated.js";
 import { AnimationGroup } from "../sketchlib/animation/AnimationGroup.js";
 import { Color } from "../sketchlib/Color.js";
-import { mod } from "../sketchlib/mod.js";
+import { WIDTH } from "../sketchlib/dimensions.js";
 import { AbsInterval } from "../sketchlib/music/AbsTimeline.js";
 import { AbsTimelineOps } from "../sketchlib/music/AbsTimelineOps.js";
 import { Note } from "../sketchlib/music/Music.js";
@@ -10,8 +10,7 @@ import { Ocarina } from "../sketchlib/music_vis/Ocarina.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
-import { BezierPrimitive } from "../sketchlib/primitives/BezierPrimitive.js";
-import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
+import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { group, style, xform } from "../sketchlib/primitives/shorthand.js";
 import { Transform } from "../sketchlib/primitives/Transform.js";
@@ -20,15 +19,17 @@ import { SoundManager } from "../sketchlib/SoundManager.js";
 import { Style } from "../sketchlib/Style.js";
 import { SCORE_OCARINA_TRIO } from "../SoundTest/example_scores/ocarina_trio.js";
 import { PlayedNotes } from "../SoundTest/PlayedNotes.js";
+import { NotePipes } from "./NotePipes.js";
 import { PianoRoll } from "./PianoRoll.js";
 import { PianoRollBackground } from "./PianoRollBackground.js";
 
-const START_X = 25;
+const BOX_ORIGIN = new Point(25, 275);
 const BOX_DIMENSIONS = new Direction(150, 150);
+const BOX_STRIDE = Direction.DIR_X.scale(BOX_DIMENSIONS.x);
 const BOUNDING_BOXES = [
-  new Rectangle(new Point(START_X, 0), BOX_DIMENSIONS),
-  new Rectangle(new Point(START_X + BOX_DIMENSIONS.x, 0), BOX_DIMENSIONS),
-  new Rectangle(new Point(START_X + 2 * BOX_DIMENSIONS.x, 0), BOX_DIMENSIONS),
+  new Rectangle(BOX_ORIGIN, BOX_DIMENSIONS),
+  new Rectangle(BOX_ORIGIN.add(BOX_STRIDE), BOX_DIMENSIONS),
+  new Rectangle(BOX_ORIGIN.add(BOX_STRIDE.scale(2)), BOX_DIMENSIONS),
 ];
 
 /**
@@ -68,7 +69,7 @@ const BOX_MARGIN = new Direction(6, 6);
 const OCARINA_BOXES = group(
   style(
     new RectPrimitive(
-      new Point(25, 0).add(BOX_MARGIN),
+      BOX_ORIGIN.add(BOX_MARGIN),
       new Direction(150, 150).add(BOX_MARGIN.scale(-2)),
     ),
     new Style({
@@ -79,7 +80,7 @@ const OCARINA_BOXES = group(
   ),
   style(
     new RectPrimitive(
-      new Point(25 + 150, 0).add(BOX_MARGIN),
+      BOX_ORIGIN.add(BOX_STRIDE).add(BOX_MARGIN),
       new Direction(150, 150).add(BOX_MARGIN.scale(-2)),
     ),
     new Style({
@@ -90,7 +91,7 @@ const OCARINA_BOXES = group(
   ),
   style(
     new RectPrimitive(
-      new Point(25 + 2 * 150, 0).add(BOX_MARGIN),
+      BOX_ORIGIN.add(BOX_STRIDE.scale(2)).add(BOX_MARGIN),
       new Direction(150, 150).add(BOX_MARGIN.scale(-2)),
     ),
     new Style({
@@ -99,6 +100,40 @@ const OCARINA_BOXES = group(
       width: 4,
     }),
   ),
+);
+
+const STYLE_NOZZLES = new Style({
+  fill: Color.from_hex_code("#666666"),
+  stroke: Color.from_hex_code("#222222"),
+  width: 4,
+});
+const INPUT_NOZZLE_SHAPE = new PolygonPrimitive(
+  [
+    new Point(25, 425),
+    new Point(0, 450),
+    new Point(WIDTH, 450),
+    new Point(475, 425),
+  ],
+  true,
+);
+const INPUT_NOZZLE = style(INPUT_NOZZLE_SHAPE, STYLE_NOZZLES);
+const OUTPUT_NOZZLE = new PolygonPrimitive(
+  [
+    new Point(0, 25),
+    new Point(50, 25),
+    new Point(25 + 12, 0),
+    new Point(25 - 12, 0),
+  ],
+  true,
+);
+// one nozzle per instrument
+const OUTPUT_NOZZLES = style(
+  [
+    xform(OUTPUT_NOZZLE, new Transform(new Direction(75, 250))),
+    xform(OUTPUT_NOZZLE, new Transform(new Direction(225, 250))),
+    xform(OUTPUT_NOZZLE, new Transform(new Direction(375, 250))),
+  ],
+  STYLE_NOZZLES,
 );
 
 /**
@@ -112,62 +147,6 @@ function get_intervals() {
     return intervals;
   });
 }
-
-/**
- * Take a sequence of intervals, and merge the time intervals that are
- * immediately adjacent
- * @param {AbsInterval<Note<Number>>[]} intervals
- * @returns {AbsInterval<number>[]} merged intervals. The value is always 1, since only the times matter.
- */
-function make_gate_signal(intervals) {
-  const result = [];
-  let start_time = intervals[0].start_time;
-  let end_time = intervals[0].end_time;
-  for (const interval of intervals) {
-    if (interval.start_time.equals(end_time)) {
-      // Merge two adjacent time intervals
-      end_time = interval.end_time;
-    } else {
-      // There's a gap before the next interval, so flush the previous
-      // one
-      result.push(new AbsInterval(1, start_time, end_time));
-      start_time = interval.start_time;
-      end_time = interval.end_time;
-    }
-  }
-  // flush the last interval
-  result.push(new AbsInterval(1, start_time, end_time));
-  return result;
-}
-
-const GATE_VELOCITY = 100;
-/**
- * Take the result from make_gate_signal and make rectangles to visualize it.
- * This is temporary, I have some ideas for a more elaborate visualization, but
- * one step at a time.
- * @param {AbsInterval<number>[]} intervals
- * @param {number} y
- * @returns {GroupPrimitive}
- */
-function render_gate(intervals, y) {
-  const HEIGHT = 10;
-  const rects = [];
-  for (const interval of intervals) {
-    const x = interval.start_time.real * GATE_VELOCITY;
-    const width = interval.duration.real * GATE_VELOCITY;
-    rects.push(
-      new RectPrimitive(new Point(x, y), new Direction(width, HEIGHT)),
-    );
-  }
-  return group(...rects);
-}
-
-const BEZIER = new BezierPrimitive(
-  new Point(25, 25),
-  new Point(25, 400),
-  new Point(300, 25),
-  new Point(300, 400),
-);
 
 /**
  * @implements {Animated}
@@ -192,17 +171,14 @@ export class OcarinaAnimation {
       new Ocarina(SOPRANO_CONFIG, new PlayedNotes(soprano_intervals)),
     );
 
-    const bass_gate = render_gate(make_gate_signal(bass_intervals), 0);
-    const tenor_gate = render_gate(make_gate_signal(tenor_intervals), 10);
-    const soprano_gate = render_gate(make_gate_signal(soprano_intervals), 20);
-    this.gates = new GroupPrimitive([bass_gate, tenor_gate, soprano_gate], {
-      transform: new Transform(Direction.ZERO),
-      style: new Style({
-        fill: Color.RED,
-      }),
-    });
+    const pipe_velocity = 300;
+    this.pipes = new NotePipes(
+      [bass_intervals, tenor_intervals, soprano_intervals],
+      [BASS_CONFIG.color, TENOR_CONFIG.color, SOPRANO_CONFIG.color],
+      pipe_velocity,
+    );
 
-    const y = 150;
+    const y = 450;
     const velocity = 200;
     /**
      * @type {[number, number]}
@@ -244,10 +220,11 @@ export class OcarinaAnimation {
     this.primitive = group(
       this.background.primitive,
       this.piano_rolls.primitive,
+      this.pipes.primitive,
+      INPUT_NOZZLE,
+      OUTPUT_NOZZLES,
       OCARINA_BOXES,
       this.ocarinas.primitive,
-      //this.gates,
-      this.dashed_bezier,
     );
   }
 
@@ -257,18 +234,7 @@ export class OcarinaAnimation {
     this.ocarinas.update(time);
     this.piano_rolls.update(time);
     this.background.update(time);
-
-    const x = time * GATE_VELOCITY;
-    this.gates.transform.translation = new Direction(-x, 150);
-
-    const dashes = [];
-    for (let t = mod(time, 1); t < 1; t += 0.2) {
-      const t_start = t;
-      const t_end = Math.min(t + 0.1, 1);
-      dashes.push(BEZIER.render_between(t_start, t_end));
-    }
-
-    this.dashed_bezier.regroup(...dashes);
+    this.pipes.update(time);
   }
 
   render() {}

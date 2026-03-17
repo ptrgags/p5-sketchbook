@@ -3,18 +3,59 @@ import { Cline } from "./Cline.js";
 import { Point } from "../pga2d/Point.js";
 import { CVersor } from "./CVersor.js";
 import { Direction } from "../pga2d/Direction.js";
-import { PGA_MATCHERS } from "../test_helpers/pga_matchers.js";
 import { Circle } from "../primitives/Circle.js";
 import { Line } from "../pga2d/Line.js";
-import { CGA_MATCHERS } from "../test_helpers/cga_matchers.js";
 import { NullPoint } from "./NullPoint.js";
 import { COdd } from "./COdd.js";
 import { CEven } from "./CEven.js";
 
-expect.extend(PGA_MATCHERS);
-expect.extend(CGA_MATCHERS);
-
 describe("CVersor", () => {
+  describe("pow", () => {
+    it("with 0 returns identity", () => {
+      const versor = CVersor.rotation(Math.PI / 4);
+
+      const result = versor.pow(0);
+
+      const expected = CVersor.IDENTITY;
+      expect(result).toBe(expected);
+    });
+
+    it("with 1 returns the versor", () => {
+      const versor = CVersor.rotation(Math.PI / 4);
+
+      const result = versor.pow(1);
+
+      expect(result).toBe(versor);
+    });
+
+    it("with positive power returns the versor iterated that many times", () => {
+      const versor = CVersor.rotation(Math.PI / 4);
+
+      const result = versor.pow(3);
+
+      const expected = CVersor.rotation((3 * Math.PI) / 4);
+      expect(result).toBeCVersor(expected);
+    });
+
+    it("with -1 returns the inverse", () => {
+      const versor = CVersor.rotation(Math.PI / 4);
+
+      const result = versor.pow(-1);
+
+      const expected = versor.inv();
+      expect(result).toBeCVersor(expected);
+    });
+
+    it("with negative power returns the inverse iterated that many times", () => {
+      const versor = CVersor.rotation(Math.PI / 4);
+
+      const result = versor.pow(-3);
+
+      const expected = CVersor.rotation(-(3 * Math.PI) / 4);
+      expect(result).toBeCVersor(expected);
+    });
+  });
+
   describe("reflection", () => {
     it("reflects point over line", () => {
       const point = NullPoint.from_point(new Point(1, -2));
@@ -631,6 +672,25 @@ describe("CVersor", () => {
       const result = para.transform(circle);
 
       expect(result).toBeCline(circle);
+    });
+  });
+
+  describe("to_screen", () => {
+    it("with unit circle returns flip y", () => {
+      const result = CVersor.to_screen(Circle.UNIT_CIRCLE);
+
+      expect(result).toBeCVersor(CVersor.FLIP_Y);
+    });
+
+    it("with other circle returns correct transformations", () => {
+      const circle = new Circle(new Point(3, -4), 5);
+
+      const result = CVersor.to_screen(circle);
+
+      const translation = CVersor.translation(new Direction(3, -4));
+      const scale = CVersor.dilation(5);
+      const expected = translation.compose(scale).compose(CVersor.FLIP_Y);
+      expect(result).toEqual(expected);
     });
   });
 

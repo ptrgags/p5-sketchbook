@@ -222,11 +222,10 @@ class SwayingCoral {
       return this.polyps[index];
     });
 
-    const polyp_primitives = group(...this.polyps.map((x) => x.primitive));
     this.primitive = group(
       styled_stripes,
       this.colored_coral,
-      polyp_primitives,
+      Polyp.uncollate(this.polyps),
     );
   }
 

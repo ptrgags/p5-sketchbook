@@ -1,9 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { Point } from "../pga2d/Point.js";
 import { Circle } from "./Circle.js";
-import { GEOMETRY_MATCHERS } from "../test_helpers/geometry_matchers.js";
-
-expect.extend(GEOMETRY_MATCHERS);
 
 describe("Circle", () => {
   describe("contains", () => {
@@ -40,6 +37,57 @@ describe("Circle", () => {
       const result = circle.contains(point);
 
       expect(result).toBe(false);
+    });
+  });
+
+  describe("get_angle", () => {
+    it("with point at center returns 0", () => {
+      const circle = new Circle(new Point(3, -4), 5);
+
+      const result = circle.get_angle(circle.center);
+
+      const expected = 0;
+      expect(result).toBeCloseTo(expected);
+    });
+
+    it("with point to the right of center returns angle of 0", () => {
+      const circle = new Circle(new Point(3, -4), 5);
+      const right_of_center = new Point(4, -4);
+
+      const result = circle.get_angle(right_of_center);
+
+      const expected = 0;
+      expect(result).toBeCloseTo(expected);
+    });
+
+    it("with point to the left of center returns pi or -pi", () => {
+      const circle = new Circle(new Point(3, -4), 5);
+      const left_of_center = new Point(1, -4);
+
+      const result = Math.abs(circle.get_angle(left_of_center));
+
+      const expected = Math.PI;
+      expect(result).toBeCloseTo(expected);
+    });
+
+    it("with point below center returns negative angle", () => {
+      const circle = new Circle(new Point(3, -4), 5);
+      const point = new Point(1, -6);
+
+      const result = circle.get_angle(point);
+
+      const expected = (-3 * Math.PI) / 4;
+      expect(result).toBeCloseTo(expected);
+    });
+
+    it("with point above center returns positive angle", () => {
+      const circle = new Circle(new Point(3, -4), 5);
+      const point = new Point(6, -1);
+
+      const result = circle.get_angle(point);
+
+      const expected = Math.PI / 4;
+      expect(result).toBeCloseTo(expected);
     });
   });
 

@@ -1,9 +1,11 @@
+import { Animated } from "../animation/Animated.js";
 import { Primitive } from "./Primitive.js";
 
 /**
  * Render an array of primtives progressively, as if slicing an array
  * (without actually copying the array)
  * @implements {Primitive}
+ * @implements {Animated}
  */
 export class ProgressivePrimitive {
   /**
@@ -15,6 +17,8 @@ export class ProgressivePrimitive {
     this.primitives = primitives;
     this.rate = rate;
     this.max_index = 0;
+
+    this.primitive = this;
   }
 
   /**

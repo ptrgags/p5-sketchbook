@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../libraries/p5.min.js"
+    ></script>
+    <script type="module">
+      import { sketch } from "./DragonVortex.js";
+      import "../sketchlib/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../styles/layout.css" />
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>Dragon Vortex (2026-03)</h1>
+      <div class="sketch">
+        <canvas id="sketch-canvas" width="500" height="700"></canvas>
+      </div>
+      <div class="description">
+        <p>
+          An animated version of the
+          <a href="https://en.wikipedia.org/wiki/Dragon_curve">Dragon Curve</a>
+          fractal. However, instead of the usual drawing method using straight
+          lines, I start with a motif of an animated vortex.
+        </p>
+        <p>
+          If you pick one of the colored vortices and watch it move about the
+          canvas, you'll see it spiral inwards towards some point. Each vortex
+          represents a different sequence of transformations, so each one ends
+          up at a different spot. If this pattern kept going forever, the limit
+          would be the true dragon curve. However, we don't have infinite time
+          or memory, so only the first several iterations are shown.
+        </p>
+        <p>
+          This was also an experiment in fractal rendering. Here I'm applying
+          the transformations in reverse order from the usual technique. This
+          emphasizes changes at a local level. In this case, each motif splits
+          into two children (somewhat reminiscent of cells undergoing mitosis).
+          The opposite order would emphasize changes at the global level. In
+          this case, you'd see the entire curve fan out into two smaller copies
+          of itself. See
+          <a
+            href="https://en.wikipedia.org/wiki/Dragon_curve#/media/File:Dragon_Curve_unfolding_zoom_numbered.gif"
+            >this diagram</a
+          >
+          from the same Wikipedia page for what that looks like in comparison.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

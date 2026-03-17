@@ -1,4 +1,5 @@
 import { Direction } from "../pga2d/Direction.js";
+import { Circle } from "../primitives/Circle.js";
 import { CEven } from "./CEven.js";
 import { COdd } from "./COdd.js";
 import { ConformalPrimitive } from "./ConfomalPrimitive.js";
@@ -10,6 +11,41 @@ export class CVersor {
    */
   constructor(versor) {
     this.versor = versor;
+  }
+
+  /**
+   * Raise a versor to a power by repeated
+   * multiplication
+   * @param {number} k The power
+   * @returns {CVersor}
+   */
+  pow(k) {
+    if (k === 0) {
+      return CVersor.IDENTITY;
+    }
+
+    if (k === 1) {
+      return this;
+    }
+
+    if (k === -1) {
+      return this.inv();
+    }
+
+    // Iterate v^0, v, v^2, v^3... v^k
+    // or v^0, v^-1, v^-2, ..., v^-k
+    // returning the last value
+
+    /**
+     * @type {CEven | COdd}
+     */
+    let result = CEven.IDENTITY;
+    let step = k > 0 ? this.versor : this.versor.reverse();
+    const iterations = Math.abs(k);
+    for (let i = 0; i < iterations; i++) {
+      result = step.gp(result);
+    }
+    return new CVersor(result);
   }
 
   /**
@@ -231,6 +267,18 @@ export class CVersor {
   }
 
   /**
+   * Create a transformation that maps the unit circle
+   * to the given circle on the screen. It also flips the y-coordinate
+   * @param {Circle} circle A circle in screen space
+   * @returns {CVersor}
+   */
+  static to_screen(circle) {
+    const translate_center = CVersor.translation(circle.center.to_direction());
+    const scale = CVersor.dilation(circle.radius);
+    return translate_center.compose(scale).compose(CVersor.FLIP_Y);
+  }
+
+  /**
    * Invert the versor. Since these versors are represented
    * by unit multivectors, this can be done using
    * versor.reverse() rather than the inverse calculation
@@ -273,7 +321,7 @@ export class CVersor {
 }
 /**
  * The identity versor is the scalar 1
- * @type {CVersor}
+ * @type {Readonly<CVersor>}
  */
 CVersor.IDENTITY = Object.freeze(
   new CVersor(new CEven(1, 0, 0, 0, 0, 0, 0, 0)),
@@ -281,8 +329,14 @@ CVersor.IDENTITY = Object.freeze(
 /**
  * Inversion in the unit circle is represented
  * by the vector p
- * @type {CVersor}
+ * @type {Readonly<CVersor>}
  */
 CVersor.INVERSION = Object.freeze(
   new CVersor(new COdd(0, 0, 1, 0, 0, 0, 0, 0)),
 );
+/**
+ * Flipping the y-coordinate is common since I do math in y-up coordinates
+ * but p5 uses y-down coordiantes
+ * @type {Readonly<CVersor>}
+ */
+CVersor.FLIP_Y = Object.freeze(CVersor.reflection(Direction.DIR_Y));

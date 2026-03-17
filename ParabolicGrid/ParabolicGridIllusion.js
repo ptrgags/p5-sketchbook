@@ -1,23 +1,31 @@
 import { Animated } from "../sketchlib/animation/Animated.js";
 import { Cline } from "../sketchlib/cga2d/Cline.js";
+import { CNode } from "../sketchlib/cga2d/CNode.js";
+import { CTile } from "../sketchlib/cga2d/CTile.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
+import { PowerIterator } from "../sketchlib/cga2d/PowerIterator.js";
+import { StyledTile } from "../sketchlib/cga2d/StyledTile.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
-import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { STYLE_X, STYLE_Y } from "./styling.js";
 import { CURVE_X, CURVE_Y } from "./timing.js";
 
 const OFFSET_X = Direction.DIR_X;
 const OFFSET_Y = Direction.DIR_Y;
 
+const X_ITER = new PowerIterator(CVersor.parabolic(OFFSET_X));
+const Y_ITER = new PowerIterator(CVersor.parabolic(OFFSET_Y));
+
 const MAX_STEP = 13;
-const X_TILES = [];
-const Y_TILES = [];
-for (let i = -MAX_STEP; i <= MAX_STEP; i++) {
-  const transform_x = CVersor.parabolic(OFFSET_X.scale(i));
-  const transform_y = CVersor.parabolic(OFFSET_Y.scale(i));
-  X_TILES.push(transform_x.transform(Cline.Y_AXIS));
-  Y_TILES.push(transform_y.transform(Cline.X_AXIS));
-}
+const X_PARTS = X_ITER.iterate(-MAX_STEP, MAX_STEP).map((x) =>
+  x.transform(Cline.Y_AXIS),
+);
+const Y_PARTS = Y_ITER.iterate(-MAX_STEP, MAX_STEP).map((x) =>
+  x.transform(Cline.X_AXIS),
+);
+
+const X_SCALLOP = new StyledTile(X_PARTS, STYLE_X);
+const Y_SCALLOP = new StyledTile(Y_PARTS, STYLE_Y);
+const SCALLOPS = new CTile(X_SCALLOP, Y_SCALLOP);
 
 /**
  * Animation of the flow of two parabolic transformations in orthogonal transformations.
@@ -48,11 +56,8 @@ export class ParabolicGridIllusion {
    * @param {CVersor} to_screen Transformation from the unit circle to a larger screen space circle
    */
   constructor(to_screen) {
-    this.to_screen = to_screen;
-
-    this.x_group = style(X_TILES, STYLE_X);
-    this.y_group = style(Y_TILES, STYLE_Y);
-    this.primitive = group(this.x_group, this.y_group);
+    this.parabolic_node = new CNode(CVersor.IDENTITY, SCALLOPS);
+    this.primitive = new CNode(to_screen, this.parabolic_node);
   }
 
   /**
@@ -65,11 +70,6 @@ export class ParabolicGridIllusion {
     const para_x = CVersor.parabolic(OFFSET_X.scale(tx));
     const para_y = CVersor.parabolic(OFFSET_Y.scale(ty));
     const para_total = para_x.compose(para_y);
-    const para_screen = this.to_screen.compose(para_total);
-
-    const x_tiles = X_TILES.map((x) => para_screen.transform(x));
-    const y_tiles = Y_TILES.map((x) => para_screen.transform(x));
-    this.x_group.primitives = x_tiles;
-    this.y_group.primitives = y_tiles;
+    this.parabolic_node.update_transforms(para_total);
   }
 }

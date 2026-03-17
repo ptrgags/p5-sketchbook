@@ -18,3 +18,13 @@ export class ConformalPrimitive extends Primitive {
     throw new Error("not implemented");
   }
 }
+/**
+ * The do-nothing primitive!
+ * @type {Readonly<ConformalPrimitive>}
+ */
+ConformalPrimitive.EMPTY = Object.freeze({
+  transform() {
+    return this;
+  },
+  draw() {},
+});

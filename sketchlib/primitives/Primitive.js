@@ -23,6 +23,13 @@ export class Primitive {
    */
   draw(p) {}
 }
+/**
+ * A primitive that displays nothing. Useful as a placeholder.
+ * @type {Readonly<Primitive>}
+ */
+Primitive.EMPTY = Object.freeze({
+  draw() {},
+});
 
 /**
  * A partial primitive is a Primitive that can also render a partial version

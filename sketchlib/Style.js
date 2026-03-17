@@ -1,5 +1,6 @@
 import { Oklch } from "./Oklch.js";
 import { Color } from "./Color.js";
+import { is_nearly } from "./is_nearly.js";
 
 /**
  * Convert from a variety of color formats to a sRGB color
@@ -83,11 +84,33 @@ export class Style {
     result.stroke_width = width;
     return result;
   }
+
+  /**
+   * Apply stroke, fill and stroke weight
+   * @param {import("p5")} p p5js context
+   */
+  apply(p) {
+    if (this.stroke && !is_nearly(this.stroke.a, 0)) {
+      const { r, g, b, a } = this.stroke;
+      p.stroke(r, g, b, a);
+    } else {
+      p.noStroke();
+    }
+
+    if (this.fill && !is_nearly(this.fill.a, 0)) {
+      const { r, g, b, a } = this.fill;
+      p.fill(r, g, b, a);
+    } else {
+      p.noFill();
+    }
+
+    p.strokeWeight(this.stroke_width);
+  }
 }
 
 Style.INVISIBLE = Object.freeze(new Style({}));
 Style.DEFAULT_STROKE = Object.freeze(new Style({ stroke: Color.WHITE }));
 Style.DEFAULT_FILL = Object.freeze(new Style({ fill: "#6eb2e8" }));
 Style.DEFAULT_STROKE_FILL = Object.freeze(
-  Style.DEFAULT_FILL.with_stroke(Color.WHITE)
+  Style.DEFAULT_FILL.with_stroke(Color.WHITE),
 );

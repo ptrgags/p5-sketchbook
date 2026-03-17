@@ -2,7 +2,7 @@ import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Color } from "./Color.js";
 import { WIDTH } from "./dimensions.js";
-import { LinePrimitive } from "./primitives/LinePrimitive.js";
+import { LineSegment } from "./primitives/LineSegment.js";
 import { PolygonPrimitive } from "./primitives/PolygonPrimitive.js";
 import { group, style } from "./primitives/shorthand.js";
 import { Style } from "./Style.js";
@@ -64,7 +64,7 @@ const SPEAKER = style(
 );
 
 const SPEAKER_SLASH = style(
-  new LinePrimitive(
+  new LineSegment(
     SOUND_TOGGLE_CORNER.add(new Direction(2, 2)),
     SOUND_TOGGLE_CORNER.add(
       new Direction((3 * SOUND_TOGGLE_SIZE) / 4 - 2, SOUND_TOGGLE_SIZE - 2),
