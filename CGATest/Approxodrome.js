@@ -68,7 +68,6 @@ function approxodrome(to_screen, a, b, start_point, t_a, t_b, curve, depth) {
   const diff = predicted_middle.point.dist_sqr(actual_middle.point);
 
   if (is_nearly(diff, 0)) {
-    console.log(depth);
     return [make_line(to_screen, a, b)];
   }
 
