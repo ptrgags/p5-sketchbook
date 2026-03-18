@@ -12,6 +12,7 @@ import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { ProgressiveSierpinski } from "./ProgressiveSierpinski.js";
 import { Tempo } from "../sketchlib/music/Tempo.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
+import { HYPERBOLIC_TILING_EXPERIMENT } from "./HyperbolicTiling.js";
 
 const TO_SCREEN = CVersor.to_screen(new Circle(SCREEN_CENTER, 200));
 
@@ -23,6 +24,7 @@ const ANIMATIONS = new SelectAnimated([
     new AnimatedSierpinski(TO_SCREEN),
   ),
   new NachoSpaceship(TO_SCREEN),
+  HYPERBOLIC_TILING_EXPERIMENT,
 ]);
 
 const MOUSE = new CanvasMouseHandler();
