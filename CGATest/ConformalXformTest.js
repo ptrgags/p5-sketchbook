@@ -157,7 +157,7 @@ export class ConformalXformTest {
     const lox_angle = (Math.PI / 12) * Math.sin(2 * Math.PI * t);
     const approx = new Approxodrome(
       this.to_screen,
-      new Direction(2, 1),
+      Direction.from_angle(2.0 * Math.PI * 0.25 * t),
       1.1,
       lox_angle,
     );
