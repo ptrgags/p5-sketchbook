@@ -66,6 +66,37 @@ export const PIPE_TREE_BASS = DashedTree.from_segments([
   make_arc(125, 250, 2, 1),
   hline(225, 125, 450),
   ...COMMON_SEGMENTS,
+  [
+    make_arc(225, 125, 3, -1),
+    hline(100, 225, 175),
+    [
+      hline(100, 175, 100),
+      make_arc(100, 75, 1, 1),
+      make_arc(50, 75, 3, -1),
+      // these two are supposed to be a bezier curve
+      make_arc(50, 75, 2, -1),
+      make_arc(0, 75, 0, 1),
+    ],
+    [
+      make_arc(175, 75, 1, 1),
+      // I changed the path a bit to avoid bezier curves
+      vline(150, 75, 50),
+      make_arc(125, 50, 3, -1),
+      hline(25, 125, 0),
+    ],
+  ],
+  [
+    vline(250, 125, 50),
+    // these two should be a bezier curve
+    make_arc(225, 50, 3, -1),
+    make_arc(225, 0, 1, 1),
+  ],
+  [
+    make_arc(275, 125, 2, 1),
+    // this path uses bezier curves
+    make_arc(275, 75, 0, -1),
+    vline(300, 75, 0),
+  ],
 ]);
 export const PIPE_TREE_TENOR = DashedTree.from_segments([
   make_arc(275, 250, 2, 1),
