@@ -99,6 +99,8 @@ export const PIPE_TREE_BASS = DashedTree.from_segments([
   ],
 ]);
 
+// there are some additional branches on the right side, but without bezier
+// curves I can't fit more in right now.
 export const PIPE_TREE_TENOR = DashedTree.from_segments([
   make_arc(275, 250, 2, 1),
   hline(225, 275, 450),
@@ -147,8 +149,30 @@ export const PIPE_TREE_SOPRANO = DashedTree.from_segments([
       vline(200, 75, 0),
     ],
   ],
-  [vline(250, 125, 100)],
-  [make_arc(275, 125, 2, 1)],
+  [
+    vline(250, 125, 100),
+    // this part is different
+    make_arc(275, 100, 2, 1),
+    make_arc(275, 50, 0, -1),
+    vline(300, 50, 0),
+  ],
+  [
+    make_arc(275, 125, 2, 1),
+    // this is a little different
+    hline(100, 275, 350),
+    [
+      make_arc(350, 75, 0, -1),
+      vline(375, 75, 50),
+      make_arc(400, 50, 2, 1),
+      hline(25, 400, 425),
+      make_arc(425, 0, 0, -1),
+    ],
+    [
+      hline(100, 350, 400),
+      [make_arc(400, 75, 0, -1), make_arc(450, 75, 2, 1), hline(50, 450, 500)],
+      [hline(100, 400, 500)],
+    ],
+  ],
 ]);
 
 PIPE_TREE_BASS.measure_lengths();
