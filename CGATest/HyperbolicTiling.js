@@ -161,10 +161,17 @@ function make_tiling(p, q) {
 const FOLDS_P = 7;
 const FOLDS_Q = 3;
 
+const GEOMETRY = compute_geometry(FOLDS_P, FOLDS_Q);
+const GENERATORS = make_tiling(FOLDS_P, FOLDS_Q);
+const ROTATIONS = GENERATORS.corner_rotation_group;
+const REFLECTIONS = GENERATORS.reflection_group;
+
 // R_p = p-fold rotation around the center of the unit circle
 // E_2 = 2-fold elliptic around the center of the arc surrounding the tile
-const GEOMETRY = compute_geometry(FOLDS_P, FOLDS_Q);
-const ROTATIONS = make_tiling(FOLDS_P, FOLDS_Q).corner_rotation_group;
+
+const FY = REFLECTIONS.flip_y;
+const FD = REFLECTIONS.diagonal_mirror;
+const FC = REFLECTIONS.circle_inversion;
 const RP = ROTATIONS.rotate_center;
 const E2 = ROTATIONS.arc_elliptic;
 const EQ = ROTATIONS.vertex_elliptic;
@@ -189,7 +196,26 @@ const STYLES = range(FOLDS_P)
 
 const MOTIF = new StyledNode(
   ROTATE_SEVENFOLD,
-  StyleRuns.from_styles(STYLES),
+  new StyleRuns([
+    [
+      1,
+      new Style({
+        stroke: new Oklch(0.7, 0.3, 200),
+      }),
+    ],
+    [
+      1,
+      new Style({
+        stroke: new Oklch(0.7, 0.3, 300),
+      }),
+    ],
+    [
+      FOLDS_P - 2,
+      new Style({
+        stroke: new Oklch(0.7, 0, 0),
+      }),
+    ],
+  ]),
   FUNDAMENTAL_TILE,
 );
 
@@ -199,10 +225,22 @@ const STYLE_BG = new Style({ stroke: Color.WHITE });
 const STYLE_A = new Style({ stroke: Color.RED });
 const STYLE_B = new Style({ stroke: Color.BLUE });
 
+const TILE_E2 = E2.transform(MOTIF);
+const TILE_V = EQ.transform(MOTIF);
+
+const F_RC = RP.conjugate(FC);
+
+const IDK = F_RC.compose(FC);
+const TILE_IDK = IDK.transform(MOTIF);
+
+const IDK_POWERS = new CNode(new PowerIterator(IDK).iterate(-5, 5), MOTIF);
+
 const EACH_XFORM = new CNode([RP, E2, EQ], MOTIF).bake_tile();
 
+const VERTEX_ORBIT = new CNode([EQ, EQ.compose(EQ)], MOTIF).bake_tile();
+
 const BACKGROUND = new StyledTile(
-  [Cline.UNIT_CIRCLE /*ROOT_TILE*/, MOTIF, EACH_XFORM],
+  [Cline.UNIT_CIRCLE /*ROOT_TILE*/, MOTIF, IDK_POWERS],
   STYLE_BG,
 );
 const RING0 = new StyledTile(START_TILE, STYLE_A);
