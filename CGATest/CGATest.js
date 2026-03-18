@@ -1,5 +1,8 @@
 import { WIDTH, HEIGHT, SCREEN_CENTER } from "../sketchlib/dimensions.js";
-import { AnimatedSierpinski } from "./AnimatedSierpinski.js";
+import {
+  SIERPINSKI_SUFFIX,
+  SIERPINSKI_TRIANGLE,
+} from "./AnimatedSierpinski.js";
 import { SelectAnimated } from "../sketchlib/animation/SelectAnimated.js";
 import { CGA_BASICS } from "./cga_basics.js";
 import { CanvasMouseHandler } from "../sketchlib/input/CanvasMouseHandler.js";
@@ -12,18 +15,27 @@ import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { ProgressiveSierpinski } from "./ProgressiveSierpinski.js";
 import { Tempo } from "../sketchlib/music/Tempo.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
+import { NACHO_FRACTAL, NACHO_SUFFIX } from "./SierpinskiNacho.js";
+import { CAnimationViewer } from "./CAnimationViewer.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 import { HYPERBOLIC_TILING_EXPERIMENT } from "./HyperbolicTiling.js";
 
 const TO_SCREEN = CVersor.to_screen(new Circle(SCREEN_CENTER, 200));
 
+// the nacho only fills 1/4 of the unit circle, so zoom in more
+const TO_SCREEN_NACHO = CVersor.to_screen(new Circle(new Point(0, 600), 500));
+
 const ANIMATIONS = new SelectAnimated([
   CGA_BASICS,
   new ConformalXformTest(TO_SCREEN),
+  new NachoSpaceship(TO_SCREEN),
   new AnimationGroup(
     new ProgressiveSierpinski(TO_SCREEN),
-    new AnimatedSierpinski(TO_SCREEN),
+    new CAnimationViewer(TO_SCREEN, SIERPINSKI_TRIANGLE),
   ),
-  new NachoSpaceship(TO_SCREEN),
+  new CAnimationViewer(TO_SCREEN, SIERPINSKI_SUFFIX),
+  new CAnimationViewer(TO_SCREEN_NACHO, NACHO_FRACTAL),
+  new CAnimationViewer(TO_SCREEN_NACHO, NACHO_SUFFIX),
   HYPERBOLIC_TILING_EXPERIMENT,
 ]);
 

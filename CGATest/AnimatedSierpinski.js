@@ -1,4 +1,3 @@
-import { Animated } from "../sketchlib/animation/Animated.js";
 import { LoopCurve } from "../sketchlib/animation/LoopCurve.js";
 import { Hold, make_param } from "../sketchlib/animation/ParamCurve.js";
 import { Cline } from "../sketchlib/cga2d/Cline.js";
@@ -6,13 +5,13 @@ import { CNode } from "../sketchlib/cga2d/CNode.js";
 import { ConformalPrimitive } from "../sketchlib/cga2d/ConfomalPrimitive.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { IFS } from "../sketchlib/cga2d/IFS.js";
-import { StyledNode } from "../sketchlib/cga2d/StyledNode.js";
 import { Sequential } from "../sketchlib/music/Timeline.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Rational } from "../sketchlib/Rational.js";
 import { Style } from "../sketchlib/Style.js";
-import { whole_fract } from "../sketchlib/whole_fract.js";
+import { FractalPrefixAnimation } from "./FractalPrefixAnimation.js";
+import { FractalSuffixAnimation } from "./FractalSuffixAnimation.js";
 
 const SHRINK_FACTOR = 0.5;
 const A_TRANSLATION = new Direction(-0.5, -0.5);
@@ -96,50 +95,16 @@ for (let i = 1; i <= MAX_ITERS; i++) {
   ).bake_tile();
 }
 
-/**
- * @implements {Animated}
- */
-export class AnimatedSierpinski {
-  /**
-   * Constructor
-   * @param {CVersor} to_screen
-   */
-  constructor(to_screen) {
-    this.to_screen = to_screen;
+export const SIERPINSKI_TRIANGLE = new FractalPrefixAnimation(
+  SIERPINSKI_FUNCTIONS,
+  MAX_ITERS,
+  Cline.UNIT_CIRCLE,
+  STYLE_SIERPINSKI,
+);
 
-    // The animation will swap out both transformations and primitives
-    this.root = new CNode(CVersor.IDENTITY, ConformalPrimitive.EMPTY);
-    this.primitive = new StyledNode(to_screen, STYLE_SIERPINSKI, this.root);
-  }
-
-  update(time) {
-    // Get the latest iteration that fully rendered, this is what we'll transform.
-    const iter_index = Math.min(Math.floor(time), ITER_PRIMS.length - 1);
-    this.root.primitive = ITER_PRIMS[iter_index];
-
-    if (time < MAX_ITERS) {
-      // Take the current iteration and apply the animated transforms
-      // A(t), B(T), C(T) to it, one by one until we reach the next iteration.
-      const t_a = CURVE_A.value(time);
-      const t_b = CURVE_B.value(time);
-      const t_c = CURVE_C.value(time);
-
-      const xform_a = sierpinski_a(t_a);
-      const xform_b = sierpinski_b(t_b);
-      const xform_c = sierpinski_c(t_c);
-
-      // since we shrink in the order A, B, C, render in the reverse order
-      // so the smallest circles are on top.
-      this.root.update_transforms(xform_c, xform_b, xform_a);
-    } else {
-      // once we hit the limit of what we can render, we want to render
-      // less. So we render only the full iteration and a scaled copy
-      // (either A(t), B(t), or C(t) depending on the animation time)
-      const param = CURVE_INFINITE_LOOP.value(time);
-      const [xform_index, xform_t] = whole_fract(param);
-      const xform = SIERPINSKI_FUNCTIONS[xform_index](xform_t);
-
-      this.root.update_transforms(CVersor.IDENTITY, xform);
-    }
-  }
-}
+export const SIERPINSKI_SUFFIX = new FractalSuffixAnimation(
+  SIERPINSKI_FUNCTIONS,
+  MAX_ITERS,
+  Cline.UNIT_CIRCLE,
+  STYLE_SIERPINSKI,
+);
