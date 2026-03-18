@@ -213,6 +213,9 @@ const PETAL = new StyledTile(
   new Style({ stroke: Color.CYAN }),
 );
 
+// EDIT: not quite right, this is only true for edge-top tiles. Vertex-top tiles
+// need one more segment... I need to think about this.
+//
 // For interior nodes of the graph, we only need to draw 2 out of 7
 // walls, as the rest will be handled by other iterations
 const ROOT_CELL_WALLS = new CTile(
@@ -223,7 +226,7 @@ const CELL_WALLS = new StyledTile(
   E2.transform(ROOT_CELL_WALLS),
   new Style({ stroke: Color.from_hex_code("#7F00FF"), width: 2 }),
 );
-const MOTIF = new CTile(CELL_WALLS);
+const MOTIF = new CTile(PETAL);
 
 // To go into a transformation, remember to C{R}Y 😢
 // where:
