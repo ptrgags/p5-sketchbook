@@ -66,9 +66,26 @@
               and hyperbolic motion, i.e. a loxodromic motion. This is related
               to moving along a logarithmic spiral.
             </p>
+            <p>
+              The purple double spiral is a prototype of rendering loxodromes. A
+              loxodrome (aka
+              <a href="https://en.wikipedia.org/wiki/Rhumb_line">rhumb line</a>)
+              is a curve on a globe that makes a constant angle with the
+              meridians. This curve spirals out of one pole and spirals into the
+              other one. When projected onto a map with stereographic projection
+              from the equator, this looks like the double spiral shape you see
+              here.
+            </p>
           </li>
           <li>
-            <b>Animated Fractals</b> - This scene shows two copies of the
+            <b>Nacho Spaceship</b> - I added circular arcs that can be
+            transformed by these conformal transformations. This animation tests
+            them out. I take a nacho chip shape and rotate it to infinity... and
+            beyond.
+          </li>
+          <li>
+            <b>Animated Sierpinski Triangle</b> - This scene shows two copies of
+            the
             <a href="https://en.wikipedia.org/wiki/Sierpi%C5%84ski_triangle"
               >Sierpiński Triangle</a
             >
@@ -78,15 +95,56 @@
             the fractal when rendering.
           </li>
           <li>
-            <b>Nacho Spaceship</b> - I added circular arcs that can be
-            transformed by these conformal transformations. This animation tests
-            them out. I take a nacho chip shape and rotate it to infinity... and
-            beyond.
+            <b>Sierpinski Triangle in Reverse</b> - This animation is like the
+            previous one, but the transformations are applied in the opposite
+            order. This emphasizes the branching of small tiles into even
+            smaller tiles.
+          </li>
+          <li>
+            <b>Sierpinski Nacho</b> - A variation on the sierpinski triangle
+            that looks like a tortilla chip. Two of the transformations use
+            hyperbolic transformations instead of scaling transformations. This
+            curves the shape into circular arcs. This is an animated adaptation
+            of the same fractal I made in
+            <a href="https://github.com/ptrgags/math-notebook/tree/main"
+              ><code>math-notebook</code></a
+            >.
+          </li>
+          <li>
+            <b>Sierpinski Nacho in Reverse</b> - Again, reversing the
+            multiplication order emphasizes the branching of tiles everywhere in
+            the hierarchy.
+          </li>
+          <li>
+            <b>{7, 3} Hyperbolic Tiling</b> - This is a prototype of rendering
+            hyperbolic tilings like this
+            <a href="https://en.wikipedia.org/wiki/Heptagonal_tiling"
+              >heptagonal tiling</a
+            >. This continues past explorations of this math from my
+            <code>math-notebook</code> repo. This time, I figured out a better
+            algorithm for traversing the tiling.
           </li>
         </ol>
         <details>
           <summary>Changelog</summary>
           <dl>
+            <dt>2026-03-18</dt>
+            <dd>
+              Added a bunch of prototypes of visualizations/animations,
+              specifically:
+              <ul>
+                <li>
+                  Added a prototype double spirals for visualizing the path of
+                  loxodromic transformations
+                </li>
+                <li>Added a prototype of rendering hyperbolic tilings</li>
+                <li>Added Sierpinski Nacho</li>
+                <li>
+                  Added both prefix and suffix animations for some fractals to
+                  show the difference
+                </li>
+              </ul>
+            </dd>
             <dt>2026-03-07</dt>
             <dd>
               The sketch was getting cluttered so I separated it into several
