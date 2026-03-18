@@ -8,7 +8,6 @@ import { mod } from "../sketchlib/mod.js";
 import { range } from "../sketchlib/range.js";
 import { Style } from "../sketchlib/Style.js";
 import { StyleRuns } from "../sketchlib/styling/StyleRuns.js";
-import { whole_fract } from "../sketchlib/whole_fract.js";
 
 /**
  *

@@ -8,7 +8,6 @@ import { Point } from "../sketchlib/pga2d/Point.js";
 import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { Style } from "../sketchlib/Style.js";
-import { MAX_ITERS } from "./AnimatedSierpinski.js";
 import { FractalPrefixAnimation } from "./FractalPrefixAnimation.js";
 import { FractalSuffixAnimation } from "./FractalSuffixAnimation.js";
 
@@ -48,6 +47,7 @@ const NACHO = new CTile(
   ClineArc.from_segment(new LineSegment(new Point(0, 1), Point.ORIGIN)),
 );
 
+const MAX_ITERS = 5;
 export const NACHO_FRACTAL = new FractalPrefixAnimation(
   NACHO_FUNCTIONS,
   MAX_ITERS,
@@ -57,7 +57,8 @@ export const NACHO_FRACTAL = new FractalPrefixAnimation(
 
 export const NACHO_SUFFIX = new FractalSuffixAnimation(
   NACHO_FUNCTIONS,
-  MAX_ITERS,
+  // This one is a bit more expensive, so setting it lower
+  MAX_ITERS - 1,
   NACHO,
   STYLE_NACHO,
 );

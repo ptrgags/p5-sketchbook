@@ -28,12 +28,12 @@ const TO_SCREEN_NACHO = CVersor.to_screen(new Circle(new Point(0, 600), 500));
 const ANIMATIONS = new SelectAnimated([
   CGA_BASICS,
   new ConformalXformTest(TO_SCREEN),
+  new NachoSpaceship(TO_SCREEN),
   new AnimationGroup(
     new ProgressiveSierpinski(TO_SCREEN),
     new CAnimationViewer(TO_SCREEN, SIERPINSKI_TRIANGLE),
   ),
   new CAnimationViewer(TO_SCREEN, SIERPINSKI_SUFFIX),
-  new NachoSpaceship(TO_SCREEN),
   new CAnimationViewer(TO_SCREEN_NACHO, NACHO_FRACTAL),
   new CAnimationViewer(TO_SCREEN_NACHO, NACHO_SUFFIX),
   HYPERBOLIC_TILING_EXPERIMENT,
