@@ -17,7 +17,6 @@ import { HYPERBOLIC_TILING_EXPERIMENT } from "./HyperbolicTiling.js";
 const TO_SCREEN = CVersor.to_screen(new Circle(SCREEN_CENTER, 200));
 
 const ANIMATIONS = new SelectAnimated([
-  HYPERBOLIC_TILING_EXPERIMENT,
   CGA_BASICS,
   new ConformalXformTest(TO_SCREEN),
   new AnimationGroup(
@@ -25,6 +24,7 @@ const ANIMATIONS = new SelectAnimated([
     new AnimatedSierpinski(TO_SCREEN),
   ),
   new NachoSpaceship(TO_SCREEN),
+  HYPERBOLIC_TILING_EXPERIMENT,
 ]);
 
 const MOUSE = new CanvasMouseHandler();
