@@ -16,6 +16,7 @@ import { PowerIterator } from "../sketchlib/cga2d/PowerIterator.js";
 import { StyledNode } from "../sketchlib/cga2d/StyledNode.js";
 import { StyledTile } from "../sketchlib/cga2d/StyledTile.js";
 import { Color } from "../sketchlib/Color.js";
+import { mod } from "../sketchlib/mod.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
@@ -25,6 +26,7 @@ import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { range } from "../sketchlib/range.js";
 import { Style } from "../sketchlib/Style.js";
 import { StyleRuns } from "../sketchlib/styling/StyleRuns.js";
+import { OrbitTile } from "./OrbitTile.js";
 
 /**
  * Compute a circle with the following properties:
@@ -220,8 +222,28 @@ const CELL_WALLS = new StyledTile(
   E2.transform(ROOT_CELL_WALLS),
   new Style({ stroke: Color.from_hex_code("#7F00FF"), width: 2 }),
 );
+const MOTIF = new CTile(CELL_WALLS);
 
-const MOTIF = new CTile(PETAL, CELL_WALLS);
+// To go into a transformation, remember to C{R}Y 😢
+// where:
+// - C is circle inversion in the circular arc edge of the root tile
+// - {R} is the set of rotations {R^n | n in [0, 1, ... q - 1]}
+// - Y is reflection in t
+//
+// {R}Y represents reflection in lines through the center of the root tile.
+// For lines that intersect the circular arc, C{R}Y we get an elliptic transformation
+// For lines that do not intersect the circular arc, C{R}Y is a hyperbolic transformation
+const TO_ADJ = range(7)
+  .toArray()
+  .map((i) => {
+    // In CCW order from the original circular arc, we need need:
+    // CR^0Y, CR^6Y, CR^5Y, ... C^1Y
+    // The powers 0, 6, 5, ..., 1 are equivalent to 0, -1, -2, ..., -6 (mod p)
+    // but we can just use a negative array index to do the same thing.
+    const r = ROTATE_SEVENFOLD.at(-i);
+    return FC.compose(r).compose(FY);
+  });
+const ORBIT_TILE = new OrbitTile(MOTIF, CVersor.IDENTITY, TO_ADJ);
 
 const STYLES = range(FOLDS_P)
   .toArray()
@@ -280,7 +302,13 @@ const EACH_XFORM = new CNode([RP, E2, EQ], MOTIF).bake_tile();
 const VERTEX_ORBIT = new CNode([EQ, EQ.compose(EQ)], MOTIF).bake_tile();
 
 const BACKGROUND = new StyledTile(
-  [Cline.UNIT_CIRCLE /*ROOT_TILE*/, MOTIF, PETAL],
+  [
+    Cline.UNIT_CIRCLE /*ROOT_TILE*/,
+    ORBIT_TILE,
+    ORBIT_TILE.step(2),
+    ORBIT_TILE.step(3),
+    ORBIT_TILE.step(4),
+  ],
   STYLE_BG,
 );
 const RING0 = new StyledTile(START_TILE, STYLE_A);
