@@ -9,6 +9,7 @@ import { ArcAngles } from "../sketchlib/ArcAngles.js";
 import { Cline } from "../sketchlib/cga2d/Cline.js";
 import { ClineArc } from "../sketchlib/cga2d/ClineArc.js";
 import { CNode } from "../sketchlib/cga2d/CNode.js";
+import { ConformalPrimitive } from "../sketchlib/cga2d/ConfomalPrimitive.js";
 import { CTile } from "../sketchlib/cga2d/CTile.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { NullPoint } from "../sketchlib/cga2d/NullPoint.js";
@@ -245,6 +246,64 @@ const TO_ADJ = range(7)
   });
 const ORBIT_TILE = new OrbitTile(MOTIF, CVersor.IDENTITY, TO_ADJ);
 
+/**
+ * @enum {number}
+ */
+const TileType = {
+  EDGE: 0,
+  VERTEX: 1,
+};
+
+/**
+ *
+ * @param {ConformalPrimitive[]} output
+ * @param {OrbitTile} tile
+ * @param {TileType} tile_type
+ * @param {number} remaining_height
+ */
+function render_tile73(output, tile, tile_type, remaining_height) {
+  output.push(tile.motif);
+  if (remaining_height === 0) {
+    return;
+  }
+
+  const start_index = tile_type === TileType.EDGE ? 2 : 3;
+  const remaining_indices = tile_type === TileType.EDGE ? [3, 4] : [4];
+
+  render_tile73(
+    output,
+    tile.step(start_index),
+    TileType.VERTEX,
+    remaining_height - 1,
+  );
+  for (const index of remaining_indices) {
+    render_tile73(
+      output,
+      tile.step(index),
+      TileType.EDGE,
+      remaining_height - 1,
+    );
+  }
+}
+
+/**
+ * @param {OrbitTile} first_tile
+ * @param {number} max_height How many levels to generate
+ * @returns {CTile}
+ */
+function render_tiling73(first_tile, max_height) {
+  const output = [];
+
+  ROTATE_SEVENFOLD.forEach((r) => {
+    const tile = first_tile.transform(r.versor);
+    render_tile73(output, tile, TileType.EDGE, max_height);
+  });
+
+  return new CTile(...output);
+}
+
+const TILE73 = render_tiling73(ORBIT_TILE, 4);
+
 const STYLES = range(FOLDS_P)
   .toArray()
   .map(
@@ -301,16 +360,7 @@ const EACH_XFORM = new CNode([RP, E2, EQ], MOTIF).bake_tile();
 
 const VERTEX_ORBIT = new CNode([EQ, EQ.compose(EQ)], MOTIF).bake_tile();
 
-const BACKGROUND = new StyledTile(
-  [
-    Cline.UNIT_CIRCLE /*ROOT_TILE*/,
-    ORBIT_TILE,
-    ORBIT_TILE.step(2),
-    ORBIT_TILE.step(3),
-    ORBIT_TILE.step(4),
-  ],
-  STYLE_BG,
-);
+const BACKGROUND = new StyledTile([Cline.UNIT_CIRCLE], STYLE_BG);
 const RING0 = new StyledTile(START_TILE, STYLE_A);
 
 // E2 gets you into the neighboring tile to the right of the center.
@@ -343,7 +393,7 @@ const TO_ADJACENT_RING3_1 = ROTATE_SEVENFOLD.map((x) =>
 const XFORMS_RING3_1 = TO_ADJACENT_RING3_1[0];
 const RING3 = new StyledNode(XFORMS_RING3_1, STYLE_B, START_TILE);
 
-const SCENE = new CTile(BACKGROUND, RING0, RING1, RING2, RING3);
+const SCENE = new CTile(BACKGROUND, TILE73);
 const TO_SCREEN = CVersor.to_screen(new Circle(new Point(250, 350), 250));
 
 export const HYPERBOLIC_TILING_EXPERIMENT = new StaticAnimation(
