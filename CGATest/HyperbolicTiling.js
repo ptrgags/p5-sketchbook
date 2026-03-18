@@ -181,12 +181,17 @@ const EQ = ROTATIONS.vertex_elliptic;
 
 const ROT_ITER = new PowerIterator(RP);
 const ROTATE_SEVENFOLD = ROT_ITER.iterate(0, FOLDS_P - 1);
-const ROOT_TILE = new CNode(ROTATE_SEVENFOLD, GEOMETRY.circle).bake_tile();
-
+const ROOT_TILE = new CNode(ROTATE_SEVENFOLD, GEOMETRY.tile_edge).bake_tile();
 const SMALLER = CVersor.dilation(0.9);
-const FUNDAMENTAL_TILE = SMALLER.transform(
-  new CTile(...GEOMETRY.edges, ...GEOMETRY.vertices),
+
+const ROOT_HEPTAGON = new StyledTile(
+  SMALLER.transform(ROOT_TILE),
+  new Style({
+    stroke: new Oklch(0.7, 0.1, 50),
+  }),
 );
+
+const HEPTAGON = E2.transform(ROOT_HEPTAGON);
 
 const EDGE_MIDPOINT = GEOMETRY.vertices[1];
 const BIG_ARC = ClineArc.from_arc(
@@ -226,7 +231,7 @@ const CELL_WALLS = new StyledTile(
   E2.transform(ROOT_CELL_WALLS),
   new Style({ stroke: Color.from_hex_code("#7F00FF"), width: 2 }),
 );
-const MOTIF = new CTile(PETAL);
+const MOTIF = HEPTAGON; //new CTile(PETAL);
 
 // To go into a transformation, remember to C{R}Y 😢
 // where:
@@ -290,12 +295,13 @@ function render_tile73(output, tile, tile_type, remaining_height) {
 }
 
 /**
+ * @param {ConformalPrimitive} root_motif
  * @param {OrbitTile} first_tile
  * @param {number} max_height How many levels to generate
  * @returns {CTile}
  */
-function render_tiling73(first_tile, max_height) {
-  const output = [];
+function render_tiling73(root_motif, first_tile, max_height) {
+  const output = [root_motif];
 
   ROTATE_SEVENFOLD.forEach((r) => {
     const tile = first_tile.transform(r.versor);
@@ -305,7 +311,7 @@ function render_tiling73(first_tile, max_height) {
   return new CTile(...output);
 }
 
-const TILE73 = render_tiling73(ORBIT_TILE, 4);
+const TILE73 = render_tiling73(ROOT_HEPTAGON, ORBIT_TILE, 4);
 
 const STYLE_BG = new Style({ stroke: Color.WHITE });
 const BACKGROUND = new StyledTile([Cline.UNIT_CIRCLE], STYLE_BG);
