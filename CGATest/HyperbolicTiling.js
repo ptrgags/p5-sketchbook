@@ -4,12 +4,18 @@
 //
 // here I'm translating that math to CGA transformations
 
+import { StaticAnimation } from "../sketchlib/animation/Animated.js";
 import { Cline } from "../sketchlib/cga2d/Cline.js";
+import { CNode } from "../sketchlib/cga2d/CNode.js";
 import { CTile } from "../sketchlib/cga2d/CTile.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
+import { PowerIterator } from "../sketchlib/cga2d/PowerIterator.js";
+import { StyledNode } from "../sketchlib/cga2d/StyledNode.js";
+import { StyledTile } from "../sketchlib/cga2d/StyledTile.js";
+import { Color } from "../sketchlib/Color.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
-import { FractalPrefixAnimation } from "./FractalPrefixAnimation.js";
+import { Style } from "../sketchlib/Style.js";
 
 /**
  * Compute a circle with the following properties:
@@ -100,8 +106,71 @@ function make_tiling(p, q) {
   return groups;
 }
 
-const TILING_6_4 = make_tiling(6, 4);
+// R_p = p-fold rotation around the center of the unit circle
+// E_2 = 2-fold elliptic around the center of the arc surrounding the tile
 
-const MOTIF = Cline.from_circle(new Circle(new Point(0.25, 0), 0.1));
+const circle = compute_edge_circle(7, 3);
+const ROTATIONS = make_tiling(7, 3).corner_rotation_group;
+const RP = ROTATIONS.rotate_center;
+const E2 = ROTATIONS.arc_elliptic;
+const EQ = ROTATIONS.vertex_elliptic;
 
-// how to animate mirror tilings? can't lerp clines or cline arcs
+const ROT_ITER = new PowerIterator(RP);
+const ROTATE_SEVENFOLD = ROT_ITER.iterate(0, 6);
+const ROOT_TILE = new CNode(
+  ROTATE_SEVENFOLD,
+  Cline.from_circle(circle),
+).bake_tile();
+
+const MOTIF = Cline.from_circle(new Circle(new Point(0.2, 0), 0.05));
+
+const START_TILE = Cline.from_circle(new Circle(Point.ORIGIN, 0.2));
+
+const STYLE_BG = new Style({ stroke: Color.WHITE });
+const STYLE_A = new Style({ stroke: Color.RED });
+const STYLE_B = new Style({ stroke: Color.BLUE });
+
+const EACH_XFORM = new CNode([RP, E2, EQ], MOTIF).bake_tile();
+
+const BACKGROUND = new StyledTile(
+  [Cline.UNIT_CIRCLE /*ROOT_TILE*/, MOTIF, EACH_XFORM],
+  STYLE_BG,
+);
+const RING0 = new StyledTile(START_TILE, STYLE_A);
+
+// E2 gets you into the neighboring tile to the right of the center.
+// R^n sandwich E2 for n = 0, 1, ... 6 gives you the 7 directions
+const TO_ADJACENT = ROTATE_SEVENFOLD.map((x) => x.conjugate(E2));
+const RING1 = new StyledNode(TO_ADJACENT, STYLE_B, START_TILE);
+
+const TO_ADJACENT_RING1 = ROTATE_SEVENFOLD.map((x) => E2.conjugate(x));
+// we only want to visit tiles we haven't seen before, so we're only going to
+// need a subset of these
+// adj(0) points back to the parent, we don't want that
+// adj(1) after rotation points to the clockwise sibling, we don't want that
+// adj(2) is unvisited, use this
+// adj(3)
+// adj(5) is new... but it's also the first descendant of our sibling tile, so skip this one
+// adj(6) points to the CCW sibling, we don't that one
+const XFORMS_RING2 = TO_ADJACENT_RING1.slice(2, 5);
+// Now repeat those transforms around the circle
+const XFORMS_RING2_REPEATED = ROTATE_SEVENFOLD.flatMap((x) => {
+  return XFORMS_RING2.map((y) => x.compose(y));
+});
+const RING2 = new StyledNode(XFORMS_RING2_REPEATED, STYLE_A, START_TILE);
+
+// for the first tile of ring 7, we need 7 neighbors, and we already have
+// 2 parent tiles + 2 siblings, so we need 3 more. Though one will be shared
+// with the neighbor tile, so we only actually need 2 here.
+const TO_ADJACENT_RING3_1 = ROTATE_SEVENFOLD.map((x) =>
+  TO_ADJACENT_RING1[0].conjugate(x),
+);
+const XFORMS_RING3_1 = TO_ADJACENT_RING3_1[0];
+const RING3 = new StyledNode(XFORMS_RING3_1, STYLE_B, START_TILE);
+
+const SCENE = new CTile(BACKGROUND, RING0, RING1, RING2, RING3);
+const TO_SCREEN = CVersor.to_screen(new Circle(new Point(250, 350), 250));
+
+export const HYPERBOLIC_TILING_EXPERIMENT = new StaticAnimation(
+  TO_SCREEN.transform(SCENE),
+);
