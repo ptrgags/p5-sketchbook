@@ -16,6 +16,7 @@ import { Sequential } from "../sketchlib/music/Timeline.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Style } from "../sketchlib/Style.js";
 import { StyleRuns } from "../sketchlib/styling/StyleRuns.js";
+import { EllipticCamera } from "./EllipticCamera.js";
 
 /**
  * Rotate the globe a quarter turn CCW around the z axis (through the poles)
@@ -151,10 +152,13 @@ export class GlobeRotation {
   /**
    *
    * @param {CVersor} to_screen
+   * @param {EllipticCamera} elliptic_cam
    */
-  constructor(to_screen) {
+  constructor(to_screen, elliptic_cam) {
+    this.elliptic_cam = elliptic_cam;
     this.rotate_node = new CNode(CVersor.IDENTITY, GEOMETRY);
-    this.primitive = new CNode(to_screen, this.rotate_node);
+    this.camera_node = new CNode(CVersor.IDENTITY, this.rotate_node);
+    this.primitive = new CNode(to_screen, this.camera_node);
   }
 
   /**
@@ -165,5 +169,7 @@ export class GlobeRotation {
     const globe_t = CURVE_GLOBE_T.value(time);
     const globe_xform = ROTATE_GLOBE.value(globe_t);
     this.rotate_node.update_transforms(globe_xform);
+
+    this.camera_node.update_transforms(this.elliptic_cam.transform);
   }
 }
