@@ -15,6 +15,7 @@ import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { range } from "../sketchlib/range.js";
 import { Style } from "../sketchlib/Style.js";
 import { StyleRuns } from "../sketchlib/styling/StyleRuns.js";
+import { Approxodrome } from "./Approxodrome.js";
 
 const STYLE_UNIT_CIRCLE = new Style({
   stroke: Color.from_hex_code("#007f00"),
@@ -98,8 +99,17 @@ export class ConformalXformTest {
       THREE_POINTS,
     );
 
-    this.primitive = new CTile(
+    this.double_spiral = style(
+      [],
+      new Style({
+        stroke: Color.from_hex_code("#7f00ff"),
+        width: 4,
+      }),
+    );
+
+    this.primitive = group(
       unit_circle,
+      this.double_spiral,
       new CNode(to_screen, new CTile(this.scallop_node, this.points_node)),
     );
   }
@@ -142,5 +152,15 @@ export class ConformalXformTest {
       t_repeat,
     );
     this.scallop_node.update_transforms(para_illusion);
+
+    // Approximate loxodrome double spiral. Let's animate the rotation angle
+    const lox_angle = (Math.PI / 12) * Math.sin(2 * Math.PI * t);
+    const approx = new Approxodrome(
+      this.to_screen,
+      new Direction(2, 1),
+      1.1,
+      lox_angle,
+    );
+    this.double_spiral.regroup(approx);
   }
 }
