@@ -2,7 +2,7 @@ import { LSystem } from "../sketchlib/LSystem.js";
 import { N16 } from "../sketchlib/music/durations.js";
 import { Part, Score } from "../sketchlib/music/Score.js";
 import { Rational } from "../sketchlib/Rational.js";
-import { MAJOR_PENTATONIC, make_scale } from "../sketchlib/music/scales.js";
+import { MAJOR_PENTATONIC } from "../sketchlib/music/scales.js";
 import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
 import { Style } from "../sketchlib/Style.js";
 import { Color } from "../sketchlib/Color.js";
@@ -11,21 +11,21 @@ import { is_nearly } from "../sketchlib/is_nearly.js";
 import { lerp } from "../sketchlib/lerp.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
-import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
+import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
-import { make_param, ParamCurve } from "../sketchlib/animation/ParamCurve.js";
+import { make_param } from "../sketchlib/animation/ParamCurve.js";
 import { AnimationCurve } from "../sketchlib/animation/AnimationCurve.js";
 import { whole_fract } from "../sketchlib/whole_fract.js";
 import {
   make_note,
   map_pitch,
   Melody,
-  Note,
   Rest,
 } from "../sketchlib/music/Music.js";
+import { C4 } from "../sketchlib/music/pitches.js";
 
 const TREE_LSYSTEM = new LSystem("Fa", {
   a: "[+Fa][-Fa]",
@@ -130,7 +130,7 @@ class TreePrimitiveBuilder {
 
     const end = this.turtle.position;
 
-    this.lines.push(new LinePrimitive(start, end));
+    this.lines.push(new LineSegment(start, end));
     this.save_state();
   }
 
@@ -161,7 +161,7 @@ class TreePrimitiveBuilder {
 
 // all notes are in scale degrees relative to middle C, this
 // scale will be used to transpose everything at the end
-const SCALE = make_scale(MAJOR_PENTATONIC);
+const SCALE = MAJOR_PENTATONIC.to_scale(C4);
 
 // Duration of the shortest note in the score
 const DUR_SHORT = N16;
@@ -254,9 +254,18 @@ class TreeMusicBuilder {
    */
   build() {
     // Convert from scale degrees to MIDI pitch
-    const draw = map_pitch(SCALE, new Melody(...this.draw_notes));
-    const stack = map_pitch(SCALE, new Melody(...this.stack_notes));
-    const turn = map_pitch(SCALE, new Melody(...this.turn_notes));
+    const draw = map_pitch(
+      (p) => SCALE.value(p),
+      new Melody(...this.draw_notes),
+    );
+    const stack = map_pitch(
+      (p) => SCALE.value(p),
+      new Melody(...this.stack_notes),
+    );
+    const turn = map_pitch(
+      (p) => SCALE.value(p),
+      new Melody(...this.turn_notes),
+    );
 
     return new Score(
       new Part("draw", draw, {
@@ -412,7 +421,7 @@ export class AnimatedTurtleTree {
      */
     this.score = undefined;
     /**
-     * @type {LinePrimitive[]}
+     * @type {LineSegment[]}
      */
     this.lines = [];
     /**
@@ -476,7 +485,7 @@ export class AnimatedTurtleTree {
     if (!is_nearly(fract_lines, 0.0)) {
       const partial_line = this.lines[whole_lines];
       const endpoint = Point.lerp(partial_line.a, partial_line.b, fract_lines);
-      const interpolated = new LinePrimitive(partial_line.a, endpoint);
+      const interpolated = new LineSegment(partial_line.a, endpoint);
       tree = style([...visible_lines, interpolated], STYLE_TREE);
     } else {
       tree = style(visible_lines, STYLE_TREE);

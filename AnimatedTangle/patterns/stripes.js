@@ -3,7 +3,7 @@ import { Point } from "../../sketchlib/pga2d/Point.js";
 import { Motor } from "../../sketchlib/pga2d/versors.js";
 import { mod } from "../../sketchlib/mod.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
-import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
+import { LineSegment } from "../../sketchlib/primitives/LineSegment.js";
 import { group } from "../../sketchlib/primitives/shorthand.js";
 import { Animated } from "../../sketchlib/animation/Animated.js";
 
@@ -34,7 +34,7 @@ export function make_stripes(center, dir_forward, spacing, dimensions, phase) {
   for (let i = 0; i < num_stripes; i++) {
     const start = corner.add(forward_stride.scale(i + phase));
     const end = start.add(right_stride);
-    lines.push(new LinePrimitive(start, end));
+    lines.push(new LineSegment(start, end));
   }
 
   return group(...lines);
@@ -57,11 +57,8 @@ export class AnimatedStripes {
     this.spacing = spacing;
     this.dimensions = dimensions;
 
-    /**
-     * @type {GroupPrimitive}
-     */
-    this.primitive = make_stripes(center, dir_forward, spacing, dimensions, 0);
-    this.lines_array = this.primitive.primitives;
+    const stripes = make_stripes(center, dir_forward, spacing, dimensions, 0);
+    this.primitive = group(stripes);
   }
 
   /**
@@ -76,7 +73,6 @@ export class AnimatedStripes {
       this.dimensions,
       mod(time, 1.0),
     );
-    this.lines_array.length = 0;
-    this.lines_array.push(...new_stripes);
+    this.primitive.regroup(new_stripes);
   }
 }

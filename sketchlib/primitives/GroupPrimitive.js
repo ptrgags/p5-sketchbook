@@ -1,99 +1,11 @@
-import { is_nearly } from "../is_nearly.js";
+import {
+  PrimitiveCollectionStats,
+  RenderStats,
+} from "../perf/PrimitiveCollectionStats.js";
 import { Style } from "../Style.js";
 import { Primitive } from "./Primitive.js";
 import { TextStyle } from "./TextStyle.js";
 import { Transform } from "./Transform.js";
-
-/**
- * Apply stroke and fill styling
- * @param {import("p5")} p p5.js context
- * @param {Style} style The style to use
- */
-function apply_style(p, style) {
-  if (style.stroke && !is_nearly(style.stroke.a, 0)) {
-    const { r, g, b, a } = style.stroke;
-    p.stroke(r, g, b, a);
-  } else {
-    p.noStroke();
-  }
-
-  if (style.fill && !is_nearly(style.fill.a, 0)) {
-    const { r, g, b, a } = style.fill;
-    p.fill(r, g, b, a);
-  } else {
-    p.noFill();
-  }
-
-  p.strokeWeight(style.stroke_width);
-}
-
-/**
- * Convert string align values to p5.js constants
- * @param {import("p5")} p p5.js library
- * @param {"left" | "center" | "right"} h_align The horizontal align value
- * @returns {import("p5").HORIZ_ALIGN} the corresponding p5.js constant
- */
-function get_horizontal_align(p, h_align) {
-  switch (h_align) {
-    case "center":
-      return p.CENTER;
-    case "right":
-      return p.RIGHT;
-    default:
-      return p.LEFT;
-  }
-}
-
-/**
- * Convert string align values to p5.js constants
- * @param {import("p5")} p p5.js library
- * @param {"top" | "bottom" | "center" | "baseline"} v_align The vertical align value
- * @returns {import("p5").VERT_ALIGN} The corresponding p5.js constant
- */
-function get_vertical_align(p, v_align) {
-  switch (v_align) {
-    case "center":
-      return p.CENTER;
-    case "top":
-      return p.TOP;
-    case "baseline":
-      return p.BASELINE;
-    default:
-      return p.BOTTOM;
-  }
-}
-
-/**
- * Apply any text styles present in a TextStyle object
- * @param {import("p5")} p p5.js library
- * @param {TextStyle} text_style The text style
- */
-function apply_text_style(p, text_style) {
-  if (text_style.size !== undefined) {
-    p.textSize(text_style.size);
-  }
-
-  const h_align = text_style.h_align
-    ? get_horizontal_align(p, text_style.h_align)
-    : undefined;
-  const v_align = text_style.v_align
-    ? get_vertical_align(p, text_style.v_align)
-    : undefined;
-
-  if (h_align || v_align) {
-    p.textAlign(h_align, v_align);
-  }
-}
-
-/**
- * Apply a transform
- * @param {import("p5")} p p5.js library
- * @param {Transform} transform The transform to apply
- */
-function apply_transform(p, transform) {
-  const translation = transform.translation;
-  p.translate(translation.x, translation.y);
-}
 
 /**
  * @typedef {{
@@ -111,6 +23,7 @@ function apply_transform(p, transform) {
  * Note: GroupPrimitive can be nested, but the most specific settings will
  * be applied.
  * @implements {Primitive}
+ * @implements {PrimitiveCollectionStats}
  */
 export class GroupPrimitive {
   /**
@@ -136,29 +49,64 @@ export class GroupPrimitive {
   }
 
   /**
+   * Replace all the primitives with a new set. This is helpful for animations
+   * where the animation changes each frame, but we need a constant primitive
+   * to contain them.
+   * @param  {...Primitive} primitives New primitives
+   */
+  regroup(...primitives) {
+    this.primitives.splice(0, Infinity, ...primitives);
+  }
+
+  /**
    * Draw a group primitive. This will always push a new drawing state, apply
    * any settings, and pop at the end.
    * @param {import("p5")} p p5.js library
    */
   draw(p) {
-    p.push();
-    if (this.style) {
-      apply_style(p, this.style);
-    }
-
-    if (this.text_style) {
-      apply_text_style(p, this.text_style);
+    if (this.primitives.length === 0) {
+      return;
     }
 
     if (this.transform) {
-      apply_transform(p, this.transform);
+      p.push();
     }
 
-    for (const child of this) {
-      child.draw(p);
+    if (this.style) {
+      this.style.apply(p);
     }
 
-    p.pop();
+    if (this.text_style) {
+      this.text_style.apply(p);
+    }
+
+    if (this.transform) {
+      this.transform.apply(p);
+    }
+
+    this.primitives.forEach((x) => x.draw(p));
+
+    if (this.transform) {
+      p.pop();
+    }
+  }
+
+  /**
+   * @type {RenderStats}
+   */
+  get render_stats() {
+    const stats = {
+      type: "group",
+      has_style: this.style !== undefined,
+      has_text_style: this.text_style !== undefined,
+      has_transform: this.transform !== undefined,
+      push_pop_count: this.transform ? 1 : 0,
+      simple_prim_count: 0,
+      children: [],
+    };
+
+    PrimitiveCollectionStats.aggregate(stats, ...this.primitives);
+
+    return stats;
   }
 }
-GroupPrimitive.EMPTY = Object.freeze(new GroupPrimitive([]));

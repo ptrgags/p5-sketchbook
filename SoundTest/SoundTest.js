@@ -4,26 +4,25 @@ import { Color } from "../sketchlib/Color.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { Grid, Index2D } from "../sketchlib/Grid.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
-import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
+import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { xform, group, style } from "../sketchlib/primitives/shorthand.js";
 import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
 import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
 import { Transform } from "../sketchlib/primitives/Transform.js";
 import { Style } from "../sketchlib/Style.js";
-import { CanvasMouseHandler } from "../sketchlib/CanvasMouseHandler.js";
+import { CanvasMouseHandler } from "../sketchlib/input/CanvasMouseHandler.js";
 import { encode_midi_file } from "../sketchlib/midi/encode_midi.js";
 import {
   MIDIExportFormat,
   score_to_midi,
 } from "../sketchlib/midi/score_to_midi.js";
-import { MouseInput } from "../sketchlib/MouseInput.js";
 import { render_score } from "../sketchlib/music/render_score.js";
 import { MuteButton } from "../sketchlib/MuteButton.js";
 import { Oklch } from "../sketchlib/Oklch.js";
-import { PlayButtonScene } from "../sketchlib/PlayButtonScene.js";
+import { PlayButtonScene } from "../sketchlib/scenes/PlayButtonScene.js";
 import { Rectangle } from "../sketchlib/Rectangle.js";
 import { SoundManager } from "../sketchlib/SoundManager.js";
-import { TouchButton } from "../sketchlib/TouchButton.js";
+import { TouchButton } from "../sketchlib/input/TouchButton.js";
 import { Piano } from "./Piano.js";
 import { SpiralBurst } from "./SpiralBurst.js";
 import { expect_element } from "../sketchlib/dom/expect_element.js";
@@ -38,13 +37,17 @@ import { SCORE_LAYERED_MELODY } from "./example_scores/layered_melody.js";
 import { Part, Score } from "../sketchlib/music/Score.js";
 import { AbsTimelineOps } from "../sketchlib/music/AbsTimelineOps.js";
 import { PlayedNotes } from "./PlayedNotes.js";
-import { Ocarina } from "./Ocarina.js";
+import { Ocarina } from "../sketchlib/music_vis/Ocarina.js";
 import { RelTimelineOps } from "../sketchlib/music/RelTimelineOps.js";
 import { minmax } from "../sketchlib/minmax.js";
 import { Note } from "../sketchlib/music/Music.js";
 import { AbsInterval } from "../sketchlib/music/AbsTimeline.js";
 import { SCORE_OCARINA_TRIO } from "./example_scores/ocarina_trio.js";
 import { Rational } from "../sketchlib/Rational.js";
+import { MouseCallbacks } from "../sketchlib/input/MouseCallbacks.js";
+import { SoundScene } from "../sketchlib/scenes/SoundScene.js";
+import { AnimationGroup } from "../sketchlib/animation/AnimationGroup.js";
+import { Primitive } from "../sketchlib/primitives/Primitive.js";
 
 const DEBUG_LOOP = false;
 const LOOP_START = new Rational(14 * 4);
@@ -166,8 +169,6 @@ const SOPRANO_OCARINA = {
   octave: Ocarina.OCTAVE_SOPRANO,
 };
 
-const INACTIVE_COLOR = new Oklch(0.7, 0, 0);
-
 const GRID_BOUNDARY = new Rectangle(
   new Point(0, 300),
   new Direction(WIDTH, 200),
@@ -187,7 +188,7 @@ const [FIRST_BUTTON_POSITION, BUTTON_STRIDE] = MELODY_BUTTONS.compute_layout(
 function make_button_labels(buttons) {
   const primitives = buttons.map_array((index, descriptor) => {
     if (!descriptor) {
-      return GroupPrimitive.EMPTY;
+      return Primitive.EMPTY;
     }
     const offset = FIRST_BUTTON_POSITION.add(MELODY_BUTTON_CENTER_OFFSET);
     const position_world = index.to_world(offset, BUTTON_STRIDE);
@@ -205,7 +206,7 @@ const BUTTON_LABELS = make_button_labels(MELODY_BUTTONS);
 const TIMELINE_TOP = 0;
 
 const CURSOR = style(
-  new LinePrimitive(
+  new LineSegment(
     new Point(WIDTH / 2, TIMELINE_TOP),
     new Point(WIDTH / 2, TIMELINE_TOP + HEIGHT / 4),
   ),
@@ -252,7 +253,7 @@ async function import_midi_file(file_list) {
   return [fname, buffer];
 }
 
-class SoundScene {
+class SoundTestAnimation {
   /**
    * Constructor
    * @param {SoundManager} sound Reference to the sound manager
@@ -260,37 +261,15 @@ class SoundScene {
    */
   constructor(sound, melodies) {
     this.sound = sound;
-    this.mute_button = new MuteButton();
+    this.mute_button = new MuteButton(sound);
     this.events = new EventTarget();
     this.piano = new Piano(PIANO_BOUNDS, new PlayedNotes([]));
     this.ocarinas = {
-      bass: new Ocarina(
-        BASS_OCARINA.bounds,
-        PlayedNotes.EMPTY,
-        BASS_OCARINA.octave,
-        INACTIVE_COLOR,
-      ),
-      tenor: new Ocarina(
-        TENOR_OCARINA.bounds,
-        PlayedNotes.EMPTY,
-        TENOR_OCARINA.octave,
-        INACTIVE_COLOR,
-      ),
-      soprano: new Ocarina(
-        SOPRANO_OCARINA.bounds,
-        PlayedNotes.EMPTY,
-        SOPRANO_OCARINA.octave,
-        INACTIVE_COLOR,
-      ),
+      bass: new Ocarina(BASS_OCARINA),
+      tenor: new Ocarina(TENOR_OCARINA),
+      soprano: new Ocarina(SOPRANO_OCARINA),
     };
     this.spiral_burst = new SpiralBurst();
-
-    this.mute_button.events.addEventListener(
-      "change",
-      (/** @type {CustomEvent}*/ e) => {
-        this.sound.toggle_sound(e.detail.sound_on);
-      },
-    );
 
     // This button is disabled until a score is selected.
     this.export_button = expect_element("export_clips", HTMLButtonElement);
@@ -347,6 +326,7 @@ class SoundScene {
      */
     this.selected_melody = undefined;
 
+    // Need to store the buttons so we can access the callbacks
     this.melody_buttons = melodies.map_array((index, descriptor) => {
       const corner = index.to_world(FIRST_BUTTON_POSITION, BUTTON_STRIDE);
       const rectangle = new Rectangle(corner, MELODY_BUTTON_DIMENSIONS);
@@ -356,6 +336,25 @@ class SoundScene {
       });
       return button;
     });
+    this.button_group = new AnimationGroup(...this.melody_buttons);
+
+    this.timeline_prim = group();
+    this.ocarina_prims = group(
+      this.ocarinas.bass.primitive,
+      this.ocarinas.tenor.primitive,
+      this.ocarinas.soprano.primitive,
+    );
+    this.piano_prim = group();
+
+    this.primitive = group(
+      this.button_group.primitive,
+      BUTTON_LABELS,
+      this.piano_prim,
+      this.timeline_prim,
+      CURSOR,
+      this.ocarina_prims,
+      this.spiral_burst.primitive,
+    );
   }
 
   /**
@@ -509,53 +508,23 @@ class SoundScene {
 
     this.piano = new Piano(PIANO_BOUNDS, assigned_notes.piano);
 
-    if (assigned_notes.bass_ocarina) {
-      this.ocarinas.bass = new Ocarina(
-        BASS_OCARINA.bounds,
-        assigned_notes.bass_ocarina,
-        BASS_OCARINA.octave,
-        BASS_OCARINA.color,
-      );
-    } else {
-      this.ocarinas.bass = new Ocarina(
-        BASS_OCARINA.bounds,
-        PlayedNotes.EMPTY,
-        BASS_OCARINA.octave,
-        INACTIVE_COLOR,
-      );
-    }
+    this.ocarinas.bass = new Ocarina(BASS_OCARINA, assigned_notes.bass_ocarina);
+    this.ocarinas.tenor = new Ocarina(
+      TENOR_OCARINA,
+      assigned_notes.tenor_ocarina,
+    );
+    this.ocarinas.soprano = new Ocarina(
+      SOPRANO_OCARINA,
+      assigned_notes.soprano_ocarina,
+    );
 
-    if (assigned_notes.tenor_ocarina) {
-      this.ocarinas.tenor = new Ocarina(
-        TENOR_OCARINA.bounds,
-        assigned_notes.tenor_ocarina,
-        TENOR_OCARINA.octave,
-        TENOR_OCARINA.color,
-      );
-    } else {
-      this.ocarinas.tenor = new Ocarina(
-        TENOR_OCARINA.bounds,
-        PlayedNotes.EMPTY,
-        TENOR_OCARINA.octave,
-        INACTIVE_COLOR,
-      );
-    }
-
-    if (assigned_notes.soprano_ocarina) {
-      this.ocarinas.soprano = new Ocarina(
-        SOPRANO_OCARINA.bounds,
-        assigned_notes.soprano_ocarina,
-        SOPRANO_OCARINA.octave,
-        SOPRANO_OCARINA.color,
-      );
-    } else {
-      this.ocarinas.soprano = new Ocarina(
-        SOPRANO_OCARINA.bounds,
-        PlayedNotes.EMPTY,
-        SOPRANO_OCARINA.octave,
-        INACTIVE_COLOR,
-      );
-    }
+    // Update the primitives
+    this.piano_prim.regroup(this.piano.primitive);
+    this.ocarina_prims.regroup(
+      this.ocarinas.bass.primitive,
+      this.ocarinas.tenor.primitive,
+      this.ocarinas.soprano.primitive,
+    );
   }
 
   /**
@@ -584,7 +553,7 @@ class SoundScene {
 
   render_timeline(time) {
     if (this.selected_melody === undefined) {
-      return GroupPrimitive.EMPTY;
+      return Primitive.EMPTY;
     }
 
     const x = time * MEASURE_DIMENSIONS.x;
@@ -593,71 +562,26 @@ class SoundScene {
     return xform(timeline, transform);
   }
 
-  render() {
-    const current_time = SOUND.transport_time;
-
-    // this should really go in update()
-    this.piano.update(current_time);
-    this.ocarinas.bass.update(current_time);
-    this.ocarinas.tenor.update(current_time);
-    this.ocarinas.soprano.update(current_time);
-    this.spiral_burst.update(current_time);
-
-    const mute = this.mute_button.render();
-    const melody_buttons = this.melody_buttons.map((x) => x.debug_render());
-    const timeline = this.render_timeline(current_time);
-
-    // TODO: this should be rewritten to use the Animated interface
-    return group(
-      ...melody_buttons,
-      BUTTON_LABELS,
-      this.piano.primitive,
-      timeline,
-      CURSOR,
-      this.ocarinas.bass.primitive,
-      this.ocarinas.tenor.primitive,
-      this.ocarinas.soprano.primitive,
-      this.spiral_burst.primitive,
-      mute,
-    );
-  }
-
-  update() {}
-
   /**
    *
-   * @param {MouseInput} input
+   * @param {number} time
    */
-  mouse_pressed(input) {
-    this.mute_button.mouse_pressed(input);
-    this.melody_buttons.forEach((x) => x.mouse_pressed(input.mouse_coords));
+  update(time) {
+    this.piano.update(time);
+    this.ocarinas.bass.update(time);
+    this.ocarinas.tenor.update(time);
+    this.ocarinas.soprano.update(time);
+    this.spiral_burst.update(time);
+    this.button_group.update(time);
+
+    this.timeline_prim.regroup(this.render_timeline(time));
   }
 
   /**
-   *
-   * @param {MouseInput} input
+   * @type {MouseCallbacks[]}
    */
-  mouse_moved(input) {
-    this.mute_button.mouse_moved(input);
-    this.melody_buttons.forEach((x) => x.mouse_moved(input.mouse_coords));
-  }
-
-  /**
-   *
-   * @param {MouseInput} input
-   */
-  mouse_dragged(input) {
-    this.mute_button.mouse_dragged(input);
-    this.melody_buttons.forEach((x) => x.mouse_moved(input.mouse_coords));
-  }
-
-  /**
-   *
-   * @param {MouseInput} input
-   */
-  mouse_released(input) {
-    this.mute_button.mouse_released(input);
-    this.melody_buttons.forEach((x) => x.mouse_released(input.mouse_coords));
+  get mouse_callbacks() {
+    return this.melody_buttons;
   }
 }
 
@@ -678,9 +602,12 @@ export const sketch = (p) => {
     ).elt;
 
     MOUSE.setup(canvas);
+    MOUSE.callbacks = scene.mouse_callbacks;
 
     scene.events.addEventListener("scene-change", () => {
-      scene = new SoundScene(SOUND, MELODY_BUTTONS);
+      const anim = new SoundTestAnimation(SOUND, MELODY_BUTTONS);
+      scene = new SoundScene(SOUND, anim);
+      MOUSE.callbacks = scene.mouse_callbacks;
     });
   };
 
@@ -688,24 +615,8 @@ export const sketch = (p) => {
     p.background(0);
 
     scene.update();
-
-    const scene_primitive = scene.render();
-    scene_primitive.draw(p);
+    scene.primitive.draw(p);
   };
 
-  MOUSE.mouse_pressed(p, (input) => {
-    scene.mouse_pressed(input);
-  });
-
-  MOUSE.mouse_moved(p, (input) => {
-    scene.mouse_moved(input);
-  });
-
-  MOUSE.mouse_released(p, (input) => {
-    scene.mouse_released(input);
-  });
-
-  MOUSE.mouse_dragged(p, (input) => {
-    scene.mouse_dragged(input);
-  });
+  MOUSE.configure_callbacks(p);
 };

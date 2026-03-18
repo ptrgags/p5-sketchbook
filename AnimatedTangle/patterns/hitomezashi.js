@@ -1,18 +1,13 @@
 import { Direction } from "../../sketchlib/pga2d/Direction.js";
 import { Point } from "../../sketchlib/pga2d/Point.js";
-import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
-import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
+import { LineSegment } from "../../sketchlib/primitives/LineSegment.js";
 import { style } from "../../sketchlib/primitives/shorthand.js";
 import { Random } from "../../sketchlib/random.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Animated } from "../../sketchlib/animation/Animated.js";
 import { AnimatedPath } from "../../sketchlib/animation/AnimatedPath.js";
 import { LoopCurve } from "../../sketchlib/animation/LoopCurve.js";
-import {
-  Hold,
-  make_param,
-  ParamCurve,
-} from "../../sketchlib/animation/ParamCurve.js";
+import { Hold, make_param } from "../../sketchlib/animation/ParamCurve.js";
 import { Sequential } from "../../sketchlib/music/Timeline.js";
 import { Rational } from "../../sketchlib/Rational.js";
 import { PALETTE_CORAL, Values } from "../theme_colors.js";
@@ -40,7 +35,7 @@ for (let i = 0; i < NUM_COLS; i++) {
     const a = column_origin.add(Y_STEP.scale(j));
     const b = column_origin.add(Y_STEP.scale(j + 1));
 
-    const stitch = new LinePrimitive(a, b);
+    const stitch = new LineSegment(a, b);
     column_stitches.push(stitch);
   }
   VERTICAL_PATHS.push(column_stitches);
@@ -55,7 +50,7 @@ for (let i = 0; i < NUM_ROWS; i++) {
     const a = row_origin.add(X_STEP.scale(j));
     const b = row_origin.add(X_STEP.scale(j + 1));
 
-    const stitch = new LinePrimitive(a, b);
+    const stitch = new LineSegment(a, b);
     row_stitches.push(stitch);
   }
   HORIZONTAL_PATHS.push(row_stitches);
@@ -105,13 +100,14 @@ const STYLE_STITCHES = new Style({
  */
 class Hitomezashi {
   constructor() {
-    this.primitive = style(GroupPrimitive.EMPTY, STYLE_STITCHES);
+    this.primitive = style([], STYLE_STITCHES);
   }
 
+  /**
+   *
+   * @param {number} time
+   */
   update(time) {
-    const primitive = this.primitive;
-    primitive.primitives.length = 0;
-
     // For the stitch animation we animate    [0, end-->
     // for the unstitch animation we animate  start-->, end]
     // so we need two curves, one per variable
@@ -123,7 +119,7 @@ class Hitomezashi {
 
     // Use render_between to slice out a portion of the path
     const prim = STITCH_PATH.render_between(start, end);
-    primitive.primitives.push(prim);
+    this.primitive.regroup(prim);
   }
 }
 

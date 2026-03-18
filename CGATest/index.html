@@ -18,37 +18,94 @@
   <body>
     <sketchbook-navbar></sketchbook-navbar>
     <div class="container">
-      <h1>Conformal Geometric Algebra (CGA) Test (2026-02)</h1>
+      <h1>Conformal Geometric Algebra (CGA) Test (2026-02/2026-03)</h1>
       <div class="sketch">
         <canvas id="sketch-canvas" width="500" height="700"></canvas>
       </div>
       <div class="description">
+        <p>Click/tap the canvas to cycle through the different scenes.</p>
         <p>
-          I want to port some of the things I did in
+          I'm porting the conformal geometry math I used in
           <a href="https://github.com/ptrgags/math-notebook/tree/main"
             >math-notebook</a
           >
-          to p5 so I can animate them. Except this time, I want to try using 2D
-          Conformal Geometric Algebra (2D CGA) rather than complex numbers.
-          There's a lot of moving pieces (see
-          <a href="https://github.com/ptrgags/p5-sketchbook/issues/217"
-            >the GitHubIssue</a
-          >). So far this is just a test of rendering the geometry primitives. A
-          Cline is a generalized circle or line. Points are encoded as null
-          points (circles with radius 0).
+          to p5js so I can animate them. This time, I'm using 2D Conformal
+          Geometric Algebra (2D CGA) rather than complex numbers.
         </p>
-        <p>
-          This sketch creates some Cline and NullPoint objects and transforms
-          them with versors. The original shapes are in yellow. The blue shapes
-          are the originals flipped over the yellow line. The orange shapes are
-          the originals inverted in the yellow circle. The green animated shapes
-          are the originals rotated around the enter of the screen.
-        </p>
-        <p>
-          Update 2026-02-27: I added support for the different kinds of Möbius
-          transformations, which allow me to do some fancy non-linear motions.
-          For now, this page just demonstrates that each is working correctly.
-        </p>
+        <p>Description of the scenes</p>
+        <ol>
+          <li>
+            <b>Transformation Basics</b> - This first scene creates various
+            shapes and transforms them to make sure the transformations look
+            correct. The original shapes are in yellow. The blue shapes are the
+            originals reflected through the yellow line. The small orange shapes
+            are the originals inverted into the yellow circle.
+          </li>
+          <li>
+            <b>Conformal Transformation Basics</b> - This second scene explores
+            the unusual transformations possible through CGA.
+            <p>The big green circle represents the unit circle.</p>
+            <p>
+              The orange circles and the ring of green points near the center
+              are moving under parabolic motions (related to translation). This
+              was a precursor to my
+              <a href="../ParabolicGrid/">Parabolic Grid</a> animation.
+            </p>
+            <p>
+              The green points that hover around the left end of the unit circle
+              are transformed by an elliptic motion. This is related to
+              rotation.
+            </p>
+            <p>
+              The green points moving across the unit circle from one end to the
+              other are undergoing hyperbolic motion. This is related to
+              scaling.
+            </p>
+            <p>
+              The purple points are what happens when you combine the elliptic
+              and hyperbolic motion, i.e. a loxodromic motion. This is related
+              to moving along a logarithmic spiral.
+            </p>
+          </li>
+          <li>
+            <b>Animated Fractals</b> - This scene shows two copies of the
+            <a href="https://en.wikipedia.org/wiki/Sierpi%C5%84ski_triangle"
+              >Sierpiński Triangle</a
+            >
+            fractal, animated in different ways. The orange circles show how the
+            fractal is created by overlaying scaled copies of the shape over and
+            over. The green circles highlight the order that the code traverses
+            the fractal when rendering.
+          </li>
+          <li>
+            <b>Nacho Spaceship</b> - I added circular arcs that can be
+            transformed by these conformal transformations. This animation tests
+            them out. I take a nacho chip shape and rotate it to infinity... and
+            beyond.
+          </li>
+        </ol>
+        <details>
+          <summary>Changelog</summary>
+          <dl>
+            <dt>2026-03-07</dt>
+            <dd>
+              The sketch was getting cluttered so I separated it into several
+              animations. I also added the nacho spaceship animation to test out
+              circular arcs.
+            </dd>
+            <dt>2026-03-05</dt>
+            <dd>
+              I prototyped fractal rendering with the two different Sierpiński
+              triangle visualizations
+            </dd>
+            <dt>2026-02-17</dt>
+            <dd>
+              I added support for the different kinds of Möbius transformations,
+              which allow me to do some fancy non-linear motions. For now, this
+              page just demonstrates that each is working correctly.
+            </dd>
+          </dl>
+        </details>
       </div>
     </div>
   </body>

@@ -1,16 +1,17 @@
 import { Style } from "../Style.js";
 import { GroupPrimitive } from "./GroupPrimitive.js";
 import { Primitive } from "./Primitive.js";
+import { SimpleGroupPrimitive } from "./SimpleGroupPrimitive.js";
 import { Transform } from "./Transform.js";
 
 /**
  * Shorthand for creating a GroupPrimitive that just groups primitives with
  * no styling/transformations
  * @param  {...Primitive} primitives
- * @returns
+ * @returns {SimpleGroupPrimitive}
  */
 export function group(...primitives) {
-  return new GroupPrimitive(primitives);
+  return new SimpleGroupPrimitive(...primitives);
 }
 
 /**

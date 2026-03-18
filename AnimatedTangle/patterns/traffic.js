@@ -1,27 +1,20 @@
 import { Direction } from "../../sketchlib/pga2d/Direction.js";
 import { Point } from "../../sketchlib/pga2d/Point.js";
 import { Ease } from "../../sketchlib/Ease.js";
-import { Circle } from "../../sketchlib/primitives/Circle.js";
-import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
-import { group, style, xform } from "../../sketchlib/primitives/shorthand.js";
-import { Transform } from "../../sketchlib/primitives/Transform.js";
+import { group } from "../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Animated } from "../../sketchlib/animation/Animated.js";
 import { AnimationGroup } from "../../sketchlib/animation/AnimationGroup.js";
 import { LoopCurve } from "../../sketchlib/animation/LoopCurve.js";
-import {
-  make_param,
-  ParamCurve,
-} from "../../sketchlib/animation/ParamCurve.js";
+import { make_param } from "../../sketchlib/animation/ParamCurve.js";
 import { Sequential } from "../../sketchlib/music/Timeline.js";
 import { Rational } from "../../sketchlib/Rational.js";
+import { PALETTE_CORAL, Values } from "../theme_colors.js";
 import {
-  PALETTE_CORAL,
-  PALETTE_NAVY,
-  PALETTE_SKY,
-  Values,
-} from "../theme_colors.js";
+  LayerPrimitive,
+  RenderLayers,
+} from "../../sketchlib/primitives/LayerPrimitive.js";
 
 const HALF_DIST = 300;
 const HALF_DURATION = new Rational(2);
@@ -36,14 +29,12 @@ const CURVE_POSITION = LoopCurve.from_timeline(TIMELINE_POSITION);
 const PLATFORM_WIDTH = 25;
 const PLATFORM_HEIGHT = 25;
 const TOP_HEIGHT = 15;
-const PLATFORM_TOP = new RectPrimitive(
-  Point.ORIGIN,
-  new Direction(PLATFORM_WIDTH, TOP_HEIGHT),
+const DIMS_PLATFORM_TOP = new Direction(PLATFORM_WIDTH, TOP_HEIGHT);
+const DIMS_PLATFORM_SHADOW = new Direction(
+  PLATFORM_WIDTH,
+  PLATFORM_HEIGHT - TOP_HEIGHT,
 );
-const PLATFORM_SHADOW = new RectPrimitive(
-  new Point(0, TOP_HEIGHT),
-  new Direction(PLATFORM_WIDTH, PLATFORM_HEIGHT - TOP_HEIGHT),
-);
+const SHADOW_ORIGIN = new Point(0, TOP_HEIGHT);
 const STYLE_TOP = new Style({
   fill: PALETTE_CORAL[Values.MED_LIGHT],
 });
@@ -60,6 +51,7 @@ const PHASES = new Array(NUM_PLATFORMS).fill(0).map((_, i) => {
 
 /**
  * @implements {Animated}
+ * @implements {RenderLayers}
  */
 class TrafficLane {
   /**
@@ -69,33 +61,28 @@ class TrafficLane {
   constructor(center_offset) {
     this.center_offset = center_offset;
 
-    this.transforms = PHASES.map((phase) => {
+    this.platform_tops = new Array(PHASES.length);
+    this.platform_shadows = new Array(PHASES.length);
+
+    PHASES.forEach((phase, i) => {
       const dx = CURVE_POSITION.value(phase);
-      return new Transform(center_offset.add(Direction.DIR_X.scale(dx)));
+      const offset = center_offset.add(Direction.DIR_X.scale(dx));
+      this.platform_tops[i] = new RectPrimitive(
+        Point.ORIGIN.add(offset),
+        DIMS_PLATFORM_TOP,
+      );
+      this.platform_shadows[i] = new RectPrimitive(
+        SHADOW_ORIGIN.add(offset),
+        DIMS_PLATFORM_SHADOW,
+      );
     });
 
-    this.primitive = group(...this.style_primitives());
-  }
+    this.layers = [
+      group(...this.platform_tops),
+      group(...this.platform_shadows),
+    ];
 
-  *style_primitives() {
-    // We have n blocks and 2 styles to apply. Somewhat surprisingly,
-    // styling each layer individually requires the least amount of
-    // saving/restoring the graphics state. See
-    // https://github.com/ptrgags/p5-sketchbook/issues/149#issuecomment-3738218567
-
-    for (const transform of this.transforms) {
-      const background = new GroupPrimitive(PLATFORM_TOP, {
-        style: STYLE_TOP,
-        transform,
-      });
-
-      const foreground = new GroupPrimitive(PLATFORM_SHADOW, {
-        style: STYLE_SHADOW,
-        transform,
-      });
-      yield background;
-      yield foreground;
-    }
+    this.primitive = group(...this.layers);
   }
 
   /**
@@ -103,9 +90,11 @@ class TrafficLane {
    * @param {number} time
    */
   update(time) {
-    this.transforms.forEach((t, i) => {
-      const dx = CURVE_POSITION.value(time + PHASES[i]);
-      t.translation = this.center_offset.add(Direction.DIR_X.scale(dx));
+    PHASES.forEach((phase, i) => {
+      const dx = CURVE_POSITION.value(time + phase);
+      const offset = this.center_offset.add(Direction.DIR_X.scale(dx));
+      this.platform_tops[i].position = Point.ORIGIN.add(offset);
+      this.platform_shadows[i].position = SHADOW_ORIGIN.add(offset);
     });
   }
 }
@@ -117,4 +106,10 @@ const LANES = [
   new Direction(100, 175),
 ].map((x) => new TrafficLane(x));
 
+// Use this for update(t)
 export const TRAFFIC = new AnimationGroup(...LANES);
+// use this for rendering
+export const TRAFFIC_LAYERS = new LayerPrimitive(LANES, [
+  STYLE_TOP,
+  STYLE_SHADOW,
+]);

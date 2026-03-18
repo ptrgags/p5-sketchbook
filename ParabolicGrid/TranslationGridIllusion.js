@@ -1,8 +1,12 @@
 import { Animated } from "../sketchlib/animation/Animated.js";
 import { Cline } from "../sketchlib/cga2d/Cline.js";
+import { CNode } from "../sketchlib/cga2d/CNode.js";
+import { CTile } from "../sketchlib/cga2d/CTile.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
+import { PowerIterator } from "../sketchlib/cga2d/PowerIterator.js";
+import { StyledTile } from "../sketchlib/cga2d/StyledTile.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
-import { group, style } from "../sketchlib/primitives/shorthand.js";
+import { StyleRuns } from "../sketchlib/styling/StyleRuns.js";
 import { STYLE_X, STYLE_Y } from "./styling.js";
 import { CURVE_X, CURVE_Y } from "./timing.js";
 
@@ -10,18 +14,25 @@ const OFFSET_X = new Direction(0.25, 0);
 const OFFSET_Y = new Direction(0, 0.25);
 
 const MAX_X_STEP = 5;
-const X_LINES = [];
-for (let i = -MAX_X_STEP; i <= MAX_X_STEP; i++) {
-  const transform_x = CVersor.translation(OFFSET_X.scale(i));
-  X_LINES.push(transform_x.transform_cline(Cline.Y_AXIS));
-}
+const X_ITER = new PowerIterator(CVersor.translation(OFFSET_X));
+const X_LINES = new CTile(
+  ...X_ITER.iterate(-MAX_X_STEP, MAX_X_STEP).map((x) =>
+    x.transform(Cline.Y_AXIS),
+  ),
+);
 
 const MAX_Y_STEP = 7;
-const Y_LINES = [];
-for (let i = -MAX_Y_STEP; i <= MAX_Y_STEP; i++) {
-  const transform_y = CVersor.translation(OFFSET_Y.scale(i));
-  Y_LINES.push(transform_y.transform_cline(Cline.X_AXIS));
-}
+const Y_ITER = new PowerIterator(CVersor.translation(OFFSET_Y));
+const Y_LINES = new CTile(
+  ...Y_ITER.iterate(-MAX_Y_STEP, MAX_Y_STEP).map((x) =>
+    x.transform(Cline.X_AXIS),
+  ),
+);
+
+const GRID = new StyledTile(
+  [X_LINES, Y_LINES],
+  StyleRuns.from_styles([STYLE_X, STYLE_Y]),
+);
 
 /**
  * Translation grid illusion, analagous to the parabolic case.
@@ -39,9 +50,8 @@ export class TranslationGridIllusion {
   constructor(to_screen) {
     this.to_screen = to_screen;
 
-    this.x_group = style(X_LINES, STYLE_X);
-    this.y_group = style(Y_LINES, STYLE_Y);
-    this.primitive = group(this.x_group, this.y_group);
+    this.translation_node = new CNode(CVersor.IDENTITY, GRID);
+    this.primitive = new CNode(to_screen, this.translation_node);
   }
 
   /**
@@ -57,11 +67,6 @@ export class TranslationGridIllusion {
     // of CGA operations.
     const offset = new Direction(OFFSET_X.x * tx, OFFSET_Y.y * ty);
     const translate = CVersor.translation(offset);
-    const para_screen = this.to_screen.compose(translate);
-
-    const x_tiles = X_LINES.map((x) => para_screen.transform_cline(x));
-    const y_tiles = Y_LINES.map((x) => para_screen.transform_cline(x));
-    this.x_group.primitives = x_tiles;
-    this.y_group.primitives = y_tiles;
+    this.translation_node.update_transforms(translate);
   }
 }

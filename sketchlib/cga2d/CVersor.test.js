@@ -3,24 +3,65 @@ import { Cline } from "./Cline.js";
 import { Point } from "../pga2d/Point.js";
 import { CVersor } from "./CVersor.js";
 import { Direction } from "../pga2d/Direction.js";
-import { PGA_MATCHERS } from "../test_helpers/pga_matchers.js";
 import { Circle } from "../primitives/Circle.js";
 import { Line } from "../pga2d/Line.js";
-import { CGA_MATCHERS } from "../test_helpers/cga_matchers.js";
 import { NullPoint } from "./NullPoint.js";
 import { COdd } from "./COdd.js";
 import { CEven } from "./CEven.js";
 
-expect.extend(PGA_MATCHERS);
-expect.extend(CGA_MATCHERS);
-
 describe("CVersor", () => {
+  describe("pow", () => {
+    it("with 0 returns identity", () => {
+      const versor = CVersor.rotation(Math.PI / 4);
+
+      const result = versor.pow(0);
+
+      const expected = CVersor.IDENTITY;
+      expect(result).toBe(expected);
+    });
+
+    it("with 1 returns the versor", () => {
+      const versor = CVersor.rotation(Math.PI / 4);
+
+      const result = versor.pow(1);
+
+      expect(result).toBe(versor);
+    });
+
+    it("with positive power returns the versor iterated that many times", () => {
+      const versor = CVersor.rotation(Math.PI / 4);
+
+      const result = versor.pow(3);
+
+      const expected = CVersor.rotation((3 * Math.PI) / 4);
+      expect(result).toBeCVersor(expected);
+    });
+
+    it("with -1 returns the inverse", () => {
+      const versor = CVersor.rotation(Math.PI / 4);
+
+      const result = versor.pow(-1);
+
+      const expected = versor.inv();
+      expect(result).toBeCVersor(expected);
+    });
+
+    it("with negative power returns the inverse iterated that many times", () => {
+      const versor = CVersor.rotation(Math.PI / 4);
+
+      const result = versor.pow(-3);
+
+      const expected = CVersor.rotation(-(3 * Math.PI) / 4);
+      expect(result).toBeCVersor(expected);
+    });
+  });
+
   describe("reflection", () => {
     it("reflects point over line", () => {
       const point = NullPoint.from_point(new Point(1, -2));
       const reflection = CVersor.reflection(Direction.DIR_X);
 
-      const result = reflection.transform_point(point);
+      const result = reflection.transform(point);
 
       const expected = NullPoint.from_point(new Point(-1, -2));
       expect(result).toBeNullPoint(expected);
@@ -30,7 +71,7 @@ describe("CVersor", () => {
       const point = NullPoint.from_point(new Point(4 / 5, -3 / 5));
       const reflection = CVersor.reflection(new Direction(3 / 5, 4 / 5));
 
-      const result = reflection.transform_point(point);
+      const result = reflection.transform(point);
 
       expect(result).toBeNullPoint(point);
     });
@@ -38,7 +79,7 @@ describe("CVersor", () => {
     it("fixes the point at infinity", () => {
       const reflection = CVersor.reflection(new Direction(3 / 5, 4 / 5));
 
-      const result = reflection.transform_point(NullPoint.INF);
+      const result = reflection.transform(NullPoint.INF);
 
       expect(result).toBeNullPoint(NullPoint.INF);
     });
@@ -47,7 +88,7 @@ describe("CVersor", () => {
       const circle = Cline.from_circle(new Circle(new Point(0, 5), 3));
       const reflection = CVersor.reflection(Direction.DIR_X);
 
-      const result = reflection.transform_cline(circle);
+      const result = reflection.transform(circle);
 
       expect(result).toBeCline(circle);
     });
@@ -56,7 +97,7 @@ describe("CVersor", () => {
       const circle = Cline.from_circle(new Circle(new Point(3, 4), 3));
       const reflection = CVersor.reflection(new Direction(1, 1));
 
-      const result = reflection.transform_cline(circle);
+      const result = reflection.transform(circle);
 
       const expected = Cline.from_circle(new Circle(new Point(-4, -3), 3));
       expect(result).toBeCline(expected);
@@ -66,7 +107,7 @@ describe("CVersor", () => {
       const line = Cline.from_line(new Line(1, 1, 0));
       const reflection = CVersor.reflection(new Direction(1, 1));
 
-      const result = reflection.transform_cline(line);
+      const result = reflection.transform(line);
 
       const expected = Cline.from_line(new Line(-1, -1, 0));
       expect(result).toBeCline(expected);
@@ -76,7 +117,7 @@ describe("CVersor", () => {
       const line = Cline.from_line(new Line(1, -1, 0));
       const reflection = CVersor.reflection(new Direction(1, 1));
 
-      const result = reflection.transform_cline(line);
+      const result = reflection.transform(line);
 
       expect(result).toBeCline(line);
     });
@@ -95,19 +136,19 @@ describe("CVersor", () => {
     it("fixes point on unit circle", () => {
       const point = NullPoint.from_point(new Point(3 / 5, -4 / 5));
 
-      const result = CVersor.INVERSION.transform_point(point);
+      const result = CVersor.INVERSION.transform(point);
 
       expect(result).toBeNullPoint(point);
     });
 
     it("sends the origin to infinity", () => {
-      const result = CVersor.INVERSION.transform_point(NullPoint.ORIGIN);
+      const result = CVersor.INVERSION.transform(NullPoint.ORIGIN);
 
       expect(result).toBeNullPoint(NullPoint.INF);
     });
 
     it("fixes unit circle", () => {
-      const result = CVersor.INVERSION.transform_cline(Cline.UNIT_CIRCLE);
+      const result = CVersor.INVERSION.transform(Cline.UNIT_CIRCLE);
 
       expect(result).toBeCline(Cline.UNIT_CIRCLE);
     });
@@ -115,7 +156,7 @@ describe("CVersor", () => {
     it("fixes line through the origin", () => {
       const line = Cline.from_line(new Line(3 / 5, -4 / 5, 0));
 
-      const result = CVersor.INVERSION.transform_cline(line);
+      const result = CVersor.INVERSION.transform(line);
 
       expect(result).toBeCline(line);
     });
@@ -123,7 +164,7 @@ describe("CVersor", () => {
     it("line outside unit circle inverts to a circle through the origin", () => {
       const line = Cline.from_line(new Line(1, 0, 4));
 
-      const result = CVersor.INVERSION.transform_cline(line);
+      const result = CVersor.INVERSION.transform(line);
 
       // A line outside the unit circle inverts to a circle inside the unit
       // circle. we can find points on an identify if we watch what happens
@@ -157,7 +198,7 @@ describe("CVersor", () => {
       const point = NullPoint.from_point(new Point(1, 2));
       const translation = CVersor.translation(new Direction(3, -2));
 
-      const result = translation.transform_point(point);
+      const result = translation.transform(point);
 
       const expected = NullPoint.from_point(new Point(4, 0));
       expect(result).toBeNullPoint(expected);
@@ -167,7 +208,7 @@ describe("CVersor", () => {
       const circle = Cline.from_circle(new Circle(new Point(3, 4), 5));
       const translation = CVersor.translation(new Direction(3, -2));
 
-      const result = translation.transform_cline(circle);
+      const result = translation.transform(circle);
 
       const expected_circle = Cline.from_circle(new Circle(new Point(6, 2), 5));
       expect(result).toBeCline(expected_circle);
@@ -178,7 +219,7 @@ describe("CVersor", () => {
       const line = Cline.from_line(new Line(normal.x, normal.y, 1));
       const translation = CVersor.translation(normal.scale(4));
 
-      const result = translation.transform_cline(line);
+      const result = translation.transform(line);
 
       const expected = Cline.from_line(new Line(normal.x, normal.y, 5));
       expect(result).toBeCline(expected);
@@ -189,7 +230,7 @@ describe("CVersor", () => {
       const line = Cline.from_line(new Line(normal.x, normal.y, 1));
       const translation = CVersor.translation(normal.rot90().scale(4));
 
-      const result = translation.transform_cline(line);
+      const result = translation.transform(line);
 
       const expected = Cline.from_line(new Line(normal.x, normal.y, 1));
       expect(result).toBeCline(expected);
@@ -198,7 +239,7 @@ describe("CVersor", () => {
     it("fixes point at infinity", () => {
       const translation = CVersor.translation(new Direction(3, -1));
 
-      const result = translation.transform_point(NullPoint.INF);
+      const result = translation.transform(NullPoint.INF);
 
       expect(result).toBeNullPoint(NullPoint.INF);
     });
@@ -221,7 +262,7 @@ describe("CVersor", () => {
       const point = NullPoint.from_point(new Point(3, 4));
       const rotation = CVersor.rotation(Math.PI / 2);
 
-      const result = rotation.transform_point(point);
+      const result = rotation.transform(point);
 
       // Rotate 90 degrees is (-y, x)
       const expected = NullPoint.from_point(new Point(-4, 3));
@@ -232,7 +273,7 @@ describe("CVersor", () => {
       const circle = Cline.from_circle(new Circle(Point.ORIGIN, 5));
       const rotation = CVersor.rotation(Math.PI / 2);
 
-      const result = rotation.transform_cline(circle);
+      const result = rotation.transform(circle);
 
       expect(result).toBeCline(circle);
     });
@@ -242,7 +283,7 @@ describe("CVersor", () => {
       const circle_cline = Cline.from_circle(circle);
       const rotation = CVersor.rotation(Math.PI / 2);
 
-      const result = rotation.transform_cline(circle_cline);
+      const result = rotation.transform(circle_cline);
 
       const expected = Cline.from_circle(new Circle(new Point(2, 5), 5));
       expect(result).toBeCline(expected);
@@ -252,7 +293,7 @@ describe("CVersor", () => {
       const line = Cline.from_line(new Line(3 / 5, 4 / 5, 10));
       const rotation = CVersor.rotation(Math.PI / 2);
 
-      const result = rotation.transform_cline(line);
+      const result = rotation.transform(line);
 
       const expected = Cline.from_line(new Line(-4 / 5, 3 / 5, 10));
       expect(result).toBeCline(expected);
@@ -261,7 +302,7 @@ describe("CVersor", () => {
     it("fixes the origin", () => {
       const rotation = CVersor.rotation(Math.PI / 2);
 
-      const result = rotation.transform_point(NullPoint.ORIGIN);
+      const result = rotation.transform(NullPoint.ORIGIN);
 
       expect(result).toBeNullPoint(NullPoint.ORIGIN);
     });
@@ -269,7 +310,7 @@ describe("CVersor", () => {
     it("fixes the point at infinity", () => {
       const rotation = CVersor.rotation(Math.PI / 2);
 
-      const result = rotation.transform_point(NullPoint.INF);
+      const result = rotation.transform(NullPoint.INF);
 
       expect(result).toBeNullPoint(NullPoint.INF);
     });
@@ -307,7 +348,7 @@ describe("CVersor", () => {
     it("fixes origin", () => {
       const scale = CVersor.dilation(3);
 
-      const result = scale.transform_point(NullPoint.ORIGIN);
+      const result = scale.transform(NullPoint.ORIGIN);
 
       expect(result).toBeNullPoint(NullPoint.ORIGIN);
     });
@@ -315,7 +356,7 @@ describe("CVersor", () => {
     it("fixes point at infinity", () => {
       const scale = CVersor.dilation(3);
 
-      const result = scale.transform_point(NullPoint.INF);
+      const result = scale.transform(NullPoint.INF);
 
       expect(result).toBeNullPoint(NullPoint.INF);
     });
@@ -324,7 +365,7 @@ describe("CVersor", () => {
       const point = NullPoint.from_point(new Point(3, -4));
       const scale = CVersor.dilation(3);
 
-      const result = scale.transform_point(point);
+      const result = scale.transform(point);
 
       const expected = NullPoint.from_point(new Point(9, -12));
       expect(result).toBeNullPoint(expected);
@@ -334,7 +375,7 @@ describe("CVersor", () => {
       const circle = Cline.from_circle(new Circle(Point.ORIGIN, 3));
       const scale = CVersor.dilation(4);
 
-      const result = scale.transform_cline(circle);
+      const result = scale.transform(circle);
 
       const expected = Cline.from_circle(new Circle(Point.ORIGIN, 12));
       expect(result).toBeCline(expected);
@@ -344,7 +385,7 @@ describe("CVersor", () => {
       const circle = Cline.from_circle(new Circle(new Point(1, -1), 3));
       const scale = CVersor.dilation(4);
 
-      const result = scale.transform_cline(circle);
+      const result = scale.transform(circle);
 
       const expected = Cline.from_circle(new Circle(new Point(4, -4), 12));
       expect(result).toBeCline(expected);
@@ -354,7 +395,7 @@ describe("CVersor", () => {
       const line = Cline.from_line(new Line(3 / 5, 4 / 5, 0));
       const scale = CVersor.dilation(3);
 
-      const result = scale.transform_cline(line);
+      const result = scale.transform(line);
 
       expect(result).toBeCline(line);
     });
@@ -363,7 +404,7 @@ describe("CVersor", () => {
       const line = Cline.from_line(new Line(3 / 5, 4 / 5, 2));
       const scale = CVersor.dilation(3);
 
-      const result = scale.transform_cline(line);
+      const result = scale.transform(line);
 
       const expected = Cline.from_line(new Line(3 / 5, 4 / 5, 6));
       expect(result).toBeCline(expected);
@@ -406,7 +447,7 @@ describe("CVersor", () => {
       const hyp = CVersor.hyperbolic(new Direction(3 / 5, 4 / 5), 2);
       const source = NullPoint.from_point(new Point(-3 / 5, -4 / 5));
 
-      const result = hyp.transform_point(source);
+      const result = hyp.transform(source);
 
       expect(result).toBeNullPoint(source);
     });
@@ -415,7 +456,7 @@ describe("CVersor", () => {
       const hyp = CVersor.hyperbolic(new Direction(3 / 5, 4 / 5), 2);
       const sink = NullPoint.from_point(new Point(3 / 5, 4 / 5));
 
-      const result = hyp.transform_point(sink);
+      const result = hyp.transform(sink);
 
       expect(result).toBeNullPoint(sink);
     });
@@ -424,7 +465,7 @@ describe("CVersor", () => {
       const dir = new Direction(3 / 5, 4 / 5);
       const hyp = CVersor.hyperbolic(new Direction(3 / 5, 4 / 5), 2);
 
-      const transformed = hyp.transform_point(NullPoint.ORIGIN);
+      const transformed = hyp.transform(NullPoint.ORIGIN);
       const result = transformed.point.to_direction().normalize();
 
       expect(result).toBeDirection(dir);
@@ -442,7 +483,7 @@ describe("CVersor", () => {
     it("fixes unit circle", () => {
       const hyp = CVersor.hyperbolic(new Direction(3 / 5, -4 / 5), 2);
 
-      const result = hyp.transform_cline(Cline.UNIT_CIRCLE);
+      const result = hyp.transform(Cline.UNIT_CIRCLE);
 
       expect(result).toBeCline(Cline.UNIT_CIRCLE);
     });
@@ -451,7 +492,7 @@ describe("CVersor", () => {
       const hyp = CVersor.hyperbolic(new Direction(3 / 5, -4 / 5), 2);
       const line = Cline.from_line(new Line(4 / 5, 3 / 5, 0));
 
-      const result = hyp.transform_cline(line);
+      const result = hyp.transform(line);
 
       expect(result).toBeCline(line);
     });
@@ -465,9 +506,9 @@ describe("CVersor", () => {
       // the circle and transforming it in the orthogonal direction
       const line = Cline.from_line(new Line(orthog_dir.x, orthog_dir.y, 0));
       const orthog_ellip = CVersor.elliptic(orthog_dir, Math.PI / 8);
-      const circle = orthog_ellip.transform_cline(line);
+      const circle = orthog_ellip.transform(line);
 
-      const result = hyp.transform_cline(circle);
+      const result = hyp.transform(circle);
 
       expect(result).toBeCline(circle);
     });
@@ -479,7 +520,7 @@ describe("CVersor", () => {
       const ellip = CVersor.elliptic(dir, Math.PI / 4);
 
       const result = ellip
-        .transform_point(NullPoint.ORIGIN)
+        .transform(NullPoint.ORIGIN)
         .point.to_direction()
         .normalize();
 
@@ -492,8 +533,8 @@ describe("CVersor", () => {
       const pole1 = NullPoint.from_point(new Point(-4 / 5, 3 / 5));
       const pole2 = NullPoint.from_point(new Point(4 / 5, -3 / 5));
 
-      const result1 = ellip.transform_point(pole1);
-      const result2 = ellip.transform_point(pole2);
+      const result1 = ellip.transform(pole1);
+      const result2 = ellip.transform(pole2);
 
       expect(result1).toBeNullPoint(pole1);
       expect(result2).toBeNullPoint(pole2);
@@ -505,7 +546,7 @@ describe("CVersor", () => {
       const ellip = CVersor.elliptic(dir, Math.PI / 4);
       const equator = Cline.from_line(new Line(orthog.x, orthog.y, 0));
 
-      const result = ellip.transform_cline(equator);
+      const result = ellip.transform(equator);
 
       expect(result).toBeCline(equator);
     });
@@ -518,9 +559,9 @@ describe("CVersor", () => {
       // If you perform an orthogonal hyperbolic transform of the equator,
       // it'll move it to a different "latitude" circle
       const hyp = CVersor.hyperbolic(orthog, 4);
-      const orthog_circle = hyp.transform_cline(equator);
+      const orthog_circle = hyp.transform(equator);
 
-      const result = ellip.transform_cline(orthog_circle);
+      const result = ellip.transform(orthog_circle);
 
       expect(result).toBeCline(orthog_circle);
     });
@@ -579,7 +620,7 @@ describe("CVersor", () => {
     it("fixes origin", () => {
       const para = CVersor.parabolic(new Direction(3 / 5, 4 / 5));
 
-      const result = para.transform_point(NullPoint.ORIGIN);
+      const result = para.transform(NullPoint.ORIGIN);
 
       expect(result).toEqual(NullPoint.ORIGIN);
     });
@@ -589,7 +630,7 @@ describe("CVersor", () => {
       const para = CVersor.parabolic(new Direction(3 / 5, 4 / 5));
 
       const result = para
-        .transform_point(NullPoint.INF)
+        .transform(NullPoint.INF)
         .point.to_direction()
         .normalize();
 
@@ -602,7 +643,7 @@ describe("CVersor", () => {
       // A point on the fixed line of the transformation
       const point = NullPoint.from_point(dir.scale(0.5).to_point());
 
-      const transformed = para.transform_point(point);
+      const transformed = para.transform(point);
       const result = transformed.point.sub(point.point).normalize();
 
       expect(result).toBeDirection(dir.neg());
@@ -614,7 +655,7 @@ describe("CVersor", () => {
       const orthog = dir.rot90();
       const line = Cline.from_line(new Line(orthog.x, orthog.y, 0));
 
-      const result = para.transform_cline(line);
+      const result = para.transform(line);
 
       expect(result).toBeCline(line);
     });
@@ -628,9 +669,28 @@ describe("CVersor", () => {
         new Circle(orthog.scale(radius).to_point(), radius),
       );
 
-      const result = para.transform_cline(circle);
+      const result = para.transform(circle);
 
       expect(result).toBeCline(circle);
+    });
+  });
+
+  describe("to_screen", () => {
+    it("with unit circle returns flip y", () => {
+      const result = CVersor.to_screen(Circle.UNIT_CIRCLE);
+
+      expect(result).toBeCVersor(CVersor.FLIP_Y);
+    });
+
+    it("with other circle returns correct transformations", () => {
+      const circle = new Circle(new Point(3, -4), 5);
+
+      const result = CVersor.to_screen(circle);
+
+      const translation = CVersor.translation(new Direction(3, -4));
+      const scale = CVersor.dilation(5);
+      const expected = translation.compose(scale).compose(CVersor.FLIP_Y);
+      expect(result).toEqual(expected);
     });
   });
 
@@ -669,7 +729,7 @@ describe("CVersor", () => {
       const rot90 = CVersor.rotation(Math.PI / 2);
 
       const spiral = rot90.compose(scale);
-      const result = spiral.transform_point(point);
+      const result = spiral.transform(point);
 
       // (2, 1) --rot--> (-1, 2) --scale--> (-2, 4)
       const expected = NullPoint.from_point(new Point(-2, 4));

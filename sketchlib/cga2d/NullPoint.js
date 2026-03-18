@@ -4,6 +4,7 @@ import { Primitive } from "../primitives/Primitive.js";
 import { CEven } from "./CEven.js";
 import { COdd } from "./COdd.js";
 import { ConformalBasis } from "./ConformalBasis.js";
+import { ConformalPrimitive } from "./ConfomalPrimitive.js";
 
 /**
  * Null point in 2D CGA (circle with radius 0),
@@ -14,6 +15,7 @@ import { ConformalBasis } from "./ConformalBasis.js";
  * P = x + 1/2 x^2 inf + o  in (inf, o) basis
  * P = x + 1/2(x^2 - 1) p + 1/2(x^2 + 1) m   in (p, m) basis
  * @implements {Primitive}
+ * @implements {ConformalPrimitive}
  */
 export class NullPoint {
   /**
@@ -23,12 +25,21 @@ export class NullPoint {
   constructor(vector) {
     this.vector = vector;
 
-    const o = ConformalBasis.get_o(vector.p, vector.m);
-
     /**
      * @type {Point | undefined}
      */
-    this.point = is_nearly(o, 0) ? undefined : new Point(vector.x, vector.y);
+    this.point = this.is_inf ? undefined : new Point(vector.x, vector.y);
+  }
+
+  /**
+   * Check if the point represents the point at infinity. This is nominally
+   * the null point inf, but this method checks more generally for any
+   * vector with 0 for the origin component.
+   * @type {boolean}
+   */
+  get is_inf() {
+    const o = ConformalBasis.get_o(this.vector.p, this.vector.m);
+    return is_nearly(o, 0);
   }
 
   /**

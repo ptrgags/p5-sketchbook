@@ -20,7 +20,7 @@ import { Color } from "../../sketchlib/Color.js";
 import { CardinalDirection } from "../../sketchlib/CardinalDirection.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
 import { Circle } from "../../sketchlib/primitives/Circle.js";
-import { LinePrimitive } from "../../sketchlib/primitives/LinePrimitive.js";
+import { LineSegment } from "../../sketchlib/primitives/LineSegment.js";
 
 const WIDTH = 500;
 const HEIGHT = 700;
@@ -83,7 +83,7 @@ function render_control_points(tiles) {
     for (const point of tile.control_points) {
       const vertex = quad.uv_to_world(point.position);
       const tangent_point = quad.uv_to_world(point.forward_point);
-      tangent_lines.push(new LinePrimitive(vertex, tangent_point));
+      tangent_lines.push(new LineSegment(vertex, tangent_point));
       vertices.push(vertex);
       tangent_tips.push(tangent_point);
     }

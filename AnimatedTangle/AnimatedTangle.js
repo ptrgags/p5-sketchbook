@@ -15,13 +15,15 @@ import { EYE } from "./patterns/peek.js";
 import { make_stripes } from "./patterns/stripes.js";
 import { PALETTE_CORAL, PALETTE_NAVY, Values } from "./theme_colors.js";
 import { HITOMEZASHI } from "./patterns/hitomezashi.js";
-import { TRAFFIC } from "./patterns/traffic.js";
-import { LinePrimitive } from "../sketchlib/primitives/LinePrimitive.js";
+import { TRAFFIC, TRAFFIC_LAYERS } from "./patterns/traffic.js";
+import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { BRICKS } from "./patterns/brick_wall.js";
 import { DOORS } from "./patterns/doors.js";
 import { AnimationGroup } from "../sketchlib/animation/AnimationGroup.js";
 import { DebugCoordinates } from "./DebugCoordinates.js";
 import { DebugGrid } from "./DebugGrid.js";
+import { KeywordRecognizer } from "../sketchlib/KeywordRecognizer.js";
+import { trace_primitive } from "../sketchlib/perf/trace_primitive.js";
 
 /**
  * Shorthand for making arrays of points
@@ -105,8 +107,8 @@ const STYLE_QUARTERS = new Style({
 
 const QUARTER_DIVIDER = style(
   [
-    new LinePrimitive(new Point(100, 300), new Point(500, 300)),
-    new LinePrimitive(new Point(300, 100), new Point(300, 500)),
+    new LineSegment(new Point(100, 300), new Point(500, 300)),
+    new LineSegment(new Point(300, 100), new Point(300, 500)),
   ],
   STYLE_QUARTERS,
 );
@@ -126,7 +128,7 @@ const QUARTERS = new VectorTangle(
 const TANGLE = new VectorTangle(
   [
     [new Mask(PANEL_LANDSCAPE), SEASCAPE.primitive],
-    [new Mask(PANEL_TRAFFIC), TRAFFIC.primitive],
+    [new Mask(PANEL_TRAFFIC), TRAFFIC_LAYERS],
     [new Mask(PANEL_QUARTERS), QUARTERS],
     [new Mask(PANEL_CORAL), SWAYING_CORAL.primitive],
     [new Mask(PANEL_DOORS), DOORS.primitive],
@@ -166,6 +168,14 @@ const BACKGROUND_STRIPES = style(
 const COORDS = new DebugCoordinates();
 const DEBUG_GRID = new DebugGrid(100, 25);
 
+const SLASH = new KeywordRecognizer();
+
+// /trace logs a trace of the scene for investigating performance issues.
+SLASH.register(["Slash", "KeyT", "KeyR", "KeyA", "KeyC", "KeyE"], () => {
+  const trace = trace_primitive(TANGLE);
+  console.log(trace);
+});
+
 export const sketch = (p) => {
   p.setup = () => {
     p.createCanvas(
@@ -191,5 +201,9 @@ export const sketch = (p) => {
     DEBUG_GRID.draw(p);
     COORDS.draw(p);
     */
+  };
+
+  p.keyReleased = (/** @type {KeyboardEvent} */ e) => {
+    SLASH.input(e.code);
   };
 };

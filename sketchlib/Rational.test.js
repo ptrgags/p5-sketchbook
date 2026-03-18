@@ -131,7 +131,15 @@ describe("Rational", () => {
       expect(result).toEqual(expected);
     });
 
-    it("reciprocal of negative fraction keeps negative sign in numerator", () => {});
+    it("reciprocal of negative fraction keeps negative sign in numerator", () => {
+      const a = new Rational(-3, 4);
+
+      const result = a.reciprocal;
+
+      const expected = new Rational(-4, 3);
+      expect(result).toEqual(expected);
+      expect(result.numerator).toBe(-4);
+    });
   });
 
   describe("mul", () => {
