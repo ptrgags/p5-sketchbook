@@ -185,6 +185,29 @@ const FUNDAMENTAL_TILE = SMALLER.transform(
   new CTile(...GEOMETRY.edges, ...GEOMETRY.vertices),
 );
 
+const EDGE_MIDPOINT = GEOMETRY.vertices[1];
+const BIG_ARC = ClineArc.from_arc(
+  new ArcPrimitive(
+    Point.ORIGIN,
+    EDGE_MIDPOINT.point.x,
+    new ArcAngles(
+      (2 * Math.PI) / FOLDS_P,
+      ((FOLDS_P - 1) / FOLDS_P) * 2 * Math.PI,
+    ),
+  ),
+);
+
+const ROOT_PETAL = new CTile(
+  ClineArc.from_segment(new LineSegment(EDGE_MIDPOINT.point, BIG_ARC.a.point)),
+  BIG_ARC,
+  ClineArc.from_segment(new LineSegment(BIG_ARC.c.point, EDGE_MIDPOINT.point)),
+);
+
+const PETAL = new StyledTile(
+  E2.transform(ROOT_PETAL),
+  new Style({ stroke: Color.CYAN }),
+);
+
 const STYLES = range(FOLDS_P)
   .toArray()
   .map(
@@ -240,7 +263,7 @@ const EACH_XFORM = new CNode([RP, E2, EQ], MOTIF).bake_tile();
 const VERTEX_ORBIT = new CNode([EQ, EQ.compose(EQ)], MOTIF).bake_tile();
 
 const BACKGROUND = new StyledTile(
-  [Cline.UNIT_CIRCLE /*ROOT_TILE*/, MOTIF, IDK_POWERS],
+  [Cline.UNIT_CIRCLE /*ROOT_TILE*/, MOTIF, PETAL],
   STYLE_BG,
 );
 const RING0 = new StyledTile(START_TILE, STYLE_A);
