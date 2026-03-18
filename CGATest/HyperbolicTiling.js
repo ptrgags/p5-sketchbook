@@ -5,17 +5,26 @@
 // here I'm translating that math to CGA transformations
 
 import { StaticAnimation } from "../sketchlib/animation/Animated.js";
+import { ArcAngles } from "../sketchlib/ArcAngles.js";
 import { Cline } from "../sketchlib/cga2d/Cline.js";
+import { ClineArc } from "../sketchlib/cga2d/ClineArc.js";
 import { CNode } from "../sketchlib/cga2d/CNode.js";
 import { CTile } from "../sketchlib/cga2d/CTile.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
+import { NullPoint } from "../sketchlib/cga2d/NullPoint.js";
 import { PowerIterator } from "../sketchlib/cga2d/PowerIterator.js";
 import { StyledNode } from "../sketchlib/cga2d/StyledNode.js";
 import { StyledTile } from "../sketchlib/cga2d/StyledTile.js";
 import { Color } from "../sketchlib/Color.js";
+import { Oklch } from "../sketchlib/Oklch.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
+import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
+import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
+import { range } from "../sketchlib/range.js";
 import { Style } from "../sketchlib/Style.js";
+import { StyleRuns } from "../sketchlib/styling/StyleRuns.js";
 
 /**
  * Compute a circle with the following properties:
@@ -43,6 +52,49 @@ function compute_edge_circle(p, q) {
   const radius = sin_p * k;
 
   return new Circle(new Point(center, 0), radius);
+}
+
+function compute_geometry(p, q) {
+  const circle = compute_edge_circle(p, q);
+  const center = Point.ORIGIN;
+  const edge_center = new Point(circle.center.x - circle.radius, 0);
+
+  // angle to vertex is pi/2 - pi/p - pi/q = pi(1/2 - 1/p - 1/q)
+  // supplimentary angle is pi - angle_to_vertex:
+  // pi - pi(1/2 - 1/p - 1/q)
+  // pi(1 - 1/2 + 1/p + 1/q)
+  // pi(1/2 + 1/p + 1/q)
+  const angle_to_vertex = Math.PI * (1 / 2 + 1 / p + 1 / q);
+  const vertex = circle.center.add(
+    Direction.from_angle(angle_to_vertex).scale(circle.radius),
+  );
+
+  const horizontal_edge = ClineArc.from_segment(
+    new LineSegment(center, edge_center),
+  );
+  const arc_edge = ClineArc.from_arc(
+    new ArcPrimitive(
+      circle.center,
+      circle.radius,
+      new ArcAngles(Math.PI, angle_to_vertex),
+    ),
+  );
+  const diagonal_edge = ClineArc.from_segment(new LineSegment(vertex, center));
+
+  const tile_edge = ClineArc.from_arc(
+    new ArcPrimitive(
+      circle.center,
+      circle.radius,
+      new ArcAngles(angle_to_vertex, 2 * Math.PI - angle_to_vertex),
+    ),
+  );
+
+  return {
+    circle: Cline.from_circle(circle),
+    vertices: [center, edge_center, vertex].map(NullPoint.from_point),
+    edges: [horizontal_edge, arc_edge, diagonal_edge],
+    tile_edge,
+  };
 }
 
 /**
@@ -106,23 +158,40 @@ function make_tiling(p, q) {
   return groups;
 }
 
+const FOLDS_P = 7;
+const FOLDS_Q = 3;
+
 // R_p = p-fold rotation around the center of the unit circle
 // E_2 = 2-fold elliptic around the center of the arc surrounding the tile
-
-const circle = compute_edge_circle(7, 3);
-const ROTATIONS = make_tiling(7, 3).corner_rotation_group;
+const GEOMETRY = compute_geometry(FOLDS_P, FOLDS_Q);
+const ROTATIONS = make_tiling(FOLDS_P, FOLDS_Q).corner_rotation_group;
 const RP = ROTATIONS.rotate_center;
 const E2 = ROTATIONS.arc_elliptic;
 const EQ = ROTATIONS.vertex_elliptic;
 
 const ROT_ITER = new PowerIterator(RP);
-const ROTATE_SEVENFOLD = ROT_ITER.iterate(0, 6);
-const ROOT_TILE = new CNode(
-  ROTATE_SEVENFOLD,
-  Cline.from_circle(circle),
-).bake_tile();
+const ROTATE_SEVENFOLD = ROT_ITER.iterate(0, FOLDS_P - 1);
+const ROOT_TILE = new CNode(ROTATE_SEVENFOLD, GEOMETRY.circle).bake_tile();
 
-const MOTIF = Cline.from_circle(new Circle(new Point(0.2, 0), 0.05));
+const SMALLER = CVersor.dilation(0.9);
+const FUNDAMENTAL_TILE = SMALLER.transform(
+  new CTile(...GEOMETRY.edges, ...GEOMETRY.vertices),
+);
+
+const STYLES = range(FOLDS_P)
+  .toArray()
+  .map(
+    (i) =>
+      new Style({
+        stroke: new Oklch(0.7, 0.3, (i / (FOLDS_P - 1)) * 360),
+      }),
+  );
+
+const MOTIF = new StyledNode(
+  ROTATE_SEVENFOLD,
+  StyleRuns.from_styles(STYLES),
+  FUNDAMENTAL_TILE,
+);
 
 const START_TILE = Cline.from_circle(new Circle(Point.ORIGIN, 0.2));
 
