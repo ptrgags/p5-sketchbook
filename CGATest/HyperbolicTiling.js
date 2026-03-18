@@ -197,16 +197,31 @@ const BIG_ARC = ClineArc.from_arc(
   ),
 );
 
+// The transformations to adjacent tiles reminded me of a scallop shape.
+// computing the circular arcs for that is tricky right now (computing a circle from 3 points would help!)
+// so for now just draw the outline which gives a petal shape
 const ROOT_PETAL = new CTile(
   ClineArc.from_segment(new LineSegment(EDGE_MIDPOINT.point, BIG_ARC.a.point)),
   BIG_ARC,
   ClineArc.from_segment(new LineSegment(BIG_ARC.c.point, EDGE_MIDPOINT.point)),
 );
-
 const PETAL = new StyledTile(
   E2.transform(ROOT_PETAL),
   new Style({ stroke: Color.CYAN }),
 );
+
+// For interior nodes of the graph, we only need to draw 2 out of 7
+// walls, as the rest will be handled by other iterations
+const ROOT_CELL_WALLS = new CTile(
+  GEOMETRY.tile_edge,
+  RP.transform(GEOMETRY.tile_edge),
+);
+const CELL_WALLS = new StyledTile(
+  E2.transform(ROOT_CELL_WALLS),
+  new Style({ stroke: Color.from_hex_code("#7F00FF"), width: 2 }),
+);
+
+const MOTIF = new CTile(PETAL, CELL_WALLS);
 
 const STYLES = range(FOLDS_P)
   .toArray()
@@ -217,6 +232,7 @@ const STYLES = range(FOLDS_P)
       }),
   );
 
+/*
 const MOTIF = new StyledNode(
   ROTATE_SEVENFOLD,
   new StyleRuns([
@@ -241,6 +257,7 @@ const MOTIF = new StyledNode(
   ]),
   FUNDAMENTAL_TILE,
 );
+*/
 
 const START_TILE = Cline.from_circle(new Circle(Point.ORIGIN, 0.2));
 
