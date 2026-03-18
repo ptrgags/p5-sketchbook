@@ -98,11 +98,29 @@ export const PIPE_TREE_BASS = DashedTree.from_segments([
     vline(300, 75, 0),
   ],
 ]);
+
 export const PIPE_TREE_TENOR = DashedTree.from_segments([
   make_arc(275, 250, 2, 1),
   hline(225, 275, 450),
   ...COMMON_SEGMENTS,
-  [make_arc(225, 125, 3, -1), hline(100, 225, 175)],
+  [
+    make_arc(225, 125, 3, -1),
+    hline(100, 225, 175),
+    [
+      hline(100, 175, 100),
+      make_arc(100, 75, 1, 1),
+      make_arc(50, 75, 3, -1),
+      hline(50, 50, 0),
+    ],
+    [
+      make_arc(175, 75, 1, 1),
+      // I changed the path a bit to avoid bezier curves
+      vline(150, 75, 50),
+      make_arc(125, 50, 3, -1),
+      hline(25, 125, 50),
+      make_arc(50, 0, 1, 1),
+    ],
+  ],
   [vline(250, 125, 0)],
   [
     make_arc(275, 125, 2, 1),
@@ -116,6 +134,21 @@ export const PIPE_TREE_SOPRANO = DashedTree.from_segments([
   make_arc(425, 250, 2, 1),
   hline(225, 425, 450),
   ...COMMON_SEGMENTS,
+  [
+    make_arc(225, 125, 3, -1),
+    [
+      hline(100, 225, 175),
+      [make_arc(175, 75, 1, 1), vline(150, 75, 0)],
+      [hline(100, 175, 100), make_arc(100, 75, 1, 1), vline(75, 75, 0)],
+    ],
+    [
+      make_arc(225, 75, 1, 1),
+      // this path is different
+      vline(200, 75, 0),
+    ],
+  ],
+  [vline(250, 125, 100)],
+  [make_arc(275, 125, 2, 1)],
 ]);
 
 PIPE_TREE_BASS.measure_lengths();
