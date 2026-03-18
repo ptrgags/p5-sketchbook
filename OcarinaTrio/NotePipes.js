@@ -1,13 +1,9 @@
 import { Animated } from "../sketchlib/animation/Animated.js";
-import { ArcAngles } from "../sketchlib/ArcAngles.js";
 import { Color } from "../sketchlib/Color.js";
 import { AbsInterval } from "../sketchlib/music/AbsTimeline.js";
 import { Note } from "../sketchlib/music/Music.js";
 import { Oklch } from "../sketchlib/Oklch.js";
-import { Point } from "../sketchlib/pga2d/Point.js";
-import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
-import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 import { DashedTree } from "./DashedTree.js";

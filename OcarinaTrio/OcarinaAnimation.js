@@ -209,6 +209,14 @@ export class OcarinaAnimation {
       ),
     );
 
+    this.dashed_bezier = style(
+      [],
+      new Style({
+        stroke: Color.RED,
+        width: 8,
+      }),
+    );
+
     this.primitive = group(
       this.background.primitive,
       this.piano_rolls.primitive,
