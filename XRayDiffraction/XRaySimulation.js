@@ -26,8 +26,9 @@ export class XRaySimulation {
 
     this.angle = 0;
 
-    // Wavelength in angstrom
-    this.wavelength = 1 / 8;
+    // Wavelength in angstroms. Smaller means more
+    // Bragg peaks will be visible
+    this.wavelength = 0.25;
 
     // I'm using linear wave vectors so the units are cycles/meter
     // not radians/meter. This skips the 2pi scaling factor that doesn't
@@ -51,12 +52,17 @@ export class XRaySimulation {
       // TODO: How is that equation connected to this circle intersection exactly?
 
       const length_sqr = g_hk.sub(this.wavevector_in).mag_sqr();
-      return is_nearly(length_sqr, this.wavelength * this.wavelength);
+      return is_nearly(
+        length_sqr,
+        1 / (this.wavelength * this.wavelength),
+        1e-3,
+      );
     });
 
     this.events.dispatchEvent(
       new CustomEvent("change", {
         detail: {
+          wavelength: this.wavelength,
           angle: this.angle,
           wavevectors: this.wavevectors,
           visible_wavevectors: this.visible_wavevectors,
