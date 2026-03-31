@@ -17,11 +17,18 @@ const STYLE_XRAY = new Style({
   stroke: new Oklch(0.7, 0.1, 300),
 });
 
+const STYLE_LATTICE = new Style({
+  fill: Color.RED,
+});
+
 const STYLE_INTERSECTION = new Style({
   stroke: new Oklch(0.7, 0.1, 100),
 });
 
 const ORIGIN = new Point(WIDTH / 2, (3 * HEIGHT) / 4);
+// how many pixels per (cycle/angstrom) unit of the lattice
+const SCALE_FACTOR = 25;
+
 const AXES = style(
   [
     new LineSegment(
@@ -47,13 +54,31 @@ export class XRayWavevectors {
     simulation.events.addEventListener(
       "change",
       (/** @type {CustomEvent} */ e) => {
-        // TODO: update simulation
+        this.update_lattice(e.detail.wavevectors);
       },
     );
 
-    this.wavevectors = group();
+    this.lattice = style([], STYLE_LATTICE);
     this.ewald_sphere = style([], STYLE_XRAY);
     this.intersections = style([], STYLE_INTERSECTION);
-    this.primitive = group(AXES, this.ewald_sphere, this.wavevectors);
+    this.visible_xrays = style([], STYLE_XRAY);
+    this.primitive = group(
+      AXES,
+      this.ewald_sphere,
+      this.visible_xrays,
+      this.lattice,
+      this.intersections,
+    );
+  }
+
+  /**
+   *
+   * @param {Direction[]} wavevectors
+   */
+  update_lattice(wavevectors) {
+    const points = wavevectors.map((g_hk) =>
+      ORIGIN.add(g_hk.scale(SCALE_FACTOR)),
+    );
+    this.lattice.regroup(...points);
   }
 }

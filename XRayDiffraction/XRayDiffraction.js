@@ -19,6 +19,8 @@ export const sketch = (p) => {
       undefined,
       document.getElementById("sketch-canvas"),
     );
+
+    SIMULATION.update(0);
   };
 
   p.draw = () => {
