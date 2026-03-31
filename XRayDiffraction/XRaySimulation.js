@@ -28,7 +28,7 @@ export class XRaySimulation {
 
     // Wavelength in angstroms. Smaller means more
     // Bragg peaks will be visible
-    this.wavelength = 0.25;
+    this.wavelength = 1 / 8;
 
     // I'm using linear wave vectors so the units are cycles/meter
     // not radians/meter. This skips the 2pi scaling factor that doesn't

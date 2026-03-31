@@ -1,4 +1,3 @@
-import { AnimationGroup } from "../sketchlib/animation/AnimationGroup.js";
 import { Color } from "../sketchlib/Color.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
@@ -39,7 +38,7 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    const angle = (p.frameCount / 117) * 2 * Math.PI;
+    const angle = (p.frameCount / 600) * 2 * Math.PI;
     SIMULATION.update(angle);
 
     SCENE.draw(p);

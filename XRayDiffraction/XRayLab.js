@@ -30,6 +30,11 @@ const STYLE_MACHINE = new Style({
   fill: Color.from_hex_code("#777777"),
 });
 
+const STYLE_CRYSTAL = new Style({
+  stroke: new Oklch(0.4, 0.1, 40),
+  fill: new Oklch(0.7, 0.1, 40),
+});
+
 const EMITTER_THICKNESS = HEIGHT / 32;
 const EMITTER = style(
   new PolygonPrimitive(
@@ -58,17 +63,37 @@ export class XRayLab {
     simulation.events.addEventListener(
       "change",
       (/** @type {CustomEvent} */ e) => {
+        this.update_crystal(e.detail.angle);
         this.update_rays(e.detail.wavelength, e.detail.visible_wavevectors);
       },
     );
 
     this.outgoing_rays = style([], STYLE_XRAY);
+    this.crystal = style([], STYLE_CRYSTAL);
     this.primitive = group(
       INCOMING_BEAM,
       this.outgoing_rays,
       EMITTER,
       DETECTOR_LINE,
+      this.crystal,
     );
+  }
+
+  /**
+   *
+   * @param {number} angle
+   */
+  update_crystal(angle) {
+    // the simulation uses y-up coordinates so we need to reverse the angle
+    const right = Direction.from_angle(-angle).scale(SCALE_FACTOR);
+    const crystal = new PolygonPrimitive(
+      [right, right.rot90(), right.rot180(), right.rot270()].map((x) =>
+        ORIGIN.add(x),
+      ),
+      true,
+    );
+
+    this.crystal.regroup(crystal);
   }
 
   /**
