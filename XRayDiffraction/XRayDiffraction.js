@@ -1,6 +1,11 @@
 import { AnimationGroup } from "../sketchlib/animation/AnimationGroup.js";
+import { Color } from "../sketchlib/Color.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
-import { group } from "../sketchlib/primitives/shorthand.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
+import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
+import { group, style } from "../sketchlib/primitives/shorthand.js";
+import { Style } from "../sketchlib/Style.js";
 import { XRayLab } from "./XRayLab.js";
 import { XRaySimulation } from "./XRaySimulation.js";
 import { XRayWavevectors } from "./XRayWavevectors.js";
@@ -9,7 +14,15 @@ const SIMULATION = new XRaySimulation();
 const LAB_ANIMATION = new XRayLab(SIMULATION);
 const WAVEVECTORS = new XRayWavevectors(SIMULATION);
 
-const SCENE = group(LAB_ANIMATION.primitive, WAVEVECTORS.primitive);
+const STYLE_BACKDROP = new Style({
+  fill: Color.BLACK,
+});
+const BACKDROP = style(
+  new RectPrimitive(Point.ORIGIN, new Direction(WIDTH, HEIGHT / 2)),
+  STYLE_BACKDROP,
+);
+
+const SCENE = group(WAVEVECTORS.primitive, BACKDROP, LAB_ANIMATION.primitive);
 
 export const sketch = (p) => {
   p.setup = () => {
@@ -26,7 +39,7 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    const angle = (p.frameCount / 700) * 2 * Math.PI;
+    const angle = (p.frameCount / 117) * 2 * Math.PI;
     SIMULATION.update(angle);
 
     SCENE.draw(p);
