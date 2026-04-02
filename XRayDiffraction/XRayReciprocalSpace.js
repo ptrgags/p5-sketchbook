@@ -15,6 +15,7 @@ const STYLE_AXES = new Style({
 
 const STYLE_XRAY = new Style({
   stroke: new Oklch(0.7, 0.1, 300),
+  width: 2,
 });
 
 const STYLE_LATTICE = new Style({
@@ -54,13 +55,18 @@ export class XRayReciprocalSpace {
     simulation.events.addEventListener(
       "change",
       (/** @type {CustomEvent} */ e) => {
-        this.update_lattice(e.detail.wavevectors);
-        this.update_visible(e.detail.visible_wavevectors);
+        const { wavevectors, visible_wavevectors } = e.detail;
+        this.update_lattice(wavevectors);
+        this.update_visible(visible_wavevectors);
       },
     );
 
     this.lattice = style([], STYLE_LATTICE);
 
+    /**
+     * @type {Point}
+     */
+    this.ewald_center = undefined;
     this.ewald_sphere = style([], STYLE_XRAY);
     this.update_ewald(simulation.wavelength);
 
@@ -82,8 +88,8 @@ export class XRayReciprocalSpace {
   update_ewald(wavelength) {
     const radius_freq = 1 / wavelength;
     const radius_px = radius_freq * SCALE_FACTOR;
-    const center = ORIGIN.add(Direction.DIR_X.scale(radius_px));
-    this.ewald_sphere.regroup(new Circle(center, radius_px));
+    this.ewald_center = ORIGIN.add(Direction.DIR_X.scale(radius_px));
+    this.ewald_sphere.regroup(new Circle(this.ewald_center, radius_px));
   }
 
   /**
@@ -106,5 +112,10 @@ export class XRayReciprocalSpace {
       ORIGIN.add(g_hk.scale(SCALE_FACTOR).flip_y()),
     );
     this.intersections.regroup(...points);
+
+    const rays = points.map((x) => {
+      return new LineSegment(this.ewald_center, x);
+    });
+    this.visible_xrays.regroup(...rays);
   }
 }
