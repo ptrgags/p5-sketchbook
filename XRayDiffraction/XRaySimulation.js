@@ -1,11 +1,9 @@
-// The frequencies will be in [-MAX_FREQ, MAX_FREQ] in both
-
-import { griderator } from "../sketchlib/Grid.js";
 import { is_nearly } from "../sketchlib/is_nearly.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Motor } from "../sketchlib/pga2d/versors.js";
 
+// The frequencies will be in [-MAX_FREQ, MAX_FREQ] in both
 // dimensions
 const MAX_FREQ = 10;
 
@@ -28,7 +26,7 @@ export class XRaySimulation {
 
     // Wavelength in angstroms. Smaller means more
     // Bragg peaks will be visible
-    this.wavelength = 1 / 8;
+    this.wavelength = 1 / 4;
 
     // I'm using linear wave vectors so the units are cycles/meter
     // not radians/meter. This skips the 2pi scaling factor that doesn't

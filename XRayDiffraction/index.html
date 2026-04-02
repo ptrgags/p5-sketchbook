@@ -18,11 +18,125 @@
   <body>
     <sketchbook-navbar></sketchbook-navbar>
     <div class="container">
-      <h1>X-Ray Diffraction (2026-03)</h1>
+      <h1>X-Ray Diffraction (2026-04)</h1>
       <div class="sketch">
         <canvas id="sketch-canvas" width="500" height="700"></canvas>
       </div>
-      <div class="description">DESCRIPTION GOES HERE</div>
+      <div class="description">
+        <p>
+          I was talking to someone who works in a materials-science related
+          field, and he was telling me about X-ray diffraction to study the
+          structure of crystals. The math details got me curious enough to make
+          this visualization. This is an early proof-of-concept.
+        </p>
+        <p>
+          The top half of the screen shows the lab setup. The crystal is
+          suspended on a
+          <a
+            href="https://en.wikipedia.org/wiki/X-ray_crystallography#Mounting_the_crystal"
+            >goniometer</a
+          >
+          which can rotate the crystal to a desired orientation. An x-ray source
+          emits a beam of a constant wavelength at the crystal. When the crystal
+          is oriented at certain angles, the scattered x-rays will
+          constructively interfere. In this visualization, the angled beams that
+          flash briefly are these peaks.
+        </p>
+        <p>
+          Note: In real life, the beams would not be visible since human eyes
+          cannot see x-rays.
+        </p>
+        <p>
+          The bottom half is a graph of the spatial frequencies both of the
+          crystal and the x-rays. Both axes use units of cycles/angstrom (where
+          an angstrom is 10^-10 m). The x-axis represents spatial frequency in
+          the horizontal direction, and likewise the y-axis represents the
+          vertical spatial frequency. The red points together are the reciprocal
+          lattice of the crystal. Here I'm assuming the simplest case of a cubic
+          lattice with atoms spaced 1 angstrom apart. This means the reciprocal
+          lattice looks similar with vectors spaced 1 cycle/angstrom apart. As
+          the crystal rotates, the orientation of the spatial frequencies rotate
+          in the same direction. This is why the red dots are rotating in the
+          diagram.
+        </p>
+        <p>
+          Note: My visualization uses linear spatial frequencies in
+          cycles/angstrom. Much of the literature uses angular spatial
+          frequencies in radians/angstrom. The only difference is a scale factor
+          of 2pi.
+        </p>
+        <p>
+          In this setup, the incoming x-ray beam is always pointed horizontally,
+          so in frequency space, its wavevector shows up as a point on the
+          x-axis (specifically at 1/wavelength in cycles/angstrom). The
+          scattered rays can be in potentially any direction, but since this is
+          elastic scattering, the outgoing ray must have the same energy, and
+          therefore same magnitude of spatial frequency as the input beam. This
+          means you can imagine a sphere in frequency space centered on the
+          incoming beam's wavevector and with a radius that matches the incoming
+          ray. This is called
+          <a href="https://en.wikipedia.org/wiki/Ewald%27s_sphere"
+            >Ewald's Sphere</a
+          >. In this 2D visualization, this sphere shows up as the purple
+          circle. You can think of it as the sphere of possible output
+          directions.
+        </p>
+        <p>
+          Though the x-rays are bouncing in all directions, most of the time the
+          bounces from different planes of the crystal lattice will result in
+          destructive interference and the result will have a low amplitude.
+          Only outgoing wavevectors corresponding to the reciprocal lattice
+          vectors will be in phase and thus produce an intense peak. In terms of
+          the diagram, this happens whenever a lattice point intersects Ewald's
+          sphere. In the diagram, the flashing lines highlight when this
+          happens.
+        </p>
+        <p>
+          Here we have a big caveat in visualizing this math: For most
+          orientations of the crystal, the lattice will only intersect the
+          lattice at the origin! Here, the difference between real life (where
+          time is continuous) and animation (where time happens in discrete
+          snapshots) makes a difference. In real life, as you rotate the
+          crystal, every lattice point that crosses the sphere surface will
+          produce a detectable peak, if only for a split second. In an
+          animation, however, it's very easy for the lattice points to skip over
+          the sphere surface from one frame to the next without ever
+          intersecting it. In other words, there should be more peaks in the
+          visualization than shown! This is one area of this sketch that needs
+          improvement, I need to handle diffraction peaks that happen between
+          frames somehow. I'm still thinking about how I want to visualize this.
+        </p>
+        <h3>References:</h3>
+        <p>
+          The Wikipedia articles on
+          <a href="https://en.wikipedia.org/wiki/Bragg%27s_law">Bragg's Law</a>
+          and the more general
+          <a href="https://en.wikipedia.org/wiki/Laue_equations"
+            >Laue Equations</a
+          >
+          that model this scattering of x-rays do list the correct equations,
+          but the explanation is particularly confusing. I found this
+          <a href="https://www.physics.udel.edu/~yji/PHYS624/Chapter3.pdf"
+            >slide deck</a
+          >
+          from a University of Delaware
+          <a href="https://www.physics.udel.edu/~yji/PHYS624/"
+            >physics course</a
+          >
+          which offers a better explanation.
+        </p>
+        <p>
+          I also found a couple videos from Bruker Corporation that show what a
+          modern x-ray diffraction set up looks like. See this
+          <a href="https://youtu.be/QHMzFUo0NL8?si=pp1ZBSuYHP4ULEbe"
+            >Short intro video</a
+          >, and a
+          <a href="https://www.youtube.com/live/qF71UgAyh4c?si=lPGQD4IcShlmhZ-O"
+            >Longer interview</a
+          >
+          about how the machines are used in practice.
+        </p>
+      </div>
     </div>
   </body>
 </html>
