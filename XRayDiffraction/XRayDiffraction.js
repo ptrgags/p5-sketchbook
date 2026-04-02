@@ -7,11 +7,11 @@ import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 import { XRayLab } from "./XRayLab.js";
 import { XRaySimulation } from "./XRaySimulation.js";
-import { XRayWavevectors } from "./XRayWavevectors.js";
+import { XRayReciprocalSpace } from "./XRayReciprocalSpace.js";
 
 const SIMULATION = new XRaySimulation();
 const LAB_ANIMATION = new XRayLab(SIMULATION);
-const WAVEVECTORS = new XRayWavevectors(SIMULATION);
+const WAVEVECTORS = new XRayReciprocalSpace(SIMULATION);
 
 const STYLE_BACKDROP = new Style({
   fill: Color.BLACK,

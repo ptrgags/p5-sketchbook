@@ -43,7 +43,7 @@ const AXES = style(
   STYLE_AXES,
 );
 
-export class XRayWavevectors {
+export class XRayReciprocalSpace {
   /**
    * Constructor
    * @param {XRaySimulation} simulation
