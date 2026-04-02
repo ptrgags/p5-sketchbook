@@ -12,8 +12,6 @@ import { Style } from "../sketchlib/Style.js";
 import { XRaySimulation } from "./XRaySimulation.js";
 
 const ORIGIN = new Point(WIDTH / 2, HEIGHT / 4);
-// how many pixels per (cycle/angstrom) unit of the lattice
-const SCALE_FACTOR = 25;
 
 const STYLE_XRAY = new Style({
   stroke: new Oklch(0.7, 0.1, 300),
@@ -52,6 +50,9 @@ const EMITTER = style(
 
 const DETECTOR_LINE = new Line(1, 0, 400);
 
+// radius of the crystal from center to the corner in pixels
+const CRYSTAL_RADIUS = 30;
+
 export class XRayLab {
   /**
    * Constructor
@@ -85,9 +86,11 @@ export class XRayLab {
    */
   update_crystal(angle) {
     // the simulation uses y-up coordinates so we need to reverse the angle
-    const right = Direction.from_angle(-angle).scale(SCALE_FACTOR);
+    const corner = Direction.from_angle(-angle + Math.PI / 4).scale(
+      CRYSTAL_RADIUS,
+    );
     const crystal = new PolygonPrimitive(
-      [right, right.rot90(), right.rot180(), right.rot270()].map((x) =>
+      [corner, corner.rot90(), corner.rot180(), corner.rot270()].map((x) =>
         ORIGIN.add(x),
       ),
       true,
