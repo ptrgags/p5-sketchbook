@@ -72,7 +72,7 @@ const DETECTOR_LINE = style(
 );
 
 // radius of the crystal from center to the corner in pixels
-const CRYSTAL_RADIUS = 30;
+const CRYSTAL_RADIUS = 20;
 
 // length of outgoing rays in pixels
 const OUTGOING_RAY_LENGTH = 175;
@@ -97,12 +97,13 @@ export class XRayLab {
     this.crystal = style([], STYLE_CRYSTAL);
     this.goniometer_bar = style([], STYLE_MACHINE_LINES);
     this.primitive = group(
+      GONIOMETER_FRAME,
+      this.goniometer_bar,
       INCOMING_BEAM,
       this.outgoing_rays,
       EMITTER,
       DETECTOR_LINE,
-      GONIOMETER_FRAME,
-      this.goniometer_bar,
+
       this.crystal,
     );
   }
