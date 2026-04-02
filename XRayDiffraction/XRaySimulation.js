@@ -36,6 +36,11 @@ export class XRaySimulation {
     this.visible_wavevectors = [];
   }
 
+  /**
+   * When the angle of the crystal changes, call this method to update the
+   * simulation
+   * @param {number} angle
+   */
   update(angle) {
     const rotate = Motor.rotation(Point.ORIGIN, angle);
 
@@ -44,11 +49,13 @@ export class XRaySimulation {
     this.visible_wavevectors = this.wavevectors.filter((g_hk) => {
       // k_in is 1/wavelength in the +x direction
       // Since this is a case of elastic scattering, |k_out| = |k_in|
+      // So it could scatter in any direction, but the length of the wavevector
+      // will match that of the incoming x-ray. In other words, k_out
+      // will be somewhere on the circle |k_out - k_in| = |k_in|
+
       // However, due to Laue-Bragg diffraction, we only get constructive
-      // interference for frequencies (h, k) when g_hk = k_out - k_in
-
-      // TODO: How is that equation connected to this circle intersection exactly?
-
+      // interference for frequencies (h, k) when g_hk = k_out - k_in. So
+      // we need to see where the lattice point intersects the wavevector.
       const length_sqr = g_hk.sub(this.wavevector_in).mag_sqr();
       return is_nearly(
         length_sqr,

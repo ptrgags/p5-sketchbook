@@ -1,9 +1,10 @@
 import { Color } from "../sketchlib/Color.js";
-import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
+import { HEIGHT, SCREEN_CENTER, WIDTH } from "../sketchlib/dimensions.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Line } from "../sketchlib/pga2d/Line.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
+import { Circle } from "../sketchlib/primitives/Circle.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
@@ -28,6 +29,11 @@ const STYLE_MACHINE = new Style({
   fill: Color.from_hex_code("#777777"),
 });
 
+const STYLE_MACHINE_LINES = new Style({
+  stroke: Color.from_hex_code("#333333"),
+  width: 4,
+});
+
 const STYLE_CRYSTAL = new Style({
   stroke: new Oklch(0.4, 0.1, 40),
   fill: new Oklch(0.7, 0.1, 40),
@@ -48,10 +54,28 @@ const EMITTER = style(
   STYLE_MACHINE,
 );
 
-const DETECTOR_LINE = new Line(1, 0, 400);
+const GONIOMETER_RADIUS = 40;
+const GONIOMETER_FRAME = style(
+  [
+    new Circle(ORIGIN, GONIOMETER_RADIUS),
+    new LineSegment(
+      ORIGIN.add(Direction.DIR_Y.scale(GONIOMETER_RADIUS)),
+      SCREEN_CENTER,
+    ),
+  ],
+  STYLE_MACHINE_LINES,
+);
+
+const DETECTOR_LINE = style(
+  new LineSegment(new Point(400, 0), new Point(400, HEIGHT / 2)),
+  STYLE_MACHINE_LINES,
+);
 
 // radius of the crystal from center to the corner in pixels
 const CRYSTAL_RADIUS = 30;
+
+// length of outgoing rays in pixels
+const OUTGOING_RAY_LENGTH = 175;
 
 export class XRayLab {
   /**
@@ -71,17 +95,20 @@ export class XRayLab {
 
     this.outgoing_rays = style([], STYLE_XRAY);
     this.crystal = style([], STYLE_CRYSTAL);
+    this.goniometer_bar = style([], STYLE_MACHINE_LINES);
     this.primitive = group(
       INCOMING_BEAM,
       this.outgoing_rays,
       EMITTER,
       DETECTOR_LINE,
+      GONIOMETER_FRAME,
+      this.goniometer_bar,
       this.crystal,
     );
   }
 
   /**
-   *
+   * Rotate the crystal
    * @param {number} angle
    */
   update_crystal(angle) {
@@ -95,12 +122,20 @@ export class XRayLab {
       ),
       true,
     );
-
     this.crystal.regroup(crystal);
+
+    // Also rotate the goniometer
+    const offset_to_circle = corner.set_length(GONIOMETER_RADIUS);
+    const bar = new LineSegment(
+      ORIGIN.add(offset_to_circle),
+      ORIGIN.add(offset_to_circle.neg()),
+    );
+    this.goniometer_bar.regroup(bar);
   }
 
   /**
-   *
+   * Update the rays that diffract from the crystal.
+   * @param {number} wavelength
    * @param {Direction[]} visible_wavevectors
    */
   update_rays(wavelength, visible_wavevectors) {
@@ -111,7 +146,7 @@ export class XRayLab {
 
       // Shoot a ray out of the crystal in the direction of
       // k_out, but skip to pixels
-      const dir_out = k_out.set_length(200);
+      const dir_out = k_out.set_length(OUTGOING_RAY_LENGTH);
       return new LineSegment(ORIGIN, ORIGIN.add(dir_out));
     });
     this.outgoing_rays.regroup(...outgoing_rays);
