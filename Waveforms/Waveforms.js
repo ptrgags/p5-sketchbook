@@ -154,7 +154,7 @@ function make_wav_file(samples) {
   data_view.setUint8(offset + 3, ord("a"));
   offset += 4;
 
-  data_view.setUint32(offset, data_length);
+  data_view.setUint32(offset, data_length, LITTLE_ENDIAN);
   offset += 4;
 
   for (const [i, value] of samples.entries()) {
@@ -197,8 +197,8 @@ class WaveformsAnimation {
     for (let i = 0; i < SAMPLE_COUNT; i++) {
       const t = i / SAMPLE_COUNT;
       samples[i] =
-        Math.sin(2 * Math.PI * freq * t) +
-        Math.sin(((2 * Math.PI * 3) / 2) * freq * t);
+        0.5 * Math.sin(2 * Math.PI * freq * t) +
+        0.5 * Math.sin(((2 * Math.PI * 3) / 2) * freq * t);
     }
     buf.copyToChannel(samples, 0);
 
