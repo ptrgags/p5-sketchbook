@@ -1,0 +1,143 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../libraries/p5.min.js"
+    ></script>
+    <script type="module">
+      import { sketch } from "./XRayDiffraction.js";
+      import "../sketchlib/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../styles/layout.css" />
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>X-Ray Diffraction (2026-04)</h1>
+      <div class="sketch">
+        <canvas id="sketch-canvas" width="500" height="700"></canvas>
+      </div>
+      <div class="description">
+        <p>
+          I was talking to someone who works in a materials-science related
+          field, and he was telling me about X-ray diffraction to study the
+          structure of crystals. The math details got me curious enough to make
+          this visualization. This is an early proof-of-concept.
+        </p>
+        <p>
+          The top half of the screen shows the lab setup. The crystal is
+          suspended on a
+          <a
+            href="https://en.wikipedia.org/wiki/X-ray_crystallography#Mounting_the_crystal"
+            >goniometer</a
+          >
+          which can rotate the crystal to a desired orientation. An x-ray source
+          emits a beam of a constant wavelength at the crystal. When the crystal
+          is oriented at certain angles, the scattered x-rays will
+          constructively interfere. In this visualization, the angled beams that
+          flash briefly are these peaks.
+        </p>
+        <p>
+          Note: In real life, the beams would not be visible since human eyes
+          cannot see x-rays.
+        </p>
+        <p>
+          The bottom half is a graph of the spatial frequencies of both the
+          crystal and the x-rays. Everything in this graph is measured in
+          cycles/angstrom in the x and y direction. There are several details
+          visualized here:
+        </p>
+        <ul>
+          <li>
+            The red dots are the reciprocal lattice of the crystal. Each set of
+            parallel planes through the atoms of the crystal corresponds to a
+            wavevector g_hk. As the crystal rotates, so does the reciprocal
+            lattice.
+          </li>
+          <li>
+            The purple vector pointing to the right represents the spatial
+            frequency of the incoming x-ray. In other words, k_in = 1/wavelength
+            in the +x direction.
+          </li>
+          <li>
+            The flashing purple vectors pointing at diagonals to the right are
+            spatial frequencies k_out of the detectable outgoing x-rays
+          </li>
+          <li>
+            The purple circle represents the possible differences between the
+            incoming and outgoing wavevectors, k_out - k_in. This is referred to
+            as
+            <a href="https://dictionary.iucr.org/Ewald_sphere">Ewald's Sphere</a
+            >.
+          </li>
+          <li>
+            The flashing yellow vectors on the left show the intersections of
+            the reciprocal lattice and Ewald's sphere. These points represent
+            spatial frequencies where constructive interference (and thus a
+            detectable k_out) occur.
+          </li>
+        </ul>
+        <p>
+          Note: My visualization uses linear spatial frequencies in
+          cycles/angstrom. Much of the literature uses angular spatial
+          frequencies in radians/angstrom. The only difference is a scale factor
+          of 2pi.
+        </p>
+        <p>
+          There's one important subtlety here: For most angles, the lattice
+          doesn't exactly intersect Ewald's sphere, and thus no constructive
+          interference happens! This makes visualization tricky.
+        </p>
+        <p>
+          In real life, time is continuous, so as you rotate the crystal through
+          various angles, a lattice point will intersect the sphere at some
+          instant in time when it crosses from outside to inside or vice-versa.
+          However, in computer animation we're computing discrete snapshots in
+          time, so in many cases the lattice points will jump across the sphere
+          without ever intersecting it. This means there should be several more
+          peaks than what is currently shown.
+        </p>
+        <p>
+          This is an area of this sketch that needs improvement - I need to
+          handle diffraction peaks that happen in between animation frames. I'm
+          still thinking about how best to visualize this. Stay tuned!
+        </p>
+        <h3>References:</h3>
+        <p>
+          The Wikipedia articles on
+          <a href="https://en.wikipedia.org/wiki/Bragg%27s_law">Bragg's Law</a>
+          and the more general
+          <a href="https://en.wikipedia.org/wiki/Laue_equations"
+            >Laue Equations</a
+          >
+          that model this scattering of x-rays do list the correct equations,
+          but the explanation is particularly confusing. I found this
+          <a href="https://www.physics.udel.edu/~yji/PHYS624/Chapter3.pdf"
+            >slide deck</a
+          >
+          from a University of Delaware
+          <a href="https://www.physics.udel.edu/~yji/PHYS624/"
+            >physics course</a
+          >
+          which offers a better explanation.
+        </p>
+        <p>
+          I also found a couple videos from Bruker Corporation that show what a
+          modern x-ray diffraction set up looks like. See this
+          <a href="https://youtu.be/QHMzFUo0NL8?si=pp1ZBSuYHP4ULEbe"
+            >Short intro video</a
+          >, and a
+          <a href="https://www.youtube.com/live/qF71UgAyh4c?si=lPGQD4IcShlmhZ-O"
+            >Longer interview</a
+          >
+          about how the machines are used in practice.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

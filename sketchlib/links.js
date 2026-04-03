@@ -1,6 +1,12 @@
 // Links for all of the sketches. Links are added to the page in this order
 export const LINKS = [
   {
+    title: "X-ray Diffraction",
+    link: "./XRayDiffraction",
+    year: "2026-04",
+    is_lab: true,
+  },
+  {
     title: "Dragon Vortex",
     year: "2026-03",
   },
