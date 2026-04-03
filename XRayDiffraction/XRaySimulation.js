@@ -47,15 +47,45 @@ export class XRaySimulation {
     this.angle = angle;
     this.wavevectors = ORIGINAL_WAVEVECTORS.map((x) => rotate.transform_dir(x));
     this.visible_wavevectors = this.wavevectors.filter((g_hk) => {
-      // k_in is 1/wavelength in the +x direction
-      // Since this is a case of elastic scattering, |k_out| = |k_in|
-      // So it could scatter in any direction, but the length of the wavevector
-      // will match that of the incoming x-ray. In other words, k_out
-      // will be somewhere on the circle |k_out - k_in| = |k_in|
+      // The incoming x-ray has a constant wavelength in the +x direction,
+      // so we can say:
+      //
+      // k_in = 1/wavelength x
+      //
+      // i.e. 1/wavelength cycles/angstrom in the x-direction
 
-      // However, due to Laue-Bragg diffraction, we only get constructive
-      // interference for frequencies (h, k) when g_hk = k_out - k_in. So
-      // we need to see where the lattice point intersects the wavevector.
+      // With elastic scattering, the scattered light will have the same
+      // energy and therefore same wavelength and spatial frequency. In other
+      // words, |k_out| = |k_in|. so k_out must live on a circle with radius
+      // 1/wavelength centered at the origin. i.e.
+      //
+      // k_out(theta) = 1/wavelength * exp(theta * xy)
+
+      // However, since the x-rays scatter off many different planes of the
+      // crystal lattice, you're adding together many possible k_out, so in
+      // many cases you will get destructive interference. The Laue equations
+      // determine when constructive interference happens (and therefore a
+      // detectable scattered beam):
+      //
+      // For spatial frequency (h, k), constructive interference happens when
+      // the reciprocal lattice vector g_hk satisfies
+      // g_hk = delta_k = k_out - k_in
+      //
+      // delta_k = k_out(theta) - k_in = 1/wavelength * exp(theta * xy) - 1/wavelength
+      // delta_k = 1/wavelength * (exp(theta * xy) - 1)
+      //
+      // this is still and equation for a circle of radius 1/wavelength, but
+      // now it's shifted to the left to be centered at -1/wavelength x.
+
+      // This means we're trying to intersect a point g_hk with the shifted
+      // circle (center: -1/wavelength, radius: 1/wavelength)
+      //
+      // |g_hk - 1/wavelength x| = 1/wavelength
+      // or, to avoid the square roots
+      // |g_hk -1/wavelength x|^2 = 1/wavelength^2
+
+      // This is the condition we test for to see if the spatial frequency
+      // will produce a detectable scattered beam.
       const length_sqr = g_hk.sub(this.wavevector_in).mag_sqr();
       return is_nearly(
         length_sqr,
