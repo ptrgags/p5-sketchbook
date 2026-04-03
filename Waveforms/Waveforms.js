@@ -5,7 +5,12 @@ import { SoundManager } from "../sketchlib/SoundManager.js";
 import { Animated } from "../sketchlib/animation/Animated.js";
 import { SoundScene } from "../sketchlib/scenes/SoundScene.js";
 import { MouseCallbacks } from "../sketchlib/input/MouseCallbacks.js";
-import { group } from "../sketchlib/primitives/shorthand.js";
+import { group, style } from "../sketchlib/primitives/shorthand.js";
+import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
+import { lerp } from "../sketchlib/lerp.js";
+import { Style } from "../sketchlib/Style.js";
+import { Color } from "../sketchlib/Color.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -20,6 +25,28 @@ const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
 const SAMPLE_RATE = 44100;
 // one channel for mono audio
 const MONO = 1;
+
+/**
+ *
+ * @param {Float32Array} samples Samples as an array of [0, -1] values
+ * @returns {LineSegment[]}
+ */
+function render_waveform(samples) {
+  const result = [];
+  for (let x = 0; x < WIDTH; x++) {
+    const t = x / (WIDTH - 1);
+    const index_f = samples.length * t;
+    const a = samples[Math.floor(index_f)];
+    const b = samples[Math.ceil(index_f)];
+    const value = lerp(a, b, index_f % 1);
+
+    const center_point = new Point(x, HEIGHT / 2);
+    const wave_point = new Point(x, HEIGHT / 2 - value * 100);
+
+    result.push(new LineSegment(center_point, wave_point));
+  }
+  return result;
+}
 
 /**
  * @implements {Animated}
@@ -54,7 +81,10 @@ class WaveformsAnimation {
     sampler.triggerAttackRelease("A3", "0:1");
     sampler.toDestination();
 
-    this.primitive = group();
+    this.primitive = style(
+      render_waveform(samples),
+      new Style({ stroke: Color.RED }),
+    );
   }
 
   /**
