@@ -29,13 +29,14 @@ const MONO = 1;
 /**
  *
  * @param {Float32Array} samples Samples as an array of [0, -1] values
+ * @param {number} sample_count number of samples to consider
  * @returns {LineSegment[]}
  */
-function render_waveform(samples) {
+function render_waveform(samples, sample_count) {
   const result = [];
   for (let x = 0; x < WIDTH; x++) {
     const t = x / (WIDTH - 1);
-    const index_f = samples.length * t;
+    const index_f = sample_count * t;
     const a = samples[Math.floor(index_f)];
     const b = samples[Math.ceil(index_f)];
     const value = lerp(a, b, index_f % 1);
@@ -68,7 +69,9 @@ class WaveformsAnimation {
     const freq = 440;
     for (let i = 0; i < SAMPLE_COUNT; i++) {
       const t = i / SAMPLE_COUNT;
-      samples[i] = Math.sin(2 * Math.PI * freq * t);
+      samples[i] =
+        Math.sin(2 * Math.PI * freq * t) +
+        Math.sin(((2 * Math.PI * 3) / 2) * freq * t);
     }
     buf.copyToChannel(samples, 0);
 
@@ -81,8 +84,11 @@ class WaveformsAnimation {
     sampler.triggerAttackRelease("A3", "0:1");
     sampler.toDestination();
 
+    const period = 1 / freq;
+    const period_samples = Math.floor(period * SAMPLE_RATE);
+
     this.primitive = style(
-      render_waveform(samples),
+      render_waveform(samples, period_samples),
       new Style({ stroke: Color.RED }),
     );
   }
