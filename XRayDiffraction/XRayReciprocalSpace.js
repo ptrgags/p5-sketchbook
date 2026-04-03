@@ -6,6 +6,7 @@ import { Point } from "../sketchlib/pga2d/Point.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
+import { VectorPrimitive } from "../sketchlib/primitives/VectorPrimitive.js";
 import { Style } from "../sketchlib/Style.js";
 import { XRaySimulation } from "./XRaySimulation.js";
 
@@ -24,6 +25,11 @@ const STYLE_LATTICE = new Style({
 
 const STYLE_INTERSECTION = new Style({
   fill: new Oklch(0.7, 0.1, 100),
+});
+
+const STYLE_G_HK = new Style({
+  stroke: new Oklch(0.7, 0.1, 100),
+  width: 2,
 });
 
 const ORIGIN = new Point(WIDTH / 2, (3 * HEIGHT) / 4);
@@ -61,8 +67,10 @@ export class XRayReciprocalSpace {
       },
     );
 
+    // set of points representing the reciprocal lattice vectors g_hk
     this.lattice = style([], STYLE_LATTICE);
 
+    this.wavelength = undefined;
     /**
      * @type {Point}
      */
@@ -70,7 +78,11 @@ export class XRayReciprocalSpace {
     this.ewald_sphere = style([], STYLE_XRAY);
     this.update_ewald(simulation.wavelength);
 
-    this.intersections = style([], STYLE_INTERSECTION);
+    // Reciprocal lattice vectors that intersect the sphere, colored in yellow.
+    this.intersections = style([], STYLE_G_HK);
+
+    // wavevectors that are detectable. This includes both the incoming beam
+    // and the scattered rays.
     this.visible_xrays = style([], STYLE_XRAY);
     this.primitive = group(
       AXES,
@@ -86,9 +98,10 @@ export class XRayReciprocalSpace {
    * @param {number} wavelength Wavelength in angstrom
    */
   update_ewald(wavelength) {
+    this.wavelength = wavelength;
     const radius_freq = 1 / wavelength;
     const radius_px = radius_freq * SCALE_FACTOR;
-    this.ewald_center = ORIGIN.add(Direction.DIR_X.scale(radius_px));
+    this.ewald_center = ORIGIN.add(Direction.DIR_X.scale(-radius_px));
     this.ewald_sphere.regroup(new Circle(this.ewald_center, radius_px));
   }
 
@@ -108,14 +121,27 @@ export class XRayReciprocalSpace {
    * @param {Direction[]} visible_wavevectors Wavevectors that will produce bragg peaks
    */
   update_visible(visible_wavevectors) {
-    const points = visible_wavevectors.map((g_hk) =>
-      ORIGIN.add(g_hk.scale(SCALE_FACTOR).flip_y()),
-    );
-    this.intersections.regroup(...points);
-
-    const rays = points.map((x) => {
-      return new LineSegment(this.ewald_center, x);
+    const lattice_vectors = visible_wavevectors.map((g_hk) => {
+      return new VectorPrimitive(
+        ORIGIN,
+        ORIGIN.add(g_hk.scale(SCALE_FACTOR).flip_y()),
+      );
     });
-    this.visible_xrays.regroup(...rays);
+    this.intersections.regroup(...lattice_vectors);
+
+    const k_in = Direction.DIR_X.scale(1 / this.wavelength);
+    const scattered_vectors = visible_wavevectors.map((g_hk) => {
+      const k_out = k_in.add(g_hk);
+      return new VectorPrimitive(
+        ORIGIN,
+        ORIGIN.add(k_out.scale(SCALE_FACTOR).flip_y()),
+      );
+    });
+
+    const k_in_vec = new VectorPrimitive(
+      ORIGIN,
+      ORIGIN.add(k_in.scale(SCALE_FACTOR).flip_y()),
+    );
+    this.visible_xrays.regroup(k_in_vec, ...scattered_vectors);
   }
 }

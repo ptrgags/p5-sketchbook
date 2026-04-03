@@ -2,12 +2,10 @@ import { Color } from "../sketchlib/Color.js";
 import { HEIGHT, SCREEN_CENTER, WIDTH } from "../sketchlib/dimensions.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
-import { Line } from "../sketchlib/pga2d/Line.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
-import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 import { XRaySimulation } from "./XRaySimulation.js";
@@ -147,7 +145,7 @@ export class XRayLab {
 
       // Shoot a ray out of the crystal in the direction of
       // k_out, but skip to pixels
-      const dir_out = k_out.set_length(OUTGOING_RAY_LENGTH);
+      const dir_out = k_out.set_length(OUTGOING_RAY_LENGTH).flip_y();
       return new LineSegment(ORIGIN, ORIGIN.add(dir_out));
     });
     this.outgoing_rays.regroup(...outgoing_rays);

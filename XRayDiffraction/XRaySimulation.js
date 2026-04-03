@@ -80,13 +80,14 @@ export class XRaySimulation {
       // This means we're trying to intersect a point g_hk with the shifted
       // circle (center: -1/wavelength, radius: 1/wavelength)
       //
-      // |g_hk - 1/wavelength x| = 1/wavelength
-      // or, to avoid the square roots
-      // |g_hk -1/wavelength x|^2 = 1/wavelength^2
+      // |g_hk - (-1/wavelength x)| = 1/wavelength
+      // |g_hk + 1/wavelength x| = 1/wavelength
+      // or, to avoid the square roots:
+      // |g_hk + 1/wavelength x|^2 = 1/wavelength^2
 
       // This is the condition we test for to see if the spatial frequency
       // will produce a detectable scattered beam.
-      const length_sqr = g_hk.sub(this.wavevector_in).mag_sqr();
+      const length_sqr = g_hk.sub(this.wavevector_in.neg()).mag_sqr();
       return is_nearly(
         length_sqr,
         1 / (this.wavelength * this.wavelength),
