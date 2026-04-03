@@ -16,11 +16,44 @@ const SOUND_MANIFEST = {};
 //@ts-ignore
 const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
 
+// samples per second: the usual 44.1 kHz
+const SAMPLE_RATE = 44100;
+// one channel for mono audio
+const MONO = 1;
+
 /**
  * @implements {Animated}
  */
 class WaveformsAnimation {
-  constructor() {
+  /**
+   *
+   * @param {import("tone")} tone
+   */
+  constructor(tone) {
+    this.tone = tone;
+    this.ctx = tone.getContext().rawContext;
+
+    // create one second of audio
+    const SAMPLE_COUNT = SAMPLE_RATE;
+    const buf = this.ctx.createBuffer(MONO, SAMPLE_COUNT, SAMPLE_RATE);
+
+    const samples = new Float32Array(SAMPLE_COUNT);
+    const freq = 440;
+    for (let i = 0; i < SAMPLE_COUNT; i++) {
+      const t = i / SAMPLE_COUNT;
+      samples[i] = Math.sin(2 * Math.PI * freq * t);
+    }
+    buf.copyToChannel(samples, 0);
+
+    const sampler = new tone.Sampler({
+      A4: buf,
+    });
+
+    sampler.volume.value = -9;
+    // trigger a different note than what's in the buffer
+    sampler.triggerAttackRelease("A3", "0:1");
+    sampler.toDestination();
+
     this.primitive = group();
   }
 
@@ -54,7 +87,7 @@ export const sketch = (p) => {
     MOUSE.callbacks = scene.mouse_callbacks;
 
     scene.events.addEventListener("scene-change", () => {
-      scene = new SoundScene(SOUND, new WaveformsAnimation());
+      scene = new SoundScene(SOUND, new WaveformsAnimation(SOUND.tone));
       MOUSE.callbacks = scene.mouse_callbacks;
     });
   };
