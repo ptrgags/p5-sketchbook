@@ -47,18 +47,41 @@
           cannot see x-rays.
         </p>
         <p>
-          The bottom half is a graph of the spatial frequencies both of the
-          crystal and the x-rays. Both axes use units of cycles/angstrom (where
-          an angstrom is 10^-10 m). The x-axis represents spatial frequency in
-          the horizontal direction, and likewise the y-axis represents the
-          vertical spatial frequency. The red points together are the reciprocal
-          lattice of the crystal. Here I'm assuming the simplest case of a cubic
-          lattice with atoms spaced 1 angstrom apart. This means the reciprocal
-          lattice looks similar with vectors spaced 1 cycle/angstrom apart. As
-          the crystal rotates, the orientation of the spatial frequencies rotate
-          in the same direction. This is why the red dots are rotating in the
-          diagram.
+          The bottom half is a graph of the spatial frequencies of both the
+          crystal and the x-rays. Everything in this graph is measured in
+          cycles/angstrom in the x and y direction. There are several details
+          visualized here:
         </p>
+        <ul>
+          <li>
+            The red dots are the reciprocal lattice of the crystal. Each set of
+            parallel planes through the atoms of the crystal corresponds to a
+            wavevector g_hk. As the crystal rotates, so does the reciprocal
+            lattice.
+          </li>
+          <li>
+            The purple vector pointing to the right represents the spatial
+            frequency of the incoming x-ray. In other words, k_in = 1/wavelength
+            in the +x direction.
+          </li>
+          <li>
+            The flashing purple vectors pointing at diagonals to the right are
+            spatial frequencies k_out of the detectable outgoing x-rays
+          </li>
+          <li>
+            The purple circle represents the possible differences between the
+            incoming and outgoing wavevectors, k_out - k_in. This is referred to
+            as
+            <a href="https://dictionary.iucr.org/Ewald_sphere">Ewald's Sphere</a
+            >.
+          </li>
+          <li>
+            The flashing yellow vectors on the left show the intersections of
+            the reciprocal lattice and Ewald's sphere. These points represent
+            spatial frequencies where constructive interference (and thus a
+            detectable k_out) occur.
+          </li>
+        </ul>
         <p>
           Note: My visualization uses linear spatial frequencies in
           cycles/angstrom. Much of the literature uses angular spatial
@@ -66,43 +89,23 @@
           of 2pi.
         </p>
         <p>
-          In this setup, the incoming x-ray beam is always pointed horizontally,
-          so in frequency space, its wavevector shows up as a point on the
-          x-axis (specifically at 1/wavelength in cycles/angstrom). The
-          scattered rays can be in potentially any direction, but since this is
-          elastic scattering, the outgoing ray must have the same energy, and
-          therefore same magnitude of spatial frequency as the input beam. This
-          means you can imagine a sphere in frequency space centered on the
-          incoming beam's wavevector and with a radius that matches the incoming
-          ray. This is called
-          <a href="https://dictionary.iucr.org/Ewald_sphere">Ewald's Sphere</a>.
-          In this 2D visualization, this sphere shows up as the purple circle.
-          You can think of it as the sphere of possible output directions.
+          There's one important subtlety here: For most angles, the lattice
+          doesn't exactly intersect Ewald's sphere, and thus no constructive
+          interference happens! This makes visualization tricky.
         </p>
         <p>
-          Though the x-rays are bouncing in all directions, most of the time the
-          bounces from different planes of the crystal lattice will result in
-          destructive interference and the result will have a low amplitude.
-          Only outgoing wavevectors corresponding to the reciprocal lattice
-          vectors will be in phase and thus produce an intense peak. In terms of
-          the diagram, this happens whenever a lattice point intersects Ewald's
-          sphere. In the diagram, the flashing lines highlight when this
-          happens.
+          In real life, time is continuous, so as you rotate the crystal through
+          various angles, a lattice point will intersect the sphere at some
+          instant in time when it crosses from outside to inside or vice-versa.
+          However, in computer animation we're computing discrete snapshots in
+          time, so in many cases the lattice points will jump across the sphere
+          without ever intersecting it. This means there should be several more
+          peaks than what is currently shown.
         </p>
         <p>
-          Here we have a big caveat in visualizing this math: For most
-          orientations of the crystal, the lattice will only intersect the
-          lattice at the origin! Here, the difference between real life (where
-          time is continuous) and animation (where time happens in discrete
-          snapshots) makes a difference. In real life, as you rotate the
-          crystal, every lattice point that crosses the sphere surface will
-          produce a detectable peak, if only for a split second. In an
-          animation, however, it's very easy for the lattice points to skip over
-          the sphere surface from one frame to the next without ever
-          intersecting it. In other words, there should be more peaks in the
-          visualization than shown! This is one area of this sketch that needs
-          improvement, I need to handle diffraction peaks that happen between
-          frames somehow. I'm still thinking about how I want to visualize this.
+          This is an area of this sketch that needs improvement - I need to
+          handle diffraction peaks that happen in between animation frames. I'm
+          still thinking about how to visualize this. Stay tuned!
         </p>
         <h3>References:</h3>
         <p>
