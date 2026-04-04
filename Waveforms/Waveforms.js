@@ -11,6 +11,7 @@ import { Point } from "../sketchlib/pga2d/Point.js";
 import { lerp } from "../sketchlib/lerp.js";
 import { Style } from "../sketchlib/Style.js";
 import { Color } from "../sketchlib/Color.js";
+import { KeywordRecognizer } from "../sketchlib/KeywordRecognizer.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -84,9 +85,10 @@ function download_file(file) {
 /**
  *
  * @param {Float32Array} samples
+ * @param {string} fname
  * @returns {File}
  */
-function make_wav_file(samples) {
+function make_wav_file(samples, fname) {
   const data_length = BYTES_PER_SAMPLE * samples.length;
   const byte_length = HEADER_SIZE + data_length;
   const buffer = new ArrayBuffer(byte_length);
@@ -173,9 +175,35 @@ function make_wav_file(samples) {
     throw new Error("whoops, my offsets are off");
   }
 
-  return new File([buffer], "waveform.wav", { type: "audio/wav" });
+  return new File([buffer], fname, { type: "audio/wav" });
 }
 
+const SLASH = new KeywordRecognizer();
+
+SLASH.register(["Slash", "KeyS", "KeyI", "KeyN", "KeyK"], () => {
+  // compute sin^7(2 pi f x)
+
+  // frequency in cycles/second
+  // period is 1/freq sec/cycle
+  // sec/cycle * samples/sec
+  // samples/cycle =
+  // a single
+
+  // A3 = 220 Hz
+  const freq = 220;
+  const cycle_length = Math.ceil(SAMPLE_RATE / freq);
+  const samples = new Float32Array(cycle_length);
+  const k = 7;
+
+  for (let i = 0; i < cycle_length; i++) {
+    const t = i / cycle_length;
+    const sin = Math.sin(2 * Math.PI * freq * t);
+    const sin_k = sin ** k;
+    samples[i] = sin_k;
+  }
+
+  download_file(make_wav_file(samples, "sin7.wav"));
+});
 /**
  * @implements {Animated}
  */
@@ -214,7 +242,7 @@ class WaveformsAnimation {
     const period = 1 / freq;
     const period_samples = Math.floor(period * SAMPLE_RATE);
 
-    download_file(make_wav_file(samples));
+    //download_file(make_wav_file(samples));
 
     this.primitive = style(
       render_waveform(samples, period_samples),
@@ -265,4 +293,8 @@ export const sketch = (p) => {
   };
 
   MOUSE.configure_callbacks(p);
+
+  p.keyReleased = (/**@type {KeyboardEvent} */ e) => {
+    SLASH.input(e.code);
+  };
 };
