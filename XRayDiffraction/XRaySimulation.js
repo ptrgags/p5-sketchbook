@@ -2,27 +2,24 @@ import { is_nearly } from "../sketchlib/is_nearly.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Motor } from "../sketchlib/pga2d/versors.js";
-
-// The frequencies will be in [-MAX_FREQ, MAX_FREQ] in both
-// dimensions
-const MAX_FREQ = 10;
+import { Circle } from "../sketchlib/primitives/Circle.js";
+import { LatticeVector } from "./LatticeVector.js";
 
 /**
- * @type {Direction[]}
+ * Axis-aligned lattice vectors before rotation
+ * @type {LatticeVector[]}
  */
-const ORIGINAL_WAVEVECTORS = [];
+const LATTICE = [];
+const MAX_FREQ = 10;
 for (let i = -MAX_FREQ; i <= MAX_FREQ; i++) {
   for (let j = -MAX_FREQ; j <= MAX_FREQ; j++) {
-    const wavevector = new Direction(i, j);
-    ORIGINAL_WAVEVECTORS.push(wavevector);
+    LATTICE.push(new LatticeVector(i, j));
   }
 }
 
 export class XRaySimulation {
   constructor() {
     this.events = new EventTarget();
-
-    this.angle = 0;
 
     // Wavelength in angstroms. Smaller means more
     // Bragg peaks will be visible
@@ -32,76 +29,71 @@ export class XRaySimulation {
     // not radians/meter. This skips the 2pi scaling factor that doesn't
     // actually matter for this simulation
     this.wavevector_in = new Direction(1 / this.wavelength, 0);
-    this.wavevectors = ORIGINAL_WAVEVECTORS;
-    this.visible_wavevectors = [];
+    this.ewald_sphere = new Circle(
+      new Point(-1 / this.wavelength, 0),
+      1 / this.wavelength,
+    );
+
+    /**
+     * @type {Set<LatticeVector>}
+     */
+    this.detected = new Set();
+
+    this.prev_angle = 0;
+    this.curr_angle = 0;
   }
 
   /**
    * When the angle of the crystal changes, call this method to update the
    * simulation
-   * @param {number} angle
+   * @param {number} angle new angle for this frame
    */
   update(angle) {
-    const rotate = Motor.rotation(Point.ORIGIN, angle);
+    // Update the state
+    this.prev_angle = this.curr_angle;
+    this.curr_angle = angle;
 
-    this.angle = angle;
-    this.wavevectors = ORIGINAL_WAVEVECTORS.map((x) => rotate.transform_dir(x));
-    this.visible_wavevectors = this.wavevectors.filter((g_hk) => {
-      // The incoming x-ray has a constant wavelength in the +x direction,
-      // so we can say:
-      //
-      // k_in = 1/wavelength x
-      //
-      // i.e. 1/wavelength cycles/angstrom in the x-direction
+    const rotate_prev = Motor.rotation(Point.ORIGIN, this.prev_angle);
+    const rotate_curr = Motor.rotation(Point.ORIGIN, this.curr_angle);
 
-      // With elastic scattering, the scattered light will have the same
-      // energy and therefore same wavelength and spatial frequency. In other
-      // words, |k_out| = |k_in|. so k_out must live on a circle with radius
-      // 1/wavelength centered at the origin. i.e.
-      //
-      // k_out(theta) = 1/wavelength * exp(theta * xy)
+    // Rotate the lattice to match the orientation of the crystal
+    const rotated_lattice = LATTICE.map((x) =>
+      rotate_curr.transform_dir(x.wavevector),
+    );
 
-      // However, since the x-rays scatter off many different planes of the
-      // crystal lattice, you're adding together many possible k_out, so in
-      // many cases you will get destructive interference. The Laue equations
-      // determine when constructive interference happens (and therefore a
-      // detectable scattered beam):
-      //
-      // For spatial frequency (h, k), constructive interference happens when
-      // the reciprocal lattice vector g_hk satisfies
-      // g_hk = delta_k = k_out - k_in
-      //
-      // delta_k = k_out(theta) - k_in = 1/wavelength * exp(theta * xy) - 1/wavelength
-      // delta_k = 1/wavelength * (exp(theta * xy) - 1)
-      //
-      // this is still and equation for a circle of radius 1/wavelength, but
-      // now it's shifted to the left to be centered at -1/wavelength x.
+    const sphere_center = this.ewald_sphere.center.to_direction();
+    const radius_sqr = this.ewald_sphere.radius * this.ewald_sphere.radius;
+    const newly_detected = LATTICE.filter((g) => {
+      const prev_g = rotate_prev.transform_dir(g.wavevector);
+      const curr_g = rotate_curr.transform_dir(g.wavevector);
 
-      // This means we're trying to intersect a point g_hk with the shifted
-      // circle (center: -1/wavelength, radius: 1/wavelength)
-      //
-      // |g_hk - (-1/wavelength x)| = 1/wavelength
-      // |g_hk + 1/wavelength x| = 1/wavelength
-      // or, to avoid the square roots:
-      // |g_hk + 1/wavelength x|^2 = 1/wavelength^2
+      // Determine signed (squared) distance from the ewald sphere's surface.
+      // + means we're outside the sphere, - means we're inside, 0 means on
+      // the sphere.
+      const prev_dist = prev_g.sub(sphere_center).mag_sqr() - radius_sqr;
+      const curr_dist = curr_g.sub(sphere_center).mag_sqr() - radius_sqr;
 
-      // This is the condition we test for to see if the spatial frequency
-      // will produce a detectable scattered beam.
-      const length_sqr = g_hk.sub(this.wavevector_in.neg()).mag_sqr();
-      return is_nearly(
-        length_sqr,
-        1 / (this.wavelength * this.wavelength),
-        1e-3,
-      );
+      // If the sign changed since the last frame, then the lattice point
+      // crossed the surface of the sphere. Most of the time, this happens
+      // in between frames.
+      const crossed_sphere = Math.sign(prev_dist) !== Math.sign(curr_dist);
+
+      // We want intersections between the lattice and the Ewald sphere, but
+      // in practice we also need to check for cases where the intersection
+      // happened between frames.
+      return is_nearly(curr_dist, 0) || crossed_sphere;
     });
+
+    newly_detected.forEach((x) => this.detected.add(x));
 
     this.events.dispatchEvent(
       new CustomEvent("change", {
         detail: {
-          wavelength: this.wavelength,
-          angle: this.angle,
-          wavevectors: this.wavevectors,
-          visible_wavevectors: this.visible_wavevectors,
+          angle: this.curr_angle,
+          ewald_sphere: this.ewald_sphere,
+          lattice: rotated_lattice,
+          newly_detected,
+          all_detected: this.detected,
         },
       }),
     );
