@@ -8,6 +8,7 @@ import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
+import { LatticeVector } from "./LatticeVector.js";
 import { XRaySimulation } from "./XRaySimulation.js";
 
 const ORIGIN = new Point(WIDTH / 2, HEIGHT / 4);
@@ -83,13 +84,11 @@ export class XRayLab {
   constructor(simulation) {
     this.simulation = simulation;
 
-    simulation.events.addEventListener(
-      "change",
-      (/** @type {CustomEvent} */ e) => {
-        this.update_crystal(e.detail.angle);
-        this.update_rays(e.detail.wavelength, e.detail.visible_wavevectors);
-      },
-    );
+    simulation.events.addEventListener("change", (e) => {
+      const { angle, newly_detected } = /** @type {CustomEvent} */ (e).detail;
+      this.#update_crystal(angle);
+      this.#update_rays(newly_detected);
+    });
 
     this.outgoing_rays = style([], STYLE_XRAY);
     this.crystal = style([], STYLE_CRYSTAL);
@@ -110,7 +109,7 @@ export class XRayLab {
    * Rotate the crystal
    * @param {number} angle
    */
-  update_crystal(angle) {
+  #update_crystal(angle) {
     // the simulation uses y-up coordinates so we need to reverse the angle
     const corner = Direction.from_angle(-angle + Math.PI / 4).scale(
       CRYSTAL_RADIUS,
@@ -134,14 +133,13 @@ export class XRayLab {
 
   /**
    * Update the rays that diffract from the crystal.
-   * @param {number} wavelength
-   * @param {Direction[]} visible_wavevectors
+   * @param {LatticeVector[]} newly_detected
    */
-  update_rays(wavelength, visible_wavevectors) {
-    const k_in = new Direction(1 / wavelength, 0);
-    const outgoing_rays = visible_wavevectors.map((g_hk) => {
+  #update_rays(newly_detected) {
+    const k_in = this.simulation.wavevector_in;
+    const outgoing_rays = newly_detected.map((g) => {
       // g = k_out - k_in, so k_out = k_in + g
-      const k_out = k_in.add(g_hk);
+      const k_out = k_in.add(g.wavevector);
 
       // Shoot a ray out of the crystal in the direction of
       // k_out, but skip to pixels
