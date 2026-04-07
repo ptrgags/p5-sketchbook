@@ -141,6 +141,10 @@ export class XRayLab {
       // g = k_out - k_in, so k_out = k_in + g
       const k_out = k_in.add(g.wavevector);
 
+      if (k_out.equals(Direction.ZERO)) {
+        return new LineSegment(ORIGIN, ORIGIN);
+      }
+
       // Shoot a ray out of the crystal in the direction of
       // k_out, but skip to pixels
       const dir_out = k_out.set_length(OUTGOING_RAY_LENGTH).flip_y();

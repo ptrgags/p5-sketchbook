@@ -38,7 +38,7 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    const angle = (p.frameCount / 600) * 2 * Math.PI;
+    const angle = (p.frameCount / 1200) * 2 * Math.PI;
     SIMULATION.update(angle);
 
     SCENE.draw(p);

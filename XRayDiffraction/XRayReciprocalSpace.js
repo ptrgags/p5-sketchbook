@@ -3,6 +3,7 @@ import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
+import { Motor } from "../sketchlib/pga2d/versors.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
@@ -60,10 +61,10 @@ export class XRayReciprocalSpace {
     this.simulation = simulation;
 
     simulation.events.addEventListener("change", (e) => {
-      const { lattice, newly_detected, ewald_sphere } =
+      const { lattice, angle, newly_detected, ewald_sphere } =
         /** @type {CustomEvent}*/ (e).detail;
       this.#update_lattice(lattice);
-      this.#update_newly_detected(newly_detected);
+      this.#update_newly_detected(angle, newly_detected);
       this.#update_ewald(ewald_sphere);
     });
 
@@ -100,32 +101,37 @@ export class XRayReciprocalSpace {
 
   /**
    *
-   * @param {LatticeVector[]} lattice Wavevectors for the whole lattice in cycles/angstrom
+   * @param {Direction[]} lattice Wavevectors for the whole lattice in cycles/angstrom
    */
   #update_lattice(lattice) {
     const points = lattice.map((g) =>
-      ORIGIN.add(g.wavevector.scale(PIXELS_PER_FREQ).flip_y()),
+      ORIGIN.add(g.scale(PIXELS_PER_FREQ).flip_y()),
     );
     this.lattice.regroup(...points);
   }
 
   /**
    *
+   * @param {number} angle The current angle
    * @param {LatticeVector[]} newly_detected Wavevectors that were detected since the last frame.
    */
-  #update_newly_detected(newly_detected) {
-    const detected_vectors = newly_detected.map(
-      (g) =>
-        new VectorPrimitive(
-          ORIGIN,
-          ORIGIN.add(g.wavevector.scale(PIXELS_PER_FREQ).flip_y()),
-        ),
-    );
+  #update_newly_detected(angle, newly_detected) {
+    const motor = Motor.rotation(Point.ORIGIN, angle);
+
+    const detected_vectors = newly_detected.map((g) => {
+      const rotated_g = motor.transform_dir(g.wavevector);
+
+      return new VectorPrimitive(
+        ORIGIN,
+        ORIGIN.add(rotated_g.scale(PIXELS_PER_FREQ).flip_y()),
+      );
+    });
     this.intersections.regroup(...detected_vectors);
 
     const k_in = this.simulation.wavevector_in;
     const scattered_vectors = newly_detected.map((g) => {
-      const k_out = k_in.add(g.wavevector);
+      const rotated_g = motor.transform_dir(g.wavevector);
+      const k_out = k_in.add(rotated_g);
       return new VectorPrimitive(
         ORIGIN,
         ORIGIN.add(k_out.scale(PIXELS_PER_FREQ).flip_y()),
