@@ -34,10 +34,7 @@ class TEMPLATEAnimation {
   update() {}
 }
 
-/**
- *
- * @param {import("p5")} p
- */
+//@ts-ignore
 export const sketch = (p) => {
   /** @type {PlayButtonScene | SoundScene} */
   let scene = new PlayButtonScene(SOUND);
@@ -46,7 +43,6 @@ export const sketch = (p) => {
       WIDTH,
       HEIGHT,
       undefined,
-      // @ts-ignore
       document.getElementById("sketch-canvas"),
     ).elt;
 
