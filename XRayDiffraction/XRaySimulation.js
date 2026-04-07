@@ -6,20 +6,41 @@ import { Circle } from "../sketchlib/primitives/Circle.js";
 import { LatticeVector } from "./LatticeVector.js";
 
 /**
- * Axis-aligned lattice vectors before rotation
- * @type {LatticeVector[]}
+ * @type {[Direction, Direction]}
  */
-const LATTICE = [];
-const MAX_FREQ = 10;
-for (let i = -MAX_FREQ; i <= MAX_FREQ; i++) {
-  for (let j = -MAX_FREQ; j <= MAX_FREQ; j++) {
-    LATTICE.push(new LatticeVector(i, j));
+const DEFAULT_BASIS = [Direction.DIR_X, Direction.DIR_Y];
+
+/**
+ * Build a grid of lattice vectors
+ * @param {[Direction, Direction]} basis basis vectors for reciprocal lattice in cycles/angstrom
+ * @returns {LatticeVector[]} Array of lattice vectors
+ */
+function make_lattice(basis) {
+  const [a, b] = basis;
+  const lattice = [];
+  const MAX_FREQ = 10;
+  for (let h = -MAX_FREQ; h <= MAX_FREQ; h++) {
+    for (let k = -MAX_FREQ; k <= MAX_FREQ; k++) {
+      const g_hk = a.scale(h).add(b.scale(k));
+      lattice.push(new LatticeVector(h, k, g_hk));
+    }
   }
+
+  return lattice;
 }
 
 export class XRaySimulation {
-  constructor() {
+  /**
+   * Construtor
+   * @param {[Direction, Direction]} basis vectors for the reciprocal basis in cycles/angstrom
+   */
+  constructor(basis = DEFAULT_BASIS) {
     this.events = new EventTarget();
+
+    /**
+     * @type {LatticeVector[]}
+     */
+    this.lattice = make_lattice(basis);
 
     // Wavelength in angstroms. Smaller means more
     // Bragg peaks will be visible
@@ -57,13 +78,13 @@ export class XRaySimulation {
     const rotate_curr = Motor.rotation(Point.ORIGIN, this.curr_angle);
 
     // Rotate the lattice to match the orientation of the crystal
-    const rotated_lattice = LATTICE.map((x) =>
+    const rotated_lattice = this.lattice.map((x) =>
       rotate_curr.transform_dir(x.wavevector),
     );
 
     const sphere_center = this.ewald_sphere.center.to_direction();
     const radius_sqr = this.ewald_sphere.radius * this.ewald_sphere.radius;
-    const newly_detected = LATTICE.filter((g) => {
+    const newly_detected = this.lattice.filter((g) => {
       const prev_g = rotate_prev.transform_dir(g.wavevector);
       const curr_g = rotate_curr.transform_dir(g.wavevector);
 
