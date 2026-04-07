@@ -23,6 +23,7 @@ const BACKDROP = style(
 
 const SCENE = group(WAVEVECTORS.primitive, BACKDROP, LAB_ANIMATION.primitive);
 
+// @ts-ignore
 export const sketch = (p) => {
   p.setup = () => {
     p.createCanvas(
@@ -43,6 +44,4 @@ export const sketch = (p) => {
 
     SCENE.draw(p);
   };
-
-  // TODO: input events
 };

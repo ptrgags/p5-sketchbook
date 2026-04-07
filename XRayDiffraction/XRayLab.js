@@ -3,6 +3,7 @@ import { HEIGHT, SCREEN_CENTER, WIDTH } from "../sketchlib/dimensions.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
+import { Motor } from "../sketchlib/pga2d/versors.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
@@ -87,7 +88,7 @@ export class XRayLab {
     simulation.events.addEventListener("change", (e) => {
       const { angle, newly_detected } = /** @type {CustomEvent} */ (e).detail;
       this.#update_crystal(angle);
-      this.#update_rays(newly_detected);
+      this.#update_rays(angle, newly_detected);
     });
 
     this.outgoing_rays = style([], STYLE_XRAY);
@@ -133,13 +134,18 @@ export class XRayLab {
 
   /**
    * Update the rays that diffract from the crystal.
+   * @param {number} angle
    * @param {LatticeVector[]} newly_detected
    */
-  #update_rays(newly_detected) {
+  #update_rays(angle, newly_detected) {
     const k_in = this.simulation.wavevector_in;
+    const rotation = Motor.rotation(Point.ORIGIN, angle);
+
     const outgoing_rays = newly_detected.map((g) => {
+      const rotated_g = rotation.transform_dir(g.wavevector);
+
       // g = k_out - k_in, so k_out = k_in + g
-      const k_out = k_in.add(g.wavevector);
+      const k_out = k_in.add(rotated_g);
 
       if (k_out.equals(Direction.ZERO)) {
         return new LineSegment(ORIGIN, ORIGIN);
