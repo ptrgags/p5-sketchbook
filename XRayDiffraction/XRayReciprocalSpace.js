@@ -25,7 +25,11 @@ const STYLE_LATTICE = new Style({
   fill: Color.from_hex_code("#6f0000"),
 });
 
-const STYLE_INTERSECTION = new Style({
+const STYLE_DETECTED = new Style({
+  fill: new Oklch(0.7, 0.1, 150),
+});
+
+const STYLE_NEWLY_DETECTED = new Style({
   fill: new Oklch(0.7, 0.1, 100),
 });
 
@@ -63,18 +67,17 @@ export class XRayReciprocalSpace {
     simulation.events.addEventListener("change", (e) => {
       const { lattice, angle, newly_detected, ewald_sphere } =
         /** @type {CustomEvent}*/ (e).detail;
-      this.#update_lattice(lattice);
+      this.#update_lattice(angle, lattice, new Set(newly_detected));
       this.#update_newly_detected(angle, newly_detected);
       this.#update_ewald(ewald_sphere);
     });
 
     // set of points representing the reciprocal lattice vectors g_hk
     this.lattice = style([], STYLE_LATTICE);
+    this.lattice_detected = style([], STYLE_DETECTED);
+    this.lattice_newly_detected = style([], STYLE_NEWLY_DETECTED);
 
     this.ewald_sphere = style([], STYLE_XRAY);
-
-    // Reciprocal lattice vectors that intersect the sphere, colored in yellow.
-    this.intersections = style([], STYLE_G_HK);
 
     // wavevectors that are detectable. This includes both the incoming beam
     // and the scattered rays.
@@ -84,7 +87,8 @@ export class XRayReciprocalSpace {
       this.ewald_sphere,
       this.visible_xrays,
       this.lattice,
-      this.intersections,
+      this.lattice_detected,
+      this.lattice_newly_detected,
     );
   }
 
@@ -100,14 +104,34 @@ export class XRayReciprocalSpace {
   }
 
   /**
-   *
-   * @param {Direction[]} lattice Wavevectors for the whole lattice in cycles/angstrom
+   * @param {number} angle Rotation angle for the lattice
+   * @param {LatticeVector[]} lattice Wavevectors for the whole lattice in cycles/angstrom
+   * @param {Set<LatticeVector>} newly_detected Wavevectors detected since the previous frame
    */
-  #update_lattice(lattice) {
-    const points = lattice.map((g) =>
-      ORIGIN.add(g.scale(PIXELS_PER_FREQ).flip_y()),
-    );
-    this.lattice.regroup(...points);
+  #update_lattice(angle, lattice, newly_detected) {
+    const newly = [];
+    const detected = [];
+    const rest = [];
+
+    const all_detected = this.simulation.detected;
+
+    const rotate = Motor.rotation(Point.ORIGIN, angle);
+    for (const g of lattice) {
+      const rotated_g = rotate.transform_dir(g.wavevector);
+      const point = ORIGIN.add(rotated_g.scale(PIXELS_PER_FREQ).flip_y());
+
+      if (newly_detected.has(g)) {
+        newly.push(new Circle(point, 10));
+      } else if (all_detected.has(g)) {
+        detected.push(point);
+      } else {
+        rest.push(point);
+      }
+    }
+
+    this.lattice_newly_detected.regroup(...newly);
+    this.lattice_detected.regroup(...detected);
+    this.lattice.regroup(...rest);
   }
 
   /**
@@ -117,16 +141,6 @@ export class XRayReciprocalSpace {
    */
   #update_newly_detected(angle, newly_detected) {
     const motor = Motor.rotation(Point.ORIGIN, angle);
-
-    const detected_vectors = newly_detected.map((g) => {
-      const rotated_g = motor.transform_dir(g.wavevector);
-
-      return new VectorPrimitive(
-        ORIGIN,
-        ORIGIN.add(rotated_g.scale(PIXELS_PER_FREQ).flip_y()),
-      );
-    });
-    this.intersections.regroup(...detected_vectors);
 
     const k_in = this.simulation.wavevector_in;
     const scattered_vectors = newly_detected.map((g) => {

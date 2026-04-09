@@ -66,8 +66,9 @@ const GONIOMETER_FRAME = style(
   STYLE_MACHINE_LINES,
 );
 
+const DETECTOR_X = 350;
 const DETECTOR_LINE = style(
-  new LineSegment(new Point(325, 0), new Point(325, HEIGHT / 2)),
+  new LineSegment(new Point(DETECTOR_X, 0), new Point(DETECTOR_X, HEIGHT / 2)),
   STYLE_MACHINE_LINES,
 );
 

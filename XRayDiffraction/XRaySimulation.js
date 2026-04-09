@@ -112,9 +112,8 @@ export class XRaySimulation {
         detail: {
           angle: this.curr_angle,
           ewald_sphere: this.ewald_sphere,
-          lattice: rotated_lattice,
+          lattice: this.lattice,
           newly_detected,
-          all_detected: this.detected,
         },
       }),
     );
