@@ -76,10 +76,15 @@
             >.
           </li>
           <li>
-            The flashing yellow vectors on the left show the intersections of
-            the reciprocal lattice and Ewald's sphere. These points represent
-            spatial frequencies where constructive interference (and thus a
-            detectable k_out) occur.
+            The flashing yellow points highlight when lattice points intersect
+            Ewald's Sphere, thus producing constructive interference. The
+            lattice points are then colored light green so you can see which
+            latice points have been detected at least once. Notice that this
+            sweeps out a larger circle as you turn the crystal. This shows that
+            for a given wavelength of incoming x-rays, there's a limit to which
+            spatial frequencies will be detectable. A shorter x-ray wavelength
+            will make Ewald's Sphere larger and therefore many more frequencies
+            will be detectable.
           </li>
         </ul>
         <p>
@@ -89,23 +94,15 @@
           of 2pi.
         </p>
         <p>
-          There's one important subtlety here: For most angles, the lattice
-          doesn't exactly intersect Ewald's sphere, and thus no constructive
-          interference happens! This makes visualization tricky.
-        </p>
-        <p>
-          In real life, time is continuous, so as you rotate the crystal through
-          various angles, a lattice point will intersect the sphere at some
-          instant in time when it crosses from outside to inside or vice-versa.
-          However, in computer animation we're computing discrete snapshots in
-          time, so in many cases the lattice points will jump across the sphere
-          without ever intersecting it. This means there should be several more
-          peaks than what is currently shown.
-        </p>
-        <p>
-          This is an area of this sketch that needs improvement - I need to
-          handle diffraction peaks that happen in between animation frames. I'm
-          still thinking about how best to visualize this. Stay tuned!
+          One interesting sublety: For most angles, the lattice doesn't exactly
+          intersect Ewald's Sphere, and thus no constructive interference
+          happens! Since animation produces discrete time snapshots, this often
+          misses x-rays that happen between frames. I changed the simulation a
+          bit so now it's computing "which lattice vectors have intersected the
+          Ewald Sphere <em>since the last animation frame</em>?". This is
+          similar to a camera taking an exposure: What to a human feels like an
+          instantaneous snapshot is really adding up light for the brief time
+          period that the camera shutter is open.
         </p>
         <h3>References:</h3>
         <p>
