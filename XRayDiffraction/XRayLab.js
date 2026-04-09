@@ -2,7 +2,6 @@ import { Color } from "../sketchlib/Color.js";
 import { HEIGHT, SCREEN_CENTER, WIDTH } from "../sketchlib/dimensions.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
-import { Line } from "../sketchlib/pga2d/Line.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Motor } from "../sketchlib/pga2d/versors.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
@@ -67,16 +66,8 @@ const GONIOMETER_FRAME = style(
   STYLE_MACHINE_LINES,
 );
 
-const DETECTOR_X = 400;
-const DETECTOR_LINE = new Line(1, 0, DETECTOR_X);
-
-const STYLE_DETECTED = new Style({
-  fill: new Oklch(0.7, 0.1, 150),
-});
-
-// line segment to visualize the detector
-const DETECTOR_SEGMENT = style(
-  new LineSegment(new Point(DETECTOR_X, 0), new Point(DETECTOR_X, HEIGHT / 2)),
+const DETECTOR_LINE = style(
+  new LineSegment(new Point(325, 0), new Point(325, HEIGHT / 2)),
   STYLE_MACHINE_LINES,
 );
 
@@ -95,8 +86,7 @@ export class XRayLab {
     this.simulation = simulation;
 
     simulation.events.addEventListener("change", (e) => {
-      const { angle, newly_detected, all_detected } =
-        /** @type {CustomEvent} */ (e).detail;
+      const { angle, newly_detected } = /** @type {CustomEvent} */ (e).detail;
       this.#update_crystal(angle);
       this.#update_rays(angle, newly_detected);
     });
@@ -104,15 +94,14 @@ export class XRayLab {
     this.outgoing_rays = style([], STYLE_XRAY);
     this.crystal = style([], STYLE_CRYSTAL);
     this.goniometer_bar = style([], STYLE_MACHINE_LINES);
-    this.detected_points = style([], STYLE_DETECTED);
     this.primitive = group(
       GONIOMETER_FRAME,
       this.goniometer_bar,
       INCOMING_BEAM,
       this.outgoing_rays,
       EMITTER,
-      DETECTOR_SEGMENT,
-      this.detected_points,
+      DETECTOR_LINE,
+
       this.crystal,
     );
   }
@@ -152,40 +141,21 @@ export class XRayLab {
     const k_in = this.simulation.wavevector_in;
     const rotation = Motor.rotation(Point.ORIGIN, angle);
 
-    const rays = [];
-    const points = [];
-
-    for (const g of newly_detected) {
+    const outgoing_rays = newly_detected.map((g) => {
       const rotated_g = rotation.transform_dir(g.wavevector);
 
       // g = k_out - k_in, so k_out = k_in + g
       const k_out = k_in.add(rotated_g);
 
-      // Only outgoing rays that move to the right will hit the screen
-      if (k_out.x > 1e-8) {
-        const trajectory = ORIGIN.join(k_out.flip_y());
-        // since x > 0, there will always be a finite intersection, even if it's offscreen
-        const intersection = DETECTOR_LINE.meet(trajectory);
-
-        if (intersection instanceof Direction) {
-          throw new Error("parallel ray shouldn't be possible here");
-        }
-
-        rays.push(new LineSegment(ORIGIN, intersection));
-        points.push(intersection);
-        continue;
-      }
-
       if (k_out.equals(Direction.ZERO)) {
-        rays.push(new LineSegment(ORIGIN, ORIGIN));
+        return new LineSegment(ORIGIN, ORIGIN);
       }
 
       // Shoot a ray out of the crystal in the direction of
       // k_out, but skip to pixels
       const dir_out = k_out.set_length(OUTGOING_RAY_LENGTH).flip_y();
-      rays.push(new LineSegment(ORIGIN, ORIGIN.add(dir_out)));
-    }
-    this.outgoing_rays.regroup(...rays);
-    this.detected_points.regroup(...points);
+      return new LineSegment(ORIGIN, ORIGIN.add(dir_out));
+    });
+    this.outgoing_rays.regroup(...outgoing_rays);
   }
 }
