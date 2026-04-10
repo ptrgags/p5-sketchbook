@@ -2,6 +2,10 @@ import { Point } from "../sketchlib/pga2d/Point.js";
 import { Primitive } from "../sketchlib/primitives/Primitive.js";
 
 /**
+ * For the x-ray detector, the same lattice vector will produce interference
+ * peaks up to twice when you rotate the crystal, and then repeat as the
+ * crystal goes through more full turns. This data structure represents all
+ * the unique peaks observed for a single lattice vector.
  * @implements {Primitive}
  */
 export class DetectorPoint {

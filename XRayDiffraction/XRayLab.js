@@ -103,6 +103,8 @@ export class XRayLab {
     });
 
     /**
+     * Map of g_hk -> detected peaks. To avoid repeats as the crystal rotates
+     * multiples of 360 degrees, DetectorPoint manages removing duplicates
      * @type {Map<LatticeVector, DetectorPoint>}
      */
     this.detected_peaks = new Map();
