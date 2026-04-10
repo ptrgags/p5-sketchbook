@@ -1,5 +1,9 @@
 import { Point } from "../sketchlib/pga2d/Point.js";
+import { Primitive } from "../sketchlib/primitives/Primitive.js";
 
+/**
+ * @implements {Primitive}
+ */
 export class DetectorPoint {
   constructor() {
     /**
@@ -27,5 +31,15 @@ export class DetectorPoint {
       return;
     }
     this.peaks.set(key, bragg_peak);
+  }
+
+  /**
+   * Draw 0-2 points depending on what was detected
+   * @param {import('p5')} p p5 library
+   */
+  draw(p) {
+    for (const point of this.peaks.values()) {
+      point.draw(p);
+    }
   }
 }
