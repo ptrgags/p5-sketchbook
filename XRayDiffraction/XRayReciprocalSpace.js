@@ -33,11 +33,6 @@ const STYLE_NEWLY_DETECTED = new Style({
   fill: new Oklch(0.7, 0.1, 100),
 });
 
-const STYLE_G_HK = new Style({
-  stroke: new Oklch(0.7, 0.1, 100),
-  width: 2,
-});
-
 const ORIGIN = new Point(WIDTH / 2, (3 * HEIGHT) / 4);
 // how many pixels per (cycle/angstrom) unit of the lattice
 const PIXELS_PER_FREQ = 25;
