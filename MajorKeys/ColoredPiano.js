@@ -38,7 +38,7 @@ function make_small_keys(bounds) {
 
   // key offsets in multiples of half the black key width, i.e. 1/28 of
   // the width of the keyboard
-  const half_key_width = 0.5 * KEY_PROPORTION.x;
+  const half_key_width = 0.5 * key_dimensions.x;
   const key_offsets = [3, 7, 15, 19, 23];
   return key_offsets.map((i) => {
     const offset = Direction.DIR_X.scale(i * half_key_width);

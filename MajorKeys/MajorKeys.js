@@ -4,10 +4,16 @@ import { griderator } from "../sketchlib/Grid.js";
 import { mod } from "../sketchlib/mod.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
-import { group } from "../sketchlib/primitives/shorthand.js";
+import { group, xform } from "../sketchlib/primitives/shorthand.js";
+import { Transform } from "../sketchlib/primitives/Transform.js";
 import { Rectangle } from "../sketchlib/Rectangle.js";
 import { Style } from "../sketchlib/Style.js";
 import { ColoredPiano } from "./ColoredPiano.js";
+
+const STYLE_ROOT = new Style({
+  stroke: Color.BLACK,
+  fill: Color.RED,
+});
 
 const STYLE_WHITE_KEYS = new Style({
   stroke: Color.BLACK,
@@ -15,10 +21,11 @@ const STYLE_WHITE_KEYS = new Style({
 });
 const STYLE_BLACK_KEYS = new Style({
   fill: Color.BLACK,
+  stroke: Color.WHITE,
 });
 
 const STYLES = [
-  STYLE_WHITE_KEYS,
+  STYLE_ROOT,
   STYLE_BLACK_KEYS,
   STYLE_WHITE_KEYS,
   STYLE_BLACK_KEYS,
@@ -36,7 +43,10 @@ const ROWS = 6;
 const COLS = 2;
 
 const STRIDE = new Direction(WIDTH / COLS, HEIGHT / ROWS);
-const KEYBOARD_DIMS = new Direction(WIDTH / COLS, (0.75 * HEIGHT) / ROWS);
+const KEYBOARD_DIMS = new Direction(
+  (0.45 * WIDTH) / COLS,
+  (0.75 * HEIGHT) / ROWS,
+);
 
 /**
  * @template T
@@ -58,17 +68,21 @@ function cycle_right(arr, places) {
 const PIANOS = [];
 griderator(6, 2, (row, col) => {
   const start_note = col * 6 + row;
+  const transposed_styles = cycle_right(STYLES, start_note);
 
   const rect = new Rectangle(
     Point.ORIGIN.add(STRIDE.mul_components(new Direction(col, row))),
     KEYBOARD_DIMS,
   );
 
-  const piano = new ColoredPiano(rect, cycle_right(STYLES, start_note));
+  const piano = new ColoredPiano(rect, transposed_styles);
+
   PIANOS.push(piano);
 });
 
-const SCENE = group(...PIANOS);
+// hacky way to get two octaves: take the pianos and add a translated copy
+const SHIFT_OCTAVE = new Transform(Direction.DIR_X.scale(KEYBOARD_DIMS.x));
+const SCENE = group(...PIANOS, xform(PIANOS, SHIFT_OCTAVE));
 
 // @ts-ignore
 export const sketch = (p) => {
@@ -82,7 +96,7 @@ export const sketch = (p) => {
   };
 
   p.draw = () => {
-    p.background(0);
+    p.background(127);
     SCENE.draw(p);
   };
 };
