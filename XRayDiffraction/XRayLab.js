@@ -1,6 +1,5 @@
 import { Color } from "../sketchlib/Color.js";
 import { HEIGHT, SCREEN_CENTER, WIDTH } from "../sketchlib/dimensions.js";
-import { is_nearly } from "../sketchlib/is_nearly.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Line } from "../sketchlib/pga2d/Line.js";
@@ -72,7 +71,7 @@ const GONIOMETER_FRAME = style(
   STYLE_MACHINE_LINES,
 );
 
-const DETECTOR_X = 350;
+const DETECTOR_X = 400;
 const DETECTOR_SEGMENT = style(
   new LineSegment(new Point(DETECTOR_X, 0), new Point(DETECTOR_X, HEIGHT / 2)),
   STYLE_MACHINE_LINES,
@@ -203,12 +202,14 @@ export class XRayLab {
       return new LineSegment(ORIGIN, intersection);
     }
 
+    // Corner case: vector.set_length() below doesn't work on zero vectors
     if (k_out.equals(Direction.ZERO)) {
       return new LineSegment(ORIGIN, ORIGIN);
     }
 
-    const tip = k_out.set_length(OUTGOING_RAY_LENGTH).to_point().flip_y();
-    return new LineSegment(ORIGIN, tip);
+    const offset_tip = k_out.set_length(OUTGOING_RAY_LENGTH).flip_y();
+    const tip = ORIGIN.add(offset_tip);
+    return new VectorPrimitive(ORIGIN, tip);
   }
 
   /**
@@ -226,7 +227,8 @@ export class XRayLab {
     }
 
     // pew-pew! compute the intersection of the outgoing ray and the detector
-    const trajectory = ORIGIN.join(k_out);
+    // in screen space using (projective) geometric algebra operations
+    const trajectory = ORIGIN.join(k_out.flip_y());
     const intersection = trajectory.meet(DETECTOR_LINE);
 
     // If the intersection is visibile on the screen, return it
