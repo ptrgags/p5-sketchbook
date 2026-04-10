@@ -3,7 +3,6 @@ export const LINKS = [
   {
     title: "Major Keys",
     year: "2026-04",
-    is_lab: true,
   },
   {
     title: "X-ray Diffraction",
