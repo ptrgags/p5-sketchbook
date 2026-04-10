@@ -1,6 +1,10 @@
 // Links for all of the sketches. Links are added to the page in this order
 export const LINKS = [
   {
+    title: "Major Keys",
+    year: "2026-04",
+  },
+  {
     title: "X-ray Diffraction",
     link: "./XRayDiffraction",
     year: "2026-04",

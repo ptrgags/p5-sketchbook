@@ -1,2 +1,5 @@
 modes/
 node_modules/
+
+// WSL adds these files when I copy in an image from the Windows partition
+*Zone.Identifier

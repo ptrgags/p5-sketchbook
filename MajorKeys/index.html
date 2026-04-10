@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../libraries/p5.min.js"
+    ></script>
+    <script type="module">
+      import { sketch } from "./MajorKeys.js";
+      import "../sketchlib/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../styles/layout.css" />
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>12 Major Keys (2026-04)</h1>
+      <div class="sketch">
+        <canvas id="sketch-canvas" width="500" height="700"></canvas>
+      </div>
+      <div class="description">
+        <p>
+          Diagram of the 12 keys on piano, but color coded to highlight the
+          scale structure. In particular:
+        </p>
+        <ul>
+          <li>Red keys - The tonic (first note) of the major scale</li>
+          <li>White keys - The other notes of the major scale</li>
+          <li>
+            Black keys - Sharps and flats. These are not a part of the major
+            scale.
+          </li>
+        </ul>
+        <p>
+          To play a major scale in a given key, start on that key's tonic (red),
+          then play only the white and red keys above it, in order from left to
+          right.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
