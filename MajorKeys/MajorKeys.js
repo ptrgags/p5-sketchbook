@@ -1,9 +1,13 @@
 import { Color } from "../sketchlib/Color.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { griderator } from "../sketchlib/Grid.js";
+import { MIDIPitch } from "../sketchlib/music/MIDIPitch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
+import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { group, xform } from "../sketchlib/primitives/shorthand.js";
+import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
+import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
 import { Transform } from "../sketchlib/primitives/Transform.js";
 import { Rectangle } from "../sketchlib/Rectangle.js";
 import { Style } from "../sketchlib/Style.js";
@@ -62,26 +66,49 @@ function cycle_right(arr, places) {
 }
 
 /**
+ * @type {TextPrimitive[]}
+ */
+const LABELS = [];
+
+/**
  * @type {ColoredPiano[]}
  */
 const PIANOS = [];
+
 griderator(6, 2, (row, col) => {
   const start_note = col * 6 + row;
   const transposed_styles = cycle_right(STYLES, start_note);
 
-  const rect = new Rectangle(
-    Point.ORIGIN.add(STRIDE.mul_components(new Direction(col, row))),
-    KEYBOARD_DIMS,
+  const KEYBOARD_ORIGIN = Point.ORIGIN.add(
+    STRIDE.mul_components(new Direction(col, row)),
   );
 
+  const rect = new Rectangle(KEYBOARD_ORIGIN, KEYBOARD_DIMS);
+
   const piano = new ColoredPiano(rect, transposed_styles);
+
+  const key_label = MIDIPitch.format_pitch_class(start_note);
+  const label = new TextPrimitive(
+    `${key_label} Major`,
+    KEYBOARD_ORIGIN.add(KEYBOARD_DIMS),
+  );
+  LABELS.push(label);
 
   PIANOS.push(piano);
 });
 
 // hacky way to get two octaves: take the pianos and add a translated copy
 const SHIFT_OCTAVE = new Transform(Direction.DIR_X.scale(KEYBOARD_DIMS.x));
-const SCENE = group(...PIANOS, xform(PIANOS, SHIFT_OCTAVE));
+const SCENE = group(
+  ...PIANOS,
+  xform(PIANOS, SHIFT_OCTAVE),
+  new GroupPrimitive(LABELS, {
+    text_style: new TextStyle(24, "center", "top"),
+    style: new Style({
+      fill: Color.BLACK,
+    }),
+  }),
+);
 
 // @ts-ignore
 export const sketch = (p) => {
