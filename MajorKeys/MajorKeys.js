@@ -1,7 +1,6 @@
 import { Color } from "../sketchlib/Color.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { griderator } from "../sketchlib/Grid.js";
-import { mod } from "../sketchlib/mod.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { group, xform } from "../sketchlib/primitives/shorthand.js";
@@ -93,10 +92,9 @@ export const sketch = (p) => {
       undefined,
       document.getElementById("sketch-canvas"),
     );
-  };
-
-  p.draw = () => {
     p.background(127);
     SCENE.draw(p);
+
+    p.noLoop();
   };
 };
