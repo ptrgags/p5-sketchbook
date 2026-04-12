@@ -1,11 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { MIDIFile, MIDIFormat, MIDIHeader } from "./MIDIFile.js";
-import {
-  encode_midi,
-  HEADER_CHUNK_LENGTH,
-  HEADER_MAGIC,
-  TRACK_MAGIC,
-} from "./encode_midi.js";
+import { encode_midi, HEADER_CHUNK_LENGTH } from "./encode_midi.js";
 import { C3, C4, E5, G4 } from "../music/pitches.js";
 import { RelativeTimingTrack } from "./MIDITrack.js";
 import { MIDIMessage, MIDIMetaEvent, MIDIMetaType } from "./MIDIEvent.js";
@@ -13,6 +8,19 @@ import { Velocity } from "../music/Velocity.js";
 
 // This will get used a lot, so use the abbreviation parts per quarter
 const PPQ = MIDIHeader.DEFAULT_TICKS_PER_QUARTER;
+
+const HEADER_MAGIC = [
+  "M".charCodeAt(0),
+  "T".charCodeAt(0),
+  "h".charCodeAt(0),
+  "d".charCodeAt(0),
+];
+const TRACK_MAGIC = [
+  "M".charCodeAt(0),
+  "T".charCodeAt(0),
+  "r".charCodeAt(0),
+  "k".charCodeAt(0),
+];
 
 // This will be the same in many tests
 const FORMAT0_HEADER = [
