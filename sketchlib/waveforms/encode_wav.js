@@ -33,14 +33,6 @@ function to_i16(sample) {
   return Math.round(interpolated);
 }
 
-// if we let L = 2^15, we want to
-// map [-1, 1] to [-L, L - 1]
-// t = unlerp(-1, 1, x)
-// (1 - t)a + tb = y
-// a + t(b - a) = y
-// (y - a)/(b-a)
-// value = lerp(-L, L - 1, t)
-
 /**
  * Encode a WAV file. I'm only generating mono waveforms
  *
