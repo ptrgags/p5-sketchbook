@@ -3,14 +3,16 @@ import { write_ascii } from "../binary/write_ascii.js";
 // WAV uses little-endian, see https://en.wikipedia.org/wiki/WAV#WAV_file_header
 const LITTLE_ENDIAN = true;
 
-const CHANNELS_MONO = 1;
+export const CHANNELS_MONO = 1;
 
 const HEADER_SIZE = 44;
 
-// 16-bit (CD-quality) audio
-const BYTES_PER_SAMPLE = 2;
+export const SAMPLE_RATE = 44100;
 
-const SAMPLE_RATE = 44100;
+// 16-bit (CD-quality) audio
+export const BYTES_PER_SAMPLE = 2;
+export const BITS_PER_SAMPLE = 8 * BYTES_PER_SAMPLE;
+export const BYTES_PER_SECOND = SAMPLE_RATE * BYTES_PER_SAMPLE;
 
 /**
  * Encode a WAV file. I'm only generating mono waveforms
