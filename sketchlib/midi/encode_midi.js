@@ -1,3 +1,4 @@
+import { write_ascii } from "../binary/write_ascii.js";
 import { MIDIEvent } from "./MIDIEvent.js";
 import { MIDIFile, MIDIHeader } from "./MIDIFile.js";
 import { RelativeTimingTrack } from "./MIDITrack.js";
@@ -5,19 +6,6 @@ import {
   compute_variable_length,
   encode_variable_length,
 } from "./variable_length.js";
-
-export const HEADER_MAGIC = [
-  "M".charCodeAt(0),
-  "T".charCodeAt(0),
-  "h".charCodeAt(0),
-  "d".charCodeAt(0),
-];
-export const TRACK_MAGIC = [
-  "M".charCodeAt(0),
-  "T".charCodeAt(0),
-  "r".charCodeAt(0),
-  "k".charCodeAt(0),
-];
 
 export const END_OF_TRACK = [0xff, 0x2f, 0x00];
 
@@ -46,18 +34,25 @@ function compute_messages_length(track) {
   return total;
 }
 
+/**
+ * Get the length of the track
+ * @param {RelativeTimingTrack} track
+ * @returns {number}
+ */
 function compute_track_length(track) {
   const message_length = compute_messages_length(track);
-  return TRACK_MAGIC.length + SIZE_U32 + message_length;
+  const TRACK_MAGIC_LENGTH = 4;
+  return TRACK_MAGIC_LENGTH + SIZE_U32 + message_length;
 }
 
 /**
  * Compute the byte length of the encoded MIDI file up front before
  * allocating the buffer
- * @param {MIDIFile} midi The MIDI file
+ * @param {MIDIFile<RelativeTimingTrack>} midi The MIDI file
  */
 function compute_length(midi) {
-  const header_length = HEADER_MAGIC.length + SIZE_U32 + HEADER_CHUNK_LENGTH;
+  const HEADER_MAGIC_LENGTH = 4;
+  const header_length = HEADER_MAGIC_LENGTH + SIZE_U32 + HEADER_CHUNK_LENGTH;
 
   let total_track_length = 0;
   for (const track of midi.tracks) {
@@ -75,11 +70,7 @@ function compute_length(midi) {
  * @returns {number} New offset after the end of the header
  */
 function encode_header(data_view, offset, header) {
-  // write Mthd in ASCII
-  for (let i = 0; i < HEADER_MAGIC.length; i++) {
-    data_view.setUint8(offset + i, HEADER_MAGIC[i]);
-  }
-  offset += HEADER_MAGIC.length;
+  offset = write_ascii(data_view, "MThd", offset);
 
   data_view.setUint32(offset, HEADER_CHUNK_LENGTH, BIG_ENDIAN);
   offset += SIZE_U32;
@@ -89,7 +80,7 @@ function encode_header(data_view, offset, header) {
   data_view.setUint16(
     offset + 2 * SIZE_U16,
     header.ticks_per_quarter,
-    BIG_ENDIAN
+    BIG_ENDIAN,
   );
   offset += HEADER_CHUNK_LENGTH;
 
@@ -119,11 +110,7 @@ function encode_messages(data_view, offset, events) {
  * @return {number} New offset after the end of the track
  */
 function encode_track(data_view, offset, track) {
-  // write Mtrk in ASCII
-  for (let i = 0; i < TRACK_MAGIC.length; i++) {
-    data_view.setUint8(offset + i, TRACK_MAGIC[i]);
-  }
-  offset += TRACK_MAGIC.length;
+  offset = write_ascii(data_view, "MTrk", offset);
 
   const messages_length = compute_messages_length(track);
   data_view.setUint32(offset, messages_length, BIG_ENDIAN);
