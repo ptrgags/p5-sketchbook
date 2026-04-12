@@ -48,6 +48,7 @@ import { MouseCallbacks } from "../sketchlib/input/MouseCallbacks.js";
 import { SoundScene } from "../sketchlib/scenes/SoundScene.js";
 import { AnimationGroup } from "../sketchlib/animation/AnimationGroup.js";
 import { Primitive } from "../sketchlib/primitives/Primitive.js";
+import { download_file } from "../sketchlib/dom/download_file.js";
 
 const DEBUG_LOOP = false;
 const LOOP_START = new Rational(14 * 4);
@@ -212,22 +213,6 @@ const CURSOR = style(
   ),
   Style.DEFAULT_STROKE,
 );
-
-/**
- * Download a generated file
- * @param {File} file The file to downlowd
- */
-function download_file(file) {
-  const url = URL.createObjectURL(file);
-
-  const anchor = document.createElement("a");
-  anchor.setAttribute("href", url);
-  anchor.setAttribute("download", file.name);
-  document.body.appendChild(anchor);
-  anchor.click();
-  anchor.remove();
-  URL.revokeObjectURL(url);
-}
 
 function clear_errors() {
   document.getElementById("errors").innerText = "";
