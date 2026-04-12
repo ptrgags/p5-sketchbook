@@ -1,4 +1,5 @@
 import { write_ascii } from "../binary/write_ascii.js";
+import { Tween } from "../Tween.js";
 
 // WAV uses little-endian, see https://en.wikipedia.org/wiki/WAV#WAV_file_header
 const LITTLE_ENDIAN = true;
@@ -13,6 +14,32 @@ export const SAMPLE_RATE = 44100;
 export const BYTES_PER_SAMPLE = 2;
 export const BITS_PER_SAMPLE = 8 * BYTES_PER_SAMPLE;
 export const BYTES_PER_SECOND = SAMPLE_RATE * BYTES_PER_SAMPLE;
+
+// max value is 0b01111111 11111111 = 2^15 - 1
+const MAX_VALUE_I16 = (1 << 15) - 1;
+// min value is 0b10000000 00000000 = -2^15
+const MIN_VALUE_I16 = -(2 ** 15);
+
+// we want to mape [-1, 1] to [MIN, MAX].
+const TWEEN_TO_I16 = Tween.scalar(MIN_VALUE_I16, MAX_VALUE_I16, -1, 2);
+
+/**
+ * Convert a sample value to a signed 16-bit integer
+ * @param {number} sample The sample value in [-1, 1]
+ * @returns an integer in the range of an i16
+ */
+function to_i16(sample) {
+  const interpolated = TWEEN_TO_I16.get_value(sample);
+  return Math.round(interpolated);
+}
+
+// if we let L = 2^15, we want to
+// map [-1, 1] to [-L, L - 1]
+// t = unlerp(-1, 1, x)
+// (1 - t)a + tb = y
+// a + t(b - a) = y
+// (y - a)/(b-a)
+// value = lerp(-L, L - 1, t)
 
 /**
  * Encode a WAV file. I'm only generating mono waveforms
@@ -76,18 +103,14 @@ export function encode_wav(samples) {
   offset += 4;
 
   for (const [i, value] of samples.entries()) {
-    // initial range is [-1, 1]
-    // we want to scale to the range of a 16-bit signed integer
-    // which is [-2^15 - 1, 2^15]
-
-    // I'm going to be lazy and ignore the minimum value
-    const quantized = Math.round(value * (1 << 15));
-
-    data_view.setInt16(offset + BYTES_PER_SAMPLE * i, quantized, LITTLE_ENDIAN);
+    data_view.setInt16(
+      offset + BYTES_PER_SAMPLE * i,
+      to_i16(value),
+      LITTLE_ENDIAN,
+    );
   }
   offset += BYTES_PER_SAMPLE * samples.length;
 
-  // TODO: Move this to a unit test
   if (offset !== byte_length) {
     console.log("actual", offset, "expected", byte_length);
     throw new Error("whoops, my offsets are off");
