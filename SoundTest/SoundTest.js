@@ -51,7 +51,12 @@ import { Primitive } from "../sketchlib/primitives/Primitive.js";
 import { download_file } from "../sketchlib/dom/download_file.js";
 import { KeywordRecognizer } from "../sketchlib/KeywordRecognizer.js";
 import { sample_single_cycle } from "../sketchlib/waveforms/sample_single_cycle.js";
-import { sine } from "../sketchlib/waveforms/basic_waves.js";
+import {
+  sawtooth,
+  sine,
+  triangle,
+  square,
+} from "../sketchlib/waveforms/basic_waves.js";
 import { encode_wav_file } from "../sketchlib/waveforms/encode_wav.js";
 
 const DEBUG_LOOP = false;
@@ -235,6 +240,24 @@ const SAMPLE_FREQ = 440;
 SLASH.register(["Slash", "KeyS", "KeyI", "KeyN", "KeyE"], () => {
   const samples = sample_single_cycle(sine, SAMPLE_FREQ);
   const wav_file = encode_wav_file(samples, "sine-A4.wav");
+  download_file(wav_file);
+});
+
+SLASH.register(["Slash", "KeyS", "KeyA", "KeyW"], () => {
+  const samples = sample_single_cycle(sawtooth, SAMPLE_FREQ);
+  const wav_file = encode_wav_file(samples, "saw-A4.wav");
+  download_file(wav_file);
+});
+
+SLASH.register(["Slash", "KeyT", "KeyR", "KeyI"], () => {
+  const samples = sample_single_cycle(triangle, SAMPLE_FREQ);
+  const wav_file = encode_wav_file(samples, "tri-A4.wav");
+  download_file(wav_file);
+});
+
+SLASH.register(["Slash", "KeyS", "KeyQ", "KeyR"], () => {
+  const samples = sample_single_cycle(square, SAMPLE_FREQ);
+  const wav_file = encode_wav_file(samples, "square-A4.wav");
   download_file(wav_file);
 });
 

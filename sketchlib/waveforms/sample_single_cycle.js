@@ -15,7 +15,7 @@ export function sample_single_cycle(f, frequency) {
   const result = new Float32Array(sample_count);
   for (let i = 0; i < sample_count; i++) {
     const t = i / sample_count;
-    result[i] = f(frequency * t);
+    result[i] = f(t);
   }
   return result;
 }
