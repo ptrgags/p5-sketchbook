@@ -49,6 +49,15 @@ import { SoundScene } from "../sketchlib/scenes/SoundScene.js";
 import { AnimationGroup } from "../sketchlib/animation/AnimationGroup.js";
 import { Primitive } from "../sketchlib/primitives/Primitive.js";
 import { download_file } from "../sketchlib/dom/download_file.js";
+import { KeywordRecognizer } from "../sketchlib/KeywordRecognizer.js";
+import { sample_single_cycle } from "../sketchlib/waveforms/sample_single_cycle.js";
+import {
+  sawtooth,
+  sine,
+  triangle,
+  square,
+} from "../sketchlib/waveforms/basic_waves.js";
+import { encode_wav_file } from "../sketchlib/waveforms/encode_wav.js";
 
 const DEBUG_LOOP = false;
 const LOOP_START = new Rational(14 * 4);
@@ -221,6 +230,38 @@ function clear_errors() {
 function show_error(message) {
   document.getElementById("errors").innerText = message;
 }
+
+const SLASH = new KeywordRecognizer();
+
+// A4 = 440 Hz, so
+// A2 is A4/2^2 = 110
+const SAMPLE_FREQ = 110;
+const SAMPLE_NOTE = "A2";
+
+// /trace logs a trace of the scene for investigating performance issues.
+SLASH.register(["Slash", "KeyS", "KeyI", "KeyN", "KeyE"], () => {
+  const samples = sample_single_cycle(sine, SAMPLE_FREQ);
+  const wav_file = encode_wav_file(samples, `sine-${SAMPLE_NOTE}.wav`);
+  download_file(wav_file);
+});
+
+SLASH.register(["Slash", "KeyS", "KeyA", "KeyW"], () => {
+  const samples = sample_single_cycle(sawtooth, SAMPLE_FREQ);
+  const wav_file = encode_wav_file(samples, `saw-${SAMPLE_NOTE}.wav`);
+  download_file(wav_file);
+});
+
+SLASH.register(["Slash", "KeyT", "KeyR", "KeyI"], () => {
+  const samples = sample_single_cycle(triangle, SAMPLE_FREQ);
+  const wav_file = encode_wav_file(samples, `tri-${SAMPLE_NOTE}.wav`);
+  download_file(wav_file);
+});
+
+SLASH.register(["Slash", "KeyS", "KeyQ", "KeyR"], () => {
+  const samples = sample_single_cycle(square, SAMPLE_FREQ);
+  const wav_file = encode_wav_file(samples, `square-${SAMPLE_NOTE}.wav`);
+  download_file(wav_file);
+});
 
 /**
  * Import a MIDI file from a file picker
@@ -570,10 +611,6 @@ class SoundTestAnimation {
   }
 }
 
-/**
- *
- * @param {import("p5")} p
- */
 export const sketch = (p) => {
   /** @type {PlayButtonScene | SoundScene} */
   let scene = new PlayButtonScene(SOUND);
@@ -604,4 +641,8 @@ export const sketch = (p) => {
   };
 
   MOUSE.configure_callbacks(p);
+
+  p.keyReleased = (/** @type {KeyboardEvent}*/ e) => {
+    SLASH.input(e.code);
+  };
 };
