@@ -63,8 +63,11 @@ describe("Rhythm", () => {
     it("with empty rhythm produces empty generator", () => {
       const rhythm = Rhythm.EMPTY;
 
-      const result = [...rhythm.beat_iter()];
+      const result = rhythm.beat_iter().toArray();
 
+      /**
+       * @type {[boolean, number][]}
+       */
       const expected = [];
       expect(result).toEqual(expected);
     });
@@ -72,7 +75,7 @@ describe("Rhythm", () => {
     it("with rhythm produces one entry per note or run of rests", () => {
       const rhythm = new Rhythm("x--...|xx-..x.x", N4);
 
-      const result = [...rhythm.beat_iter()];
+      const result = rhythm.beat_iter().toArray();
 
       const expected = [
         [true, 3],
@@ -90,7 +93,7 @@ describe("Rhythm", () => {
     it("handles stray sustains as extending rests", () => {
       const rhythm = new Rhythm("--...---", N4);
 
-      const result = [...rhythm.beat_iter()];
+      const result = rhythm.beat_iter().toArray();
 
       const expected = [[false, 8]];
       expect(result).toEqual(expected);
@@ -100,6 +103,9 @@ describe("Rhythm", () => {
   describe("zip", () => {
     it("zip with empty grids produces empty timeline", () => {
       const rhythm = Rhythm.EMPTY;
+      /**
+       * @type {number[]}
+       */
       const values = [];
 
       const result = rhythm.zip(values);
