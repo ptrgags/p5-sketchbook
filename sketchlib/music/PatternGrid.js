@@ -1,10 +1,6 @@
 import { lcm } from "../gcd.js";
 import { Rational } from "../Rational.js";
-import { flatten_timeline } from "./flatten_timeline.js";
-import { make_note, Melody, Note, Rest } from "./Music.js";
 import { RelTimelineOps } from "./RelTimelineOps.js";
-import { RhythmStep } from "./RhythmStep.js";
-import { Velocity } from "./Velocity.js";
 
 /**
  * Compute the smallest subdivision, i.e. the largest denominator in all of the
