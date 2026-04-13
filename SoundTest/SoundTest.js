@@ -233,31 +233,33 @@ function show_error(message) {
 
 const SLASH = new KeywordRecognizer();
 
-// A4 = 440 Hz
-const SAMPLE_FREQ = 440;
+// A4 = 440 Hz, so
+// A2 is A4/2^2 = 110
+const SAMPLE_FREQ = 110;
+const SAMPLE_NOTE = "A2";
 
 // /trace logs a trace of the scene for investigating performance issues.
 SLASH.register(["Slash", "KeyS", "KeyI", "KeyN", "KeyE"], () => {
   const samples = sample_single_cycle(sine, SAMPLE_FREQ);
-  const wav_file = encode_wav_file(samples, "sine-A4.wav");
+  const wav_file = encode_wav_file(samples, `sine-${SAMPLE_NOTE}.wav`);
   download_file(wav_file);
 });
 
 SLASH.register(["Slash", "KeyS", "KeyA", "KeyW"], () => {
   const samples = sample_single_cycle(sawtooth, SAMPLE_FREQ);
-  const wav_file = encode_wav_file(samples, "saw-A4.wav");
+  const wav_file = encode_wav_file(samples, `saw-${SAMPLE_NOTE}.wav`);
   download_file(wav_file);
 });
 
 SLASH.register(["Slash", "KeyT", "KeyR", "KeyI"], () => {
   const samples = sample_single_cycle(triangle, SAMPLE_FREQ);
-  const wav_file = encode_wav_file(samples, "tri-A4.wav");
+  const wav_file = encode_wav_file(samples, `tri-${SAMPLE_NOTE}.wav`);
   download_file(wav_file);
 });
 
 SLASH.register(["Slash", "KeyS", "KeyQ", "KeyR"], () => {
   const samples = sample_single_cycle(square, SAMPLE_FREQ);
-  const wav_file = encode_wav_file(samples, "square-A4.wav");
+  const wav_file = encode_wav_file(samples, `square-${SAMPLE_NOTE}.wav`);
   download_file(wav_file);
 });
 
