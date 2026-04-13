@@ -33,4 +33,32 @@ describe("sample_single_cycle", () => {
     const expected = 100;
     expect(result.length).toEqual(expected);
   });
+
+  it("with sawtooth wave computes correct values", () => {
+    const sample_count = 12;
+    const freq = SAMPLE_RATE / sample_count;
+
+    const result = sample_single_cycle(sawtooth, freq);
+
+    // This sawtooth wave ramps from 1 to -1 over 12 samples, something like:
+    // lerp(1, -1, i/12)
+    // = (12-i)/12 - i/12
+    // = 12/12 - i/12 - i/12
+    // = 1 - i/6
+    const expected = new Float32Array([
+      1,
+      1 - 1 / 6,
+      1 - 2 / 6,
+      1 - 3 / 6,
+      1 - 4 / 6,
+      1 - 5 / 6,
+      1 - 6 / 6,
+      1 - 7 / 6,
+      1 - 8 / 6,
+      1 - 9 / 6,
+      1 - 10 / 6,
+      1 - 11 / 6,
+    ]);
+    expect(result).toEqual(expected);
+  });
 });
