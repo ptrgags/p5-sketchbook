@@ -1,36 +1,38 @@
 import { mod } from "../mod.js";
 
 /**
- *
- * @param {number} t
- * @returns {number}
+ * It was a sine of the times.
+ * Sine wave sin(2pi t)
+ * @param {number} t Time value in [0, 1]
+ * @returns {number} Sine value in [-1, 1]
  */
 export function sine(t) {
   return Math.sin(2 * Math.PI * t);
 }
 
 /**
- *
- * @param {number} t
- * @returns {number}
+ * Square wave, computed as sign(sin(2pi * t)).
+ * @param {number} t Time in [0, 1]
+ * @returns {number} Square wave, with a value that toggles between -1 and 1,
+ * though the value is 0 at the discontinuities
  */
 export function square(t) {
   return Math.sign(sine(t));
 }
 
 /**
- *
- * @param {number} t
- * @returns {number}
+ * Sawtooth wave
+ * @param {number} t Time value in [0, 1]
+ * @returns {number} Sawtooth value in [-1, 1]
  */
 export function sawtooth(t) {
   return 1 - 2 * mod(t, 1);
 }
 
 /**
- *
- * @param {number} t
- * @returns {number}
+ * Triangle wave. This is defined so triangle(0) = 0
+ * @param {number} t Time value in [0, 1]
+ * @returns {number} Triangle value in [-1, 1]
  */
 export function triangle(t) {
   // the math below creates a triangle wave that starts at the max value,
