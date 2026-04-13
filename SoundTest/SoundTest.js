@@ -261,6 +261,27 @@ SLASH.register(["Slash", "KeyS", "KeyQ", "KeyR"], () => {
   download_file(wav_file);
 });
 
+// 7-bit LFSR based on https://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Noise_Channel
+SLASH.register(["Slash", "KeyL", "KeyF", "KeyS", "KeyR"], () => {
+  const sample_count = 127;
+  const samples = new Float32Array(sample_count);
+
+  let register = 0b10101010;
+  for (let i = 0; i < sample_count; i++) {
+    const bit0 = register & 1;
+    const bit1 = (register >> 1) & 1;
+    const xored = bit0 ^ bit1;
+
+    register >>= 1;
+    register = (xored << 6) | (register & 0b00111111);
+
+    samples[i] = register & 1 ? 1 : -1;
+  }
+
+  const wav_file = encode_wav_file(samples, "lfsr7-test.wav");
+  download_file(wav_file);
+});
+
 /**
  * Import a MIDI file from a file picker
  * @param {File[]} file_list
