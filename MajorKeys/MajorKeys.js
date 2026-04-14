@@ -1,17 +1,14 @@
 import { Color } from "../sketchlib/Color.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { griderator } from "../sketchlib/Grid.js";
-import { MIDIPitch } from "../sketchlib/music/MIDIPitch.js";
 import {
   A,
   Ab,
-  AS,
   B,
   Bb,
   C,
   D,
   Db,
-  DS,
   E,
   Eb,
   F,
@@ -67,6 +64,11 @@ const KEYBOARD_DIMS = new Direction(
   (0.75 * HEIGHT) / ROWS,
 );
 
+// the keyboards are slightly less than half the canvas wide. So compute
+// the remaining width and even it out a bit by shifting the origin.
+const MARGIN = 0.5 * WIDTH - 2 * KEYBOARD_DIMS.x;
+const OFFSET_MARGIN = Direction.DIR_X.scale(0.5 * MARGIN);
+
 /**
  * @template T
  * @param {Array<T>} arr
@@ -116,7 +118,7 @@ griderator(6, 2, (row, col) => {
 
   const KEYBOARD_ORIGIN = Point.ORIGIN.add(
     STRIDE.mul_components(new Direction(col, row)),
-  );
+  ).add(OFFSET_MARGIN);
 
   const rect = new Rectangle(KEYBOARD_ORIGIN, KEYBOARD_DIMS);
 
