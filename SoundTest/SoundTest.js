@@ -50,7 +50,6 @@ import { AnimationGroup } from "../sketchlib/animation/AnimationGroup.js";
 import { Primitive } from "../sketchlib/primitives/Primitive.js";
 import { download_file } from "../sketchlib/dom/download_file.js";
 import { KeywordRecognizer } from "../sketchlib/KeywordRecognizer.js";
-import { sample_single_cycle } from "../sketchlib/waveforms/sample_single_cycle.js";
 import {
   sawtooth,
   sine,
@@ -58,6 +57,7 @@ import {
   square,
 } from "../sketchlib/waveforms/basic_waves.js";
 import { encode_wav_file } from "../sketchlib/waveforms/encode_wav.js";
+import { sample_n_cycles } from "../sketchlib/waveforms/sample_wave.js";
 
 const DEBUG_LOOP = false;
 const LOOP_START = new Rational(14 * 4);
@@ -237,28 +237,31 @@ const SLASH = new KeywordRecognizer();
 // A2 is A4/2^2 = 110
 const SAMPLE_FREQ = 110;
 const SAMPLE_NOTE = "A2";
+// In Renoise I was getting artifacts with a single cycle, so let's use
+// several instead.
+const CYCLE_COUNT = 4;
 
 // /trace logs a trace of the scene for investigating performance issues.
 SLASH.register(["Slash", "KeyS", "KeyI", "KeyN", "KeyE"], () => {
-  const samples = sample_single_cycle(sine, SAMPLE_FREQ);
+  const samples = sample_n_cycles(sine, SAMPLE_FREQ, CYCLE_COUNT);
   const wav_file = encode_wav_file(samples, `sine-${SAMPLE_NOTE}.wav`);
   download_file(wav_file);
 });
 
 SLASH.register(["Slash", "KeyS", "KeyA", "KeyW"], () => {
-  const samples = sample_single_cycle(sawtooth, SAMPLE_FREQ);
+  const samples = sample_n_cycles(sawtooth, SAMPLE_FREQ, CYCLE_COUNT);
   const wav_file = encode_wav_file(samples, `saw-${SAMPLE_NOTE}.wav`);
   download_file(wav_file);
 });
 
 SLASH.register(["Slash", "KeyT", "KeyR", "KeyI"], () => {
-  const samples = sample_single_cycle(triangle, SAMPLE_FREQ);
+  const samples = sample_n_cycles(triangle, SAMPLE_FREQ, CYCLE_COUNT);
   const wav_file = encode_wav_file(samples, `tri-${SAMPLE_NOTE}.wav`);
   download_file(wav_file);
 });
 
 SLASH.register(["Slash", "KeyS", "KeyQ", "KeyR"], () => {
-  const samples = sample_single_cycle(square, SAMPLE_FREQ);
+  const samples = sample_n_cycles(square, SAMPLE_FREQ, CYCLE_COUNT);
   const wav_file = encode_wav_file(samples, `square-${SAMPLE_NOTE}.wav`);
   download_file(wav_file);
 });
