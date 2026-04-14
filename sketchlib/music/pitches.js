@@ -1,15 +1,20 @@
 // pitch classes
 export const C = 0;
 export const CS = 1;
+export const Db = 1;
 export const D = 2;
 export const DS = 3;
+export const Eb = 3;
 export const E = 4;
 export const F = 5;
 export const FS = 6;
+export const Gb = 6;
 export const G = 7;
 export const GS = 8;
+export const Ab = 8;
 export const A = 9;
 export const AS = 10;
+export const Bb = 10;
 export const B = 11;
 
 // Undefined means rest
