@@ -2,6 +2,22 @@ import { Color } from "../sketchlib/Color.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { griderator } from "../sketchlib/Grid.js";
 import { MIDIPitch } from "../sketchlib/music/MIDIPitch.js";
+import {
+  A,
+  Ab,
+  AS,
+  B,
+  Bb,
+  C,
+  D,
+  Db,
+  DS,
+  E,
+  Eb,
+  F,
+  FS,
+  G,
+} from "../sketchlib/music/pitches.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
@@ -75,8 +91,27 @@ const LABELS = [];
  */
 const PIANOS = [];
 
+// Order the pianos in a circle of fourths progression. Though the layout
+// is in two columns so it's a rather squashed circle.
+const START_NOTES = [
+  [C, G],
+  [F, D],
+  [Bb, A],
+  [Eb, E],
+  [Ab, B],
+  [Db, FS],
+];
+const NOTE_LABELS = [
+  ["C", "G"],
+  ["F", "D"],
+  ["B♭", "A"],
+  ["E♭", "E"],
+  ["A♭", "B"],
+  ["D♭", "G♭/F♯"],
+];
+
 griderator(6, 2, (row, col) => {
-  const start_note = col * 6 + row;
+  const start_note = START_NOTES[row][col];
   const transposed_styles = cycle_right(STYLES, start_note);
 
   const KEYBOARD_ORIGIN = Point.ORIGIN.add(
@@ -87,7 +122,7 @@ griderator(6, 2, (row, col) => {
 
   const piano = new ColoredPiano(rect, transposed_styles);
 
-  const key_label = MIDIPitch.format_pitch_class(start_note);
+  const key_label = NOTE_LABELS[row][col];
   const label = new TextPrimitive(
     `${key_label} Major`,
     KEYBOARD_ORIGIN.add(KEYBOARD_DIMS),
