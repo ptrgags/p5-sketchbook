@@ -58,6 +58,9 @@ import {
 } from "../sketchlib/waveforms/basic_waves.js";
 import { encode_wav_file } from "../sketchlib/waveforms/encode_wav.js";
 import { sample_n_cycles } from "../sketchlib/waveforms/sample_wave.js";
+import { organ_wave } from "../sketchlib/waveforms/organ_waves.js";
+import { Drawbars } from "../sketchlib/instruments/DrawbarOrgan.js";
+import { fourier_series } from "../sketchlib/waveforms/fourier_series.js";
 
 const DEBUG_LOOP = false;
 const LOOP_START = new Rational(14 * 4);
@@ -263,6 +266,33 @@ SLASH.register(["Slash", "KeyT", "KeyR", "KeyI"], () => {
 SLASH.register(["Slash", "KeyS", "KeyQ", "KeyR"], () => {
   const samples = sample_n_cycles(square, SAMPLE_FREQ, CYCLE_COUNT);
   const wav_file = encode_wav_file(samples, `square-${SAMPLE_NOTE}.wav`);
+  download_file(wav_file);
+});
+
+SLASH.register(["Slash", "KeyO", "KeyB", "KeyO", "KeyE"], () => {
+  const oboe = organ_wave(new Drawbars("00 4763 000"));
+  const samples = sample_n_cycles(oboe, SAMPLE_FREQ, CYCLE_COUNT);
+  const wav_file = encode_wav_file(samples, "organ-oboe-A2.wav");
+  download_file(wav_file);
+});
+
+// I was curious what the fourier series
+// (1/f, f=2^k) (i.e. powers of two with inverse falloff)
+// sounds like (this is inspired by binary trees and rulers)
+// It makes a pleasant organ sound when played back in a sampler.
+// But also, the graph seems to have self-similar structure (at least in the infinite case)
+// I'll need to explore this more.
+SLASH.register(["Slash", "KeyT", "KeyW", "KeyO"], () => {
+  const powers_of_two = fourier_series([
+    [1, 1],
+    [1 / 2, 2],
+    [1 / 4, 4],
+    [1 / 8, 8],
+    [1 / 16, 16],
+    [1 / 32, 32],
+  ]);
+  const samples = sample_n_cycles(powers_of_two, SAMPLE_FREQ, CYCLE_COUNT);
+  const wav_file = encode_wav_file(samples, "pow2-A2.wav");
   download_file(wav_file);
 });
 
