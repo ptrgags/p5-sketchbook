@@ -239,7 +239,7 @@ const SAMPLE_FREQ = 110;
 const SAMPLE_NOTE = "A2";
 // In Renoise I was getting artifacts with a single cycle, so let's use
 // several instead.
-const CYCLE_COUNT = 4;
+const CYCLE_COUNT = 100;
 
 // /trace logs a trace of the scene for investigating performance issues.
 SLASH.register(["Slash", "KeyS", "KeyI", "KeyN", "KeyE"], () => {
