@@ -16,6 +16,7 @@ export class AnimationGroup {
   constructor(...children) {
     this.children = children;
 
+    this.primitive = Primitive.EMPTY;
     if (children.length === 0) {
       this.primitive = Primitive.EMPTY;
     } else if (children.length === 1) {

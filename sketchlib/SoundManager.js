@@ -49,11 +49,11 @@ const INSTRUMENT_MAP = new InstrumentMap({
 });
 
 /**
- * @typedef {{[id: string]: Score}} ScoreDeclarations
+ * @typedef {{[id: string]: Score<number>}} ScoreDeclarations
  *
  * @typedef {{
  *  bpm?: number,
- *  scores?: ScoreDeclarations,
+ *  scores: ScoreDeclarations,
  *  sfx?: ScoreDeclarations,
  * }} SoundManifest
  */
