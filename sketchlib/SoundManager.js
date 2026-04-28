@@ -223,8 +223,8 @@ export class SoundManager {
       clip.value.material.start(start);
     }
 
-    this.transport.set_loop(Rational.ZERO, score.duration);
     this.transport.jump_to(Rational.ZERO);
+    this.transport.set_loop(Rational.ZERO, score.duration);
     this.transport.start();
 
     this.current_score = score_id;

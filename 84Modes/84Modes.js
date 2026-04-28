@@ -11,7 +11,9 @@ const MOUSE = new CanvasMouseHandler();
 
 // Add scores here
 /**@type {import("../sketchlib/SoundManager.js").SoundManifest} */
-const SOUND_MANIFEST = {};
+const SOUND_MANIFEST = {
+  scores: {},
+};
 
 //@ts-ignore
 const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
