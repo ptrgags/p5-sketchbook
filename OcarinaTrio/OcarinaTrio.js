@@ -20,9 +20,6 @@ const SOUND_MANIFEST = {
 //@ts-ignore
 const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
 
-//@ts-ignore
-const TRANSPORT = new Transport(Tone);
-
 /**
  *
  * @param {import("p5")} p
@@ -44,7 +41,6 @@ export const sketch = (p) => {
 
     scene.events.addEventListener("scene-change", async () => {
       await SOUND.init();
-      TRANSPORT.no_loop();
       scene = new SoundScene(SOUND, new OcarinaAnimation(SOUND));
       MOUSE.callbacks = scene.mouse_callbacks;
     });

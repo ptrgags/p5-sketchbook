@@ -161,6 +161,7 @@ export class OcarinaAnimation {
     this.events = new EventTarget();
 
     this.sound.play_score("ocarina_trio");
+    this.sound.transport.no_loop();
 
     const [soprano_intervals, tenor_intervals, bass_intervals] =
       get_intervals();

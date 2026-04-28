@@ -218,8 +218,6 @@ export class SoundManager {
     // Clear the timeline so we can continue
     this.stop_the_music();
 
-    const transport = this.tone.getTransport();
-
     for (const clip of AbsTimelineOps.iter_intervals(score)) {
       const start = to_tone_time(clip.start_time);
       clip.value.material.start(start);
