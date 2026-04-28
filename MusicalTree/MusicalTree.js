@@ -32,7 +32,7 @@ class MusicalTreeAnimation {
    */
   constructor(sound) {
     sound.play_score("tree");
-    sound.no_loop();
+    sound.transport.no_loop();
 
     this.primitive = group(ANIMATION.render(0));
   }
