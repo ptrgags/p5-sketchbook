@@ -16,7 +16,7 @@ export class BasicSynth {
     this.envelope = envelope;
 
     /**
-     * @type {import("tone").Synth | import("tone").PolySynth}
+     * @type {import("tone").Synth | import("tone").PolySynth | undefined}
      */
     this.synth = undefined;
   }
@@ -32,7 +32,7 @@ export class BasicSynth {
    * @type {number}
    */
   set volume(value) {
-    if (this.synth) {
+    if (this.synth && value) {
       this.synth.volume.value = value;
     }
   }

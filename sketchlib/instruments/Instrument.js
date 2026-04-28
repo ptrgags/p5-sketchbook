@@ -14,6 +14,13 @@ Object.freeze(Polyphony);
  */
 export class Instrument {
   /**
+   * @type {number | undefined}
+   */
+  get volume() {
+    throw new Error("not implemented");
+  }
+
+  /**
    * @param {number} value volume in dBFS
    */
   set volume(value) {

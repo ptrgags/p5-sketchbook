@@ -10,9 +10,9 @@ import { Note } from "./music/Music.js";
 import { Score } from "./music/Score.js";
 import { Rational } from "./Rational.js";
 import { compile_score } from "./tone_helpers/compile_music.js";
+import { SoundSystem } from "./tone_helpers/SoundSystem.js";
 import { to_tone_time } from "./tone_helpers/to_tone_time.js";
 import { ToneClip } from "./tone_helpers/tone_clips.js";
-import { Transport } from "./tone_helpers/Transport.js";
 
 const DEFAULT_INSTRUMENTS = {
   sine: new BasicSynth("sine"),
@@ -71,16 +71,17 @@ const DEFAULT_BPM = 128;
 
 /**
  * Class to manage playing sounds through Tone.js
+ * @deprecated Eventually this class will be removed, use SoundSystem instead
  */
-export class SoundManager {
+export class SoundManager extends SoundSystem {
   /**
    * Constructor
    * @param {import('tone')} tone_module The Tone.js module
    * @param {SoundManifest} manifest The manifest of sounds and scores to declare once initialized
    */
   constructor(tone_module, manifest) {
+    super(tone_module);
     this.tone = tone_module;
-    this.transport = new Transport(tone_module);
     this.manifest = manifest;
 
     this.init_requested = false;
@@ -109,31 +110,13 @@ export class SoundManager {
   }
 
   async init() {
-    if (this.init_requested) {
-      return;
-    }
-
-    this.init_requested = true;
-
-    await this.tone.start();
+    await super.init();
 
     this.init_synths();
     this.process_manifest();
 
     this.transport.set_tempo(this.manifest.bpm ?? DEFAULT_BPM);
     this.audio_ready = true;
-  }
-
-  /**
-   * Toggle the sound on/off.
-   * @param {boolean} sound_on true if the sound should turn on
-   */
-  toggle_sound(sound_on) {
-    const FADE_SEC = 0.2;
-    const next_volume_db = sound_on ? 0 : -Infinity;
-    // While you could set the destination's mute property, that abrupt change
-    // can sound like crackling audio, so fade the volume quickly instead.
-    this.tone.getDestination().volume.rampTo(next_volume_db, FADE_SEC);
   }
 
   process_manifest() {

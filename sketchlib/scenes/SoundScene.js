@@ -2,7 +2,7 @@ import { Animated } from "../animation/Animated.js";
 import { MouseCallbacks } from "../input/MouseCallbacks.js";
 import { MuteButton } from "../MuteButton.js";
 import { group } from "../primitives/shorthand.js";
-import { SoundManager } from "../SoundManager.js";
+import { SoundSystem } from "../tone_helpers/SoundSystem.js";
 import { Scene } from "./Scene.js";
 
 /**
@@ -11,7 +11,7 @@ import { Scene } from "./Scene.js";
 export class SoundScene {
   /**
    * Constructor
-   * @param {SoundManager} sound
+   * @param {SoundSystem} sound
    * @param {Animated & {mouse_callbacks?: MouseCallbacks[]}} animation The animation to display
    */
   constructor(sound, animation) {
@@ -21,7 +21,7 @@ export class SoundScene {
 
     this.events = new EventTarget();
 
-    this.mute_button = new MuteButton(sound);
+    this.mute_button = new MuteButton(sound.volume);
 
     this.primitive = group(
       this.animation.primitive,
@@ -42,7 +42,8 @@ export class SoundScene {
   }
 
   update() {
-    const time = this.transport.time;
+    const time = this.sound.transport.time;
+
     this.mute_button.update();
     this.animation.update(time);
   }

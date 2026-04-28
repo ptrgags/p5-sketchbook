@@ -18,17 +18,15 @@ import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
+import { BackgroundMusic } from "../sketchlib/tone_helpers/BackgroundMusic.js";
+import { INSTRUMENT_84MODES, PATTERN_84MODES } from "./mode_music.js";
+import { SoundSystem } from "../sketchlib/tone_helpers/SoundSystem.js";
 
 const MOUSE = new CanvasMouseHandler();
 
-// Add scores here
-/**@type {import("../sketchlib/SoundManager.js").SoundManifest} */
-const SOUND_MANIFEST = {
-  scores: {},
-};
-
 //@ts-ignore
-const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
+const tone = Tone;
+const SOUND = new SoundSystem(tone);
 
 const STYLE_LINES = new Style({
   stroke: Color.WHITE,
@@ -110,12 +108,11 @@ const MODE_LABELS = Direction.roots_of_unity(MODE_COUNT).map((dir, i) => {
  * @implements {Animated}
  */
 class Modes84Animation {
-  /**
-   *
-   * @param {Transport} transport
-   */
-  constructor(transport) {
-    this.transport = transport;
+  constructor() {
+    this.bgm = SOUND.bgm;
+    this.bgm.schedule_pattern(PATTERN_84MODES, INSTRUMENT_84MODES);
+
+    const transport = SOUND.transport;
     transport.set_loop(Rational.ZERO, new Rational(TOTAL_MEASURES));
     transport.start();
 
@@ -186,7 +183,7 @@ export const sketch = (p) => {
     MOUSE.callbacks = scene.mouse_callbacks;
 
     scene.events.addEventListener("scene-change", () => {
-      scene = new SoundScene(SOUND, new Modes84Animation(SOUND.transport));
+      scene = new SoundScene(SOUND, new Modes84Animation());
       MOUSE.callbacks = scene.mouse_callbacks;
     });
   };

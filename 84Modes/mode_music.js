@@ -1,3 +1,5 @@
+import { ADSR } from "../sketchlib/instruments/ADSR.js";
+import { BasicSynth } from "../sketchlib/instruments/BasicSynth.js";
 import { N8 } from "../sketchlib/music/durations.js";
 import { Note } from "../sketchlib/music/Music.js";
 import { PatternGrid } from "../sketchlib/music/PatternGrid.js";
@@ -57,3 +59,5 @@ for (const root of ROOT_ORDER) {
 export const PATTERN_84MODES = PatternGrid.concat(...PATTERNS).map(
   (p) => new Note(p),
 );
+
+export const INSTRUMENT_84MODES = new BasicSynth("triangle", ADSR.pluck(1));
