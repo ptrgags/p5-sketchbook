@@ -17,7 +17,6 @@ import {
   G4,
   GS4,
 } from "../sketchlib/music/pitches.js";
-import { Riff } from "../sketchlib/music/Riff.js";
 import {
   AEOLIAN_MODE,
   DORIAN_MODE,
