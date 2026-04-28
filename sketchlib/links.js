@@ -1,6 +1,11 @@
 // Links for all of the sketches. Links are added to the page in this order
 export const LINKS = [
   {
+    title: "84 Modes",
+    year: "2026-04",
+    is_lab: true,
+  },
+  {
     title: "Major Keys",
     year: "2026-04",
   },
