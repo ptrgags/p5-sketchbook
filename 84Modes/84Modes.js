@@ -17,6 +17,7 @@ import { Rational } from "../sketchlib/Rational.js";
 import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -35,10 +36,11 @@ const STYLE_LINES = new Style({
 });
 
 const NOTE_LABEL_RADIUS = 225;
+const MODE_LABEL_RADIUS = 200;
 const CIRCLE_RADIUS = 175;
 const MAJOR_TICK_LENGTH = 32;
 const MINOR_TICK_LENGTH = 16;
-const POINTER_LENGTH = 150;
+const POINTER_LENGTH = 160;
 
 const MODE_CIRCLE = new Circle(SCREEN_CENTER, CIRCLE_RADIUS);
 
@@ -86,13 +88,21 @@ const NOTE_NAMES = [
 ];
 const TEXT_STYLE_SCALE_LABEL = new TextStyle(32, "center", "top");
 const TEXT_STYLE_NOTE_LABELS = new TextStyle(32, "center", "center");
-const TEXT_STYLE_MODE_LABEL = new TextStyle(16, "center", "center");
+const TEXT_STYLE_MODE_LABELS = new TextStyle(10, "center", "center");
 const STYLE_TEXT_FILL = new Style({ fill: Color.WHITE });
 
 const NOTE_LABELS = Direction.roots_of_unity(12).map((dir, i) => {
   return new TextPrimitive(
     NOTE_NAMES[i],
     SCREEN_CENTER.add(dir.scale(NOTE_LABEL_RADIUS)),
+  );
+});
+
+const MODE_LABELS = Direction.roots_of_unity(MODE_COUNT).map((dir, i) => {
+  const index = i % 7;
+  return new TextPrimitive(
+    MODE_NAMES_SHORT[index],
+    SCREEN_CENTER.add(dir.scale(MODE_LABEL_RADIUS)),
   );
 });
 
@@ -113,10 +123,7 @@ class Modes84Animation {
       SCREEN_CENTER,
       SCREEN_CENTER.add(Direction.DIR_X.scale(POINTER_LENGTH)),
     );
-    this.label = new TextPrimitive(
-      "C Lydian",
-      SCREEN_CENTER.add(Direction.DIR_Y.scale(50)),
-    );
+    this.label = new TextPrimitive("C Lydian", new Point(WIDTH / 2, 600));
     this.primitive = group(
       style(
         [MODE_CIRCLE, ...MAJOR_TICKS, ...MINOR_TICKS, this.pointer],
@@ -129,6 +136,10 @@ class Modes84Animation {
       new GroupPrimitive(NOTE_LABELS, {
         style: STYLE_TEXT_FILL,
         text_style: TEXT_STYLE_NOTE_LABELS,
+      }),
+      new GroupPrimitive(MODE_LABELS, {
+        style: STYLE_TEXT_FILL,
+        text_style: TEXT_STYLE_MODE_LABELS,
       }),
     );
   }
