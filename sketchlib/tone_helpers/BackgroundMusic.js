@@ -47,6 +47,7 @@ export class BackgroundMusic {
     instrument.init(this.tone, Polyphony.MONOPHONIC, this.destination);
     const clip = new PatternClip(pattern);
     const event = clip.to_tone_event(this.tone, instrument);
+    event.start();
 
     this.active_instruments.push(instrument);
     this.active_events.push(event);

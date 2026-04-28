@@ -113,6 +113,7 @@ class Modes84Animation {
     this.bgm.schedule_pattern(PATTERN_84MODES, INSTRUMENT_84MODES);
 
     const transport = SOUND.transport;
+    transport.set_tempo(128);
     transport.set_loop(Rational.ZERO, new Rational(TOTAL_MEASURES));
     transport.start();
 
