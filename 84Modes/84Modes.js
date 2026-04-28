@@ -1,7 +1,6 @@
 import { WIDTH, HEIGHT, SCREEN_CENTER } from "../sketchlib/dimensions.js";
 import { CanvasMouseHandler } from "../sketchlib/input/CanvasMouseHandler.js";
 import { PlayButtonScene } from "../sketchlib/scenes/PlayButtonScene.js";
-import { SoundManager } from "../sketchlib/SoundManager.js";
 import { Animated } from "../sketchlib/animation/Animated.js";
 import { SoundScene } from "../sketchlib/scenes/SoundScene.js";
 import { MouseCallbacks } from "../sketchlib/input/MouseCallbacks.js";
@@ -12,13 +11,11 @@ import { Circle } from "../sketchlib/primitives/Circle.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { VectorPrimitive } from "../sketchlib/primitives/VectorPrimitive.js";
-import { Transport } from "../sketchlib/tone_helpers/Transport.js";
 import { Rational } from "../sketchlib/Rational.js";
 import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
-import { BackgroundMusic } from "../sketchlib/tone_helpers/BackgroundMusic.js";
 import { INSTRUMENT_84MODES, PATTERN_84MODES } from "./mode_music.js";
 import { SoundSystem } from "../sketchlib/tone_helpers/SoundSystem.js";
 
@@ -111,6 +108,8 @@ class Modes84Animation {
   constructor() {
     this.bgm = SOUND.bgm;
     this.bgm.schedule_pattern(PATTERN_84MODES, INSTRUMENT_84MODES);
+
+    INSTRUMENT_84MODES.volume = -6;
 
     const transport = SOUND.transport;
     transport.set_tempo(128);
