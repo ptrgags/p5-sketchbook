@@ -16,6 +16,7 @@ export class SoundScene {
    */
   constructor(sound, animation) {
     this.sound = sound;
+    this.transport = this.sound.transport;
     this.animation = animation;
 
     this.events = new EventTarget();
@@ -41,7 +42,7 @@ export class SoundScene {
   }
 
   update() {
-    const time = this.sound.transport_time;
+    const time = this.transport.time;
     this.mute_button.update();
     this.animation.update(time);
   }

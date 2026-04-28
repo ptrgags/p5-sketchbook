@@ -5,6 +5,7 @@ import { SoundManager } from "../sketchlib/SoundManager.js";
 import { SCORE_OCARINA_TRIO } from "../SoundTest/example_scores/ocarina_trio.js";
 import { SoundScene } from "../sketchlib/scenes/SoundScene.js";
 import { OcarinaAnimation } from "./OcarinaAnimation.js";
+import { Transport } from "../sketchlib/tone_helpers/Transport.js";
 
 const MOUSE = new CanvasMouseHandler();
 
@@ -18,6 +19,9 @@ const SOUND_MANIFEST = {
 
 //@ts-ignore
 const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
+
+//@ts-ignore
+const TRANSPORT = new Transport(Tone);
 
 /**
  *
@@ -40,6 +44,7 @@ export const sketch = (p) => {
 
     scene.events.addEventListener("scene-change", async () => {
       await SOUND.init();
+      TRANSPORT.no_loop();
       scene = new SoundScene(SOUND, new OcarinaAnimation(SOUND));
       MOUSE.callbacks = scene.mouse_callbacks;
     });
