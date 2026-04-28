@@ -132,6 +132,38 @@ export class PatternGrid {
   }
 
   /**
+   * Concatenate pattern grids. They must have the same type and step size
+   * @template T
+   * @param  {...PatternGrid<T>} grids
+   * @returns {PatternGrid<T>} result
+   */
+  static concat(...grids) {
+    if (grids.length === 0) {
+      return PatternGrid.empty();
+    }
+
+    if (grids.length === 1) {
+      return grids[0];
+    }
+
+    if (!grids.every((x) => x.step_size.equals(grids[0].step_size))) {
+      throw new Error("grids must have the same step size");
+    }
+
+    const result = [];
+
+    let index = 0;
+    for (const grid of grids) {
+      for (let i = 0; i < grid.length; i++) {
+        result[index] = grid.values[i];
+        index++;
+      }
+    }
+
+    return new PatternGrid(result, grids[0].step_size);
+  }
+
+  /**
    * Take two patterns and merge them together with a function applied
    * component-wise. The patterns must have the same duration in time, though
    * they can have different step sizes. The result will be subdivided as
