@@ -12,6 +12,7 @@ import { Rational } from "./Rational.js";
 import { compile_score } from "./tone_helpers/compile_music.js";
 import { to_tone_time } from "./tone_helpers/to_tone_time.js";
 import { ToneClip } from "./tone_helpers/tone_clips.js";
+import { Transport } from "./tone_helpers/Transport.js";
 
 const DEFAULT_INSTRUMENTS = {
   sine: new BasicSynth("sine"),
@@ -79,6 +80,7 @@ export class SoundManager {
    */
   constructor(tone_module, manifest) {
     this.tone = tone_module;
+    this.transport = new Transport(tone_module);
     this.manifest = manifest;
 
     this.init_requested = false;
@@ -118,17 +120,8 @@ export class SoundManager {
     this.init_synths();
     this.process_manifest();
 
-    this.set_tempo(this.manifest.bpm ?? DEFAULT_BPM);
+    this.transport.set_tempo(this.manifest.bpm ?? DEFAULT_BPM);
     this.audio_ready = true;
-  }
-
-  /**
-   * Set a new tempo
-   * @param {number} bpm Beats per minute
-   */
-  set_tempo(bpm) {
-    const transport = this.tone.getTransport();
-    transport.bpm.value = bpm;
   }
 
   /**
@@ -186,22 +179,6 @@ export class SoundManager {
   }
 
   /**
-   * Get the current transport time as a float, as this is helpful for
-   * animation.
-   * @return {number} The current transport time in measures as a float
-   */
-  get transport_time() {
-    const transport = this.tone.getTransport();
-    const [measures, beats, sixteenths] = transport.position
-      .toString()
-      .split(":");
-
-    return (
-      parseFloat(measures) + parseFloat(beats) / 4 + parseFloat(sixteenths) / 16
-    );
-  }
-
-  /**
    * Compile and save a score
    * @param {string} score_id The score ID to use. This must be the same as
    * the ID used for play_score() later.
@@ -225,8 +202,7 @@ export class SoundManager {
 
   stop_the_music() {
     this.instruments.release_all();
-    const transport = this.tone.getTransport();
-    transport.cancel();
+    this.tone.getTransport().cancel();
   }
 
   /**
@@ -249,43 +225,12 @@ export class SoundManager {
       clip.value.material.start(start);
     }
 
-    transport.position = "0:0";
-    transport.loop = true;
-    transport.loopStart = "0:0";
-    transport.loopEnd = to_tone_time(score.duration);
-    transport.start("+0.1", "0:0");
+    this.transport.set_loop(Rational.ZERO, score.duration);
+    this.transport.jump_to(Rational.ZERO);
+    this.transport.start();
 
     this.current_score = score_id;
     this.transport_playing = true;
-  }
-
-  /**
-   * Turn off looping on the timeline.
-   */
-  no_loop() {
-    const transport = this.tone.getTransport();
-    transport.loop = false;
-  }
-
-  /**
-   * Set the loop points on the transport
-   * @param {Rational} start_time Rational measures from the start of the score where the loop starts
-   * @param {Rational} duration How long the loop should be.
-   */
-  set_loop(start_time, duration) {
-    const transport = this.tone.getTransport();
-    transport.loopStart = to_tone_time(start_time);
-    transport.loopEnd = to_tone_time(start_time.add(duration));
-    transport.loop = true;
-  }
-
-  /**
-   * Jump to a specific time on the timeline.
-   * @param {Rational} time Time to jump to in measures from start
-   */
-  jump_to(time) {
-    const transport = this.tone.getTransport();
-    transport.position = to_tone_time(time);
   }
 
   /**
