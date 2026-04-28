@@ -34,10 +34,14 @@ const STYLE_LINES = new Style({
   width: 4,
 });
 
-const CIRCLE_RADIUS = 240;
+const NOTE_LABEL_RADIUS = 225;
+const CIRCLE_RADIUS = 175;
+const MAJOR_TICK_LENGTH = 32;
+const MINOR_TICK_LENGTH = 16;
+const POINTER_LENGTH = 150;
+
 const MODE_CIRCLE = new Circle(SCREEN_CENTER, CIRCLE_RADIUS);
 
-const MAJOR_TICK_LENGTH = 32;
 const MAJOR_TICKS = Direction.roots_of_unity(12).map((dir) => {
   return new LineSegment(
     SCREEN_CENTER.add(dir.scale(CIRCLE_RADIUS - MAJOR_TICK_LENGTH / 2)),
@@ -45,20 +49,12 @@ const MAJOR_TICKS = Direction.roots_of_unity(12).map((dir) => {
   );
 });
 
-const MINOR_TICK_LENGTH = 16;
 const MINOR_TICKS = Direction.roots_of_unity(84).map((dir) => {
   return new LineSegment(
     SCREEN_CENTER.add(dir.scale(CIRCLE_RADIUS - MINOR_TICK_LENGTH / 2)),
     SCREEN_CENTER.add(dir.scale(CIRCLE_RADIUS + MINOR_TICK_LENGTH / 2)),
   );
 });
-
-const CIRCLE_OF_MODES = style(
-  [MODE_CIRCLE, ...MINOR_TICKS, ...MAJOR_TICKS],
-  STYLE_LINES,
-);
-
-const POINTER_LENGTH = 200;
 
 const MEASURES_PER_MODE = 4;
 const MODE_COUNT = 84;
@@ -73,6 +69,7 @@ const MODE_NAMES = [
   "Phrygian",
   "Locrian",
 ];
+const MODE_NAMES_SHORT = ["Ly", "Io", "Mi", "Do", "Ae", "Ph", "Lo"];
 const NOTE_NAMES = [
   "C",
   "B",
@@ -87,6 +84,17 @@ const NOTE_NAMES = [
   "D",
   "Db",
 ];
+const TEXT_STYLE_SCALE_LABEL = new TextStyle(32, "center", "top");
+const TEXT_STYLE_NOTE_LABELS = new TextStyle(32, "center", "center");
+const TEXT_STYLE_MODE_LABEL = new TextStyle(16, "center", "center");
+const STYLE_TEXT_FILL = new Style({ fill: Color.WHITE });
+
+const NOTE_LABELS = Direction.roots_of_unity(12).map((dir, i) => {
+  return new TextPrimitive(
+    NOTE_NAMES[i],
+    SCREEN_CENTER.add(dir.scale(NOTE_LABEL_RADIUS)),
+  );
+});
 
 /**
  * @implements {Animated}
@@ -110,11 +118,17 @@ class Modes84Animation {
       SCREEN_CENTER.add(Direction.DIR_Y.scale(50)),
     );
     this.primitive = group(
-      CIRCLE_OF_MODES,
-      style(this.pointer, STYLE_LINES),
+      style(
+        [MODE_CIRCLE, ...MAJOR_TICKS, ...MINOR_TICKS, this.pointer],
+        STYLE_LINES,
+      ),
       new GroupPrimitive(this.label, {
-        style: new Style({ fill: Color.WHITE }),
-        text_style: new TextStyle(32, "center", "top"),
+        style: STYLE_TEXT_FILL,
+        text_style: TEXT_STYLE_SCALE_LABEL,
+      }),
+      new GroupPrimitive(NOTE_LABELS, {
+        style: STYLE_TEXT_FILL,
+        text_style: TEXT_STYLE_NOTE_LABELS,
       }),
     );
   }
