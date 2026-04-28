@@ -91,6 +91,27 @@ export class PatternGrid {
   }
 
   /**
+   * Repeat the pattern grid a specific number of times.
+   * @param {number} count Integer number of repeats
+   * @returns {PatternGrid<T>} A PatternGrid with the repeated values
+   */
+  repeat(count) {
+    if (count < 1) {
+      throw new Error("count must be a positive integer");
+    }
+
+    if (count === 1) {
+      return this;
+    }
+
+    const repeated = new Array(count * this.values.length);
+    for (let i = 0; i < count * this.values.length; i++) {
+      repeated[i] = this.values[i % this.values.length];
+    }
+    return new PatternGrid(repeated, this.step_size);
+  }
+
+  /**
    * Map a function over each step of the pattern. This is just like Array.map()
    * but for PatternGrids.
    * @template U

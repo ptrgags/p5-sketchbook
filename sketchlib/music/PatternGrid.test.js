@@ -66,6 +66,33 @@ describe("PatternGrid", () => {
     });
   });
 
+  describe("repeat", () => {
+    it("with count of 0 throws error", () => {
+      const pattern = new PatternGrid([1, 2, 3], N4);
+
+      expect(() => {
+        return pattern.repeat(0);
+      }).toThrowError("count must be a positive integer");
+    });
+
+    it("with count of 1 returns the same array", () => {
+      const pattern = new PatternGrid([1, 2, 3], N4);
+
+      const result = pattern.repeat(1);
+
+      expect(result).toBe(pattern);
+    });
+
+    it("with postive count repeates values", () => {
+      const pattern = new PatternGrid([1, 2, 3], N4);
+
+      const result = pattern.repeat(3);
+
+      const expected = new PatternGrid([1, 2, 3, 1, 2, 3, 1, 2, 3], N4);
+      expect(result).toEqual(expected);
+    });
+  });
+
   describe("merge", () => {
     it("with patterns of different durations throws error", () => {
       const a = new PatternGrid([1, 2, 3], N4);
