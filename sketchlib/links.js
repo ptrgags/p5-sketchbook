@@ -3,8 +3,8 @@ export const LINKS = [
   {
     title: "84 Musical Modes",
     link: "./Modes84",
+    thumbnail: "thumbnails/modes84.png",
     year: "2026-04",
-    is_lab: true,
   },
   {
     title: "Major Keys",
