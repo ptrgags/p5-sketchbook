@@ -91,6 +91,27 @@ export class PatternGrid {
   }
 
   /**
+   * Repeat the pattern grid a specific number of times.
+   * @param {number} count Integer number of repeats
+   * @returns {PatternGrid<T>} A PatternGrid with the repeated values
+   */
+  repeat(count) {
+    if (count < 1) {
+      throw new Error("count must be a positive integer");
+    }
+
+    if (count === 1) {
+      return this;
+    }
+
+    const repeated = new Array(count * this.values.length);
+    for (let i = 0; i < count * this.values.length; i++) {
+      repeated[i] = this.values[i % this.values.length];
+    }
+    return new PatternGrid(repeated, this.step_size);
+  }
+
+  /**
    * Map a function over each step of the pattern. This is just like Array.map()
    * but for PatternGrids.
    * @template U
@@ -108,6 +129,38 @@ export class PatternGrid {
    */
   static empty() {
     return new PatternGrid([], Rational.ONE);
+  }
+
+  /**
+   * Concatenate pattern grids. They must have the same type and step size
+   * @template T
+   * @param  {...PatternGrid<T>} grids
+   * @returns {PatternGrid<T>} result
+   */
+  static concat(...grids) {
+    if (grids.length === 0) {
+      return PatternGrid.empty();
+    }
+
+    if (grids.length === 1) {
+      return grids[0];
+    }
+
+    if (!grids.every((x) => x.step_size.equals(grids[0].step_size))) {
+      throw new Error("grids must have the same step size");
+    }
+
+    const result = [];
+
+    let index = 0;
+    for (const grid of grids) {
+      for (let i = 0; i < grid.length; i++) {
+        result[index] = grid.values[i];
+        index++;
+      }
+    }
+
+    return new PatternGrid(result, grids[0].step_size);
   }
 
   /**

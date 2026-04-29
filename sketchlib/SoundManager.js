@@ -10,6 +10,7 @@ import { Note } from "./music/Music.js";
 import { Score } from "./music/Score.js";
 import { Rational } from "./Rational.js";
 import { compile_score } from "./tone_helpers/compile_music.js";
+import { SoundSystem } from "./tone_helpers/SoundSystem.js";
 import { to_tone_time } from "./tone_helpers/to_tone_time.js";
 import { ToneClip } from "./tone_helpers/tone_clips.js";
 
@@ -48,11 +49,11 @@ const INSTRUMENT_MAP = new InstrumentMap({
 });
 
 /**
- * @typedef {{[id: string]: Score}} ScoreDeclarations
+ * @typedef {{[id: string]: Score<number>}} ScoreDeclarations
  *
  * @typedef {{
  *  bpm?: number,
- *  scores?: ScoreDeclarations,
+ *  scores: ScoreDeclarations,
  *  sfx?: ScoreDeclarations,
  * }} SoundManifest
  */
@@ -70,14 +71,16 @@ const DEFAULT_BPM = 128;
 
 /**
  * Class to manage playing sounds through Tone.js
+ * @deprecated Eventually this class will be removed, use SoundSystem instead
  */
-export class SoundManager {
+export class SoundManager extends SoundSystem {
   /**
    * Constructor
    * @param {import('tone')} tone_module The Tone.js module
    * @param {SoundManifest} manifest The manifest of sounds and scores to declare once initialized
    */
   constructor(tone_module, manifest) {
+    super(tone_module);
     this.tone = tone_module;
     this.manifest = manifest;
 
@@ -107,40 +110,13 @@ export class SoundManager {
   }
 
   async init() {
-    if (this.init_requested) {
-      return;
-    }
-
-    this.init_requested = true;
-
-    await this.tone.start();
+    await super.init();
 
     this.init_synths();
     this.process_manifest();
 
-    this.set_tempo(this.manifest.bpm ?? DEFAULT_BPM);
+    this.transport.set_tempo(this.manifest.bpm ?? DEFAULT_BPM);
     this.audio_ready = true;
-  }
-
-  /**
-   * Set a new tempo
-   * @param {number} bpm Beats per minute
-   */
-  set_tempo(bpm) {
-    const transport = this.tone.getTransport();
-    transport.bpm.value = bpm;
-  }
-
-  /**
-   * Toggle the sound on/off.
-   * @param {boolean} sound_on true if the sound should turn on
-   */
-  toggle_sound(sound_on) {
-    const FADE_SEC = 0.2;
-    const next_volume_db = sound_on ? 0 : -Infinity;
-    // While you could set the destination's mute property, that abrupt change
-    // can sound like crackling audio, so fade the volume quickly instead.
-    this.tone.getDestination().volume.rampTo(next_volume_db, FADE_SEC);
   }
 
   process_manifest() {
@@ -186,22 +162,6 @@ export class SoundManager {
   }
 
   /**
-   * Get the current transport time as a float, as this is helpful for
-   * animation.
-   * @return {number} The current transport time in measures as a float
-   */
-  get transport_time() {
-    const transport = this.tone.getTransport();
-    const [measures, beats, sixteenths] = transport.position
-      .toString()
-      .split(":");
-
-    return (
-      parseFloat(measures) + parseFloat(beats) / 4 + parseFloat(sixteenths) / 16
-    );
-  }
-
-  /**
    * Compile and save a score
    * @param {string} score_id The score ID to use. This must be the same as
    * the ID used for play_score() later.
@@ -225,8 +185,7 @@ export class SoundManager {
 
   stop_the_music() {
     this.instruments.release_all();
-    const transport = this.tone.getTransport();
-    transport.cancel();
+    this.tone.getTransport().cancel();
   }
 
   /**
@@ -242,50 +201,17 @@ export class SoundManager {
     // Clear the timeline so we can continue
     this.stop_the_music();
 
-    const transport = this.tone.getTransport();
-
     for (const clip of AbsTimelineOps.iter_intervals(score)) {
       const start = to_tone_time(clip.start_time);
       clip.value.material.start(start);
     }
 
-    transport.position = "0:0";
-    transport.loop = true;
-    transport.loopStart = "0:0";
-    transport.loopEnd = to_tone_time(score.duration);
-    transport.start("+0.1", "0:0");
+    this.transport.jump_to(Rational.ZERO);
+    this.transport.set_loop(Rational.ZERO, score.duration);
+    this.transport.start();
 
     this.current_score = score_id;
     this.transport_playing = true;
-  }
-
-  /**
-   * Turn off looping on the timeline.
-   */
-  no_loop() {
-    const transport = this.tone.getTransport();
-    transport.loop = false;
-  }
-
-  /**
-   * Set the loop points on the transport
-   * @param {Rational} start_time Rational measures from the start of the score where the loop starts
-   * @param {Rational} duration How long the loop should be.
-   */
-  set_loop(start_time, duration) {
-    const transport = this.tone.getTransport();
-    transport.loopStart = to_tone_time(start_time);
-    transport.loopEnd = to_tone_time(start_time.add(duration));
-    transport.loop = true;
-  }
-
-  /**
-   * Jump to a specific time on the timeline.
-   * @param {Rational} time Time to jump to in measures from start
-   */
-  jump_to(time) {
-    const transport = this.tone.getTransport();
-    transport.position = to_tone_time(time);
   }
 
   /**

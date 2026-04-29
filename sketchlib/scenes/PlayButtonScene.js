@@ -1,8 +1,8 @@
 import { Animated } from "../animation/Animated.js";
 import { MouseCallbacks } from "../input/MouseCallbacks.js";
 import { PlayButton } from "../input/PlayButton.js";
+import { SoundSystem } from "../tone_helpers/SoundSystem.js";
 import { Scene } from "./Scene.js";
-import { SoundManager } from "../SoundManager.js";
 
 /**
  * @implements {Scene}
@@ -11,16 +11,15 @@ import { SoundManager } from "../SoundManager.js";
 export class PlayButtonScene {
   /**
    * Constructor
-   * @param {SoundManager} sound
+   * @param {SoundSystem} sound
    */
   constructor(sound) {
-    this.sound = sound;
     this.play_button = new PlayButton();
 
     this.events = new EventTarget();
 
     this.play_button.events.addEventListener("click", async () => {
-      await this.sound.init();
+      await sound.init();
 
       const change_of_scene = new CustomEvent("scene-change");
       this.events.dispatchEvent(change_of_scene);

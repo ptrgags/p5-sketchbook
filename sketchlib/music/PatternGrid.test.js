@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { PatternGrid } from "./PatternGrid.js";
-import { N2T, N4, N4T, N8T } from "./durations.js";
+import { N2T, N4, N4T, N8, N8T } from "./durations.js";
 import { Rational } from "../Rational.js";
 
 describe("PatternGrid", () => {
@@ -62,6 +62,81 @@ describe("PatternGrid", () => {
       // 1/4 divided into 3 is 1/12 which is an eighth note triplet
       // to check, 9 * 1/12 = 3/4, so the overall duration is the same ✅
       const expected = new PatternGrid([1, 1, 1, 2, 2, 2, 3, 3, 3], N8T);
+      expect(result).toEqual(expected);
+    });
+  });
+
+  describe("repeat", () => {
+    it("with count of 0 throws error", () => {
+      const pattern = new PatternGrid([1, 2, 3], N4);
+
+      expect(() => {
+        return pattern.repeat(0);
+      }).toThrowError("count must be a positive integer");
+    });
+
+    it("with count of 1 returns the same array", () => {
+      const pattern = new PatternGrid([1, 2, 3], N4);
+
+      const result = pattern.repeat(1);
+
+      expect(result).toBe(pattern);
+    });
+
+    it("with postive count repeates values", () => {
+      const pattern = new PatternGrid([1, 2, 3], N4);
+
+      const result = pattern.repeat(3);
+
+      const expected = new PatternGrid([1, 2, 3, 1, 2, 3, 1, 2, 3], N4);
+      expect(result).toEqual(expected);
+    });
+  });
+
+  describe("concat", () => {
+    it("with no grids returns empty grid", () => {
+      const result = PatternGrid.concat();
+
+      const expected = PatternGrid.empty();
+      expect(result).toEqual(expected);
+    });
+
+    it("with one grid returns it", () => {
+      const pattern = new PatternGrid([1, 2, 3], N4);
+
+      const result = PatternGrid.concat(pattern);
+
+      const expected = pattern;
+      expect(result).toBe(expected);
+    });
+
+    it("with grids of mismatched step sizes throws error", () => {
+      const pattern1 = new PatternGrid([1, 2, 3], N4);
+      const pattern2 = new PatternGrid([1, 2, 3], N8);
+      expect(() => {
+        return PatternGrid.concat(pattern1, pattern2);
+      }).toThrowError("grids must have the same step size");
+    });
+
+    it("concats two patterns", () => {
+      const pattern1 = new PatternGrid([1, 2, 3], N4);
+      const pattern2 = new PatternGrid([4, 5], N4);
+
+      const result = PatternGrid.concat(pattern1, pattern2);
+
+      const expected = new PatternGrid([1, 2, 3, 4, 5], N4);
+      expect(result).toEqual(expected);
+    });
+
+    it("concats many patterns", () => {
+      const pattern1 = new PatternGrid([1, 2, 3], N4);
+      const pattern2 = new PatternGrid([4, 5], N4);
+      const pattern3 = new PatternGrid([6, 7, 8], N4);
+      const pattern4 = new PatternGrid([9, 10], N4);
+
+      const result = PatternGrid.concat(pattern1, pattern2, pattern3, pattern4);
+
+      const expected = new PatternGrid([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], N4);
       expect(result).toEqual(expected);
     });
   });

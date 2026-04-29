@@ -14,6 +14,13 @@ Object.freeze(Polyphony);
  */
 export class Instrument {
   /**
+   * @type {number | undefined}
+   */
+  get volume() {
+    throw new Error("not implemented");
+  }
+
+  /**
    * @param {number} value volume in dBFS
    */
   set volume(value) {
@@ -35,8 +42,9 @@ export class Instrument {
    * @param {string} pitch The pitch in ToneJS format
    * @param {string} duration The duration in ToneJS format
    * @param {number} time Tonejs time
+   * @param {number} velocity Velocity as a number from 0 to 1
    */
-  play_note(pitch, duration, time) {
+  play_note(pitch, duration, time, velocity) {
     throw new Error("not implemented");
   }
 

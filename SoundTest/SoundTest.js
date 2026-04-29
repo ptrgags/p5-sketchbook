@@ -93,10 +93,13 @@ const PART_STYLES = Oklch.gradient(
     }),
 );
 
+/**
+ * @type {{[key: string]: GroupPrimitive}}
+ */
 const RENDERED_TIMELINES = {};
 const MEASURE_DIMENSIONS = new Direction(25, 50);
 
-for (const [key, score] of Object.entries(SOUND_MANIFEST.scores)) {
+for (const [key, score] of Object.entries(SOUND_MANIFEST.scores ?? {})) {
   RENDERED_TIMELINES[key] = render_score(
     Point.ORIGIN,
     score,
@@ -224,11 +227,15 @@ const CURSOR = style(
 );
 
 function clear_errors() {
-  document.getElementById("errors").innerText = "";
+  expect_element("id", HTMLParagraphElement).innerText = "";
 }
 
+/**
+ * Print an error message on the page
+ * @param {string} message
+ */
 function show_error(message) {
-  document.getElementById("errors").innerText = message;
+  expect_element("id", HTMLParagraphElement).innerText = message;
 }
 
 const SLASH = new KeywordRecognizer();
@@ -341,17 +348,18 @@ class SoundTestAnimation {
         this.change_score(score_id);
 
         const bpm = tempos[0] ?? 120;
-        SOUND.set_tempo(bpm);
+        SOUND.transport.set_tempo(bpm);
       } catch (err) {
         console.error(err);
-        show_error(err);
+        const msg = err instanceof Error ? err.message : "unknown error";
+        show_error(msg);
       }
     });
     this.import_input.disabled = false;
 
     /**
      * ID of the score currently playing
-     * @type {string}
+     * @type {string | undefined}
      */
     this.selected_melody = undefined;
 
@@ -399,11 +407,11 @@ class SoundTestAnimation {
     this.sound.play_score(score_id);
 
     if (DEBUG_LOOP) {
-      this.sound.set_loop(LOOP_START, LOOP_DURATION);
+      this.sound.transport.set_loop(LOOP_START, LOOP_DURATION);
     }
 
     if (DEBUG_JUMP) {
-      this.sound.jump_to(JUMP_POINT);
+      this.sound.transport.jump_to(JUMP_POINT);
     }
 
     this.export_button.disabled = false;
@@ -450,9 +458,9 @@ class SoundTestAnimation {
    * @param {Score<number>} score Score of MIDI notes
    * @returns {{
    *    piano: PlayedNotes,
-   *    bass_ocarina: PlayedNotes,
-   *    tenor_ocarina: PlayedNotes,
-   *    soprano_ocarina: PlayedNotes,
+   *    bass_ocarina: PlayedNotes | undefined,
+   *    tenor_ocarina: PlayedNotes | undefined,
+   *    soprano_ocarina: PlayedNotes | undefined,
    * }}
    */
   assign_instruments(score) {
@@ -580,6 +588,11 @@ class SoundTestAnimation {
     download_file(file);
   }
 
+  /**
+   *
+   * @param {number} time
+   * @returns {Primitive}
+   */
   render_timeline(time) {
     if (this.selected_melody === undefined) {
       return Primitive.EMPTY;
