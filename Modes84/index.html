@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../libraries/p5.min.js"
+    ></script>
+    <script src="https://unpkg.com/tone@15.0.4/build/Tone.js"></script>
+    <script type="module">
+      import { sketch } from "./Modes84.js";
+      import "../sketchlib/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../styles/layout.css" />
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>84 Musical Modes (2026-04)</h1>
+      <div class="sketch">
+        <canvas id="sketch-canvas" width="500" height="700"></canvas>
+      </div>
+      <div class="description">
+        <p>
+          This sketch is a demonstration for my other project,
+          <a href="https://ptrgags.dev/pattern-spotting"
+            ><code>pattern-spotting</code></a
+          >, which is all about documenting patterns in music, art, and math.
+          More specifically, the page on
+          <a
+            href="https://ptrgags.dev/pattern-spotting/patterns/diatonic-modes.html"
+            >modes of the major scale</a
+          >
+          describes this pattern.
+        </p>
+        <p>
+          In short, there are 7 modes of the major scale in music. Each mode can
+          start on any of the 12 pitches on the piano keyboard. That means there
+          are 7 * 12 = 84 unique modes. With a careful ordering (see the link
+          above), you can cycle through all 84 modes, adding a single flat to
+          the scale each time.
+        </p>
+        <p>
+          Some observations: You start at C Lydian which is bright, and it
+          slowly sounds darker as you add flats. However, after C Locrian, the
+          next flat lowers the C to a B, and the scale happens to be B Lydian.
+          This has an interesting sound, as we're both lowering the root by a
+          half step, but also jumping from the darkest mode (Locrian) to the
+          brightest one (Lydian).
+        </p>
+        <details>
+          <summary>Changelog</summary>
+          <dl>
+            <dt>2026-04-29</dt>
+            <dd>Original version of sketch</dd>
+          </dl>
+        </details>
+      </div>
+    </div>
+  </body>
+</html>
