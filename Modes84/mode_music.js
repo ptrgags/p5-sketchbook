@@ -26,6 +26,7 @@ import {
   MIXOLYDIAN_MODE,
   PHRYGIAN_MODE,
 } from "../sketchlib/music/scales.js";
+import { PatternClip } from "../sketchlib/tone_helpers/PatternClip.js";
 
 const SCALE_DEGREES = [0, 7, 0, 6, 0, 5, 0, 4, 0, 3, 0, 2, 0, 1, 0, 0];
 
@@ -55,8 +56,8 @@ for (const root of ROOT_ORDER) {
 }
 
 // Chain all the patterns together into one big pattern
-export const PATTERN_84MODES = PatternGrid.concat(...PATTERNS).map(
-  (p) => new Note(p),
-);
+const PATTERN_84MODES = PatternGrid.concat(...PATTERNS).map((p) => new Note(p));
+
+export const CLIP_84MODES = new PatternClip(PATTERN_84MODES);
 
 export const INSTRUMENT_84MODES = new BasicSynth("triangle", ADSR.pluck(1));
