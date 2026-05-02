@@ -57,11 +57,33 @@ export class Riff {
   }
 
   /**
+   * Map the values of the riff to a new type. The rhythm remains the same.
+   * @template U
+   * @param {function(T, number): U} f A function (x: T, i: number) to some new type U
+   * @returns {Riff<U>} The transformed riff
+   */
+  map(f) {
+    return new Riff(this.rhythm, this.values.map(f));
+  }
+
+  /**
    * Zip the rhythm with the values to create a timeline.
    * @returns {Sequential<T>}
    */
   to_timeline() {
     return this.rhythm.zip(this.values);
+  }
+
+  /**
+   * Concat riffs of the same type and step size
+   * @template T
+   * @param  {...Riff<T>} riffs
+   * @returns {Riff<T>}
+   */
+  static concat(...riffs) {
+    const rhythm = Rhythm.concat(...riffs.map((x) => x.rhythm));
+    const values = riffs.map((x) => x.values).flat();
+    return new Riff(rhythm, values);
   }
 
   /**

@@ -210,6 +210,16 @@ export class Rhythm {
   }
 
   /**
+   * Concatenate several rhythms together
+   * @param  {...Rhythm} rhythms Rhythms to concatenate. They must all have the same step size.
+   * @returns {Rhythm}
+   */
+  static concat(...rhythms) {
+    const pattern = PatternGrid.concat(...rhythms.map((x) => x.pattern));
+    return new Rhythm(pattern.values, pattern.step_size);
+  }
+
+  /**
    * Split a timeline into a rhythm + a sequence of values, one per beat
    *
    * This is approximately an inverse of zip(), however it accepts a broader
