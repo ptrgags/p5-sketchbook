@@ -42,7 +42,7 @@ export class Riff {
 
   /**
    * Iterate over the rhythm's beats and zip in the values
-   * @returns {Generator<[T, number] | number>} for notes, returns [value, duration]. For rests, returns duration.
+   * @returns {Generator<[T, number] | number>} for notes, returns [value, duration]. For rests, returns duration. Durations are integer number of steps
    */
   *beat_iter() {
     let index = 0;
