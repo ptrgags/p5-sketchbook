@@ -6,6 +6,7 @@ import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { range } from "../sketchlib/range.js";
+import { Rational } from "../sketchlib/Rational.js";
 import { Style } from "../sketchlib/Style.js";
 
 const STYLE_FRETBOARD = new Style({
@@ -29,6 +30,26 @@ const STYLE_STRINGS = new Style({
  */
 function fret_position(n) {
   return 1 - 2 ** (-n / 12);
+}
+
+/**
+ * Compute the positions where the nth harmonic
+ * will be heard
+ * @param {number} n
+ * @returns {number[]}
+ */
+function harmonic_positions(n) {
+  const result = [];
+  for (let i = 0; i <= n; i++) {
+    const fraction = new Rational(i, n);
+    // If the fraction was not in lowest terms,
+    // skip it as a lower harmonic will be heard instead.
+    if (fraction.denominator !== n) {
+      continue;
+    }
+    result.push(fraction.real);
+  }
+  return result;
 }
 
 const STRING_LENGTH = HEIGHT;
@@ -56,10 +77,34 @@ const STRINGS = STRING_POSITIONS.map((p) => {
   );
 });
 
+const MAX_HARMONIC = 100;
+const HARMONIC_LINES = range(MAX_HARMONIC).map((i) => {
+  const width = (2 * WIDTH) / (i + 1);
+  const lines = harmonic_positions(i + 1).map(
+    (p) =>
+      new LineSegment(
+        new Point(NECK_WIDTH, p * STRING_LENGTH),
+        new Point(NECK_WIDTH + width, p * STRING_LENGTH),
+      ),
+  );
+  return style(
+    lines,
+    new Style({
+      stroke: Oklch.lerp(
+        new Oklch(0.7, 0.1, 0),
+        new Oklch(0.7, 0.1, 360),
+        i / (MAX_HARMONIC - 1),
+      ),
+      width: 2,
+    }),
+  );
+});
+
 const SCENE = group(
   style(FRETBOARD, STYLE_FRETBOARD),
   style(FRETS, STYLE_FRETS),
   style(STRINGS, STYLE_STRINGS),
+  ...HARMONIC_LINES,
 );
 
 // @ts-ignore
