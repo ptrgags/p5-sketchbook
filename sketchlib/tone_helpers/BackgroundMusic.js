@@ -1,7 +1,5 @@
 import { Instrument, Polyphony } from "../instruments/Instrument.js";
-import { Note } from "../music/Music.js";
-import { PatternGrid } from "../music/PatternGrid.js";
-import { PatternClip } from "./PatternClip.js";
+import { ToneClip } from "./ToneClip.js";
 
 export class BackgroundMusic {
   /**
@@ -37,15 +35,14 @@ export class BackgroundMusic {
   }
 
   /**
-   * Schedule a pattern for a monophonic instrument
-   * @param {PatternGrid<Note<number>>} pattern
-   * @param {Instrument} instrument The instrument that will play the pattern
+   * Schedule a single ToneClip for a monophonic instrument
+   * @param {ToneClip} clip
+   * @param {Instrument} instrument
    */
-  schedule_pattern(pattern, instrument) {
+  schedule_clip(clip, instrument) {
     this.reset();
 
     instrument.init(this.tone, Polyphony.MONOPHONIC, this.destination);
-    const clip = new PatternClip(pattern);
     const event = clip.to_tone_event(this.tone, instrument);
     event.start();
 

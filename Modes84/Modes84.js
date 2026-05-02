@@ -16,7 +16,7 @@ import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
-import { INSTRUMENT_84MODES, PATTERN_84MODES } from "./mode_music.js";
+import { CLIP_84MODES, INSTRUMENT_84MODES } from "./mode_music.js";
 import { SoundSystem } from "../sketchlib/tone_helpers/SoundSystem.js";
 
 const MOUSE = new CanvasMouseHandler();
@@ -107,7 +107,7 @@ const MODE_LABELS = Direction.roots_of_unity(MODE_COUNT).map((dir, i) => {
 class Modes84Animation {
   constructor() {
     this.bgm = SOUND.bgm;
-    this.bgm.schedule_pattern(PATTERN_84MODES, INSTRUMENT_84MODES);
+    this.bgm.schedule_clip(CLIP_84MODES, INSTRUMENT_84MODES);
 
     INSTRUMENT_84MODES.volume = -6;
 
