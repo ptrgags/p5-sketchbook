@@ -47,6 +47,7 @@ export class HarmonicFinder {
 
     this.primitive = group(
       xform(this.guitar.body, TRANSLATE_CENTER),
+      xform(this.guitar.fret_numbers, TRANSLATE_CENTER),
       ...HARMONIC_LINES,
       xform(this.guitar.strings, TRANSLATE_CENTER),
     );

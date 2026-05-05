@@ -3,9 +3,12 @@ import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
+import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
+import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
+import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
 import { range } from "../sketchlib/range.js";
 import { Style } from "../sketchlib/Style.js";
 
@@ -27,7 +30,10 @@ const FRETBOARD = new RectPrimitive(
   new Direction(NECK_WIDTH, FRETBOARD_LENGTH),
 );
 
-const FRETS = range(24 + 1)
+// 0th fret + 24 frets
+const NUM_FRETS = 24 + 1;
+
+const FRETS = range(NUM_FRETS)
   .map((i) => {
     const y = fret_position(i) * STRING_LENGTH;
     return new LineSegment(new Point(0, y), new Point(NECK_WIDTH, y));
@@ -60,6 +66,25 @@ const STYLE_STRINGS = new Style({
 const DOT_RADIUS = 4;
 const STYLE_DOTS = new Style({
   fill: new Oklch(0.7, 0.1, 50),
+});
+
+const STYLE_NUMBERS = new Style({
+  fill: Oklch.grey(1.0),
+});
+const TEXT_STYLE_FRETS = new TextStyle(14, "right", "center");
+
+const NUMBERS = range(NUM_FRETS)
+  .map((i) => {
+    return new TextPrimitive(
+      `${i}`,
+      new Point(-2, fret_position(i) * STRING_LENGTH),
+    );
+  })
+  .toArray();
+
+const FRET_NUMBERS = new GroupPrimitive(NUMBERS, {
+  style: STYLE_NUMBERS,
+  text_style: TEXT_STYLE_FRETS,
 });
 
 /**
@@ -99,6 +124,8 @@ export class GuitarDiagram {
       style(FRETS, STYLE_FRETS),
       style(DOTS, STYLE_DOTS),
     );
+    this.fret_numbers = FRET_NUMBERS;
+
     this.strings = style(STRINGS, STYLE_STRINGS);
   }
 }
