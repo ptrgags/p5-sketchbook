@@ -22,7 +22,32 @@
       <div class="sketch">
         <canvas id="sketch-canvas" width="500" height="700"></canvas>
       </div>
-      <div class="description">DESCRIPTION GOES HERE</div>
+      <div class="controls">
+        <button id="toggle-visualization">Toggle Visualization</button>
+      </div>
+      <div class="description">
+        <p>This sketch creates two diagrams about guitar harmonics.</p>
+        <p>
+          The first diagram helps to locate harmonics along the guitar strings.
+          The first several harmonics are located on (or very nearly on) a fret
+          on the fretboard. However, higher harmonics tend to show up between
+          frets in general.
+        </p>
+        <p>
+          To play a harmonic on guitar, lightly touch a string at the specified
+          point, without pressing it to the fretboard. When you strum, this
+          restricts which vibrations are possible. At the locations marked in
+          the diagram, you should hear the harmonic ring out.
+        </p>
+        <p>
+          The second diagram illustrates what happens when you continue the
+          pattern to higher and higher harmonics. You get a harmonic for every
+          rational number between 0 and 1 (representing a fraction of the length
+          of the string). In practice, this means there are harmonics everywhere
+          along the string, arranged in this fractal pattern. However, higher
+          harmonic numbers tend to produce more dissonant pitches.
+        </p>
+      </div>
     </div>
   </body>
 </html>
