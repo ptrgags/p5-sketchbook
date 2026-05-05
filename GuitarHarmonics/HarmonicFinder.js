@@ -52,6 +52,10 @@ export class HarmonicFinder {
     );
   }
 
+  /**
+   *
+   * @param {import("p5")} p
+   */
   draw(p) {
     this.primitive.draw(p);
   }
