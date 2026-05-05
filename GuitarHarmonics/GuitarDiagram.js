@@ -71,7 +71,7 @@ const STYLE_DOTS = new Style({
 const STYLE_NUMBERS = new Style({
   fill: Oklch.grey(1.0),
 });
-const TEXT_STYLE_FRETS = new TextStyle(14, "right", "center");
+const TEXT_STYLE_FRETS = new TextStyle(14, "right", "top");
 
 const NUMBERS = range(NUM_FRETS)
   .map((i) => {
