@@ -90,8 +90,17 @@ export class Oklch {
       clamp(red255, 0, 255),
       clamp(green255, 0, 255),
       clamp(blue255, 0, 255),
-      clamp(alpha255, 0, 255)
+      clamp(alpha255, 0, 255),
     );
+  }
+
+  /**
+   * Compute a grey value
+   * @param {number} lightness Lightness value in 0-1
+   * @returns {Oklch}
+   */
+  static grey(lightness) {
+    return new Oklch(lightness, 0, 0);
   }
 
   /**

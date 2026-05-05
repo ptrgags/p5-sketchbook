@@ -6,6 +6,7 @@ import { Vector2 } from "./Vector2.js";
 import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
 import { Color } from "../sketchlib/Color.js";
 import { KeywordRecognizer } from "../sketchlib/KeywordRecognizer.js";
+import { expect_element } from "../sketchlib/dom/expect_element.js";
 
 const BOUNDS = new Rectangle(0, 0, WIDTH, HEIGHT);
 const QUADTREE = new Quadtree(BOUNDS);
@@ -52,9 +53,12 @@ export const sketch = (p) => {
     p.createCanvas(WIDTH, HEIGHT);
     p.background(128);
 
-    document.getElementById("toggle-ref-geom").addEventListener("click", () => {
-      show_ref_geometry = !show_ref_geometry;
-    });
+    expect_element("toggle-ref-geom", HTMLButtonElement).addEventListener(
+      "click",
+      () => {
+        show_ref_geometry = !show_ref_geometry;
+      },
+    );
 
     // Typing /ref toggles the reference geometry as well. This is
     // an initial test of KeywordRecognizer for debug tools
@@ -98,10 +102,10 @@ export const sketch = (p) => {
 
     if (show_ref_geometry) {
       const poly1 = POLYLINE.make_polyline(
-        STYLE_POLYLINE1.with_stroke(Color.WHITE)
+        STYLE_POLYLINE1.with_stroke(Color.WHITE),
       );
       const poly2 = POLYLINE2.make_polyline(
-        STYLE_POLYLINE2.with_stroke(Color.WHITE)
+        STYLE_POLYLINE2.with_stroke(Color.WHITE),
       );
       poly1.draw(p);
       poly2.draw(p);
