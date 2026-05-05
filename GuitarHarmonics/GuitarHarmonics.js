@@ -21,7 +21,7 @@ export const sketch = (p) => {
     expect_element("toggle-visualization", HTMLButtonElement).addEventListener(
       "click",
       () => {
-        SCENE.show_flags.map((x) => !x);
+        SCENE.show_flags = SCENE.show_flags.map((x) => !x);
 
         // Redraw the scene.
         background(0);
