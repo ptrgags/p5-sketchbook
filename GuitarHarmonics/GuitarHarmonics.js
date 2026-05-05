@@ -24,7 +24,7 @@ export const sketch = (p) => {
         SCENE.show_flags = SCENE.show_flags.map((x) => !x);
 
         // Redraw the scene.
-        background(0);
+        p.background(0);
         SCENE.draw(p);
       },
     );
