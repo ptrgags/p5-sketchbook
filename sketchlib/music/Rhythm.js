@@ -210,11 +210,28 @@ export class Rhythm {
   }
 
   /**
+   * Create an empty rhythm with step size 1 measure
+   * @returns {Rhythm}
+   */
+  static empty() {
+    return new Rhythm([], Rational.ONE);
+  }
+
+  /**
    * Concatenate several rhythms together
    * @param  {...Rhythm} rhythms Rhythms to concatenate. They must all have the same step size.
    * @returns {Rhythm}
    */
   static concat(...rhythms) {
+    if (rhythms.length === 0) {
+      return Rhythm.empty();
+    }
+
+    if (rhythms.length === 1) {
+      return rhythms[0];
+    }
+
+    // step size is checked by PatternGrid.concat
     const pattern = PatternGrid.concat(...rhythms.map((x) => x.pattern));
     return new Rhythm(pattern.values, pattern.step_size);
   }
