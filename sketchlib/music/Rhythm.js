@@ -73,6 +73,10 @@ export class Rhythm {
    * @type {number}
    */
   get length_beats() {
+    if (this.pattern.length === 0) {
+      return 0;
+    }
+
     // Count the number of note onsets - this is the number
     // of beats.
     return this.pattern.values

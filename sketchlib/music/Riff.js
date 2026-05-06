@@ -75,12 +75,29 @@ export class Riff {
   }
 
   /**
+   * Return an empty riff
+   * @template T
+   * @returns {Riff<T>}
+   */
+  static empty() {
+    return new Riff(Rhythm.empty(), []);
+  }
+
+  /**
    * Concat riffs of the same type and step size
    * @template T
    * @param  {...Riff<T>} riffs
    * @returns {Riff<T>}
    */
   static concat(...riffs) {
+    if (riffs.length === 0) {
+      return Riff.empty();
+    }
+
+    if (riffs.length === 1) {
+      return riffs[0];
+    }
+
     const rhythm = Rhythm.concat(...riffs.map((x) => x.rhythm));
     const values = riffs.map((x) => x.values).flat();
     return new Riff(rhythm, values);
