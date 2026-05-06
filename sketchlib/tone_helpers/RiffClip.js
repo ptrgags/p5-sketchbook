@@ -11,7 +11,7 @@ import { ToneClip } from "./ToneClip.js";
  * Exposed for unit testing
  * @private
  * @param {Riff<Note<number>>} riff
- * @returns {[string, [string, string, number]][]}
+ * @returns {[string, [string, string, number]][]} Events of the form (start_time, (duration, pitch, velocity))
  */
 export function make_events(riff) {
   const step_size = riff.step_size;
