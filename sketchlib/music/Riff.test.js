@@ -34,6 +34,30 @@ describe("Riff", () => {
     expect(result).toEqual(expected);
   });
 
+  describe("map", () => {
+    it("maps function over values", () => {
+      const pattern = Riff.literal("x.x.x.", [1, 2, 3], N4);
+
+      const result = pattern.map((x) => `x = ${x}`);
+
+      const expected = Riff.literal("x.x.x.", ["x = 1", "x = 2", "x = 3"], N4);
+      expect(result).toEqual(expected);
+    });
+
+    it("maps function with index", () => {
+      const pattern = Riff.literal("x--x--x--", ["a", "b", "c"], N4);
+
+      const result = pattern.map((x, i) => `a[${i}] = ${x}`);
+
+      const expected = Riff.literal(
+        "x--x--x--",
+        ["a[0] = a", "a[1] = b", "a[2] = c"],
+        N4,
+      );
+      expect(result).toEqual(expected);
+    });
+  });
+
   describe("concat", () => {
     it("with no riffs returns empty riff", () => {
       const result = Riff.concat();
