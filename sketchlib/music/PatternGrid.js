@@ -135,17 +135,8 @@ export class PatternGrid {
       throw new Error("grids must have the same step size");
     }
 
-    const result = [];
-
-    let index = 0;
-    for (const grid of grids) {
-      for (let i = 0; i < grid.length; i++) {
-        result[index] = grid.values[i];
-        index++;
-      }
-    }
-
-    return new PatternGrid(result, grids[0].step_size);
+    const values = grids.map((x) => x.values).flat();
+    return new PatternGrid(values, grids[0].step_size);
   }
 
   /**
