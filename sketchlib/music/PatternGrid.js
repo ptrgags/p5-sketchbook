@@ -3,21 +3,6 @@ import { Rational } from "../Rational.js";
 import { RelTimelineOps } from "./RelTimelineOps.js";
 
 /**
- * Compute the smallest subdivision, i.e. the largest denominator in all of the
- * duration values
- * @param {import("./Music.js").Music<number>} melody
- * @return {Rational} denominator value
- */
-function compute_subdivision(melody) {
-  let subdivision = 1;
-  for (const note_or_rest of RelTimelineOps.iter_with_gaps(melody)) {
-    subdivision = lcm(subdivision, note_or_rest.duration.denominator);
-  }
-
-  return new Rational(1, subdivision);
-}
-
-/**
  * @template T
  */
 export class PatternGrid {
@@ -150,17 +135,8 @@ export class PatternGrid {
       throw new Error("grids must have the same step size");
     }
 
-    const result = [];
-
-    let index = 0;
-    for (const grid of grids) {
-      for (let i = 0; i < grid.length; i++) {
-        result[index] = grid.values[i];
-        index++;
-      }
-    }
-
-    return new PatternGrid(result, grids[0].step_size);
+    const values = grids.map((x) => x.values).flat();
+    return new PatternGrid(values, grids[0].step_size);
   }
 
   /**

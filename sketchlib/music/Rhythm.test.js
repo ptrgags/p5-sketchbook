@@ -171,6 +171,54 @@ describe("Rhythm", () => {
     });
   });
 
+  describe("concat", () => {
+    it("with no rhythms returns empty rhythm", () => {
+      const result = Rhythm.concat();
+
+      const expected = Rhythm.empty();
+      expect(result).toEqual(expected);
+    });
+
+    it("with one rhythm returns it", () => {
+      const rhythm = new Rhythm("xxx", N4);
+
+      const result = Rhythm.concat(rhythm);
+
+      const expected = rhythm;
+      expect(result).toBe(expected);
+    });
+
+    it("with rhythms of mismatched step sizes throws error", () => {
+      const rhythm1 = new Rhythm("xxx", N4);
+      const rhythm2 = new Rhythm("xxx", N8);
+      expect(() => {
+        return Rhythm.concat(rhythm1, rhythm2);
+      }).toThrowError("grids must have the same step size");
+    });
+
+    it("concats two rhythms", () => {
+      const rhythm1 = new Rhythm("x--", N4);
+      const rhythm2 = new Rhythm("x.", N4);
+
+      const result = Rhythm.concat(rhythm1, rhythm2);
+
+      const expected = new Rhythm("x--x.", N4);
+      expect(result).toEqual(expected);
+    });
+
+    it("concats many rhythms", () => {
+      const rhythm1 = new Rhythm("xxx", N4);
+      const rhythm2 = new Rhythm("x.", N4);
+      const rhythm3 = new Rhythm("x--", N4);
+      const rhythm4 = new Rhythm("..", N4);
+
+      const result = Rhythm.concat(rhythm1, rhythm2, rhythm3, rhythm4);
+
+      const expected = new Rhythm("xxxx.x--..", N4);
+      expect(result).toEqual(expected);
+    });
+  });
+
   describe("unzip", () => {
     it("with parallel timeline music throws", () => {
       const parallel = new Parallel(

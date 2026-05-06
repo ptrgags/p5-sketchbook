@@ -93,6 +93,29 @@ describe("PatternGrid", () => {
     });
   });
 
+  describe("map", () => {
+    it("maps function over values", () => {
+      const pattern = new PatternGrid([1, 2, 3], N4);
+
+      const result = pattern.map((x) => `x = ${x}`);
+
+      const expected = new PatternGrid(["x = 1", "x = 2", "x = 3"], N4);
+      expect(result).toEqual(expected);
+    });
+
+    it("maps function with index", () => {
+      const pattern = new PatternGrid(["a", "b", "c"], N4);
+
+      const result = pattern.map((x, i) => `a[${i}] = ${x}`);
+
+      const expected = new PatternGrid(
+        ["a[0] = a", "a[1] = b", "a[2] = c"],
+        N4,
+      );
+      expect(result).toEqual(expected);
+    });
+  });
+
   describe("concat", () => {
     it("with no grids returns empty grid", () => {
       const result = PatternGrid.concat();

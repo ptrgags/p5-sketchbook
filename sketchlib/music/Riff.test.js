@@ -34,6 +34,82 @@ describe("Riff", () => {
     expect(result).toEqual(expected);
   });
 
+  describe("map", () => {
+    it("maps function over values", () => {
+      const pattern = Riff.literal("x.x.x.", [1, 2, 3], N4);
+
+      const result = pattern.map((x) => `x = ${x}`);
+
+      const expected = Riff.literal("x.x.x.", ["x = 1", "x = 2", "x = 3"], N4);
+      expect(result).toEqual(expected);
+    });
+
+    it("maps function with index", () => {
+      const pattern = Riff.literal("x--x--x--", ["a", "b", "c"], N4);
+
+      const result = pattern.map((x, i) => `a[${i}] = ${x}`);
+
+      const expected = Riff.literal(
+        "x--x--x--",
+        ["a[0] = a", "a[1] = b", "a[2] = c"],
+        N4,
+      );
+      expect(result).toEqual(expected);
+    });
+  });
+
+  describe("concat", () => {
+    it("with no riffs returns empty riff", () => {
+      const result = Riff.concat();
+
+      const expected = Riff.empty();
+      expect(result).toEqual(expected);
+    });
+
+    it("with one riff returns it", () => {
+      const pattern = Riff.literal("x.x.x.", [1, 2, 3], N4);
+
+      const result = Riff.concat(pattern);
+
+      const expected = pattern;
+      expect(result).toBe(expected);
+    });
+
+    it("with riffs of mismatched step sizes throws error", () => {
+      const pattern1 = Riff.literal("x.x.x.", [1, 2, 3], N4);
+      const pattern2 = Riff.literal("x.x.x.", [1, 2, 3], N8);
+      expect(() => {
+        return Riff.concat(pattern1, pattern2);
+      }).toThrowError("grids must have the same step size");
+    });
+
+    it("concats two riffs", () => {
+      const pattern1 = Riff.literal("xxx", [1, 2, 3], N4);
+      const pattern2 = Riff.literal("x-x-", [4, 5], N4);
+
+      const result = Riff.concat(pattern1, pattern2);
+
+      const expected = Riff.literal("xxxx-x-", [1, 2, 3, 4, 5], N4);
+      expect(result).toEqual(expected);
+    });
+
+    it("concats many riffs", () => {
+      const pattern1 = Riff.literal("x.x.x.", [1, 2, 3], N4);
+      const pattern2 = Riff.literal("x-x-", [4, 5], N4);
+      const pattern3 = Riff.literal("x.x.x.", [6, 7, 8], N4);
+      const pattern4 = Riff.literal("x-x-", [9, 10], N4);
+
+      const result = Riff.concat(pattern1, pattern2, pattern3, pattern4);
+
+      const expected = Riff.literal(
+        "x.x.x.x-x-x.x.x.x-x-",
+        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        N4,
+      );
+      expect(result).toEqual(expected);
+    });
+  });
+
   describe("literal", () => {
     it("with constant value repeats value", () => {
       const rhythm_str = "x-x.x-x.";
