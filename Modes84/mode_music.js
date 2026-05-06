@@ -2,7 +2,6 @@ import { ADSR } from "../sketchlib/instruments/ADSR.js";
 import { BasicSynth } from "../sketchlib/instruments/BasicSynth.js";
 import { N4, N8 } from "../sketchlib/music/durations.js";
 import { Note } from "../sketchlib/music/Music.js";
-import { PatternGrid } from "../sketchlib/music/PatternGrid.js";
 import {
   A4,
   AS4,
@@ -30,9 +29,10 @@ import {
 } from "../sketchlib/music/scales.js";
 import { RiffClip } from "../sketchlib/tone_helpers/RiffClip.js";
 
-//const SCALE_DEGREES = [0, 7, 0, 6, 0, 5, 0, 4, 0, 3, 0, 2, 0, 1, 0, 0];
-const RHYTHM = new Rhythm("x-x-|x--x|x-xx|xx--", N4);
-const SCALE_DEGREES = [7, 6, 5, 4, 3, 2, 1, 0, 7];
+const RHYTHM = new Rhythm("xxxxx---|xxxxx---|xxxxxxxx|x-x-x-x-", N8);
+const SCALE_DEGREES = [
+  0, 0, 1, 2, 3, 0, 0, 4, 5, 6, 0, 0, 1, 2, 3, 4, 5, 6, 7, 5, 2, 0,
+];
 
 const MODE_ORDER = [
   LYDIAN_MODE,
