@@ -14,10 +14,8 @@ import { CTile } from "../sketchlib/cga2d/CTile.js";
 import { CVersor } from "../sketchlib/cga2d/CVersor.js";
 import { NullPoint } from "../sketchlib/cga2d/NullPoint.js";
 import { PowerIterator } from "../sketchlib/cga2d/PowerIterator.js";
-import { StyledNode } from "../sketchlib/cga2d/StyledNode.js";
 import { StyledTile } from "../sketchlib/cga2d/StyledTile.js";
 import { Color } from "../sketchlib/Color.js";
-import { mod } from "../sketchlib/mod.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
@@ -26,140 +24,12 @@ import { Circle } from "../sketchlib/primitives/Circle.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { range } from "../sketchlib/range.js";
 import { Style } from "../sketchlib/Style.js";
-import { StyleRuns } from "../sketchlib/styling/StyleRuns.js";
+import {
+  compute_geometry,
+  make_tiling,
+  TileType,
+} from "./hyperbolic_tilings.js";
 import { OrbitTile } from "./OrbitTile.js";
-
-/**
- * Compute a circle with the following properties:
- *
- * - its center is on the x-axis
- * - the circle is orthogonal to the unit circle
- * - the circle intersects the line for the diagonal mirror (see reflection_group() below), making an angle pi/q
- * @param {number} p
- * @param {number} q
- * @returns {Circle}
- */
-function compute_edge_circle(p, q) {
-  const angle_p = Math.PI / p;
-  const angle_q = Math.PI / q;
-
-  // TODO: how did I derive this again?
-  // center = cos(pi/q) * k
-  // radius = sin(pi/p) * K
-  // where K = 1/sqrt(cos^2(pi/q) - sin^2(pi/2))
-
-  const cos_q = Math.cos(angle_q);
-  const sin_p = Math.sin(angle_p);
-  const k = 1 / Math.sqrt(cos_q * cos_q - sin_p * sin_p);
-  const center = cos_q * k;
-  const radius = sin_p * k;
-
-  return new Circle(new Point(center, 0), radius);
-}
-
-function compute_geometry(p, q) {
-  const circle = compute_edge_circle(p, q);
-  const center = Point.ORIGIN;
-  const edge_center = new Point(circle.center.x - circle.radius, 0);
-
-  // angle to vertex is pi/2 - pi/p - pi/q = pi(1/2 - 1/p - 1/q)
-  // supplimentary angle is pi - angle_to_vertex:
-  // pi - pi(1/2 - 1/p - 1/q)
-  // pi(1 - 1/2 + 1/p + 1/q)
-  // pi(1/2 + 1/p + 1/q)
-  const angle_to_vertex = Math.PI * (1 / 2 + 1 / p + 1 / q);
-  const vertex = circle.center.add(
-    Direction.from_angle(angle_to_vertex).scale(circle.radius),
-  );
-
-  const horizontal_edge = ClineArc.from_segment(
-    new LineSegment(center, edge_center),
-  );
-  const arc_edge = ClineArc.from_arc(
-    new ArcPrimitive(
-      circle.center,
-      circle.radius,
-      new ArcAngles(Math.PI, angle_to_vertex),
-    ),
-  );
-  const diagonal_edge = ClineArc.from_segment(new LineSegment(vertex, center));
-
-  const tile_edge = ClineArc.from_arc(
-    new ArcPrimitive(
-      circle.center,
-      circle.radius,
-      new ArcAngles(angle_to_vertex, 2 * Math.PI - angle_to_vertex),
-    ),
-  );
-
-  return {
-    circle: Cline.from_circle(circle),
-    vertices: [center, edge_center, vertex].map(NullPoint.from_point),
-    edges: [horizontal_edge, arc_edge, diagonal_edge],
-    tile_edge,
-  };
-}
-
-/**
- *
- * @param {number} p How many sides does the centeral (hyperbolic) polygon have?
- * @param {number} q How many polygons meet at each vertex?
- * @returns
- */
-function make_tiling(p, q) {
-  if (p < 3) {
-    throw new Error("p must be at least 3");
-  }
-
-  if (q < 3) {
-    throw new Error("q must be at least 3");
-  }
-
-  if ((p - 2) * (q - 2) <= 4) {
-    throw new Error(
-      "to make a hyperbolic tiling, (p - 2)(q - 2) must be greater than 4",
-    );
-  }
-
-  // first transformation is flipping over the x-axis
-  const flip_y = CVersor.FLIP_Y;
-  const rotate_center = CVersor.rotation((2 * Math.PI) / p);
-  const diagonal_mirror = rotate_center.compose(flip_y);
-
-  // compute the circle for the arc that marks the boundary of the tile,
-  // and turn it into a circle inversion
-  const circle = compute_edge_circle(p, q);
-  const circle_inversion = CVersor.to_screen(circle).conjugate(
-    CVersor.INVERSION,
-  );
-
-  const arc_elliptic = circle_inversion.compose(flip_y);
-  const vertex_elliptic = arc_elliptic.compose(rotate_center.inv());
-
-  const groups = {
-    reflection_group: {
-      flip_y,
-      diagonal_mirror,
-      circle_inversion,
-    },
-    corner_rotation_group: {
-      rotate_center,
-      arc_elliptic,
-      vertex_elliptic,
-    },
-  };
-
-  // Some subgroups require the angle divisor to be even
-  if (q % 2 === 0) {
-    groups.center_edge_group = { rotate_center, arc_elliptic };
-  }
-
-  if (p % 2 === 0) {
-    groups.bisector_vertex_group = { vertex_elliptic, flip_y };
-  }
-
-  return groups;
-}
 
 const FOLDS_P = 7;
 const FOLDS_Q = 3;
@@ -249,18 +119,10 @@ const TO_ADJ = range(7)
     // CR^0Y, CR^6Y, CR^5Y, ... C^1Y
     // The powers 0, 6, 5, ..., 1 are equivalent to 0, -1, -2, ..., -6 (mod p)
     // but we can just use a negative array index to do the same thing.
-    const r = ROTATE_SEVENFOLD.at(-i);
+    const r = ROTATE_SEVENFOLD.at(-i) ?? CVersor.IDENTITY;
     return FC.compose(r).compose(FY);
   });
 const ORBIT_TILE = new OrbitTile(MOTIF, CVersor.IDENTITY, TO_ADJ);
-
-/**
- * @enum {number}
- */
-const TileType = {
-  EDGE: 0,
-  VERTEX: 1,
-};
 
 /**
  *
@@ -319,6 +181,6 @@ const BACKGROUND = new StyledTile([Cline.UNIT_CIRCLE], STYLE_BG);
 const SCENE = new CTile(BACKGROUND, TILE73);
 const TO_SCREEN = CVersor.to_screen(new Circle(new Point(250, 350), 250));
 
-export const HYPERBOLIC_TILING_EXPERIMENT = new StaticAnimation(
+export const HYPERBOLIC_TILING_73 = new StaticAnimation(
   TO_SCREEN.transform(SCENE),
 );

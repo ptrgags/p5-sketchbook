@@ -18,7 +18,8 @@ import { Circle } from "../sketchlib/primitives/Circle.js";
 import { NACHO_FRACTAL, NACHO_SUFFIX } from "./SierpinskiNacho.js";
 import { CAnimationViewer } from "./CAnimationViewer.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
-import { HYPERBOLIC_TILING_EXPERIMENT } from "./HyperbolicTiling.js";
+import { HYPERBOLIC_TILING_73 } from "./HyperbolicTiling73.js";
+import { HYPERBOLIC_TILING_74 } from "./HyperbolicTiling74.js";
 
 const TO_SCREEN = CVersor.to_screen(new Circle(SCREEN_CENTER, 200));
 
@@ -26,6 +27,8 @@ const TO_SCREEN = CVersor.to_screen(new Circle(SCREEN_CENTER, 200));
 const TO_SCREEN_NACHO = CVersor.to_screen(new Circle(new Point(0, 600), 500));
 
 const ANIMATIONS = new SelectAnimated([
+  HYPERBOLIC_TILING_74,
+  HYPERBOLIC_TILING_73,
   CGA_BASICS,
   new ConformalXformTest(TO_SCREEN),
   new NachoSpaceship(TO_SCREEN),
@@ -36,7 +39,6 @@ const ANIMATIONS = new SelectAnimated([
   new CAnimationViewer(TO_SCREEN, SIERPINSKI_SUFFIX),
   new CAnimationViewer(TO_SCREEN_NACHO, NACHO_FRACTAL),
   new CAnimationViewer(TO_SCREEN_NACHO, NACHO_SUFFIX),
-  HYPERBOLIC_TILING_EXPERIMENT,
 ]);
 
 const MOUSE = new CanvasMouseHandler();
