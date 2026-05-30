@@ -4,7 +4,7 @@ import { Color } from "../Color.js";
 import { Primitive } from "../primitives/Primitive.js";
 import { GroupPrimitive } from "../primitives/GroupPrimitive.js";
 import { LineSegment } from "../primitives/LineSegment.js";
-import { Rect } from "../primitives/RectPrimitive.js";
+import { Rect } from "../primitives/Rect.js";
 import { group, style } from "../primitives/shorthand.js";
 import { Point } from "../../sketchlib/pga2d/Point.js";
 import { Direction } from "../../sketchlib/pga2d/Direction.js";

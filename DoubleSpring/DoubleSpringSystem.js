@@ -4,7 +4,7 @@ import { RingBuffer } from "../sketchlib/RingBuffer.js";
 import { GeneralizedCoordinates } from "../sketchlib/VectorSpace.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
-import { Rect } from "../sketchlib/primitives/RectPrimitive.js";
+import { Rect } from "../sketchlib/primitives/Rect.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";

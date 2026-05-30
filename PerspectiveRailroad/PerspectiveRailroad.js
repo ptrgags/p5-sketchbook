@@ -1,7 +1,7 @@
 import { Style } from "../sketchlib/Style.js";
 import { Color } from "../sketchlib/Color.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
-import { Rect } from "../sketchlib/primitives/RectPrimitive.js";
+import { Rect } from "../sketchlib/primitives/Rect.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Line } from "../sketchlib/pga2d/Line.js";

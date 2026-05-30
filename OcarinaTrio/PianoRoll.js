@@ -8,7 +8,7 @@ import { Point } from "../sketchlib/pga2d/Point.js";
 import { Mask } from "../sketchlib/primitives/ClipMask.js";
 import { ClipPrimitive } from "../sketchlib/primitives/ClipPrimitive.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
-import { Rect } from "../sketchlib/primitives/RectPrimitive.js";
+import { Rect } from "../sketchlib/primitives/Rect.js";
 import { Transform } from "../sketchlib/primitives/Transform.js";
 import { Style } from "../sketchlib/Style.js";
 

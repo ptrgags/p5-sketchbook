@@ -1,7 +1,7 @@
 import { Direction } from "../../sketchlib/pga2d/Direction.js";
 import { Point } from "../../sketchlib/pga2d/Point.js";
 import { Ease } from "../../sketchlib/Ease.js";
-import { Rect } from "../../sketchlib/primitives/RectPrimitive.js";
+import { Rect } from "../../sketchlib/primitives/Rect.js";
 import { group } from "../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Animated } from "../../sketchlib/animation/Animated.js";

@@ -3,7 +3,7 @@ import { Point } from "../pga2d/Point.js";
 import { CardinalDirection, to_direction } from "../CardinalDirection.js";
 import { GroupPrimitive } from "../primitives/GroupPrimitive.js";
 import { PolygonPrimitive } from "../primitives/PolygonPrimitive.js";
-import { Rect } from "../primitives/RectPrimitive.js";
+import { Rect } from "../primitives/Rect.js";
 import { group, style } from "../primitives/shorthand.js";
 import { VectorPrimitive } from "../primitives/VectorPrimitive.js";
 import { Style } from "../Style.js";

@@ -1,5 +1,5 @@
 import { Color } from "../Color.js";
-import { Rect } from "../primitives/RectPrimitive.js";
+import { Rect } from "../primitives/Rect.js";
 import { style } from "../primitives/shorthand.js";
 import { Style } from "../Style.js";
 import { Rectangle } from "../Rectangle.js";
