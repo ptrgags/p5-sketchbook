@@ -3,7 +3,6 @@ import { Color } from "../sketchlib/Color.js";
 import { Rect } from "../sketchlib/primitives/Rect.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
-import { Rectangle } from "../sketchlib/Rectangle.js";
 import { ShowHidePrimitive } from "../sketchlib/primitives/ShowHidePrimitive.js";
 
 const NUM_WHITE_KEYS = 7;
@@ -12,7 +11,7 @@ const NUM_BLACK_KEYS = 5;
 /**
  * Given a bounding rectangle, make 7 evenly-spaced rectangles for the
  * white keys
- * @param {Rectangle} bounding_rect Bounding rectangle for the whole piano octave
+ * @param {Rect} bounding_rect Bounding rectangle for the whole piano octave
  * @return {Rect[]} An array of 7 rectangle primitives for the white keys
  */
 function make_white_keys(bounding_rect) {
@@ -30,7 +29,7 @@ function make_white_keys(bounding_rect) {
 
 /**
  * Given the bounds for a piano octave, make 5 rectangles for the black keys.
- * @param {Rectangle} bounding_rect Bounding rectangle for the whole piano octave
+ * @param {Rect} bounding_rect Bounding rectangle for the whole piano octave
  * @returns {Rect[]} An array of 5 rectangle primitives for the black keys, positioned at their respective spots over the white keys
  */
 function make_black_keys(bounding_rect) {
@@ -83,7 +82,7 @@ const STYLE_HIGHLIGHT = new Style({
 export class SingleOctavePiano {
   /**
    * Construct
-   * @param {Rectangle} bounding_rect The bounding rectangle within which to draw the piano
+   * @param {Rect} bounding_rect The bounding rectangle within which to draw the piano
    */
   constructor(bounding_rect) {
     const white_key_rects = make_white_keys(bounding_rect);

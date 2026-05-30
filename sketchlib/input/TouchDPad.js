@@ -1,7 +1,6 @@
 import { Direction } from "../pga2d/Direction.js";
 import { Point } from "../pga2d/Point.js";
 import { CardinalDirection, to_direction } from "../CardinalDirection.js";
-import { GroupPrimitive } from "../primitives/GroupPrimitive.js";
 import { PolygonPrimitive } from "../primitives/PolygonPrimitive.js";
 import { Rect } from "../primitives/Rect.js";
 import { group, style } from "../primitives/shorthand.js";
@@ -9,9 +8,9 @@ import { VectorPrimitive } from "../primitives/VectorPrimitive.js";
 import { Style } from "../Style.js";
 import { DirectionInput } from "../DirectionInput.js";
 import { MouseInCanvas, MouseInput } from "./MouseInput.js";
-import { Rectangle } from "../Rectangle.js";
 import { Oklch } from "../Oklch.js";
 import { Color } from "../Color.js";
+import { SimpleGroupPrimitive } from "../primitives/SimpleGroupPrimitive.js";
 
 /**
  * A virtual pad of 4 directional buttons, modeled after the D-pad on
@@ -20,7 +19,7 @@ import { Color } from "../Color.js";
 export class TouchDPad {
   /**
    * Constructor
-   * @param {Rectangle} rect The boundary rectangle within which the d-pad will be on the screen
+   * @param {Rect} rect The boundary rectangle within which the d-pad will be on the screen
    * @param {number} dead_zone_radius The size of the dead zone in _normalized coordinates_
    */
   constructor(rect, dead_zone_radius) {
@@ -156,7 +155,7 @@ export class TouchDPad {
 
   /**
    * Render a virtual D-pad
-   * @returns {GroupPrimitive} the 4 buttons, suitable for a mobile overlay
+   * @returns {SimpleGroupPrimitive} the 4 buttons, suitable for a mobile overlay
    */
   render() {
     if (this.button_geometry === undefined) {

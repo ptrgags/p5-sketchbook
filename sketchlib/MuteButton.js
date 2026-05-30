@@ -6,7 +6,7 @@ import { LineSegment } from "./primitives/LineSegment.js";
 import { PolygonPrimitive } from "./primitives/PolygonPrimitive.js";
 import { group, style } from "./primitives/shorthand.js";
 import { Style } from "./Style.js";
-import { Rectangle } from "./Rectangle.js";
+import { Rect } from "./primitives/Rect.js";
 import { ToggleButton, ToggleState } from "./input/ToggleButton.js";
 import { ShowHidePrimitive } from "./primitives/ShowHidePrimitive.js";
 import { Animated } from "./animation/Animated.js";
@@ -84,7 +84,7 @@ export class MuteButton {
    */
   constructor(sound) {
     this.sound_toggle = new ToggleButton(
-      new Rectangle(
+      new Rect(
         SOUND_TOGGLE_CORNER,
         new Direction(SOUND_TOGGLE_SIZE, SOUND_TOGGLE_SIZE),
       ),

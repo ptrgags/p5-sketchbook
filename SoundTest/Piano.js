@@ -1,7 +1,7 @@
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { group } from "../sketchlib/primitives/shorthand.js";
 import { MIDIPitch } from "../sketchlib/music/MIDIPitch.js";
-import { Rectangle } from "../sketchlib/Rectangle.js";
+import { Rect } from "../sketchlib/primitives/Rect.js";
 import { SingleOctavePiano } from "./SingleOctavePiano.js";
 import { Animated } from "../sketchlib/animation/Animated.js";
 import { PlayedNotes } from "./PlayedNotes.js";
@@ -9,7 +9,7 @@ import { B4, C4 } from "../sketchlib/music/pitches.js";
 
 /**
  * Make enough pianos to span the note range
- * @param {Rectangle} bounding_rect
+ * @param {Rect} bounding_rect
  * @param {number} num_octaves How many octaves to make
  * @return {SingleOctavePiano[]}
  */
@@ -25,7 +25,7 @@ function make_octaves(bounding_rect, num_octaves) {
       Direction.DIR_X.scale(i * octave_width),
     );
     octave_pianos[i] = new SingleOctavePiano(
-      new Rectangle(offset, octave_dimensions),
+      new Rect(offset, octave_dimensions),
     );
   }
 
@@ -38,7 +38,7 @@ function make_octaves(bounding_rect, num_octaves) {
 export class Piano {
   /**
    * Constructor
-   * @param {Rectangle} bounding_rect Bounds for the whole piano
+   * @param {Rect} bounding_rect Bounds for the whole piano
    * @param {PlayedNotes} score_notes The notes that will be played over time
    */
   constructor(bounding_rect, score_notes) {

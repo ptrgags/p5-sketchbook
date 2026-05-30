@@ -1,7 +1,7 @@
 import { describe, it, expect, test } from "vitest";
 import { Grid, griderator, Index2D } from "./Grid";
 import { CardinalDirection } from "./CardinalDirection";
-import { Rectangle } from "./Rectangle";
+import { Rect } from "./primitives/Rect";
 import { Point } from "../sketchlib/pga2d/Point";
 import { Direction } from "../sketchlib/pga2d/Direction";
 
@@ -419,7 +419,7 @@ describe("Grid", () => {
   describe("compute_layout", () => {
     it("computes a layout without spacing or margins", () => {
       const grid = new Grid(2, 2);
-      const boundary = new Rectangle(Point.ORIGIN, new Direction(4, 4));
+      const boundary = new Rect(Point.ORIGIN, new Direction(4, 4));
       const item_size = new Direction(2, 2);
       const margin = Direction.ZERO;
 
@@ -433,7 +433,7 @@ describe("Grid", () => {
 
     it("computes a layout with margins", () => {
       const grid = new Grid(2, 2);
-      const boundary = new Rectangle(Point.ORIGIN, new Direction(8, 12));
+      const boundary = new Rect(Point.ORIGIN, new Direction(8, 12));
       const item_size = new Direction(2, 2);
       const margin = new Direction(2, 4);
 
@@ -447,7 +447,7 @@ describe("Grid", () => {
 
     it("computes a layout with spacing", () => {
       const grid = new Grid(2, 2);
-      const boundary = new Rectangle(Point.ORIGIN, new Direction(8, 10));
+      const boundary = new Rect(Point.ORIGIN, new Direction(8, 10));
       const item_size = new Direction(2, 2);
       const margin = Direction.ZERO;
 
@@ -461,7 +461,7 @@ describe("Grid", () => {
 
     it("computes a layout with spacing and margins", () => {
       const grid = new Grid(3, 3);
-      const boundary = new Rectangle(Point.ORIGIN, new Direction(16, 8));
+      const boundary = new Rect(Point.ORIGIN, new Direction(16, 8));
       const item_size = new Direction(2, 2);
       const margin = new Direction(4, 1);
 

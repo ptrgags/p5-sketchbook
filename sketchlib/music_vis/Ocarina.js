@@ -11,9 +11,9 @@ import { group, style } from "../primitives/shorthand.js";
 import { ShowHidePrimitive } from "../primitives/ShowHidePrimitive.js";
 import { TextPrimitive } from "../primitives/TextPrimitive.js";
 import { TextStyle } from "../primitives/TextStyle.js";
-import { Rectangle } from "../Rectangle.js";
 import { Style } from "../Style.js";
 import { PlayedNotes } from "../../SoundTest/PlayedNotes.js";
+import { Rect } from "../primitives/Rect.js";
 
 // See https://www.desmos.com/calculator/o222tjtle9 for a diagram of the
 // tone hole placement
@@ -198,7 +198,7 @@ const NO_HOLES = new Array(12).fill(false);
 
 /**
  *
- * @param {Rectangle} bounding_rect
+ * @param {Rect} bounding_rect
  * @param {Point} centered_uv
  * @returns {Point}
  */
@@ -217,7 +217,7 @@ function centered_uv_to_world(bounding_rect, centered_uv) {
 
 /**
  * Position the tone holes in screen space
- * @param {Rectangle} bounding_rect
+ * @param {Rect} bounding_rect
  * @returns {Circle[]}
  */
 function position_tone_holes(bounding_rect) {
@@ -238,7 +238,7 @@ function position_tone_holes(bounding_rect) {
 
 /**
  * Position the body on the screen
- * @param {Rectangle} bounding_rect
+ * @param {Rect} bounding_rect
  * @returns {BeziergonPrimitive}
  */
 function position_body(bounding_rect) {
@@ -253,7 +253,7 @@ const INACTIVE_COLOR = new Oklch(0.7, 0, 0);
 
 /**
  * @typedef {Object} OcarinaConfig
- * @property {Rectangle} bounds A bounding rectangle to determine the size of the ocarina on the screen
+ * @property {Rect} bounds A bounding rectangle to determine the size of the ocarina on the screen
  * @property {number} octave Octave number of the lowest A of the ocarina
  * @property {Oklch} color Base color for the ocarina
  */

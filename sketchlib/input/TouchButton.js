@@ -2,7 +2,6 @@ import { Color } from "../Color.js";
 import { Rect } from "../primitives/Rect.js";
 import { style } from "../primitives/shorthand.js";
 import { Style } from "../Style.js";
-import { Rectangle } from "../Rectangle.js";
 import { Animated } from "../animation/Animated.js";
 import { MouseCallbacks } from "./MouseCallbacks.js";
 import { MouseInput } from "./MouseInput.js";
@@ -24,7 +23,7 @@ export const ButtonState = {
 export class TouchButton {
   /**
    * Constructor
-   * @param {Rectangle} rect The boundary rectangle of this button
+   * @param {Rect} rect The boundary rectangle of this button
    */
   constructor(rect) {
     this.rect = rect;

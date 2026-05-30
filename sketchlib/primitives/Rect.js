@@ -3,9 +3,11 @@ import { Point } from "../pga2d/Point.js";
 import { HEIGHT, WIDTH } from "../dimensions.js";
 import { clamp } from "../clamp.js";
 import { Grid } from "../Grid.js";
+import { Primitive } from "./Primitive.js";
 
 /**
  * Rectangle
+ * @implements {Primitive}
  */
 export class Rect {
   /**

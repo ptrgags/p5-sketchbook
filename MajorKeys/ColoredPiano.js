@@ -3,7 +3,6 @@ import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { Primitive } from "../sketchlib/primitives/Primitive.js";
 import { Rect } from "../sketchlib/primitives/Rect.js";
 import { style } from "../sketchlib/primitives/shorthand.js";
-import { Rectangle } from "../sketchlib/Rectangle.js";
 import { Style } from "../sketchlib/Style.js";
 
 // the larger keys (usually white)
@@ -12,7 +11,7 @@ const NUM_SMALL_KEYS = 5;
 
 /**
  *
- * @param {Rectangle} bounds The bounding box
+ * @param {Rect} bounds The bounding box
  * @returns {Rect[]} An array of 7 rectangle primitives
  */
 function make_big_keys(bounds) {
@@ -29,7 +28,7 @@ function make_big_keys(bounds) {
 
 /**
  *
- * @param {Rectangle} bounds
+ * @param {Rect} bounds
  * @returns {Rect[]} An array of 5 thin rectangles within the bounding box
  */
 function make_small_keys(bounds) {
@@ -56,7 +55,7 @@ const RENDER_ORDER = [0, 2, 4, 5, 7, 9, 11, 1, 3, 6, 8, 10];
 export class ColoredPiano {
   /**
    *
-   * @param {Rectangle} bounds
+   * @param {Rect} bounds
    * @param {Style[]} styles Styles for each key in keyboard order
    */
   constructor(bounds, styles) {
