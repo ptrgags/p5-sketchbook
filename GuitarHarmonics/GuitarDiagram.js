@@ -5,7 +5,7 @@ import { Point } from "../sketchlib/pga2d/Point.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
-import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
+import { Rect } from "../sketchlib/primitives/RectPrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
 import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
@@ -25,7 +25,7 @@ function fret_position(n) {
   return 1 - 2 ** (-n / 12);
 }
 
-const FRETBOARD = new RectPrimitive(
+const FRETBOARD = new Rect(
   Point.ORIGIN,
   new Direction(NECK_WIDTH, FRETBOARD_LENGTH),
 );

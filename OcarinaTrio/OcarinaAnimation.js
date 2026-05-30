@@ -11,7 +11,7 @@ import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
-import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
+import { Rect } from "../sketchlib/primitives/RectPrimitive.js";
 import { group, style, xform } from "../sketchlib/primitives/shorthand.js";
 import { Transform } from "../sketchlib/primitives/Transform.js";
 import { Rectangle } from "../sketchlib/Rectangle.js";
@@ -68,7 +68,7 @@ const BOX_MARGIN = new Direction(6, 6);
 
 const OCARINA_BOXES = group(
   style(
-    new RectPrimitive(
+    new Rect(
       BOX_ORIGIN.add(BOX_MARGIN),
       new Direction(150, 150).add(BOX_MARGIN.scale(-2)),
     ),
@@ -79,7 +79,7 @@ const OCARINA_BOXES = group(
     }),
   ),
   style(
-    new RectPrimitive(
+    new Rect(
       BOX_ORIGIN.add(BOX_STRIDE).add(BOX_MARGIN),
       new Direction(150, 150).add(BOX_MARGIN.scale(-2)),
     ),
@@ -90,7 +90,7 @@ const OCARINA_BOXES = group(
     }),
   ),
   style(
-    new RectPrimitive(
+    new Rect(
       BOX_ORIGIN.add(BOX_STRIDE.scale(2)).add(BOX_MARGIN),
       new Direction(150, 150).add(BOX_MARGIN.scale(-2)),
     ),

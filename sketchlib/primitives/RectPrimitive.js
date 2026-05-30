@@ -7,7 +7,7 @@ import { Grid } from "../Grid.js";
 /**
  * Rectangle
  */
-export class RectPrimitive {
+export class Rect {
   /**
    * Constructor
    * @param {Point} position The top left corner of the rectangle as a Point
@@ -74,10 +74,10 @@ export class RectPrimitive {
    * Compute a rectangle from a center point and the dimensions
    * @param {Point} center The center of the
    * @param {Direction} dimensions
-   * @returns {RectPrimitive}
+   * @returns {Rect}
    */
   static from_center(center, dimensions) {
-    return new RectPrimitive(center.add(dimensions.scale(-0.5)), dimensions);
+    return new Rect(center.add(dimensions.scale(-0.5)), dimensions);
   }
 
   /**
@@ -110,7 +110,7 @@ export class RectPrimitive {
   /**
    * Subdivide into a n x n grid of smaller quads
    * @param {number} n the number of divisions on a side
-   * @returns {Grid<RectPrimitive>} The sub-tiles
+   * @returns {Grid<Rect>} The sub-tiles
    */
   subdivide_grid(n) {
     const result = new Grid(n, n);
@@ -121,7 +121,7 @@ export class RectPrimitive {
       const x = this.position.x + j * sub_dimensions.x;
       const position = new Point(x, y);
 
-      return new RectPrimitive(position, sub_dimensions);
+      return new Rect(position, sub_dimensions);
     });
 
     return result;
@@ -130,9 +130,6 @@ export class RectPrimitive {
 
 /**
  * A rectangle that sets the boundary of the screen
- * @type {RectPrimitive}
+ * @type {Rect}
  */
-export const SCREEN_RECT = new RectPrimitive(
-  Point.ORIGIN,
-  new Direction(WIDTH, HEIGHT),
-);
+export const SCREEN_RECT = new Rect(Point.ORIGIN, new Direction(WIDTH, HEIGHT));

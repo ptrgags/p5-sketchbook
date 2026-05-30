@@ -13,7 +13,7 @@ import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
-import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
+import { Rect } from "../sketchlib/primitives/RectPrimitive.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { make_param } from "../sketchlib/animation/ParamCurve.js";
@@ -566,14 +566,14 @@ function render_stack(position, depth) {
   const rects = new Array(whole_depth);
   const first_offset = position.add(OFFSET_STACK_START);
   for (let i = 0; i < whole_depth; i++) {
-    rects[i] = new RectPrimitive(
+    rects[i] = new Rect(
       first_offset.add(OFFSET_STACK_STRIDE.scale(i)),
       STACK_RECT_DIMENSIONS,
     );
   }
 
   if (!is_nearly(fract_depth, 0.0)) {
-    const partial_rect = new RectPrimitive(
+    const partial_rect = new Rect(
       first_offset.add(
         OFFSET_STACK_STRIDE.scale(whole_depth + (1 - fract_depth)),
       ),

@@ -4,7 +4,7 @@ import { Color } from "../Color.js";
 import { Primitive } from "../primitives/Primitive.js";
 import { GroupPrimitive } from "../primitives/GroupPrimitive.js";
 import { LineSegment } from "../primitives/LineSegment.js";
-import { RectPrimitive } from "../primitives/RectPrimitive.js";
+import { Rect } from "../primitives/RectPrimitive.js";
 import { group, style } from "../primitives/shorthand.js";
 import { Point } from "../../sketchlib/pga2d/Point.js";
 import { Direction } from "../../sketchlib/pga2d/Direction.js";
@@ -64,7 +64,7 @@ function render_notes(offset, music, measure_dimensions, pitch_range) {
       music.duration.real * measure_dimensions.x,
       note_height,
     );
-    return new RectPrimitive(offset.add(note_offset), dimensions);
+    return new Rect(offset.add(note_offset), dimensions);
   }
 
   if (music instanceof Melody) {
@@ -121,10 +121,7 @@ export function render_music(
     width_measures * measure_dimensions.x,
     measure_dimensions.y,
   );
-  const background = style(
-    new RectPrimitive(offset, dimensions),
-    background_style,
-  );
+  const background = style(new Rect(offset, dimensions), background_style);
 
   // Vertical lines to mark the start of each measure -------------
   const whole_measures = duration.quotient;

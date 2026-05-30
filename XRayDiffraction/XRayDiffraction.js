@@ -2,7 +2,7 @@ import { Color } from "../sketchlib/Color.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
-import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
+import { Rect } from "../sketchlib/primitives/RectPrimitive.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 import { XRayLab } from "./XRayLab.js";
@@ -17,7 +17,7 @@ const STYLE_BACKDROP = new Style({
   fill: Color.BLACK,
 });
 const BACKDROP = style(
-  new RectPrimitive(Point.ORIGIN, new Direction(WIDTH, HEIGHT / 2)),
+  new Rect(Point.ORIGIN, new Direction(WIDTH, HEIGHT / 2)),
   STYLE_BACKDROP,
 );
 
