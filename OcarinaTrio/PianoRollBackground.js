@@ -8,7 +8,7 @@ import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
-import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
+import { Rect } from "../sketchlib/primitives/Rect.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 
@@ -42,7 +42,7 @@ export class PianoRollBackground {
       const x = (i - min_pitch) * column_width;
       const pitch_class = MIDIPitch.get_pitch_class(i);
       const top_left = new Point(x, this.y);
-      const rect = new RectPrimitive(
+      const rect = new Rect(
         top_left,
         new Direction(column_width, HEIGHT - this.y),
       );

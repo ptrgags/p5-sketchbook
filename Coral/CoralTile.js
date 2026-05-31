@@ -1,5 +1,5 @@
 import { ControlPoint } from "./ControlPoint.js";
-import { Rect } from "./Rect.js";
+import { Rect } from "../sketchlib/primitives/Rect.js";
 import { FlagSet } from "../sketchlib/FlagSet.js";
 import { CardinalDirection } from "../sketchlib/CardinalDirection.js";
 import { Point } from "../sketchlib/pga2d/Point.js";

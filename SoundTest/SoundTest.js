@@ -20,7 +20,7 @@ import { render_score } from "../sketchlib/music/render_score.js";
 import { MuteButton } from "../sketchlib/MuteButton.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { PlayButtonScene } from "../sketchlib/scenes/PlayButtonScene.js";
-import { Rectangle } from "../sketchlib/Rectangle.js";
+import { Rect } from "../sketchlib/primitives/Rect.js";
 import { SoundManager } from "../sketchlib/SoundManager.js";
 import { TouchButton } from "../sketchlib/input/TouchButton.js";
 import { Piano } from "./Piano.js";
@@ -161,31 +161,28 @@ const TEXT_COLOR = new Style({
   fill: Color.WHITE,
 });
 
-const PIANO_BOUNDS = new Rectangle(new Point(0, 200), new Direction(500, 100));
+const PIANO_BOUNDS = new Rect(new Point(0, 200), new Direction(500, 100));
 
 const BASS_OCARINA = {
-  bounds: new Rectangle(new Point(0, 500), new Direction(200, 200)),
+  bounds: new Rect(new Point(0, 500), new Direction(200, 200)),
   // Orange
   color: new Oklch(0.6, 0.1, 60),
   octave: Ocarina.OCTAVE_BASS,
 };
 const TENOR_OCARINA = {
-  bounds: new Rectangle(new Point(200, 550), new Direction(150, 150)),
+  bounds: new Rect(new Point(200, 550), new Direction(150, 150)),
   // Purple
   color: new Oklch(0.5, 0.1, 300),
   octave: Ocarina.OCTAVE_TENOR,
 };
 const SOPRANO_OCARINA = {
-  bounds: new Rectangle(new Point(350, 700 - 112), new Direction(112, 112)),
+  bounds: new Rect(new Point(350, 700 - 112), new Direction(112, 112)),
   // Blue green
   color: new Oklch(0.6, 0.1, 213),
   octave: Ocarina.OCTAVE_SOPRANO,
 };
 
-const GRID_BOUNDARY = new Rectangle(
-  new Point(0, 300),
-  new Direction(WIDTH, 200),
-);
+const GRID_BOUNDARY = new Rect(new Point(0, 300), new Direction(WIDTH, 200));
 const GRID_MARGIN = new Direction(20, 40);
 const [FIRST_BUTTON_POSITION, BUTTON_STRIDE] = MELODY_BUTTONS.compute_layout(
   GRID_BOUNDARY,
@@ -366,7 +363,7 @@ class SoundTestAnimation {
     // Need to store the buttons so we can access the callbacks
     this.melody_buttons = melodies.map_array((index, descriptor) => {
       const corner = index.to_world(FIRST_BUTTON_POSITION, BUTTON_STRIDE);
-      const rectangle = new Rectangle(corner, MELODY_BUTTON_DIMENSIONS);
+      const rectangle = new Rect(corner, MELODY_BUTTON_DIMENSIONS);
       const button = new TouchButton(rectangle);
       button.events.addEventListener("click", () => {
         this.change_score(descriptor.id);

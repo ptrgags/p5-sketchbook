@@ -1,8 +1,8 @@
 import { Direction } from "../../sketchlib/pga2d/Direction.js";
 import { Point } from "../../sketchlib/pga2d/Point.js";
 import { Flector } from "../../sketchlib/pga2d/versors.js";
+import { Rect } from "../../sketchlib/primitives/Rect.js";
 import { ControlPoint } from "../ControlPoint.js";
-import { Rect } from "../Rect.js";
 
 export const SELECT_RADIUS = 10;
 const SELECT_RADIUS_SQR = SELECT_RADIUS * SELECT_RADIUS;
