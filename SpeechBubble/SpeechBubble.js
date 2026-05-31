@@ -7,6 +7,7 @@ import { Ellipse } from "../sketchlib/primitives/Ellipse.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
 import { Rect } from "../sketchlib/primitives/Rect.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
+import { SpeechBubblePrimitive } from "../sketchlib/primitives/SpeechBubblePrimitive.js";
 import { Style } from "../sketchlib/Style.js";
 
 const BOUNDING_BOX = new Rect(new Point(100, 100), new Direction(200, 200));
@@ -58,6 +59,16 @@ const SPEECH_BUBBLE = group(
   style(ELLIPSIS, STYLE_OUTLINE),
 );
 
+const BUBBLE2 = style(
+  new SpeechBubblePrimitive(
+    Rect.from_center(new Point(250, 400), new Direction(100, 50)),
+    new Direction(50, 50),
+    new Point(100, 450),
+    Math.PI / 16,
+  ),
+  STYLE_OUTLINE,
+);
+
 // @ts-ignore
 export const sketch = (p) => {
   p.setup = () => {
@@ -73,5 +84,7 @@ export const sketch = (p) => {
     p.background(128);
 
     SPEECH_BUBBLE.draw(p);
+
+    BUBBLE2.draw(p);
   };
 };
