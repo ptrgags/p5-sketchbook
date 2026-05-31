@@ -5,14 +5,11 @@ import { Point } from "../sketchlib/pga2d/Point.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
 import { Ellipse } from "../sketchlib/primitives/Ellipse.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
-import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
+import { Rect } from "../sketchlib/primitives/Rect.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 
-const BOUNDING_BOX = new RectPrimitive(
-  new Point(100, 100),
-  new Direction(200, 200),
-);
+const BOUNDING_BOX = new Rect(new Point(100, 100), new Direction(200, 200));
 const BUBBLE_RADII = BOUNDING_BOX.dimensions.mul_components(
   new Direction(0.5, 3 / 8),
 );
