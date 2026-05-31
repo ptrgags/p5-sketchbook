@@ -1,4 +1,3 @@
-import { Rect } from "./Rect.js";
 import { CoralTile } from "./CoralTile.js";
 import { CardinalDirection } from "../sketchlib/CardinalDirection.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
