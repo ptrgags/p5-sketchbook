@@ -11,10 +11,9 @@ import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
-import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
+import { Rect } from "../sketchlib/primitives/Rect.js";
 import { group, style, xform } from "../sketchlib/primitives/shorthand.js";
 import { Transform } from "../sketchlib/primitives/Transform.js";
-import { Rectangle } from "../sketchlib/Rectangle.js";
 import { SoundManager } from "../sketchlib/SoundManager.js";
 import { Style } from "../sketchlib/Style.js";
 import { SCORE_OCARINA_TRIO } from "../SoundTest/example_scores/ocarina_trio.js";
@@ -27,19 +26,19 @@ const BOX_ORIGIN = new Point(25, 275);
 const BOX_DIMENSIONS = new Direction(150, 150);
 const BOX_STRIDE = Direction.DIR_X.scale(BOX_DIMENSIONS.x);
 const BOUNDING_BOXES = [
-  new Rectangle(BOX_ORIGIN, BOX_DIMENSIONS),
-  new Rectangle(BOX_ORIGIN.add(BOX_STRIDE), BOX_DIMENSIONS),
-  new Rectangle(BOX_ORIGIN.add(BOX_STRIDE.scale(2)), BOX_DIMENSIONS),
+  new Rect(BOX_ORIGIN, BOX_DIMENSIONS),
+  new Rect(BOX_ORIGIN.add(BOX_STRIDE), BOX_DIMENSIONS),
+  new Rect(BOX_ORIGIN.add(BOX_STRIDE.scale(2)), BOX_DIMENSIONS),
 ];
 
 /**
  * Scale a bounding box about its center, creating a smaller box
- * @param {Rectangle} bounding_box
+ * @param {Rect} bounding_box
  * @param {number} factor scale factor
- * @returns {Rectangle}
+ * @returns {Rect}
  */
 function smaller_box(bounding_box, factor) {
-  return Rectangle.from_center(
+  return Rect.from_center(
     bounding_box.center,
     bounding_box.dimensions.scale(factor),
   );
@@ -68,7 +67,7 @@ const BOX_MARGIN = new Direction(6, 6);
 
 const OCARINA_BOXES = group(
   style(
-    new RectPrimitive(
+    new Rect(
       BOX_ORIGIN.add(BOX_MARGIN),
       new Direction(150, 150).add(BOX_MARGIN.scale(-2)),
     ),
@@ -79,7 +78,7 @@ const OCARINA_BOXES = group(
     }),
   ),
   style(
-    new RectPrimitive(
+    new Rect(
       BOX_ORIGIN.add(BOX_STRIDE).add(BOX_MARGIN),
       new Direction(150, 150).add(BOX_MARGIN.scale(-2)),
     ),
@@ -90,7 +89,7 @@ const OCARINA_BOXES = group(
     }),
   ),
   style(
-    new RectPrimitive(
+    new Rect(
       BOX_ORIGIN.add(BOX_STRIDE.scale(2)).add(BOX_MARGIN),
       new Direction(150, 150).add(BOX_MARGIN.scale(-2)),
     ),

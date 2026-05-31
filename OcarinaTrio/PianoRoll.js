@@ -8,7 +8,7 @@ import { Point } from "../sketchlib/pga2d/Point.js";
 import { Mask } from "../sketchlib/primitives/ClipMask.js";
 import { ClipPrimitive } from "../sketchlib/primitives/ClipPrimitive.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
-import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
+import { Rect } from "../sketchlib/primitives/Rect.js";
 import { Transform } from "../sketchlib/primitives/Transform.js";
 import { Style } from "../sketchlib/Style.js";
 
@@ -38,7 +38,7 @@ export class PianoRoll {
       const x = (pitch - min_pitch) * column_width;
       const y = interval.start_time.real * velocity;
       const height = interval.duration.real * velocity;
-      const rect = new RectPrimitive(
+      const rect = new Rect(
         new Point(x, y),
         new Direction(column_width, height),
       );
@@ -54,10 +54,7 @@ export class PianoRoll {
 
     this.primitive = new ClipPrimitive(
       new Mask(
-        new RectPrimitive(
-          new Point(0, this.y),
-          new Direction(WIDTH, HEIGHT - this.y),
-        ),
+        new Rect(new Point(0, this.y), new Direction(WIDTH, HEIGHT - this.y)),
       ),
       this.rects,
     );

@@ -1,7 +1,7 @@
 import { fix_mouse_coords } from "../fix_mouse_coords.js";
 import { prevent_mobile_scroll } from "../prevent_mobile_scroll.js";
 import { MouseInCanvas, MouseInput, MousePressed } from "./MouseInput.js";
-import { SCREEN_RECT } from "../Rectangle.js";
+import { SCREEN_RECT } from "../primitives/Rect.js";
 import { MouseCallbacks } from "./MouseCallbacks.js";
 
 /**

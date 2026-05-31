@@ -4,7 +4,7 @@ import { HEIGHT } from "./dimensions.js";
 import { DirectionInput } from "./DirectionInput.js";
 import { KeyboardDPad } from "./KeyboardDPad.js";
 import { MouseInput } from "./input/MouseInput.js";
-import { Rectangle } from "./Rectangle.js";
+import { Rect } from "./primitives/Rect.js";
 import { TouchDPad } from "./input/TouchDPad.js";
 import { Primitive } from "./primitives/Primitive.js";
 
@@ -16,7 +16,7 @@ const DEAD_ZONE_RADIUS = 0.01;
 export class DirectionalPad {
   constructor() {
     this.touch_dpad = new TouchDPad(
-      new Rectangle(DPAD_ORIGIN, DPAD_DIMENSIONS),
+      new Rect(DPAD_ORIGIN, DPAD_DIMENSIONS),
       DEAD_ZONE_RADIUS,
     );
     this.keyboard_dpad = new KeyboardDPad("both");

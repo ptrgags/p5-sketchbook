@@ -1,7 +1,7 @@
 import { Direction } from "../../sketchlib/pga2d/Direction.js";
 import { Point } from "../../sketchlib/pga2d/Point.js";
 import { Ease } from "../../sketchlib/Ease.js";
-import { RectPrimitive } from "../../sketchlib/primitives/RectPrimitive.js";
+import { Rect } from "../../sketchlib/primitives/Rect.js";
 import { group } from "../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Animated } from "../../sketchlib/animation/Animated.js";
@@ -67,11 +67,11 @@ class TrafficLane {
     PHASES.forEach((phase, i) => {
       const dx = CURVE_POSITION.value(phase);
       const offset = center_offset.add(Direction.DIR_X.scale(dx));
-      this.platform_tops[i] = new RectPrimitive(
+      this.platform_tops[i] = new Rect(
         Point.ORIGIN.add(offset),
         DIMS_PLATFORM_TOP,
       );
-      this.platform_shadows[i] = new RectPrimitive(
+      this.platform_shadows[i] = new Rect(
         SHADOW_ORIGIN.add(offset),
         DIMS_PLATFORM_SHADOW,
       );

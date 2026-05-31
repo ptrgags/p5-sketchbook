@@ -1,10 +1,8 @@
-import { Point } from "../pga2d/Point.js";
 import { Color } from "../Color.js";
 import { GroupPrimitive } from "../primitives/GroupPrimitive.js";
-import { RectPrimitive } from "../primitives/RectPrimitive.js";
 import { style } from "../primitives/shorthand.js";
 import { Style } from "../Style.js";
-import { Rectangle } from "../Rectangle.js";
+import { Rect } from "../primitives/Rect.js";
 import { ButtonState, TouchButton } from "./TouchButton.js";
 import { MouseCallbacks } from "./MouseCallbacks.js";
 
@@ -32,7 +30,7 @@ function toggle(state) {
 export class ToggleButton {
   /**
    * Constructor
-   * @param {Rectangle} rect The boundary rectangle
+   * @param {Rect} rect The boundary rectangle
    * @param {ToggleState} initial_value The initial state of the toggle
    */
   constructor(rect, initial_value) {
@@ -65,7 +63,7 @@ export class ToggleButton {
    * @returns {GroupPrimitive}
    */
   debug_render() {
-    const rect = new RectPrimitive(this.rect.position, this.rect.dimensions);
+    const rect = new Rect(this.rect.position, this.rect.dimensions);
 
     const button_style =
       this.toggle_state === ToggleState.STATE_A

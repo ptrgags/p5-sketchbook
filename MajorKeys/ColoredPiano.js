@@ -1,9 +1,8 @@
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { Primitive } from "../sketchlib/primitives/Primitive.js";
-import { RectPrimitive } from "../sketchlib/primitives/RectPrimitive.js";
+import { Rect } from "../sketchlib/primitives/Rect.js";
 import { style } from "../sketchlib/primitives/shorthand.js";
-import { Rectangle } from "../sketchlib/Rectangle.js";
 import { Style } from "../sketchlib/Style.js";
 
 // the larger keys (usually white)
@@ -12,8 +11,8 @@ const NUM_SMALL_KEYS = 5;
 
 /**
  *
- * @param {Rectangle} bounds The bounding box
- * @returns {RectPrimitive[]} An array of 7 rectangle primitives
+ * @param {Rect} bounds The bounding box
+ * @returns {Rect[]} An array of 7 rectangle primitives
  */
 function make_big_keys(bounds) {
   const { x: width, y: height } = bounds.dimensions;
@@ -22,15 +21,15 @@ function make_big_keys(bounds) {
   const result = new Array(NUM_BIG_KEYS);
   for (let i = 0; i < NUM_BIG_KEYS; i++) {
     const offset = Direction.DIR_X.scale(i * key_dimensions.x);
-    result[i] = new RectPrimitive(bounds.position.add(offset), key_dimensions);
+    result[i] = new Rect(bounds.position.add(offset), key_dimensions);
   }
   return result;
 }
 
 /**
  *
- * @param {Rectangle} bounds
- * @returns {RectPrimitive[]} An array of 5 thin rectangles within the bounding box
+ * @param {Rect} bounds
+ * @returns {Rect[]} An array of 5 thin rectangles within the bounding box
  */
 function make_small_keys(bounds) {
   const KEY_PROPORTION = new Direction(1 / 14, 9 / 16);
@@ -42,7 +41,7 @@ function make_small_keys(bounds) {
   const key_offsets = [3, 7, 15, 19, 23];
   return key_offsets.map((i) => {
     const offset = Direction.DIR_X.scale(i * half_key_width);
-    return new RectPrimitive(bounds.position.add(offset), key_dimensions);
+    return new Rect(bounds.position.add(offset), key_dimensions);
   });
 }
 
@@ -56,7 +55,7 @@ const RENDER_ORDER = [0, 2, 4, 5, 7, 9, 11, 1, 3, 6, 8, 10];
 export class ColoredPiano {
   /**
    *
-   * @param {Rectangle} bounds
+   * @param {Rect} bounds
    * @param {Style[]} styles Styles for each key in keyboard order
    */
   constructor(bounds, styles) {

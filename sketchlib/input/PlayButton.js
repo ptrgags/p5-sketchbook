@@ -4,7 +4,7 @@ import { HEIGHT, WIDTH } from "../dimensions.js";
 import { PolygonPrimitive } from "../primitives/PolygonPrimitive.js";
 import { group, style } from "../primitives/shorthand.js";
 import { Style } from "../Style.js";
-import { SCREEN_RECT } from "../Rectangle.js";
+import { SCREEN_RECT } from "../primitives/Rect.js";
 import { TouchButton } from "./TouchButton.js";
 import { MouseCallbacks } from "./MouseCallbacks.js";
 import { Animated } from "../animation/Animated.js";

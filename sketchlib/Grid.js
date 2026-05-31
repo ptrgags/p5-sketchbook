@@ -1,7 +1,7 @@
-import { Rectangle } from "./Rectangle.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { CardinalDirection } from "./CardinalDirection.js";
+import { Rect } from "./primitives/Rect.js";
 
 /**
  * Iterate over a 2D range of values, performing an action at each step.
@@ -322,7 +322,7 @@ export class Grid {
   /**
    * Evenly space items of item_size within the bounding rectangle according
    * to the number of rows/columns in this grid.
-   * @param {Rectangle} boundary The bounding rectangle
+   * @param {Rect} boundary The bounding rectangle
    * @param {Direction} item_size The size of each item as a Direction
    * @param {Direction} margin How much space to leave around the x or y direction (note that this will be doubled). Any remaining space will be used as padding
    * @return {[Point, Direction]} [offset, stride] The computed offset and stride

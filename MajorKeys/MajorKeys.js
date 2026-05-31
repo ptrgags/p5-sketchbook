@@ -18,11 +18,11 @@ import {
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
+import { Rect } from "../sketchlib/primitives/Rect.js";
 import { group, xform } from "../sketchlib/primitives/shorthand.js";
 import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
 import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
 import { Transform } from "../sketchlib/primitives/Transform.js";
-import { Rectangle } from "../sketchlib/Rectangle.js";
 import { Style } from "../sketchlib/Style.js";
 import { ColoredPiano } from "./ColoredPiano.js";
 
@@ -120,7 +120,7 @@ griderator(6, 2, (row, col) => {
     STRIDE.mul_components(new Direction(col, row)),
   ).add(OFFSET_MARGIN);
 
-  const rect = new Rectangle(KEYBOARD_ORIGIN, KEYBOARD_DIMS);
+  const rect = new Rect(KEYBOARD_ORIGIN, KEYBOARD_DIMS);
 
   const piano = new ColoredPiano(rect, transposed_styles);
 
