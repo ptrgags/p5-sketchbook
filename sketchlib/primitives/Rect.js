@@ -63,6 +63,18 @@ export class Rect {
   }
 
   /**
+   *
+   * @param {Rect} other
+   * @returns {boolean}
+   */
+  equals(other) {
+    return (
+      this.position.equals(other.position) &&
+      this.dimensions.equals(other.dimensions)
+    );
+  }
+
+  /**
    * Draw a rectangle to the screen
    * @param {import("p5")} p p5.js library
    */

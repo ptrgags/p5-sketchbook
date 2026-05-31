@@ -3,6 +3,7 @@ import { ArcPrimitive } from "../primitives/ArcPrimitive.js";
 import { Circle } from "../primitives/Circle.js";
 import { LineSegment } from "../primitives/LineSegment.js";
 import { Ray } from "../primitives/Ray.js";
+import { Rect } from "../primitives/Rect.js";
 import { diff_float_property, format_diff } from "./diff_properties.js";
 import { diff_dir, diff_point } from "./pga_matchers.js";
 
@@ -14,6 +15,17 @@ export function diff_circle(diffs, received, expected) {
 
   diff_point(diffs, received.center, expected.center);
   diff_float_property(diffs, received, expected, "radius");
+  return diffs;
+}
+
+export function diff_rect(diffs, received, expected) {
+  if (!(received instanceof Rect)) {
+    diffs.push(`expected Rect, got ${received}`);
+    return diffs;
+  }
+
+  diff_point(diffs, received.position, expected.position);
+  diff_dir(diffs, received, expected);
   return diffs;
 }
 
@@ -75,6 +87,12 @@ export const GEOMETRY_MATCHERS = {
     return {
       pass: received.equals(expected),
       message: () => format_diff(diff_circle([], received, expected)),
+    };
+  },
+  toBeRect(received, expected) {
+    return {
+      pass: received.equals(expected),
+      message: () => format_diff(diff_rect([], received, expected)),
     };
   },
   toBeLineSegment(received, expected) {
