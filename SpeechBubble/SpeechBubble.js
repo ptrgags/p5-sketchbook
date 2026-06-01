@@ -64,6 +64,7 @@ const BUBBLE2 = style(
     Rect.from_center(new Point(250, 400), new Direction(150, 50)),
     new Direction(50, 50),
     new Point(100, 550),
+    8,
   ),
   STYLE_OUTLINE,
 );

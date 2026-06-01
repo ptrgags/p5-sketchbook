@@ -1,10 +1,19 @@
+import { Color } from "../Color.js";
 import { Direction } from "../pga2d/Direction.js";
 import { Point } from "../pga2d/Point.js";
+import { Style } from "../Style.js";
 import { Circle } from "./Circle.js";
 import { Ellipse } from "./Ellipse.js";
 import { PolygonPrimitive } from "./PolygonPrimitive.js";
 import { Rect } from "./Rect.js";
-import { group } from "./shorthand.js";
+import { group, style } from "./shorthand.js";
+
+const STYLE_OUTER = new Style({
+  fill: Color.BLACK,
+});
+const STYLE_INNER = new Style({
+  fill: Color.WHITE,
+});
 
 /**
  *
@@ -53,26 +62,65 @@ export class SpeechBubblePrimitive {
   /**
    * Constructor
    * @param {Rect} content_bounds Bounds for the content inside the speech bubble
-   * @param {Direction} margin How far the bubble extends past the content bounds in the x and y direction
-   * @param {Point} tip Tip of the tail of the speech bubble
+   * @param {Direction} margin How far the (inner) bubble extends past the content bounds in the x and y direction.
+   * @param {Point} inner_tip Tip of the (inner) tail of the speech bubble
+   * @param {number} outline_thickness Approximate thickness of the outline in pixels
    * @param {number} [tail_thickness=0.5] scale factor (usuaully in [0, 1]) to adjust the thickness where the tail meets a circle inside the speech bubble
    */
-  constructor(content_bounds, margin, tip, tail_thickness = 0.5) {
+  constructor(
+    content_bounds,
+    margin,
+    inner_tip,
+    outline_thickness,
+    tail_thickness = 0.5,
+  ) {
     const center = content_bounds.center;
 
-    const radii = content_bounds.dimensions.scale(0.5).add(margin);
-
-    const bubble = new Ellipse(center, radii);
-
-    // To compute the tail, look at
-    const tail_circle = new Circle(
-      center,
-      tail_thickness * Math.min(radii.x, radii.y),
+    const inner_radii = content_bounds.dimensions.scale(0.5).add(margin);
+    const outer_radii = inner_radii.add(
+      new Direction(outline_thickness, outline_thickness),
     );
-    const [tangent1, tangent2] = tangent_points(tail_circle, tip);
-    const tail = new PolygonPrimitive([tip, tangent1, tangent2], true);
 
-    this.primitive = group(bubble, tail);
+    const to_tip = inner_tip.sub(center);
+    const tail_length = to_tip.mag();
+    const outer_tip = center.add(
+      to_tip.set_length(tail_length + 4 * outline_thickness),
+    );
+
+    const outer_bubble = new Ellipse(center, outer_radii);
+    const inner_bubble = new Ellipse(center, inner_radii);
+
+    const inner_min_r = Math.min(inner_radii.x, inner_radii.y);
+    const outer_min_r = Math.min(outer_radii.x, outer_radii.y);
+
+    const inner_tail_circle = new Circle(center, tail_thickness * inner_min_r);
+    const outer_tail_circle = new Circle(center, tail_thickness * outer_min_r);
+
+    const [inner_tangent1, inner_tangent2] = tangent_points(
+      inner_tail_circle,
+      inner_tip,
+    );
+    const [outer_tangent1, outer_tangent2] = tangent_points(
+      outer_tail_circle,
+      outer_tip,
+    );
+
+    const inner_tail = new PolygonPrimitive(
+      [inner_tip, inner_tangent1, inner_tangent2],
+      true,
+    );
+    const outer_tail = new PolygonPrimitive(
+      [outer_tip, outer_tangent1, outer_tangent2],
+      true,
+    );
+
+    this.inner_primitiive = group(inner_bubble, inner_tail);
+    this.outer_primitiive = group(outer_bubble, outer_tail);
+
+    this.primitive = group(
+      style(this.outer_primitiive, STYLE_OUTER),
+      style(this.inner_primitiive, STYLE_INNER),
+    );
   }
 
   /**
