@@ -1,6 +1,11 @@
 // Links for all of the sketches. Links are added to the page in this order
 export const LINKS = [
   {
+    title: "Speech Bubble",
+    is_lab: true,
+    year: "2026-05",
+  },
+  {
     title: "Guitar Harmonics",
     year: "2026-05",
   },
