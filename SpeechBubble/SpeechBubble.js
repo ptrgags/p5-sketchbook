@@ -1,73 +1,34 @@
 import { Color } from "../sketchlib/Color.js";
-import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
+import { WIDTH, HEIGHT, SCREEN_CENTER } from "../sketchlib/dimensions.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
-import { Ellipse } from "../sketchlib/primitives/Ellipse.js";
-import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
 import { Rect } from "../sketchlib/primitives/Rect.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { SpeechBubblePrimitive } from "../sketchlib/primitives/SpeechBubblePrimitive.js";
 import { Style } from "../sketchlib/Style.js";
 
-const BOUNDING_BOX = new Rect(new Point(100, 100), new Direction(200, 200));
-const BUBBLE_RADII = BOUNDING_BOX.dimensions.mul_components(
-  new Direction(0.5, 3 / 8),
+const BUBBLE = new SpeechBubblePrimitive(
+  Rect.from_center(SCREEN_CENTER, new Direction(150, 50)),
+  new Direction(50, 50),
+  new Point(150, 450),
+  8,
 );
-const BUBBLE_CENTER = BOUNDING_BOX.position.add(BUBBLE_RADII);
 
-const STYLE_BOUNDS = new Style({
-  stroke: Color.RED,
-});
-const STYLE_OUTLINE = new Style({
-  fill: Color.BLACK,
-});
-const STYLE_INTERIOR = new Style({
-  fill: Color.WHITE,
-});
-
-const BUBBLE_OUTER = new Ellipse(BUBBLE_CENTER, BUBBLE_RADII);
-const BUBBLE_INNER = new Ellipse(BUBBLE_CENTER, BUBBLE_RADII.scale(0.95));
-
-// TODO: compute this relative to the bounding box
-const TAIL_OUTER = new PolygonPrimitive(
-  [new Point(100, 300), new Point(200, 150), new Point(150, 150)],
-  true,
-);
-const TAIL_INNER = new PolygonPrimitive(
-  [
-    new Point(100 + 10, 300 - 20),
-    new Point(200 - 5, 150 - 5),
-    new Point(150 + 5, 150 + 5),
-  ],
-  true,
-);
+const STRIDE = Direction.DIR_X.scale(50);
 
 const ELLIPSIS_RADIUS = 10;
 const ELLIPSIS = group(
-  new Circle(new Point(150, 175), ELLIPSIS_RADIUS),
-  new Circle(new Point(200, 175), ELLIPSIS_RADIUS),
-  new Circle(new Point(250, 175), ELLIPSIS_RADIUS),
+  new Circle(SCREEN_CENTER.add(STRIDE.neg()), ELLIPSIS_RADIUS),
+  new Circle(SCREEN_CENTER, ELLIPSIS_RADIUS),
+  new Circle(SCREEN_CENTER.add(STRIDE), ELLIPSIS_RADIUS),
 );
 
-const SPEECH_BUBBLE = group(
-  style(BOUNDING_BOX, STYLE_BOUNDS),
-  style(BUBBLE_OUTER, STYLE_OUTLINE),
-  style(TAIL_OUTER, STYLE_OUTLINE),
-  style(BUBBLE_INNER, STYLE_INTERIOR),
-  style(TAIL_INNER, STYLE_INTERIOR),
-  style(ELLIPSIS, STYLE_OUTLINE),
-);
+const STYLE_ELLIPSIS = new Style({
+  fill: Color.BLACK,
+});
 
-const BUBBLE2 = style(
-  new SpeechBubblePrimitive(
-    Rect.from_center(new Point(250, 400), new Direction(150, 50)),
-    new Direction(50, 50),
-    new Point(100, 550),
-    8,
-  ),
-  STYLE_OUTLINE,
-);
+const SCENE = group(BUBBLE, style(ELLIPSIS, STYLE_ELLIPSIS));
 
 // @ts-ignore
 export const sketch = (p) => {
@@ -83,8 +44,6 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(128);
 
-    SPEECH_BUBBLE.draw(p);
-
-    BUBBLE2.draw(p);
+    SCENE.draw(p);
   };
 };
