@@ -61,10 +61,9 @@ const SPEECH_BUBBLE = group(
 
 const BUBBLE2 = style(
   new SpeechBubblePrimitive(
-    Rect.from_center(new Point(250, 400), new Direction(100, 50)),
+    Rect.from_center(new Point(250, 400), new Direction(150, 50)),
     new Direction(50, 50),
-    new Point(100, 450),
-    Math.PI / 16,
+    new Point(100, 550),
   ),
   STYLE_OUTLINE,
 );

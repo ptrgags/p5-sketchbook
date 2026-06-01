@@ -1,35 +1,52 @@
-import { is_nearly } from "../is_nearly.js";
 import { Direction } from "../pga2d/Direction.js";
 import { Point } from "../pga2d/Point.js";
-import { Motor } from "../pga2d/versors.js";
+import { Circle } from "./Circle.js";
 import { Ellipse } from "./Ellipse.js";
 import { PolygonPrimitive } from "./PolygonPrimitive.js";
 import { Rect } from "./Rect.js";
 import { group } from "./shorthand.js";
 
 /**
- * When computing points for the tail triangle, we have pairs of intersections,
- * one with the horizontal center line, and one with the vertical center line.
  *
- * This selects the correct one
- * @param {Direction | Point} h_isx
- * @param {Direction | Point} v_isx
- * @param {Point} tip
- * @returns {Point} The point to use in the polygon
+ * @param {Circle} circle
+ * @param {Point} point
+ * @return {[Point, Point]}
  */
-function closer_to_tip(h_isx, v_isx, tip) {
-  if (h_isx instanceof Point && v_isx instanceof Point) {
-    const dist_h = h_isx.dist_sqr(tip);
-    const dist_v = v_isx.dist_sqr(tip);
+function tangent_points(circle, point) {
+  const to_point = point.sub(circle.center);
 
-    return dist_h < dist_v ? h_isx : v_isx;
-  } else if (h_isx instanceof Point) {
-    return h_isx;
-  } else if (v_isx instanceof Point) {
-    return v_isx;
-  }
+  // d = |point - center|
+  const dist = to_point.mag();
 
-  throw new Error("no valid intersection point");
+  // Since the radius of the circle (r) and the tangent segment (t)
+  // make a right anglee the area of the kite equals the product of those
+  // two lengths
+  // A = r * t
+  //
+  // But you could also compute the area as the sum of two triangular halves
+  // with the distance to the point (d) as the base and the perpendicular
+  // distance (b) as the height.
+  //
+  // A = 2 * (1/2 b * d) = b * d
+  //
+  // so r * t = b * d
+  //    r * t / d = b
+  //
+  // in the end we'll only need this for a ratio, so sqrt
+  const tangental_dist = Math.sqrt(dist * dist - circle.radius * circle.radius);
+  const perp_dist = (circle.radius * tangental_dist) / dist;
+  const parallel_dist = Math.sqrt(
+    circle.radius * circle.radius - perp_dist * perp_dist,
+  );
+
+  const dir_to_point = to_point.normalize();
+  const dir_perp = dir_to_point.rot90();
+  const parallel = dir_to_point.scale(parallel_dist);
+  const perp = dir_perp.scale(perp_dist);
+  const tangent1 = circle.center.add(parallel).add(perp);
+  const tangent2 = circle.center.add(parallel).add(perp.neg());
+
+  return [tangent1, tangent2];
 }
 
 export class SpeechBubblePrimitive {
@@ -38,38 +55,30 @@ export class SpeechBubblePrimitive {
    * @param {Rect} content_bounds Bounds for the content inside the speech bubble
    * @param {Direction} margin How far the bubble extends past the content bounds in the x and y direction
    * @param {Point} tip Tip of the tail of the speech bubble
-   * @param {number} tail_angle How wide the speech bubble opens in radians
+   * @param {number} [tail_thickness=0.5] scale factor (usuaully in [0, 1]) to adjust the thickness where the tail meets a circle inside the speech bubble
    */
-  constructor(content_bounds, margin, tip, tail_angle) {
+  constructor(content_bounds, margin, tip, tail_thickness = 0.5) {
     const center = content_bounds.center;
-    const horizontal = center.join(Direction.DIR_X);
-    const vertical = center.join(Direction.DIR_Y);
-    const tail_line = center.join(tip);
 
-    const rotate = Motor.rotation(tip, tail_angle);
-    const rotate_inv = rotate.reverse();
+    const radii = content_bounds.dimensions.scale(0.5).add(margin);
 
-    const tail_line_left = rotate.transform_line(tail_line);
-    const tail_line_right = rotate_inv.transform_line(tail_line);
+    const bubble = new Ellipse(center, radii);
 
-    const left_h = tail_line_left.meet(horizontal);
-    const left_v = tail_line_left.meet(vertical);
-    const point_left = closer_to_tip(left_h, left_v, tip);
-
-    const right_h = tail_line_right.meet(horizontal);
-    const right_v = tail_line_right.meet(vertical);
-    const point_right = closer_to_tip(right_h, right_v, tip);
-
-    const bubble = new Ellipse(
+    // To compute the tail, look at
+    const tail_circle = new Circle(
       center,
-      content_bounds.dimensions.scale(0.5).add(margin),
+      tail_thickness * Math.min(radii.x, radii.y),
     );
-
-    const tail = new PolygonPrimitive([tip, point_right, point_left], true);
+    const [tangent1, tangent2] = tangent_points(tail_circle, tip);
+    const tail = new PolygonPrimitive([tip, tangent1, tangent2], true);
 
     this.primitive = group(bubble, tail);
   }
 
+  /**
+   *
+   * @param {import("p5")} p
+   */
   draw(p) {
     this.primitive.draw(p);
   }
