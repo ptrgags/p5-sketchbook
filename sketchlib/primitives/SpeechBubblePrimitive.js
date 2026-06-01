@@ -7,6 +7,7 @@ import { Ellipse } from "./Ellipse.js";
 import { PolygonPrimitive } from "./PolygonPrimitive.js";
 import { Rect } from "./Rect.js";
 import { group, style } from "./shorthand.js";
+import { SimpleGroupPrimitive } from "./SimpleGroupPrimitive.js";
 
 const STYLE_OUTER = new Style({
   fill: Color.BLACK,
@@ -58,6 +59,23 @@ function tangent_points(circle, point) {
   return [tangent1, tangent2];
 }
 
+/**
+ * Make an ellipse and a triangle for one of the layers of the speech bubble
+ * @param {Point} center
+ * @param {Direction} radii
+ * @param {Point} tip
+ * @param {number} tail_thickness
+ * @returns {SimpleGroupPrimitive}
+ */
+function make_bubble(center, radii, tip, tail_thickness) {
+  const bubble = new Ellipse(center, radii);
+  const min_r = Math.min(radii.x, radii.y);
+  const tail_circle = new Circle(center, tail_thickness * min_r);
+  const [tangent1, tangent2] = tangent_points(tail_circle, tip);
+  const tail = new PolygonPrimitive([tip, tangent1, tangent2], true);
+  return group(bubble, tail);
+}
+
 export class SpeechBubblePrimitive {
   /**
    * Constructor
@@ -87,35 +105,18 @@ export class SpeechBubblePrimitive {
       to_tip.set_length(tail_length + 4 * outline_thickness),
     );
 
-    const outer_bubble = new Ellipse(center, outer_radii);
-    const inner_bubble = new Ellipse(center, inner_radii);
-
-    const inner_min_r = Math.min(inner_radii.x, inner_radii.y);
-    const outer_min_r = Math.min(outer_radii.x, outer_radii.y);
-
-    const inner_tail_circle = new Circle(center, tail_thickness * inner_min_r);
-    const outer_tail_circle = new Circle(center, tail_thickness * outer_min_r);
-
-    const [inner_tangent1, inner_tangent2] = tangent_points(
-      inner_tail_circle,
+    this.inner_primitiive = make_bubble(
+      center,
+      inner_radii,
       inner_tip,
+      tail_thickness,
     );
-    const [outer_tangent1, outer_tangent2] = tangent_points(
-      outer_tail_circle,
+    this.outer_primitiive = make_bubble(
+      center,
+      outer_radii,
       outer_tip,
+      tail_thickness,
     );
-
-    const inner_tail = new PolygonPrimitive(
-      [inner_tip, inner_tangent1, inner_tangent2],
-      true,
-    );
-    const outer_tail = new PolygonPrimitive(
-      [outer_tip, outer_tangent1, outer_tangent2],
-      true,
-    );
-
-    this.inner_primitiive = group(inner_bubble, inner_tail);
-    this.outer_primitiive = group(outer_bubble, outer_tail);
 
     this.primitive = group(
       style(this.outer_primitiive, STYLE_OUTER),
