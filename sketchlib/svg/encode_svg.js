@@ -1,4 +1,4 @@
-import { ToSVG } from "./primitives/ToSVG.js";
+import { ToSVG } from "./ToSVG.js";
 
 /**
  * Encode an object as an SVG tag
