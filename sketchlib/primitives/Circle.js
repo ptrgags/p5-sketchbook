@@ -30,7 +30,7 @@ export class Circle {
   to_svg() {
     const { x, y } = this.center;
 
-    return svg_tag("ellipse", {
+    return svg_tag("circle", {
       cx: x.toString(),
       cy: y.toString(),
       r: this.radius.toString(),

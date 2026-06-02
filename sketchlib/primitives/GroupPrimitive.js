@@ -10,6 +10,25 @@ import { TextStyle } from "./TextStyle.js";
 import { Transform } from "./Transform.js";
 
 /**
+ * Apply a Style as SVG attributes
+ * @param {{[key: string]: string}} attributes
+ * @param {Style} style
+ */
+function apply_svg_style(attributes, style) {
+  if (style.stroke) {
+    attributes.stroke = style.stroke.to_hex_code();
+  }
+
+  if (style.fill) {
+    attributes.fill = style.fill.to_hex_code();
+  }
+
+  if (style.stroke_width) {
+    attributes["stroke-width"] = style.stroke_width.toString();
+  }
+}
+
+/**
  * @typedef {{
  *  style?: Style,
  *  text_style?: TextStyle,
@@ -26,7 +45,7 @@ import { Transform } from "./Transform.js";
  * be applied.
  * @implements {Primitive}
  * @implements {PrimitiveCollectionStats}
- * //@implements {ToSVG}
+ * @implements {ToSVG}
  */
 export class GroupPrimitive {
   /**
@@ -113,8 +132,10 @@ export class GroupPrimitive {
     return stats;
   }
 
-  /*
   to_svg() {
+    /**
+     * @type {{[key: string]: string}}
+     */
     const attributes = {};
 
     if (this.style) {
@@ -125,17 +146,22 @@ export class GroupPrimitive {
       throw new Error("not yet implemented: SVG transformations");
     }
 
-    if (this.text_style)
+    if (this.text_style) {
+      throw new Error("not yet implemented: SVG text style");
+    }
 
     const g = svg_tag("g", attributes);
 
     for (const child of this.primitives) {
-        if (!ToSVG.is_svg_compatible(child)) {
-            
-        }
+      if (!ToSVG.is_svg_compatible(child)) {
+        console.warn("SVG export: skipping child", child);
+        continue;
+      }
+
+      const child_svg = child.to_svg();
+      g.appendChild(child_svg);
     }
 
     return g;
   }
-    */
 }

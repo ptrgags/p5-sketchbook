@@ -17,6 +17,6 @@ export class ToSVG {
    * @returns {x is ToSVG}
    */
   static is_svg_compatible(x) {
-    return x.hasOwnProperty("to_svg");
+    return x.to_svg !== undefined;
   }
 }
