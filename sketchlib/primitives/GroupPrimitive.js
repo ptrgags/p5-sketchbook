@@ -3,6 +3,8 @@ import {
   RenderStats,
 } from "../perf/PrimitiveCollectionStats.js";
 import { Style } from "../Style.js";
+import { svg_tag } from "../svg/svg_tag.js";
+import { ToSVG } from "../svg/ToSVG.js";
 import { Primitive } from "./Primitive.js";
 import { TextStyle } from "./TextStyle.js";
 import { Transform } from "./Transform.js";
@@ -24,6 +26,7 @@ import { Transform } from "./Transform.js";
  * be applied.
  * @implements {Primitive}
  * @implements {PrimitiveCollectionStats}
+ * //@implements {ToSVG}
  */
 export class GroupPrimitive {
   /**
@@ -109,4 +112,30 @@ export class GroupPrimitive {
 
     return stats;
   }
+
+  /*
+  to_svg() {
+    const attributes = {};
+
+    if (this.style) {
+      apply_svg_style(attributes, this.style);
+    }
+
+    if (this.transform) {
+      throw new Error("not yet implemented: SVG transformations");
+    }
+
+    if (this.text_style)
+
+    const g = svg_tag("g", attributes);
+
+    for (const child of this.primitives) {
+        if (!ToSVG.is_svg_compatible(child)) {
+            
+        }
+    }
+
+    return g;
+  }
+    */
 }

@@ -54,6 +54,7 @@ export class SimpleGroupPrimitive {
     const g = svg_tag("g", {});
     for (const child of this.children) {
       if (!ToSVG.is_svg_compatible(child)) {
+        console.warn("SVG export: skipping child", child);
         continue;
       }
 
