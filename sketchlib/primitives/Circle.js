@@ -1,5 +1,6 @@
 import { is_nearly } from "../is_nearly.js";
 import { Point } from "../pga2d/Point.js";
+import { svg_tag } from "../svg/svg_tag.js";
 import { Primitive } from "./Primitive.js";
 
 /**
@@ -24,6 +25,16 @@ export class Circle {
   draw(p) {
     const { x, y } = this.center;
     p.circle(x, y, 2 * this.radius);
+  }
+
+  to_svg() {
+    const { x, y } = this.center;
+
+    return svg_tag("ellipse", {
+      cx: x.toString(),
+      cy: y.toString(),
+      r: this.radius.toString(),
+    });
   }
 
   /**
