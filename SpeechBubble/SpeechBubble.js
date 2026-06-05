@@ -73,26 +73,29 @@ const SCENE = group(BUBBLE_SCREEN, style(ELLIPSIS_SCREEN, STYLE_ELLIPSIS));
 
 const STYLE_OUTLINE = new Style({ fill: Color.BLACK });
 const STYLE_INTERIOR = new Style({ fill: Color.WHITE });
-const SVG_SCENE = group(
-  style(BUBBLE_PRINT.outer_primitiive, STYLE_OUTLINE),
-  style(BUBBLE_PRINT.inner_primitiive, STYLE_INTERIOR),
-  style(ELLIPSIS_PRINT, STYLE_ELLIPSIS),
-);
-
-const SVG_VIEWPORT = Rect.from_center(
-  Point.ORIGIN,
-  new Direction(MAX_WIDTH, MAX_WIDTH),
-);
+const SVG_OUTLINE = style(BUBBLE_PRINT.outer_primitiive, STYLE_OUTLINE);
+const SVG_INTERIOR = style(BUBBLE_PRINT.inner_primitiive, STYLE_INTERIOR);
+const SVG_ELLIPSIS = style(ELLIPSIS_PRINT, STYLE_ELLIPSIS);
 
 const SLASH = new KeywordRecognizer();
 // export SVG version of ellipse
 SLASH.register(["Slash", "KeyS", "KeyV", "KeyG"], () => {
-  const svg_file = encode_svg_file(
-    SVG_SCENE,
-    SVG_VIEWPORT,
-    "speech-bubble.svg",
+  const outline_file = encode_svg_file(
+    SVG_OUTLINE,
+    "speech-bubble-outline.svg",
   );
-  download_file(svg_file);
+  const interior_file = encode_svg_file(
+    SVG_INTERIOR,
+    "speech-bubble-interior.svg",
+  );
+  const ellipsis_file = encode_svg_file(
+    SVG_ELLIPSIS,
+    "speech-bubble-ellipsis.svg",
+  );
+
+  download_file(outline_file);
+  download_file(interior_file);
+  download_file(ellipsis_file);
 });
 
 // @ts-ignore
