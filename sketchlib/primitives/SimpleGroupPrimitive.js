@@ -2,6 +2,8 @@ import {
   PrimitiveCollectionStats,
   RenderStats,
 } from "../perf/PrimitiveCollectionStats.js";
+import { svg_tag } from "../svg/svg_tag.js";
+import { ToSVG } from "../svg/ToSVG.js";
 import { Primitive } from "./Primitive.js";
 
 /**
@@ -9,6 +11,7 @@ import { Primitive } from "./Primitive.js";
  * This is rendered as simply as possible
  * @implements {Primitive}
  * @implements {PrimitiveCollectionStats}
+ * @implements {ToSVG}
  */
 export class SimpleGroupPrimitive {
   /**
@@ -41,6 +44,24 @@ export class SimpleGroupPrimitive {
     for (const child of this.children) {
       child.draw(p);
     }
+  }
+
+  /**
+   *
+   * @returns {SVGElement}
+   */
+  to_svg() {
+    const g = svg_tag("g", {});
+    for (const child of this.children) {
+      if (!ToSVG.is_svg_compatible(child)) {
+        console.warn("SVG export: skipping child", child);
+        continue;
+      }
+
+      const child_svg = child.to_svg();
+      g.appendChild(child_svg);
+    }
+    return g;
   }
 
   /**

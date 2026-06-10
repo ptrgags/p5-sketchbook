@@ -1,4 +1,5 @@
 import { Point } from "../../sketchlib/pga2d/Point.js";
+import { svg_tag } from "../svg/svg_tag.js";
 import { Primitive } from "./Primitive.js";
 
 /**
@@ -35,5 +36,14 @@ export class PolygonPrimitive {
     } else {
       p.endShape();
     }
+  }
+
+  to_svg() {
+    const tag_name = this.closed ? "polygon" : "polyline";
+    const points = this.vertices
+      .map((vertex) => `${vertex.x},${vertex.y}`)
+      .join(" ");
+
+    return svg_tag(tag_name, { points });
   }
 }
