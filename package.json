@@ -12,6 +12,6 @@
   "devDependencies": {
     "p5": "^2.0.2",
     "tone": "^15.2.6",
-    "vitest": "^3.1.4"
+    "vitest": "^4.1.8"
   }
 }
