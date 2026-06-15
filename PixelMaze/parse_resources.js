@@ -1,5 +1,5 @@
 import { Direction } from "../sketchlib/pga2d/Direction.js";
-import { ImageFrames } from "./ImageFrames.js";
+import { ImageFrames } from "../sketchlib/pixel/ImageFrames.js";
 import { Sprite } from "./Sprite.js";
 
 function parse_image_frames(p5_images, manifest, image_frames) {

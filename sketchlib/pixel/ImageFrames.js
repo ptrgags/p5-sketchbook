@@ -1,4 +1,4 @@
-import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Direction } from "../pga2d/Direction.js";
 
 /**
  * Class for managing frames of a spritesheet or tile
@@ -37,5 +37,13 @@ export class ImageFrames {
     const x = frame_id % width;
     const y = Math.floor(frame_id / width);
     return new Direction(x * this.frame_size.x, y * this.frame_size.y);
+  }
+
+  /**
+   * Make an ImageFrames object for a single frame
+   * @param {Direction} image_dimensions
+   */
+  static single_frame(image_dimensions) {
+    return new ImageFrames(image_dimensions, image_dimensions);
   }
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { ImageFrames } from "./ImageFrames";
+import { ImageFrames } from "../sketchlib/pixel/ImageFrames";
 import { Grid, Index2D } from "../sketchlib/Grid";
 import { Tilemap } from "./Tilemap.js";
 import { Direction } from "../sketchlib/pga2d/Direction";

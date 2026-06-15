@@ -1,6 +1,6 @@
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { mod } from "../sketchlib/mod.js";
-import { ImageFrames } from "./ImageFrames.js";
+import { ImageFrames } from "../sketchlib/pixel/ImageFrames.js";
 
 /**
  * A contiguous strip of frames from an ImageFrames, used as an animation.

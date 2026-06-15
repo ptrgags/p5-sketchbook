@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { ImageFrames } from "./ImageFrames.js";
-import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Direction } from "../pga2d/Direction.js";
 
 describe("ImageFrames", () => {
   it("Throws for frame size not evenly divisible", () => {
@@ -23,5 +23,11 @@ describe("ImageFrames", () => {
 
     const expected = new Direction(32, 32);
     expect(result).toBePoint(expected);
+  });
+
+  it("single_frame creates a single frame", () => {
+    const result = ImageFrames.single_frame(new Direction(32, 32));
+
+    expect(result.frame_count).toEqual(1);
   });
 });

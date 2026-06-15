@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { ImageFrames } from "./ImageFrames.js";
+import { ImageFrames } from "../sketchlib/pixel/ImageFrames.js";
 import { Sprite } from "./Sprite.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 

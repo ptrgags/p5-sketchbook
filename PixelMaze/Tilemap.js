@@ -1,5 +1,5 @@
 import { Grid } from "../sketchlib/Grid.js";
-import { ImageFrames } from "./ImageFrames.js";
+import { ImageFrames } from "../sketchlib/pixel/ImageFrames.js";
 
 /**
  * A tilemap is just a tuple of image frames (the tileset) and a grid of
@@ -29,7 +29,7 @@ export class Tilemap {
     if (errors.length > 0) {
       const error_messages = errors.join("\n");
       throw new Error(
-        `tilemap has invalid indices (must be in [0, ${max_index})):\n${error_messages}`
+        `tilemap has invalid indices (must be in [0, ${max_index})):\n${error_messages}`,
       );
     }
   }

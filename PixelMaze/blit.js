@@ -1,6 +1,6 @@
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
-import { ImageFrames } from "./ImageFrames.js";
+import { ImageFrames } from "../sketchlib/pixel/ImageFrames.js";
 import { Sprite } from "./Sprite.js";
 import { Tilemap } from "./Tilemap.js";
 

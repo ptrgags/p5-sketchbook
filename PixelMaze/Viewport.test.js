@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { Viewport } from "./Viewport";
 import { Sprite } from "./Sprite";
-import { ImageFrames } from "./ImageFrames";
+import { ImageFrames } from "../sketchlib/pixel/ImageFrames";
 import { Direction } from "../sketchlib/pga2d/Direction";
 import { Point } from "../sketchlib/pga2d/Point";
 
