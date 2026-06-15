@@ -11,6 +11,7 @@ import { Tilemap } from "./Tilemap.js";
 import { Viewport } from "./Viewport.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
+import { ImageLibrary } from "../sketchlib/pixel/ImageLibrary.js";
 
 const TILE_SIZE = 16;
 const TILE_SCALE = 2;
@@ -18,6 +19,17 @@ const TILE_SCALE = 2;
 const MAZE_ROWS = 20;
 const MAZE_COLS = 20;
 const INDICES = make_maze(MAZE_ROWS, MAZE_COLS);
+
+const IMGS = new ImageLibrary({
+  tileset: {
+    url: "./sprites/placeholder-tileset.png",
+    dimensions: new Direction(16, 48),
+  },
+  character: {
+    url: "./sprites/placeholder-character.png",
+    dimensions: new Direction(64, 256),
+  },
+});
 
 const ORIGIN_CHARACTER = new Direction(0, TILE_SIZE);
 const RESOURCE_MANIFEST = {
