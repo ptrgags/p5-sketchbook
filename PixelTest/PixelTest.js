@@ -1,4 +1,5 @@
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { ImageLibrary } from "../sketchlib/pixel/ImageLibrary.js";
 import { group } from "../sketchlib/primitives/shorthand.js";
@@ -10,9 +11,15 @@ const IMGS = new ImageLibrary({
 const SCENE = group();
 
 function init_sprites() {
-  const cube_strip = IMGS.make_image("cube", new Point(10, 10));
+  const TILE_SIZE = new Direction(64, 64);
 
-  SCENE.regroup(cube_strip);
+  const cube_strip = IMGS.make_image("cube", new Point(10, 10));
+  const whole_cube = IMGS.make_sprite("cube", TILE_SIZE, new Point(200, 200));
+
+  const pyramid = IMGS.make_sprite("cube", TILE_SIZE, new Point(200, 300));
+  pyramid.frame_id = 14;
+
+  SCENE.regroup(cube_strip, whole_cube, pyramid);
 }
 
 // @ts-ignore
