@@ -1,7 +1,7 @@
-import { Index2D } from "../Grid.js";
 import { Direction } from "../pga2d/Direction.js";
 import { Point } from "../pga2d/Point.js";
 import { Primitive } from "../primitives/Primitive.js";
+import { ImageFrames } from "./ImageFrames.js";
 
 /**
  * A sprite is an image divided into a grid of equally sized frames, indexed
@@ -21,6 +21,11 @@ export class Sprite {
    */
   constructor(spritesheet, frame_size, position, frame_id = 0) {
     this.spritesheet = spritesheet;
+
+    // @ts-ignore
+    const dimensions = new Direction(spritesheet.width, spritesheet.height);
+    this.frames = new ImageFrames(dimensions, frame_size);
+
     this.frame_size = frame_size;
     this.position = position;
     this.frame_id = frame_id;
@@ -31,31 +36,23 @@ export class Sprite {
    * @param {import("p5")} p
    */
   draw(p) {
-    // @ts-ignore
-    const spritesheet_width = this.spritesheet.width;
-    const cols = spritesheet_width / this.frame_size.x;
-
-    const col = this.frame_id % cols;
-    const row = Math.floor(this.frame_id / cols);
-
-    const src_x = col * this.frame_size.x;
-    const src_y = row * this.frame_size.y;
-    const { x: src_width, y: src_height } = this.frame_size;
-
     const { x: dst_x, y: dst_y } = this.position;
-    const { x: dst_width, y: dst_height } = this.frame_size;
+
+    const { position: src_position, dimensions } = this.frames.get_frame(
+      this.frame_id,
+    );
 
     // @ts-ignore
     p.image(
       this.spritesheet,
       dst_x,
       dst_y,
-      dst_width,
-      dst_height,
-      src_x,
-      src_y,
-      src_width,
-      src_height,
+      dimensions.x,
+      dimensions.y,
+      src_position.x,
+      src_position.y,
+      dimensions.x,
+      dimensions.y,
     );
   }
 }
