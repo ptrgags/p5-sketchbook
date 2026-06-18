@@ -2,60 +2,63 @@ import { Index2D } from "../Grid.js";
 import { Direction } from "../pga2d/Direction.js";
 import { Point } from "../pga2d/Point.js";
 import { Primitive } from "../primitives/Primitive.js";
+import { ImageFrames } from "./ImageFrames.js";
 
 /**
+ * A tilemap lets you copy and paste tiles from a tileset into a buffer.
+ *
+ * When drawn as a Primitive, the whole buffer is drawn to the screen
  * @implements {Primitive}
  */
 export class Tilemap {
   /**
    * Constructor
-   * @param {import("p5")} p
-   * @param {import("p5").Image} tileset
-   * @param {Direction} tile_size
-   * @param {Direction} map_size
-   * @param {Point} [position=Point.ORIGIN]
+   * @param {import("p5")} p p5 instance for allocating resources
+   * @param {import("p5").Image} tileset Image with the tiles
+   * @param {Direction} tile_size How big is each tile
+   * @param {Direction} map_size How many tiles wide/tall is the map?
+   * @param {Point} position Position on the screen to
    */
-  constructor(p, tileset, tile_size, map_size, position = Point.ORIGIN) {
+  constructor(p, tileset, tile_size, map_size, position) {
     this.tileset = tileset;
-    this.tile_size = tile_size;
-    this.tile_counts = new Direction(
-      tileset.width / tile_size.x,
-      tileset.height / tile_size.y,
-    );
 
-    this.map_size = map_size;
+    // @ts-ignore
+    const tileset_dimensions = new Direction(tileset.width, tileset.height);
+    this.tileset_frames = new ImageFrames(tileset_dimensions, tile_size);
+
+    const map_dimensions = tile_size.mul_components(map_size);
+    this.map_frames = new ImageFrames(map_dimensions, tile_size);
+    this.map_gfx = p.createGraphics(map_dimensions.x, map_dimensions.y);
+
     this.position = position;
-
-    const dimensions = tile_size.mul_components(map_size);
-    this.gfx = p.createGraphics(dimensions.x, dimensions.y);
   }
 
   /**
+   * Paste a single tile into the buffer
    *
-   * @param {Index2D} coords
-   * @param {number} tile_index
+   * Notably, this always draws on top of the grid cell, it does not erase
+   * any pixels. This allows for layering tiles without needing a separate
+   * tilemap. Though this requires some care to render in the correct order.
+   * @param {Index2D} coords (row, col) coordinates of the tile
+   * @param {number} tile_index The tile number within the tileset
    */
   blit_tile(coords, tile_index) {
-    const { i, j } = coords;
-    const dst_x = j * this.tile_size.x;
-    const dst_y = i * this.tile_size.y;
+    const dst_frame = this.map_frames.get_frame_2d(coords);
+    const { position: dst_position, dimensions } = dst_frame;
 
-    const row = Math.floor(tile_index / this.tile_counts.x);
-    const col = tile_index % this.tile_counts.x;
+    const src_frame = this.tileset_frames.get_frame(tile_index);
+    const { position: src_position } = src_frame;
 
-    const src_x = col * this.tile_size.x;
-    const src_y = row * this.tile_size.y;
-
-    this.gfx.image(
+    this.map_gfx.image(
       this.tileset,
-      dst_x,
-      dst_y,
-      this.tile_size.x,
-      this.tile_size.y,
-      src_x,
-      src_y,
-      this.tile_size.x,
-      this.tile_size.y,
+      dst_position.x,
+      dst_position.y,
+      dimensions.x,
+      dimensions.y,
+      src_position.x,
+      src_position.y,
+      dimensions.x,
+      dimensions.y,
     );
   }
 
@@ -64,6 +67,6 @@ export class Tilemap {
    * @param {import("p5")} p
    */
   draw(p) {
-    p.image(this.gfx, this.position.x, this.position.y);
+    p.image(this.map_gfx, this.position.x, this.position.y);
   }
 }

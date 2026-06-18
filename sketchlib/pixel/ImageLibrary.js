@@ -69,14 +69,15 @@ export class ImageLibrary {
   }
 
   /**
-   * Shorthand for making a tileset
+   * Shorthand for making a tilemap
    * @param {import("p5")} p
    * @param {string} id
    * @param {Direction} tile_size
    * @param {Direction} map_size
+   * @param {Point} [position=Point.ORIGIN] Where to draw the tilemap
    */
-  make_tileset(p, id, tile_size, map_size) {
+  make_tilemap(p, id, tile_size, map_size, position) {
     const tileset = this.get_p5_image(id);
-    return new Tilemap(p, tileset, tile_size, map_size);
+    return new Tilemap(p, tileset, tile_size, map_size, position);
   }
 }

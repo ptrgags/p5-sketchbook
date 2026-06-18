@@ -29,7 +29,7 @@ let animated;
  * @param {import("p5")} p
  */
 function init_sprites(p) {
-  const iso_tiles = IMGS.make_tileset(
+  const iso_tiles = IMGS.make_tilemap(
     p,
     "iso",
     ISO_TILE_SIZE,
