@@ -23,14 +23,31 @@ function init_sprites(p) {
     ISO_TILE_SIZE,
     new Direction(4, 8),
   );
-  iso_tiles.position = new Point(0, 250);
+  iso_tiles.position = new Point(16, 250);
 
   // For now, let's manually pick out tiles to make a single iso grid
   // square from four triangles
   iso_tiles.set_tile(new Index2D(0, 0), 12);
-  iso_tiles.set_tile(new Index2D(1, 0), 8);
-  iso_tiles.set_tile(new Index2D(0, 1), 1);
-  iso_tiles.set_tile(new Index2D(1, 1), 5);
+  iso_tiles.set_tile(new Index2D(0, 1), 8);
+  iso_tiles.set_tile(new Index2D(1, 0), 17);
+  iso_tiles.set_tile(new Index2D(1, 1), 29);
+  iso_tiles.set_tile(new Index2D(2, 0), 18);
+  iso_tiles.set_tile(new Index2D(2, 1), 27);
+  iso_tiles.set_tile(new Index2D(3, 0), 2);
+  iso_tiles.set_tile(new Index2D(3, 1), 7);
+
+  // now for the edges
+  const EDGE_OFFSET = 32;
+  iso_tiles.set_tile(new Index2D(0, 0), EDGE_OFFSET + 6);
+  iso_tiles.set_tile(new Index2D(0, 1), EDGE_OFFSET + 2);
+  iso_tiles.set_tile(new Index2D(1, 0), EDGE_OFFSET + 3);
+  iso_tiles.set_tile(new Index2D(1, 1), EDGE_OFFSET + 6);
+  iso_tiles.set_tile(new Index2D(1, 2), EDGE_OFFSET + 1); // the outline for the rightmost edge is in the next tile over
+  iso_tiles.set_tile(new Index2D(2, 0), EDGE_OFFSET + 1);
+  iso_tiles.set_tile(new Index2D(2, 1), EDGE_OFFSET + 1);
+  iso_tiles.set_tile(new Index2D(2, 2), EDGE_OFFSET + 1);
+  iso_tiles.set_tile(new Index2D(3, 0), EDGE_OFFSET + 2);
+  iso_tiles.set_tile(new Index2D(3, 1), EDGE_OFFSET + 7);
 
   SCENE.regroup(iso_tiles, cube_strip);
 }
@@ -53,7 +70,7 @@ export const sketch = (p) => {
   };
 
   p.draw = () => {
-    p.background(0);
+    p.background(128);
 
     SCENE.draw(p);
   };

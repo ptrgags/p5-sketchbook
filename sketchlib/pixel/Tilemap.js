@@ -18,6 +18,11 @@ export class Tilemap {
   constructor(p, tileset, tile_size, map_size, position = Point.ORIGIN) {
     this.tileset = tileset;
     this.tile_size = tile_size;
+    this.tile_counts = new Direction(
+      tileset.width / tile_size.x,
+      tileset.height / tile_size.y,
+    );
+
     this.map_size = map_size;
     this.position = position;
 
@@ -35,8 +40,11 @@ export class Tilemap {
     const dst_x = j * this.tile_size.x;
     const dst_y = i * this.tile_size.y;
 
-    const src_x = (tile_index % this.map_size.x) * this.tile_size.x;
-    const src_y = Math.floor(tile_index / this.map_size.x) * this.tile_size.y;
+    const row = Math.floor(tile_index / this.tile_counts.x);
+    const col = tile_index % this.tile_counts.x;
+
+    const src_x = col * this.tile_size.x;
+    const src_y = row * this.tile_size.y;
 
     this.gfx.image(
       this.tileset,
