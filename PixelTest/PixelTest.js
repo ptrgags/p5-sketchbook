@@ -24,6 +24,21 @@ const ISO_TILE_SIZE = new Direction(64, 32);
  */
 let animated;
 
+const PATCH_CUBE_FACES = [
+  [12, 8],
+  [17, 29],
+  [18, 27],
+  [2, 7],
+];
+
+const EDGE_OFFSET = 32;
+const PATCH_CUBE_EDGES = [
+  [EDGE_OFFSET + 6, EDGE_OFFSET + 2, EDGE_OFFSET + 0],
+  [EDGE_OFFSET + 3, EDGE_OFFSET + 6, EDGE_OFFSET + 1],
+  [EDGE_OFFSET + 1, EDGE_OFFSET + 1, EDGE_OFFSET + 1],
+  [EDGE_OFFSET + 2, EDGE_OFFSET + 7, EDGE_OFFSET + 0],
+];
+
 /**
  *
  * @param {import("p5")} p
@@ -34,8 +49,8 @@ function init_sprites(p) {
     "iso",
     ISO_TILE_SIZE,
     new Direction(4, 8),
+    new Point(16, 150),
   );
-  iso_tiles.position = new Point(16, 250);
 
   // For now, let's manually pick out tiles to make a single iso grid
   // square from four triangles
@@ -61,6 +76,26 @@ function init_sprites(p) {
   iso_tiles.blit_tile(new Index2D(3, 0), EDGE_OFFSET + 2);
   iso_tiles.blit_tile(new Index2D(3, 1), EDGE_OFFSET + 7);
 
+  const iso_patch = IMGS.make_tilemap(
+    p,
+    "iso",
+    ISO_TILE_SIZE,
+    new Direction(5, 8),
+    new Point(36, 300),
+  );
+  // blit whole cubes at a time
+  iso_patch.blit_patch(new Index2D(0, 0), PATCH_CUBE_FACES);
+  iso_patch.blit_patch(new Index2D(0, 0), PATCH_CUBE_EDGES);
+  iso_patch.blit_patch(new Index2D(0, 2), PATCH_CUBE_FACES);
+  iso_patch.blit_patch(new Index2D(0, 2), PATCH_CUBE_EDGES);
+  iso_patch.blit_patch(new Index2D(3, 1), PATCH_CUBE_FACES);
+  iso_patch.blit_patch(new Index2D(3, 1), PATCH_CUBE_EDGES);
+  // these next ones partial cover existing tiles
+  iso_patch.blit_patch(new Index2D(1, 1), PATCH_CUBE_FACES);
+  iso_patch.blit_patch(new Index2D(1, 1), PATCH_CUBE_EDGES);
+  iso_patch.blit_patch(new Index2D(2, 2), PATCH_CUBE_FACES);
+  iso_patch.blit_patch(new Index2D(2, 2), PATCH_CUBE_EDGES);
+
   const tile_size = new Direction(64, 64);
 
   const cube_strip = IMGS.make_image("cube", new Point(10, 10));
@@ -72,7 +107,14 @@ function init_sprites(p) {
   const center = new Point(32, 32);
   animated = IMGS.make_sprite("cube", tile_size, new Point(400, 300), center);
 
-  SCENE.regroup(iso_tiles, cube_strip, whole_cube, pyramid, animated);
+  SCENE.regroup(
+    iso_tiles,
+    iso_patch,
+    cube_strip,
+    whole_cube,
+    pyramid,
+    animated,
+  );
 }
 
 const FRAME_CURVE = LoopCurve.from_timeline(make_param(0, 3, Rational.ONE));

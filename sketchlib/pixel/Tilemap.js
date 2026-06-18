@@ -5,6 +5,33 @@ import { Primitive } from "../primitives/Primitive.js";
 import { ImageFrames } from "./ImageFrames.js";
 
 /**
+ * Check if a patch of tiles will fit in the buffer and that there
+ * are no mismatched row lengths
+ * @param {Direction} grid_dimensions How many tiles wide/tall is the tilemap
+ * @param {Index2D} dst_coord The top left corner of where the patch will be pasted
+ * @param {number[][]} src_indices
+ */
+function check_patch(grid_dimensions, dst_coord, src_indices) {
+  const { i, j } = dst_coord;
+  const max_width = grid_dimensions.x - j;
+  const max_height = grid_dimensions.y - i;
+
+  if (src_indices.length > max_height) {
+    throw new Error("patch is too tall for tilemap");
+  }
+
+  for (const row of src_indices) {
+    if (row.length > max_width) {
+      throw new Error("patch is too wide for tilemap");
+    }
+  }
+
+  if (src_indices.some((row) => row.length != src_indices[0].length)) {
+    throw new Error("patch has mismatched row lengths!");
+  }
+}
+
+/**
  * A tilemap lets you copy and paste tiles from a tileset into a buffer.
  *
  * When drawn as a Primitive, the whole buffer is drawn to the screen
@@ -39,14 +66,14 @@ export class Tilemap {
    * Notably, this always draws on top of the grid cell, it does not erase
    * any pixels. This allows for layering tiles without needing a separate
    * tilemap. Though this requires some care to render in the correct order.
-   * @param {Index2D} coords (row, col) coordinates of the tile
-   * @param {number} tile_index The tile number within the tileset
+   * @param {Index2D} dst_coords (row, col) coordinates of the tile in the map
+   * @param {number} src_index The tile number within the tileset
    */
-  blit_tile(coords, tile_index) {
-    const dst_frame = this.map_frames.get_frame_2d(coords);
+  blit_tile(dst_coords, src_index) {
+    const dst_frame = this.map_frames.get_frame_2d(dst_coords);
     const { position: dst_position, dimensions } = dst_frame;
 
-    const src_frame = this.tileset_frames.get_frame(tile_index);
+    const src_frame = this.tileset_frames.get_frame(src_index);
     const { position: src_position } = src_frame;
 
     this.map_gfx.image(
@@ -60,6 +87,40 @@ export class Tilemap {
       dimensions.x,
       dimensions.y,
     );
+  }
+
+  /**
+   *
+   * @param {Index2D} dst_coord (row, col) coordinates of the top left corner of the output tiles
+   * @param {number[][]} src_indices 2D array of tile indices. It must fit within the bounds
+   */
+  blit_patch(dst_coord, src_indices) {
+    check_patch(this.map_frames.grid_dimensions, dst_coord, src_indices);
+    const { i: start_row, j: start_col } = dst_coord;
+
+    for (const [d_row, row] of src_indices.entries()) {
+      for (const [d_col, index] of row.entries()) {
+        const dst_frame = this.map_frames.get_frame_2d(
+          new Index2D(start_row + d_row, start_col + d_col),
+        );
+        const { position: dst_position, dimensions } = dst_frame;
+
+        const src_frame = this.tileset_frames.get_frame(index);
+        const { position: src_position } = src_frame;
+
+        this.map_gfx.image(
+          this.tileset,
+          dst_position.x,
+          dst_position.y,
+          dimensions.x,
+          dimensions.y,
+          src_position.x,
+          src_position.y,
+          dimensions.x,
+          dimensions.y,
+        );
+      }
+    }
   }
 
   /**
