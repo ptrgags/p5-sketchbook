@@ -21,15 +21,16 @@ const SCENE = group();
 let animated;
 
 function init_sprites() {
-  const TILE_SIZE = new Direction(64, 64);
+  const tile_size = new Direction(64, 64);
 
   const cube_strip = IMGS.make_image("cube", new Point(10, 10));
-  const whole_cube = IMGS.make_sprite("cube", TILE_SIZE, new Point(200, 200));
+  const whole_cube = IMGS.make_sprite("cube", tile_size, new Point(200, 200));
 
-  const pyramid = IMGS.make_sprite("cube", TILE_SIZE, new Point(200, 300));
+  const pyramid = IMGS.make_sprite("cube", tile_size, new Point(200, 300));
   pyramid.frame_id = 14;
 
-  animated = IMGS.make_sprite("cube", TILE_SIZE, new Point(400, 300));
+  const center = new Point(32, 32);
+  animated = IMGS.make_sprite("cube", tile_size, new Point(400, 300), center);
 
   SCENE.regroup(cube_strip, whole_cube, pyramid, animated);
 }

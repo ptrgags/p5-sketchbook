@@ -58,10 +58,12 @@ export class ImageLibrary {
    * @param {string} id image ID for the spritesheet. It must match
    * @param {Direction} frame_size Size of each frame
    * @param {Point} position Position on the screen for the sprite
+   * @param {Point} [origin=Point.ORIGIN] The anchor point for positioning the sprite
+   * @param {number} [frame_id=0] The frame to use
    * @returns {Sprite}
    */
-  make_sprite(id, frame_size, position) {
+  make_sprite(id, frame_size, position, origin = Point.ORIGIN, frame_id = 0) {
     const spritesheet = this.get_img(id);
-    return new Sprite(spritesheet, frame_size, position);
+    return new Sprite(spritesheet, frame_size, position, frame_id, origin);
   }
 }
