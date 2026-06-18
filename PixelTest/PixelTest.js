@@ -1,3 +1,4 @@
+import { Index2D } from "../sketchlib/Grid.js";
 import { Clock } from "../sketchlib/animation/Clock.js";
 import { LoopCurve } from "../sketchlib/animation/LoopCurve.js";
 import { make_param } from "../sketchlib/animation/ParamCurve.js";
@@ -11,16 +12,101 @@ import { Rational } from "../sketchlib/Rational.js";
 
 const IMGS = new ImageLibrary({
   cube: "sprites/cube.png",
+  iso: "sprites/iso-tiles.png",
 });
 
 const SCENE = group();
+
+const ISO_TILE_SIZE = new Direction(64, 32);
 
 /**
  * @type {Sprite}
  */
 let animated;
 
-function init_sprites() {
+const PATCH_CUBE_FACES = [
+  [12, 8],
+  [17, 29],
+  [18, 27],
+  [2, 7],
+];
+
+const EDGE_OFFSET = 32;
+const PATCH_CUBE_EDGES = [
+  [EDGE_OFFSET + 6, EDGE_OFFSET + 2, EDGE_OFFSET + 0],
+  [EDGE_OFFSET + 3, EDGE_OFFSET + 6, EDGE_OFFSET + 1],
+  [EDGE_OFFSET + 1, EDGE_OFFSET + 1, EDGE_OFFSET + 1],
+  [EDGE_OFFSET + 2, EDGE_OFFSET + 7, EDGE_OFFSET + 0],
+];
+
+/**
+ *
+ * @param {import("p5")} p
+ */
+function init_sprites(p) {
+  const iso_tiles = IMGS.make_tilemap(
+    p,
+    "iso",
+    ISO_TILE_SIZE,
+    new Direction(4, 8),
+    new Point(16, 150),
+  );
+
+  // For now, let's manually pick out tiles to make a cube where only the top
+  // is filled in.
+  iso_tiles.blit_tile(new Index2D(0, 0), 12);
+  iso_tiles.blit_tile(new Index2D(0, 1), 8);
+  iso_tiles.blit_tile(new Index2D(1, 0), 1);
+  iso_tiles.blit_tile(new Index2D(1, 1), 5);
+
+  // now for the edges
+  const EDGE_OFFSET = 32;
+  iso_tiles.blit_tile(new Index2D(0, 0), EDGE_OFFSET + 6);
+  iso_tiles.blit_tile(new Index2D(0, 1), EDGE_OFFSET + 2);
+  iso_tiles.blit_tile(new Index2D(1, 0), EDGE_OFFSET + 3);
+  iso_tiles.blit_tile(new Index2D(1, 1), EDGE_OFFSET + 6);
+  iso_tiles.blit_tile(new Index2D(1, 2), EDGE_OFFSET + 1); // the outline for the rightmost edge is in the next tile over
+  iso_tiles.blit_tile(new Index2D(2, 0), EDGE_OFFSET + 1);
+  iso_tiles.blit_tile(new Index2D(2, 1), EDGE_OFFSET + 1);
+  iso_tiles.blit_tile(new Index2D(2, 2), EDGE_OFFSET + 1);
+  iso_tiles.blit_tile(new Index2D(3, 0), EDGE_OFFSET + 2);
+  iso_tiles.blit_tile(new Index2D(3, 1), EDGE_OFFSET + 7);
+
+  const iso_patch = IMGS.make_tilemap(
+    p,
+    "iso",
+    ISO_TILE_SIZE,
+    new Direction(5, 8),
+    new Point(36, 300),
+  );
+  // blit whole cubes at a time
+  iso_patch.blit_patch(new Index2D(0, 0), PATCH_CUBE_FACES);
+  iso_patch.blit_patch(new Index2D(0, 0), PATCH_CUBE_EDGES);
+  iso_patch.blit_patch(new Index2D(0, 2), PATCH_CUBE_FACES);
+  iso_patch.blit_patch(new Index2D(0, 2), PATCH_CUBE_EDGES);
+  iso_patch.blit_patch(new Index2D(3, 1), PATCH_CUBE_FACES);
+  iso_patch.blit_patch(new Index2D(3, 1), PATCH_CUBE_EDGES);
+  // these next ones partial cover existing tiles
+  iso_patch.blit_patch(new Index2D(1, 1), PATCH_CUBE_FACES);
+  iso_patch.blit_patch(new Index2D(1, 1), PATCH_CUBE_EDGES);
+  iso_patch.blit_patch(new Index2D(2, 2), PATCH_CUBE_FACES);
+  iso_patch.blit_patch(new Index2D(2, 2), PATCH_CUBE_EDGES);
+
+  // Make a truchet pattern that fills a whole tilemap
+  const truchet = IMGS.make_tilemap(
+    p,
+    "iso",
+    ISO_TILE_SIZE,
+    new Direction(4, 4),
+    new Point(0, 550),
+  );
+  truchet.blit_all([
+    [10, 11, 10, 11],
+    [10, 11, 10, 11],
+    [10, 11, 10, 11],
+    [10, 11, 10, 11],
+  ]);
+
   const tile_size = new Direction(64, 64);
 
   const cube_strip = IMGS.make_image("cube", new Point(10, 10));
@@ -32,7 +118,15 @@ function init_sprites() {
   const center = new Point(32, 32);
   animated = IMGS.make_sprite("cube", tile_size, new Point(400, 300), center);
 
-  SCENE.regroup(cube_strip, whole_cube, pyramid, animated);
+  SCENE.regroup(
+    iso_tiles,
+    iso_patch,
+    truchet,
+    cube_strip,
+    whole_cube,
+    pyramid,
+    animated,
+  );
 }
 
 const FRAME_CURVE = LoopCurve.from_timeline(make_param(0, 3, Rational.ONE));
@@ -67,11 +161,11 @@ export const sketch = (p) => {
       document.getElementById("sketch-canvas"),
     );
 
-    init_sprites();
+    init_sprites(p);
   };
 
   p.draw = () => {
-    p.background(0);
+    p.background(128);
 
     update_animated(CLOCK.elapsed_time);
 
