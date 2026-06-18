@@ -52,16 +52,12 @@ function init_sprites(p) {
     new Point(16, 150),
   );
 
-  // For now, let's manually pick out tiles to make a single iso grid
-  // square from four triangles
+  // For now, let's manually pick out tiles to make a cube where only the top
+  // is filled in.
   iso_tiles.blit_tile(new Index2D(0, 0), 12);
   iso_tiles.blit_tile(new Index2D(0, 1), 8);
-  iso_tiles.blit_tile(new Index2D(1, 0), 17);
-  iso_tiles.blit_tile(new Index2D(1, 1), 29);
-  iso_tiles.blit_tile(new Index2D(2, 0), 18);
-  iso_tiles.blit_tile(new Index2D(2, 1), 27);
-  iso_tiles.blit_tile(new Index2D(3, 0), 2);
-  iso_tiles.blit_tile(new Index2D(3, 1), 7);
+  iso_tiles.blit_tile(new Index2D(1, 0), 1);
+  iso_tiles.blit_tile(new Index2D(1, 1), 5);
 
   // now for the edges
   const EDGE_OFFSET = 32;
@@ -96,6 +92,21 @@ function init_sprites(p) {
   iso_patch.blit_patch(new Index2D(2, 2), PATCH_CUBE_FACES);
   iso_patch.blit_patch(new Index2D(2, 2), PATCH_CUBE_EDGES);
 
+  // Make a truchet pattern that fills a whole tilemap
+  const truchet = IMGS.make_tilemap(
+    p,
+    "iso",
+    ISO_TILE_SIZE,
+    new Direction(4, 4),
+    new Point(0, 550),
+  );
+  truchet.blit_all([
+    [10, 11, 10, 11],
+    [10, 11, 10, 11],
+    [10, 11, 10, 11],
+    [10, 11, 10, 11],
+  ]);
+
   const tile_size = new Direction(64, 64);
 
   const cube_strip = IMGS.make_image("cube", new Point(10, 10));
@@ -110,6 +121,7 @@ function init_sprites(p) {
   SCENE.regroup(
     iso_tiles,
     iso_patch,
+    truchet,
     cube_strip,
     whole_cube,
     pyramid,

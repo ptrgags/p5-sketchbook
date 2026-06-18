@@ -1,4 +1,4 @@
-import { Index2D } from "../Grid.js";
+import { griderator, Index2D } from "../Grid.js";
 import { Direction } from "../pga2d/Direction.js";
 import { Point } from "../pga2d/Point.js";
 import { Primitive } from "../primitives/Primitive.js";
@@ -121,6 +121,22 @@ export class Tilemap {
         );
       }
     }
+  }
+
+  /**
+   * Blit tiles for the entire map at once.
+   * @param {number[][]} src_indices 2D array of tile indices. It must match the full grid dimensions
+   */
+  blit_all(src_indices) {
+    const dimensions = this.map_frames.grid_dimensions;
+    if (
+      src_indices.length !== dimensions.y ||
+      src_indices.some((row) => row.length !== dimensions.x)
+    ) {
+      throw new Error("src_indices must match tilemap size!");
+    }
+
+    this.blit_patch(new Index2D(0, 0), src_indices);
   }
 
   /**
