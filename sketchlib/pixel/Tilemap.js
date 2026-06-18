@@ -35,7 +35,7 @@ export class Tilemap {
    * @param {Index2D} coords
    * @param {number} tile_index
    */
-  set_tile(coords, tile_index) {
+  blit_tile(coords, tile_index) {
     const { i, j } = coords;
     const dst_x = j * this.tile_size.x;
     const dst_y = i * this.tile_size.y;
