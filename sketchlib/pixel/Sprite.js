@@ -38,9 +38,8 @@ export class Sprite {
   draw(p) {
     const { x: dst_x, y: dst_y } = this.position;
 
-    const { position: src_position, dimensions } = this.frames.get_frame(
-      this.frame_id,
-    );
+    const frame = this.frames.get_frame(this.frame_id);
+    const { position: src_position, dimensions } = frame;
 
     // @ts-ignore
     p.image(
