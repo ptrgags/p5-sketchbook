@@ -90,7 +90,8 @@ export class Tilemap {
   }
 
   /**
-   *
+   * Paste a rectangle of pixels into the tilemap. The rectangle can be smaller
+   * than the tilemap, but cannot go out of bounds (for simplicity)
    * @param {Index2D} dst_coord (row, col) coordinates of the top left corner of the output tiles
    * @param {number[][]} src_indices 2D array of tile indices. It must fit within the bounds
    */
