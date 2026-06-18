@@ -72,7 +72,7 @@ function init_sprites(p) {
   const center = new Point(32, 32);
   animated = IMGS.make_sprite("cube", tile_size, new Point(400, 300), center);
 
-  SCENE.regroup(cube_strip, whole_cube, pyramid, animated);
+  SCENE.regroup(iso_tiles, cube_strip, whole_cube, pyramid, animated);
 }
 
 const FRAME_CURVE = LoopCurve.from_timeline(make_param(0, 3, Rational.ONE));
