@@ -40,6 +40,19 @@ const PATCH_CUBE_EDGES = [
   [EDGE_OFFSET + 2, EDGE_OFFSET + 7, EDGE_OFFSET + 0],
 ];
 
+const PATCH_EDGE_Y_FACES = [
+  [12, 8],
+  [17, 5],
+  [18, 0],
+  [2, 0],
+];
+const PATCH_EDGE_Y_EDGES = [
+  [EDGE_OFFSET + 6, EDGE_OFFSET + 2],
+  [EDGE_OFFSET + 3, EDGE_OFFSET + 6],
+  [EDGE_OFFSET + 1, EDGE_OFFSET + 0],
+  [EDGE_OFFSET + 2, EDGE_OFFSET + 0],
+];
+
 const ISO_BASIS_TILES = {
   x: new Direction(-1, 1),
   y: new Direction(1, 1),
@@ -106,6 +119,21 @@ function penrose_vertex(tilemap, center_coords, connection_flags) {
     const { x, y } = center_dir.add(ISO_BASIS_TILES.z);
     const coords = new Index2D(y, x);
     blit_cube(tilemap, coords);
+  }
+}
+
+/**
+ *
+ * @param {Tilemap} tilemap
+ * @param {Index2D} coords
+ * @param {"x" | "y" | "z"} edge_type
+ */
+function penrose_edge(tilemap, coords, edge_type) {
+  if (edge_type === "y") {
+    tilemap.blit_patch(coords, PATCH_EDGE_Y_FACES);
+    tilemap.blit_patch(coords, PATCH_EDGE_Y_EDGES);
+  } else {
+    throw new Error("not implemented");
   }
 }
 
@@ -215,6 +243,8 @@ function init_sprites(p) {
     false,
     true,
   ]);
+  penrose_edge(penrose, new Index2D(2, 2), "y");
+  penrose_edge(penrose, new Index2D(10, 2), "y");
 
   const tile_size = new Direction(64, 64);
 
