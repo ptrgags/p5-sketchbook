@@ -1,3 +1,4 @@
+import { FlagSet } from "../sketchlib/FlagSet.js";
 import { Index2D } from "../sketchlib/Grid.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Tilemap } from "../sketchlib/pixel/Tilemap.js";
@@ -41,57 +42,54 @@ const PATCH_EDGE_Z_EDGES = [
 ];
 
 /**
+ * Flags for the 6 cardinal directions in 3D
+ * @enum {number} DirectionFlags
+ */
+export const DirectionFlags = {
+  NEG_X: 1 << 0,
+  NEG_Y: 1 << 1,
+  NEG_Z: 1 << 2,
+  POS_X: 1 << 3,
+  POS_Y: 1 << 4,
+  POS_Z: 1 << 5,
+};
+const OFFSET_POS = 3;
+
+const POS_OFFSETS = [ISO_BASIS_TILES.x, ISO_BASIS_TILES.y, ISO_BASIS_TILES.z];
+const NEG_OFFSETS = POS_OFFSETS.map((x) => x.neg());
+
+/**
  * A vertex from a triangular tiling corresponds to a cube in the center plus
  * a cube for each outgoing edge
  * @param {Tilemap} tilemap The tilemap to blit into
  * @param {Index2D} center_coords coordinates for the top left of the center cube's bounding box
- * @param {boolean[]} connection_flags flags for (-x, -y, -z, +x, +y, +z) connections
+ * @param {number} connection_flags flags for (-x, -y, -z, +x, +y, +z) connections. Use the DirectionFlags enum for this.
  */
 export function penrose_vertex(tilemap, center_coords, connection_flags) {
-  const [neg_x, neg_y, neg_z, pos_x, pos_y, pos_z] = connection_flags;
+  const flags = new FlagSet(connection_flags, 6);
 
   // convert to a direction to do math
   const center_dir = new Direction(center_coords.j, center_coords.i);
 
   // -x, -y, -z are farthest away from viewer so render them first
-  if (neg_x) {
-    const { x, y } = center_dir.add(ISO_BASIS_TILES.x.neg());
-    const coords = new Index2D(y, x);
-    blit_cube(tilemap, coords);
-  }
-
-  if (neg_y) {
-    const { x, y } = center_dir.add(ISO_BASIS_TILES.y.neg());
-    const coords = new Index2D(y, x);
-    blit_cube(tilemap, coords);
-  }
-
-  if (neg_z) {
-    const { x, y } = center_dir.add(ISO_BASIS_TILES.z.neg());
-    const coords = new Index2D(y, x);
-    blit_cube(tilemap, coords);
+  for (const [i, offset] of NEG_OFFSETS.entries()) {
+    if (flags.has_flag(i)) {
+      const { x, y } = center_dir.add(offset);
+      const coords = new Index2D(y, x);
+      blit_cube(tilemap, coords);
+    }
   }
 
   // center cube is always present
   blit_cube(tilemap, center_coords);
 
   // +x, +y, +z are closest to the viewer
-  if (pos_x) {
-    const { x, y } = center_dir.add(ISO_BASIS_TILES.x);
-    const coords = new Index2D(y, x);
-    blit_cube(tilemap, coords);
-  }
-
-  if (pos_y) {
-    const { x, y } = center_dir.add(ISO_BASIS_TILES.y);
-    const coords = new Index2D(y, x);
-    blit_cube(tilemap, coords);
-  }
-
-  if (pos_z) {
-    const { x, y } = center_dir.add(ISO_BASIS_TILES.z);
-    const coords = new Index2D(y, x);
-    blit_cube(tilemap, coords);
+  for (const [i, offset] of POS_OFFSETS.entries()) {
+    if (flags.has_flag(OFFSET_POS + i)) {
+      const { x, y } = center_dir.add(offset);
+      const coords = new Index2D(y, x);
+      blit_cube(tilemap, coords);
+    }
   }
 }
 

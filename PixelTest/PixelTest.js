@@ -9,7 +9,7 @@ import { ImageLibrary } from "../sketchlib/pixel/ImageLibrary.js";
 import { Sprite } from "../sketchlib/pixel/Sprite.js";
 import { group } from "../sketchlib/primitives/shorthand.js";
 import { Rational } from "../sketchlib/Rational.js";
-import { penrose_edge, penrose_vertex } from "./penrose.js";
+import { DirectionFlags, penrose_edge, penrose_vertex } from "./penrose.js";
 import { blit_cube } from "./iso_tiles.js";
 
 const IMGS = new ImageLibrary({
@@ -81,38 +81,26 @@ function init_sprites(p) {
     new Direction(7, 16),
     new Point(16, 112),
   );
-  penrose_vertex(penrose, new Index2D(0, 0), [
-    false,
-    false,
-    true,
-    false,
-    true,
-    false,
-  ]);
-  penrose_vertex(penrose, new Index2D(4, 4), [
-    false,
-    true,
-    true,
-    true,
-    false,
-    false,
-  ]);
-  penrose_vertex(penrose, new Index2D(8, 0), [
-    true,
-    false,
-    false,
-    false,
-    true,
-    true,
-  ]);
-  penrose_vertex(penrose, new Index2D(12, 4), [
-    false,
-    true,
-    false,
-    false,
-    false,
-    true,
-  ]);
+  penrose_vertex(
+    penrose,
+    new Index2D(0, 0),
+    DirectionFlags.NEG_Z | DirectionFlags.POS_Y,
+  );
+  penrose_vertex(
+    penrose,
+    new Index2D(4, 4),
+    DirectionFlags.NEG_Y | DirectionFlags.NEG_Z | DirectionFlags.POS_X,
+  );
+  penrose_vertex(
+    penrose,
+    new Index2D(8, 0),
+    DirectionFlags.NEG_X | DirectionFlags.POS_Y | DirectionFlags.POS_Z,
+  );
+  penrose_vertex(
+    penrose,
+    new Index2D(12, 4),
+    DirectionFlags.NEG_Y | DirectionFlags.POS_Z,
+  );
   penrose_edge(penrose, new Index2D(6, 2), "x");
   penrose_edge(penrose, new Index2D(2, 2), "y");
   penrose_edge(penrose, new Index2D(10, 2), "y");
