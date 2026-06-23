@@ -9,7 +9,8 @@ import { ImageLibrary } from "../sketchlib/pixel/ImageLibrary.js";
 import { Sprite } from "../sketchlib/pixel/Sprite.js";
 import { group } from "../sketchlib/primitives/shorthand.js";
 import { Rational } from "../sketchlib/Rational.js";
-import { Tilemap } from "../sketchlib/pixel/Tilemap.js";
+import { penrose_edge, penrose_vertex } from "./penrose.js";
+import { blit_cube } from "./iso_tiles.js";
 
 const IMGS = new ImageLibrary({
   cube: "sprites/cube.png",
@@ -24,146 +25,6 @@ const ISO_TILE_SIZE = new Direction(64, 32);
  * @type {Sprite}
  */
 let animated;
-
-const PATCH_CUBE_FACES = [
-  [12, 8],
-  [17, 29],
-  [18, 27],
-  [2, 7],
-];
-
-const EDGE_OFFSET = 32;
-const PATCH_CUBE_EDGES = [
-  [EDGE_OFFSET + 6, EDGE_OFFSET + 2, EDGE_OFFSET + 0],
-  [EDGE_OFFSET + 3, EDGE_OFFSET + 6, EDGE_OFFSET + 1],
-  [EDGE_OFFSET + 1, EDGE_OFFSET + 1, EDGE_OFFSET + 1],
-  [EDGE_OFFSET + 2, EDGE_OFFSET + 7, EDGE_OFFSET + 0],
-];
-
-const PATCH_EDGE_X_FACES = [
-  [12, 8],
-  [1, 29],
-  [0, 27],
-  [0, 7],
-];
-const PATCH_EDGE_X_EDGES = [
-  [EDGE_OFFSET + 6, EDGE_OFFSET + 2, EDGE_OFFSET + 0],
-  [EDGE_OFFSET + 2, EDGE_OFFSET + 6, EDGE_OFFSET + 1],
-  [EDGE_OFFSET + 0, EDGE_OFFSET + 1, EDGE_OFFSET + 1],
-  [EDGE_OFFSET + 0, EDGE_OFFSET + 7, EDGE_OFFSET + 0],
-];
-
-const PATCH_EDGE_Y_FACES = [
-  [12, 8],
-  [17, 5],
-  [18, 0],
-  [2, 0],
-];
-const PATCH_EDGE_Y_EDGES = [
-  [EDGE_OFFSET + 6, EDGE_OFFSET + 2],
-  [EDGE_OFFSET + 3, EDGE_OFFSET + 6],
-  [EDGE_OFFSET + 1, EDGE_OFFSET + 0],
-  [EDGE_OFFSET + 2, EDGE_OFFSET + 0],
-];
-
-const PATCH_EDGE_Z_FACES = [
-  [16, 28],
-  [18, 27],
-  [2, 7],
-];
-const PATCH_EDGE_Z_EDGES = [
-  [EDGE_OFFSET + 3, EDGE_OFFSET + 6, EDGE_OFFSET + 1],
-  [EDGE_OFFSET + 1, EDGE_OFFSET + 1, EDGE_OFFSET + 1],
-  [EDGE_OFFSET + 2, EDGE_OFFSET + 7, EDGE_OFFSET + 0],
-];
-
-const ISO_BASIS_TILES = {
-  x: new Direction(-1, 1),
-  y: new Direction(1, 1),
-  z: new Direction(0, -2),
-};
-
-/**
- *
- * @param {Tilemap} tilemap
- * @param {Index2D} coords
- */
-function blit_cube(tilemap, coords) {
-  tilemap.blit_patch(coords, PATCH_CUBE_FACES);
-  tilemap.blit_patch(coords, PATCH_CUBE_EDGES);
-}
-
-/**
- * @param {Tilemap} tilemap The tilemap to blit into
- * @param {Index2D} center_coords coordinates for the top left of the center cube
- * @param {boolean[]} connection_flags flags for (-x, -y, -z, +x, +y, +z) connections
- */
-function penrose_vertex(tilemap, center_coords, connection_flags) {
-  const [neg_x, neg_y, neg_z, pos_x, pos_y, pos_z] = connection_flags;
-
-  // convert to a direction to do math
-  const center_dir = new Direction(center_coords.j, center_coords.i);
-
-  // -x, -y, -z are farthest away from viewer so render them first
-  if (neg_x) {
-    const { x, y } = center_dir.add(ISO_BASIS_TILES.x.neg());
-    const coords = new Index2D(y, x);
-    blit_cube(tilemap, coords);
-  }
-
-  if (neg_y) {
-    const { x, y } = center_dir.add(ISO_BASIS_TILES.y.neg());
-    const coords = new Index2D(y, x);
-    blit_cube(tilemap, coords);
-  }
-
-  if (neg_z) {
-    const { x, y } = center_dir.add(ISO_BASIS_TILES.z.neg());
-    const coords = new Index2D(y, x);
-    blit_cube(tilemap, coords);
-  }
-
-  // center cube is always present
-  blit_cube(tilemap, center_coords);
-
-  // +x, +y, +z are closest to the viewer
-  if (pos_x) {
-    const { x, y } = center_dir.add(ISO_BASIS_TILES.x);
-    const coords = new Index2D(y, x);
-    blit_cube(tilemap, coords);
-  }
-
-  if (pos_y) {
-    const { x, y } = center_dir.add(ISO_BASIS_TILES.y);
-    const coords = new Index2D(y, x);
-    blit_cube(tilemap, coords);
-  }
-
-  if (pos_z) {
-    const { x, y } = center_dir.add(ISO_BASIS_TILES.z);
-    const coords = new Index2D(y, x);
-    blit_cube(tilemap, coords);
-  }
-}
-
-/**
- *
- * @param {Tilemap} tilemap
- * @param {Index2D} coords
- * @param {"x" | "y" | "z"} edge_type
- */
-function penrose_edge(tilemap, coords, edge_type) {
-  if (edge_type === "x") {
-    tilemap.blit_patch(coords, PATCH_EDGE_X_FACES);
-    tilemap.blit_patch(coords, PATCH_EDGE_X_EDGES);
-  } else if (edge_type === "y") {
-    tilemap.blit_patch(coords, PATCH_EDGE_Y_FACES);
-    tilemap.blit_patch(coords, PATCH_EDGE_Y_EDGES);
-  } else {
-    tilemap.blit_patch(coords, PATCH_EDGE_Z_FACES);
-    tilemap.blit_patch(coords, PATCH_EDGE_Z_EDGES);
-  }
-}
 
 /**
  *
@@ -206,17 +67,12 @@ function init_sprites(p) {
     new Point(36, 300),
   );
   // blit whole cubes at a time
-  iso_patch.blit_patch(new Index2D(0, 0), PATCH_CUBE_FACES);
-  iso_patch.blit_patch(new Index2D(0, 0), PATCH_CUBE_EDGES);
-  iso_patch.blit_patch(new Index2D(0, 2), PATCH_CUBE_FACES);
-  iso_patch.blit_patch(new Index2D(0, 2), PATCH_CUBE_EDGES);
-  iso_patch.blit_patch(new Index2D(3, 1), PATCH_CUBE_FACES);
-  iso_patch.blit_patch(new Index2D(3, 1), PATCH_CUBE_EDGES);
+  blit_cube(iso_patch, new Index2D(0, 0));
+  blit_cube(iso_patch, new Index2D(0, 2));
+  blit_cube(iso_patch, new Index2D(3, 1));
   // these next ones partial cover existing tiles
-  iso_patch.blit_patch(new Index2D(1, 1), PATCH_CUBE_FACES);
-  iso_patch.blit_patch(new Index2D(1, 1), PATCH_CUBE_EDGES);
-  iso_patch.blit_patch(new Index2D(2, 2), PATCH_CUBE_FACES);
-  iso_patch.blit_patch(new Index2D(2, 2), PATCH_CUBE_EDGES);
+  blit_cube(iso_patch, new Index2D(1, 1));
+  blit_cube(iso_patch, new Index2D(2, 2));
 
   // Make a truchet pattern that fills a whole tilemap
   const truchet = IMGS.make_tilemap(
@@ -289,19 +145,16 @@ function init_sprites(p) {
   const center = new Point(32, 32);
   animated = IMGS.make_sprite("cube", tile_size, new Point(400, 300), center);
 
-  /*
   SCENE.regroup(
     iso_tiles,
     iso_patch,
     truchet,
+    penrose,
     cube_strip,
     whole_cube,
     pyramid,
     animated,
   );
-  */
-
-  SCENE.regroup(penrose);
 }
 
 const FRAME_CURVE = LoopCurve.from_timeline(make_param(0, 3, Rational.ONE));
