@@ -59,21 +59,6 @@ function init_sprites(p) {
   iso_tiles.blit_tile(new Index2D(3, 0), EDGE_OFFSET + 2);
   iso_tiles.blit_tile(new Index2D(3, 1), EDGE_OFFSET + 7);
 
-  const iso_patch = IMGS.make_tilemap(
-    p,
-    "iso",
-    ISO_TILE_SIZE,
-    new Direction(5, 8),
-    new Point(36, 300),
-  );
-  // blit whole cubes at a time
-  blit_cube(iso_patch, new Index2D(0, 0));
-  blit_cube(iso_patch, new Index2D(0, 2));
-  blit_cube(iso_patch, new Index2D(3, 1));
-  // these next ones partial cover existing tiles
-  blit_cube(iso_patch, new Index2D(1, 1));
-  blit_cube(iso_patch, new Index2D(2, 2));
-
   // Make a truchet pattern that fills a whole tilemap
   const truchet = IMGS.make_tilemap(
     p,
@@ -94,7 +79,7 @@ function init_sprites(p) {
     "iso",
     ISO_TILE_SIZE,
     new Direction(7, 16),
-    new Point(16, 16),
+    new Point(16, 112),
   );
   penrose_vertex(penrose, new Index2D(0, 0), [
     false,
@@ -146,11 +131,10 @@ function init_sprites(p) {
   animated = IMGS.make_sprite("cube", tile_size, new Point(400, 300), center);
 
   SCENE.regroup(
+    cube_strip,
     iso_tiles,
-    iso_patch,
     truchet,
     penrose,
-    cube_strip,
     whole_cube,
     pyramid,
     animated,
