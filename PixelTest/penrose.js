@@ -41,8 +41,10 @@ const PATCH_EDGE_Z_EDGES = [
 ];
 
 /**
+ * A vertex from a triangular tiling corresponds to a cube in the center plus
+ * a cube for each outgoing edge
  * @param {Tilemap} tilemap The tilemap to blit into
- * @param {Index2D} center_coords coordinates for the top left of the center cube
+ * @param {Index2D} center_coords coordinates for the top left of the center cube's bounding box
  * @param {boolean[]} connection_flags flags for (-x, -y, -z, +x, +y, +z) connections
  */
 export function penrose_vertex(tilemap, center_coords, connection_flags) {
@@ -94,10 +96,11 @@ export function penrose_vertex(tilemap, center_coords, connection_flags) {
 }
 
 /**
- *
- * @param {Tilemap} tilemap
- * @param {Index2D} coords
- * @param {"x" | "y" | "z"} edge_type
+ * An edge in a triangular tiling corresponds to two faces of a cube wrapping
+ * around the edge
+ * @param {Tilemap} tilemap The isometric tileset
+ * @param {Index2D} coords Coordinates for the top left of the cube for the edge
+ * @param {"x" | "y" | "z"} edge_type The axis along the edge
  */
 export function penrose_edge(tilemap, coords, edge_type) {
   if (edge_type === "x") {

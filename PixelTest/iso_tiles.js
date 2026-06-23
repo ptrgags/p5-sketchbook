@@ -24,9 +24,9 @@ export const PATCH_CUBE_EDGES = [
 ];
 
 /**
- *
- * @param {Tilemap} tilemap
- * @param {Index2D} coords
+ * Blit several tiles that correspond to one cube in isometric projection
+ * @param {Tilemap} tilemap An isometric tileset
+ * @param {Index2D} coords The coordinates for the top left corner of the cube's bounding box
  */
 export function blit_cube(tilemap, coords) {
   tilemap.blit_patch(coords, PATCH_CUBE_FACES);
