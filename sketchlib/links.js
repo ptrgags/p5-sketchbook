@@ -1,6 +1,11 @@
 // Links for all of the sketches. Links are added to the page in this order
 export const LINKS = [
   {
+    title: "Bivector Clock",
+    is_lab: true,
+    year: "2026-06",
+  },
+  {
     title: "Pixel Test",
     is_lab: true,
     year: "2026-06",
