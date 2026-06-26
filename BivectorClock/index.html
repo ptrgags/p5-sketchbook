@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../libraries/p5.min.js"
+    ></script>
+    <script type="module">
+      import { sketch } from "./BivectorClock.js";
+      import "../sketchlib/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../styles/layout.css" />
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>Bivector Clock (2026)</h1>
+      <div class="sketch">
+        <canvas id="sketch-canvas" width="500" height="700"></canvas>
+      </div>
+      <div class="description">
+        <p>
+          In <a href="https://bivector.net/">Geometric Algebra</a>, you can
+          wedge two vectors together to form a <em>bivector</em>, or oriented
+          area.
+        </p>
+        <p>
+          Here, I'm taking pairs of clock hands and wedging them together. I
+          visualize the resulting area as a parallelogram.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
