@@ -3,11 +3,49 @@ const SEC_PER_MIN = 60;
 const MS_PER_SEC = 1000;
 
 /**
- * Get the current time as components
+ * @interface TimeSource
+ */
+export class TimeSource {
+  /**
+   * @returns {Date}
+   */
+  now() {
+    throw new Error("not implemented");
+  }
+}
+
+/**
+ * @implements {TimeSource}
+ */
+export class LocalTime {
+  now() {
+    return new Date();
+  }
+}
+
+/**
+ * @implements {TimeSource}
+ */
+export class FixedTime {
+  /**
+   * Constructor
+   * @param {Date} time A time that will be held constant
+   */
+  constructor(time) {
+    this.time = time;
+  }
+
+  now() {
+    return this.time;
+  }
+}
+
+/**
+ * Extract the components from a Date object
+ * @param {Date} date The date
  * @returns {{hr: number, min: number, sec: number, ms: number}}
  */
-function current_time() {
-  const date = new Date();
+function current_time(date) {
   const hr = date.getHours();
   const min = date.getMinutes();
   const sec = date.getSeconds();
@@ -22,12 +60,19 @@ function current_time() {
  * This clock is also configurable to return the result in seconds or minutes
  */
 export class WallClock {
+  /**
+   * @param {TimeSource} [time_source] Time source. If not present, creates a LocalTime object
+   */
+  constructor(time_source) {
+    this.time_source = time_source ?? new LocalTime();
+  }
+
   get discrete_hours() {
-    return new Date().getHours();
+    return this.time_source.now().getHours();
   }
 
   get continuous_hours() {
-    const { hr, min, sec, ms } = current_time();
+    const { hr, min, sec, ms } = current_time(this.time_source.now());
 
     return (
       hr +
@@ -38,11 +83,11 @@ export class WallClock {
   }
 
   get discrete_minutes() {
-    return new Date().getMinutes();
+    return this.time_source.now().getMinutes();
   }
 
   get continuous_min() {
-    const { hr, min, sec, ms } = current_time();
+    const { hr, min, sec, ms } = current_time(this.time_source.now());
 
     return (
       hr * MIN_PER_HOUR +
@@ -53,11 +98,11 @@ export class WallClock {
   }
 
   get discrete_sec() {
-    return new Date().getSeconds();
+    return this.time_source.now().getSeconds();
   }
 
   get continuous_sec() {
-    const { hr, min, sec, ms } = current_time();
+    const { hr, min, sec, ms } = current_time(this.time_source.now());
     return (
       hr * MIN_PER_HOUR * SEC_PER_MIN +
       min * SEC_PER_MIN +
@@ -67,11 +112,11 @@ export class WallClock {
   }
 
   get discrete_ms() {
-    return new Date().getMilliseconds();
+    return this.time_source.now().getMilliseconds();
   }
 
   get continuous_ms() {
-    const { hr, min, sec, ms } = current_time();
+    const { hr, min, sec, ms } = current_time(this.time_source.now());
     return (
       hr * MIN_PER_HOUR * SEC_PER_MIN * MS_PER_SEC +
       min * SEC_PER_MIN * MS_PER_SEC +

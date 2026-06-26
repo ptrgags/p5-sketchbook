@@ -1,4 +1,4 @@
-import { WallClock } from "../sketchlib/animation/WallClock.js";
+import { FixedTime, WallClock } from "../sketchlib/animation/WallClock.js";
 import { Color } from "../sketchlib/Color.js";
 import { WIDTH, HEIGHT, SCREEN_CENTER } from "../sketchlib/dimensions.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
@@ -95,6 +95,13 @@ const SCENE = group(
 );
 
 const WALL_CLOCK = new WallClock();
+// uncomment to use a fixed time. It was chosen to keep the hands spread apart
+// at roughly 120 degrees which makes for a nice looking screenshot
+/*
+const WALL_CLOCK = new WallClock(
+  new FixedTime(new Date(2026, 6, 26, 8, 20, 0, 0)),
+);
+*/
 
 function update_hands() {
   const seconds = WALL_CLOCK.discrete_sec;

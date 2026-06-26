@@ -2,7 +2,6 @@
 export const LINKS = [
   {
     title: "Bivector Clock",
-    is_lab: true,
     year: "2026-06",
   },
   {
