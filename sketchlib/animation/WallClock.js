@@ -62,7 +62,7 @@ export class WallClock {
       hr * MIN_PER_HOUR * SEC_PER_MIN +
       min * SEC_PER_MIN +
       sec +
-      ms / SEC_PER_MIN
+      ms / MS_PER_SEC
     );
   }
 

@@ -1,11 +1,13 @@
 import { WallClock } from "../sketchlib/animation/WallClock.js";
+import { Color } from "../sketchlib/Color.js";
 import { WIDTH, HEIGHT, SCREEN_CENTER } from "../sketchlib/dimensions.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { BivectorPrimitive } from "../sketchlib/primitives/BivectorPrimitive.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
-import { group } from "../sketchlib/primitives/shorthand.js";
+import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { VectorPrimitive } from "../sketchlib/primitives/VectorPrimitive.js";
+import { Style } from "../sketchlib/Style.js";
 
 const DIAL_RADIUS = 200;
 const HASH_LENGTH = 50;
@@ -24,6 +26,12 @@ const HOUR_WEDGE_MIN = new BivectorPrimitive(
 );
 
 const MIN_WEDGE_SEC = new BivectorPrimitive(
+  SCREEN_CENTER,
+  Direction.DIR_X.scale(DIAL_RADIUS),
+  Direction.DIR_Y.scale(DIAL_RADIUS),
+);
+
+const SEC_WEDGE_HOUR = new BivectorPrimitive(
   SCREEN_CENTER,
   Direction.DIR_X.scale(DIAL_RADIUS),
   Direction.DIR_Y.scale(DIAL_RADIUS),
@@ -48,14 +56,42 @@ const HOUR_HAND = new VectorPrimitive(
   ),
 );
 
+const STYLE_DIAL = new Style({
+  fill: Color.WHITE,
+});
+
+const STYLE_TICKS = new Style({
+  stroke: Color.BLACK,
+  width: 4,
+});
+
+const STYLE_HOUR_MIN = new Style({
+  stroke: Color.RED,
+  fill: new Color(255, 0, 0, 127),
+});
+
+const STYLE_MIN_SEC = new Style({
+  stroke: Color.GREEN,
+  fill: new Color(0, 255, 0, 127),
+});
+
+const STYLE_SEC_HOUR = new Style({
+  stroke: Color.BLUE,
+  fill: new Color(0, 0, 255, 127),
+});
+
+const STYLE_HANDS = new Style({
+  stroke: Color.BLACK,
+  width: 4,
+});
+
 const SCENE = group(
-  DIAL,
-  group(...TICK_MARKS),
-  HOUR_WEDGE_MIN,
-  MIN_WEDGE_SEC,
-  HOUR_HAND,
-  MINUTE_HAND,
-  SECOND_HAND,
+  style(DIAL, STYLE_DIAL),
+  style(TICK_MARKS, STYLE_TICKS),
+  style(HOUR_WEDGE_MIN, STYLE_HOUR_MIN),
+  style(MIN_WEDGE_SEC, STYLE_MIN_SEC),
+  style(SEC_WEDGE_HOUR, STYLE_SEC_HOUR),
+  style([HOUR_HAND, MINUTE_HAND, SECOND_HAND], STYLE_HANDS),
 );
 
 const WALL_CLOCK = new WallClock();
@@ -82,6 +118,9 @@ function update_hands() {
 
   MIN_WEDGE_SEC.a = min_dir;
   MIN_WEDGE_SEC.b = sec_dir;
+
+  SEC_WEDGE_HOUR.a = sec_dir;
+  SEC_WEDGE_HOUR.b = hour_dir;
 }
 
 // @ts-ignore
