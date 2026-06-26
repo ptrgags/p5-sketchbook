@@ -104,16 +104,13 @@ const WALL_CLOCK = new WallClock(
 */
 
 function update_hands() {
-  const seconds = WALL_CLOCK.discrete_sec;
-  const sec_angle = -Math.PI / 2 + ((seconds % 60) * Math.PI) / 30;
+  const sec_angle = WALL_CLOCK.get_discrete_angle("sec");
   const sec_dir = Direction.from_angle(sec_angle).scale(DIAL_RADIUS);
 
-  const hours = WALL_CLOCK.continuous_hours;
-  const hour_angle = -Math.PI / 2 + ((hours % 12) * Math.PI) / 6;
+  const hour_angle = WALL_CLOCK.get_continuous_angle("hr");
   const hour_dir = Direction.from_angle(hour_angle).scale(DIAL_RADIUS * 0.5);
 
-  const minutes = WALL_CLOCK.continuous_min;
-  const min_angle = -Math.PI / 2 + ((minutes % 60) * Math.PI) / 30;
+  const min_angle = WALL_CLOCK.get_continuous_angle("min");
   const min_dir = Direction.from_angle(min_angle).scale(DIAL_RADIUS * 0.9);
 
   SECOND_HAND.tip = SCREEN_CENTER.add(sec_dir);

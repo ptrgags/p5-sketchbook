@@ -44,18 +44,12 @@ export class FixedTime {
   }
 }
 
-/**
- * Extract the components from a Date object
- * @param {Date} date The date
- * @returns {{hr: number, min: number, sec: number, ms: number}}
- */
-function current_time(date) {
-  const hr = date.getHours();
-  const min = date.getMinutes();
-  const sec = date.getSeconds();
-  const ms = date.getMilliseconds();
-  return { hr, min, sec, ms };
-}
+const SUBDIVISIONS = {
+  hr: 12,
+  min: 60,
+  sec: 60,
+  ms: 1000,
+};
 
 /**
  * Similar to Clock, but measures time since midnight instead of using performance.now().
@@ -71,61 +65,97 @@ export class WallClock {
     this.time_source = time_source ?? new LocalTime();
   }
 
-  get discrete_hours() {
-    return this.time_source.now().getHours();
+  /**
+   * Get the time in discrete ticks, as you would see in a digital clock
+   * @param {"hr" | "min" | "sec" | "ms"} unit Which time unit to use
+   * @returns {number}
+   */
+  get_discrete_time(unit) {
+    const date = this.time_source.now();
+    switch (unit) {
+      case "hr":
+        return date.getHours();
+      case "min":
+        return date.getMinutes();
+      case "sec":
+        return date.getSeconds();
+      case "ms":
+        return date.getMilliseconds();
+    }
   }
 
-  get continuous_hours() {
-    const { hr, min, sec, ms } = current_time(this.time_source.now());
+  /**
+   * Get the clockwise angle (measured from 0 at the x-axis) for rendering
+   * the selected part of the time
+   * @param {"hr" | "min" | "sec" | "ms"} unit Which time unit to use
+   * @returns {number} The angle in radians
+   */
+  get_discrete_angle(unit) {
+    const MIDNIGHT = -Math.PI / 2;
 
-    return (
-      hr +
-      min / MIN_PER_HOUR +
-      sec / SEC_PER_MIN / MIN_PER_HOUR +
-      ms / MS_PER_SEC / SEC_PER_MIN / MIN_PER_HOUR
-    );
+    const time = this.get_discrete_time(unit);
+    const subdivision = SUBDIVISIONS[unit];
+    const index = time % subdivision;
+
+    return MIDNIGHT + ((2.0 * Math.PI) / subdivision) * index;
   }
 
-  get discrete_minutes() {
-    return this.time_source.now().getMinutes();
+  /**
+   * Get the time as a continuous value, accounting for the other values
+   * @param {"hr" | "min" | "sec" | "ms"} unit Which time unit to use
+   * @returns {number}
+   */
+  get_continuous_time(unit) {
+    const date = this.time_source.now();
+    const hr = date.getHours();
+    const min = date.getMinutes();
+    const sec = date.getSeconds();
+    const ms = date.getMilliseconds();
+    switch (unit) {
+      case "hr":
+        return (
+          hr +
+          min / MIN_PER_HOUR +
+          sec / SEC_PER_MIN / MIN_PER_HOUR +
+          ms / MS_PER_SEC / SEC_PER_MIN / MIN_PER_HOUR
+        );
+      case "min":
+        return (
+          hr * MIN_PER_HOUR +
+          min +
+          sec / SEC_PER_MIN +
+          ms / MS_PER_SEC / SEC_PER_MIN
+        );
+      case "sec":
+        return (
+          hr * MIN_PER_HOUR * SEC_PER_MIN +
+          min * SEC_PER_MIN +
+          sec +
+          ms / MS_PER_SEC
+        );
+      case "ms":
+        return (
+          hr * MIN_PER_HOUR * SEC_PER_MIN * MS_PER_SEC +
+          min * SEC_PER_MIN * MS_PER_SEC +
+          sec * MS_PER_SEC +
+          ms
+        );
+    }
   }
 
-  get continuous_min() {
-    const { hr, min, sec, ms } = current_time(this.time_source.now());
+  /**
+   * Get the clockwise angle (measured from 0 at the x-axis) for rendering
+   * the selected part of the time
+   * @param {"hr" | "min" | "sec" | "ms"} unit Which time unit to use
+   * @returns {number} The angle in radians
+   */
+  get_continuous_angle(unit) {
+    const MIDNIGHT = -Math.PI / 2;
 
-    return (
-      hr * MIN_PER_HOUR +
-      min +
-      sec / SEC_PER_MIN +
-      ms / MS_PER_SEC / SEC_PER_MIN
-    );
-  }
+    const time = this.get_continuous_time(unit);
+    const subdivision = SUBDIVISIONS[unit];
+    const index = time % subdivision;
 
-  get discrete_sec() {
-    return this.time_source.now().getSeconds();
-  }
-
-  get continuous_sec() {
-    const { hr, min, sec, ms } = current_time(this.time_source.now());
-    return (
-      hr * MIN_PER_HOUR * SEC_PER_MIN +
-      min * SEC_PER_MIN +
-      sec +
-      ms / MS_PER_SEC
-    );
-  }
-
-  get discrete_ms() {
-    return this.time_source.now().getMilliseconds();
-  }
-
-  get continuous_ms() {
-    const { hr, min, sec, ms } = current_time(this.time_source.now());
-    return (
-      hr * MIN_PER_HOUR * SEC_PER_MIN * MS_PER_SEC +
-      min * SEC_PER_MIN * MS_PER_SEC +
-      sec * MS_PER_SEC +
-      ms
-    );
+    return MIDNIGHT + ((2.0 * Math.PI) / subdivision) * index;
   }
 }
