@@ -54,8 +54,9 @@ describe("WallClock", () => {
 
       const result = clock.get_continuous_time("hr");
 
-      const expected = 13;
-      expect(result).toEqual(expected);
+      // 13 + 10 / 60 + 30 / 3600 + 100 / 3_600_000
+      const expected = 13.175;
+      expect(result).toBeCloseTo(expected);
     });
 
     it("with min returns minutes component", () => {
@@ -63,8 +64,9 @@ describe("WallClock", () => {
 
       const result = clock.get_continuous_time("min");
 
-      const expected = 10;
-      expect(result).toEqual(expected);
+      // 13 * 60 + 10 + 30 / 60 + 100 / 60_000
+      const expected = 790.502;
+      expect(result).toBeCloseTo(expected);
     });
 
     it("with sec returns seconds component", () => {
@@ -72,7 +74,8 @@ describe("WallClock", () => {
 
       const result = clock.get_continuous_time("sec");
 
-      const expected = 30;
+      // 13 * 3600 + 10 * 60 + 30 + 100 / 1000
+      const expected = 47430.1;
       expect(result).toEqual(expected);
     });
 
@@ -81,46 +84,62 @@ describe("WallClock", () => {
 
       const result = clock.get_continuous_time("ms");
 
-      const expected = 100;
+      // 13 * 3_600_000 + 10 * 60_000 + 30 * 1000 + 100
+      const expected = 47430100;
       expect(result).toEqual(expected);
     });
   });
 
   describe("get_discrete_angle", () => {
-    it("with hr returns hour component", () => {
+    it("with hr returns correct angle", () => {
       const clock = make_clock();
 
       const result = clock.get_discrete_angle("hr");
 
-      const expected = 13;
-      expect(result).toEqual(expected);
+      // -pi/2 + 1 * pi/6
+      // = -3pi/6 + pi/6
+      // = -2pi/6
+      // = -pi/3
+      const expected = -Math.PI / 3;
+      expect(result).toBeCloseTo(expected);
     });
 
-    it("with min returns minutes component", () => {
+    it("with min returns corrrect angle", () => {
       const clock = make_clock();
 
       const result = clock.get_discrete_angle("min");
 
-      const expected = 10;
-      expect(result).toEqual(expected);
+      // -pi/2 + 10 * pi/30
+      // = -pi/2 + pi/3
+      // = -3pi/6 + 2pi/6
+      // = -pi/6
+      const expected = -Math.PI / 6;
+      expect(result).toBeCloseTo(expected);
     });
 
-    it("with sec returns seconds component", () => {
+    it("with sec returns correct angle", () => {
       const clock = make_clock();
 
       const result = clock.get_discrete_angle("sec");
 
-      const expected = 30;
-      expect(result).toEqual(expected);
+      // -pi/2 + 30 * pi/30
+      // = -pi/2 + 2pi/2
+      // = pi/2
+      const expected = Math.PI / 2;
+      expect(result).toBeCloseTo(expected);
     });
 
-    it("with ms returns milliseconds component", () => {
+    it("with ms returns correct angle", () => {
       const clock = make_clock();
 
       const result = clock.get_discrete_angle("ms");
 
-      const expected = 100;
-      expect(result).toEqual(expected);
+      // -pi/2 + 100 * pi/500
+      // = -pi/2 + pi/5
+      // = -5pi/10 + 2pi/10
+      // = -3pi/10
+      const expected = (-3 * Math.PI) / 10;
+      expect(result).toBeCloseTo(expected);
     });
   });
 
@@ -130,8 +149,12 @@ describe("WallClock", () => {
 
       const result = clock.get_continuous_angle("hr");
 
-      const expected = 13;
-      expect(result).toEqual(expected);
+      // okay these are annoying to compute by hand
+      // time is 13.175 hr (from the continuous time tests above)
+      // mod 12 is 1.175
+      // -pi/2 + 1.175 * pi/6
+      const expected = -Math.PI / 2 + (1.175 * Math.PI) / 6;
+      expect(result).toBeCloseTo(expected);
     });
 
     it("with min returns minutes component", () => {
@@ -139,8 +162,10 @@ describe("WallClock", () => {
 
       const result = clock.get_continuous_angle("min");
 
-      const expected = 10;
-      expect(result).toEqual(expected);
+      // 790.502 % 60 is around 10.502
+      // -pi/2 + 10.502 * pi/30
+      const expected = -Math.PI / 2 + (10.502 * Math.PI) / 30;
+      expect(result).toBeCloseTo(expected);
     });
 
     it("with sec returns seconds component", () => {
@@ -148,8 +173,10 @@ describe("WallClock", () => {
 
       const result = clock.get_continuous_angle("sec");
 
-      const expected = 30;
-      expect(result).toEqual(expected);
+      // 47430.1 % 60 is around 30.1
+      // -pi/2 + 30.1 * pi/30
+      const expected = -Math.PI / 2 + (30.1 * Math.PI) / 30;
+      expect(result).toBeCloseTo(expected);
     });
 
     it("with ms returns milliseconds component", () => {
@@ -157,8 +184,11 @@ describe("WallClock", () => {
 
       const result = clock.get_continuous_angle("ms");
 
-      const expected = 100;
-      expect(result).toEqual(expected);
+      // 47430100 % 1000 = 100
+      // = -pi/2 + 100 * pi/500
+      // = -3pi/10 like in the discrete version of the test
+      const expected = (-3 * Math.PI) / 10;
+      expect(result).toBeCloseTo(expected);
     });
   });
 });
