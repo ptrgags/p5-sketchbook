@@ -37,9 +37,11 @@ export function iso_face_tile(slant, upper_face, lower_face) {
 }
 
 /**
+ * Compute a patch of isometric face tiles all at once. This handles computing the slant
  *
- * @param {[number, number][][]} faces
- * @returns {number[][]}
+ * This assumes the first tile will slant to the right like in the top left of an isometric cube
+ * @param {[number, number][][]} faces Pairs of (upper_face, lower_face) in a grid. Use [NONE, NONE] for transparent tiles
+ * @returns {number[][]} A patch of tiles, usable with Tilemap.blit_patch
  */
 export function iso_face_patch(faces) {
   return faces.map((row, i) =>
@@ -90,9 +92,9 @@ export const VERTICAL = 0b01;
  * Compute edge tile indices for a whole patch at once. This handles computing
  * the alternating slant direction. Note that the first tile is assumed to
  * slant to the right (like it does for the top face of an isometric cube)
- * @param {number[][]} flags
- * @param {number} [offset=EDGE_OFFSET]
- * @returns {number[][]}
+ * @param {number[][]} flags Bit flags, DIAGONAL, VERTICAL or both
+ * @param {number} [offset=EDGE_OFFSET] Tile index of the first tile, as there are multiple edge styles
+ * @returns {number[][]} A patch suitable for use with Tilemap.blit_patch
  */
 export function iso_edge_patch(flags, offset = EDGE_OFFSET) {
   return flags.map((row, i) =>
