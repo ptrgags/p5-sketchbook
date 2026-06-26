@@ -1,10 +1,12 @@
 import { Point } from "../../sketchlib/pga2d/Point.js";
 import { svg_tag } from "../svg/svg_tag.js";
+import { ToSVG } from "../svg/ToSVG.js";
 import { Primitive } from "./Primitive.js";
 
 /**
  * A closed polygon
  * @implements {Primitive}
+ * @implements {ToSVG}
  */
 export class PolygonPrimitive {
   /**
@@ -38,6 +40,10 @@ export class PolygonPrimitive {
     }
   }
 
+  /**
+   *
+   * @returns {SVGElement}
+   */
   to_svg() {
     const tag_name = this.closed ? "polygon" : "polyline";
     const points = this.vertices

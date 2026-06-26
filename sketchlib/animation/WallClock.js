@@ -3,6 +3,7 @@ const SEC_PER_MIN = 60;
 const MS_PER_SEC = 1000;
 
 /**
+ * An object that can produce a Date for the current local time
  * @interface TimeSource
  */
 export class TimeSource {
@@ -15,6 +16,7 @@ export class TimeSource {
 }
 
 /**
+ * Default implementation of TimeSource, it just returns a Date object
  * @implements {TimeSource}
  */
 export class LocalTime {
@@ -24,6 +26,8 @@ export class LocalTime {
 }
 
 /**
+ * For taking screenshots and unit tests, it's sometimes helpful to hardcode
+ * the time.
  * @implements {TimeSource}
  */
 export class FixedTime {

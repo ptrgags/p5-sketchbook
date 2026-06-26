@@ -1,10 +1,12 @@
 import { Point } from "../../sketchlib/pga2d/Point.js";
 import { Motor } from "../../sketchlib/pga2d/versors.js";
+import { Primitive } from "./Primitive.js";
 
 const ARROW_ANGLE = Math.PI / 6;
 
 /**
  * Draw an arrow from tail to tip
+ * @implements {Primitive}
  */
 export class VectorPrimitive {
   /**

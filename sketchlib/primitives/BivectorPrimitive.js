@@ -1,7 +1,16 @@
 import { Direction } from "../pga2d/Direction.js";
 import { Point } from "../pga2d/Point.js";
 import { svg_tag } from "../svg/svg_tag.js";
+import { ToSVG } from "../svg/ToSVG.js";
+import { Primitive } from "./Primitive.js";
 
+/**
+ * Parallelogram-shaped primitive representing the wedge product of two vectors.
+ *
+ * As of right now, it's rendered without the orientation labeled.
+ * @implements {Primitive}
+ * @implements {ToSVG}
+ */
 export class BivectorPrimitive {
   /**
    * Constructor
@@ -32,6 +41,10 @@ export class BivectorPrimitive {
     p.endShape(p.CLOSE);
   }
 
+  /**
+   *
+   * @returns {SVGElement}
+   */
   to_svg() {
     const { x, y } = this.origin;
     const { x: ax, y: ay } = this.a;
