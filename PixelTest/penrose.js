@@ -4,13 +4,15 @@ import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Tilemap } from "../sketchlib/pixel/Tilemap.js";
 import {
   blit_cube,
-  EDGE_OFFSET,
+  DIAGONAL,
   ISO_BASIS_TILES,
+  iso_edge_patch,
   iso_face_patch,
   LEFT,
   NONE,
   RIGHT,
   TOP,
+  VERTICAL,
 } from "./iso_tiles.js";
 
 const PATCH_EDGE_X_FACES = iso_face_patch([
@@ -31,12 +33,12 @@ const PATCH_EDGE_X_FACES = iso_face_patch([
     [RIGHT, NONE],
   ],
 ]);
-const PATCH_EDGE_X_EDGES = [
-  [EDGE_OFFSET + 6, EDGE_OFFSET + 2, EDGE_OFFSET + 0],
-  [EDGE_OFFSET + 2, EDGE_OFFSET + 6, EDGE_OFFSET + 1],
-  [EDGE_OFFSET + 0, EDGE_OFFSET + 1, EDGE_OFFSET + 1],
-  [EDGE_OFFSET + 0, EDGE_OFFSET + 7, EDGE_OFFSET + 0],
-];
+const PATCH_EDGE_X_EDGES = iso_edge_patch([
+  [DIAGONAL, DIAGONAL, 0],
+  [DIAGONAL, DIAGONAL, VERTICAL],
+  [0, VERTICAL, VERTICAL],
+  [0, VERTICAL | DIAGONAL, 0],
+]);
 
 const PATCH_EDGE_Y_FACES = iso_face_patch([
   [
@@ -56,12 +58,12 @@ const PATCH_EDGE_Y_FACES = iso_face_patch([
     [NONE, NONE],
   ],
 ]);
-const PATCH_EDGE_Y_EDGES = [
-  [EDGE_OFFSET + 6, EDGE_OFFSET + 2],
-  [EDGE_OFFSET + 3, EDGE_OFFSET + 6],
-  [EDGE_OFFSET + 1, EDGE_OFFSET + 0],
-  [EDGE_OFFSET + 2, EDGE_OFFSET + 0],
-];
+const PATCH_EDGE_Y_EDGES = iso_edge_patch([
+  [DIAGONAL, DIAGONAL, 0],
+  [VERTICAL | DIAGONAL, DIAGONAL, 0],
+  [VERTICAL, VERTICAL, 0],
+  [DIAGONAL, VERTICAL, 0],
+]);
 
 const PATCH_EDGE_Z_FACES = iso_face_patch([
   [
@@ -81,11 +83,12 @@ const PATCH_EDGE_Z_FACES = iso_face_patch([
     [RIGHT, NONE],
   ],
 ]);
-const PATCH_EDGE_Z_EDGES = [
-  [EDGE_OFFSET + 3, EDGE_OFFSET + 6, EDGE_OFFSET + 1],
-  [EDGE_OFFSET + 1, EDGE_OFFSET + 1, EDGE_OFFSET + 1],
-  [EDGE_OFFSET + 2, EDGE_OFFSET + 7, EDGE_OFFSET + 0],
-];
+const PATCH_EDGE_Z_EDGES = iso_edge_patch([
+  [0, 0, 0],
+  [VERTICAL | DIAGONAL, DIAGONAL, VERTICAL],
+  [VERTICAL, VERTICAL, VERTICAL],
+  [DIAGONAL, VERTICAL | DIAGONAL, 0],
+]);
 
 /**
  * Flags for the 6 cardinal directions in 3D
