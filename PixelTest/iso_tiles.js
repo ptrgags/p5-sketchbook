@@ -18,10 +18,10 @@ export const IsoSlant = {
   LEFT: 1,
 };
 
-const NONE = 0;
-const TOP = 1;
-const LEFT = 2;
-const RIGHT = 3;
+export const NONE = 0;
+export const TOP = 1;
+export const LEFT = 2;
+export const RIGHT = 3;
 
 /**
  * Compute the index for an isometric face tile
