@@ -1,3 +1,4 @@
+import { WallClock } from "../sketchlib/animation/WallClock.js";
 import { WIDTH, HEIGHT, SCREEN_CENTER } from "../sketchlib/dimensions.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
@@ -42,27 +43,25 @@ const SCENE = group(
   SECOND_HAND,
 );
 
-/**
- *
- * @param {Date} date
- */
-function update_hands(date) {
-  const hours = date.getHours();
+const WALL_CLOCK = new WallClock();
+
+function update_hands() {
+  const seconds = WALL_CLOCK.discrete_sec;
+  const sec_angle = -Math.PI / 2 + ((seconds % 60) * Math.PI) / 30;
+  SECOND_HAND.tip = SCREEN_CENTER.add(
+    Direction.from_angle(sec_angle).scale(DIAL_RADIUS),
+  );
+
+  const hours = WALL_CLOCK.continuous_hours;
   const hour_angle = -Math.PI / 2 + ((hours % 12) * Math.PI) / 6;
   HOUR_HAND.tip = SCREEN_CENTER.add(
     Direction.from_angle(hour_angle).scale(DIAL_RADIUS * 0.5),
   );
 
-  const minutes = date.getMinutes();
+  const minutes = WALL_CLOCK.continuous_min;
   const min_angle = -Math.PI / 2 + ((minutes % 60) * Math.PI) / 30;
   MINUTE_HAND.tip = SCREEN_CENTER.add(
     Direction.from_angle(min_angle).scale(DIAL_RADIUS * 0.9),
-  );
-
-  const seconds = date.getSeconds();
-  const sec_angle = -Math.PI / 2 + ((seconds % 60) * Math.PI) / 30;
-  SECOND_HAND.tip = SCREEN_CENTER.add(
-    Direction.from_angle(sec_angle).scale(DIAL_RADIUS),
   );
 }
 
@@ -80,9 +79,7 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    const date = new Date();
-
-    update_hands(date);
+    update_hands();
 
     SCENE.draw(p);
   };
