@@ -2,44 +2,93 @@ import { FlagSet } from "../sketchlib/FlagSet.js";
 import { Index2D } from "../sketchlib/Grid.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Tilemap } from "../sketchlib/pixel/Tilemap.js";
-import { blit_cube, EDGE_OFFSET, ISO_BASIS_TILES } from "./iso_tiles.js";
+import {
+  blit_cube,
+  DIAGONAL,
+  ISO_BASIS_TILES,
+  iso_edge_patch,
+  iso_face_patch,
+  LEFT,
+  NONE,
+  RIGHT,
+  TOP,
+  VERTICAL,
+} from "./iso_tiles.js";
 
-const PATCH_EDGE_X_FACES = [
-  [12, 8],
-  [1, 29],
-  [0, 27],
-  [0, 7],
-];
-const PATCH_EDGE_X_EDGES = [
-  [EDGE_OFFSET + 6, EDGE_OFFSET + 2, EDGE_OFFSET + 0],
-  [EDGE_OFFSET + 2, EDGE_OFFSET + 6, EDGE_OFFSET + 1],
-  [EDGE_OFFSET + 0, EDGE_OFFSET + 1, EDGE_OFFSET + 1],
-  [EDGE_OFFSET + 0, EDGE_OFFSET + 7, EDGE_OFFSET + 0],
-];
+const PATCH_EDGE_X_FACES = iso_face_patch([
+  [
+    [NONE, TOP],
+    [NONE, TOP],
+  ],
+  [
+    [TOP, NONE],
+    [TOP, RIGHT],
+  ],
+  [
+    [NONE, NONE],
+    [RIGHT, RIGHT],
+  ],
+  [
+    [NONE, NONE],
+    [RIGHT, NONE],
+  ],
+]);
+const PATCH_EDGE_X_EDGES = iso_edge_patch([
+  [DIAGONAL, DIAGONAL, 0],
+  [DIAGONAL, DIAGONAL, VERTICAL],
+  [0, VERTICAL, VERTICAL],
+  [0, VERTICAL | DIAGONAL, 0],
+]);
 
-const PATCH_EDGE_Y_FACES = [
-  [12, 8],
-  [17, 5],
-  [18, 0],
-  [2, 0],
-];
-const PATCH_EDGE_Y_EDGES = [
-  [EDGE_OFFSET + 6, EDGE_OFFSET + 2],
-  [EDGE_OFFSET + 3, EDGE_OFFSET + 6],
-  [EDGE_OFFSET + 1, EDGE_OFFSET + 0],
-  [EDGE_OFFSET + 2, EDGE_OFFSET + 0],
-];
+const PATCH_EDGE_Y_FACES = iso_face_patch([
+  [
+    [NONE, TOP],
+    [NONE, TOP],
+  ],
+  [
+    [TOP, LEFT],
+    [TOP, NONE],
+  ],
+  [
+    [LEFT, LEFT],
+    [NONE, NONE],
+  ],
+  [
+    [LEFT, NONE],
+    [NONE, NONE],
+  ],
+]);
+const PATCH_EDGE_Y_EDGES = iso_edge_patch([
+  [DIAGONAL, DIAGONAL, 0],
+  [VERTICAL | DIAGONAL, DIAGONAL, 0],
+  [VERTICAL, VERTICAL, 0],
+  [DIAGONAL, VERTICAL, 0],
+]);
 
-const PATCH_EDGE_Z_FACES = [
-  [16, 28],
-  [18, 27],
-  [2, 7],
-];
-const PATCH_EDGE_Z_EDGES = [
-  [EDGE_OFFSET + 3, EDGE_OFFSET + 6, EDGE_OFFSET + 1],
-  [EDGE_OFFSET + 1, EDGE_OFFSET + 1, EDGE_OFFSET + 1],
-  [EDGE_OFFSET + 2, EDGE_OFFSET + 7, EDGE_OFFSET + 0],
-];
+const PATCH_EDGE_Z_FACES = iso_face_patch([
+  [
+    [NONE, NONE],
+    [NONE, NONE],
+  ],
+  [
+    [NONE, LEFT],
+    [NONE, RIGHT],
+  ],
+  [
+    [LEFT, LEFT],
+    [RIGHT, RIGHT],
+  ],
+  [
+    [LEFT, NONE],
+    [RIGHT, NONE],
+  ],
+]);
+const PATCH_EDGE_Z_EDGES = iso_edge_patch([
+  [0, 0, 0],
+  [VERTICAL | DIAGONAL, DIAGONAL, VERTICAL],
+  [VERTICAL, VERTICAL, VERTICAL],
+  [DIAGONAL, VERTICAL | DIAGONAL, 0],
+]);
 
 /**
  * Flags for the 6 cardinal directions in 3D

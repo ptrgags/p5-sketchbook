@@ -104,8 +104,8 @@ function init_sprites(p) {
   penrose_edge(penrose, new Index2D(6, 2), "x");
   penrose_edge(penrose, new Index2D(2, 2), "y");
   penrose_edge(penrose, new Index2D(10, 2), "y");
-  penrose_edge(penrose, new Index2D(5, 0), "z");
-  penrose_edge(penrose, new Index2D(9, 4), "z");
+  penrose_edge(penrose, new Index2D(4, 0), "z");
+  penrose_edge(penrose, new Index2D(8, 4), "z");
 
   const tile_size = new Direction(64, 64);
 
