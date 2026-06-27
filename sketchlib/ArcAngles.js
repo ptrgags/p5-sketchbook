@@ -83,6 +83,10 @@ export class ArcAngles {
     return new ArcAngles(this.end_angle, this.start_angle);
   }
 
+  complement() {
+    return new ArcAngles(this.end_angle, this.start_angle + 2.0 * Math.PI);
+  }
+
   /**
    * Compute reduced angles from raw angles (e.g. from atan2) and the orientation
    * of the arc

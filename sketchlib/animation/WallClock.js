@@ -46,6 +46,7 @@ export class FixedTime {
 
 const SUBDIVISIONS = {
   hr: 12,
+  hr24: 24,
   min: 60,
   sec: 60,
   ms: 1000,
@@ -67,13 +68,15 @@ export class WallClock {
 
   /**
    * Get the time in discrete ticks, as you would see in a digital clock
-   * @param {"hr" | "min" | "sec" | "ms"} unit Which time unit to use
+   * @param {"hr" | "hr24" | "min" | "sec" | "ms"} unit Which time unit to use
    * @returns {number}
    */
   get_discrete_time(unit) {
     const date = this.time_source.now();
     switch (unit) {
       case "hr":
+        return date.getHours() % 12;
+      case "hr24":
         return date.getHours();
       case "min":
         return date.getMinutes();
@@ -87,7 +90,7 @@ export class WallClock {
   /**
    * Get the clockwise angle (measured from 0 at the x-axis) for rendering
    * the selected part of the time
-   * @param {"hr" | "min" | "sec" | "ms"} unit Which time unit to use
+   * @param {"hr" | "hr24" | "min" | "sec" | "ms"} unit Which time unit to use
    * @returns {number} The angle in radians
    */
   get_discrete_angle(unit) {
@@ -100,7 +103,7 @@ export class WallClock {
 
   /**
    * Get the time as a continuous value, accounting for the other values
-   * @param {"hr" | "min" | "sec" | "ms"} unit Which time unit to use
+   * @param {"hr" | "hr24" | "min" | "sec" | "ms"} unit Which time unit to use
    * @returns {number}
    */
   get_continuous_time(unit) {
@@ -111,6 +114,13 @@ export class WallClock {
     const ms = date.getMilliseconds();
     switch (unit) {
       case "hr":
+        return (
+          (hr % 12) +
+          min / MIN_PER_HOUR +
+          sec / SEC_PER_MIN / MIN_PER_HOUR +
+          ms / MS_PER_SEC / SEC_PER_MIN / MIN_PER_HOUR
+        );
+      case "hr24":
         return (
           hr +
           min / MIN_PER_HOUR +
@@ -144,7 +154,7 @@ export class WallClock {
   /**
    * Get the clockwise angle (measured from 0 at the x-axis) for rendering
    * the selected part of the time
-   * @param {"hr" | "min" | "sec" | "ms"} unit Which time unit to use
+   * @param {"hr" | "hr24" | "min" | "sec" | "ms"} unit Which time unit to use
    * @returns {number} The angle in radians
    */
   get_continuous_angle(unit) {
