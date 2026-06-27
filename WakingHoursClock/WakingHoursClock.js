@@ -2,6 +2,7 @@ import { WallClock } from "../sketchlib/animation/WallClock.js";
 import { ArcAngles } from "../sketchlib/ArcAngles.js";
 import { Color } from "../sketchlib/Color.js";
 import { WIDTH, HEIGHT, SCREEN_CENTER } from "../sketchlib/dimensions.js";
+import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
@@ -71,14 +72,16 @@ const STYLE_NUMERALS = new Style({
 });
 
 const STYLE_WAKE = new Style({
-  stroke: Color.CYAN,
+  // Orange
+  stroke: new Oklch(0.8, 0.15, 51),
+  width: 8,
+});
+const STYLE_SLEEP = new Style({
+  // Purple
+  stroke: new Oklch(0.5, 0.1, 277),
   width: 8,
 });
 
-const STYLE_SLEEP = new Style({
-  stroke: Color.RED,
-  width: 8,
-});
 const STYLE_HAND = new Style({
   stroke: Color.WHITE,
   width: 8,
