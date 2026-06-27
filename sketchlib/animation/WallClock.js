@@ -91,13 +91,11 @@ export class WallClock {
    * @returns {number} The angle in radians
    */
   get_discrete_angle(unit) {
-    const MIDNIGHT = -Math.PI / 2;
-
     const time = this.get_discrete_time(unit);
     const subdivision = SUBDIVISIONS[unit];
     const index = time % subdivision;
 
-    return MIDNIGHT + ((2.0 * Math.PI) / subdivision) * index;
+    return WallClock.compute_angle(index, subdivision);
   }
 
   /**
@@ -150,12 +148,22 @@ export class WallClock {
    * @returns {number} The angle in radians
    */
   get_continuous_angle(unit) {
-    const MIDNIGHT = -Math.PI / 2;
-
     const time = this.get_continuous_time(unit);
     const subdivision = SUBDIVISIONS[unit];
     const index = time % subdivision;
 
-    return MIDNIGHT + ((2.0 * Math.PI) / subdivision) * index;
+    return WallClock.compute_angle(index, subdivision);
+  }
+
+  /**
+   * Compute a clockwise angle from the x-axis where a position on the clock
+   * will appear.
+   * @param {number} index Which tick number (e.g. 5 for 5:00). Ticks are counted from midnight clockwise
+   * @param {number} subdivision How many ticks for this unit of time. E.g. 12 for hours, 60 for minutes
+   * @returns {number}
+   */
+  static compute_angle(index, subdivision) {
+    const MIDNIGHT = -Math.PI / 2;
+    return MIDNIGHT + (index * (2.0 * Math.PI)) / subdivision;
   }
 }
