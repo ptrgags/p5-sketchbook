@@ -11,6 +11,13 @@ import { Style } from "../sketchlib/Style.js";
 const DIAL_RADIUS = 200;
 const HAND_LENGTH = 225;
 
+const HASH_LENGTH = 25;
+const TICK_MARKS = Direction.roots_of_unity(24).map((dir) => {
+  const outer_point = SCREEN_CENTER.add(dir.scale(DIAL_RADIUS));
+  const inner_point = SCREEN_CENTER.add(dir.scale(DIAL_RADIUS + HASH_LENGTH));
+  return new LineSegment(outer_point, inner_point);
+});
+
 const HOUR_WAKE = 6;
 const HOUR_SLEEP = 22;
 
@@ -28,6 +35,11 @@ const HAND = new LineSegment(
   SCREEN_CENTER.add(Direction.DIR_Y.scale(HAND_LENGTH)),
 );
 
+const STYLE_TICKS = new Style({
+  stroke: Color.WHITE,
+  width: 4,
+});
+
 const STYLE_WAKE = new Style({
   stroke: Color.CYAN,
   width: 8,
@@ -43,6 +55,7 @@ const STYLE_HAND = new Style({
 });
 
 const SCENE = group(
+  style(TICK_MARKS, STYLE_TICKS),
   style(ARC_SLEEP, STYLE_SLEEP),
   style(ARC_WAKE, STYLE_WAKE),
   style(HAND, STYLE_HAND),
