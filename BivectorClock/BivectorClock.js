@@ -107,7 +107,7 @@ function update_hands() {
   const sec_angle = WALL_CLOCK.get_discrete_angle("sec");
   const sec_dir = Direction.from_angle(sec_angle).scale(DIAL_RADIUS);
 
-  const hour_angle = WALL_CLOCK.get_continuous_angle("hr");
+  const hour_angle = WALL_CLOCK.get_continuous_angle("hr12");
   const hour_dir = Direction.from_angle(hour_angle).scale(DIAL_RADIUS * 0.5);
 
   const min_angle = WALL_CLOCK.get_continuous_angle("min");

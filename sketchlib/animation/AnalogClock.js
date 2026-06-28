@@ -45,7 +45,7 @@ export class FixedTime {
 }
 
 const SUBDIVISIONS = {
-  hr: 12,
+  hr12: 12,
   hr24: 24,
   min: 60,
   sec: 60,
@@ -68,13 +68,13 @@ export class AnalogClock {
 
   /**
    * Get the time in discrete ticks, as you would see in a digital clock
-   * @param {"hr" | "hr24" | "min" | "sec" | "ms"} unit Which time unit to use
+   * @param {"hr12" | "hr24" | "min" | "sec" | "ms"} unit Which time unit to use
    * @returns {number}
    */
   get_discrete_time(unit) {
     const date = this.time_source.now();
     switch (unit) {
-      case "hr":
+      case "hr12":
         return date.getHours() % 12;
       case "hr24":
         return date.getHours();
@@ -90,7 +90,7 @@ export class AnalogClock {
   /**
    * Get the clockwise angle (measured from 0 at the x-axis) for rendering
    * the selected part of the time
-   * @param {"hr" | "hr24" | "min" | "sec" | "ms"} unit Which time unit to use
+   * @param {"hr12" | "hr24" | "min" | "sec" | "ms"} unit Which time unit to use
    * @returns {number} The angle in radians
    */
   get_discrete_angle(unit) {
@@ -103,7 +103,7 @@ export class AnalogClock {
 
   /**
    * Get the time as a continuous value, accounting for the other values
-   * @param {"hr" | "hr24" | "min" | "sec" | "ms"} unit Which time unit to use
+   * @param {"hr12" | "hr24" | "min" | "sec" | "ms"} unit Which time unit to use
    * @returns {number}
    */
   get_continuous_time(unit) {
@@ -113,7 +113,7 @@ export class AnalogClock {
     const sec = date.getSeconds();
     const ms = date.getMilliseconds();
     switch (unit) {
-      case "hr":
+      case "hr12":
         return (
           (hr % 12) +
           min / MIN_PER_HOUR +
@@ -154,7 +154,7 @@ export class AnalogClock {
   /**
    * Get the clockwise angle (measured from 0 at the x-axis) for rendering
    * the selected part of the time
-   * @param {"hr" | "hr24" | "min" | "sec" | "ms"} unit Which time unit to use
+   * @param {"hr12" | "hr24" | "min" | "sec" | "ms"} unit Which time unit to use
    * @returns {number} The angle in radians
    */
   get_continuous_angle(unit) {
