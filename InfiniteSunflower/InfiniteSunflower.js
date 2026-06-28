@@ -11,30 +11,26 @@ const PRIMORDIUM_GROWTH_RATE = 1 / 32;
 
 const MAX_PRIMORDIA = 150;
 
+/**
+ *
+ * @param {import("p5")} p
+ * @param {Petal} petal
+ */
 function draw_petal(p, petal) {
   // flip coordinates so y is up.
   p.push();
   p.scale(1, -1);
 
-  p.beginShape();
+  p.beginShape(p.PATH);
   p.vertex(petal.start.x, petal.start.y);
   p.vertex(petal.side_cw.x, petal.side_cw.y);
-  p.bezierVertex(
-    petal.control_cw.x,
-    petal.control_cw.y,
-    petal.control_tip.x,
-    petal.control_tip.y,
-    petal.tip.x,
-    petal.tip.y
-  );
-  p.bezierVertex(
-    petal.control_tip.x,
-    petal.control_tip.y,
-    petal.control_ccw.x,
-    petal.control_ccw.y,
-    petal.side_ccw.x,
-    petal.side_ccw.y
-  );
+  p.bezierVertex(petal.control_cw.x, petal.control_cw.y);
+  p.bezierVertex(petal.control_tip.x, petal.control_tip.y);
+  p.bezierVertex(petal.tip.x, petal.tip.y);
+
+  p.bezierVertex(petal.control_tip.x, petal.control_tip.y);
+  p.bezierVertex(petal.control_ccw.x, petal.control_ccw.y);
+  p.bezierVertex(petal.side_ccw.x, petal.side_ccw.y);
   p.endShape(p.CLOSE);
   p.pop();
 }
@@ -95,7 +91,7 @@ export const sketch = (p) => {
         p.frameCount,
         PRIMORDIUM_MIN_SIZE,
         PRIMORDIUM_SPEED,
-        PRIMORDIUM_GROWTH_RATE
+        PRIMORDIUM_GROWTH_RATE,
       );
       primordia.push(primordium);
       primordia_count++;

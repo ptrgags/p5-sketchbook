@@ -47,11 +47,12 @@ export class BeziergonPrimitive {
    * @param {import("p5")} p p5.js instance
    */
   draw(p) {
-    p.beginShape();
-    const first_point = this.curves[0].a;
-    p.vertex(first_point.x, first_point.y);
-    for (const { b, c, d } of this) {
-      p.bezierVertex(b.x, b.y, c.x, c.y, d.x, d.y);
+    p.beginShape(p.PATH);
+    for (const { a, b, c, d } of this) {
+      p.bezierVertex(a.x, a.y);
+      p.bezierVertex(b.x, b.y);
+      p.bezierVertex(c.x, c.y);
+      p.bezierVertex(d.x, d.y);
     }
     p.endShape(p.CLOSE);
   }
