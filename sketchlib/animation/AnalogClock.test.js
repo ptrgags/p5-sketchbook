@@ -11,10 +11,19 @@ function make_clock() {
 
 describe("AnalogClock", () => {
   describe("get_discrete_time", () => {
-    it("with hr returns hour component", () => {
+    it("with hr12 returns hour component in 12 hour time", () => {
       const clock = make_clock();
 
-      const result = clock.get_discrete_time("hr");
+      const result = clock.get_discrete_time("hr12");
+
+      const expected = 1;
+      expect(result).toEqual(expected);
+    });
+
+    it("with hr24 returns hour component in 24 hour time", () => {
+      const clock = make_clock();
+
+      const result = clock.get_discrete_time("hr24");
 
       const expected = 13;
       expect(result).toEqual(expected);
@@ -49,10 +58,20 @@ describe("AnalogClock", () => {
   });
 
   describe("get_continuous_time", () => {
-    it("with hr returns computed hours", () => {
+    it("with hr12 returns computed hours in 12 hour time", () => {
       const clock = make_clock();
 
-      const result = clock.get_continuous_time("hr");
+      const result = clock.get_continuous_time("hr12");
+
+      // 13 + 10 / 60 + 30 / 3600 + 100 / 3_600_000
+      const expected = 1.175;
+      expect(result).toBeCloseTo(expected);
+    });
+
+    it("with hr24 returns computed hours in 24 hour time", () => {
+      const clock = make_clock();
+
+      const result = clock.get_continuous_time("hr24");
 
       // 13 + 10 / 60 + 30 / 3600 + 100 / 3_600_000
       const expected = 13.175;
@@ -91,16 +110,28 @@ describe("AnalogClock", () => {
   });
 
   describe("get_discrete_angle", () => {
-    it("with hr returns correct angle", () => {
+    it("with hr12 returns correct angle", () => {
       const clock = make_clock();
 
-      const result = clock.get_discrete_angle("hr");
+      const result = clock.get_discrete_angle("hr12");
 
-      // -pi/2 + 1 * pi/6
+      // -pi/2 + 1 * 2pi/12
       // = -3pi/6 + pi/6
       // = -2pi/6
       // = -pi/3
       const expected = -Math.PI / 3;
+      expect(result).toBeCloseTo(expected);
+    });
+
+    it("with hr24 returns correct angle", () => {
+      const clock = make_clock();
+
+      const result = clock.get_discrete_angle("hr24");
+
+      // -pi/2 + 13 * 2pi/24
+      // = -6pi/12 + 13 * pi/12
+      // = 7pi/12
+      const expected = (7 * Math.PI) / 12;
       expect(result).toBeCloseTo(expected);
     });
 
@@ -144,48 +175,60 @@ describe("AnalogClock", () => {
   });
 
   describe("get_continuous_angle", () => {
-    it("with hr returns computed hours", () => {
+    it("with hr12 returns correct angle", () => {
       const clock = make_clock();
 
-      const result = clock.get_continuous_angle("hr");
+      const result = clock.get_continuous_angle("hr12");
 
       // okay these are annoying to compute by hand
       // time is 13.175 hr (from the continuous time tests above)
       // mod 12 is 1.175
-      // -pi/2 + 1.175 * pi/6
+      // -pi/2 + 1.175 * 2pi/12
       const expected = -Math.PI / 2 + (1.175 * Math.PI) / 6;
       expect(result).toBeCloseTo(expected);
     });
 
-    it("with min returns minutes component", () => {
+    it("with hr24 returns correct angle", () => {
+      const clock = make_clock();
+
+      const result = clock.get_continuous_angle("hr24");
+
+      // okay these are annoying to compute by hand
+      // time is 13.175 hr (from the continuous time tests above)
+      // -pi/2 + 1.175 * 2pi/24
+      const expected = -Math.PI / 2 + (13.175 * Math.PI) / 12;
+      expect(result).toBeCloseTo(expected);
+    });
+
+    it("with min returns correct angle", () => {
       const clock = make_clock();
 
       const result = clock.get_continuous_angle("min");
 
       // 790.502 % 60 is around 10.502
-      // -pi/2 + 10.502 * pi/30
+      // -pi/2 + 10.502 * 2pi/60
       const expected = -Math.PI / 2 + (10.502 * Math.PI) / 30;
       expect(result).toBeCloseTo(expected);
     });
 
-    it("with sec returns seconds component", () => {
+    it("with sec returns correct angle", () => {
       const clock = make_clock();
 
       const result = clock.get_continuous_angle("sec");
 
       // 47430.1 % 60 is around 30.1
-      // -pi/2 + 30.1 * pi/30
+      // -pi/2 + 30.1 * 2pi/60
       const expected = -Math.PI / 2 + (30.1 * Math.PI) / 30;
       expect(result).toBeCloseTo(expected);
     });
 
-    it("with ms returns milliseconds component", () => {
+    it("with ms returns correct angle", () => {
       const clock = make_clock();
 
       const result = clock.get_continuous_angle("ms");
 
       // 47430100 % 1000 = 100
-      // = -pi/2 + 100 * pi/500
+      // = -pi/2 + 100 * 2pi/1000
       // = -3pi/10 like in the discrete version of the test
       const expected = (-3 * Math.PI) / 10;
       expect(result).toBeCloseTo(expected);
