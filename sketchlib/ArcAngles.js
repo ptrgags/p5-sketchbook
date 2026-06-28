@@ -83,6 +83,10 @@ export class ArcAngles {
     return new ArcAngles(this.end_angle, this.start_angle);
   }
 
+  /**
+   * Returns arc angles for the rest of the circle in the same direction
+   * @returns {ArcAngles}
+   */
   complement() {
     return new ArcAngles(this.end_angle, this.start_angle + 2.0 * Math.PI);
   }
