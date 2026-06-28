@@ -103,6 +103,9 @@ export class AnalogClock {
 
   /**
    * Get the time as a continuous value, accounting for the other values
+   *
+   * Note: for minutes, seconds and ms, the hour contribution assumes 24 hour
+   * time
    * @param {"hr12" | "hr24" | "min" | "sec" | "ms"} unit Which time unit to use
    * @returns {number}
    */
@@ -154,6 +157,9 @@ export class AnalogClock {
   /**
    * Get the clockwise angle (measured from 0 at the x-axis) for rendering
    * the selected part of the time
+   *
+   * Note: for minutes, seconds and ms, the hour contribution assumes 24 hour
+   * time
    * @param {"hr12" | "hr24" | "min" | "sec" | "ms"} unit Which time unit to use
    * @returns {number} The angle in radians
    */
