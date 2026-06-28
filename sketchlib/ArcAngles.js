@@ -84,6 +84,14 @@ export class ArcAngles {
   }
 
   /**
+   * Returns arc angles for the rest of the circle in the same direction
+   * @returns {ArcAngles}
+   */
+  complement() {
+    return new ArcAngles(this.end_angle, this.start_angle + 2.0 * Math.PI);
+  }
+
+  /**
    * Compute reduced angles from raw angles (e.g. from atan2) and the orientation
    * of the arc
    * @param {number} start_angle Start angle

@@ -1,6 +1,10 @@
 // Links for all of the sketches. Links are added to the page in this order
 export const LINKS = [
   {
+    title: "Waking Hours Clock",
+    year: "2026-06",
+  },
+  {
     title: "Bivector Clock",
     year: "2026-06",
   },

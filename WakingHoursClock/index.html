@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../libraries/p5.min.js"
+    ></script>
+    <script type="module">
+      import { sketch } from "./WakingHoursClock.js";
+      import "../sketchlib/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../styles/layout.css" />
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>Waking Hours Clock (2026-06)</h1>
+      <div class="sketch">
+        <canvas id="sketch-canvas" width="500" height="700"></canvas>
+      </div>
+      <div class="description">
+        <p>
+          This clock is less about telling time, and more about understanding
+          one's sleep/wake cycle.
+        </p>
+        <p>
+          For this first iteration, the clock is hard-coded to my own (ideal)
+          sleep schedule. I try to allow 8 hours for sleep, and I wake up at 6
+          AM.
+        </p>
+        <p>
+          One satisfying result of this is there are 16 waking hours, which is a
+          power of 2. This means I can divide my day into 4 quarters (Delineated
+          by green ticks). One last tick mark divides the night into "late
+          night" and "early morning" portions.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

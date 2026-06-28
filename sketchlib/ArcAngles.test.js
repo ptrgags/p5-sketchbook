@@ -111,6 +111,15 @@ describe("ArcAngles", () => {
     expect(result.equals(expected)).toBe(true);
   });
 
+  it("complement returns rest of circle", () => {
+    const angles = new ArcAngles(-Math.PI / 3, Math.PI / 4);
+
+    const result = angles.complement();
+
+    const expected = new ArcAngles(Math.PI / 4, (5 * Math.PI) / 3);
+    expect(result.equals(expected)).toBe(true);
+  });
+
   describe("from_raw_angles", () => {
     it("with positive angles computes correct arc", () => {
       const start_angle = Math.PI / 4;
