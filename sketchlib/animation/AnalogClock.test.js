@@ -1,15 +1,15 @@
 import { describe, it, expect } from "vitest";
-import { FixedTime, WallClock } from "./WallClock.js";
+import { FixedTime, AnalogClock } from "./AnalogClock.js";
 
 // oh wow, you could write today's date as 26/6/26, a palindrome. Neat.
 // Let's set the time to 13:50:30.100 so all the components are different
 const TEST_TIME = new Date(2026, 6, 26, 13, 10, 30, 100);
 
 function make_clock() {
-  return new WallClock(new FixedTime(TEST_TIME));
+  return new AnalogClock(new FixedTime(TEST_TIME));
 }
 
-describe("WallClock", () => {
+describe("AnalogClock", () => {
   describe("get_discrete_time", () => {
     it("with hr returns hour component", () => {
       const clock = make_clock();

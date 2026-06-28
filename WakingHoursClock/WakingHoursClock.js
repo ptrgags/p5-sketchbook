@@ -1,4 +1,4 @@
-import { WallClock } from "../sketchlib/animation/WallClock.js";
+import { AnalogClock } from "../sketchlib/animation/AnalogClock.js";
 import { ArcAngles } from "../sketchlib/ArcAngles.js";
 import { Color } from "../sketchlib/Color.js";
 import { WIDTH, HEIGHT, SCREEN_CENTER } from "../sketchlib/dimensions.js";
@@ -50,8 +50,8 @@ const HOUR_WAKE = 6;
 const HOUR_SLEEP = 22;
 
 const ANGLES_WAKE = new ArcAngles(
-  WallClock.compute_angle(HOUR_WAKE, 24),
-  WallClock.compute_angle(HOUR_SLEEP, 24),
+  AnalogClock.compute_angle(HOUR_WAKE, 24),
+  AnalogClock.compute_angle(HOUR_SLEEP, 24),
 );
 const ANGLES_SLEEP = ANGLES_WAKE.complement();
 
@@ -111,7 +111,7 @@ const SCENE = group(
   style(HAND, STYLE_HAND),
 );
 
-const CLOCK = new WallClock();
+const CLOCK = new AnalogClock();
 
 function update_hands() {
   const angle_hour = CLOCK.get_continuous_angle("hr24");

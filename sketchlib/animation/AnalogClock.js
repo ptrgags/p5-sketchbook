@@ -58,7 +58,7 @@ const SUBDIVISIONS = {
  *
  * This clock is also configurable to return the result in seconds or minutes
  */
-export class WallClock {
+export class AnalogClock {
   /**
    * @param {TimeSource} [time_source] Time source. If not present, creates a LocalTime object
    */
@@ -98,7 +98,7 @@ export class WallClock {
     const subdivision = SUBDIVISIONS[unit];
     const index = time % subdivision;
 
-    return WallClock.compute_angle(index, subdivision);
+    return AnalogClock.compute_angle(index, subdivision);
   }
 
   /**
@@ -162,7 +162,7 @@ export class WallClock {
     const subdivision = SUBDIVISIONS[unit];
     const index = time % subdivision;
 
-    return WallClock.compute_angle(index, subdivision);
+    return AnalogClock.compute_angle(index, subdivision);
   }
 
   /**
