@@ -58,10 +58,10 @@ export class HourSelector {
 
   /**
    * Update whether the highlight circle is visible
-   * @param {Point} mouse_coords
+   * @param {boolean} show_highlight
    */
-  update_highlight(mouse_coords) {
-    this.show_highlight.show_flags = [this.is_hovering(mouse_coords)];
+  update_highlight(show_highlight) {
+    this.show_highlight.show_flags = [show_highlight];
   }
 
   /**

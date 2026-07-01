@@ -26,10 +26,10 @@ export class Bezel {
 
   /**
    * Update the bezel highlight
-   * @param {Point} mouse_coords
+   * @param {boolean} show_highlight
    */
-  update_highlight(mouse_coords) {
-    this.highlight.show_flags = [this.is_hovering(mouse_coords)];
+  update_highlight(show_highlight) {
+    this.highlight.show_flags = [show_highlight];
   }
 
   /**

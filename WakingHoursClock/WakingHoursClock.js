@@ -108,6 +108,8 @@ const WAKE_HANDLE = new HourSelector(6, "wake");
 const SLEEP_HANDLE = new HourSelector(22, "sleep");
 const BEZEL = new Bezel();
 
+const PRIORITY_ORDER = [WAKE_HANDLE, SLEEP_HANDLE, BEZEL];
+
 const SCENE = group(
   BEZEL.primitive,
   style(MINOR_TICKS, STYLE_MINOR_TICKS),
@@ -157,9 +159,17 @@ export const sketch = (p) => {
   };
 
   MOUSE.mouse_moved(p, (mouse) => {
-    WAKE_HANDLE.update_highlight(mouse.mouse_coords);
-    SLEEP_HANDLE.update_highlight(mouse.mouse_coords);
-    BEZEL.update_highlight(mouse.mouse_coords);
+    // clear all highlights
+    for (const x of PRIORITY_ORDER) {
+      x.update_highlight(false);
+    }
+
+    for (const x of PRIORITY_ORDER) {
+      if (x.is_hovering(mouse.mouse_coords)) {
+        x.update_highlight(true);
+        break;
+      }
+    }
   });
   MOUSE.mouse_pressed(p, (mouse) => {
     // if we clicked one of the drag handles, start editing the corresponding time
