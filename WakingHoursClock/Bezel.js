@@ -42,4 +42,8 @@ export class Bezel {
 
     return Math.abs(dist_center - DIAL_RADIUS) < 0.5 * BEZEL_THICKNESS;
   }
+
+  move(mouse_coords) {
+    throw new Error("not implemented");
+  }
 }

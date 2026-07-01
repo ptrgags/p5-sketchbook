@@ -139,6 +139,8 @@ const MOUSE = new CanvasMouseHandler();
 
 // @ts-ignore
 export const sketch = (p) => {
+  let selected_object;
+
   p.setup = () => {
     const canvas = p.createCanvas(
       WIDTH,
@@ -174,7 +176,22 @@ export const sketch = (p) => {
   MOUSE.mouse_pressed(p, (mouse) => {
     // if we clicked one of the drag handles, start editing the corresponding time
     // else if we clicked the bezel, start editing the corresponding time
+
+    for (const x of PRIORITY_ORDER) {
+      if (x.is_hovering(mouse.mouse_coords)) {
+        selected_object = x;
+        break;
+      }
+    }
   });
-  MOUSE.mouse_dragged(p, (mouse) => {});
-  MOUSE.mouse_released(p, (mouse) => {});
+
+  MOUSE.mouse_dragged(p, (mouse) => {
+    if (selected_object) {
+      selected_object.move(mouse.mouse_coords);
+    }
+  });
+
+  MOUSE.mouse_released(p, (mouse) => {
+    selected_object = undefined;
+  });
 };

@@ -1,4 +1,5 @@
 import { SCREEN_CENTER } from "../sketchlib/dimensions.js";
+import { mod } from "../sketchlib/mod.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
@@ -12,8 +13,8 @@ import {
   DIAL_RADIUS,
 } from "./constants.js";
 
-const RADIUS_MARKER = 10;
-const RADIUS_HIGHLIGHT = 15;
+const RADIUS_MARKER = 8;
+const RADIUS_HIGHLIGHT = 12;
 
 /**
  *
@@ -24,6 +25,16 @@ function compute_position(hour) {
   const angle = -Math.PI / 2 + (hour * Math.PI) / 12;
   const offset = Direction.from_angle(angle).scale(DIAL_RADIUS);
   return SCREEN_CENTER.add(offset);
+}
+
+/**
+ * Compute the hour rounded to the nearest quarter hour
+ * @param {number} angle
+ */
+function compute_hour(angle) {
+  const continuous_hour = mod((12 / Math.PI) * angle + 6, 24);
+  const nearest_quarter = 0.25 * Math.floor(4 * continuous_hour);
+  return nearest_quarter;
 }
 
 const STYLE_HIGHLIGHT = new Style({
@@ -79,5 +90,19 @@ export class HourSelector {
       mouse_coords.sub(this.position).mag_sqr() <
       RADIUS_HIGHLIGHT * RADIUS_HIGHLIGHT
     );
+  }
+
+  /**
+   *
+   * @param {Point} mouse_coords
+   */
+  move(mouse_coords) {
+    const from_center = mouse_coords.sub(SCREEN_CENTER);
+    const angle = Math.atan2(from_center.y, from_center.x);
+    this.hour = compute_hour(angle);
+    this.position = compute_position(this.hour);
+
+    this.marker_circle.center = this.position;
+    this.highlight_circle.center = this.position;
   }
 }
