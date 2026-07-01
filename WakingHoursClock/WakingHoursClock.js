@@ -139,6 +139,9 @@ const MOUSE = new CanvasMouseHandler();
 
 // @ts-ignore
 export const sketch = (p) => {
+  /**
+   * @type {HourSelector | Bezel | undefined}
+   */
   let selected_object;
 
   p.setup = () => {
@@ -173,6 +176,7 @@ export const sketch = (p) => {
       }
     }
   });
+
   MOUSE.mouse_pressed(p, (mouse) => {
     // if we clicked one of the drag handles, start editing the corresponding time
     // else if we clicked the bezel, start editing the corresponding time
@@ -180,6 +184,7 @@ export const sketch = (p) => {
     for (const x of PRIORITY_ORDER) {
       if (x.is_hovering(mouse.mouse_coords)) {
         selected_object = x;
+        x.select(mouse.mouse_coords);
         break;
       }
     }

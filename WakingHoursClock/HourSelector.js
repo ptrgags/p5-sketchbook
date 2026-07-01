@@ -6,6 +6,7 @@ import { Circle } from "../sketchlib/primitives/Circle.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { ShowHidePrimitive } from "../sketchlib/primitives/ShowHidePrimitive.js";
 import { Style } from "../sketchlib/Style.js";
+import { compute_hour, compute_position } from "./clock_math.js";
 import {
   COLOR_HIGHLIGHT,
   COLOR_SLEEP,
@@ -15,27 +16,6 @@ import {
 
 const RADIUS_MARKER = 8;
 const RADIUS_HIGHLIGHT = 12;
-
-/**
- *
- * @param {number} hour
- * @returns {Point}
- */
-function compute_position(hour) {
-  const angle = -Math.PI / 2 + (hour * Math.PI) / 12;
-  const offset = Direction.from_angle(angle).scale(DIAL_RADIUS);
-  return SCREEN_CENTER.add(offset);
-}
-
-/**
- * Compute the hour rounded to the nearest quarter hour
- * @param {number} angle
- */
-function compute_hour(angle) {
-  const continuous_hour = mod((12 / Math.PI) * angle + 6, 24);
-  const nearest_quarter = 0.25 * Math.floor(4 * continuous_hour);
-  return nearest_quarter;
-}
 
 const STYLE_HIGHLIGHT = new Style({
   fill: COLOR_HIGHLIGHT,
@@ -97,12 +77,12 @@ export class HourSelector {
    * @param {Point} mouse_coords
    */
   move(mouse_coords) {
-    const from_center = mouse_coords.sub(SCREEN_CENTER);
-    const angle = Math.atan2(from_center.y, from_center.x);
-    this.hour = compute_hour(angle);
+    this.hour = compute_hour(mouse_coords);
     this.position = compute_position(this.hour);
 
     this.marker_circle.center = this.position;
     this.highlight_circle.center = this.position;
   }
+
+  select = this.move;
 }

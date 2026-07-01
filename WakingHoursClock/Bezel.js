@@ -1,9 +1,11 @@
 import { SCREEN_CENTER } from "../sketchlib/dimensions.js";
+import { mod } from "../sketchlib/mod.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { ShowHidePrimitive } from "../sketchlib/primitives/ShowHidePrimitive.js";
 import { Style } from "../sketchlib/Style.js";
+import { compute_hour } from "./clock_math.js";
 import { COLOR_HIGHLIGHT, DIAL_RADIUS } from "./constants.js";
 
 const BEZEL_THICKNESS = 30;
@@ -20,6 +22,8 @@ const HIGHLIGHT_CIRCLE = style(
 
 export class Bezel {
   constructor() {
+    this.reference_hour = 0;
+
     this.highlight = new ShowHidePrimitive([HIGHLIGHT_CIRCLE], [false]);
     this.primitive = group(this.highlight);
   }
@@ -43,7 +47,13 @@ export class Bezel {
     return Math.abs(dist_center - DIAL_RADIUS) < 0.5 * BEZEL_THICKNESS;
   }
 
+  select(mouse_coords) {
+    this.reference_hour = compute_hour(mouse_coords);
+  }
+
   move(mouse_coords) {
-    throw new Error("not implemented");
+    const mouse_hour = compute_hour(mouse_coords);
+    const hour_diff = mod(mouse_hour - this.reference_hour, 24);
+    console.log(hour_diff);
   }
 }
