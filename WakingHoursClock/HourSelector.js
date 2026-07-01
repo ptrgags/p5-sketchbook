@@ -57,7 +57,7 @@ export class HourSelector {
   }
 
   /**
-   * Update the highlight flag
+   * Update whether the highlight circle is visible
    * @param {Point} mouse_coords
    */
   update_highlight(mouse_coords) {
@@ -65,7 +65,7 @@ export class HourSelector {
   }
 
   /**
-   * Check if the mouse is hovering over
+   * Check if the mouse is hovering over the hour drag handle
    * @param {Point} mouse_coords
    * @returns {boolean}
    */

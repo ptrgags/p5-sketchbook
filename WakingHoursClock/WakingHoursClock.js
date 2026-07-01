@@ -12,6 +12,7 @@ import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
 import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
 import { Style } from "../sketchlib/Style.js";
+import { Bezel } from "./Bezel.js";
 import {
   DIAL_RADIUS,
   HASH_LENGTH,
@@ -105,8 +106,10 @@ const STYLE_HAND = new Style({
 
 const WAKE_HANDLE = new HourSelector(6, "wake");
 const SLEEP_HANDLE = new HourSelector(22, "sleep");
+const BEZEL = new Bezel();
 
 const SCENE = group(
+  BEZEL.primitive,
   style(MINOR_TICKS, STYLE_MINOR_TICKS),
   style(TICK_MARKS, STYLE_TICKS),
   style(PORTION_TICKS, STYLE_PORTION_TICKS),
@@ -156,6 +159,7 @@ export const sketch = (p) => {
   MOUSE.mouse_moved(p, (mouse) => {
     WAKE_HANDLE.update_highlight(mouse.mouse_coords);
     SLEEP_HANDLE.update_highlight(mouse.mouse_coords);
+    BEZEL.update_highlight(mouse.mouse_coords);
   });
   MOUSE.mouse_pressed(p, (mouse) => {
     // if we clicked one of the drag handles, start editing the corresponding time
