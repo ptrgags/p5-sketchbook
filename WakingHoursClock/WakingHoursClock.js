@@ -2,6 +2,7 @@ import { AnalogClock } from "../sketchlib/animation/AnalogClock.js";
 import { ArcAngles } from "../sketchlib/ArcAngles.js";
 import { Color } from "../sketchlib/Color.js";
 import { WIDTH, HEIGHT, SCREEN_CENTER } from "../sketchlib/dimensions.js";
+import { CanvasMouseHandler } from "../sketchlib/input/CanvasMouseHandler.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
@@ -129,15 +130,19 @@ function update_hands() {
   );
 }
 
+const MOUSE = new CanvasMouseHandler();
+
 // @ts-ignore
 export const sketch = (p) => {
   p.setup = () => {
-    p.createCanvas(
+    const canvas = p.createCanvas(
       WIDTH,
       HEIGHT,
       undefined,
       document.getElementById("sketch-canvas"),
-    );
+    ).elt;
+
+    MOUSE.setup(canvas);
   };
 
   p.draw = () => {
@@ -147,4 +152,15 @@ export const sketch = (p) => {
 
     SCENE.draw(p);
   };
+
+  MOUSE.mouse_moved(p, (mouse) => {
+    WAKE_HANDLE.update_highlight(mouse.mouse_coords);
+    SLEEP_HANDLE.update_highlight(mouse.mouse_coords);
+  });
+  MOUSE.mouse_pressed(p, (mouse) => {
+    // if we clicked one of the drag handles, start editing the corresponding time
+    // else if we clicked the bezel, start editing the corresponding time
+  });
+  MOUSE.mouse_dragged(p, (mouse) => {});
+  MOUSE.mouse_released(p, (mouse) => {});
 };

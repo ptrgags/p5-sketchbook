@@ -2,7 +2,8 @@ import { SCREEN_CENTER } from "../sketchlib/dimensions.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
-import { style } from "../sketchlib/primitives/shorthand.js";
+import { group, style } from "../sketchlib/primitives/shorthand.js";
+import { ShowHidePrimitive } from "../sketchlib/primitives/ShowHidePrimitive.js";
 import { Style } from "../sketchlib/Style.js";
 import { COLOR_SLEEP, COLOR_WAKE, DIAL_RADIUS } from "./constants.js";
 
@@ -22,7 +23,7 @@ function compute_position(hour) {
 
 export class HourSelector {
   /**
-   *
+   * Constructor
    * @param {number} hour current hour
    * @param {"wake" | "sleep"} sleep_or_wake Whether the marker represents
    */
@@ -31,19 +32,47 @@ export class HourSelector {
     this.position = compute_position(hour);
     this.sleep_or_wake = sleep_or_wake;
 
+    // Save the two circles so we can update the positions
+    this.marker_circle = new Circle(this.position, RADIUS_MARKER);
+    this.highlight_circle = new Circle(this.position, RADIUS_HIGHLIGHT);
+    // also need to save a reference to the show/hide flag.
+    this.show_highlight = new ShowHidePrimitive(
+      [this.highlight_circle],
+      [false],
+    );
+
+    const color = sleep_or_wake === "sleep" ? COLOR_SLEEP : COLOR_WAKE;
+    const highlight_color = color.adjust_lightness(0.1);
     const style_marker = new Style({
-      fill: sleep_or_wake === "sleep" ? COLOR_SLEEP : COLOR_WAKE,
+      fill: color,
+    });
+    const style_highlight = new Style({
+      fill: highlight_color,
     });
 
-    this.primitive = style(
-      new Circle(this.position, RADIUS_MARKER),
-      style_marker,
+    this.primitive = group(
+      style(this.show_highlight, style_highlight),
+      style(this.marker_circle, style_marker),
     );
   }
 
   /**
-   * Check if the mouse is hovering over
-   * @param {Point} mouse
+   * Update the highlight flag
+   * @param {Point} mouse_coords
    */
-  is_hovering(mouse) {}
+  update_highlight(mouse_coords) {
+    this.show_highlight.show_flags = [this.is_hovering(mouse_coords)];
+  }
+
+  /**
+   * Check if the mouse is hovering over
+   * @param {Point} mouse_coords
+   * @returns {boolean}
+   */
+  is_hovering(mouse_coords) {
+    return (
+      mouse_coords.sub(this.position).mag_sqr() <
+      RADIUS_HIGHLIGHT * RADIUS_HIGHLIGHT
+    );
+  }
 }
