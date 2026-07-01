@@ -4,12 +4,12 @@ import { Circle } from "../sketchlib/primitives/Circle.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { ShowHidePrimitive } from "../sketchlib/primitives/ShowHidePrimitive.js";
 import { Style } from "../sketchlib/Style.js";
-import { COLOR_BEZEL_HIGHLIGHT, DIAL_RADIUS } from "./constants.js";
+import { COLOR_HIGHLIGHT, DIAL_RADIUS } from "./constants.js";
 
 const BEZEL_THICKNESS = 30;
 
 const STYLE_HIGHLIGHT = new Style({
-  stroke: COLOR_BEZEL_HIGHLIGHT,
+  stroke: COLOR_HIGHLIGHT,
   width: BEZEL_THICKNESS,
 });
 

@@ -5,7 +5,12 @@ import { Circle } from "../sketchlib/primitives/Circle.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { ShowHidePrimitive } from "../sketchlib/primitives/ShowHidePrimitive.js";
 import { Style } from "../sketchlib/Style.js";
-import { COLOR_SLEEP, COLOR_WAKE, DIAL_RADIUS } from "./constants.js";
+import {
+  COLOR_HIGHLIGHT,
+  COLOR_SLEEP,
+  COLOR_WAKE,
+  DIAL_RADIUS,
+} from "./constants.js";
 
 const RADIUS_MARKER = 10;
 const RADIUS_HIGHLIGHT = 15;
@@ -20,6 +25,10 @@ function compute_position(hour) {
   const offset = Direction.from_angle(angle).scale(DIAL_RADIUS);
   return SCREEN_CENTER.add(offset);
 }
+
+const STYLE_HIGHLIGHT = new Style({
+  fill: COLOR_HIGHLIGHT,
+});
 
 export class HourSelector {
   /**
@@ -42,16 +51,12 @@ export class HourSelector {
     );
 
     const color = sleep_or_wake === "sleep" ? COLOR_SLEEP : COLOR_WAKE;
-    const highlight_color = color.adjust_lightness(0.1);
     const style_marker = new Style({
       fill: color,
     });
-    const style_highlight = new Style({
-      fill: highlight_color,
-    });
 
     this.primitive = group(
-      style(this.show_highlight, style_highlight),
+      style(this.show_highlight, STYLE_HIGHLIGHT),
       style(this.marker_circle, style_marker),
     );
   }
