@@ -11,11 +11,15 @@ import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
 import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
 import { Style } from "../sketchlib/Style.js";
-
-const DIAL_RADIUS = 175;
-const HAND_LENGTH = 225;
-const HASH_LENGTH = 30;
-const NUMERAL_RADIUS = 235;
+import {
+  DIAL_RADIUS,
+  HASH_LENGTH,
+  NUMERAL_RADIUS,
+  HAND_LENGTH,
+  COLOR_WAKE,
+  COLOR_SLEEP,
+} from "./constants.js";
+import { HourSelector } from "./HourSelector.js";
 
 const TICK_MARKS = Direction.roots_of_unity(24).map((dir) => {
   const outer_point = SCREEN_CENTER.add(dir.scale(DIAL_RADIUS));
@@ -84,12 +88,12 @@ const STYLE_NUMERALS = new Style({
 
 const STYLE_WAKE = new Style({
   // Orange
-  stroke: new Oklch(0.8, 0.15, 51),
+  stroke: COLOR_WAKE,
   width: 8,
 });
 const STYLE_SLEEP = new Style({
   // Purple
-  stroke: new Oklch(0.5, 0.1, 277),
+  stroke: COLOR_SLEEP,
   width: 8,
 });
 
@@ -97,6 +101,9 @@ const STYLE_HAND = new Style({
   stroke: Color.WHITE,
   width: 8,
 });
+
+const WAKE_HANDLE = new HourSelector(6, "wake");
+const SLEEP_HANDLE = new HourSelector(22, "sleep");
 
 const SCENE = group(
   style(MINOR_TICKS, STYLE_MINOR_TICKS),
@@ -108,6 +115,8 @@ const SCENE = group(
   }),
   style(ARC_SLEEP, STYLE_SLEEP),
   style(ARC_WAKE, STYLE_WAKE),
+  WAKE_HANDLE.primitive,
+  SLEEP_HANDLE.primitive,
   style(HAND, STYLE_HAND),
 );
 

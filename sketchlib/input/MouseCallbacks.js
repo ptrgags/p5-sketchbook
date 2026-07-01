@@ -8,22 +8,22 @@ import { MouseInput } from "./MouseInput.js";
 export class MouseCallbacks {
   /**
    * Mouse pressed event
-   * @type {function(MouseInput): void}
+   * @type {undefined | function(MouseInput): void}
    */
   mouse_pressed = undefined;
   /**
    * Mouse moved event
-   * @type {function(MouseInput): void}
+   * @type {undefined | function(MouseInput): void}
    */
   mouse_moved = undefined;
   /**
    * Mouse dragged event
-   * @type {function(MouseInput): void}
+   * @type {undefined | function(MouseInput): void}
    */
   mouse_dragged = undefined;
   /**
    * Mouse released event
-   * @type {function(MouseInput): void}
+   * @type {undefined | function(MouseInput): void}
    */
   mouse_released = undefined;
 
