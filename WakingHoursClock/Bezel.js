@@ -1,7 +1,6 @@
 import { AnalogClock } from "../sketchlib/animation/AnalogClock.js";
 import { ArcAngles } from "../sketchlib/ArcAngles.js";
 import { Color } from "../sketchlib/Color.js";
-import { SCREEN_CENTER } from "../sketchlib/dimensions.js";
 import { mod } from "../sketchlib/mod.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
@@ -19,6 +18,7 @@ import {
   COLOR_HIGHLIGHT,
   COLOR_SLEEP,
   COLOR_WAKE,
+  DIAL_CENTER,
   DIAL_RADIUS,
   HASH_LENGTH,
   NUMERAL_RADIUS,
@@ -58,14 +58,14 @@ const STYLE_MINOR_TICKS = new Style({
 });
 
 const TICK_MARKS = Direction.roots_of_unity(24).map((dir) => {
-  const outer_point = SCREEN_CENTER.add(dir.scale(DIAL_RADIUS));
-  const inner_point = SCREEN_CENTER.add(dir.scale(DIAL_RADIUS + HASH_LENGTH));
+  const outer_point = DIAL_CENTER.add(dir.scale(DIAL_RADIUS));
+  const inner_point = DIAL_CENTER.add(dir.scale(DIAL_RADIUS + HASH_LENGTH));
   return new LineSegment(outer_point, inner_point);
 });
 
 const MINOR_TICKS = Direction.roots_of_unity(24 * 4).map((dir) => {
-  const outer_point = SCREEN_CENTER.add(dir.scale(DIAL_RADIUS));
-  const inner_point = SCREEN_CENTER.add(
+  const outer_point = DIAL_CENTER.add(dir.scale(DIAL_RADIUS));
+  const inner_point = DIAL_CENTER.add(
     dir.scale(DIAL_RADIUS + HASH_LENGTH * 0.5),
   );
   return new LineSegment(outer_point, inner_point);
@@ -75,13 +75,13 @@ const NUMERALS = Direction.roots_of_unity(24).map((dir, i) => {
   const numeral = (i + 6) % 24;
   return new TextPrimitive(
     `${numeral}`,
-    SCREEN_CENTER.add(dir.scale(NUMERAL_RADIUS)),
+    DIAL_CENTER.add(dir.scale(NUMERAL_RADIUS)),
   );
 });
 const TEXT_STYLE_NUMERALS = new TextStyle(25, "center", "center");
 
 const HIGHLIGHT_CIRCLE = style(
-  new Circle(SCREEN_CENTER, DIAL_RADIUS),
+  new Circle(DIAL_CENTER, DIAL_RADIUS),
   STYLE_HIGHLIGHT,
 );
 
@@ -95,12 +95,12 @@ export class Bezel {
     this.reference_hour = 0;
 
     this.arc_wake = new ArcPrimitive(
-      SCREEN_CENTER,
+      DIAL_CENTER,
       DIAL_RADIUS,
       new ArcAngles(0, Math.PI),
     );
     this.arc_sleep = new ArcPrimitive(
-      SCREEN_CENTER,
+      DIAL_CENTER,
       DIAL_RADIUS,
       new ArcAngles(Math.PI, 2 * Math.PI),
     );
@@ -148,7 +148,7 @@ export class Bezel {
    * @returns {boolean}
    */
   is_hovering(mouse_coords) {
-    const dist_center = mouse_coords.dist(SCREEN_CENTER);
+    const dist_center = mouse_coords.dist(DIAL_CENTER);
 
     return Math.abs(dist_center - DIAL_RADIUS) < 0.5 * BEZEL_THICKNESS;
   }

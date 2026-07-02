@@ -1,18 +1,10 @@
-import { SCREEN_CENTER } from "../sketchlib/dimensions.js";
-import { mod } from "../sketchlib/mod.js";
-import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { ShowHidePrimitive } from "../sketchlib/primitives/ShowHidePrimitive.js";
 import { Style } from "../sketchlib/Style.js";
 import { compute_hour, compute_position } from "./clock_math.js";
-import {
-  COLOR_HIGHLIGHT,
-  COLOR_SLEEP,
-  COLOR_WAKE,
-  DIAL_RADIUS,
-} from "./constants.js";
+import { COLOR_HIGHLIGHT, COLOR_SLEEP, COLOR_WAKE } from "./constants.js";
 import { WakingHours } from "./WakingHours.js";
 
 const RADIUS_MARKER = 8;

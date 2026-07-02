@@ -1,6 +1,6 @@
 import { AnalogClock } from "../sketchlib/animation/AnalogClock.js";
 import { Color } from "../sketchlib/Color.js";
-import { WIDTH, HEIGHT, SCREEN_CENTER } from "../sketchlib/dimensions.js";
+import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { CanvasMouseHandler } from "../sketchlib/input/CanvasMouseHandler.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
@@ -8,14 +8,14 @@ import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 import { Bezel } from "./Bezel.js";
-import { HAND_LENGTH } from "./constants.js";
+import { DIAL_CENTER, HAND_LENGTH } from "./constants.js";
 import { DayDivisions } from "./DayDivisions.js";
 import { HourSelector } from "./HourSelector.js";
 import { WakingHours } from "./WakingHours.js";
 
 const HAND = new LineSegment(
-  SCREEN_CENTER,
-  SCREEN_CENTER.add(Direction.DIR_Y.scale(HAND_LENGTH)),
+  DIAL_CENTER,
+  DIAL_CENTER.add(Direction.DIR_Y.scale(HAND_LENGTH)),
 );
 
 const STYLE_PORTION_TICKS = new Style({
@@ -48,9 +48,7 @@ const CLOCK = new AnalogClock();
 
 function update_hands() {
   const angle_hour = CLOCK.get_continuous_angle("hr24");
-  HAND.b = SCREEN_CENTER.add(
-    Direction.from_angle(angle_hour).scale(HAND_LENGTH),
-  );
+  HAND.b = DIAL_CENTER.add(Direction.from_angle(angle_hour).scale(HAND_LENGTH));
 }
 
 const MOUSE = new CanvasMouseHandler();
