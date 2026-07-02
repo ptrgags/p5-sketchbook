@@ -18,25 +18,29 @@
   <body>
     <sketchbook-navbar></sketchbook-navbar>
     <div class="container">
-      <h1>Waking Hours Clock (2026-06)</h1>
+      <h1>Waking Hours Clock (2026-06/2026-07)</h1>
       <div class="sketch">
         <canvas id="sketch-canvas" width="500" height="700"></canvas>
       </div>
       <div class="description">
         <p>
-          This clock is less about telling time, and more about understanding
-          one's sleep/wake cycle.
+          <b>Controls</b>: Drag the handles to adjust the sleep/wake times. You
+          can also drag the bezel to adjust both times by the same amount.
         </p>
         <p>
-          For this first iteration, the clock is hard-coded to my own (ideal)
-          sleep schedule. I try to allow 8 hours for sleep, and I wake up at 6
-          AM.
+          This clock visualizes one's sleep/wake cycle. The orange arc
+          represents waking hours, while the purple arc represents sleeping
+          hours.
         </p>
         <p>
-          One satisfying result of this is there are 16 waking hours, which is a
-          power of 2. This means I can divide my day into 4 quarters (Delineated
-          by green ticks). One last tick mark divides the night into "late
-          night" and "early morning" portions.
+          The blue tick marks represent subdivisions of one's day. For waking
+          hours, I divide it into halves, quarters, eighths, and sixteenths. The
+          length of these divisions will vary as the sleep/wake times change.
+        </p>
+        <p>
+          For the sleeping hours, I first divide them into 2 portions. Half for
+          "early morning" and half for "late night". Each is divided into
+          quarters.
         </p>
       </div>
     </div>
