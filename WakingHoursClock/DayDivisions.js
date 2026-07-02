@@ -62,6 +62,25 @@ function compute_tick_marks(angles, subdivisions, length) {
 }
 
 /**
+ * Place a sequence of labels around the circle within the given angles
+ * @param {ArcAngles} angles The angles representing the endpoints of the arc
+ * @param {string[]} labels The labels. The arc will be subdivided based on the number of these labels.
+ * @param {number} radius Radius at which labels will appear
+ * @returns {TextPrimitive[]} Label text primitives
+ */
+function compute_labels(angles, labels, radius) {
+  const primitives = [];
+  const label_count = labels.length;
+  for (let i = 0; i < label_count; i++) {
+    const angle = lerp(angles.start_angle, angles.end_angle, i / label_count);
+    const position = DIAL_CENTER.add(Direction.from_angle(angle).scale(radius));
+    const label = new TextPrimitive(DAY_FRACTIONS[i], position);
+    primitives.push(label);
+  }
+  return primitives;
+}
+
+/**
  * Class that manages the blue tick marks for the interior of the clock face.
  *
  * These need to be updated when the sleep/wake times change, as the daytime
@@ -118,35 +137,16 @@ export class DayDivisions {
       ...night_lines2,
     );
 
-    const day_labels = [];
-    const day_label_count = DAY_FRACTIONS.length;
-    for (let i = 0; i < day_label_count; i++) {
-      const angle = lerp(
-        day_angles.start_angle,
-        day_angles.end_angle,
-        i / day_label_count,
-      );
-      const position = DIAL_CENTER.add(
-        Direction.from_angle(angle).scale(DIVISION_RADIUS),
-      );
-      const label = new TextPrimitive(DAY_FRACTIONS[i], position);
-      day_labels.push(label);
-    }
-
-    const night_labels = [];
-    const night_label_count = NIGHT_FRACTIONS.length;
-    for (let i = 0; i < night_label_count; i++) {
-      const angle = lerp(
-        night_angles.start_angle,
-        night_angles.end_angle,
-        i / night_label_count,
-      );
-      const position = DIAL_CENTER.add(
-        Direction.from_angle(angle).scale(1.1 * DIVISION_RADIUS),
-      );
-      const label = new TextPrimitive(NIGHT_FRACTIONS[i], position);
-      night_labels.push(label);
-    }
+    const day_labels = compute_labels(
+      day_angles,
+      DAY_FRACTIONS,
+      DIVISION_RADIUS,
+    );
+    const night_labels = compute_labels(
+      night_angles,
+      NIGHT_FRACTIONS,
+      1.1 * DIVISION_RADIUS,
+    );
 
     this.labels.regroup(...day_labels, ...night_labels);
   }
