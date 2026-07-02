@@ -127,6 +127,7 @@ export const sketch = (p) => {
     ).elt;
 
     MOUSE.setup(canvas);
+    STATE.init();
   };
 
   p.draw = () => {

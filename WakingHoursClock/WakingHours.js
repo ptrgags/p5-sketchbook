@@ -13,6 +13,13 @@ export class WakingHours {
   }
 
   /**
+   * Trigger the first state update
+   */
+  init() {
+    this.#dispach_change();
+  }
+
+  /**
    *
    * @param {"sleep" | "wake"} sleep_or_wake
    * @param {number} hour
