@@ -70,9 +70,10 @@ export class Bezel {
     this.state.events.addEventListener("change", (e) => {
       const { sleep, wake } = /** @type {CustomEvent} */ (e).detail;
 
-      const angles_wake = new ArcAngles(
+      const angles_wake = ArcAngles.from_raw_angles(
         AnalogClock.compute_angle(wake, 24),
         AnalogClock.compute_angle(sleep, 24),
+        +1,
       );
       const angles_sleep = angles_wake.complement();
 
