@@ -28,7 +28,17 @@ const STYLE_HEX_LABELS = new Style({
 
 const TEXT_STYLE_HEX_LABELS = new TextStyle(18, "center", "center");
 
-const DAY_HEX_VALUES = ["00", "20", "40", "60", "80", "A0", "C0", "E0"];
+const DAY_HEX_VALUES = ["0", "1/8", "1/4", "3/8", "1/2", "5/8", "3/4", "7/8"];
+const NIGHT_HEX_VALUES = [
+  "+0",
+  "+1/8",
+  "+1/4",
+  "+3/8",
+  "1/2",
+  "-3/8",
+  "-1/4",
+  "-1/8",
+];
 
 /**
  * Compute tick marks for the inside of the specified arc of the clock
@@ -95,7 +105,7 @@ export class DayDivisions {
     const night_lines2 = compute_tick_marks(
       night_angles,
       2,
-      1.25 * HASH_LENGTH,
+      0.75 * HASH_LENGTH,
     );
     const night_lines8 = compute_tick_marks(night_angles, 8, 0.5 * HASH_LENGTH);
 
@@ -123,6 +133,21 @@ export class DayDivisions {
       day_labels.push(label);
     }
 
-    this.labels.regroup(...day_labels);
+    const night_labels = [];
+    const night_label_count = NIGHT_HEX_VALUES.length;
+    for (let i = 0; i < night_label_count; i++) {
+      const angle = lerp(
+        night_angles.start_angle,
+        night_angles.end_angle,
+        i / night_label_count,
+      );
+      const position = DIAL_CENTER.add(
+        Direction.from_angle(angle).scale(1.1 * DIVISION_RADIUS),
+      );
+      const label = new TextPrimitive(NIGHT_HEX_VALUES[i], position);
+      night_labels.push(label);
+    }
+
+    this.labels.regroup(...day_labels, ...night_labels);
   }
 }
