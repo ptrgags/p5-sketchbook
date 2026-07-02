@@ -217,23 +217,17 @@ export class WakingHoursSummary {
     const sec = clock.get_discrete_time("sec");
     this.label_current_time.text = `Current Time: ${format_dec2(hour)}:${format_dec2(min)}:${format_dec2(sec)}`;
 
-    const wake = this.state.wake_hour;
-    const sleep = this.state.sleep_hour;
-    const sleep_after_wake = sleep < wake ? sleep + 24 : sleep;
-    const mid_wake = lerp(wake, sleep_after_wake, 0.5);
-    const mid_sleep = mid_wake + 12;
-
     // remap the current time between wake and wake + 24 hr
     let raw_hour = clock.get_continuous_time("hr24");
-    if (raw_hour < wake) {
+    if (raw_hour < this.wake) {
       raw_hour += 24;
     }
 
     let proportion = 0;
-    if (raw_hour < sleep_after_wake) {
+    if (raw_hour < this.sleep_after_wake) {
       proportion = this.tween_day.get_value(raw_hour);
       this.label_time_of_day.text = "Daytime ☀";
-    } else if (raw_hour < mid_sleep) {
+    } else if (raw_hour < this.mid_sleep) {
       proportion = this.tween_late_night.get_value(raw_hour);
       this.label_time_of_day.text = "Late Night 🌙";
     } else {
