@@ -8,7 +8,7 @@ import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
 import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
 import { Style } from "../sketchlib/Style.js";
 import { Tween } from "../sketchlib/Tween.js";
-import { DEFAULT_WAKE_HOUR } from "./constants.js";
+import { DEFAULT_SLEEP_HOUR, DEFAULT_WAKE_HOUR } from "./constants.js";
 import { WakingHours } from "./WakingHours.js";
 import { lerp } from "../sketchlib/lerp.js";
 import { mod } from "../sketchlib/mod.js";
@@ -75,48 +75,70 @@ export class WakingHoursSummary {
   constructor(state) {
     this.state = state;
 
-    // These will be overwritten in the event handler
-    this.tween_early_morning = Tween.scalar(-0.5, 0, 2.0, 4);
-    this.tween_day = Tween.scalar(0, 1, 6, 16);
-    this.tween_late_night = Tween.scalar(1.0, 1.5, 22, 4);
+    // These times will be updated in the first state changed event
+    this.wake = 0;
+    this.sleep_after_wake = 0;
+    this.mid_wake = 0;
+    this.mid_sleep = 0;
+    this.wake_duration = 0;
+    this.sleep_duration = 0;
 
-    this.wake_time = new TextPrimitive("Wake Time: HH:MM", new Point(10, 10));
-    this.wake_duration = new TextPrimitive(
+    // Three different tweens that together map [wake, wake + 24] -> a fraction
+    // however daytime, late night, and early morning are handled piecewise.
+    // these will be set in the first state changed event
+    this.tween_early_morning = Tween.scalar(0, 1, 0, 1);
+    this.tween_day = Tween.scalar(0, 1, 0, 1);
+    this.tween_late_night = Tween.scalar(0, 1, 0, 1);
+
+    this.label_wake_time = new TextPrimitive(
+      "Wake Time: HH:MM",
+      new Point(10, 10),
+    );
+    this.label_wake_duration = new TextPrimitive(
       "Duration: HH hr",
       new Point(10, 32 + 10),
     );
-    this.sleep_time = new TextPrimitive(
+    this.label_sleep_time = new TextPrimitive(
       "Sleep Time: HH:MM",
       new Point(WIDTH - 10, 10),
     );
-    this.sleep_duration = new TextPrimitive(
+    this.label_sleep_duration = new TextPrimitive(
       "Duration: HH hr",
       new Point(WIDTH - 10, 32 + 10),
     );
 
-    this.current_time = new TextPrimitive(
+    this.label_current_time = new TextPrimitive(
       "Current Time: HH:MM",
       new Point(10, HEIGHT - 32),
     );
-    this.time_of_day = new TextPrimitive(
+    this.label_time_of_day = new TextPrimitive(
       "Day",
       new Point(WIDTH - 10, HEIGHT - 64),
     );
-    this.fraction = new TextPrimitive(
+    this.label_fraction = new TextPrimitive(
       "Proportion: XX/YY",
       new Point(WIDTH - 10, HEIGHT - 32),
     );
 
     this.primitive = group(
       new GroupPrimitive(
-        [this.wake_time, this.wake_duration, this.current_time],
+        [
+          this.label_wake_time,
+          this.label_wake_duration,
+          this.label_current_time,
+        ],
         {
           style: STYLE_LABELS,
           text_style: TEXT_STYLE_LEFT,
         },
       ),
       new GroupPrimitive(
-        [this.sleep_time, this.sleep_duration, this.time_of_day, this.fraction],
+        [
+          this.label_sleep_time,
+          this.label_sleep_duration,
+          this.label_time_of_day,
+          this.label_fraction,
+        ],
         {
           style: STYLE_LABELS,
           text_style: TEXT_STYLE_RIGHT,
@@ -125,34 +147,47 @@ export class WakingHoursSummary {
     );
 
     state.events.addEventListener("change", (e) => {
-      const { wake, sleep } = /** @type {CustomEvent} */ (e).detail;
+      const { sleep, wake } = /** @type {CustomEvent} */ (e).detail;
 
-      this.wake_time.text = `Wake Time: ${format_hours(wake)}`;
-      this.sleep_time.text = `Sleep Time: ${format_hours(sleep)}`;
+      this.#update_sleep_wake_times(sleep, wake);
+      this.#update_tweens();
 
-      const sleep_after_wake = sleep < wake ? sleep + 24 : sleep;
+      this.label_wake_time.text = `Wake Time: ${format_hours(wake)}`;
+      this.label_sleep_time.text = `Sleep Time: ${format_hours(sleep)}`;
 
-      const mid_wake = lerp(wake, sleep_after_wake, 0.5);
-      const mid_sleep = mid_wake + 12;
-      const wake_duration = sleep_after_wake - wake;
-      const sleep_duration = 24 - wake_duration;
-      this.tween_early_morning = Tween.scalar(
-        -0.5,
-        0,
-        mid_sleep,
-        0.5 * sleep_duration,
-      );
-      this.tween_day = Tween.scalar(0, 1, wake, wake_duration);
-      this.tween_late_night = Tween.scalar(
-        1,
-        1.5,
-        sleep_after_wake,
-        0.5 * sleep_duration,
-      );
-
-      this.sleep_duration.text = `${format_duration(sleep_duration)}`;
-      this.wake_duration.text = `${format_duration(wake_duration)}`;
+      this.label_sleep_duration.text = `${format_duration(this.sleep_duration)}`;
+      this.label_wake_duration.text = `${format_duration(this.wake_duration)}`;
     });
+  }
+
+  /**
+   * Update the sleep/wake hours and derived quantities
+   * @param {number} sleep Sleep time from the state
+   * @param {number} wake Wake time from the state
+   */
+  #update_sleep_wake_times(sleep, wake) {
+    this.wake = wake;
+    this.sleep_after_wake = sleep < wake ? sleep + 24 : sleep;
+    this.mid_wake = lerp(wake, this.sleep_after_wake, 0.5);
+    this.mid_sleep = this.mid_wake + 12;
+    this.wake_duration = this.sleep_after_wake - wake;
+    this.sleep_duration = 24 - this.wake_duration;
+  }
+
+  #update_tweens() {
+    this.tween_early_morning = Tween.scalar(
+      -0.5,
+      0,
+      this.mid_sleep,
+      0.5 * this.sleep_duration,
+    );
+    this.tween_day = Tween.scalar(0, 1, this.wake, this.wake_duration);
+    this.tween_late_night = Tween.scalar(
+      1,
+      1.5,
+      this.sleep_after_wake,
+      0.5 * this.sleep_duration,
+    );
   }
 
   /**
@@ -163,7 +198,7 @@ export class WakingHoursSummary {
     const hour = clock.get_discrete_time("hr24");
     const min = clock.get_discrete_time("min");
     const sec = clock.get_discrete_time("sec");
-    this.current_time.text = `Current Time: ${format_dec2(hour)}:${format_dec2(min)}:${format_dec2(sec)}`;
+    this.label_current_time.text = `Current Time: ${format_dec2(hour)}:${format_dec2(min)}:${format_dec2(sec)}`;
 
     const wake = this.state.wake_hour;
     const sleep = this.state.sleep_hour;
@@ -180,13 +215,13 @@ export class WakingHoursSummary {
     let proportion = 0;
     if (raw_hour < sleep_after_wake) {
       proportion = this.tween_day.get_value(raw_hour);
-      this.time_of_day.text = "Daytime ☀";
+      this.label_time_of_day.text = "Daytime ☀";
     } else if (raw_hour < mid_sleep) {
       proportion = this.tween_late_night.get_value(raw_hour);
-      this.time_of_day.text = "Late Night 🌙";
+      this.label_time_of_day.text = "Late Night 🌙";
     } else {
       proportion = this.tween_early_morning.get_value(raw_hour);
-      this.time_of_day.text = "Early Morning 🌙";
+      this.label_time_of_day.text = "Early Morning 🌙";
     }
     proportion = round_sixteenth(proportion);
     const proportion_rational = new Rational(proportion * 16, 16);
@@ -197,6 +232,6 @@ export class WakingHoursSummary {
       proportion_str = `+${reduced}`;
     }
 
-    this.fraction.text = `Proportion: ${proportion_str}`;
+    this.label_fraction.text = `Proportion: ${proportion_str}`;
   }
 }
