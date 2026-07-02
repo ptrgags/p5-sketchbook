@@ -14,10 +14,13 @@ const STYLE_HIGHLIGHT = new Style({
   fill: COLOR_HIGHLIGHT,
 });
 
+/**
+ * One of the drag handles for setting either the sleep/wake time
+ */
 export class HourSelector {
   /**
    * Constructor
-   * @param {WakingHours} state current hour
+   * @param {WakingHours} state State of the clock
    * @param {"wake" | "sleep"} sleep_or_wake Whether the marker represents
    */
   constructor(state, sleep_or_wake) {
@@ -81,7 +84,8 @@ export class HourSelector {
   }
 
   /**
-   *
+   * When the mouse is dragged, update the corresponding hour value in the
+   * state.
    * @param {Point} mouse_coords
    */
   move(mouse_coords) {

@@ -19,13 +19,15 @@ const STYLE_DIVISION_TICK = new Style({
 });
 
 /**
+ * Compute tick marks for the inside of the specified arc of the clock
  *
- * @param {ArcAngles} angles
- * @param {number} subdivisions
- * @param {number} length
- * @returns {LineSegment[]}
+ * Note: this creates a tick at the start angle, but excludes the end angle
+ * @param {ArcAngles} angles Angles that determine the endpoints of the arc
+ * @param {number} subdivisions How many subdivisions to make
+ * @param {number} length Length of each tick mark in pixels
+ * @returns {LineSegment[]} The generated tick marks
  */
-function compute_lines(angles, subdivisions, length) {
+function compute_tick_marks(angles, subdivisions, length) {
   const lines = [];
   for (let i = 0; i < subdivisions; i++) {
     const angle = lerp(angles.start_angle, angles.end_angle, i / subdivisions);
@@ -37,10 +39,16 @@ function compute_lines(angles, subdivisions, length) {
   return lines;
 }
 
+/**
+ * Class that manages the blue tick marks for the interior of the clock face.
+ *
+ * These need to be updated when the sleep/wake times change, as the daytime
+ * and nighttime portions are handled separately
+ */
 export class DayDivisions {
   /**
    * Constructor
-   * @param {WakingHours} state
+   * @param {WakingHours} state State of the clock
    */
   constructor(state) {
     this.divisions = group();
@@ -63,13 +71,17 @@ export class DayDivisions {
     const day_angles = new ArcAngles(wake_angle, sleep_angle);
     const night_angles = day_angles.complement();
 
-    const day_lines2 = compute_lines(day_angles, 2, 1.25 * HASH_LENGTH);
-    const day_lines4 = compute_lines(day_angles, 4, HASH_LENGTH);
-    const day_lines8 = compute_lines(day_angles, 8, 0.75 * HASH_LENGTH);
-    const day_lines16 = compute_lines(day_angles, 16, 0.5 * HASH_LENGTH);
+    const day_lines2 = compute_tick_marks(day_angles, 2, 1.25 * HASH_LENGTH);
+    const day_lines4 = compute_tick_marks(day_angles, 4, HASH_LENGTH);
+    const day_lines8 = compute_tick_marks(day_angles, 8, 0.75 * HASH_LENGTH);
+    const day_lines16 = compute_tick_marks(day_angles, 16, 0.5 * HASH_LENGTH);
 
-    const night_lines2 = compute_lines(night_angles, 2, 1.25 * HASH_LENGTH);
-    const night_lines8 = compute_lines(night_angles, 8, 0.5 * HASH_LENGTH);
+    const night_lines2 = compute_tick_marks(
+      night_angles,
+      2,
+      1.25 * HASH_LENGTH,
+    );
+    const night_lines8 = compute_tick_marks(night_angles, 8, 0.5 * HASH_LENGTH);
 
     this.divisions.regroup(
       ...day_lines16,

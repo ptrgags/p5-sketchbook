@@ -4,9 +4,9 @@ import { Point } from "../sketchlib/pga2d/Point.js";
 import { DIAL_CENTER, DIAL_RADIUS } from "./constants.js";
 
 /**
- *
- * @param {number} hour
- * @returns {Point}
+ * Compute the position on the clock based on the hour
+ * @param {number} hour Hour (rounded to nearest quarter hour)
+ * @returns {Point} Position on the screen.
  */
 export function compute_position(hour) {
   const angle = -Math.PI / 2 + (hour * Math.PI) / 12;

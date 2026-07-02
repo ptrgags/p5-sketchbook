@@ -85,10 +85,17 @@ const HIGHLIGHT_CIRCLE = style(
   STYLE_HIGHLIGHT,
 );
 
+/**
+ * The bezel of this clock displays two circular arcs, one for waking hours and
+ * another for sleeping hours.
+ *
+ * When dragged with mouse/touch input, it shifts both sleep and wake times
+ * by the same amount.
+ */
 export class Bezel {
   /**
    * Constructor
-   * @param {WakingHours} state
+   * @param {WakingHours} state State of the cclock
    */
   constructor(state) {
     this.state = state;
@@ -144,8 +151,8 @@ export class Bezel {
 
   /**
    * Check if the mouse is over the bezel circle
-   * @param {Point} mouse_coords
-   * @returns {boolean}
+   * @param {Point} mouse_coords Coordinates of the mouse
+   * @returns {boolean} True if the mouse is over the area of the bezel highlight
    */
   is_hovering(mouse_coords) {
     const dist_center = mouse_coords.dist(DIAL_CENTER);
@@ -154,7 +161,9 @@ export class Bezel {
   }
 
   /**
-   *
+   * When the bezel is selected with the mouse, save the position as a
+   * reference point so we can see how far the bezel travels in the next
+   * drag event (see move())
    * @param {Point} mouse_coords
    */
   select(mouse_coords) {
@@ -162,7 +171,7 @@ export class Bezel {
   }
 
   /**
-   *
+   * When the mouse is dragged, this updates the sleep/wake times
    * @param {Point} mouse_coords
    */
   move(mouse_coords) {

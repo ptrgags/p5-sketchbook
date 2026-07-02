@@ -30,6 +30,11 @@ function save_hours(sleep, wake) {
   storage.setItem("wake", wake.toString());
 }
 
+/**
+ * State for the waking hours clock -- it has methods UI components can
+ * use to edit the state in controlled ways. It also has an event handler
+ * to signal state changes
+ */
 export class WakingHours {
   /**
    * Constructor
@@ -49,9 +54,10 @@ export class WakingHours {
   }
 
   /**
-   *
-   * @param {"sleep" | "wake"} sleep_or_wake
-   * @param {number} hour
+   * Called when a hour selector moves
+   * @see HourSelector
+   * @param {"sleep" | "wake"} sleep_or_wake which end point moved
+   * @param {number} hour The new hour number (rounded to nearest 0.25 hr)
    */
   move_end_point(sleep_or_wake, hour) {
     if (sleep_or_wake === "sleep") {
@@ -63,8 +69,9 @@ export class WakingHours {
   }
 
   /**
-   *
-   * @param {number} hour_diff
+   * Called when the bezel rotates
+   * @see Bezel
+   * @param {number} hour_diff How many hours moved (rounded to nearest 0.25 hr)
    */
   move_bezel(hour_diff) {
     this.wake_hour = mod(this.wake_hour + hour_diff, 24);
@@ -73,6 +80,10 @@ export class WakingHours {
     this.#dispach_change();
   }
 
+  /**
+   * Save the sleep/wake times to local storage to persist across page refreshes
+   * and dispatch a 'change' event
+   */
   #dispach_change() {
     save_hours(this.sleep_hour, this.wake_hour);
     this.events.dispatchEvent(
