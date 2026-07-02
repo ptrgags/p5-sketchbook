@@ -29,7 +29,7 @@ const STYLE_FRACTION_LABELS = new Style({
 const TEXT_STYLE_FRACTION_LABELS = new TextStyle(18, "center", "center");
 
 const DAY_FRACTIONS = ["0", "1/8", "1/4", "3/8", "1/2", "5/8", "3/4", "7/8"];
-const NIGHT_FRACTION_VALUES = [
+const NIGHT_FRACTIONS = [
   "1",
   "+1/8",
   "+1/4",
@@ -134,7 +134,7 @@ export class DayDivisions {
     }
 
     const night_labels = [];
-    const night_label_count = NIGHT_FRACTION_VALUES.length;
+    const night_label_count = NIGHT_FRACTIONS.length;
     for (let i = 0; i < night_label_count; i++) {
       const angle = lerp(
         night_angles.start_angle,
@@ -144,7 +144,7 @@ export class DayDivisions {
       const position = DIAL_CENTER.add(
         Direction.from_angle(angle).scale(1.1 * DIVISION_RADIUS),
       );
-      const label = new TextPrimitive(NIGHT_FRACTION_VALUES[i], position);
+      const label = new TextPrimitive(NIGHT_FRACTIONS[i], position);
       night_labels.push(label);
     }
 
