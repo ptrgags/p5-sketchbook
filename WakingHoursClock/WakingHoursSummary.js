@@ -59,12 +59,23 @@ function format_duration(hours) {
 }
 
 /**
- *
- * @param {number} x
- * @returns {number}
+ * Format proportions. Late night is renumbered from 0 and marked with a +.
+ * Early morning is renumbered with negative fractions
+ * @param {number} proportion The proportion
+ * @returns {string} a fraction, -a/b for early morning, a/b during the day (between 0 and 1) and +a/b for late night
  */
-function round_sixteenth(x) {
-  return Math.floor(16 * x) / 16;
+function format_proportion(proportion) {
+  const sixteenths = Math.floor(16 * proportion);
+  const rational = new Rational(sixteenths, 16);
+
+  // for negative values and values up to one, return the fraction with the
+  // usual proportion
+  if (rational.le(Rational.ONE)) {
+    return rational.toString();
+  }
+
+  const reduced = rational.sub(Rational.ONE);
+  return `+${reduced}`;
 }
 
 /**
@@ -227,15 +238,7 @@ export class WakingHoursSummary {
       proportion = this.tween_early_morning.get_value(raw_hour);
       this.label_time_of_day.text = "Early Morning 🌙";
     }
-    proportion = round_sixteenth(proportion);
-    const proportion_rational = new Rational(proportion * 16, 16);
 
-    let proportion_str = proportion_rational.toString();
-    if (proportion_rational.gt(Rational.ONE)) {
-      const reduced = proportion_rational.sub(Rational.ONE).toString();
-      proportion_str = `+${reduced}`;
-    }
-
-    this.label_fraction.text = `Proportion: ${proportion_str}`;
+    this.label_fraction.text = `Proportion: ${format_proportion(proportion)}`;
   }
 }

@@ -74,7 +74,7 @@ function compute_labels(angles, labels, radius) {
   for (let i = 0; i < label_count; i++) {
     const angle = lerp(angles.start_angle, angles.end_angle, i / label_count);
     const position = DIAL_CENTER.add(Direction.from_angle(angle).scale(radius));
-    const label = new TextPrimitive(DAY_FRACTIONS[i], position);
+    const label = new TextPrimitive(labels[i], position);
     primitives.push(label);
   }
   return primitives;
