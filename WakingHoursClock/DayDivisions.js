@@ -18,6 +18,25 @@ const STYLE_DIVISION_TICK = new Style({
   width: 4,
 });
 
+/**
+ *
+ * @param {ArcAngles} angles
+ * @param {number} subdivisions
+ * @param {number} length
+ * @returns {LineSegment[]}
+ */
+function compute_lines(angles, subdivisions, length) {
+  const lines = [];
+  for (let i = 0; i < subdivisions; i++) {
+    const angle = lerp(angles.start_angle, angles.end_angle, i / subdivisions);
+    const dir = Direction.from_angle(angle);
+    const outer_point = DIAL_CENTER.add(dir.scale(DIAL_RADIUS));
+    const inner_point = DIAL_CENTER.add(dir.scale(DIAL_RADIUS - length));
+    lines.push(new LineSegment(outer_point, inner_point));
+  }
+  return lines;
+}
+
 export class DayDivisions {
   /**
    * Constructor
@@ -42,30 +61,23 @@ export class DayDivisions {
     const wake_angle = AnalogClock.compute_angle(wake_hour, 24);
     const sleep_angle = AnalogClock.compute_angle(sleep_hour, 24);
     const day_angles = new ArcAngles(wake_angle, sleep_angle);
-
-    const day_lines = [];
-    for (let i = 0; i <= 8; i++) {
-      const angle = lerp(day_angles.start_angle, day_angles.end_angle, i / 8);
-      const dir = Direction.from_angle(angle);
-      const outer_point = DIAL_CENTER.add(dir.scale(DIAL_RADIUS));
-      const inner_point = DIAL_CENTER.add(dir.scale(DIAL_RADIUS - HASH_LENGTH));
-      day_lines.push(new LineSegment(outer_point, inner_point));
-    }
-
     const night_angles = day_angles.complement();
-    const night_lines = [];
-    for (let i = 1; i < 8; i++) {
-      const angle = lerp(
-        night_angles.start_angle,
-        night_angles.end_angle,
-        i / 8,
-      );
-      const dir = Direction.from_angle(angle);
-      const outer_point = DIAL_CENTER.add(dir.scale(DIAL_RADIUS));
-      const inner_point = DIAL_CENTER.add(dir.scale(DIAL_RADIUS - HASH_LENGTH));
-      night_lines.push(new LineSegment(outer_point, inner_point));
-    }
 
-    this.divisions.regroup(...day_lines, ...night_lines);
+    const day_lines2 = compute_lines(day_angles, 2, 1.25 * HASH_LENGTH);
+    const day_lines4 = compute_lines(day_angles, 4, HASH_LENGTH);
+    const day_lines8 = compute_lines(day_angles, 8, 0.75 * HASH_LENGTH);
+    const day_lines16 = compute_lines(day_angles, 16, 0.5 * HASH_LENGTH);
+
+    const night_lines2 = compute_lines(night_angles, 2, 1.25 * HASH_LENGTH);
+    const night_lines8 = compute_lines(night_angles, 8, 0.5 * HASH_LENGTH);
+
+    this.divisions.regroup(
+      ...day_lines16,
+      ...day_lines8,
+      ...day_lines4,
+      ...day_lines2,
+      ...night_lines8,
+      ...night_lines2,
+    );
   }
 }
