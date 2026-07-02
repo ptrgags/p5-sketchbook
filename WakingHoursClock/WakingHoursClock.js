@@ -4,6 +4,7 @@ import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { CanvasMouseHandler } from "../sketchlib/input/CanvasMouseHandler.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
@@ -46,6 +47,24 @@ function update_hands() {
   HAND.b = DIAL_CENTER.add(Direction.from_angle(angle_hour).scale(HAND_LENGTH));
 }
 
+function clear_highlights() {
+  PRIORITY_ORDER.forEach((x) => x.update_highlight(false));
+}
+
+/**
+ * Update the highlights in a mouse event. This only affects the first
+ * UI component under the mouse according to PRIORITY_ORDER above.
+ * @param {Point} mouse_coords
+ */
+function update_highlights(mouse_coords) {
+  for (const x of PRIORITY_ORDER) {
+    if (x.is_hovering(mouse_coords)) {
+      x.update_highlight(true);
+      break;
+    }
+  }
+}
+
 const MOUSE = new CanvasMouseHandler();
 
 // @ts-ignore
@@ -76,27 +95,20 @@ export const sketch = (p) => {
   };
 
   MOUSE.mouse_moved(p, (mouse) => {
-    // clear all highlights
-    for (const x of PRIORITY_ORDER) {
-      x.update_highlight(false);
-    }
-
-    for (const x of PRIORITY_ORDER) {
-      if (x.is_hovering(mouse.mouse_coords)) {
-        x.update_highlight(true);
-        break;
-      }
-    }
+    clear_highlights();
+    update_highlights(mouse.mouse_coords);
   });
 
   MOUSE.mouse_pressed(p, (mouse) => {
     // if we clicked one of the drag handles, start editing the corresponding time
     // else if we clicked the bezel, start editing the corresponding time
+    clear_highlights();
 
     for (const x of PRIORITY_ORDER) {
       if (x.is_hovering(mouse.mouse_coords)) {
         selected_object = x;
         x.select(mouse.mouse_coords);
+        x.update_highlight(true);
         break;
       }
     }
@@ -106,9 +118,14 @@ export const sketch = (p) => {
     if (selected_object) {
       selected_object.move(mouse.mouse_coords);
     }
+
+    // don't update the highlights until the mouse is released
   });
 
   MOUSE.mouse_released(p, (mouse) => {
     selected_object = undefined;
+
+    clear_highlights();
+    // don't set the highlights here, it feels off in mobile
   });
 };
