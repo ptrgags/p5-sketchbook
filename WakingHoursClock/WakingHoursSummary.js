@@ -7,7 +7,12 @@ import { group } from "../sketchlib/primitives/shorthand.js";
 import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
 import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
 import { Style } from "../sketchlib/Style.js";
+import { Tween } from "../sketchlib/Tween.js";
+import { DEFAULT_WAKE_HOUR } from "./constants.js";
 import { WakingHours } from "./WakingHours.js";
+import { lerp } from "../sketchlib/lerp.js";
+import { mod } from "../sketchlib/mod.js";
+import { Rational } from "../sketchlib/Rational.js";
 
 const STYLE_LABELS = new Style({
   fill: Color.WHITE,
@@ -39,6 +44,15 @@ function format_hours(hours) {
   return `${hour_str}:${min_str}`;
 }
 
+/**
+ *
+ * @param {number} x
+ * @returns {number}
+ */
+function round_sixteenth(x) {
+  return Math.floor(16 * x) / 16;
+}
+
 export class WakingHoursSummary {
   /**
    * Constructor
@@ -46,6 +60,11 @@ export class WakingHoursSummary {
    */
   constructor(state) {
     this.state = state;
+
+    // These will be overwritten in the event handler
+    this.tween_early_morning = Tween.scalar(-0.5, 0, 2.0, 4);
+    this.tween_day = Tween.scalar(0, 1, 6, 16);
+    this.tween_late_night = Tween.scalar(1.0, 1.5, 22, 4);
 
     this.wake_time = new TextPrimitive("Wake Time: HH:MM", new Point(10, 10));
     this.sleep_time = new TextPrimitive(
@@ -56,13 +75,17 @@ export class WakingHoursSummary {
       "Current Time: HH:MM",
       new Point(10, HEIGHT - 32),
     );
+    this.fraction = new TextPrimitive(
+      "Proportion: XX/YY",
+      new Point(WIDTH - 10, HEIGHT - 32),
+    );
 
     this.primitive = group(
       new GroupPrimitive([this.wake_time, this.current_time], {
         style: STYLE_LABELS,
         text_style: TEXT_STYLE_LEFT,
       }),
-      new GroupPrimitive([this.sleep_time], {
+      new GroupPrimitive([this.sleep_time, this.fraction], {
         style: STYLE_LABELS,
         text_style: TEXT_STYLE_RIGHT,
       }),
@@ -73,6 +96,26 @@ export class WakingHoursSummary {
 
       this.wake_time.text = `Wake Time: ${format_hours(wake)}`;
       this.sleep_time.text = `Sleep Time: ${format_hours(sleep)}`;
+
+      const sleep_after_wake = sleep < wake ? sleep + 24 : sleep;
+
+      const mid_wake = lerp(wake, sleep_after_wake, 0.5);
+      const mid_sleep = mid_wake + 12;
+      const wake_duration = sleep_after_wake - wake;
+      const sleep_duration = 24 - wake_duration;
+      this.tween_early_morning = Tween.scalar(
+        -0.5,
+        0,
+        mid_sleep,
+        0.5 * sleep_duration,
+      );
+      this.tween_day = Tween.scalar(0, 1, wake, wake_duration);
+      this.tween_late_night = Tween.scalar(
+        1,
+        1.5,
+        sleep_after_wake,
+        0.5 * sleep_duration,
+      );
     });
   }
 
@@ -85,5 +128,41 @@ export class WakingHoursSummary {
     const min = clock.get_discrete_time("min");
     const sec = clock.get_discrete_time("sec");
     this.current_time.text = `Current Time: ${format_dec2(hour)}:${format_dec2(min)}:${format_dec2(sec)}`;
+
+    const wake = this.state.wake_hour;
+    const sleep = this.state.sleep_hour;
+    const sleep_after_wake = sleep < wake ? sleep + 24 : sleep;
+    const mid_wake = lerp(wake, sleep_after_wake, 0.5);
+    const mid_sleep = mid_wake + 12;
+
+    // remap the current time between wake and wake + 24 hr
+    let raw_hour = clock.get_continuous_time("hr24");
+    if (raw_hour < wake) {
+      raw_hour += 24;
+    }
+
+    let proportion = 0;
+    let is_night = false;
+    if (raw_hour < sleep_after_wake) {
+      proportion = this.tween_day.get_value(raw_hour);
+    } else if (raw_hour < mid_sleep) {
+      proportion = this.tween_late_night.get_value(raw_hour);
+      is_night = true;
+    } else {
+      proportion = this.tween_early_morning.get_value(raw_hour);
+      is_night = true;
+    }
+    proportion = round_sixteenth(proportion);
+    const proportion_rational = new Rational(proportion * 16, 16);
+
+    let proportion_str = proportion_rational.toString();
+    if (proportion_rational.gt(Rational.ONE)) {
+      const reduced = proportion_rational.sub(Rational.ONE).toString();
+      proportion_str = `+${reduced}`;
+    }
+
+    let emoji = is_night ? "🌙" : "☀";
+
+    this.fraction.text = `Proportion: ${proportion_str}${emoji}`;
   }
 }
