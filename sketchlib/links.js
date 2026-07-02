@@ -2,7 +2,7 @@
 export const LINKS = [
   {
     title: "Waking Hours Clock",
-    year: "2026-06",
+    year: "2026-06/2026-07",
   },
   {
     title: "Bivector Clock",
