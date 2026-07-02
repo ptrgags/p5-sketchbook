@@ -2,7 +2,6 @@ import { AnalogClock } from "../sketchlib/animation/AnalogClock.js";
 import { Color } from "../sketchlib/Color.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { CanvasMouseHandler } from "../sketchlib/input/CanvasMouseHandler.js";
-import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
@@ -13,6 +12,7 @@ import { DIAL_CENTER, HAND_LENGTH } from "./constants.js";
 import { DayDivisions } from "./DayDivisions.js";
 import { HourSelector } from "./HourSelector.js";
 import { WakingHours } from "./WakingHours.js";
+import { WakingHoursSummary } from "./WakingHoursSummary.js";
 
 const HAND = new LineSegment(
   DIAL_CENTER,
@@ -29,6 +29,7 @@ const WAKE_HANDLE = new HourSelector(STATE, "wake");
 const SLEEP_HANDLE = new HourSelector(STATE, "sleep");
 const BEZEL = new Bezel(STATE);
 const DIVISIONS = new DayDivisions(STATE);
+const SUMMARY = new WakingHoursSummary(STATE);
 
 const PRIORITY_ORDER = [WAKE_HANDLE, SLEEP_HANDLE, BEZEL];
 
@@ -38,6 +39,7 @@ const SCENE = group(
   WAKE_HANDLE.primitive,
   SLEEP_HANDLE.primitive,
   style(HAND, STYLE_HAND),
+  SUMMARY.primitive,
 );
 
 const CLOCK = new AnalogClock();
@@ -89,6 +91,7 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
+    SUMMARY.update_time(CLOCK);
     update_hands();
 
     SCENE.draw(p);

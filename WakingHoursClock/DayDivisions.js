@@ -9,14 +9,36 @@ import {
   COLOR_HIGHLIGHT,
   DIAL_CENTER,
   DIAL_RADIUS,
+  DIVISION_RADIUS,
   HASH_LENGTH,
 } from "./constants.js";
 import { WakingHours } from "./WakingHours.js";
+import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
+import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
+import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 
 const STYLE_DIVISION_TICK = new Style({
   stroke: COLOR_HIGHLIGHT,
   width: 4,
 });
+
+const STYLE_FRACTION_LABELS = new Style({
+  fill: COLOR_HIGHLIGHT,
+});
+
+const TEXT_STYLE_FRACTION_LABELS = new TextStyle(18, "center", "center");
+
+const DAY_FRACTIONS = ["0", "1/8", "1/4", "3/8", "1/2", "5/8", "3/4", "7/8"];
+const NIGHT_FRACTIONS = [
+  "1",
+  "+1/8",
+  "+1/4",
+  "+3/8",
+  "1/2",
+  "-3/8",
+  "-1/4",
+  "-1/8",
+];
 
 /**
  * Compute tick marks for the inside of the specified arc of the clock
@@ -40,6 +62,25 @@ function compute_tick_marks(angles, subdivisions, length) {
 }
 
 /**
+ * Place a sequence of labels around the circle within the given angles
+ * @param {ArcAngles} angles The angles representing the endpoints of the arc
+ * @param {string[]} labels The labels. The arc will be subdivided based on the number of these labels.
+ * @param {number} radius Radius at which labels will appear
+ * @returns {TextPrimitive[]} Label text primitives
+ */
+function compute_labels(angles, labels, radius) {
+  const primitives = [];
+  const label_count = labels.length;
+  for (let i = 0; i < label_count; i++) {
+    const angle = lerp(angles.start_angle, angles.end_angle, i / label_count);
+    const position = DIAL_CENTER.add(Direction.from_angle(angle).scale(radius));
+    const label = new TextPrimitive(labels[i], position);
+    primitives.push(label);
+  }
+  return primitives;
+}
+
+/**
  * Class that manages the blue tick marks for the interior of the clock face.
  *
  * These need to be updated when the sleep/wake times change, as the daytime
@@ -52,7 +93,11 @@ export class DayDivisions {
    */
   constructor(state) {
     this.divisions = group();
-    this.primitive = style(this.divisions, STYLE_DIVISION_TICK);
+    this.labels = new GroupPrimitive([], {
+      style: STYLE_FRACTION_LABELS,
+      text_style: TEXT_STYLE_FRACTION_LABELS,
+    });
+    this.primitive = style([this.divisions, this.labels], STYLE_DIVISION_TICK);
 
     state.events.addEventListener("change", (e) => {
       const { sleep, wake } = /** @type {CustomEvent} */ (e).detail;
@@ -68,7 +113,7 @@ export class DayDivisions {
   #compute_subdivisions(sleep_hour, wake_hour) {
     const wake_angle = AnalogClock.compute_angle(wake_hour, 24);
     const sleep_angle = AnalogClock.compute_angle(sleep_hour, 24);
-    const day_angles = new ArcAngles(wake_angle, sleep_angle);
+    const day_angles = ArcAngles.from_raw_angles(wake_angle, sleep_angle, +1);
     const night_angles = day_angles.complement();
 
     const day_lines2 = compute_tick_marks(day_angles, 2, 1.25 * HASH_LENGTH);
@@ -79,7 +124,7 @@ export class DayDivisions {
     const night_lines2 = compute_tick_marks(
       night_angles,
       2,
-      1.25 * HASH_LENGTH,
+      0.75 * HASH_LENGTH,
     );
     const night_lines8 = compute_tick_marks(night_angles, 8, 0.5 * HASH_LENGTH);
 
@@ -91,5 +136,18 @@ export class DayDivisions {
       ...night_lines8,
       ...night_lines2,
     );
+
+    const day_labels = compute_labels(
+      day_angles,
+      DAY_FRACTIONS,
+      DIVISION_RADIUS,
+    );
+    const night_labels = compute_labels(
+      night_angles,
+      NIGHT_FRACTIONS,
+      1.1 * DIVISION_RADIUS,
+    );
+
+    this.labels.regroup(...day_labels, ...night_labels);
   }
 }
