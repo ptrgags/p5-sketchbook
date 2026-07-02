@@ -1,12 +1,18 @@
 import { AnalogClock } from "../sketchlib/animation/AnalogClock.js";
 import { ArcAngles } from "../sketchlib/ArcAngles.js";
+import { Color } from "../sketchlib/Color.js";
 import { SCREEN_CENTER } from "../sketchlib/dimensions.js";
 import { mod } from "../sketchlib/mod.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
+import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
+import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { ShowHidePrimitive } from "../sketchlib/primitives/ShowHidePrimitive.js";
+import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
+import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
 import { Style } from "../sketchlib/Style.js";
 import { compute_hour } from "./clock_math.js";
 import {
@@ -14,6 +20,8 @@ import {
   COLOR_SLEEP,
   COLOR_WAKE,
   DIAL_RADIUS,
+  HASH_LENGTH,
+  NUMERAL_RADIUS,
 } from "./constants.js";
 import { WakingHours } from "./WakingHours.js";
 
@@ -34,6 +42,43 @@ const STYLE_SLEEP = new Style({
   stroke: COLOR_SLEEP,
   width: 8,
 });
+
+const STYLE_NUMERALS = new Style({
+  fill: Color.WHITE,
+});
+
+const STYLE_TICKS = new Style({
+  stroke: Color.WHITE,
+  width: 4,
+});
+
+const STYLE_MINOR_TICKS = new Style({
+  stroke: Color.WHITE,
+  width: 2,
+});
+
+const TICK_MARKS = Direction.roots_of_unity(24).map((dir) => {
+  const outer_point = SCREEN_CENTER.add(dir.scale(DIAL_RADIUS));
+  const inner_point = SCREEN_CENTER.add(dir.scale(DIAL_RADIUS + HASH_LENGTH));
+  return new LineSegment(outer_point, inner_point);
+});
+
+const MINOR_TICKS = Direction.roots_of_unity(24 * 4).map((dir) => {
+  const outer_point = SCREEN_CENTER.add(dir.scale(DIAL_RADIUS));
+  const inner_point = SCREEN_CENTER.add(
+    dir.scale(DIAL_RADIUS + HASH_LENGTH * 0.5),
+  );
+  return new LineSegment(outer_point, inner_point);
+});
+
+const NUMERALS = Direction.roots_of_unity(24).map((dir, i) => {
+  const numeral = (i + 6) % 24;
+  return new TextPrimitive(
+    `${numeral}`,
+    SCREEN_CENTER.add(dir.scale(NUMERAL_RADIUS)),
+  );
+});
+const TEXT_STYLE_NUMERALS = new TextStyle(25, "center", "center");
 
 const HIGHLIGHT_CIRCLE = style(
   new Circle(SCREEN_CENTER, DIAL_RADIUS),
@@ -63,6 +108,13 @@ export class Bezel {
     this.highlight = new ShowHidePrimitive([HIGHLIGHT_CIRCLE], [false]);
     this.primitive = group(
       this.highlight,
+      style(MINOR_TICKS, STYLE_MINOR_TICKS),
+      style(TICK_MARKS, STYLE_TICKS),
+
+      new GroupPrimitive(NUMERALS, {
+        style: STYLE_NUMERALS,
+        text_style: TEXT_STYLE_NUMERALS,
+      }),
       style(this.arc_sleep, STYLE_SLEEP),
       style(this.arc_wake, STYLE_WAKE),
     );
