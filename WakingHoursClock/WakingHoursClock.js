@@ -79,14 +79,13 @@ const STYLE_HAND = new Style({
 });
 
 const STATE = new WakingHours(6, 22);
-const WAKE_HANDLE = new HourSelector(6, "wake");
-const SLEEP_HANDLE = new HourSelector(22, "sleep");
+const WAKE_HANDLE = new HourSelector(STATE, "wake");
+const SLEEP_HANDLE = new HourSelector(STATE, "sleep");
 const BEZEL = new Bezel(STATE);
 
 const PRIORITY_ORDER = [WAKE_HANDLE, SLEEP_HANDLE, BEZEL];
 
 const SCENE = group(
-  BEZEL.primitive,
   style(MINOR_TICKS, STYLE_MINOR_TICKS),
   style(TICK_MARKS, STYLE_TICKS),
   style(PORTION_TICKS, STYLE_PORTION_TICKS),
@@ -95,6 +94,7 @@ const SCENE = group(
     text_style: TEXT_STYLE_NUMERALS,
   }),
 
+  BEZEL.primitive,
   WAKE_HANDLE.primitive,
   SLEEP_HANDLE.primitive,
   style(HAND, STYLE_HAND),

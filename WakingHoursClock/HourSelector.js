@@ -13,6 +13,7 @@ import {
   COLOR_WAKE,
   DIAL_RADIUS,
 } from "./constants.js";
+import { WakingHours } from "./WakingHours.js";
 
 const RADIUS_MARKER = 8;
 const RADIUS_HIGHLIGHT = 12;
@@ -24,13 +25,13 @@ const STYLE_HIGHLIGHT = new Style({
 export class HourSelector {
   /**
    * Constructor
-   * @param {number} hour current hour
+   * @param {WakingHours} state current hour
    * @param {"wake" | "sleep"} sleep_or_wake Whether the marker represents
    */
-  constructor(hour, sleep_or_wake) {
-    this.hour = hour;
-    this.position = compute_position(hour);
+  constructor(state, sleep_or_wake) {
     this.sleep_or_wake = sleep_or_wake;
+    this.state = state;
+    this.position = compute_position(this.hour);
 
     // Save the two circles so we can update the positions
     this.marker_circle = new Circle(this.position, RADIUS_MARKER);
@@ -50,6 +51,21 @@ export class HourSelector {
       style(this.show_highlight, STYLE_HIGHLIGHT),
       style(this.marker_circle, style_marker),
     );
+
+    this.state.events.addEventListener("change", (e) => {
+      this.position = compute_position(this.hour);
+
+      this.marker_circle.center = this.position;
+      this.highlight_circle.center = this.position;
+    });
+  }
+
+  get hour() {
+    if (this.sleep_or_wake === "sleep") {
+      return this.state.sleep_hour;
+    }
+
+    return this.state.wake_hour;
   }
 
   /**
@@ -77,11 +93,8 @@ export class HourSelector {
    * @param {Point} mouse_coords
    */
   move(mouse_coords) {
-    this.hour = compute_hour(mouse_coords);
-    this.position = compute_position(this.hour);
-
-    this.marker_circle.center = this.position;
-    this.highlight_circle.center = this.position;
+    const hour = compute_hour(mouse_coords);
+    this.state.move_end_point(this.sleep_or_wake, hour);
   }
 
   select = this.move;

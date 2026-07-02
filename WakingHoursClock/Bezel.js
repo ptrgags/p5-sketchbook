@@ -115,6 +115,7 @@ export class Bezel {
   move(mouse_coords) {
     const mouse_hour = compute_hour(mouse_coords);
     const hour_diff = mod(mouse_hour - this.reference_hour, 24);
+    this.reference_hour = mouse_hour;
     this.state.move_bezel(hour_diff);
   }
 }
