@@ -1,14 +1,43 @@
 import { mod } from "../sketchlib/mod.js";
+import { DEFAULT_SLEEP_HOUR, DEFAULT_WAKE_HOUR } from "./constants.js";
+
+/**
+ * Load hours - from local storage if available, else the defaults defined
+ * in constants.js
+ * @returns {{
+ *   sleep: number,
+ *   wake: number
+ * }} Hours from local storage, or defaults
+ */
+function load_hours() {
+  const storage = window.localStorage;
+  const sleep_str = storage.getItem("sleep") ?? DEFAULT_SLEEP_HOUR.toString();
+  const wake_str = storage.getItem("wake") ?? DEFAULT_WAKE_HOUR.toString();
+
+  const sleep = parseFloat(sleep_str);
+  const wake = parseFloat(wake_str);
+  return { sleep, wake };
+}
+
+/**
+ * Save the hours to local storage
+ * @param {number} sleep Sleep hour rounded to the nearest 0.25
+ * @param {number} wake Waking hour rounded to the nearest 0.25 hour
+ */
+function save_hours(sleep, wake) {
+  const storage = window.localStorage;
+  storage.setItem("sleep", sleep.toString());
+  storage.setItem("wake", wake.toString());
+}
 
 export class WakingHours {
   /**
    * Constructor
-   * @param {number} wake_hour Wake hour (in increments of 0.25)
-   * @param {number} sleep_hour Sleep hour (in increments of 0.25)
    */
-  constructor(wake_hour, sleep_hour) {
-    this.wake_hour = wake_hour;
-    this.sleep_hour = sleep_hour;
+  constructor() {
+    const { sleep, wake } = load_hours();
+    this.wake_hour = wake;
+    this.sleep_hour = sleep;
     this.events = new EventTarget();
   }
 
@@ -45,6 +74,7 @@ export class WakingHours {
   }
 
   #dispach_change() {
+    save_hours(this.sleep_hour, this.wake_hour);
     this.events.dispatchEvent(
       new CustomEvent("change", {
         detail: {
