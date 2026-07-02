@@ -46,6 +46,20 @@ function format_hours(hours) {
 
 /**
  *
+ * @param {number} hours
+ * @returns {string}
+ */
+function format_duration(hours) {
+  const hour_str = format_dec2(Math.floor(hours));
+
+  const min = 60 * (hours % 1);
+  const min_str = format_dec2(min);
+
+  return `${hour_str}h${min_str}m`;
+}
+
+/**
+ *
  * @param {number} x
  * @returns {number}
  */
@@ -136,8 +150,8 @@ export class WakingHoursSummary {
         0.5 * sleep_duration,
       );
 
-      this.sleep_duration.text = `Duration: ${format_hours(sleep_duration)} hr`;
-      this.wake_duration.text = `Duration: ${format_hours(wake_duration)} hr`;
+      this.sleep_duration.text = `${format_duration(sleep_duration)}`;
+      this.wake_duration.text = `${format_duration(wake_duration)}`;
     });
   }
 
