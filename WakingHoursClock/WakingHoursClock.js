@@ -1,11 +1,9 @@
 import { AnalogClock } from "../sketchlib/animation/AnalogClock.js";
-import { ArcAngles } from "../sketchlib/ArcAngles.js";
 import { Color } from "../sketchlib/Color.js";
 import { WIDTH, HEIGHT, SCREEN_CENTER } from "../sketchlib/dimensions.js";
 import { CanvasMouseHandler } from "../sketchlib/input/CanvasMouseHandler.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
-import { ArcPrimitive } from "../sketchlib/primitives/ArcPrimitive.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
@@ -18,10 +16,9 @@ import {
   HASH_LENGTH,
   NUMERAL_RADIUS,
   HAND_LENGTH,
-  COLOR_WAKE,
-  COLOR_SLEEP,
 } from "./constants.js";
 import { HourSelector } from "./HourSelector.js";
+import { WakingHours } from "./WakingHours.js";
 
 const TICK_MARKS = Direction.roots_of_unity(24).map((dir) => {
   const outer_point = SCREEN_CENTER.add(dir.scale(DIAL_RADIUS));
@@ -52,18 +49,6 @@ const NUMERALS = Direction.roots_of_unity(24).map((dir, i) => {
 });
 const TEXT_STYLE_NUMERALS = new TextStyle(25, "center", "center");
 
-const HOUR_WAKE = 6;
-const HOUR_SLEEP = 22;
-
-const ANGLES_WAKE = new ArcAngles(
-  AnalogClock.compute_angle(HOUR_WAKE, 24),
-  AnalogClock.compute_angle(HOUR_SLEEP, 24),
-);
-const ANGLES_SLEEP = ANGLES_WAKE.complement();
-
-const ARC_WAKE = new ArcPrimitive(SCREEN_CENTER, DIAL_RADIUS, ANGLES_WAKE);
-const ARC_SLEEP = new ArcPrimitive(SCREEN_CENTER, DIAL_RADIUS, ANGLES_SLEEP);
-
 const HAND = new LineSegment(
   SCREEN_CENTER,
   SCREEN_CENTER.add(Direction.DIR_Y.scale(HAND_LENGTH)),
@@ -88,25 +73,15 @@ const STYLE_NUMERALS = new Style({
   fill: Color.WHITE,
 });
 
-const STYLE_WAKE = new Style({
-  // Orange
-  stroke: COLOR_WAKE,
-  width: 8,
-});
-const STYLE_SLEEP = new Style({
-  // Purple
-  stroke: COLOR_SLEEP,
-  width: 8,
-});
-
 const STYLE_HAND = new Style({
   stroke: Color.WHITE,
   width: 8,
 });
 
+const STATE = new WakingHours(6, 22);
 const WAKE_HANDLE = new HourSelector(6, "wake");
 const SLEEP_HANDLE = new HourSelector(22, "sleep");
-const BEZEL = new Bezel();
+const BEZEL = new Bezel(STATE);
 
 const PRIORITY_ORDER = [WAKE_HANDLE, SLEEP_HANDLE, BEZEL];
 
@@ -119,8 +94,7 @@ const SCENE = group(
     style: STYLE_NUMERALS,
     text_style: TEXT_STYLE_NUMERALS,
   }),
-  style(ARC_SLEEP, STYLE_SLEEP),
-  style(ARC_WAKE, STYLE_WAKE),
+
   WAKE_HANDLE.primitive,
   SLEEP_HANDLE.primitive,
   style(HAND, STYLE_HAND),
