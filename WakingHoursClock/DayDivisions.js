@@ -22,15 +22,15 @@ const STYLE_DIVISION_TICK = new Style({
   width: 4,
 });
 
-const STYLE_HEX_LABELS = new Style({
+const STYLE_FRACTION_LABELS = new Style({
   fill: COLOR_HIGHLIGHT,
 });
 
-const TEXT_STYLE_HEX_LABELS = new TextStyle(18, "center", "center");
+const TEXT_STYLE_FRACTION_LABELS = new TextStyle(18, "center", "center");
 
-const DAY_HEX_VALUES = ["0", "1/8", "1/4", "3/8", "1/2", "5/8", "3/4", "7/8"];
-const NIGHT_HEX_VALUES = [
-  "+0",
+const DAY_FRACTIONS = ["0", "1/8", "1/4", "3/8", "1/2", "5/8", "3/4", "7/8"];
+const NIGHT_FRACTION_VALUES = [
+  "1",
   "+1/8",
   "+1/4",
   "+3/8",
@@ -75,8 +75,8 @@ export class DayDivisions {
   constructor(state) {
     this.divisions = group();
     this.labels = new GroupPrimitive([], {
-      style: STYLE_HEX_LABELS,
-      text_style: TEXT_STYLE_HEX_LABELS,
+      style: STYLE_FRACTION_LABELS,
+      text_style: TEXT_STYLE_FRACTION_LABELS,
     });
     this.primitive = style([this.divisions, this.labels], STYLE_DIVISION_TICK);
 
@@ -119,7 +119,7 @@ export class DayDivisions {
     );
 
     const day_labels = [];
-    const day_label_count = DAY_HEX_VALUES.length;
+    const day_label_count = DAY_FRACTIONS.length;
     for (let i = 0; i < day_label_count; i++) {
       const angle = lerp(
         day_angles.start_angle,
@@ -129,12 +129,12 @@ export class DayDivisions {
       const position = DIAL_CENTER.add(
         Direction.from_angle(angle).scale(DIVISION_RADIUS),
       );
-      const label = new TextPrimitive(DAY_HEX_VALUES[i], position);
+      const label = new TextPrimitive(DAY_FRACTIONS[i], position);
       day_labels.push(label);
     }
 
     const night_labels = [];
-    const night_label_count = NIGHT_HEX_VALUES.length;
+    const night_label_count = NIGHT_FRACTION_VALUES.length;
     for (let i = 0; i < night_label_count; i++) {
       const angle = lerp(
         night_angles.start_angle,
@@ -144,7 +144,7 @@ export class DayDivisions {
       const position = DIAL_CENTER.add(
         Direction.from_angle(angle).scale(1.1 * DIVISION_RADIUS),
       );
-      const label = new TextPrimitive(NIGHT_HEX_VALUES[i], position);
+      const label = new TextPrimitive(NIGHT_FRACTION_VALUES[i], position);
       night_labels.push(label);
     }
 

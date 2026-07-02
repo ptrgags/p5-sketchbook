@@ -1,9 +1,9 @@
 import { AnalogClock } from "../sketchlib/animation/AnalogClock.js";
 import { Color } from "../sketchlib/Color.js";
-import { HEIGHT } from "../sketchlib/dimensions.js";
+import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
-import { style } from "../sketchlib/primitives/shorthand.js";
+import { group } from "../sketchlib/primitives/shorthand.js";
 import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
 import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
 import { Style } from "../sketchlib/Style.js";
@@ -13,7 +13,8 @@ const STYLE_LABELS = new Style({
   fill: Color.WHITE,
 });
 
-const TEXT_STYLE = new TextStyle(24, "left", "top");
+const TEXT_STYLE_LEFT = new TextStyle(24, "left", "top");
+const TEXT_STYLE_RIGHT = new TextStyle(24, "right", "top");
 
 /**
  * Format a number padded to 2 decimal places with leading 0s
@@ -46,20 +47,25 @@ export class WakingHoursSummary {
   constructor(state) {
     this.state = state;
 
-    this.wake_time = new TextPrimitive("Wake Time: HH:MM", new Point(0, 0));
-    this.sleep_time = new TextPrimitive("Sleep Time: HH:MM", new Point(0, 32));
+    this.wake_time = new TextPrimitive("Wake Time: HH:MM", new Point(10, 10));
+    this.sleep_time = new TextPrimitive(
+      "Sleep Time: HH:MM",
+      new Point(WIDTH - 10, 10),
+    );
     this.current_time = new TextPrimitive(
       "Current Time: HH:MM",
-      new Point(0, HEIGHT - 64),
-    );
-    this.hex_time = new TextPrimitive(
-      "Waking Hour: XX",
-      new Point(0, HEIGHT - 32),
+      new Point(10, HEIGHT - 32),
     );
 
-    this.primitive = new GroupPrimitive(
-      [this.wake_time, this.sleep_time, this.current_time, this.hex_time],
-      { style: STYLE_LABELS, text_style: TEXT_STYLE },
+    this.primitive = group(
+      new GroupPrimitive([this.wake_time, this.current_time], {
+        style: STYLE_LABELS,
+        text_style: TEXT_STYLE_LEFT,
+      }),
+      new GroupPrimitive([this.sleep_time], {
+        style: STYLE_LABELS,
+        text_style: TEXT_STYLE_RIGHT,
+      }),
     );
 
     state.events.addEventListener("change", (e) => {
@@ -78,7 +84,6 @@ export class WakingHoursSummary {
     const hour = clock.get_discrete_time("hr24");
     const min = clock.get_discrete_time("min");
     const sec = clock.get_discrete_time("sec");
-
     this.current_time.text = `Current Time: ${format_dec2(hour)}:${format_dec2(min)}:${format_dec2(sec)}`;
   }
 }
