@@ -67,13 +67,26 @@ export class WakingHoursSummary {
     this.tween_late_night = Tween.scalar(1.0, 1.5, 22, 4);
 
     this.wake_time = new TextPrimitive("Wake Time: HH:MM", new Point(10, 10));
+    this.wake_duration = new TextPrimitive(
+      "Duration: HH hr",
+      new Point(10, 32 + 10),
+    );
     this.sleep_time = new TextPrimitive(
       "Sleep Time: HH:MM",
       new Point(WIDTH - 10, 10),
     );
+    this.sleep_duration = new TextPrimitive(
+      "Duration: HH hr",
+      new Point(WIDTH - 10, 32 + 10),
+    );
+
     this.current_time = new TextPrimitive(
       "Current Time: HH:MM",
       new Point(10, HEIGHT - 32),
+    );
+    this.time_of_day = new TextPrimitive(
+      "Day",
+      new Point(WIDTH - 10, HEIGHT - 64),
     );
     this.fraction = new TextPrimitive(
       "Proportion: XX/YY",
@@ -81,14 +94,20 @@ export class WakingHoursSummary {
     );
 
     this.primitive = group(
-      new GroupPrimitive([this.wake_time, this.current_time], {
-        style: STYLE_LABELS,
-        text_style: TEXT_STYLE_LEFT,
-      }),
-      new GroupPrimitive([this.sleep_time, this.fraction], {
-        style: STYLE_LABELS,
-        text_style: TEXT_STYLE_RIGHT,
-      }),
+      new GroupPrimitive(
+        [this.wake_time, this.wake_duration, this.current_time],
+        {
+          style: STYLE_LABELS,
+          text_style: TEXT_STYLE_LEFT,
+        },
+      ),
+      new GroupPrimitive(
+        [this.sleep_time, this.sleep_duration, this.time_of_day, this.fraction],
+        {
+          style: STYLE_LABELS,
+          text_style: TEXT_STYLE_RIGHT,
+        },
+      ),
     );
 
     state.events.addEventListener("change", (e) => {
@@ -116,6 +135,9 @@ export class WakingHoursSummary {
         sleep_after_wake,
         0.5 * sleep_duration,
       );
+
+      this.sleep_duration.text = `Duration: ${format_hours(sleep_duration)} hr`;
+      this.wake_duration.text = `Duration: ${format_hours(wake_duration)} hr`;
     });
   }
 
