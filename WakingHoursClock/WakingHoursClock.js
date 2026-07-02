@@ -18,11 +18,6 @@ const HAND = new LineSegment(
   DIAL_CENTER.add(Direction.DIR_Y.scale(HAND_LENGTH)),
 );
 
-const STYLE_PORTION_TICKS = new Style({
-  stroke: new Oklch(0.7, 0.1, 140),
-  width: 4,
-});
-
 const STYLE_HAND = new Style({
   stroke: Color.WHITE,
   width: 8,
