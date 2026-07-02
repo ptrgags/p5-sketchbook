@@ -14,6 +14,8 @@ import { lerp } from "../sketchlib/lerp.js";
 import { mod } from "../sketchlib/mod.js";
 import { Rational } from "../sketchlib/Rational.js";
 
+const MARGIN = 10;
+
 const STYLE_LABELS = new Style({
   fill: Color.WHITE,
 });
@@ -107,32 +109,32 @@ export class WakingHoursSummary {
 
     this.label_wake_time = new TextPrimitive(
       "Wake Time: HH:MM",
-      new Point(10, 10),
+      new Point(MARGIN, MARGIN),
     );
     this.label_wake_duration = new TextPrimitive(
-      "Duration: HH hr",
-      new Point(10, 32 + 10),
+      "HHhMMm",
+      new Point(MARGIN, 32 + MARGIN),
     );
     this.label_sleep_time = new TextPrimitive(
       "Sleep Time: HH:MM",
-      new Point(WIDTH - 10, 10),
+      new Point(WIDTH - MARGIN, MARGIN),
     );
     this.label_sleep_duration = new TextPrimitive(
-      "Duration: HH hr",
-      new Point(WIDTH - 10, 32 + 10),
+      "HHhrMMm",
+      new Point(WIDTH - MARGIN, 32 + MARGIN),
     );
 
     this.label_current_time = new TextPrimitive(
       "Current Time: HH:MM",
-      new Point(10, HEIGHT - 32),
+      new Point(MARGIN, HEIGHT - 32),
     );
     this.label_time_of_day = new TextPrimitive(
       "Day",
-      new Point(WIDTH - 10, HEIGHT - 64),
+      new Point(WIDTH - MARGIN, HEIGHT - 64),
     );
     this.label_fraction = new TextPrimitive(
       "Proportion: XX/YY",
-      new Point(WIDTH - 10, HEIGHT - 32),
+      new Point(WIDTH - MARGIN, HEIGHT - 32),
     );
 
     this.primitive = group(
