@@ -31,9 +31,9 @@ function format_dec2(x) {
 }
 
 /**
- *
- * @param {number} hours
- * @returns {string}
+ * Format a time rounded to the nearest 15 min as HH:MM
+ * @param {number} hours The continuous number of hours
+ * @returns {string} String of the form HH:MM
  */
 function format_hours(hours) {
   const hour_str = format_dec2(Math.floor(hours));
@@ -45,9 +45,9 @@ function format_hours(hours) {
 }
 
 /**
- *
- * @param {number} hours
- * @returns {string}
+ * Format a duration as HHhMMm, rounded to the nearest 15 min
+ * @param {number} hours The continuous number of hours
+ * @returns {string} String of the form HHhMMm
  */
 function format_duration(hours) {
   const hour_str = format_dec2(Math.floor(hours));
@@ -67,6 +67,10 @@ function round_sixteenth(x) {
   return Math.floor(16 * x) / 16;
 }
 
+/**
+ * Several text labels at the top and bottom of the screen to show the
+ * current time and sleep/wake settings
+ */
 export class WakingHoursSummary {
   /**
    * Constructor
@@ -191,8 +195,8 @@ export class WakingHoursSummary {
   }
 
   /**
-   *
-   * @param {AnalogClock} clock
+   * Update all the time labels
+   * @param {AnalogClock} clock The clock for getting the clock time
    */
   update_time(clock) {
     const hour = clock.get_discrete_time("hr24");
