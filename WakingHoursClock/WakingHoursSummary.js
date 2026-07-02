@@ -178,15 +178,15 @@ export class WakingHoursSummary {
     }
 
     let proportion = 0;
-    let is_night = false;
     if (raw_hour < sleep_after_wake) {
       proportion = this.tween_day.get_value(raw_hour);
+      this.time_of_day.text = "Daytime ☀";
     } else if (raw_hour < mid_sleep) {
       proportion = this.tween_late_night.get_value(raw_hour);
-      is_night = true;
+      this.time_of_day.text = "Late Night 🌙";
     } else {
       proportion = this.tween_early_morning.get_value(raw_hour);
-      is_night = true;
+      this.time_of_day.text = "Early Morning 🌙";
     }
     proportion = round_sixteenth(proportion);
     const proportion_rational = new Rational(proportion * 16, 16);
@@ -197,8 +197,6 @@ export class WakingHoursSummary {
       proportion_str = `+${reduced}`;
     }
 
-    let emoji = is_night ? "🌙" : "☀";
-
-    this.fraction.text = `Proportion: ${proportion_str}${emoji}`;
+    this.fraction.text = `Proportion: ${proportion_str}`;
   }
 }
