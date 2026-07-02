@@ -8,15 +8,10 @@ import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 import { Bezel } from "./Bezel.js";
-import { DIAL_RADIUS, HASH_LENGTH, HAND_LENGTH } from "./constants.js";
+import { HAND_LENGTH } from "./constants.js";
+import { DayDivisions } from "./DayDivisions.js";
 import { HourSelector } from "./HourSelector.js";
 import { WakingHours } from "./WakingHours.js";
-
-const PORTION_TICKS = Direction.roots_of_unity(6).map((dir) => {
-  const outer_point = SCREEN_CENTER.add(dir.scale(DIAL_RADIUS));
-  const inner_point = SCREEN_CENTER.add(dir.scale(DIAL_RADIUS - HASH_LENGTH));
-  return new LineSegment(outer_point, inner_point);
-});
 
 const HAND = new LineSegment(
   SCREEN_CENTER,
@@ -37,11 +32,12 @@ const STATE = new WakingHours();
 const WAKE_HANDLE = new HourSelector(STATE, "wake");
 const SLEEP_HANDLE = new HourSelector(STATE, "sleep");
 const BEZEL = new Bezel(STATE);
+const DIVISIONS = new DayDivisions(STATE);
 
 const PRIORITY_ORDER = [WAKE_HANDLE, SLEEP_HANDLE, BEZEL];
 
 const SCENE = group(
-  style(PORTION_TICKS, STYLE_PORTION_TICKS),
+  DIVISIONS.primitive,
   BEZEL.primitive,
   WAKE_HANDLE.primitive,
   SLEEP_HANDLE.primitive,
