@@ -7,10 +7,12 @@ import {
 import { Clock } from "../sketchlib/animation/Clock.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { Index2D } from "../sketchlib/Grid.js";
+import { mod } from "../sketchlib/mod.js";
 import { Tempo } from "../sketchlib/music/Tempo.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { ImageLibrary } from "../sketchlib/pixel/ImageLibrary.js";
+import { Tilemap } from "../sketchlib/pixel/Tilemap.js";
 import { group } from "../sketchlib/primitives/shorthand.js";
 
 const IMGS = new ImageLibrary({
@@ -90,6 +92,26 @@ const PATCH_Z_UNDER = iso_edge_patch(
   EDGE_HIGHLIGHT_OFFSET,
 );
 
+const CUBE_POSITIONS = [
+  Direction.ZERO,
+  ISO_DIR.y,
+  ISO_DIR.y.scale(2),
+  ISO_DIR.y.scale(3),
+  ISO_DIR.y.scale(4),
+  ISO_DIR.y.scale(4).add(ISO_DIR.x),
+  ISO_DIR.y.scale(4).add(ISO_DIR.x.scale(2)),
+  ISO_DIR.y.scale(4).add(ISO_DIR.x.scale(3)),
+  ISO_DIR.z.scale(4),
+  ISO_DIR.z.scale(3),
+  ISO_DIR.z.scale(2),
+  ISO_DIR.z,
+].map((x) => TILE_ORIGIN.add(x));
+
+/**
+ * @type {Tilemap[]}
+ */
+const PATCHES = [];
+
 /**
  *
  * @param {import("p5")} p
@@ -149,11 +171,17 @@ function init_sprites(p) {
   );
   highlight_z_under.blit_patch(new Index2D(0, 0), PATCH_Z_UNDER);
 
-  SCENE.regroup(
+  PATCHES.push(
+    highlight_y,
+    highlight_y,
     highlight_y,
     highlight_y_under,
     highlight_x,
+    highlight_x,
+    highlight_x,
     highlight_x_under,
+    highlight_z,
+    highlight_z,
     highlight_z,
     highlight_z_under,
   );
@@ -180,6 +208,11 @@ export const sketch = (p) => {
     p.background(0);
 
     const time = Tempo.sec_to_measures(CLOCK.elapsed_time, 128);
+    const index = Math.floor(mod(time, 12));
+
+    const highlight = PATCHES[index];
+    highlight.position = CUBE_POSITIONS[index];
+    SCENE.regroup(highlight);
 
     SCENE.draw(p);
   };
