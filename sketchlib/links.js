@@ -1,6 +1,11 @@
 // Links for all of the sketches. Links are added to the page in this order
 export const LINKS = [
   {
+    title: "Penrose Triangle Blues",
+    is_lab: true,
+    year: "2026-07",
+  },
+  {
     title: "Waking Hours Clock",
     year: "2026-06/2026-07",
   },
