@@ -1,8 +1,10 @@
+import { penrose_vertex } from "../PixelTest/penrose.js";
 import { Color } from "../sketchlib/Color.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { Index2D } from "../sketchlib/Grid.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
+import { ImageLibrary } from "../sketchlib/pixel/ImageLibrary.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
@@ -80,10 +82,45 @@ const STYLE_EDGES = new Style({
   stroke: Color.WHITE,
 });
 
-const SCENE = group(style(EDGES, STYLE_EDGES), style(VERTICES, STYLE_VERTEX));
+// leave space for the tiling
+const TILING = group();
+const SCENE = group(
+  TILING,
+  style(EDGES, STYLE_EDGES),
+  style(VERTICES, STYLE_VERTEX),
+);
+
+const IMGS = new ImageLibrary({
+  // TODO: Swap in a new tileset for this
+  iso: "../PixelTest/sprites/iso-tiles.png",
+});
+
+const ISO_TILE_SIZE = new Direction(64, 32);
+function init_sprites(p) {
+  const penrose = IMGS.make_tilemap(
+    p,
+    "iso",
+    ISO_TILE_SIZE,
+    // TODO: compute this size more accurately
+    new Direction(20, 30),
+    new Point(0, 0),
+  );
+
+  for (const vertex of GRID.vertex_iter()) {
+    const { i, j } = vertex.index;
+    const tile = new Index2D(4 * (2 * i + j), 4 * j);
+    penrose_vertex(penrose, tile, vertex.connection_flags.flags);
+  }
+
+  TILING.regroup(penrose);
+}
 
 // @ts-ignore
 export const sketch = (p) => {
+  p.preload = () => {
+    IMGS.preload(p);
+  };
+
   p.setup = () => {
     p.createCanvas(
       WIDTH,
@@ -91,6 +128,8 @@ export const sketch = (p) => {
       undefined,
       document.getElementById("sketch-canvas"),
     );
+
+    init_sprites(p);
   };
 
   p.draw = () => {
