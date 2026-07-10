@@ -92,17 +92,17 @@ const SCENE = group(
 
 const IMGS = new ImageLibrary({
   // TODO: Swap in a new tileset for this
-  iso: "../PixelTest/sprites/iso-tiles.png",
+  iso: "./sprites/iso-tiles16.png",
 });
 
-const ISO_TILE_SIZE = new Direction(64, 32);
+const ISO_TILE_SIZE = new Direction(32, 16);
 function init_sprites(p) {
   const penrose = IMGS.make_tilemap(
     p,
     "iso",
     ISO_TILE_SIZE,
-    // TODO: compute this size more accurately
-    new Direction(20, 30),
+    // TODO: compute this size
+    new Direction(10 + 1, 28),
     new Point(0, 0),
   );
 
