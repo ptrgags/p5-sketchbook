@@ -1,4 +1,4 @@
-import { penrose_vertex } from "../PixelTest/penrose.js";
+import { penrose_edge, penrose_vertex } from "../PixelTest/penrose.js";
 import { Color } from "../sketchlib/Color.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { Index2D } from "../sketchlib/Grid.js";
@@ -110,6 +110,16 @@ function init_sprites(p) {
     const { i, j } = vertex.index;
     const tile = new Index2D(4 * (2 * i + j), 4 * j);
     penrose_vertex(penrose, tile, vertex.connection_flags.flags);
+  }
+
+  for (const [a, b, axis] of GRID.edge_iter()) {
+    const { i: ai, j: aj } = a.index;
+    const { i: bi, j: bj } = b.index;
+    const i = 0.5 * (ai + bi);
+    const j = 0.5 * (aj + bj);
+    const tile = new Index2D(4 * (2 * i + j), 4 * j);
+
+    penrose_edge(penrose, tile, axis);
   }
 
   TILING.regroup(penrose);

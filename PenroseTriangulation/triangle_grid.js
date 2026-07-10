@@ -148,7 +148,7 @@ export class TriangleGrid {
   }
 
   /**
-   * @returns {Generator<[TriangleGridCell, TriangleGridCell]>}
+   * @returns {Generator<[TriangleGridCell, TriangleGridCell, "x" | "y" | "z"]>}
    */
   *edge_iter() {
     for (const cell of this.grid) {
@@ -158,13 +158,17 @@ export class TriangleGrid {
       // edges
       if (cell.is_connected(IsoDirection.NEG_Z)) {
         const neighbor_idx = new Index2D(i + 1, j);
-        yield [cell, this.grid.get(neighbor_idx)];
-      } else if (cell.is_connected(IsoDirection.POS_Y)) {
+        yield [cell, this.grid.get(neighbor_idx), "z"];
+      }
+
+      if (cell.is_connected(IsoDirection.POS_Y)) {
         const neighbor_idx = new Index2D(i, j + 1);
-        yield [cell, this.grid.get(neighbor_idx)];
-      } else if (cell.is_connected(IsoDirection.NEG_X)) {
+        yield [cell, this.grid.get(neighbor_idx), "y"];
+      }
+
+      if (cell.is_connected(IsoDirection.NEG_X)) {
         const neighbor_idx = new Index2D(i - 1, j + 1);
-        yield [cell, this.grid.get(neighbor_idx)];
+        yield [cell, this.grid.get(neighbor_idx), "x"];
       }
     }
   }
