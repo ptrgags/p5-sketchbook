@@ -107,7 +107,7 @@ export class TriangleGridCell {
    */
   static connect(cell_a, cell_b) {
     const dir = get_neighbor_dir(cell_a.index, cell_b.index);
-    if (!dir) {
+    if (dir === undefined) {
       throw new Error("cells must be adjacent");
     }
     cell_a.connection_flags.set_flag(dir);
