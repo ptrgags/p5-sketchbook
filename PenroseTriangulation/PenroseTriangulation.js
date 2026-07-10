@@ -1,12 +1,14 @@
 import { penrose_edge, penrose_vertex } from "../PixelTest/penrose.js";
 import { Color } from "../sketchlib/Color.js";
-import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
+import { WIDTH, HEIGHT, SCREEN_DIMENSIONS } from "../sketchlib/dimensions.js";
 import { Index2D } from "../sketchlib/Grid.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { ImageLibrary } from "../sketchlib/pixel/ImageLibrary.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
-import { group, style } from "../sketchlib/primitives/shorthand.js";
+import { group, style, xform } from "../sketchlib/primitives/shorthand.js";
+import { Transform } from "../sketchlib/primitives/Transform.js";
+import { VectorPrimitive } from "../sketchlib/primitives/VectorPrimitive.js";
 import { Style } from "../sketchlib/Style.js";
 import { TriangleGrid } from "./triangle_grid.js";
 
@@ -82,13 +84,26 @@ const STYLE_EDGES = new Style({
   stroke: Color.WHITE,
 });
 
+const OFFSET_TRIANGLES = 0.5 * (WIDTH - 4 * SIZE);
+const LIL_BIT = 8;
+
+const TRIANGLE_DIAGRAM = xform(
+  [style(EDGES, STYLE_EDGES), style(VERTICES, STYLE_VERTEX)],
+  new Transform(new Direction(OFFSET_TRIANGLES, LIL_BIT)),
+);
+
+const STYLE_ARROW = new Style({
+  stroke: Color.WHITE,
+  width: 4,
+});
+const ARROW = new VectorPrimitive(
+  new Point(0.5 * WIDTH, 6 * SIZE),
+  new Point(0.5 * WIDTH, 9 * SIZE),
+);
+
 // leave space for the tiling
 const TILING = group();
-const SCENE = group(
-  TILING,
-  style(EDGES, STYLE_EDGES),
-  style(VERTICES, STYLE_VERTEX),
-);
+const SCENE = group(TRIANGLE_DIAGRAM, style(ARROW, STYLE_ARROW), TILING);
 
 const IMGS = new ImageLibrary({
   // TODO: Swap in a new tileset for this
@@ -97,13 +112,22 @@ const IMGS = new ImageLibrary({
 
 const ISO_TILE_SIZE = new Direction(32, 16);
 function init_sprites(p) {
+  const tilemap_size = new Direction(10 + 1, 28);
+
+  // TODO: this could be replaced with the help of Rectangle.align once
+  // available
+  const margin = SCREEN_DIMENSIONS.sub(
+    tilemap_size.mul_components(ISO_TILE_SIZE),
+  );
+  const offset = new Direction(0.5 * margin.x, margin.y);
+
   const penrose = IMGS.make_tilemap(
     p,
     "iso",
     ISO_TILE_SIZE,
     // TODO: compute this size
-    new Direction(10 + 1, 28),
-    new Point(0, 0),
+    tilemap_size,
+    Point.ORIGIN.add(offset),
   );
 
   for (const vertex of GRID.vertex_iter()) {
