@@ -96,8 +96,8 @@ export class TriangleGridCell {
     return this.connection_flags.has_flag(direction);
   }
 
-  get has_connection() {
-    return !this.connection_flags.is_empty;
+  get is_disconnected() {
+    return this.connection_flags.is_empty;
   }
 
   /**
@@ -141,8 +141,30 @@ export class TriangleGrid {
    */
   *vertex_iter() {
     for (const cell of this.grid) {
-      if (cell.has_connection) {
+      if (!cell.is_disconnected) {
         yield cell;
+      }
+    }
+  }
+
+  /**
+   * @returns {Generator<[TriangleGridCell, TriangleGridCell]>}
+   */
+  *edge_iter() {
+    for (const cell of this.grid) {
+      const { i, j } = cell.index;
+
+      // Only iterate over half of the directions so we don't double count
+      // edges
+      if (cell.is_connected(IsoDirection.NEG_Z)) {
+        const neighbor_idx = new Index2D(i + 1, j);
+        yield [cell, this.grid.get(neighbor_idx)];
+      } else if (cell.is_connected(IsoDirection.POS_Y)) {
+        const neighbor_idx = new Index2D(i, j + 1);
+        yield [cell, this.grid.get(neighbor_idx)];
+      } else if (cell.is_connected(IsoDirection.NEG_X)) {
+        const neighbor_idx = new Index2D(i - 1, j + 1);
+        yield [cell, this.grid.get(neighbor_idx)];
       }
     }
   }

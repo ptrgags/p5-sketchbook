@@ -3,7 +3,8 @@ import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { Index2D } from "../sketchlib/Grid.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
-import { style } from "../sketchlib/primitives/shorthand.js";
+import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
+import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 import { TriangleGrid } from "./triangle_grid.js";
 
@@ -68,7 +69,18 @@ const STYLE_VERTEX = new Style({
   fill: Color.WHITE,
 });
 
-const SCENE = style(VERTICES, STYLE_VERTEX);
+const EDGES = GRID.edge_iter()
+  .map(([a, b]) => {
+    const pos_a = iso_position(a.index);
+    const pos_b = iso_position(b.index);
+    return new LineSegment(pos_a, pos_b);
+  })
+  .toArray();
+const STYLE_EDGES = new Style({
+  stroke: Color.WHITE,
+});
+
+const SCENE = group(style(EDGES, STYLE_EDGES), style(VERTICES, STYLE_VERTEX));
 
 // @ts-ignore
 export const sketch = (p) => {

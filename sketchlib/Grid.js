@@ -136,13 +136,22 @@ export class Index2D {
  * @template T
  */
 export class Grid {
+  /**
+   *
+   * @param {number} rows
+   * @param {number} cols
+   */
   constructor(rows, cols) {
     this.rows = rows;
     this.cols = cols;
     // Preallocate the array
+    /** @type {T[]} */
     this.values = new Array(rows * cols);
   }
 
+  /**
+   * @returns {Generator<T>}
+   */
   *[Symbol.iterator]() {
     yield* this.values;
   }
