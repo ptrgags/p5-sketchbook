@@ -29,6 +29,8 @@ export function opposite(direction) {
       return CardinalDirection.DOWN;
     case CardinalDirection.DOWN:
       return CardinalDirection.UP;
+    default:
+      throw new Error("invalid direction");
   }
 }
 
