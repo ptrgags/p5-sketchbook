@@ -36,18 +36,9 @@ const ANIMATED_STRIPES = new AnimatedStripes(
 );
 
 const STRIPE_STYLES = [
-  new Style({
-    stroke: PALETTE_SKY[Values.LIGHT],
-    width: STRIPE_SPACING / 3,
-  }),
-  new Style({
-    stroke: PALETTE_CORAL[Values.MED_DARK],
-    width: STRIPE_SPACING / 3,
-  }),
-  new Style({
-    stroke: PALETTE_SKY[Values.MED_DARK],
-    width: STRIPE_SPACING / 3,
-  }),
+  Style.lines(PALETTE_SKY[Values.LIGHT], STRIPE_SPACING / 3),
+  Style.lines(PALETTE_CORAL[Values.MED_DARK], STRIPE_SPACING / 3),
+  Style.lines(PALETTE_SKY[Values.MED_DARK], STRIPE_SPACING / 3),
 ];
 
 const XFORMS = [

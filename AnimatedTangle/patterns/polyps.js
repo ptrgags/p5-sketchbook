@@ -68,16 +68,9 @@ const STYLE_MOUTH_BACK = new Style({
   stroke: PALETTE_CORAL[Values.DARK],
   fill: PALETTE_CORAL[Values.LIGHT],
 });
+const STYLE_MOUTH_FRONT = Style.flat(PALETTE_NAVY[Values.MEDIUM]);
 
-const STYLE_MOUTH_FRONT = new Style({
-  fill: PALETTE_NAVY[Values.MEDIUM],
-});
-
-const STYLE_TENTACLE_LINES = new Style({
-  stroke: PALETTE_CORAL[Values.MED_DARK],
-  width: 2,
-});
-
+const STYLE_TENTACLE_LINES = Style.lines(PALETTE_CORAL[Values.MED_DARK], 2);
 const STYLE_TENTACLE_CIRCLES = new Style({
   stroke: PALETTE_CORAL[Values.MED_DARK],
   fill: PALETTE_CORAL[Values.LIGHT],

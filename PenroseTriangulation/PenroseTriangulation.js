@@ -69,9 +69,7 @@ function iso_position(cell) {
 const VERTICES = GRID.vertex_iter()
   .map((cell) => iso_position(cell.index))
   .toArray();
-const STYLE_VERTEX = new Style({
-  fill: Color.WHITE,
-});
+const STYLE_VERTEX = Style.flat(Color.WHITE);
 
 const EDGES = GRID.edge_iter()
   .map(([a, b]) => {
@@ -80,9 +78,7 @@ const EDGES = GRID.edge_iter()
     return new LineSegment(pos_a, pos_b);
   })
   .toArray();
-const STYLE_EDGES = new Style({
-  stroke: Color.WHITE,
-});
+const STYLE_EDGES = Style.lines(Color.WHITE);
 
 const OFFSET_TRIANGLES = 0.5 * (WIDTH - 4 * SIZE);
 const LIL_BIT = 8;
@@ -92,10 +88,7 @@ const TRIANGLE_DIAGRAM = xform(
   new Transform(new Direction(OFFSET_TRIANGLES, LIL_BIT)),
 );
 
-const STYLE_ARROW = new Style({
-  stroke: Color.WHITE,
-  width: 4,
-});
+const STYLE_ARROW = Style.lines(Color.WHITE, 4);
 const ARROW = new VectorPrimitive(
   new Point(0.5 * WIDTH, 6 * SIZE),
   new Point(0.5 * WIDTH, 9 * SIZE),

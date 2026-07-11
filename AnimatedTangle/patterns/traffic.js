@@ -35,12 +35,8 @@ const DIMS_PLATFORM_SHADOW = new Direction(
   PLATFORM_HEIGHT - TOP_HEIGHT,
 );
 const SHADOW_ORIGIN = new Point(0, TOP_HEIGHT);
-const STYLE_TOP = new Style({
-  fill: PALETTE_CORAL[Values.MED_LIGHT],
-});
-const STYLE_SHADOW = new Style({
-  fill: PALETTE_CORAL[Values.DARK],
-});
+const STYLE_TOP = Style.flat(PALETTE_CORAL[Values.MED_LIGHT]);
+const STYLE_SHADOW = Style.flat(PALETTE_CORAL[Values.DARK]);
 
 // This should always be odd so one platform always sits at the center
 const NUM_PLATFORMS = 11;
