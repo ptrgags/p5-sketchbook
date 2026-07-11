@@ -19,7 +19,7 @@ const CURVE_INTERPOLATION = LoopCurve.from_timeline(
   ),
 );
 
-const STYLE_PARALLELS = new Style({ stroke: Color.RED });
+const STYLE_PARALLELS = Style.lines(Color.RED);
 
 /**
  * @implements {Animated}

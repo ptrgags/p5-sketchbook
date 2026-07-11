@@ -9,9 +9,7 @@ import { Style } from "../sketchlib/Style.js";
 import { GuitarDiagram, NECK_WIDTH, STRING_LENGTH } from "./GuitarDiagram.js";
 import { harmonic_positions } from "./harmonic_positions.js";
 
-const STYLE_HARMONIC_LINES = new Style({
-  stroke: new Oklch(0.7, 0.1, 210),
-});
+const STYLE_HARMONIC_LINES = Style.lines(new Oklch(0.7, 0.1, 210));
 
 const MAX_HARMONIC = 200;
 const HARMONIC_LINES = range(MAX_HARMONIC).map((i) => {

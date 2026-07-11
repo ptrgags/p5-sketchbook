@@ -27,35 +27,13 @@ import { WakingHours } from "./WakingHours.js";
 
 const BEZEL_THICKNESS = 30;
 
-const STYLE_HIGHLIGHT = new Style({
-  stroke: COLOR_HIGHLIGHT,
-  width: BEZEL_THICKNESS,
-});
+const STYLE_HIGHLIGHT = Style.lines(COLOR_HIGHLIGHT, BEZEL_THICKNESS);
 
-const STYLE_WAKE = new Style({
-  // Orange
-  stroke: COLOR_WAKE,
-  width: 8,
-});
-const STYLE_SLEEP = new Style({
-  // Purple
-  stroke: COLOR_SLEEP,
-  width: 8,
-});
-
-const STYLE_NUMERALS = new Style({
-  fill: Color.WHITE,
-});
-
-const STYLE_TICKS = new Style({
-  stroke: Color.WHITE,
-  width: 4,
-});
-
-const STYLE_MINOR_TICKS = new Style({
-  stroke: Color.WHITE,
-  width: 2,
-});
+const STYLE_WAKE = Style.lines(COLOR_WAKE, 8);
+const STYLE_SLEEP = Style.lines(COLOR_SLEEP, 8);
+const STYLE_NUMERALS = Style.flat(Color.WHITE);
+const STYLE_TICKS = Style.lines(Color.WHITE, 4);
+const STYLE_MINOR_TICKS = Style.lines(Color.WHITE, 2);
 
 const TICK_MARKS = Direction.roots_of_unity(24).map((dir) => {
   const outer_point = DIAL_CENTER.add(dir.scale(DIAL_RADIUS));

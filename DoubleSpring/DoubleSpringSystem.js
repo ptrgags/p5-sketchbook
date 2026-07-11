@@ -33,7 +33,7 @@ export class Spring {
     this.bob_mass = bob_mass;
     this.bob_width = bob_width;
 
-    this.spring_style = new Style({ stroke: color });
+    this.spring_style = Style.lines(color);
     this.bob_style = new Style({
       stroke: color.adjust_lightness(-0.3),
       fill: color,

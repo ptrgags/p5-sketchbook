@@ -17,14 +17,8 @@ import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
 import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 
-const STYLE_DIVISION_TICK = new Style({
-  stroke: COLOR_HIGHLIGHT,
-  width: 4,
-});
-
-const STYLE_FRACTION_LABELS = new Style({
-  fill: COLOR_HIGHLIGHT,
-});
+const STYLE_DIVISION_TICK = Style.lines(COLOR_HIGHLIGHT, 4);
+const STYLE_FRACTION_LABELS = Style.flat(COLOR_HIGHLIGHT);
 
 const TEXT_STYLE_FRACTION_LABELS = new TextStyle(18, "center", "center");
 

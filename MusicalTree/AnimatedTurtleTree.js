@@ -401,9 +401,7 @@ class TreeAnimationBuilder {
   }
 }
 
-const STYLE_TREE = new Style({
-  stroke: Color.YELLOW,
-});
+const STYLE_TREE = Style.lines(Color.YELLOW);
 
 export class AnimatedTurtleTree {
   /**

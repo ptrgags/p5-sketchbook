@@ -12,26 +12,13 @@ import { Style } from "../sketchlib/Style.js";
 import { LatticeVector } from "./LatticeVector.js";
 import { XRaySimulation } from "./XRaySimulation.js";
 
-const STYLE_AXES = new Style({
-  stroke: Color.WHITE,
-});
+const STYLE_AXES = Style.lines(Color.WHITE);
 
-const STYLE_XRAY = new Style({
-  stroke: new Oklch(0.7, 0.1, 300),
-  width: 2,
-});
+const STYLE_XRAY = Style.lines(new Oklch(0.7, 0.1, 300), 2);
 
-const STYLE_LATTICE = new Style({
-  fill: Color.from_hex_code("#6f0000"),
-});
-
-const STYLE_DETECTED = new Style({
-  fill: new Oklch(0.7, 0.1, 150),
-});
-
-const STYLE_NEWLY_DETECTED = new Style({
-  fill: new Oklch(0.7, 0.1, 100),
-});
+const STYLE_LATTICE = Style.flat("#6f0000");
+const STYLE_DETECTED = Style.flat(new Oklch(0.7, 0.1, 150));
+const STYLE_NEWLY_DETECTED = Style.flat(new Oklch(0.7, 0.1, 100));
 
 const ORIGIN = new Point(WIDTH / 2, (3 * HEIGHT) / 4);
 // how many pixels per (cycle/angstrom) unit of the lattice

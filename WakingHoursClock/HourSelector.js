@@ -10,9 +10,7 @@ import { WakingHours } from "./WakingHours.js";
 const RADIUS_MARKER = 8;
 const RADIUS_HIGHLIGHT = 12;
 
-const STYLE_HIGHLIGHT = new Style({
-  fill: COLOR_HIGHLIGHT,
-});
+const STYLE_HIGHLIGHT = Style.flat(COLOR_HIGHLIGHT);
 
 /**
  * One of the drag handles for setting either the sleep/wake time
@@ -38,9 +36,7 @@ export class HourSelector {
     );
 
     const color = sleep_or_wake === "sleep" ? COLOR_SLEEP : COLOR_WAKE;
-    const style_marker = new Style({
-      fill: color,
-    });
+    const style_marker = Style.flat(color);
 
     this.primitive = group(
       style(this.show_highlight, STYLE_HIGHLIGHT),

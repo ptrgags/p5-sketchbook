@@ -15,13 +15,9 @@ import { RelTimelineOps } from "./RelTimelineOps.js";
 import { minmax } from "../minmax.js";
 
 // For the background colors I'm using, solid black fill looks fine
-const NOTE_STYLE = new Style({
-  fill: Color.BLACK,
-});
+const NOTE_STYLE = Style.flat(Color.BLACK);
 
-const MEASURE_LINE_STYLE = new Style({
-  stroke: "#777777",
-});
+const MEASURE_LINE_STYLE = Style.lines("#777777");
 
 /**
  * Get the minimum and maximum MIDI notes

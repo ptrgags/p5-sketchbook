@@ -18,7 +18,7 @@ const PLAY_TRIANGLE = new PolygonPrimitive(
   ],
   true,
 );
-const PLAY_GROUP = style(PLAY_TRIANGLE, new Style({ stroke: Color.WHITE }));
+const PLAY_GROUP = style(PLAY_TRIANGLE, Style.lines(Color.WHITE));
 
 /**
  * @implements {Animated}

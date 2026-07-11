@@ -68,7 +68,7 @@ export class ToggleButton {
     const button_style =
       this.toggle_state === ToggleState.STATE_A
         ? Style.DEFAULT_FILL
-        : new Style({ fill: Color.MAGENTA });
+        : Style.flat(Color.MAGENTA);
 
     return style(rect, button_style);
   }

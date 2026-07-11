@@ -9,12 +9,8 @@ import { Rect } from "./Rect.js";
 import { group, style } from "./shorthand.js";
 import { SimpleGroupPrimitive } from "./SimpleGroupPrimitive.js";
 
-const STYLE_OUTER = new Style({
-  fill: Color.BLACK,
-});
-const STYLE_INNER = new Style({
-  fill: Color.WHITE,
-});
+const STYLE_OUTER = Style.flat(Color.BLACK);
+const STYLE_INNER = Style.flat(Color.WHITE);
 
 /**
  *

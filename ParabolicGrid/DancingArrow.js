@@ -73,10 +73,7 @@ const STYLE_CIRCLE = new Style({
   stroke: COLOR_DARKER,
   width: 4,
 });
-const STYLE_ARROW = new Style({
-  stroke: COLOR_DARKER,
-  width: 4,
-});
+const STYLE_ARROW = Style.lines(COLOR_DARKER, 4);
 
 /**
  * Make an arrow that points in the direction of translation, but animates

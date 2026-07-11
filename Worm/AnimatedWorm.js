@@ -26,8 +26,8 @@ const WORM_MIN_BEND_ANGLE = (3 * Math.PI) / 4;
 const ROT45 = Motor.rotation(Point.ORIGIN, Math.PI / 4);
 const DEBUG_SHOW_SPINE = false;
 
-const SPINE_STYLE = new Style({ stroke: Color.WHITE });
-const CENTER_STYLE = new Style({ fill: Color.WHITE });
+const SPINE_STYLE = Style.lines(Color.WHITE);
+const CENTER_STYLE = Style.flat(Color.WHITE);
 const WORM_STYLE = new Style({
   fill: new Color(255, 122, 151),
   stroke: new Color(127, 61, 76),

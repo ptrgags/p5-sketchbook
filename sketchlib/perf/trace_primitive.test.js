@@ -18,9 +18,7 @@ import { CTile } from "../cga2d/CTile.js";
 import { NullPoint } from "../cga2d/NullPoint.js";
 import { Cline } from "../cga2d/Cline.js";
 
-const STYLE = new Style({
-  stroke: Color.RED,
-});
+const STYLE = Style.lines(Color.RED);
 
 const TRANSLATE = new Transform(new Direction(3, -4));
 

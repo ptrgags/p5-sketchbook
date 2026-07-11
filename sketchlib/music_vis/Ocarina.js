@@ -320,9 +320,7 @@ export class Ocarina {
       style(this.closed_holes, style_closed),
       new GroupPrimitive(this.pitch_label, {
         text_style,
-        style: new Style({
-          fill: Color.WHITE,
-        }),
+        style: Style.flat(Color.WHITE),
       }),
     );
   }

@@ -176,7 +176,7 @@ export class TouchDPad {
     const STYLE_IDLE = Style.DEFAULT_STROKE.with_width(2);
     const STYLE_PRESSED = new Style({
       // light blue, half transparency
-      fill: new Oklch(0.7, 0.1, 215, 0.5).to_srgb(),
+      fill: new Oklch(0.7, 0.1, 215, 0.5),
       stroke: Color.WHITE,
       width: 2,
     });

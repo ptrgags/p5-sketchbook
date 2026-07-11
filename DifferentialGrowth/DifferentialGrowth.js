@@ -26,7 +26,7 @@ for (let i = 0; i < INITIAL_POINTS; i++) {
 const POLYLINE = new DifferentialPolyline(points, QUADTREE);
 const POLYLINE2 = new DifferentialPolyline(points2, QUADTREE);
 
-const BASE_STYLE = new Style({ stroke: Color.BLACK, width: 2 });
+const BASE_STYLE = Style.lines(Color.BLACK, 2);
 const STYLE_POLYLINE1 = BASE_STYLE.with_fill(new Color(255, 127, 0));
 const STYLE_POLYLINE2 = BASE_STYLE.with_fill(new Color(0, 127, 0));
 

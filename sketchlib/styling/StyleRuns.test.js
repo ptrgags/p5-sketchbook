@@ -3,15 +3,9 @@ import { Style } from "../Style.js";
 import { Color } from "../Color.js";
 import { StyleRuns } from "./StyleRuns.js";
 
-const STYLE_RED = new Style({
-  stroke: Color.RED,
-});
-const STYLE_GREEN = new Style({
-  stroke: Color.RED,
-});
-const STYLE_BLUE = new Style({
-  stroke: Color.RED,
-});
+const STYLE_RED = Style.lines(Color.RED);
+const STYLE_GREEN = Style.lines(Color.RED);
+const STYLE_BLUE = Style.lines(Color.RED);
 
 describe("StyleRuns", () => {
   describe("iter", () => {

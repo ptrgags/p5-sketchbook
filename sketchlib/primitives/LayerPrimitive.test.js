@@ -20,12 +20,8 @@ function stub_render_layers(primitives) {
   };
 }
 
-const STYLE = new Style({
-  stroke: Color.BLUE,
-});
-const STYLE2 = new Style({
-  fill: Color.RED,
-});
+const STYLE = Style.lines(Color.BLUE);
+const STYLE2 = Style.flat(Color.RED);
 
 describe("LayerPrimitive", () => {
   it("with no primitives creates no groups", () => {
