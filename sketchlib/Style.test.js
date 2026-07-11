@@ -80,4 +80,50 @@ describe("Style", () => {
     expect(result.fill).toEqual(style.fill);
     expect(result.stroke_width).toEqual(10);
   });
+
+  it("lines with color returns correct style", () => {
+    const result = Style.lines(Color.RED);
+
+    expect(result.stroke).toEqual(Color.RED);
+    expect(result.fill).toBeUndefined();
+    expect(result.stroke_width).toBe(1);
+  });
+
+  it("lines with color and width returns correct style", () => {
+    const result = Style.lines(Color.RED, 4);
+
+    expect(result.stroke).toEqual(Color.RED);
+    expect(result.fill).toBeUndefined();
+    expect(result.stroke_width).toBe(4);
+  });
+
+  it("solid with oklch computes darker stroke color", () => {
+    const color = new Oklch(0.7, 0.1, 50);
+    const darker = new Oklch(0.6, 0.1, 50);
+
+    const result = Style.solid(color);
+
+    expect(result.stroke).toEqual(darker.to_srgb());
+    expect(result.fill).toEqual(color.to_srgb());
+    expect(result.stroke_width).toBe(1);
+  });
+
+  it("solid with oklch and width computes correct stroke width", () => {
+    const color = new Oklch(0.7, 0.1, 50);
+    const darker = new Oklch(0.6, 0.1, 50);
+
+    const result = Style.solid(color, 4);
+
+    expect(result.stroke).toEqual(darker.to_srgb());
+    expect(result.fill).toEqual(color.to_srgb());
+    expect(result.stroke_width).toBe(4);
+  });
+
+  it("flat with color sets up fill color only", () => {
+    const result = Style.flat(Color.BLUE);
+
+    expect(result.stroke).toBeUndefined();
+    expect(result.stroke_width).toBe(1);
+    expect(result.fill).toEqual(Color.BLUE);
+  });
 });
