@@ -17,10 +17,7 @@ const POINT_A = Point.ORIGIN;
 const POINT_B = POINT_A.add(DIR_45.scale(0.5));
 const POINT_C = POINT_A.add(DIR_135.scale(0.5));
 
-const STYLE_SPACESHIP = new Style({
-  stroke: Color.from_hex_code("#ffaf00"),
-  width: 3,
-});
+const STYLE_SPACESHIP = Style.lines("#ffaf00", 3);
 const NACHO = new StyledTile(
   [
     ClineArc.from_segment(new LineSegment(POINT_A, POINT_B)),

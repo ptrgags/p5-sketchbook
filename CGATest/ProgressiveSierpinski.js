@@ -15,9 +15,7 @@ const SIERPINSKI_IFS = new IFS([
   CVersor.translation(new Direction(0, -0.5)).compose(SHRINK),
 ]);
 
-const STYLE_CIRCLES = new Style({
-  stroke: Color.GREEN,
-});
+const STYLE_CIRCLES = Style.lines(Color.GREEN);
 
 export class ProgressiveSierpinski {
   /**

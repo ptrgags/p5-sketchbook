@@ -39,15 +39,9 @@ const INVERTED_POINT = POINT.transform(INVERT);
 const INVERTED_LINE = LINE.transform(INVERT);
 const INVERTED_CHIP = CHIP.transform(INVERT);
 
-const LINE_STYLE = new Style({
-  stroke: Color.YELLOW,
-});
-const REFLECTED_STYLE = new Style({
-  stroke: Color.CYAN,
-});
-const INVERTED_STYLE = new Style({
-  stroke: new Color(255, 127, 0),
-});
+const LINE_STYLE = Style.lines(Color.YELLOW);
+const REFLECTED_STYLE = Style.lines(Color.CYAN);
+const INVERTED_STYLE = Style.lines(new Color(255, 127, 0));
 
 const ORIGINAL_GEOM = style([CIRCLE, POINT, LINE, CHIP], LINE_STYLE);
 const REFLECTED_GEOM = style(

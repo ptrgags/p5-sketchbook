@@ -35,10 +35,7 @@ const nacho_b = hyperbolic_to_point(new Direction(RADIUS_A, 0));
 const nacho_c = hyperbolic_to_point(new Direction(0, RADIUS_A));
 const NACHO_FUNCTIONS = [nacho_a, nacho_b, nacho_c];
 
-const STYLE_NACHO = new Style({
-  stroke: Color.from_hex_code("#ff7f00"),
-  width: 2,
-});
+const STYLE_NACHO = Style.lines("#ff7f00", 2);
 const NACHO = new CTile(
   ClineArc.from_segment(new LineSegment(Point.ORIGIN, new Point(1, 0))),
   ClineArc.from_arc(
