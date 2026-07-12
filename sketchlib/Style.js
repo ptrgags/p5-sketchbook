@@ -106,6 +106,28 @@ export class Style {
 
     p.strokeWeight(this.stroke_width);
   }
+
+  /**
+   * Shorthand for styling lines and the outline of shapes
+   * @param {Color | Oklch | string} color The stroke color for the lines
+   * @param {number} [width] Line width, if different from the default
+   * @returns {Style}
+   */
+  static lines(color, width) {
+    return new Style({
+      stroke: color,
+      width,
+    });
+  }
+
+  /**
+   * Shorthand for a shape that's filled
+   * @param {Color | Oklch | string} color Fill color
+   * @returns {Style}
+   */
+  static flat(color) {
+    return new Style({ fill: color });
+  }
 }
 
 Style.INVISIBLE = Object.freeze(new Style({}));

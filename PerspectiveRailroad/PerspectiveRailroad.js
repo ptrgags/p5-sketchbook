@@ -20,9 +20,9 @@ const BOTTOM_SIDE = new Line(0, 1, HEIGHT);
 const RAIL_WIDTH = 30;
 const RAIL_HEIGHT = 50;
 
-const DEFAULT_STYLE = new Style({ stroke: Color.BLACK });
+const DEFAULT_STYLE = Style.lines(Color.BLACK);
 const GROUND_STYLE = DEFAULT_STYLE.with_fill(new Color(135, 201, 162));
-const SKY_STYLE = new Style({ fill: new Color(30, 173, 235) });
+const SKY_STYLE = Style.flat(new Color(30, 173, 235));
 const RAIL_STYLE = DEFAULT_STYLE.with_fill(new Color(71, 70, 69));
 const TIE_STYLE = DEFAULT_STYLE.with_fill(new Color(99, 59, 26));
 

@@ -18,11 +18,7 @@ const HAND = new LineSegment(
   DIAL_CENTER,
   DIAL_CENTER.add(Direction.DIR_Y.scale(HAND_LENGTH)),
 );
-
-const STYLE_HAND = new Style({
-  stroke: Color.WHITE,
-  width: 8,
-});
+const STYLE_HAND = Style.lines(Color.WHITE, 8);
 
 const STATE = new WakingHours();
 const WAKE_HANDLE = new HourSelector(STATE, "wake");

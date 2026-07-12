@@ -17,14 +17,8 @@ import {
   PIPE_TREE_TENOR,
 } from "./pipe_network.js";
 
-const STYLE_PIPE_WALLS = new Style({
-  stroke: Color.from_hex_code("#666666"),
-  width: 12,
-});
-const STYLE_PIPE_INTERIOR = new Style({
-  stroke: Color.from_hex_code("#111111"),
-  width: 8,
-});
+const STYLE_PIPE_WALLS = Style.lines("#666666", 12);
+const STYLE_PIPE_INTERIOR = Style.lines("#111111", 8);
 
 const ALL_PIPES = [
   ...PIPE_TREE_BASS.iter_segments(),
@@ -42,7 +36,7 @@ const PIPES = group(PIPE_WALLS, PIPE_INTERIOR);
  * @returns {Style}
  */
 function fluid_style(color) {
-  return new Style({ stroke: color, width: 8 });
+  return Style.lines(color, 8);
 }
 
 /**

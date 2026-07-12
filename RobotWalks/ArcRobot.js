@@ -50,15 +50,9 @@ const COLORS = [
   Color.GREEN,
 ];
 
-const N_STYLES = COLORS.map((x) => new Style({ stroke: x, width: 2 }));
-const GREY_LINES = new Style({
-  stroke: "#777777",
-  width: 2,
-});
-const YELLOW_LINES = new Style({
-  stroke: Color.YELLOW,
-  width: 2,
-});
+const N_STYLES = COLORS.map((x) => Style.lines(x, 2));
+const GREY_LINES = Style.lines("#777777", 2);
+const YELLOW_LINES = Style.lines(Color.YELLOW, 2);
 
 const SEA_GREEN = new Oklch(0.7, 0.1, 196);
 const POINT_STYLE = new Style({

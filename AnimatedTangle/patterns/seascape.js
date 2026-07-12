@@ -20,9 +20,7 @@ import { Circle } from "../../sketchlib/primitives/Circle.js";
 import { LineSegment } from "../../sketchlib/primitives/LineSegment.js";
 import { Animated } from "../../sketchlib/animation/Animated.js";
 
-const STYLE_MOUNTAINS = new Style({
-  fill: PALETTE_ROCK[Values.MEDIUM],
-});
+const STYLE_MOUNTAINS = Style.flat(PALETTE_ROCK[Values.MEDIUM]);
 
 const NUM_HILL_LAYERS = 3;
 const MOUNTAIN_AMPLITUDE = 35;
@@ -32,23 +30,15 @@ const HILL_FIRST_CENTER = 60;
 const HILL_Y_SPACING = 10;
 const HILL_AMPLITUDE = 20;
 const HILL_STYLES = [
-  new Style({
-    fill: PALETTE_NAVY[Values.MED_LIGHT],
-  }),
-  new Style({
-    fill: PALETTE_NAVY[Values.MEDIUM],
-  }),
-  new Style({
-    fill: PALETTE_NAVY[Values.MED_DARK],
-  }),
+  Style.flat(PALETTE_NAVY[Values.MED_LIGHT]),
+  Style.flat(PALETTE_NAVY[Values.MEDIUM]),
+  Style.flat(PALETTE_NAVY[Values.MED_DARK]),
 ];
 
 const DURATION_MOUNTAIN = 8;
 const PARALLAX_STEP = 1.5;
 
-const STYLE_SKY = new Style({
-  fill: PALETTE_SKY[Values.MEDIUM],
-});
+const STYLE_SKY = Style.flat(PALETTE_SKY[Values.MEDIUM]);
 const BACKGROUND = style(
   new Rect(Point.ORIGIN, new Direction(500, 100)),
   STYLE_SKY,
@@ -65,19 +55,13 @@ const SUN_RAY_LINES = Direction.roots_of_unity(12).map((dir) => {
   return new LineSegment(start, end);
 });
 
-const STYLE_SUN_LINES = new Style({
-  stroke: PALETTE_CORAL[Values.LIGHT],
-});
-const STYLE_SUN = new Style({
-  fill: PALETTE_CORAL[Values.LIGHT],
-});
+const STYLE_SUN_LINES = Style.lines(PALETTE_CORAL[Values.LIGHT]);
+const STYLE_SUN = Style.flat(PALETTE_CORAL[Values.LIGHT]);
 const SUN_RAYS = style(SUN_RAY_LINES, STYLE_SUN_LINES);
 const SUN_DISK = style(new Circle(SUN_CENTER, SUN_RADIUS), STYLE_SUN);
 const SUN = group(SUN_DISK, SUN_RAYS);
 
-const STYLE_SNOWCAPS = new Style({
-  fill: PALETTE_SKY[Values.LIGHT],
-});
+const STYLE_SNOWCAPS = Style.flat(PALETTE_SKY[Values.LIGHT]);
 
 // percentage of height from bottom to top
 const SNOW_LEVEL = 0.6;

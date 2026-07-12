@@ -56,34 +56,23 @@ const HOUR_HAND = new VectorPrimitive(
   ),
 );
 
-const STYLE_DIAL = new Style({
-  fill: Color.WHITE,
-});
-
-const STYLE_TICKS = new Style({
-  stroke: Color.BLACK,
-  width: 4,
-});
+const STYLE_DIAL = Style.flat(Color.WHITE);
+const STYLE_TICKS = Style.lines(Color.BLACK, 4);
 
 const STYLE_HOUR_MIN = new Style({
   stroke: Color.RED,
   fill: new Color(255, 0, 0, 127),
 });
-
 const STYLE_MIN_SEC = new Style({
   stroke: Color.GREEN,
   fill: new Color(0, 255, 0, 127),
 });
-
 const STYLE_SEC_HOUR = new Style({
   stroke: Color.BLUE,
   fill: new Color(0, 0, 255, 127),
 });
 
-const STYLE_HANDS = new Style({
-  stroke: Color.BLACK,
-  width: 4,
-});
+const STYLE_HANDS = Style.lines(Color.BLACK, 4);
 
 const SCENE = group(
   style(DIAL, STYLE_DIAL),

@@ -19,10 +19,7 @@ const EPSILON = 1e-8;
 
 const ORIGIN = new Point(WIDTH / 2, HEIGHT / 4);
 
-const STYLE_XRAY = new Style({
-  stroke: new Oklch(0.7, 0.1, 300),
-  width: 4,
-});
+const STYLE_XRAY = Style.lines(new Oklch(0.7, 0.1, 300), 4);
 
 const INCOMING_BEAM = style(
   new LineSegment(new Point(0, HEIGHT / 4), ORIGIN),
@@ -30,14 +27,11 @@ const INCOMING_BEAM = style(
 );
 
 const STYLE_MACHINE = new Style({
-  stroke: Color.from_hex_code("#333333"),
-  fill: Color.from_hex_code("#777777"),
+  stroke: "#333333",
+  fill: "#777777",
 });
 
-const STYLE_MACHINE_LINES = new Style({
-  stroke: Color.from_hex_code("#333333"),
-  width: 4,
-});
+const STYLE_MACHINE_LINES = Style.lines("#333333", 4);
 
 const STYLE_CRYSTAL = new Style({
   stroke: new Oklch(0.4, 0.1, 40),
@@ -78,9 +72,7 @@ const DETECTOR_SEGMENT = style(
 );
 const DETECTOR_LINE = new Line(1, 0, DETECTOR_X);
 
-const STYLE_DETECTED = new Style({
-  fill: new Oklch(0.7, 0.1, 150),
-});
+const STYLE_DETECTED = Style.flat(new Oklch(0.7, 0.1, 150));
 
 // radius of the crystal from center to the corner in pixels
 const CRYSTAL_RADIUS = 20;

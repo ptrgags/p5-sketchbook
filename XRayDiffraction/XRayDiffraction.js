@@ -13,9 +13,7 @@ const SIMULATION = new XRaySimulation();
 const LAB_ANIMATION = new XRayLab(SIMULATION);
 const WAVEVECTORS = new XRayReciprocalSpace(SIMULATION);
 
-const STYLE_BACKDROP = new Style({
-  fill: Color.BLACK,
-});
+const STYLE_BACKDROP = Style.flat(Color.BLACK);
 const BACKDROP = style(
   new Rect(Point.ORIGIN, new Direction(WIDTH, HEIGHT / 2)),
   STYLE_BACKDROP,

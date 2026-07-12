@@ -49,28 +49,17 @@ const STRINGS = STRING_POSITIONS.map((p) => {
   );
 });
 
-const STYLE_FRETBOARD = new Style({
-  // brown
-  fill: new Oklch(0.3576, 0.0675, 65.7),
-});
+// brown
+const STYLE_FRETBOARD = Style.flat(new Oklch(0.3576, 0.0675, 65.7));
 
-const STYLE_FRETS = new Style({
-  stroke: Oklch.grey(0.75),
-});
-
-const STYLE_STRINGS = new Style({
-  stroke: Oklch.grey(0.5),
-  width: 2,
-});
+const STYLE_FRETS = Style.lines(Oklch.grey(0.75));
+const STYLE_STRINGS = Style.lines(Oklch.grey(0.5), 2);
 
 const DOT_RADIUS = 4;
-const STYLE_DOTS = new Style({
-  fill: new Oklch(0.7, 0.1, 50),
-});
 
-const STYLE_NUMBERS = new Style({
-  fill: Oklch.grey(1.0),
-});
+const STYLE_DOTS = Style.flat(new Oklch(0.7, 0.1, 50));
+const STYLE_NUMBERS = Style.flat(Oklch.grey(1.0));
+
 const TEXT_STYLE_FRETS = new TextStyle(14, "right", "top");
 
 const NUMBERS = range(NUM_FRETS)

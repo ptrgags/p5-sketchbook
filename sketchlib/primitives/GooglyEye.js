@@ -12,9 +12,7 @@ const STYLE_SCLERA = new Style({
   stroke: Color.BLACK,
 });
 
-const STYLE_PUPIL = new Style({
-  fill: Color.BLACK,
-});
+const STYLE_PUPIL = Style.flat(Color.BLACK);
 
 /**
  * Everything is better with googly eyes, so let's make it a full-fledged

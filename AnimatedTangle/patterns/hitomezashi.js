@@ -90,10 +90,7 @@ const CURVE_END = LoopCurve.from_timeline(
   ),
 );
 
-const STYLE_STITCHES = new Style({
-  stroke: PALETTE_CORAL[Values.MEDIUM],
-  width: 4,
-});
+const STYLE_STITCHES = Style.lines(PALETTE_CORAL[Values.MEDIUM], 4);
 
 /**
  * @implements {Animated}

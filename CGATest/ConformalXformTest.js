@@ -17,22 +17,11 @@ import { Style } from "../sketchlib/Style.js";
 import { StyleRuns } from "../sketchlib/styling/StyleRuns.js";
 import { Approxodrome } from "./Approxodrome.js";
 
-const STYLE_UNIT_CIRCLE = new Style({
-  stroke: Color.from_hex_code("#007f00"),
-  width: 4,
-});
+const STYLE_UNIT_CIRCLE = Style.lines("#007f00", 4);
+const STYLE_PARABOLIC = Style.lines("#ff7f00", 2);
 
-const STYLE_PARABOLIC = new Style({
-  stroke: Color.from_hex_code("#ff7f00"),
-  width: 2,
-});
-
-const STYLE_LOX = new Style({
-  fill: Color.from_hex_code("#7f00ff"),
-});
-const STYLE_POINTS = new Style({
-  fill: Color.from_hex_code("#007f00"),
-});
+const STYLE_LOX = Style.flat("#7f00ff");
+const STYLE_POINTS = Style.flat("#007f00");
 const STYLE_RUNS_POINTS = new StyleRuns([
   [2, STYLE_POINTS], // hyperbolic and elliptic in green
   [1, STYLE_LOX], // loxodromic in purple
@@ -99,13 +88,7 @@ export class ConformalXformTest {
       THREE_POINTS,
     );
 
-    this.double_spiral = style(
-      [],
-      new Style({
-        stroke: Color.from_hex_code("#7f00ff"),
-        width: 4,
-      }),
-    );
+    this.double_spiral = style([], Style.lines("#7f00ff", 4));
 
     this.primitive = group(
       unit_circle,

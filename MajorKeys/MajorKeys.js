@@ -141,9 +141,7 @@ const SCENE = group(
   xform(PIANOS, SHIFT_OCTAVE),
   new GroupPrimitive(LABELS, {
     text_style: new TextStyle(24, "center", "top"),
-    style: new Style({
-      fill: Color.BLACK,
-    }),
+    style: Style.flat(Color.BLACK),
   }),
 );
 

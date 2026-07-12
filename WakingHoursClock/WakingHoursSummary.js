@@ -16,9 +16,7 @@ import { Rational } from "../sketchlib/Rational.js";
 
 const MARGIN = 10;
 
-const STYLE_LABELS = new Style({
-  fill: Color.WHITE,
-});
+const STYLE_LABELS = Style.flat(Color.WHITE);
 
 const TEXT_STYLE_LEFT = new TextStyle(24, "left", "top");
 const TEXT_STYLE_RIGHT = new TextStyle(24, "right", "top");

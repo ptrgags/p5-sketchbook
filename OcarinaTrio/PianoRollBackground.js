@@ -13,8 +13,8 @@ import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 
 const COLUMN_STYLES = [
-  new Style({ fill: new Oklch(0.3, 0, 0) }),
-  new Style({ fill: new Oklch(0.2, 0, 0) }),
+  Style.flat(new Oklch(0.3, 0, 0)),
+  Style.flat(new Oklch(0.2, 0, 0)),
 ];
 const COLUMN_STYLE_INDICES = [0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0];
 
@@ -56,21 +56,8 @@ export class PianoRollBackground {
       );
     }
 
-    this.beat_lines = style(
-      [],
-      new Style({
-        stroke: new Oklch(0.8, 0, 0),
-        width: 2,
-      }),
-    );
-
-    this.bar_lines = style(
-      [],
-      new Style({
-        stroke: Color.WHITE,
-        width: 2,
-      }),
-    );
+    this.beat_lines = style([], Style.lines(new Oklch(0.8, 0, 0), 2));
+    this.bar_lines = style([], Style.lines(Color.WHITE, 2));
     this.primitive = group(
       ...columns,
       ...pitch_lines,

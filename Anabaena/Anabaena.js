@@ -26,20 +26,11 @@ const MAX_SYMBOLS = 100;
 const MAX_SPEED = 10;
 
 const CELL_THICKNESS = 20;
-const STYLE_CELL_S = new Style({
-  // light blue
-  stroke: "#4cbac0",
-  width: CELL_THICKNESS,
-});
-const STYLE_CELL_L = new Style({
-  // dark sea green
-  stroke: "#419977",
-  width: CELL_THICKNESS,
-});
-const STYLE_ARROW = new Style({
-  stroke: Color.BLACK,
-  width: 2,
-});
+// light blue
+const STYLE_CELL_S = Style.lines("#4cbac0", CELL_THICKNESS);
+// dark sea green
+const STYLE_CELL_L = Style.lines("#419977", CELL_THICKNESS);
+const STYLE_ARROW = Style.lines(Color.BLACK, 2);
 
 class AnabaenaCatenula {
   constructor() {

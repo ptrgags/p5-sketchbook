@@ -186,9 +186,7 @@ const SMALLER = CVersor.dilation(0.9);
 
 const ROOT_HEPTAGON = new StyledTile(
   SMALLER.transform(ROOT_TILE),
-  new Style({
-    stroke: new Oklch(0.7, 0.1, 50),
-  }),
+  Style.lines(new Oklch(0.7, 0.1, 50)),
 );
 
 const HEPTAGON = E2.transform(ROOT_HEPTAGON);
@@ -213,10 +211,7 @@ const ROOT_PETAL = new CTile(
   BIG_ARC,
   ClineArc.from_segment(new LineSegment(BIG_ARC.c.point, EDGE_MIDPOINT.point)),
 );
-const PETAL = new StyledTile(
-  E2.transform(ROOT_PETAL),
-  new Style({ stroke: Color.CYAN }),
-);
+const PETAL = new StyledTile(E2.transform(ROOT_PETAL), Style.lines(Color.CYAN));
 
 // EDIT: not quite right, this is only true for edge-top tiles. Vertex-top tiles
 // need one more segment... I need to think about this.
@@ -229,7 +224,7 @@ const ROOT_CELL_WALLS = new CTile(
 );
 const CELL_WALLS = new StyledTile(
   E2.transform(ROOT_CELL_WALLS),
-  new Style({ stroke: Color.from_hex_code("#7F00FF"), width: 2 }),
+  Style.lines("#7F00FF", 2),
 );
 const MOTIF = HEPTAGON; //new CTile(PETAL);
 
@@ -313,7 +308,7 @@ function render_tiling73(root_motif, first_tile, max_height) {
 
 const TILE73 = render_tiling73(ROOT_HEPTAGON, ORBIT_TILE, 4);
 
-const STYLE_BG = new Style({ stroke: Color.WHITE });
+const STYLE_BG = Style.lines(Color.WHITE);
 const BACKGROUND = new StyledTile([Cline.UNIT_CIRCLE], STYLE_BG);
 
 const SCENE = new CTile(BACKGROUND, TILE73);

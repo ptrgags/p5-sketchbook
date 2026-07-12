@@ -73,10 +73,10 @@ const SELECTION_ORDER = [...TANGENTS, ...VERTICES];
 const SPLINES = find_splines(TILES);
 
 // These styles are only used in this sketch
-export const HIGHLIGHT_STYLE = new Style({ fill: Color.CYAN });
-export const VERTEX_STYLE = new Style({ fill: Color.YELLOW });
-export const TANGENT_TIP_STYLE = new Style({ fill: Color.GREEN });
-export const TANGENT_STYLE = new Style({ stroke: Color.GREEN, width: 1.5 });
+export const HIGHLIGHT_STYLE = Style.flat(Color.CYAN);
+export const VERTEX_STYLE = Style.flat(Color.YELLOW);
+export const TANGENT_TIP_STYLE = Style.flat(Color.GREEN);
+export const TANGENT_STYLE = Style.lines(Color.GREEN, 1.5);
 
 function render_control_points(tiles) {
   const tangent_lines = [];

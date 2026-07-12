@@ -157,9 +157,7 @@ const MELODY_BUTTON_SIZE = 150;
 const MELODY_BUTTON_DIMENSIONS = new Direction(MELODY_BUTTON_SIZE, 40);
 const MELODY_BUTTON_CENTER_OFFSET = MELODY_BUTTON_DIMENSIONS.scale(0.5);
 const TEXT_STYLE = new TextStyle(16, "center", "center");
-const TEXT_COLOR = new Style({
-  fill: Color.WHITE,
-});
+const TEXT_COLOR = Style.flat(Color.WHITE);
 
 const PIANO_BOUNDS = new Rect(new Point(0, 200), new Direction(500, 100));
 

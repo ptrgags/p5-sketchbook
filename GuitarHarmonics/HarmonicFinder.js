@@ -40,14 +40,13 @@ for (let i = 2; i <= MAX_HARMONIC; i++) {
     const y = p * STRING_LENGTH;
     return new LineSegment(new Point(start_x, y), new Point(end_x, y));
   });
-  const line_style = new Style({
-    stroke: Oklch.lerp(
-      new Oklch(0.7, 0.1, 0),
-      new Oklch(0.7, 0.1, 360),
-      (i - 2) / (MAX_HARMONIC - 2),
-    ),
-    width: 2,
-  });
+
+  const line_color = Oklch.lerp(
+    new Oklch(0.7, 0.1, 0),
+    new Oklch(0.7, 0.1, 360),
+    (i - 2) / (MAX_HARMONIC - 2),
+  );
+  const line_style = Style.lines(line_color, 2);
   HARMONIC_LINES.push(style(lines, line_style));
 
   const labels = positions.map((p) => {
@@ -57,7 +56,7 @@ for (let i = 2; i <= MAX_HARMONIC; i++) {
 }
 
 const HARMONIC_LABELS = new GroupPrimitive(LABELS, {
-  style: new Style({ fill: Oklch.grey(1.0) }),
+  style: Style.flat(Oklch.grey(1.0)),
   text_style: new TextStyle(16, "left", "center"),
 });
 

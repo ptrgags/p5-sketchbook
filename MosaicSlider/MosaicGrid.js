@@ -19,7 +19,7 @@ const MARGIN_Y = (HEIGHT - ROWS * SQUARE_SIZE) / 2;
 const STRIDE = new Direction(SQUARE_SIZE, SQUARE_SIZE);
 const CORNER = new Point(MARGIN_X, MARGIN_Y);
 const SWAP_DURATION = sec_to_frames(1 / 16);
-const PIXEL_STYLE = new Style({ stroke: Color.BLACK, width: 2 });
+const PIXEL_STYLE = Style.lines(Color.BLACK, 2);
 
 /**
  * Color each quadrant of the grid a different color

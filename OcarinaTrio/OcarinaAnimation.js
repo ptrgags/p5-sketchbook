@@ -190,21 +190,21 @@ export class OcarinaAnimation {
         y,
         velocity,
         pitch_range,
-        new Style({ fill: BASS_CONFIG.color }),
+        Style.flat(BASS_CONFIG.color),
       ),
       new PianoRoll(
         tenor_intervals,
         y,
         velocity,
         pitch_range,
-        new Style({ fill: TENOR_CONFIG.color }),
+        Style.flat(TENOR_CONFIG.color),
       ),
       new PianoRoll(
         soprano_intervals,
         y,
         velocity,
         pitch_range,
-        new Style({ fill: SOPRANO_CONFIG.color }),
+        Style.flat(SOPRANO_CONFIG.color),
       ),
     );
 

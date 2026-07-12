@@ -43,9 +43,7 @@ const BRICK_DIMENSIONS = PANEL_DIMENSIONS.mul_components(
   new Direction(0.5, 0.25),
 );
 
-const STYLE_BACKGROUND = new Style({
-  fill: PALETTE_CORAL[Values.MED_DARK],
-});
+const STYLE_BACKGROUND = Style.flat(PALETTE_CORAL[Values.MED_DARK]);
 const BRICK_BACKGROUND = style(
   new Rect(PANEL_CORNER, PANEL_DIMENSIONS),
   STYLE_BACKGROUND,
@@ -53,10 +51,10 @@ const BRICK_BACKGROUND = style(
 
 const STRIPE_SPACING = 20;
 
-const STYLE_STRIPES = new Style({
-  stroke: PALETTE_CORAL[Values.DARK],
-  width: STRIPE_SPACING / 2,
-});
+const STYLE_STRIPES = Style.lines(
+  PALETTE_CORAL[Values.DARK],
+  STRIPE_SPACING / 2,
+);
 const BRICK_STRIPES = style(
   make_stripes(
     new Point(400, 400),
@@ -123,9 +121,7 @@ const BRICK_OFFSETS = [
   new Direction(-0.5, 0),
 ];
 
-const STYLE_DROP_SHADOW = new Style({
-  fill: PALETTE_ROCK[Values.DARK],
-});
+const STYLE_DROP_SHADOW = Style.flat(PALETTE_ROCK[Values.DARK]);
 const DROP_SHADOW_OFFSET = new Direction(12, 12);
 
 const DURATION_FALL = new Rational(6);
