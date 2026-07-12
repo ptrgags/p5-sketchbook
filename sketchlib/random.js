@@ -9,7 +9,22 @@ export class Random {
     return Math.floor(Math.random() * (max - min) + min);
   }
 
+  /**
+   * Random float in [min, max)
+   * @param {number} min Minimum value (inclusive)
+   * @param {number} max Maximum value (exclusive)
+   * @returns {number} Random float in [min, max)
+   */
+  static rand_range(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
   // Random choice from an array of choices
+  /**
+   * @template T
+   * @param {T[]} choices Array of items to choose from
+   * @returns {T} One of the choices
+   */
   static rand_choice(choices) {
     const index = Random.rand_int(0, choices.length);
     return choices[index];
