@@ -7,6 +7,7 @@ import { Transform } from "../sketchlib/primitives/Transform.js";
 
 /**
  * A shape that moves with a constant velocity
+ * @implements {Primitive}
  */
 export class FlyingShape {
   /**
@@ -22,6 +23,10 @@ export class FlyingShape {
     this.prev_time = 0;
   }
 
+  /**
+   *
+   * @param {number} time
+   */
   update(time) {
     const dt = time - this.prev_time;
     this.prev_time = time;
@@ -35,6 +40,10 @@ export class FlyingShape {
     );
   }
 
+  /**
+   *
+   * @param {import("p5")} p
+   */
   draw(p) {
     this.primitive.draw(p);
   }
