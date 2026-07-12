@@ -32,6 +32,11 @@ const ISO_TILE_SIZE = new Direction(64, 32);
 let animated;
 
 /**
+ * @type {Sprite}
+ */
+let chopped_sprite;
+
+/**
  *
  * @param {import("p5")} p
  */
@@ -156,6 +161,14 @@ function init_sprites(p) {
     [3, 0, 3, 0],
   ]);
 
+  chopped_sprite = new Sprite(
+    gfx,
+    new Direction(16, 32),
+    new Point(350, 200),
+    0,
+    Point.ORIGIN,
+  );
+
   SCENE.regroup(
     cube_strip,
     iso_tiles,
@@ -166,6 +179,7 @@ function init_sprites(p) {
     animated,
     drawing,
     chopped,
+    chopped_sprite,
   );
 }
 
@@ -183,6 +197,18 @@ function update_animated(time) {
   const offset = Direction.from_angle(2 * time).scale(100);
   animated.position = SCREEN_CENTER.add(offset);
   animated.frame_id = Math.floor(FRAME_CURVE.value(time) || 0);
+}
+
+/**
+ *
+ * @param {number} time
+ */
+function update_chopped_sprite(time) {
+  if (!chopped_sprite) {
+    return;
+  }
+
+  chopped_sprite.frame_id = Math.floor(time % 2);
 }
 
 const CLOCK = new Clock();
@@ -210,7 +236,9 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(128);
 
-    update_animated(CLOCK.elapsed_time);
+    const time = CLOCK.elapsed_time;
+    update_animated(time);
+    update_chopped_sprite(time);
 
     SCENE.draw(p);
   };
