@@ -4,6 +4,8 @@ import { Primitive } from "../primitives/Primitive.js";
 /**
  * Offscreen graphics object. This wraps p5.Graphics, but adapts it to the
  * primitive system
+ *
+ * @implements {Primitive}
  */
 export class Drawing {
   /**
