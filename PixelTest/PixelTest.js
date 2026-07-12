@@ -7,10 +7,14 @@ import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { ImageLibrary } from "../sketchlib/pixel/ImageLibrary.js";
 import { Sprite } from "../sketchlib/pixel/Sprite.js";
-import { group } from "../sketchlib/primitives/shorthand.js";
+import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Rational } from "../sketchlib/Rational.js";
 import { DirectionFlags, penrose_edge, penrose_vertex } from "./penrose.js";
 import { blit_cube } from "./iso_tiles.js";
+import { Drawing } from "../sketchlib/pixel/Drawing.js";
+import { Style } from "../sketchlib/Style.js";
+import { Color } from "../sketchlib/Color.js";
+import { Circle } from "../sketchlib/primitives/Circle.js";
 
 const IMGS = new ImageLibrary({
   cube: "sprites/cube.png",
@@ -118,6 +122,11 @@ function init_sprites(p) {
   const center = new Point(32, 32);
   animated = IMGS.make_sprite("cube", tile_size, new Point(400, 300), center);
 
+  const drawing = new Drawing(p.createGraphics(32, 32), new Point(350, 150));
+  const circle_style = Style.flat(Color.RED);
+  const circle_scene = style(new Circle(new Point(16, 16), 17), circle_style);
+  drawing.draw_primitive(circle_scene);
+
   SCENE.regroup(
     cube_strip,
     iso_tiles,
@@ -126,6 +135,7 @@ function init_sprites(p) {
     whole_cube,
     pyramid,
     animated,
+    drawing,
   );
 }
 
