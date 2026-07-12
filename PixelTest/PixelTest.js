@@ -137,12 +137,14 @@ function init_sprites(p) {
     ],
     motif_style,
   );
-  const drawing = new Drawing(p.createGraphics(32, 32), new Point(350, 150));
+  const gfx = p.createGraphics(32, 32);
+  gfx.noSmooth();
+  const drawing = new Drawing(gfx, new Point(350, 150));
   drawing.draw_primitive(motif_scene);
 
   const chopped = new Tilemap(
     p,
-    drawing.p5_gfx,
+    gfx,
     new Direction(16, 16),
     new Direction(4, 4),
     new Point(350 + 64, 150),
@@ -198,6 +200,9 @@ export const sketch = (p) => {
       undefined,
       document.getElementById("sketch-canvas"),
     );
+
+    p.noSmooth();
+    p.pixelDensity(1);
 
     init_sprites(p);
   };

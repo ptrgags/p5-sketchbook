@@ -1,6 +1,10 @@
 import { Point } from "../pga2d/Point.js";
 import { Primitive } from "../primitives/Primitive.js";
 
+/**
+ * Offscreen graphics object. This wraps p5.Graphics, but adapts it to the
+ * primitive system
+ */
 export class Drawing {
   /**
    * Constructor
@@ -13,12 +17,11 @@ export class Drawing {
   }
 
   clear() {
-    this.p5_gfx.clear();
     this.p5_gfx.reset();
   }
 
   /**
-   * Draw a primitive to the drawing
+   * Draw a primitive to the underlying canvas
    * @param {Primitive} primitive
    */
   draw_primitive(primitive) {
