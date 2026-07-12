@@ -11,6 +11,7 @@ import { Tilemap } from "../sketchlib/pixel/Tilemap.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
 import { Rect } from "../sketchlib/primitives/Rect.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
+import { ShowHidePrimitive } from "../sketchlib/primitives/ShowHidePrimitive.js";
 import { Random } from "../sketchlib/random.js";
 import { range } from "../sketchlib/range.js";
 import { Style } from "../sketchlib/Style.js";
@@ -86,12 +87,12 @@ class CopyPaste {
     this.cursor = new Rect(Point.ORIGIN, TILE_SIZE);
     this.styled_cursor = style(this.cursor, STYLE_COPY);
 
-    this.next_index = rand_index();
-    this.next_target = TILE_SIZE.mul_components(
-      new Direction(this.next_index.j, this.next_index.i),
-    ).to_point();
+    this.copy_index = rand_index();
+    this.paste_index = new Index2D(0, 0);
 
-    this.next_paste_index = 0;
+    this.next_target = TILE_SIZE.mul_components(
+      new Direction(this.copy_index.j, this.copy_index.i),
+    ).to_point();
 
     this.tween = Tween.point(
       this.cursor.position,
@@ -101,7 +102,8 @@ class CopyPaste {
       Ease.in_out_cubic,
     );
 
-    this.primitive = group(this.styled_cursor);
+    this.show_copy_buffer = new ShowHidePrimitive([this.tilemap_copy], [true]);
+    this.primitive = group(this.styled_cursor, this.show_copy_buffer);
   }
 
   /**
@@ -129,13 +131,15 @@ class CopyPaste {
    * @param {number} time
    */
   copy(time) {
-    // Select the next paste location in the list
-    const row = Math.floor(this.next_paste_index / 5);
-    const col = this.next_paste_index % 5;
-    this.next_index = new Index2D(row, col);
-    this.next_paste_index++;
-    this.choose_next_target(time);
+    const { i, j } = this.copy_index;
+    const idx = i * 5 + j;
+    this.tilemap_copy.blit_tile(new Index2D(0, 0), idx);
+    this.show_copy_buffer.show_flags = [true];
 
+    // Select the next copy location
+    this.copy_index = rand_index();
+
+    this.choose_next_target(time, this.paste_index);
     this.styled_cursor.style = STYLE_PASTE;
     this.state = CopyPasteState.MOVING_PASTE;
   }
@@ -145,9 +149,19 @@ class CopyPaste {
    * @param {number} time
    */
   paste(time) {
-    // Select a random tile to copy
-    this.next_index = rand_index();
-    this.choose_next_target(time);
+    // TODO: This isn't right! the tile may have changed!
+    // paste the copied tile into the paste buffer
+    const copy_1d = this.copy_index.i * 5 + this.copy_index.j;
+    this.tilemap_paste.blit_tile(this.paste_index, copy_1d);
+    this.show_copy_buffer.show_flags = [false];
+
+    // increment the paste index
+    const next_paste_1d = this.paste_index.i * 5 + this.paste_index.j + 1;
+    const row = Math.floor(next_paste_1d / 5);
+    const col = next_paste_1d % 5;
+    this.paste_index = new Index2D(row, col);
+
+    this.choose_next_target(time, this.copy_index);
     this.styled_cursor.style = STYLE_COPY;
     this.state = CopyPasteState.MOVING_COPY;
   }
@@ -155,13 +169,14 @@ class CopyPaste {
   /**
    *
    * @param {number} time
+   * @param {Index2D} index of the next target in the grid
    */
-  choose_next_target(time) {
+  choose_next_target(time, index) {
     const position = this.next_target;
     this.cursor.position = position;
 
     this.next_target = TILE_SIZE.mul_components(
-      new Direction(this.next_index.j, this.next_index.i),
+      new Direction(index.j, index.i),
     ).to_point();
 
     this.tween = Tween.point(
@@ -239,7 +254,7 @@ export const sketch = (p) => {
     // set up a feedback loop - pasting to the screen impacts future copy
     // operations!
     SCENE_OFFSCREEN.regroup(tilemap_paste, ...SHAPES);
-    SCENE_SCREEN.regroup(SCENE_OFFSCREEN, copy_paste, tilemap_copy);
+    SCENE_SCREEN.regroup(SCENE_OFFSCREEN, copy_paste);
   };
 
   p.draw = () => {
