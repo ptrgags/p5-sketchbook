@@ -41,7 +41,7 @@ export class Tilemap {
   /**
    * Constructor
    * @param {import("p5")} p p5 instance for allocating resources
-   * @param {import("p5").Image} tileset Image with the tiles
+   * @param {import("p5").Image | import("p5").Graphics} tileset Image with the tiles
    * @param {Direction} tile_size How big is each tile
    * @param {Direction} map_size How many tiles wide/tall is the map?
    * @param {Point} position Position on the screen to
