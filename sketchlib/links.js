@@ -16,7 +16,7 @@ export const LINKS = [
   {
     title: "Pixel Test",
     is_lab: true,
-    year: "2026-06",
+    year: "2026-06/2026-07",
   },
   {
     title: "Speech Bubble",
