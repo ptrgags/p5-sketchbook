@@ -7,10 +7,15 @@ import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { ImageLibrary } from "../sketchlib/pixel/ImageLibrary.js";
 import { Sprite } from "../sketchlib/pixel/Sprite.js";
-import { group } from "../sketchlib/primitives/shorthand.js";
+import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Rational } from "../sketchlib/Rational.js";
 import { DirectionFlags, penrose_edge, penrose_vertex } from "./penrose.js";
-import { blit_cube } from "./iso_tiles.js";
+import { Drawing } from "../sketchlib/pixel/Drawing.js";
+import { Style } from "../sketchlib/Style.js";
+import { Color } from "../sketchlib/Color.js";
+import { Circle } from "../sketchlib/primitives/Circle.js";
+import { Rect } from "../sketchlib/primitives/Rect.js";
+import { Tilemap } from "../sketchlib/pixel/Tilemap.js";
 
 const IMGS = new ImageLibrary({
   cube: "sprites/cube.png",
@@ -25,6 +30,11 @@ const ISO_TILE_SIZE = new Direction(64, 32);
  * @type {Sprite}
  */
 let animated;
+
+/**
+ * @type {Sprite}
+ */
+let chopped_sprite;
 
 /**
  *
@@ -118,6 +128,47 @@ function init_sprites(p) {
   const center = new Point(32, 32);
   animated = IMGS.make_sprite("cube", tile_size, new Point(400, 300), center);
 
+  // create an offscreen buffer, draw on it with the primitive system, then
+  // chop it up and use it like a tilemap!
+  const motif_style = new Style({
+    stroke: Color.BLACK,
+    fill: Color.RED,
+  });
+  const motif_scene = style(
+    [
+      new Rect(new Point(0, 10), new Direction(32, 4)),
+      new Rect(new Point(0, 18), new Direction(32, 4)),
+      new Circle(new Point(16, 16), 10),
+    ],
+    motif_style,
+  );
+  const gfx = p.createGraphics(32, 32);
+  gfx.noSmooth();
+  const drawing = new Drawing(gfx, new Point(350, 150));
+  drawing.draw_primitive(motif_scene);
+
+  const chopped = new Tilemap(
+    p,
+    gfx,
+    new Direction(16, 16),
+    new Direction(4, 4),
+    new Point(350 + 64, 150),
+  );
+  chopped.blit_all([
+    [1, 2, 1, 2],
+    [3, 0, 3, 0],
+    [1, 2, 1, 2],
+    [3, 0, 3, 0],
+  ]);
+
+  chopped_sprite = new Sprite(
+    gfx,
+    new Direction(16, 32),
+    new Point(350, 200),
+    0,
+    Point.ORIGIN,
+  );
+
   SCENE.regroup(
     cube_strip,
     iso_tiles,
@@ -126,6 +177,9 @@ function init_sprites(p) {
     whole_cube,
     pyramid,
     animated,
+    drawing,
+    chopped,
+    chopped_sprite,
   );
 }
 
@@ -145,6 +199,18 @@ function update_animated(time) {
   animated.frame_id = Math.floor(FRAME_CURVE.value(time) || 0);
 }
 
+/**
+ *
+ * @param {number} time
+ */
+function update_chopped_sprite(time) {
+  if (!chopped_sprite) {
+    return;
+  }
+
+  chopped_sprite.frame_id = Math.floor(time % 2);
+}
+
 const CLOCK = new Clock();
 
 // @ts-ignore
@@ -161,13 +227,18 @@ export const sketch = (p) => {
       document.getElementById("sketch-canvas"),
     );
 
+    p.noSmooth();
+    p.pixelDensity(1);
+
     init_sprites(p);
   };
 
   p.draw = () => {
     p.background(128);
 
-    update_animated(CLOCK.elapsed_time);
+    const time = CLOCK.elapsed_time;
+    update_animated(time);
+    update_chopped_sprite(time);
 
     SCENE.draw(p);
   };
