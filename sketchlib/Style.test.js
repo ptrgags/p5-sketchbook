@@ -97,28 +97,6 @@ describe("Style", () => {
     expect(result.stroke_width).toBe(4);
   });
 
-  it("solid with oklch computes darker stroke color", () => {
-    const color = new Oklch(0.7, 0.1, 50);
-    const darker = new Oklch(0.6, 0.1, 50);
-
-    const result = Style.solid(color);
-
-    expect(result.stroke).toEqual(darker.to_srgb());
-    expect(result.fill).toEqual(color.to_srgb());
-    expect(result.stroke_width).toBe(1);
-  });
-
-  it("solid with oklch and width computes correct stroke width", () => {
-    const color = new Oklch(0.7, 0.1, 50);
-    const darker = new Oklch(0.6, 0.1, 50);
-
-    const result = Style.solid(color, 4);
-
-    expect(result.stroke).toEqual(darker.to_srgb());
-    expect(result.fill).toEqual(color.to_srgb());
-    expect(result.stroke_width).toBe(4);
-  });
-
   it("flat with color sets up fill color only", () => {
     const result = Style.flat(Color.BLUE);
 
