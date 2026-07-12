@@ -10,11 +10,12 @@ import { Sprite } from "../sketchlib/pixel/Sprite.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Rational } from "../sketchlib/Rational.js";
 import { DirectionFlags, penrose_edge, penrose_vertex } from "./penrose.js";
-import { blit_cube } from "./iso_tiles.js";
 import { Drawing } from "../sketchlib/pixel/Drawing.js";
 import { Style } from "../sketchlib/Style.js";
 import { Color } from "../sketchlib/Color.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
+import { Rect } from "../sketchlib/primitives/Rect.js";
+import { Tilemap } from "../sketchlib/pixel/Tilemap.js";
 
 const IMGS = new ImageLibrary({
   cube: "sprites/cube.png",
@@ -122,10 +123,36 @@ function init_sprites(p) {
   const center = new Point(32, 32);
   animated = IMGS.make_sprite("cube", tile_size, new Point(400, 300), center);
 
+  // create an offscreen buffer, draw on it with the primitive system, then
+  // chop it up and use it like a tilemap!
+  const motif_style = new Style({
+    stroke: Color.BLACK,
+    fill: Color.RED,
+  });
+  const motif_scene = style(
+    [
+      new Rect(new Point(0, 10), new Direction(32, 4)),
+      new Rect(new Point(0, 18), new Direction(32, 4)),
+      new Circle(new Point(16, 16), 10),
+    ],
+    motif_style,
+  );
   const drawing = new Drawing(p.createGraphics(32, 32), new Point(350, 150));
-  const circle_style = Style.flat(Color.RED);
-  const circle_scene = style(new Circle(new Point(16, 16), 17), circle_style);
-  drawing.draw_primitive(circle_scene);
+  drawing.draw_primitive(motif_scene);
+
+  const chopped = new Tilemap(
+    p,
+    drawing.p5_gfx,
+    new Direction(16, 16),
+    new Direction(4, 4),
+    new Point(350 + 64, 150),
+  );
+  chopped.blit_all([
+    [1, 2, 1, 2],
+    [3, 0, 3, 0],
+    [1, 2, 1, 2],
+    [3, 0, 3, 0],
+  ]);
 
   SCENE.regroup(
     cube_strip,
@@ -136,6 +163,7 @@ function init_sprites(p) {
     pyramid,
     animated,
     drawing,
+    chopped,
   );
 }
 
