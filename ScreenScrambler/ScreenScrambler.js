@@ -9,6 +9,7 @@ import { Point } from "../sketchlib/pga2d/Point.js";
 import { Drawing } from "../sketchlib/pixel/Drawing.js";
 import { Tilemap } from "../sketchlib/pixel/Tilemap.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
+import { Primitive } from "../sketchlib/primitives/Primitive.js";
 import { Rect } from "../sketchlib/primitives/Rect.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { ShowHidePrimitive } from "../sketchlib/primitives/ShowHidePrimitive.js";
@@ -72,7 +73,10 @@ const CopyPasteState = {
 const STYLE_COPY = Style.lines(Color.YELLOW, 4);
 const STYLE_PASTE = Style.lines(Color.BLUE, 4);
 
-class CopyPaste {
+/**
+ * @implements {Primitive}
+ */
+class CopyPasteCursor {
   /**
    *
    * @param {Tilemap} tilemap_copy
@@ -228,7 +232,7 @@ export const sketch = (p) => {
   let tilemap_copy;
   let tilemap_paste;
   /**
-   * @type {CopyPaste | undefined}
+   * @type {CopyPasteCursor | undefined}
    */
   let cursor;
 
@@ -276,7 +280,7 @@ export const sketch = (p) => {
       Point.ORIGIN,
     );
 
-    cursor = new CopyPaste(tilemap_copy, tilemap_paste);
+    cursor = new CopyPasteCursor(tilemap_copy, tilemap_paste);
 
     // set up a feedback loop - pasting to the screen impacts future copy
     // operations!
