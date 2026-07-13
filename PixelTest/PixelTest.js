@@ -7,7 +7,7 @@ import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { ImageLibrary } from "../sketchlib/pixel/ImageLibrary.js";
 import { Sprite } from "../sketchlib/pixel/Sprite.js";
-import { group, style } from "../sketchlib/primitives/shorthand.js";
+import { group, style, xform } from "../sketchlib/primitives/shorthand.js";
 import { Rational } from "../sketchlib/Rational.js";
 import { DirectionFlags, penrose_edge, penrose_vertex } from "./penrose.js";
 import { Drawing } from "../sketchlib/pixel/Drawing.js";
@@ -16,6 +16,7 @@ import { Color } from "../sketchlib/Color.js";
 import { Circle } from "../sketchlib/primitives/Circle.js";
 import { Rect } from "../sketchlib/primitives/Rect.js";
 import { Tilemap } from "../sketchlib/pixel/Tilemap.js";
+import { Rigid } from "../sketchlib/primitives/Rigid.js";
 
 const IMGS = new ImageLibrary({
   cube: "sprites/cube.png",
@@ -26,10 +27,7 @@ const SCENE = group();
 
 const ISO_TILE_SIZE = new Direction(64, 32);
 
-/**
- * @type {Sprite}
- */
-let animated;
+const ANIMATED_RIGID = new Rigid({});
 
 /**
  * @type {Sprite}
@@ -126,7 +124,12 @@ function init_sprites(p) {
   pyramid.frame_id = 14;
 
   const center = new Point(32, 32);
-  animated = IMGS.make_sprite("cube", tile_size, new Point(400, 300), center);
+  const spr_animated = IMGS.make_sprite(
+    "cube",
+    tile_size,
+    Point.ORIGIN,
+    center,
+  );
 
   // create an offscreen buffer, draw on it with the primitive system, then
   // chop it up and use it like a tilemap!
@@ -170,16 +173,18 @@ function init_sprites(p) {
   );
 
   SCENE.regroup(
+    /*
     cube_strip,
     iso_tiles,
     truchet,
     penrose,
     whole_cube,
     pyramid,
-    animated,
+
     drawing,
     chopped,
-    chopped_sprite,
+    chopped_sprite,*/
+    xform(spr_animated, ANIMATED_RIGID),
   );
 }
 
@@ -190,13 +195,13 @@ const FRAME_CURVE = LoopCurve.from_timeline(make_param(0, 3, Rational.ONE));
  * @param {number} time
  */
 function update_animated(time) {
-  if (!animated) {
-    return;
-  }
-
+  ANIMATED_RIGID.translation = SCREEN_CENTER.to_direction();
+  ANIMATED_RIGID.rotation = 2 * time;
+  /*
   const offset = Direction.from_angle(2 * time).scale(100);
   animated.position = SCREEN_CENTER.add(offset);
   animated.frame_id = Math.floor(FRAME_CURVE.value(time) || 0);
+  */
 }
 
 /**
