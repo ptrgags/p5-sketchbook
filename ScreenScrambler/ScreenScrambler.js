@@ -216,6 +216,9 @@ class CopyPaste {
 
 // @ts-ignore
 export const sketch = (p) => {
+  /**
+   * @type {Drawing | undefined}
+   */
   let drawing_offscreen;
   let tilemap_copy;
   let tilemap_paste;
@@ -264,6 +267,8 @@ export const sketch = (p) => {
     for (const shape of SHAPES) {
       shape.update(time);
     }
+
+    drawing_offscreen?.draw_primitive(SCENE_OFFSCREEN);
 
     copy_paste?.update(time);
 
