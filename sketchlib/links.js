@@ -3,7 +3,6 @@ export const LINKS = [
   {
     title: "Screen Scrambler",
     year: "2026-07",
-    is_lab: true,
   },
   {
     title: "Penrose Triangulation",
