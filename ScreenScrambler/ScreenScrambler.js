@@ -67,7 +67,7 @@ const CopyPasteState = {
   PASTE: 3,
 };
 
-const DURATION_MOVE = 2.0;
+const DURATION_MOVE = 1.5;
 
 const STYLE_COPY = Style.lines(Color.YELLOW, 4);
 const STYLE_PASTE = Style.lines(Color.BLUE, 4);
@@ -154,7 +154,8 @@ class CopyPaste {
     this.show_copy_buffer.show_flags = [false];
 
     // increment the paste index
-    const next_paste_1d = this.paste_index.i * 5 + this.paste_index.j + 1;
+    const paste_1d = this.paste_index.i * 5 + this.paste_index.j;
+    const next_paste_1d = (paste_1d + 1) % (5 * 7);
     const row = Math.floor(next_paste_1d / 5);
     const col = next_paste_1d % 5;
     this.paste_index = new Index2D(row, col);
