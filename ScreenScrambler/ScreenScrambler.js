@@ -14,20 +14,22 @@ import { Style } from "../sketchlib/Style.js";
 import { CopyPasteCursor } from "./CopyPasteCursor.js";
 import { FlyingShape } from "./FlyingShape.js";
 
-const SHAPES = range(20)
-  .map(() => {
+const NUM_SHAPES = 20;
+const MAX_RADIUS = 100;
+const SHAPES = range(NUM_SHAPES)
+  .map((i) => {
     const rand_x = Random.rand_int(0, WIDTH);
     const rand_y = Random.rand_int(0, HEIGHT);
     const start_point = new Direction(rand_x, rand_y);
-    const rand_radius = Random.rand_int(16, 100);
+    const rand_radius = Random.rand_int(16, MAX_RADIUS);
     const rand_angle = Random.rand_range(0, 2.0 * Math.PI);
     const rand_speed = Random.rand_range(20, 100);
     const start_velocity = Direction.from_angle(rand_angle).scale(rand_speed);
 
-    const rand_hue = Random.rand_range(0, 360);
+    const hue = (i * 360) / NUM_SHAPES;
     const circle_style = new Style({
       stroke: Color.WHITE,
-      fill: new Oklch(0.7, 0.1, rand_hue),
+      fill: new Oklch(0.7, 0.1, hue),
       width: 2,
     });
 
@@ -35,6 +37,7 @@ const SHAPES = range(20)
       style(new Circle(Point.ORIGIN, rand_radius), circle_style),
       start_point,
       start_velocity,
+      MAX_RADIUS,
     );
   })
   .toArray();

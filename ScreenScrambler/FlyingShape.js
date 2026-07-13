@@ -15,12 +15,22 @@ export class FlyingShape {
    * @param {Primitive} shape The primitive to draw
    * @param {Direction} initial_displacement Initial displacement from the origin
    * @param {Direction} initial_velocity The initial velocity of the shape
+   * @param {number} offscreen_margin How far offscreen to allow before looping
    */
-  constructor(shape, initial_displacement, initial_velocity) {
+  constructor(shape, initial_displacement, initial_velocity, offscreen_margin) {
     this.velocity = initial_velocity;
-    this.transform = new Transform(initial_displacement);
-    this.primitive = xform(shape, this.transform);
+
     this.prev_time = 0;
+    this.offscreen_margin = offscreen_margin;
+
+    this.transform = new Transform(initial_displacement);
+    const flying_shape = xform(shape, this.transform);
+    this.primitive = xform(
+      flying_shape,
+      new Transform(
+        new Direction(-this.offscreen_margin, -this.offscreen_margin),
+      ),
+    );
   }
 
   /**
@@ -35,8 +45,8 @@ export class FlyingShape {
     const moved = pos.add(this.velocity.scale(dt));
 
     this.transform.translation = new Direction(
-      mod(moved.x, WIDTH),
-      mod(moved.y, HEIGHT),
+      mod(moved.x, WIDTH + 2 * this.offscreen_margin),
+      mod(moved.y, HEIGHT + 2 * this.offscreen_margin),
     );
   }
 
