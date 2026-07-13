@@ -102,7 +102,7 @@ class CopyPaste {
       Ease.in_out_cubic,
     );
 
-    this.show_copy_buffer = new ShowHidePrimitive([this.tilemap_copy], [true]);
+    this.show_copy_buffer = new ShowHidePrimitive([this.tilemap_copy], [false]);
     this.primitive = group(this.styled_cursor, this.show_copy_buffer);
   }
 
@@ -124,6 +124,7 @@ class CopyPaste {
     }
 
     this.cursor.position = position;
+    this.tilemap_copy.position = position;
   }
 
   /**
@@ -149,10 +150,7 @@ class CopyPaste {
    * @param {number} time
    */
   paste(time) {
-    // TODO: This isn't right! the tile may have changed!
-    // paste the copied tile into the paste buffer
-    const copy_1d = this.copy_index.i * 5 + this.copy_index.j;
-    this.tilemap_paste.blit_tile(this.paste_index, copy_1d);
+    this.tilemap_paste.blit_tile(this.paste_index, 0);
     this.show_copy_buffer.show_flags = [false];
 
     // increment the paste index
@@ -235,6 +233,8 @@ export const sketch = (p) => {
       document.getElementById("sketch-canvas"),
     );
 
+    p.pixelDensity(1);
+
     const gfx_offscreen = p.createGraphics(WIDTH, HEIGHT);
     drawing_offscreen = new Drawing(gfx_offscreen, Point.ORIGIN);
     tilemap_copy = new Tilemap(
@@ -246,7 +246,7 @@ export const sketch = (p) => {
     );
     tilemap_paste = new Tilemap(
       p,
-      gfx_offscreen,
+      tilemap_copy.map_gfx,
       TILE_SIZE,
       new Direction(5, 7),
       Point.ORIGIN,
@@ -268,6 +268,8 @@ export const sketch = (p) => {
       shape.update(time);
     }
 
+    drawing_offscreen?.clear();
+    drawing_offscreen?.p5_gfx.background(0);
     drawing_offscreen?.draw_primitive(SCENE_OFFSCREEN);
 
     copy_paste?.update(time);
