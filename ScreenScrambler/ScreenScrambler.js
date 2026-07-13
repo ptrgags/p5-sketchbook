@@ -50,6 +50,7 @@ const TILE_SIZE = new Direction(100, 100);
 // These will be updated in setup() as some primitives need p5 resources
 const SCENE_OFFSCREEN = group(...SHAPES);
 const SCENE_SCREEN = group(SCENE_OFFSCREEN);
+const SCENE_TILES_ONLY = group();
 
 function rand_index() {
   const rand_row = Random.rand_int(0, 7);
@@ -226,6 +227,8 @@ export const sketch = (p) => {
    */
   let copy_paste;
 
+  let show_tiles_only = false;
+
   p.setup = () => {
     p.createCanvas(
       WIDTH,
@@ -233,6 +236,12 @@ export const sketch = (p) => {
       undefined,
       document.getElementById("sketch-canvas"),
     );
+
+    const checkbox = document.getElementById("tiles-only");
+    checkbox?.addEventListener("change", (e) => {
+      // @ts-ignore
+      show_tiles_only = e.target?.checked;
+    });
 
     p.pixelDensity(1);
 
@@ -259,6 +268,7 @@ export const sketch = (p) => {
     // operations!
     SCENE_OFFSCREEN.regroup(tilemap_paste, ...SHAPES);
     SCENE_SCREEN.regroup(SCENE_OFFSCREEN, copy_paste);
+    SCENE_TILES_ONLY.regroup(tilemap_paste);
   };
 
   p.draw = () => {
@@ -275,6 +285,10 @@ export const sketch = (p) => {
 
     copy_paste?.update(time);
 
-    SCENE_SCREEN.draw(p);
+    if (show_tiles_only) {
+      SCENE_TILES_ONLY.draw(p);
+    } else {
+      SCENE_SCREEN.draw(p);
+    }
   };
 };

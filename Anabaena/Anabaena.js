@@ -239,7 +239,7 @@ export const sketch = (p) => {
     prevent_mobile_scroll(canvas);
 
     const checkbox = document.getElementById("arrows");
-    checkbox.addEventListener("change", (e) => {
+    checkbox?.addEventListener("change", (e) => {
       // @ts-ignore
       show_arrows = e.target.checked;
     });
