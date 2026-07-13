@@ -48,17 +48,17 @@ export class Tilemap {
    */
   constructor(p, tileset, tile_size, map_size, position) {
     this.tileset = tileset;
+    this.tile_size = tile_size;
+    this.map_size = map_size;
+    this.position = position;
 
     // @ts-ignore
     const tileset_dimensions = new Direction(tileset.width, tileset.height);
     this.tileset_frames = new ImageFrames(tileset_dimensions, tile_size);
 
-    this.map_size = map_size;
     const map_dimensions = tile_size.mul_components(map_size);
     this.map_frames = new ImageFrames(map_dimensions, tile_size);
     this.map_gfx = p.createGraphics(map_dimensions.x, map_dimensions.y);
-
-    this.position = position;
   }
 
   /**
