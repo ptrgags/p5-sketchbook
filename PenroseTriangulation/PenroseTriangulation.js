@@ -6,8 +6,8 @@ import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { ImageLibrary } from "../sketchlib/pixel/ImageLibrary.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
+import { Rigid } from "../sketchlib/primitives/Rigid.js";
 import { group, style, xform } from "../sketchlib/primitives/shorthand.js";
-import { Transform } from "../sketchlib/primitives/Transform.js";
 import { VectorPrimitive } from "../sketchlib/primitives/VectorPrimitive.js";
 import { Style } from "../sketchlib/Style.js";
 import { TriangleGrid } from "./triangle_grid.js";
@@ -85,7 +85,7 @@ const LIL_BIT = 8;
 
 const TRIANGLE_DIAGRAM = xform(
   [style(EDGES, STYLE_EDGES), style(VERTICES, STYLE_VERTEX)],
-  new Transform(new Direction(OFFSET_TRIANGLES, LIL_BIT)),
+  Rigid.translation(new Direction(OFFSET_TRIANGLES, LIL_BIT)),
 );
 
 const STYLE_ARROW = Style.lines(Color.WHITE, 4);

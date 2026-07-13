@@ -3,7 +3,6 @@ import { Point } from "../../sketchlib/pga2d/Point.js";
 import { WIDTH } from "../../sketchlib/dimensions.js";
 import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
-import { Transform } from "../../sketchlib/primitives/Transform.js";
 import { Style } from "../../sketchlib/Style.js";
 import {
   PALETTE_CORAL,
@@ -19,6 +18,7 @@ import { Rect } from "../../sketchlib/primitives/Rect.js";
 import { Circle } from "../../sketchlib/primitives/Circle.js";
 import { LineSegment } from "../../sketchlib/primitives/LineSegment.js";
 import { Animated } from "../../sketchlib/animation/Animated.js";
+import { Rigid } from "../../sketchlib/primitives/Rigid.js";
 
 const STYLE_MOUNTAINS = Style.flat(PALETTE_ROCK[Values.MEDIUM]);
 
@@ -166,8 +166,8 @@ class Seascape {
     );
     const snowcaps = make_snowcaps(this.mountain_points);
 
-    this.transform_orig = new Transform(new Direction(0, 0));
-    this.transform_copy = new Transform(new Direction(-WIDTH, 0));
+    this.transform_orig = Rigid.translation(new Direction(0, 0));
+    this.transform_copy = Rigid.translation(new Direction(-WIDTH, 0));
     const original = new GroupPrimitive([mountain_poly, snowcaps], {
       style: STYLE_MOUNTAINS,
       transform: this.transform_orig,
@@ -185,8 +185,8 @@ class Seascape {
       const points = [...point_array, BOTTOM_RIGHT, BOTTOM_LEFT];
       const rolling_hills = BeziergonPrimitive.interpolate_points(points);
 
-      const transform_orig = new Transform(new Direction(0, 0));
-      const transform_copy = new Transform(new Direction(-WIDTH, 0));
+      const transform_orig = Rigid.translation(new Direction(0, 0));
+      const transform_copy = Rigid.translation(new Direction(-WIDTH, 0));
 
       this.hill_transforms_orig[i] = transform_orig;
       this.hill_transforms_copy[i] = transform_copy;

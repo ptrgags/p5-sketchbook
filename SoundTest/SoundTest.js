@@ -8,7 +8,6 @@ import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { xform, group, style } from "../sketchlib/primitives/shorthand.js";
 import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
 import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
-import { Transform } from "../sketchlib/primitives/Transform.js";
 import { Style } from "../sketchlib/Style.js";
 import { CanvasMouseHandler } from "../sketchlib/input/CanvasMouseHandler.js";
 import { encode_midi_file } from "../sketchlib/midi/encode_midi.js";
@@ -58,6 +57,7 @@ import {
 } from "../sketchlib/waveforms/basic_waves.js";
 import { encode_wav_file } from "../sketchlib/waveforms/encode_wav.js";
 import { sample_n_cycles } from "../sketchlib/waveforms/sample_wave.js";
+import { Rigid } from "../sketchlib/primitives/Rigid.js";
 
 const DEBUG_LOOP = false;
 const LOOP_START = new Rational(14 * 4);
@@ -594,7 +594,9 @@ class SoundTestAnimation {
     }
 
     const x = time * MEASURE_DIMENSIONS.x;
-    const transform = new Transform(new Direction(WIDTH / 2 - x, TIMELINE_TOP));
+    const transform = Rigid.translation(
+      new Direction(WIDTH / 2 - x, TIMELINE_TOP),
+    );
     const timeline = RENDERED_TIMELINES[this.selected_melody];
     return xform(timeline, transform);
   }

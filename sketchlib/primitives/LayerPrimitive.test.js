@@ -5,9 +5,9 @@ import { Color } from "../Color.js";
 import { Style } from "../Style.js";
 import { group, style } from "./shorthand.js";
 import { Point } from "../pga2d/Point.js";
-import { Transform } from "./Transform.js";
 import { Direction } from "../pga2d/Direction.js";
 import { GroupPrimitive } from "./GroupPrimitive.js";
+import { Rigid } from "./Rigid.js";
 
 /**
  *
@@ -87,7 +87,7 @@ describe("LayerPrimitive", () => {
       style: STYLE,
     };
     const settings2 = {
-      transform: new Transform(Direction.DIR_X),
+      transform: Rigid.translation(Direction.DIR_X),
     };
 
     const point = new Point(3, 4);
