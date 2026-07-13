@@ -44,7 +44,7 @@ const SHAPES = range(NUM_SHAPES)
 
 const CLOCK = new Clock();
 
-const TILE_SIZE = new Direction(50, 50);
+const TILE_SIZE = new Direction(25, 25);
 const GRID_SIZE = SCREEN_DIMENSIONS.div_components(TILE_SIZE);
 
 // These will be updated in setup() as some primitives need p5 resources
