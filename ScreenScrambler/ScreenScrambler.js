@@ -69,8 +69,6 @@ const CopyPasteState = {
   PASTE: 3,
 };
 
-const DURATION_MOVE = 1.5;
-
 const STYLE_COPY = Style.lines(Color.YELLOW, 4);
 const STYLE_PASTE = Style.lines(Color.BLUE, 4);
 
@@ -98,11 +96,13 @@ class CopyPaste {
       new Direction(this.copy_index.j, this.copy_index.i),
     ).to_point();
 
+    this.duration_move = 1.0;
+
     this.tween = Tween.point(
       this.cursor.position,
       this.next_target,
       0,
-      DURATION_MOVE,
+      this.duration_move,
       Ease.in_out_cubic,
     );
 
@@ -188,7 +188,7 @@ class CopyPaste {
       position,
       this.next_target,
       time,
-      DURATION_MOVE,
+      this.duration_move,
       Ease.in_out_cubic,
     );
   }
@@ -230,7 +230,7 @@ export const sketch = (p) => {
   /**
    * @type {CopyPaste | undefined}
    */
-  let copy_paste;
+  let cursor;
 
   let show_tiles_only = false;
 
@@ -246,6 +246,15 @@ export const sketch = (p) => {
     checkbox?.addEventListener("change", (e) => {
       // @ts-ignore
       show_tiles_only = e.target?.checked;
+
+      if (cursor) {
+        // when in pasted tiles mode only, speed up the animation so it's more
+        // bearable to watch
+        const DEFAULT_CURSOR_SPEED = 1.0;
+        cursor.duration_move = show_tiles_only
+          ? 0.25 * DEFAULT_CURSOR_SPEED
+          : DEFAULT_CURSOR_SPEED;
+      }
     });
 
     p.pixelDensity(1);
@@ -267,12 +276,12 @@ export const sketch = (p) => {
       Point.ORIGIN,
     );
 
-    copy_paste = new CopyPaste(tilemap_copy, tilemap_paste);
+    cursor = new CopyPaste(tilemap_copy, tilemap_paste);
 
     // set up a feedback loop - pasting to the screen impacts future copy
     // operations!
     SCENE_OFFSCREEN.regroup(tilemap_paste, ...SHAPES);
-    SCENE_SCREEN.regroup(SCENE_OFFSCREEN, copy_paste);
+    SCENE_SCREEN.regroup(SCENE_OFFSCREEN, cursor);
     SCENE_TILES_ONLY.regroup(tilemap_paste);
   };
 
@@ -288,7 +297,7 @@ export const sketch = (p) => {
     drawing_offscreen?.p5_gfx.background(0);
     drawing_offscreen?.draw_primitive(SCENE_OFFSCREEN);
 
-    copy_paste?.update(time);
+    cursor?.update(time);
 
     if (show_tiles_only) {
       SCENE_TILES_ONLY.draw(p);
