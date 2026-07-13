@@ -28,6 +28,10 @@ const SCENE = group();
 const ISO_TILE_SIZE = new Direction(64, 32);
 
 const ANIMATED_RIGID = new Rigid({});
+/**
+ * @type {Sprite}
+ */
+let spr_animated;
 
 /**
  * @type {Sprite}
@@ -124,12 +128,7 @@ function init_sprites(p) {
   pyramid.frame_id = 14;
 
   const center = new Point(32, 32);
-  const spr_animated = IMGS.make_sprite(
-    "cube",
-    tile_size,
-    Point.ORIGIN,
-    center,
-  );
+  spr_animated = IMGS.make_sprite("cube", tile_size, Point.ORIGIN, center);
 
   // create an offscreen buffer, draw on it with the primitive system, then
   // chop it up and use it like a tilemap!
@@ -173,7 +172,6 @@ function init_sprites(p) {
   );
 
   SCENE.regroup(
-    /*
     cube_strip,
     iso_tiles,
     truchet,
@@ -183,8 +181,12 @@ function init_sprites(p) {
 
     drawing,
     chopped,
-    chopped_sprite,*/
-    xform(spr_animated, ANIMATED_RIGID),
+    chopped_sprite,
+    xform(
+      // TODO: This could be done by composing rigid transofrmations
+      xform(spr_animated, Rigid.translation(Direction.DIR_X.scale(150))),
+      ANIMATED_RIGID,
+    ),
   );
 }
 
@@ -195,13 +197,13 @@ const FRAME_CURVE = LoopCurve.from_timeline(make_param(0, 3, Rational.ONE));
  * @param {number} time
  */
 function update_animated(time) {
+  const FREQ = 0.5;
   ANIMATED_RIGID.translation = SCREEN_CENTER.to_direction();
-  ANIMATED_RIGID.rotation = 2 * time;
-  /*
-  const offset = Direction.from_angle(2 * time).scale(100);
-  animated.position = SCREEN_CENTER.add(offset);
-  animated.frame_id = Math.floor(FRAME_CURVE.value(time) || 0);
-  */
+  ANIMATED_RIGID.rotation = -2 * Math.PI * FREQ * time;
+
+  if (spr_animated) {
+    spr_animated.frame_id = Math.floor(FRAME_CURVE.value(time) || 0);
+  }
 }
 
 /**
