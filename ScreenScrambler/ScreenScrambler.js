@@ -1,6 +1,6 @@
 import { Clock } from "../sketchlib/animation/Clock.js";
 import { Color } from "../sketchlib/Color.js";
-import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
+import { WIDTH, HEIGHT, SCREEN_DIMENSIONS } from "../sketchlib/dimensions.js";
 import { Ease } from "../sketchlib/Ease.js";
 import { Index2D } from "../sketchlib/Grid.js";
 import { Oklch } from "../sketchlib/Oklch.js";
@@ -45,7 +45,8 @@ const SHAPES = range(20)
 
 const CLOCK = new Clock();
 
-const TILE_SIZE = new Direction(100, 100);
+const TILE_SIZE = new Direction(50, 50);
+const GRID_SIZE = SCREEN_DIMENSIONS.div_components(TILE_SIZE);
 
 // These will be updated in setup() as some primitives need p5 resources
 const SCENE_OFFSCREEN = group(...SHAPES);
@@ -82,6 +83,8 @@ class CopyPaste {
   constructor(tilemap_copy, tilemap_paste) {
     this.tilemap_copy = tilemap_copy;
     this.tilemap_paste = tilemap_paste;
+
+    this.grid_dimensions = tilemap_paste.map_frames.grid_dimensions;
 
     this.state = CopyPasteState.MOVING_COPY;
 
@@ -133,8 +136,9 @@ class CopyPaste {
    * @param {number} time
    */
   copy(time) {
+    const columns = this.grid_dimensions.x;
     const { i, j } = this.copy_index;
-    const idx = i * 5 + j;
+    const idx = i * columns + j;
     this.tilemap_copy.blit_tile(new Index2D(0, 0), idx);
     this.show_copy_buffer.show_flags = [true];
 
@@ -155,10 +159,11 @@ class CopyPaste {
     this.show_copy_buffer.show_flags = [false];
 
     // increment the paste index
-    const paste_1d = this.paste_index.i * 5 + this.paste_index.j;
-    const next_paste_1d = (paste_1d + 1) % (5 * 7);
-    const row = Math.floor(next_paste_1d / 5);
-    const col = next_paste_1d % 5;
+    const { x: cols, y: rows } = this.grid_dimensions;
+    const paste_1d = this.paste_index.i * cols + this.paste_index.j;
+    const next_paste_1d = (paste_1d + 1) % (rows * cols);
+    const row = Math.floor(next_paste_1d / cols);
+    const col = next_paste_1d % cols;
     this.paste_index = new Index2D(row, col);
 
     this.choose_next_target(time, this.copy_index);
@@ -258,7 +263,7 @@ export const sketch = (p) => {
       p,
       tilemap_copy.map_gfx,
       TILE_SIZE,
-      new Direction(5, 7),
+      GRID_SIZE,
       Point.ORIGIN,
     );
 

@@ -227,9 +227,19 @@ export class Direction {
    * something done in geometric algebra, but very handy for computing
    * positions and dimensions in 2D grpahics
    * @param {Direction} other Another direction to multiply by
+   * @returns {Direction} the product
    */
   mul_components(other) {
     return new Direction(this.x * other.x, this.y * other.y);
+  }
+
+  /**
+   * Component-wise division
+   * @param {Direction} other
+   * @returns {Direction} the quotient
+   */
+  div_components(other) {
+    return new Direction(this.x / other.x, this.y / other.y);
   }
 
   /**
