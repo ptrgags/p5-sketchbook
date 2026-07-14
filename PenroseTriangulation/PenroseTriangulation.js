@@ -156,6 +156,8 @@ export const sketch = (p) => {
       document.getElementById("sketch-canvas"),
     );
 
+    p.pixelDensity(1);
+
     init_sprites(p);
   };
 
