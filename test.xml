@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xlmns="http://www.w3.org/2005/Atom">
+    <title>P5 Sketchbook Atom Feed Test</title>
+    <link href="https://ptrgags.dev/p5-sketchbook/" />
+    <updated>2026-07-15T12:11:00Z</updated>
+    <author>
+        <name>Peter Gagliardi</name>
+    </author>
+    <id>urn:uuid:a954b5df-5a23-42c5-8687-b1f61309948a</id>
+    <entry>
+        <title>Hello World</title>
+        <link href="http://example.org/2026/hello-world.html" />
+        <id>f311fe3c-16f5-40be-b6aa-2b8ecc826852</id>
+        <updated>2026-07-15T12:11:00Z</updated>
+        <summary>Testing out an RSS feed reader</summary>
+    </entry>
+</feed>
