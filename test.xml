@@ -1,18 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xlmns="http://www.w3.org/2005/Atom">
+    <!-- See https://www.ietf.org/rfc/rfc4287.txt for the Atom spec -->
+    <!-- See https://www.uuidgenerator.net/ for generating UUIDs. Make sure to prefix with urn:uuid:-->
+    <!-- See https://www.utctime.net/ for generating UTC timestamps -->
     <title>P5 Sketchbook Atom Feed Test</title>
     <link href="https://ptrgags.dev/p5-sketchbook/" />
-    <updated>2026-07-02T12:00:00Z</updated>
+    <!-- IMPORTANT! Make sure to update this every time! -->
+    <updated>2026-07-05T12:00:00Z</updated>
     <author>
         <name>Peter Gagliardi</name>
     </author>
     <id>urn:uuid:a954b5df-5a23-42c5-8687-b1f61309948a</id>
     <entry>
+        <title>Episode IV: A New Entry</title>
+        <link href="http://example.org/2026/hello-world.html" />
+        <id>urn:uuid:7069935f-7bd4-4280-bde0-c9cc08e42891</id>
+        <published>2026-07-05T12:00:00Z</published>
+        <summary>Another new thing</summary>
+        <content type="text">blah blah blah
+        </content>
+    </entry>
+    <entry>
         <title>Hello World</title>
         <link href="http://example.org/2026/hello-world.html" />
-        <id>f311fe3c-16f5-40be-b6aa-2b8ecc826852</id>
-        <updated>2026-07-02T12:00:00Z</updated>
+        <id>urn:uuid:f311fe3c-16f5-40be-b6aa-2b8ecc826852</id>
+        <updated>2026-07-04T12:00:00Z</updated>
         <published>2026-07-01T12:00:00Z</published>
-        <summary>Testing out an RSS feed reader. The summary changed.</summary>
+        <summary>Entry summary</summary>
+        <content type="html">Now with <b>100%</b> more <i>content</i>!🎉
+        </content>
     </entry>
 </feed>
