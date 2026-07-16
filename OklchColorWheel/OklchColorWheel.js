@@ -13,7 +13,7 @@ import { Style } from "../sketchlib/Style.js";
 
 const TEXT_STYLE_CENTERED = new TextStyle(24, "center", "center");
 
-const N = 12;
+const N = 24;
 const DEGREE_STEP = 360 / N;
 const RADIAN_STEP = -(2 * Math.PI) / N;
 
@@ -39,8 +39,38 @@ const CIRCLES = HUE_ANGLES.map((hue_angle, i) => {
   return style(circle, style_circle);
 });
 
+const CIRCLE5_RADIUS = 12;
+const CIRCLES5 = HUE_ANGLES.map((hue_angle, i) => {
+  const theta = i * RADIAN_STEP;
+  const center = SCREEN_CENTER.add(Direction.from_angle(theta).scale(110));
+  const circle = new Circle(center, CIRCLE5_RADIUS);
+  const style_circle = Style.flat(new Oklch(0.5, 0.1, hue_angle));
+  return style(circle, style_circle);
+});
+
+const CIRCLE6_RADIUS = 18;
+const CIRCLES6 = HUE_ANGLES.map((hue_angle, i) => {
+  const theta = i * RADIAN_STEP;
+  const center = SCREEN_CENTER.add(Direction.from_angle(theta).scale(150));
+  const circle = new Circle(center, CIRCLE6_RADIUS);
+  const style_circle = Style.flat(new Oklch(0.6, 0.1, hue_angle));
+  return style(circle, style_circle);
+});
+
+const CIRCLE8_RADIUS = 32;
+const CIRCLES8 = HUE_ANGLES.map((hue_angle, i) => {
+  const theta = i * RADIAN_STEP;
+  const center = SCREEN_CENTER.add(Direction.from_angle(theta).scale(260));
+  const circle = new Circle(center, CIRCLE8_RADIUS);
+  const style_circle = Style.flat(new Oklch(0.8, 0.1, hue_angle));
+  return style(circle, style_circle);
+});
+
 const SCENE = group(
+  ...CIRCLES5,
+  ...CIRCLES6,
   ...CIRCLES,
+  ...CIRCLES8,
   new GroupPrimitive(TEXT, {
     style: Style.flat(Color.WHITE),
     text_style: TEXT_STYLE_CENTERED,
