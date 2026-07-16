@@ -1,6 +1,11 @@
 // Links for all of the sketches. Links are added to the page in this order
 export const LINKS = [
   {
+    title: "Oklch Color Wheel",
+    year: "2026-07",
+    is_lab: true,
+  },
+  {
     title: "Triple Quatrain",
     year: "2026-07",
     is_lab: true,
