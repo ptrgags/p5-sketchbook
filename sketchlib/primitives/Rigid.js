@@ -1,3 +1,4 @@
+import { is_nearly } from "../is_nearly.js";
 import { Direction } from "../pga2d/Direction.js";
 import { Point } from "../pga2d/Point.js";
 import { Motor } from "../pga2d/versors.js";
@@ -24,6 +25,19 @@ export class Rigid {
     this.translation = options.translation ?? Direction.ZERO;
     this.rotation = options.rotation ?? 0;
     this.flip = options.flip ?? false;
+  }
+
+  /**
+   *
+   * @param {Rigid} other
+   * @returns {boolean}
+   */
+  equals(other) {
+    return (
+      is_nearly(this.rotation, other.rotation) &&
+      this.flip === other.flip &&
+      this.translation.equals(other.translation)
+    );
   }
 
   inverse() {
