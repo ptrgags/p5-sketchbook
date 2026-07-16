@@ -6,6 +6,11 @@ export const LINKS = [
     is_lab: true,
   },
   {
+    title: "Triple Quatrain",
+    year: "2026-07",
+    is_lab: true,
+  },
+  {
     title: "Screen Scrambler",
     year: "2026-07",
   },
