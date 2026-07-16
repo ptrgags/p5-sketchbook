@@ -1,5 +1,6 @@
 import { Color } from "../sketchlib/Color.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
+import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
@@ -89,9 +90,10 @@ const PHRASE_TICKS = style(TICK_MARKS, Style.lines(Color.BLACK));
 /**
  * Generate a primitive that displays a random quatrain structure for
  * a single line of a song
+ * @param {Color} color fill color for the lin
  * @returns {SimpleGroupPrimitive}
  */
-function rand_line() {
+function rand_line(color) {
   const quatrain = Random.rand_choice(QUATRAIN_INDICES);
 
   const labels = [];
@@ -108,7 +110,10 @@ function rand_line() {
     Point.ORIGIN,
     MEASURE_SIZE.mul_components(new Direction(8, 1)),
   );
-  const line_background = style(background_rect, STYLE_LINE_RECT);
+  const line_background = style(
+    background_rect,
+    STYLE_LINE_RECT.with_fill(color),
+  );
 
   return group(
     line_background,
@@ -122,6 +127,12 @@ function rand_line() {
 
 const TEXT_STYLE_LEFT = new TextStyle(24, "left", "center");
 const STYLE_LINE_LABELS = Style.flat(Color.WHITE);
+const LINE_COLORS = [
+  new Oklch(0.7, 0.13, 60),
+  new Oklch(0.7, 0.13, 120),
+  new Oklch(0.7, 0.13, 180),
+  new Oklch(0.7, 0.13, 240),
+].map((x) => x.to_srgb());
 
 /**
  * Compute a random section, a quatrain of four lines of music
@@ -131,7 +142,7 @@ function rand_section() {
   const quatrain = Random.rand_choice(QUATRAIN_INDICES);
 
   const unique_lines = iter_unique(quatrain)
-    .map(() => rand_line())
+    .map((i) => rand_line(LINE_COLORS[i]))
     .toArray();
 
   const labels = [];
