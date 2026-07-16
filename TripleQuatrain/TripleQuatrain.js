@@ -5,8 +5,10 @@ import { Point } from "../sketchlib/pga2d/Point.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { Rect } from "../sketchlib/primitives/Rect.js";
 import { group, style, xform } from "../sketchlib/primitives/shorthand.js";
+import { SimpleGroupPrimitive } from "../sketchlib/primitives/SimpleGroupPrimitive.js";
 import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
 import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
+import { Transform } from "../sketchlib/primitives/Transform.js";
 import { Random } from "../sketchlib/random.js";
 import { Style } from "../sketchlib/Style.js";
 
@@ -76,7 +78,12 @@ const STYLE_LINE_RECT = new Style({
   fill: Color.YELLOW,
 });
 
-function make_line() {
+/**
+ * Generate a primitive that displays a random quatrain structure for
+ * a single line of a song
+ * @returns {SimpleGroupPrimitive}
+ */
+function rand_line() {
   const quatrain = Random.rand_choice(QUATRAIN_INDICES);
 
   const labels = [];
@@ -104,7 +111,43 @@ function make_line() {
   );
 }
 
-const LINE = make_line();
+const TEXT_STYLE_LINE = new TextStyle(24, "left", "center");
+const STYLE_LINE_LABELS = Style.flat(Color.WHITE);
+
+function rand_section() {
+  const quatrain = Random.rand_choice(QUATRAIN_INDICES);
+
+  const unique_lines = iter_unique(quatrain)
+    .map(() => rand_line())
+    .toArray();
+
+  const labels = [];
+  const line_groups = [];
+  for (const [i, index] of quatrain.entries()) {
+    const label = LINE_LABELS[index];
+    const text = new TextPrimitive(
+      label,
+      Point.ORIGIN.add(
+        MEASURE_SIZE.mul_components(new Direction(8.5, i + 0.5)),
+      ),
+    );
+    labels.push(text);
+
+    const offset = new Transform(new Direction(0, i * MEASURE_SIZE.y));
+    const translated_line = xform(unique_lines[index], offset);
+    line_groups.push(translated_line);
+  }
+
+  return group(
+    ...line_groups,
+    new GroupPrimitive(labels, {
+      style: STYLE_LINE_LABELS,
+      text_style: TEXT_STYLE_LINE,
+    }),
+  );
+}
+
+const SCENE = rand_section();
 
 // @ts-ignore
 export const sketch = (p) => {
@@ -120,6 +163,6 @@ export const sketch = (p) => {
   p.draw = () => {
     p.background(0);
 
-    LINE.draw(p);
+    SCENE.draw(p);
   };
 };
