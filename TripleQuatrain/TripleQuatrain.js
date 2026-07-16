@@ -1,5 +1,14 @@
+import { Color } from "../sketchlib/Color.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
+import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
+import { Rect } from "../sketchlib/primitives/Rect.js";
+import { group, style, xform } from "../sketchlib/primitives/shorthand.js";
+import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
+import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
 import { Random } from "../sketchlib/random.js";
+import { Style } from "../sketchlib/Style.js";
 
 /**
  * There are 15 rhyme schemes for a quatrain, this is the basis for this
@@ -44,8 +53,9 @@ function rand_quatrain(labels) {
 
 /**
  * Iterate over a quatrain structure and return the unique labels
- * @param {string[]} quatrain Quatrain structure
- * @returns {Generator<string>}
+ * @template T
+ * @param {T[]} quatrain Quatrain structure
+ * @returns {Generator<T>}
  */
 function* iter_unique(quatrain) {
   const visited = new Set();
@@ -56,6 +66,45 @@ function* iter_unique(quatrain) {
     visited.add(label);
   }
 }
+
+const MEASURE_SIZE = new Direction(32, 32);
+const PHRASE_CENTER = new Point(32, 16);
+const TEXT_STYLE_PHRASE = new TextStyle(24, "center", "center");
+const STYLE_PHRASE_LABELS = Style.flat(Color.BLACK);
+const STYLE_LINE_RECT = new Style({
+  stroke: Color.WHITE,
+  fill: Color.YELLOW,
+});
+
+function make_line() {
+  const quatrain = Random.rand_choice(QUATRAIN_INDICES);
+
+  const labels = [];
+  for (const [i, index] of quatrain.entries()) {
+    const label = PHRASE_LABELS[index];
+    const text = new TextPrimitive(
+      label,
+      PHRASE_CENTER.add(Direction.DIR_X.scale(2 * MEASURE_SIZE.x * i)),
+    );
+    labels.push(text);
+  }
+
+  const background_rect = new Rect(
+    Point.ORIGIN,
+    MEASURE_SIZE.mul_components(new Direction(8, 1)),
+  );
+  const line_background = style(background_rect, STYLE_LINE_RECT);
+
+  return group(
+    line_background,
+    new GroupPrimitive(labels, {
+      style: STYLE_PHRASE_LABELS,
+      text_style: TEXT_STYLE_PHRASE,
+    }),
+  );
+}
+
+const LINE = make_line();
 
 // @ts-ignore
 export const sketch = (p) => {
@@ -70,5 +119,7 @@ export const sketch = (p) => {
 
   p.draw = () => {
     p.background(0);
+
+    LINE.draw(p);
   };
 };
