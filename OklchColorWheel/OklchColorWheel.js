@@ -13,12 +13,16 @@ import { Style } from "../sketchlib/Style.js";
 
 const TEXT_STYLE_CENTERED = new TextStyle(24, "center", "center");
 
-const HUE_ANGLES = range(12)
-  .map((i) => i * 30)
+const N = 12;
+const DEGREE_STEP = 360 / N;
+const RADIAN_STEP = -(2 * Math.PI) / N;
+
+const HUE_ANGLES = range(N)
+  .map((i) => i * DEGREE_STEP)
   .toArray();
 
 const TEXT = HUE_ANGLES.map((hue_angle, i) => {
-  const theta = (i * 2 * Math.PI) / 12;
+  const theta = i * RADIAN_STEP;
 
   return new TextPrimitive(
     hue_angle.toString(),
@@ -26,9 +30,9 @@ const TEXT = HUE_ANGLES.map((hue_angle, i) => {
   );
 });
 
-const CIRCLE_RADIUS = 32;
+const CIRCLE_RADIUS = 24;
 const CIRCLES = HUE_ANGLES.map((hue_angle, i) => {
-  const theta = (i * 2 * Math.PI) / 12;
+  const theta = i * RADIAN_STEP;
   const center = SCREEN_CENTER.add(Direction.from_angle(theta).scale(200));
   const circle = new Circle(center, CIRCLE_RADIUS);
   const style_circle = Style.flat(new Oklch(0.7, 0.1, hue_angle));
