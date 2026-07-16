@@ -3,6 +3,7 @@ import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
+import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { Rect, SCREEN_RECT } from "../sketchlib/primitives/Rect.js";
 import { group, style, xform } from "../sketchlib/primitives/shorthand.js";
 import { SimpleGroupPrimitive } from "../sketchlib/primitives/SimpleGroupPrimitive.js";
@@ -78,6 +79,13 @@ const STYLE_LINE_RECT = new Style({
   fill: Color.YELLOW,
 });
 
+const TICK_X_MEASURES = [2, 4, 6];
+const TICK_MARKS = TICK_X_MEASURES.map((x_measures) => {
+  const x = x_measures * MEASURE_SIZE.x;
+  return new LineSegment(new Point(x, 0), new Point(x, 0.25 * MEASURE_SIZE.y));
+});
+const PHRASE_TICKS = style(TICK_MARKS, Style.lines(Color.BLACK));
+
 /**
  * Generate a primitive that displays a random quatrain structure for
  * a single line of a song
@@ -104,6 +112,7 @@ function rand_line() {
 
   return group(
     line_background,
+    PHRASE_TICKS,
     new GroupPrimitive(labels, {
       style: STYLE_PHRASE_LABELS,
       text_style: TEXT_STYLE_CENTERED,
