@@ -3,7 +3,7 @@ import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
-import { Rect } from "../sketchlib/primitives/Rect.js";
+import { Rect, SCREEN_RECT } from "../sketchlib/primitives/Rect.js";
 import { group, style, xform } from "../sketchlib/primitives/shorthand.js";
 import { SimpleGroupPrimitive } from "../sketchlib/primitives/SimpleGroupPrimitive.js";
 import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
@@ -71,10 +71,10 @@ function* iter_unique(quatrain) {
 
 const MEASURE_SIZE = new Direction(32, 32);
 const PHRASE_CENTER = new Point(32, 16);
-const TEXT_STYLE_PHRASE = new TextStyle(24, "center", "center");
+const TEXT_STYLE_CENTERED = new TextStyle(24, "center", "center");
 const STYLE_PHRASE_LABELS = Style.flat(Color.BLACK);
 const STYLE_LINE_RECT = new Style({
-  stroke: Color.WHITE,
+  stroke: Color.BLACK,
   fill: Color.YELLOW,
 });
 
@@ -106,14 +106,18 @@ function rand_line() {
     line_background,
     new GroupPrimitive(labels, {
       style: STYLE_PHRASE_LABELS,
-      text_style: TEXT_STYLE_PHRASE,
+      text_style: TEXT_STYLE_CENTERED,
     }),
   );
 }
 
-const TEXT_STYLE_LINE = new TextStyle(24, "left", "center");
+const TEXT_STYLE_LEFT = new TextStyle(24, "left", "center");
 const STYLE_LINE_LABELS = Style.flat(Color.WHITE);
 
+/**
+ * Compute a random section, a quatrain of four lines of music
+ * @returns {SimpleGroupPrimitive}
+ */
 function rand_section() {
   const quatrain = Random.rand_choice(QUATRAIN_INDICES);
 
@@ -142,12 +146,64 @@ function rand_section() {
     ...line_groups,
     new GroupPrimitive(labels, {
       style: STYLE_LINE_LABELS,
-      text_style: TEXT_STYLE_LINE,
+      text_style: TEXT_STYLE_LEFT,
     }),
   );
 }
 
-const SCENE = rand_section();
+const STYLE_SECTION_LABELS = Style.flat(Color.WHITE);
+
+const SECTION_STRIDE = 5;
+function rand_song() {
+  const quatrain = Random.rand_choice(QUATRAIN_INDICES);
+  const unique_sections = iter_unique(quatrain)
+    .map(() => rand_section())
+    .toArray();
+
+  const labels = [];
+  const section_groups = [];
+  for (const [i, index] of quatrain.entries()) {
+    const label = SECTION_LABELS[index];
+    const text = new TextPrimitive(
+      label,
+      Point.ORIGIN.add(
+        MEASURE_SIZE.mul_components(new Direction(4, SECTION_STRIDE * i + 0.5)),
+      ),
+    );
+    labels.push(text);
+
+    const offset = new Transform(
+      new Direction(0, (SECTION_STRIDE * i + 1) * MEASURE_SIZE.y),
+    );
+    const translated_section = xform(unique_sections[index], offset);
+    section_groups.push(translated_section);
+  }
+
+  return group(
+    ...section_groups,
+    new GroupPrimitive(labels, {
+      style: STYLE_SECTION_LABELS,
+      text_style: TEXT_STYLE_CENTERED,
+    }),
+  );
+}
+
+/**
+ *
+ * @param {Rect} rect
+ * @param {Direction} dimensions
+ */
+function center_rect(rect, dimensions) {
+  const margin = rect.dimensions.sub(dimensions).scale(0.5);
+  return new Rect(rect.position.add(margin), dimensions);
+}
+
+const offset = center_rect(
+  SCREEN_RECT,
+  MEASURE_SIZE.mul_components(new Direction(9, 20)),
+).position.to_direction();
+
+const SCENE = xform(rand_song(), new Transform(offset));
 
 // @ts-ignore
 export const sketch = (p) => {
