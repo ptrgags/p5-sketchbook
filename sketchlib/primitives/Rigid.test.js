@@ -251,9 +251,138 @@ describe("Rigid", () => {
     });
   });
 
-  describe("difference", () => {});
+  describe("difference", () => {
+    it("difference of two translations is the translation between them", () => {
+      const a = Rigid.translation(new Direction(2, -3));
+      const b = Rigid.translation(new Direction(-1, -1));
 
-  describe("conjugate", () => {});
+      const result = a.difference(b);
+
+      const expected = Rigid.translation(new Direction(3, -2));
+      expect(result).toBeRigid(expected);
+    });
+
+    it("difference of two rotations is the rotation between them", () => {
+      const a = Rigid.rotation(Math.PI / 4);
+      const b = Rigid.rotation(Math.PI);
+
+      const result = a.difference(b);
+
+      const expected = Rigid.rotation((3 * Math.PI) / 4);
+      expect(result).toBeRigid(expected);
+    });
+
+    it("difference of translation and rotation is a TR transformation", () => {
+      const a = Rigid.translation(Direction.DIR_X);
+      const b = Rigid.rotation(Math.PI / 2);
+
+      const result = a.difference(b);
+
+      const expected = new Rigid({
+        translation: Direction.DIR_X,
+        rotation: -Math.PI / 2,
+      });
+      expect(result).toBeRigid(expected);
+    });
+
+    it("difference of two transformation chains is computed correctly", () => {
+      const a = new Rigid({
+        translation: Direction.DIR_X,
+        rotation: Math.PI / 2,
+        flip: true,
+      });
+      const b = new Rigid({
+        translation: Direction.DIR_Y,
+        rotation: Math.PI,
+      });
+
+      const result = a.difference(b);
+
+      const expected = Rigid.rotation((3 * Math.PI) / 4);
+      expect(result).toBeRigid(expected);
+    });
+  });
+
+  describe("conjugate", () => {
+    it("translation conjugate translation returns filling", () => {
+      const a = Rigid.translation(Direction.DIR_X);
+      const b = Rigid.translation(new Direction(2, -4));
+
+      const result = a.conjugate(b);
+
+      const expected = b;
+      expect(result).toBeRigid(expected);
+    });
+
+    it("rotation conjugate rotation returns filling", () => {
+      const a = Rigid.rotation(Math.PI);
+      const b = Rigid.rotation(Math.PI / 4);
+
+      const result = a.conjugate(b);
+
+      const expected = b;
+      expect(result).toBeRigid(expected);
+    });
+
+    it("flip conjugate flip returns flip", () => {
+      const a = Rigid.FLIP_Y;
+      const b = Rigid.FLIP_Y;
+
+      const result = a.conjugate(b);
+
+      const expected = Rigid.FLIP_Y;
+      expect(result).toBeRigid(expected);
+    });
+
+    it("translate conjugate rotation returns correct TR transform", () => {
+      const a = Rigid.translation(Direction.DIR_Y);
+      const b = Rigid.rotation(Math.PI / 2);
+
+      const result = a.conjugate(b);
+
+      const expected = new Rigid({
+        translation: Direction.DIR_Y,
+        rotation: Math.PI / 2,
+      });
+      expect(result).toBeRigid(expected);
+    });
+
+    it("translate conjugate flip returns correct TY transform", () => {
+      const a = Rigid.translation(Direction.DIR_Y);
+      const b = Rigid.FLIP_Y;
+
+      const result = a.conjugate(b);
+
+      const expected = new Rigid({
+        translation: Direction.DIR_Y,
+        flip: true,
+      });
+      expect(result).toBeRigid(expected);
+    });
+
+    it("TRY conjugate TRY returns correct TRY transform", () => {
+      const a = new Rigid({
+        translation: Direction.DIR_X,
+        rotation: Math.PI / 2,
+        flip: true,
+      });
+
+      const b = new Rigid({
+        translation: new Direction(1, 2),
+        rotation: Math.PI,
+        flip: true,
+      });
+
+      const result = a.conjugate(b);
+
+      const expected = new Rigid({
+        translation: Direction.DIR_X,
+        rotation: Math.PI / 2,
+        flip: true,
+      });
+      expect(result).toBeRigid(expected);
+    });
+  });
 
   describe("interpolate", () => {
     it("with mismatched flip flags throws error", () => {
