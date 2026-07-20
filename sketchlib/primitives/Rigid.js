@@ -2,6 +2,7 @@ import { is_nearly } from "../is_nearly.js";
 import { Direction } from "../pga2d/Direction.js";
 import { Point } from "../pga2d/Point.js";
 import { Motor } from "../pga2d/versors.js";
+import { lerp } from "../lerp.js";
 
 /**
  * @typedef {{
