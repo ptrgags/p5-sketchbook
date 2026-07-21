@@ -182,7 +182,8 @@ describe("Rigid", () => {
 
       // T * Y matches the internal representation, so the expected result
       // is straightforward combination of parameters. However, Y * T
-      // = T(Y(d)) * R
+      // = Y * T(2, 3)
+      // = T(2, -3) * Y
       const expected_t_flip = new Rigid({
         translation: Direction.DIR_X,
         flip: true,
@@ -236,14 +237,21 @@ describe("Rigid", () => {
       const ab = a.compose(b);
       const ba = b.compose(a);
 
+      // T(1, 0) * R4 * Y * T(0, 1) * R4^2
+      // = T(1, 0) * R4 * T(0, -1) * R4^2 * Y
+      // = T(1, 0) * T(1, 0) * R4 * R4^2 * Y
+      // = T(2, 0) * R4^3 * Y
       const expected_ab = new Rigid({
-        translation: Direction.DIR_X,
-        rotation: Math.PI / 4,
+        translation: new Direction(2, 0),
+        rotation: (3 * Math.PI) / 2,
         flip: true,
       });
+      // T(0, 1) * R4^2 * T(1, 0) * R4 * Y
+      // = T(0, 1) * T(-1, 0) * R4^2 * R4 * Y
+      // = T(-1, 1) * R4^3 * Y
       const expected_ba = new Rigid({
-        translation: Direction.DIR_X,
-        rotation: Math.PI / 4,
+        translation: new Direction(-1, 1),
+        rotation: (3 * Math.PI) / 2,
         flip: true,
       });
       expect(ab).toBeRigid(expected_ab);
@@ -268,7 +276,7 @@ describe("Rigid", () => {
 
       const result = a.difference(b);
 
-      const expected = Rigid.rotation((3 * Math.PI) / 4);
+      const expected = Rigid.rotation(-(3 * Math.PI) / 4);
       expect(result).toBeRigid(expected);
     });
 
@@ -298,7 +306,16 @@ describe("Rigid", () => {
 
       const result = a.difference(b);
 
-      const expected = Rigid.rotation((3 * Math.PI) / 4);
+      // T(1, 0) * R4 * Y * R4^2 * T(0, -1)
+      // T(1, 0) * R4 * R4^2 * Y * T(0, -1)
+      // T(1, 0) * R4^3 * T(0, 1) * Y
+      // T(1, 0) * T(1, 0) * R4^3 * Y
+      // T(2, 0) * R4^3 * Y
+      const expected = new Rigid({
+        translation: new Direction(2, 0),
+        rotation: (3 * Math.PI) / 2,
+        flip: true,
+      });
       expect(result).toBeRigid(expected);
     });
   });
@@ -341,7 +358,7 @@ describe("Rigid", () => {
       const result = a.conjugate(b);
 
       const expected = new Rigid({
-        translation: Direction.DIR_Y,
+        translation: new Direction(1, 1),
         rotation: Math.PI / 2,
       });
       expect(result).toBeRigid(expected);
@@ -353,8 +370,11 @@ describe("Rigid", () => {
 
       const result = a.conjugate(b);
 
+      // T(0, 1) * Y * T(0, -1)
+      // = T(0, 1) * T(0, 1) * Y
+      // = T(0, 2) * Y
       const expected = new Rigid({
-        translation: Direction.DIR_Y,
+        translation: new Direction(0, 2),
         flip: true,
       });
       expect(result).toBeRigid(expected);
@@ -375,9 +395,16 @@ describe("Rigid", () => {
 
       const result = a.conjugate(b);
 
+      // T(1, 0) * R4 * Y * T(1, 2) * R4^2 * Y * Y * R4^-1 * T(-1, 0)
+      // = T(1, 0) * R4 * T(1, -2) * Y * R4^2 * R4^-1 * T(-1, 0)
+      // = T(1, 0) * T(2, 1) * R4 * Y * R4 * T(-1, 0)
+      // = T(3, 1) * R4 * R4^-1 * Y * T(-1, 0)
+      // = T(3, 1) * Y * T(-1, 0)
+      // = T(3, 1) * T(-1, 0) * Y
+      // = T(2, 1) * Y
       const expected = new Rigid({
-        translation: Direction.DIR_X,
-        rotation: Math.PI / 2,
+        translation: new Direction(2, 1),
+        rotation: 0,
         flip: true,
       });
       expect(result).toBeRigid(expected);

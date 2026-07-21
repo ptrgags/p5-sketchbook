@@ -5,6 +5,16 @@ import { Motor } from "../pga2d/versors.js";
 import { lerp } from "../lerp.js";
 
 /**
+ * Flip a direction if the flag is set
+ * @param {Direction} dir
+ * @param {boolean} should_flip
+ * @returns {Direction} the possibly flipped
+ */
+function maybe_flip(dir, should_flip) {
+  return should_flip ? dir.neg() : dir;
+}
+
+/**
  * @typedef {{
  *  translation?: Direction
  *  rotation?: number
@@ -79,9 +89,7 @@ export class Rigid {
     // = T1 * T(R1 * Y1 * d2) * R1 * R2^(+/-1) * Y1? * Y2?
     const motor = Motor.rotation(Point.ORIGIN, this.rotation);
 
-    const flipped_offset = this.flip
-      ? other.translation.neg()
-      : other.translation;
+    const flipped_offset = maybe_flip(other.translation, this.flip);
     const translation = this.translation.add(
       motor.transform_dir(flipped_offset),
     );
@@ -114,6 +122,8 @@ export class Rigid {
    * @returns {Rigid}
    */
   conjugate(other) {
+    return this.compose(other).compose(this.inverse());
+
     // T1 * R1 * Y1 * T2 * R2 * Y2 * Y1 * R1^-1 * T1^-1
     // = T1 * T(R1 * Y1 * d2) * R1 * Y1 * R2 * Y2 * Y1 * R1^-1 * T1^-1
     // = T1 *
@@ -128,7 +138,7 @@ export class Rigid {
     //
     // where s1, s2 are -1 when the respective flip is present, and 1 otherwise.
 
-    const sign_r1 = this.flip ? -1 : 1;
+    /*const sign_r1 = this.flip ? -1 : 1;
     const sign_r2 = other.flip ? -1 : 1;
 
     const motor1 = Motor.rotation(Point.ORIGIN, this.rotation);
@@ -158,6 +168,7 @@ export class Rigid {
       // since Y1 is present an even number of times, we can ignore it
       flip: other.flip,
     });
+    */
   }
 
   /**
