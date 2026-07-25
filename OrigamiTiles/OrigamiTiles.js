@@ -91,15 +91,24 @@ function draw_tile(p, row, column, tile1, tile2) {
   p.pop();
 }
 
-export const sketch = (p) => {
-  p.preload = () => {
-    for (let i = 0; i < TILE_COUNT; i++) {
-      TILES[i] = p.loadImage(`tiles/triangle-tile${i + 1}.svg`);
-    }
-  };
+async function load_images(p) {
+  const promises = [];
+  for (let i = 0; i < TILE_COUNT; i++) {
+    const load_func = async () => {
+      TILES[i] = await p.loadImage(`tiles/triangle-tile${i + 1}.svg`);
+    };
+    promises.push(load_func());
+  }
 
-  p.setup = () => {
+  await Promise.all(promises);
+}
+
+export const sketch = (p) => {
+  p.setup = async () => {
+    await load_images(p);
+
     p.createCanvas(500, 700);
+    p.pixelDensity(1);
     p.background(200);
 
     // The image is square, but I want to fit it into a trading card frame.
@@ -116,7 +125,7 @@ export const sketch = (p) => {
         i * TILE_SIZE + 1,
         j * TILE_SIZE + 1,
         TILE_SIZE - 2,
-        TILE_SIZE - 2
+        TILE_SIZE - 2,
       );
 
       if ((i + j) % 2 == 0) {
@@ -124,14 +133,14 @@ export const sketch = (p) => {
           i * TILE_SIZE,
           j * TILE_SIZE,
           (i + 1) * TILE_SIZE,
-          (j + 1) * TILE_SIZE
+          (j + 1) * TILE_SIZE,
         );
       } else {
         p.line(
           (i + 1) * TILE_SIZE,
           j * TILE_SIZE,
           i * TILE_SIZE,
-          (j + 1) * TILE_SIZE
+          (j + 1) * TILE_SIZE,
         );
       }
     });
