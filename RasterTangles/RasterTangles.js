@@ -100,6 +100,33 @@ function raster_tangle(p, coarse_mask, medium_masks, fine_masks) {
   return img;
 }
 
+async function load_images(p) {
+  const promises = [];
+
+  for (let i = 0; i < LOW_MASK_COUNT; i++) {
+    const load_func = async () => {
+      low_masks[i] = await p.loadImage(`masks/low-${i}.png`);
+    };
+    promises.push(load_func());
+  }
+
+  for (let i = 0; i < MED_MASK_COUNT; i++) {
+    const load_func = async () => {
+      med_masks[i] = await p.loadImage(`masks/med-${i}.png`);
+    };
+    promises.push(load_func());
+  }
+
+  for (let i = 0; i < FINE_MASK_COUNT; i++) {
+    const load_func = async () => {
+      fine_masks[i] = await p.loadImage(`masks/fine-${i}.png`);
+    };
+    promises.push(load_func());
+  }
+
+  await Promise.all(promises);
+}
+
 /**
  * Sketch function
  * @param {import("p5")} p p5.js context
@@ -107,22 +134,10 @@ function raster_tangle(p, coarse_mask, medium_masks, fine_masks) {
 export const sketch = (p) => {
   let dirty = true;
 
-  p.preload = () => {
-    for (let i = 0; i < LOW_MASK_COUNT; i++) {
-      low_masks[i] = p.loadImage(`masks/low-${i}.png`);
-    }
-
-    for (let i = 0; i < MED_MASK_COUNT; i++) {
-      med_masks[i] = p.loadImage(`masks/med-${i}.png`);
-    }
-
-    for (let i = 0; i < FINE_MASK_COUNT; i++) {
-      fine_masks[i] = p.loadImage(`masks/fine-${i}.png`);
-    }
-  };
-
-  p.setup = () => {
+  p.setup = async () => {
+    await load_images(p);
     p.createCanvas(MASK_WIDTH, MASK_HEIGHT);
+    p.pixelDensity(1);
 
     document.getElementById("regen").addEventListener("click", () => {
       dirty = true;
