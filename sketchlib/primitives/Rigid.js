@@ -45,27 +45,21 @@ export class Rigid {
   }
 
   inverse() {
-    // (TR)^-1 = R^-1 T^-1
-    // = T(R^-1 * -d) * R^-1
-    if (!this.flip) {
-      const rotation = Motor.rotation(Point.ORIGIN, -this.rotation);
-      const offset = rotation.transform_dir(this.translation.neg());
-      return new Rigid({
-        translation: offset,
-        rotation: -this.rotation,
-      });
-    }
+    // (T * R * Y?)^-1 = Y? * R^-1 * T^-1
+    // = Y? * R^-1 * T(-d)
+    // = Y? * T(R^-1 * -d) * R^-1
+    // = T(Y? * R^-1 * -d) * Y? * R^-1
+    // = T(Y? * R^-1 * -d) * R^(+/-1) * Y?
 
-    // (TRY)^-1 = Y^-1 * R^-1 * T^-1
-    // = Y * T(R^-1 * -d) * R^-1
-    // = T(Y * R^(-1) * -d) * Y * R^-1
-    // = T(Y * R^(-1) * -d) * R * Y
-    const rotation = Motor.rotation(Point.ORIGIN, -this.rotation);
-    const offset = rotation.transform_dir(this.translation.neg()).flip_y();
+    const angle = this.flip ? this.rotation : -this.rotation;
+
+    const inv_rot = Motor.rotation(Point.ORIGIN, -this.rotation);
+    const rotated_offset = inv_rot.transform_dir(this.translation.neg());
+    const translation = this.flip ? rotated_offset.flip_y() : rotated_offset;
 
     return new Rigid({
-      translation: offset,
-      rotation: this.rotation,
+      translation: translation,
+      rotation: angle,
       flip: this.flip,
     });
   }
@@ -107,6 +101,8 @@ export class Rigid {
    * @returns {Rigid}
    */
   difference(other) {
+    // PERFORMANCE IDEA: this can be written out explicitly and simplified
+    // instead of making temporaries, similar to compose()
     return this.compose(other.inverse());
   }
 
@@ -117,53 +113,9 @@ export class Rigid {
    * @returns {Rigid}
    */
   conjugate(other) {
+    // PERFORMANCE IDEA: this can be written out explicitly and simplified
+    // instead of making temporaries, similar to compose()
     return this.compose(other).compose(this.inverse());
-
-    // T1 * R1 * Y1 * T2 * R2 * Y2 * Y1 * R1^-1 * T1^-1
-    // = T1 * T(R1 * Y1 * d2) * R1 * Y1 * R2 * Y2 * Y1 * R1^-1 * T1^-1
-    // = T1 *
-    //   T(R1 * Y1 * d2) *
-    //   T(R1 * Y1 * R2 * Y2 * Y1 * R1^-1 * -d1) *
-    //   R1 * Y1 * R2 * Y2 * Y1 * R1^-1
-    // = T1 *
-    //   T(R1 * Y1 * d2) *
-    //   T(R1 * Y1 * R2 * Y2 * Y1 * R1^-1 * -d1) *
-    //   R1 * R2^(s1) * R1^(-s2) *
-    //   Y1 * Y2 * Y1
-    //
-    // where s1, s2 are -1 when the respective flip is present, and 1 otherwise.
-
-    /*const sign_r1 = this.flip ? -1 : 1;
-    const sign_r2 = other.flip ? -1 : 1;
-
-    const motor1 = Motor.rotation(Point.ORIGIN, this.rotation);
-    const motor2 = Motor.rotation(Point.ORIGIN, other.rotation);
-
-    // oof, quite a chain of steps
-    const term1 = this.translation;
-
-    const flipped_d2 = this.flip ? other.translation.neg() : other.translation;
-    const term2 = motor1.transform_dir(flipped_d2);
-
-    const tr_inv = motor1.reverse().transform_dir(this.translation.neg());
-    const flipped_tr_inv = this.flip !== other.flip ? tr_inv.neg() : tr_inv;
-    const rotated_flipped = motor2.transform_dir(flipped_tr_inv);
-    const flip_rot_flip = this.flip ? rotated_flipped.neg() : rotated_flipped;
-    const term3 = motor1.transform_dir(flip_rot_flip);
-
-    const translation = term1.add(term2).add(term3);
-
-    // note that the contribution from R1 is either 0 (no Y2 present) or
-    // 2R1 when Y2 is present
-    const rotation = (1 - sign_r2) * this.rotation + sign_r1 * other.rotation;
-
-    return new Rigid({
-      translation,
-      rotation,
-      // since Y1 is present an even number of times, we can ignore it
-      flip: other.flip,
-    });
-    */
   }
 
   /**
