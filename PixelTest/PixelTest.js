@@ -27,7 +27,17 @@ const SCENE = group();
 
 const ISO_TILE_SIZE = new Direction(64, 32);
 
-const ANIMATED_RIGID = new Rigid({});
+const RIGID_ORBIT = new Rigid({
+  translation: SCREEN_CENTER.to_direction(),
+  rotation: 0,
+});
+const RIGID_SPIN = new Rigid({
+  translation: Direction.DIR_X.scale(150),
+  rotation: 0,
+});
+const FREQ_ORBIT = 0.25;
+const FREQ_SPIN = FREQ_ORBIT * 2;
+
 /**
  * @type {Sprite}
  */
@@ -182,11 +192,7 @@ function init_sprites(p) {
     drawing,
     chopped,
     chopped_sprite,
-    xform(
-      // TODO: This could be done by composing rigid transofrmations
-      xform(spr_animated, Rigid.translation(Direction.DIR_X.scale(150))),
-      ANIMATED_RIGID,
-    ),
+    xform(xform(spr_animated, RIGID_SPIN), RIGID_ORBIT),
   );
 }
 
@@ -197,9 +203,8 @@ const FRAME_CURVE = LoopCurve.from_timeline(make_param(0, 3, Rational.ONE));
  * @param {number} time
  */
 function update_animated(time) {
-  const FREQ = 0.5;
-  ANIMATED_RIGID.translation = SCREEN_CENTER.to_direction();
-  ANIMATED_RIGID.rotation = -2 * Math.PI * FREQ * time;
+  RIGID_ORBIT.rotation = -2 * Math.PI * FREQ_ORBIT * time;
+  RIGID_SPIN.rotation = -2 * Math.PI * FREQ_SPIN * time;
 
   if (spr_animated) {
     spr_animated.frame_id = Math.floor(FRAME_CURVE.value(time) || 0);
