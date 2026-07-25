@@ -230,12 +230,7 @@ export const sketch = (p) => {
   p.setup = async () => {
     await IMGS.preload(p);
 
-    p.createCanvas(
-      WIDTH,
-      HEIGHT,
-      undefined,
-      document.getElementById("sketch-canvas"),
-    );
+    p.createCanvas(WIDTH, HEIGHT);
 
     p.noSmooth();
     p.pixelDensity(1);
