@@ -6,7 +6,7 @@ import { group, style } from "./primitives/shorthand.js";
 import { Style } from "./Style.js";
 
 const SPINE_STYLE = Style.DEFAULT_STROKE;
-const CENTER_STYLE = new Style({ fill: Color.WHITE });
+const CENTER_STYLE = Style.flat(Color.WHITE);
 
 /**
  * A joint in an AnimationChain

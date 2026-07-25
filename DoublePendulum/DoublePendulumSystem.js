@@ -15,8 +15,8 @@ import { Direction } from "../sketchlib/pga2d/Direction.js";
 const STYLE_AXIS = Style.DEFAULT_STROKE.with_width(2);
 const ARM_STYLE = STYLE_AXIS;
 
-const STYLE_PHASE1 = new Style({ stroke: Color.YELLOW });
-const STYLE_PHASE2 = new Style({ stroke: Color.CYAN });
+const STYLE_PHASE1 = Style.lines(Color.YELLOW);
+const STYLE_PHASE2 = Style.lines(Color.CYAN);
 
 const PIXELS_PER_METER = 100;
 

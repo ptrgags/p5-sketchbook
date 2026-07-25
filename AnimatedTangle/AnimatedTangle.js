@@ -65,10 +65,7 @@ const PANEL_STRIPES = new PolygonPrimitive(
   true,
 );
 
-const PANEL_STYLE = new Style({
-  stroke: PALETTE_NAVY[Values.LIGHT],
-  width: 10,
-});
+const PANEL_STYLE = Style.lines(PALETTE_NAVY[Values.LIGHT], 10);
 
 const PANELS = style(
   [
@@ -88,10 +85,7 @@ const QUARTER_CIRCLE_FAN = new Rect(new Point(300, 100), QUARTERS_DIMENSIONS);
 const QUARTER_BRICK_WALL = new Rect(new Point(300, 300), QUARTERS_DIMENSIONS);
 const QUARTER_PEEK = new Rect(new Point(100, 300), QUARTERS_DIMENSIONS);
 
-const STYLE_QUARTERS = new Style({
-  stroke: PALETTE_CORAL[Values.LIGHT],
-  width: 6,
-});
+const STYLE_QUARTERS = Style.lines(PALETTE_CORAL[Values.LIGHT], 6);
 
 const QUARTER_DIVIDER = style(
   [
@@ -137,11 +131,7 @@ const ANIMATIONS = new AnimationGroup(
   DOORS,
 );
 
-const STYLE_BACKGROUND_STRIPES = new Style({
-  // navy blue
-  stroke: PALETTE_NAVY[Values.DARK],
-  width: 15,
-});
+const STYLE_BACKGROUND_STRIPES = Style.lines(PALETTE_NAVY[Values.DARK], 15);
 const BACKGROUND_STRIPES = style(
   make_stripes(
     SCREEN_CENTER,

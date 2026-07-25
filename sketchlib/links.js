@@ -1,8 +1,27 @@
 // Links for all of the sketches. Links are added to the page in this order
 export const LINKS = [
   {
+    title: "Oklch Color Wheel",
+    year: "2026-07",
+    is_lab: true,
+  },
+  {
+    title: "Triple Quatrain",
+    year: "2026-07",
+    is_lab: true,
+  },
+  {
+    title: "Screen Scrambler",
+    year: "2026-07",
+  },
+  {
+    title: "Penrose Triangulation",
+    year: "2026-07",
+    is_lab: true,
+  },
+  {
     title: "Waking Hours Clock",
-    year: "2026-06",
+    year: "2026-06/2026-07",
   },
   {
     title: "Bivector Clock",
@@ -11,7 +30,7 @@ export const LINKS = [
   {
     title: "Pixel Test",
     is_lab: true,
-    year: "2026-06",
+    year: "2026-06/2026-07",
   },
   {
     title: "Speech Bubble",

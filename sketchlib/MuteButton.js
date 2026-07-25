@@ -58,10 +58,7 @@ const SPEAKER_BASE = new PolygonPrimitive(
   true,
 );
 
-const SPEAKER = style(
-  [SPEAKER_BASE, SPEAKER_CONE],
-  new Style({ stroke: Color.WHITE }),
-);
+const SPEAKER = style([SPEAKER_BASE, SPEAKER_CONE], Style.lines(Color.WHITE));
 
 const SPEAKER_SLASH = style(
   new LineSegment(
@@ -70,7 +67,7 @@ const SPEAKER_SLASH = style(
       new Direction((3 * SOUND_TOGGLE_SIZE) / 4 - 2, SOUND_TOGGLE_SIZE - 2),
     ),
   ),
-  new Style({ stroke: Color.RED }),
+  Style.lines(Color.RED),
 );
 
 /**

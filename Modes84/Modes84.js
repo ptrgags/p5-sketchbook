@@ -25,10 +25,7 @@ const MOUSE = new CanvasMouseHandler();
 const tone = Tone;
 const SOUND = new SoundSystem(tone);
 
-const STYLE_LINES = new Style({
-  stroke: Color.WHITE,
-  width: 4,
-});
+const STYLE_LINES = Style.lines(Color.WHITE, 4);
 
 const NOTE_LABEL_RADIUS = 225;
 const MODE_LABEL_RADIUS = 200;
@@ -84,7 +81,7 @@ const NOTE_NAMES = [
 const TEXT_STYLE_SCALE_LABEL = new TextStyle(32, "center", "top");
 const TEXT_STYLE_NOTE_LABELS = new TextStyle(32, "center", "center");
 const TEXT_STYLE_MODE_LABELS = new TextStyle(10, "center", "center");
-const STYLE_TEXT_FILL = new Style({ fill: Color.WHITE });
+const STYLE_TEXT_FILL = Style.flat(Color.WHITE);
 
 const NOTE_LABELS = Direction.roots_of_unity(12).map((dir, i) => {
   return new TextPrimitive(

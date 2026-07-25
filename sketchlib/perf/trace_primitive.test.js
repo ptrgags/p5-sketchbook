@@ -6,7 +6,6 @@ import { group, style, xform } from "../primitives/shorthand.js";
 import { Circle } from "../primitives/Circle.js";
 import { Style } from "../Style.js";
 import { Color } from "../Color.js";
-import { Transform } from "../primitives/Transform.js";
 import { Direction } from "../pga2d/Direction.js";
 import { TextStyle } from "../primitives/TextStyle.js";
 import { TextPrimitive } from "../primitives/TextPrimitive.js";
@@ -17,12 +16,11 @@ import { LayerPrimitive } from "../primitives/LayerPrimitive.js";
 import { CTile } from "../cga2d/CTile.js";
 import { NullPoint } from "../cga2d/NullPoint.js";
 import { Cline } from "../cga2d/Cline.js";
+import { Rigid } from "../primitives/Rigid.js";
 
-const STYLE = new Style({
-  stroke: Color.RED,
-});
+const STYLE = Style.lines(Color.RED);
 
-const TRANSLATE = new Transform(new Direction(3, -4));
+const TRANSLATE = Rigid.translation(new Direction(3, -4));
 
 const TEXT_STYLE = new TextStyle(24, "left", "top");
 

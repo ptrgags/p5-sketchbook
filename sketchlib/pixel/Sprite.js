@@ -13,7 +13,7 @@ import { ImageFrames } from "./ImageFrames.js";
 export class Sprite {
   /**
    * Constructor
-   * @param {import("p5").Image} spritesheet Image containing a number of frames
+   * @param {import("p5").Image | import("p5").Graphics} spritesheet Image containing a number of frames
    * @param {Direction} frame_size Size of a single frame
    * @param {Point} position Position of the sprite on the screen
    * @param {number} frame_id ID of the current frame that will be rendered

@@ -99,9 +99,7 @@ export class SpiralBurst {
     const hue = CURVE_HUE.value(time);
 
     const color = new Oklch(CURVE_LIGHTNESS, chroma, hue);
-    const point_style = new Style({
-      fill: color,
-    });
+    const point_style = Style.flat(color);
 
     for (let i = 0; i < N; i++) {
       const angle = this.phases[i] + phase_shift * Math.PI;

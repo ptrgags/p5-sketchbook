@@ -26,7 +26,7 @@ export class ImageFrames {
 
     this.image_dimensions = image_dimensions;
     this.frame_size = frame_size;
-    this.grid_dimensions = new Direction(w / frame_w, h / frame_h);
+    this.grid_dimensions = image_dimensions.div_components(frame_size);
     this.frame_count = this.grid_dimensions.x * this.grid_dimensions.y;
   }
 

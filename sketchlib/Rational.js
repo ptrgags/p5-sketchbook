@@ -222,6 +222,14 @@ export class Rational {
     const { numerator: c, denominator: d } = other;
     return new Rational(lcm(a, c), gcd(b, d));
   }
+
+  /**
+   * Format as a string "a/b"
+   * @returns {string}
+   */
+  toString() {
+    return `${this.numerator}/${this.denominator}`;
+  }
 }
 
 Rational.ZERO = Object.freeze(new Rational(0, 1));

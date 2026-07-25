@@ -8,8 +8,6 @@ import { Hold, make_param } from "../../sketchlib/animation/ParamCurve.js";
 import { lerp } from "../../sketchlib/lerp.js";
 import { Direction } from "../../sketchlib/pga2d/Direction.js";
 import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
-import { Motor } from "../../sketchlib/pga2d/versors.js";
-import { Transform } from "../../sketchlib/primitives/Transform.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import {
   PALETTE_CORAL,
@@ -20,6 +18,7 @@ import {
 import { Ease } from "../../sketchlib/Ease.js";
 import { LoopCurve } from "../../sketchlib/animation/LoopCurve.js";
 import { Animated } from "../../sketchlib/animation/Animated.js";
+import { Rigid } from "../../sketchlib/primitives/Rigid.js";
 
 const CENTER = new Point(500, 300);
 const BAND_THICKNESS = 50;
@@ -124,7 +123,7 @@ class CircleFan {
       return row.map((angle) => {
         const diamond = make_diamond(angle);
         const offset = Direction.from_angle(angle).scale(0.01);
-        return xform(diamond, new Transform(offset));
+        return xform(diamond, Rigid.translation(offset));
       });
     });
 
@@ -147,7 +146,7 @@ class CircleFan {
    * @param {number} time
    */
   update(time) {
-    const r = CURVE_RADIUS.value(time);
+    const r = CURVE_RADIUS.value(time) ?? 0;
 
     for (const [i, max_radius] of MAX_RADII.entries()) {
       const outer_radius = Math.min(r, max_radius);
@@ -157,7 +156,11 @@ class CircleFan {
       // Note: When the radius is 0, the diamonds are slightly out of frame
       this.diamonds[i].forEach((x, j) => {
         const angle = DIAMOND_ANGLES[i][j];
-        x.transform.translation = Direction.from_angle(angle).scale(diamond_r);
+
+        if (x.transform) {
+          x.transform.translation =
+            Direction.from_angle(angle).scale(diamond_r);
+        }
       });
     }
   }

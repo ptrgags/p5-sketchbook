@@ -14,6 +14,13 @@ export class FlagSet {
   }
 
   /**
+   * @type {boolean}
+   */
+  get is_empty() {
+    return this.flags === 0;
+  }
+
+  /**
    * Get the integer representation of the set of bit flags
    * @returns {number}
    */

@@ -65,14 +65,12 @@ const ELLIPSIS_SCREEN = group(
   new Circle(SCREEN_CENTER.add(ELLIPSIS_STRIDE_SCREEN), ELLIPSIS_RADIUS_SCREEN),
 );
 
-const STYLE_ELLIPSIS = new Style({
-  fill: Color.BLACK,
-});
+const STYLE_ELLIPSIS = Style.flat(Color.BLACK);
 
 const SCENE = group(BUBBLE_SCREEN, style(ELLIPSIS_SCREEN, STYLE_ELLIPSIS));
 
-const STYLE_OUTLINE = new Style({ fill: Color.BLACK });
-const STYLE_INTERIOR = new Style({ fill: Color.WHITE });
+const STYLE_OUTLINE = Style.flat(Color.BLACK);
+const STYLE_INTERIOR = Style.flat(Color.WHITE);
 const SVG_OUTLINE = style(BUBBLE_PRINT.outer_primitiive, STYLE_OUTLINE);
 const SVG_INTERIOR = style(BUBBLE_PRINT.inner_primitiive, STYLE_INTERIOR);
 const SVG_ELLIPSIS = style(ELLIPSIS_PRINT, STYLE_ELLIPSIS);

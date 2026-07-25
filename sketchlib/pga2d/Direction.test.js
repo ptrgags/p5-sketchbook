@@ -175,6 +175,26 @@ describe("Direction", () => {
     expect(result).toBe(expected);
   });
 
+  it("mul_components does component-wise multiplication", () => {
+    const a = new Direction(1, 2);
+    const b = new Direction(-2, 0.5);
+
+    const result = a.mul_components(b);
+
+    const expected = new Direction(-2, 1);
+    expect(result).toBeDirection(expected);
+  });
+
+  it("div_components does component-wise division", () => {
+    const a = new Direction(1, 2);
+    const b = new Direction(-2, 0.5);
+
+    const result = a.div_components(b);
+
+    const expected = new Direction(-0.5, 4);
+    expect(result).toBeDirection(expected);
+  });
+
   describe("roots_of_unity", () => {
     /**
      * Compare two arrays of points

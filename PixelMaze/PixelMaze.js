@@ -107,6 +107,7 @@ export const sketch = (p) => {
     );
 
     p.noSmooth();
+    p.pixelDensity(1);
 
     MOUSE.setup(canvas);
     DPAD.setup();

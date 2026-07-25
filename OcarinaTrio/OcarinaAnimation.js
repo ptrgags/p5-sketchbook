@@ -12,8 +12,8 @@ import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
 import { Rect } from "../sketchlib/primitives/Rect.js";
+import { Rigid } from "../sketchlib/primitives/Rigid.js";
 import { group, style, xform } from "../sketchlib/primitives/shorthand.js";
-import { Transform } from "../sketchlib/primitives/Transform.js";
 import { SoundManager } from "../sketchlib/SoundManager.js";
 import { Style } from "../sketchlib/Style.js";
 import { SCORE_OCARINA_TRIO } from "../SoundTest/example_scores/ocarina_trio.js";
@@ -128,9 +128,9 @@ const OUTPUT_NOZZLE = new PolygonPrimitive(
 // one nozzle per instrument
 const OUTPUT_NOZZLES = style(
   [
-    xform(OUTPUT_NOZZLE, new Transform(new Direction(75, 250))),
-    xform(OUTPUT_NOZZLE, new Transform(new Direction(225, 250))),
-    xform(OUTPUT_NOZZLE, new Transform(new Direction(375, 250))),
+    xform(OUTPUT_NOZZLE, Rigid.translation(new Direction(75, 250))),
+    xform(OUTPUT_NOZZLE, Rigid.translation(new Direction(225, 250))),
+    xform(OUTPUT_NOZZLE, Rigid.translation(new Direction(375, 250))),
   ],
   STYLE_NOZZLES,
 );
@@ -190,21 +190,21 @@ export class OcarinaAnimation {
         y,
         velocity,
         pitch_range,
-        new Style({ fill: BASS_CONFIG.color }),
+        Style.flat(BASS_CONFIG.color),
       ),
       new PianoRoll(
         tenor_intervals,
         y,
         velocity,
         pitch_range,
-        new Style({ fill: TENOR_CONFIG.color }),
+        Style.flat(TENOR_CONFIG.color),
       ),
       new PianoRoll(
         soprano_intervals,
         y,
         velocity,
         pitch_range,
-        new Style({ fill: SOPRANO_CONFIG.color }),
+        Style.flat(SOPRANO_CONFIG.color),
       ),
     );
 

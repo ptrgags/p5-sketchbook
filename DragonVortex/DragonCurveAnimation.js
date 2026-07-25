@@ -67,20 +67,11 @@ function spin(t) {
   return CVersor.rotation(SPIN_ANGULAR_FREQUENCY * t);
 }
 
-const STYLE_PARENT = new Style({
-  stroke: new Oklch(0.9, 0, 0),
-  width: 2,
-});
-const STYLE_CHILD_A = new Style({
-  // cinnamon red
-  stroke: new Oklch(0.6, 0.1389, 17.63),
-  width: 4,
-});
-const STYLE_CHILD_B = new Style({
-  // mint green
-  stroke: new Oklch(0.8, 0.1, 176.8),
-  width: 4,
-});
+const STYLE_PARENT = Style.lines(new Oklch(0.9, 0, 0), 2);
+// cinnamon red
+const STYLE_CHILD_A = Style.lines(new Oklch(0.6, 0.1389, 17.63), 4);
+// mint green
+const STYLE_CHILD_B = Style.lines(new Oklch(0.8, 0.1, 176.8), 4);
 const STYLE_RUNS = StyleRuns.from_styles([STYLE_CHILD_A, STYLE_CHILD_B]);
 
 // both transformations map the unit square's diagonal

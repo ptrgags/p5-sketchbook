@@ -41,13 +41,16 @@ export class Tilemap {
   /**
    * Constructor
    * @param {import("p5")} p p5 instance for allocating resources
-   * @param {import("p5").Image} tileset Image with the tiles
+   * @param {import("p5").Image | import("p5").Graphics} tileset Image with the tiles
    * @param {Direction} tile_size How big is each tile
    * @param {Direction} map_size How many tiles wide/tall is the map?
    * @param {Point} position Position on the screen to
    */
   constructor(p, tileset, tile_size, map_size, position) {
     this.tileset = tileset;
+    this.tile_size = tile_size;
+    this.map_size = map_size;
+    this.position = position;
 
     // @ts-ignore
     const tileset_dimensions = new Direction(tileset.width, tileset.height);
@@ -56,8 +59,6 @@ export class Tilemap {
     const map_dimensions = tile_size.mul_components(map_size);
     this.map_frames = new ImageFrames(map_dimensions, tile_size);
     this.map_gfx = p.createGraphics(map_dimensions.x, map_dimensions.y);
-
-    this.position = position;
   }
 
   /**

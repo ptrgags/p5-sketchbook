@@ -34,10 +34,7 @@ const STYLE_CORAL = new Style({
   width: 4,
 });
 
-const STYLE_STRIPES = new Style({
-  stroke: PALETTE_SKY[Values.MED_DARK],
-  width: 4,
-});
+const STYLE_STRIPES = Style.lines(PALETTE_SKY[Values.MED_DARK], 4);
 
 const SWAY_AMPLITUDE = Math.PI / 12;
 const SWAY_FREQUENCY = 0.25;

@@ -69,12 +69,8 @@ const STYLE_WHITE_KEYS = new Style({
   stroke: Color.BLACK,
   fill: Color.WHITE,
 });
-const STYLE_BLACK_KEYS = new Style({
-  fill: Color.BLACK,
-});
-const STYLE_HIGHLIGHT = new Style({
-  fill: Color.CYAN,
-});
+const STYLE_BLACK_KEYS = Style.flat(Color.BLACK);
+const STYLE_HIGHLIGHT = Style.flat(Color.CYAN);
 
 /**
  * Single octave piano keyboard

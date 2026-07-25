@@ -66,32 +66,13 @@ const ROTATE_GLOBE = new TransformationSequence([
   rotate_y,
 ]);
 
-const STYLE_POLES = new Style({
-  fill: Color.from_hex_code("#7f00ff"),
-});
+const STYLE_POLES = Style.flat("#7f00ff");
 
-const STYLE_NORTH_HEMISPHERE = new Style({
-  stroke: Color.RED,
-  width: 2,
-});
-const STYLE_SOUTH_HEMISPHERE = new Style({
-  stroke: Color.from_hex_code("#ff7f00"),
-  width: 2,
-});
-const STYLE_EQUATOR = new Style({
-  stroke: Color.CYAN,
-  width: 4,
-});
-
-const STYLE_MERIDIANS = new Style({
-  stroke: Color.YELLOW,
-  width: 2,
-});
-
-const STYLE_PRIME_MERIDIAN = new Style({
-  stroke: Color.BLUE,
-  width: 4,
-});
+const STYLE_NORTH_HEMISPHERE = Style.lines(Color.RED, 2);
+const STYLE_SOUTH_HEMISPHERE = Style.lines("#ff7f00", 2);
+const STYLE_EQUATOR = Style.lines(Color.CYAN, 4);
+const STYLE_MERIDIANS = Style.lines(Color.YELLOW, 2);
+const STYLE_PRIME_MERIDIAN = Style.lines(Color.BLUE, 4);
 
 const PARALLEL_MAX_ITERS = 5;
 const PARALLEL_ITERATOR = new PowerIterator(CVersor.dilation(1.5));

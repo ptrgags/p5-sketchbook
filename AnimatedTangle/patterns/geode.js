@@ -10,10 +10,7 @@ import { Primitive } from "../../sketchlib/primitives/Primitive.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
 import { Style } from "../../sketchlib/Style.js";
 import { make_stripes } from "./stripes.js";
-import {
-  make_param,
-  ParamCurve,
-} from "../../sketchlib/animation/ParamCurve.js";
+import { make_param } from "../../sketchlib/animation/ParamCurve.js";
 import { PALETTE_CORAL, PALETTE_ROCK, Values } from "../theme_colors.js";
 import { Oklch } from "../../sketchlib/Oklch.js";
 import { Random } from "../../sketchlib/random.js";
@@ -21,14 +18,8 @@ import { LoopCurve } from "../../sketchlib/animation/LoopCurve.js";
 import { Animated } from "../../sketchlib/animation/Animated.js";
 import { lerp } from "../../sketchlib/lerp.js";
 
-const STYLE_ROCK1 = new Style({
-  stroke: PALETTE_ROCK[Values.MED_DARK],
-  width: 4,
-});
-const STYLE_ROCK2 = new Style({
-  stroke: PALETTE_ROCK[Values.MEDIUM],
-  width: 4,
-});
+const STYLE_ROCK1 = Style.lines(PALETTE_ROCK[Values.MED_DARK], 4);
+const STYLE_ROCK2 = Style.lines(PALETTE_ROCK[Values.MEDIUM], 4);
 
 const DURATION_TOTAL = new Rational(8);
 const DURATION_GROW = DURATION_TOTAL.mul(new Rational(2, 3));
@@ -51,9 +42,7 @@ const ROCK_STRIPES2 = make_stripes(
   0,
 );
 
-const STYLE_INSIDE_GEODE = new Style({
-  fill: PALETTE_ROCK[Values.DARK],
-});
+const STYLE_INSIDE_GEODE = Style.flat(PALETTE_ROCK[Values.DARK]);
 
 /**
  * @implements {Animated}
@@ -138,15 +127,6 @@ const PALETTE_AGATE = Random.shuffle(
   ),
 );
 
-/**
- * @type {Style[]}
- */
-const GEODE_STYLES = PALETTE_AGATE.map(
-  (x, i) =>
-    new Style({
-      stroke: x,
-      width: WIDTHS[i],
-    }),
-);
+const GEODE_STYLES = PALETTE_AGATE.map((x, i) => Style.lines(x, WIDTHS[i]));
 
 export const GEODE = new Geode(GEODE_BOUNDARY, GEODE_STYLES);

@@ -5,7 +5,6 @@ import { ClipPrimitive } from "../../sketchlib/primitives/ClipPrimitive.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { Rect } from "../../sketchlib/primitives/Rect.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
-import { Transform } from "../../sketchlib/primitives/Transform.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Tween } from "../../sketchlib/Tween.js";
 import { Animated } from "../../sketchlib/animation/Animated.js";
@@ -18,6 +17,7 @@ import { Sequential } from "../../sketchlib/music/Timeline.js";
 import { Rational } from "../../sketchlib/Rational.js";
 import { PALETTE_CORAL, PALETTE_ROCK, Values } from "../theme_colors.js";
 import { make_stripes } from "./stripes.js";
+import { Rigid } from "../../sketchlib/primitives/Rigid.js";
 
 const FALL_DURATION = 1;
 const HIT_TIMES = [
@@ -43,9 +43,7 @@ const BRICK_DIMENSIONS = PANEL_DIMENSIONS.mul_components(
   new Direction(0.5, 0.25),
 );
 
-const STYLE_BACKGROUND = new Style({
-  fill: PALETTE_CORAL[Values.MED_DARK],
-});
+const STYLE_BACKGROUND = Style.flat(PALETTE_CORAL[Values.MED_DARK]);
 const BRICK_BACKGROUND = style(
   new Rect(PANEL_CORNER, PANEL_DIMENSIONS),
   STYLE_BACKGROUND,
@@ -53,10 +51,10 @@ const BRICK_BACKGROUND = style(
 
 const STRIPE_SPACING = 20;
 
-const STYLE_STRIPES = new Style({
-  stroke: PALETTE_CORAL[Values.DARK],
-  width: STRIPE_SPACING / 2,
-});
+const STYLE_STRIPES = Style.lines(
+  PALETTE_CORAL[Values.DARK],
+  STRIPE_SPACING / 2,
+);
 const BRICK_STRIPES = style(
   make_stripes(
     new Point(400, 400),
@@ -123,9 +121,7 @@ const BRICK_OFFSETS = [
   new Direction(-0.5, 0),
 ];
 
-const STYLE_DROP_SHADOW = new Style({
-  fill: PALETTE_ROCK[Values.DARK],
-});
+const STYLE_DROP_SHADOW = Style.flat(PALETTE_ROCK[Values.DARK]);
 const DROP_SHADOW_OFFSET = new Direction(12, 12);
 
 const DURATION_FALL = new Rational(6);
@@ -161,7 +157,7 @@ class BrickWall {
     // ---BOTTOM---
     const brick_shape = group(...this.bricks.map((x) => x.primitive));
     const drop_shadow = new GroupPrimitive(brick_shape, {
-      transform: new Transform(DROP_SHADOW_OFFSET),
+      transform: Rigid.translation(DROP_SHADOW_OFFSET),
       style: STYLE_DROP_SHADOW,
     });
     const striped_bricks = new ClipPrimitive(
