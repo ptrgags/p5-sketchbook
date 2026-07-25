@@ -46,12 +46,8 @@ export const sketch = (p) => {
   }
 
   p.setup = () => {
-    canvas = p.createCanvas(
-      WIDTH,
-      HEIGHT,
-      undefined,
-      document.getElementById("sketch-canvas")
-    ).elt;
+    canvas = p.createCanvas(WIDTH, HEIGHT).elt;
+    p.pixelDensity(1);
     prevent_mobile_scroll(canvas);
 
     init_color_pickers();

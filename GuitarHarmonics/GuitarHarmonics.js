@@ -12,12 +12,9 @@ const SCENE = new ShowHidePrimitive(
 // @ts-ignore
 export const sketch = (p) => {
   p.setup = () => {
-    p.createCanvas(
-      WIDTH,
-      HEIGHT,
-      undefined,
-      document.getElementById("sketch-canvas"),
-    );
+    p.createCanvas(WIDTH, HEIGHT);
+    p.pixelDensity(1);
+
     expect_element("toggle-visualization", HTMLButtonElement).addEventListener(
       "click",
       () => {

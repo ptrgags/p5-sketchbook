@@ -148,12 +148,8 @@ const SCENE = group(
 // @ts-ignore
 export const sketch = (p) => {
   p.setup = () => {
-    p.createCanvas(
-      WIDTH,
-      HEIGHT,
-      undefined,
-      document.getElementById("sketch-canvas"),
-    );
+    p.createCanvas(WIDTH, HEIGHT);
+    p.pixelDensity(1);
     p.background(127);
     SCENE.draw(p);
 

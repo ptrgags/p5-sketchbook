@@ -21,12 +21,8 @@ const ARROW = new DancingArrow(new Circle(SCREEN_CENTER, 20));
 
 export const sketch = (p) => {
   p.setup = () => {
-    const canvas = p.createCanvas(
-      WIDTH,
-      HEIGHT,
-      undefined,
-      document.getElementById("sketch-canvas"),
-    ).elt;
+    const canvas = p.createCanvas(WIDTH, HEIGHT).elt;
+    p.pixelDensity(1);
 
     MOUSE.setup(canvas);
   };
