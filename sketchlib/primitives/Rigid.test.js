@@ -185,7 +185,7 @@ describe("Rigid", () => {
       // = Y * T(2, 3)
       // = T(2, -3) * Y
       const expected_t_flip = new Rigid({
-        translation: Direction.DIR_X,
+        translation: new Direction(2, 3),
         flip: true,
       });
       const expected_flip_t = new Rigid({
@@ -211,13 +211,22 @@ describe("Rigid", () => {
       const ab = a.compose(b);
       const ba = b.compose(a);
 
+      // T(1, 0) * R4 * Y * T(0, 1) * R4^2 * Y
+      // = T(1, 0) * R4 * T(0, -1) * R4^2 * Y * Y
+      // = T(1, 0) * T(1, 0) * R4 * R4^2
+      // = T(2, 1) * R4^3
+      // = R4^3
       const expected_ab = new Rigid({
-        translation: Direction.DIR_X,
-        rotation: Math.PI / 4,
+        translation: new Direction(2, 0),
+        rotation: (3 * Math.PI) / 2,
       });
+      // T(0, 1) * R4^2 * Y * T(1, 0) * R4 * Y
+      // = T(0, 1) * T(-1, 0) * R4^2 * Y * R4 * Y
+      // = T(-1, 1) * R4^2 * R4^-1 * Y * Y
+      // = T(-1, 1) * R4
       const expected_ba = new Rigid({
-        translation: Direction.DIR_X,
-        rotation: Math.PI / 4,
+        translation: new Direction(-1, 1),
+        rotation: Math.PI / 2,
       });
       expect(ab).toBeRigid(expected_ab);
       expect(ba).toBeRigid(expected_ba);

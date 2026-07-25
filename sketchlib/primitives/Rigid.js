@@ -3,16 +3,7 @@ import { Direction } from "../pga2d/Direction.js";
 import { Point } from "../pga2d/Point.js";
 import { Motor } from "../pga2d/versors.js";
 import { lerp } from "../lerp.js";
-
-/**
- * Flip a direction if the flag is set
- * @param {Direction} dir
- * @param {boolean} should_flip
- * @returns {Direction} the possibly flipped
- */
-function maybe_flip(dir, should_flip) {
-  return should_flip ? dir.neg() : dir;
-}
+import { mod } from "../mod.js";
 
 /**
  * @typedef {{
@@ -26,6 +17,8 @@ function maybe_flip(dir, should_flip) {
  * Rigid transformation in the form:
  *
  * translate(offset) * rotate(angle) * flip_y?
+ *
+ * The rotation angle will always be reduced to be in [0, 2pi]
  */
 export class Rigid {
   /**
@@ -34,7 +27,7 @@ export class Rigid {
    */
   constructor(options) {
     this.translation = options.translation ?? Direction.ZERO;
-    this.rotation = options.rotation ?? 0;
+    this.rotation = mod(options.rotation ?? 0, 2 * Math.PI);
     this.flip = options.flip ?? false;
   }
 
@@ -89,7 +82,9 @@ export class Rigid {
     // = T1 * T(R1 * Y1 * d2) * R1 * R2^(+/-1) * Y1? * Y2?
     const motor = Motor.rotation(Point.ORIGIN, this.rotation);
 
-    const flipped_offset = maybe_flip(other.translation, this.flip);
+    const flipped_offset = this.flip
+      ? new Direction(other.translation.x, -other.translation.y)
+      : other.translation;
     const translation = this.translation.add(
       motor.transform_dir(flipped_offset),
     );
