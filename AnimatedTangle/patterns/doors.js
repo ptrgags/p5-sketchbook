@@ -5,7 +5,6 @@ import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { PolygonPrimitive } from "../../sketchlib/primitives/PolygonPrimitive.js";
 import { Rect } from "../../sketchlib/primitives/Rect.js";
 import { group, style, xform } from "../../sketchlib/primitives/shorthand.js";
-import { Transform } from "../../sketchlib/primitives/Transform.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Animated } from "../../sketchlib/animation/Animated.js";
 import { LoopCurve } from "../../sketchlib/animation/LoopCurve.js";
@@ -23,6 +22,7 @@ import {
   Values,
 } from "../theme_colors.js";
 import { AnimatedStripes } from "./stripes.js";
+import { Rigid } from "../../sketchlib/primitives/Rigid.js";
 
 const STRIPE_CENTER = new Point(200, 650);
 const STRIPE_SPACING = 60;
@@ -44,8 +44,8 @@ const STRIPE_STYLES = [
 const XFORMS = [
   // First stripe doesn't need a transform, it's identity
   undefined,
-  new Transform(STRIPE_DIRECTION.scale(STRIPE_SPACING / 3)),
-  new Transform(STRIPE_DIRECTION.scale((2 * STRIPE_SPACING) / 3)),
+  Rigid.translation(STRIPE_DIRECTION.scale(STRIPE_SPACING / 3)),
+  Rigid.translation(STRIPE_DIRECTION.scale((2 * STRIPE_SPACING) / 3)),
 ];
 
 const BASE_STRIPES = ANIMATED_STRIPES.primitive;
@@ -136,8 +136,8 @@ class Door {
   constructor(shut_offset, shut_time) {
     this.shut_offset = shut_offset;
     this.shut_time = shut_time;
-    this.lower_xform = new Transform(shut_offset);
-    this.upper_xform = new Transform(shut_offset);
+    this.lower_xform = Rigid.translation(shut_offset);
+    this.upper_xform = Rigid.translation(shut_offset);
 
     const background = new Rect(
       Point.ORIGIN.add(this.shut_offset).add(

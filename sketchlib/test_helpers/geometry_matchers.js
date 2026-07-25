@@ -4,7 +4,12 @@ import { Circle } from "../primitives/Circle.js";
 import { LineSegment } from "../primitives/LineSegment.js";
 import { Ray } from "../primitives/Ray.js";
 import { Rect } from "../primitives/Rect.js";
-import { diff_float_property, format_diff } from "./diff_properties.js";
+import { Rigid } from "../primitives/Rigid.js";
+import {
+  diff_float_property,
+  diff_property,
+  format_diff,
+} from "./diff_properties.js";
 import { diff_dir, diff_point } from "./pga_matchers.js";
 
 export function diff_circle(diffs, received, expected) {
@@ -82,6 +87,19 @@ export function diff_arc(diffs, received, expected) {
   return diffs;
 }
 
+export function diff_rigid(diffs, received, expected) {
+  if (!(received instanceof Rigid)) {
+    diffs.push(`expected Rigid, got ${received}`);
+    return diffs;
+  }
+
+  diff_float_property(diffs, received, expected, "rotation");
+  diff_property(diffs, received, expected, "flip");
+  diff_dir(diffs, received.translation, expected.translation);
+
+  return diffs;
+}
+
 export const GEOMETRY_MATCHERS = {
   toBeCircle(received, expected) {
     return {
@@ -117,6 +135,12 @@ export const GEOMETRY_MATCHERS = {
     return {
       pass: received.equals(expected),
       message: () => format_diff(diff_arc([], received, expected)),
+    };
+  },
+  toBeRigid(received, expected) {
+    return {
+      pass: received.equals(expected),
+      message: () => format_diff(diff_rigid([], received, expected)),
     };
   },
 };

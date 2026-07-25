@@ -2,8 +2,8 @@ import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
 import { mod } from "../sketchlib/mod.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Primitive } from "../sketchlib/primitives/Primitive.js";
+import { Rigid } from "../sketchlib/primitives/Rigid.js";
 import { xform } from "../sketchlib/primitives/shorthand.js";
-import { Transform } from "../sketchlib/primitives/Transform.js";
 
 /**
  * A shape that moves with a constant velocity
@@ -23,11 +23,11 @@ export class FlyingShape {
     this.prev_time = 0;
     this.offscreen_margin = offscreen_margin;
 
-    this.transform = new Transform(initial_displacement);
+    this.transform = Rigid.translation(initial_displacement);
     const flying_shape = xform(shape, this.transform);
     this.primitive = xform(
       flying_shape,
-      new Transform(
+      Rigid.translation(
         new Direction(-this.offscreen_margin, -this.offscreen_margin),
       ),
     );

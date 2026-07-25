@@ -5,11 +5,10 @@ import { Point } from "../sketchlib/pga2d/Point.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { Primitive } from "../sketchlib/primitives/Primitive.js";
-import { group, style, xform } from "../sketchlib/primitives/shorthand.js";
+import { Rigid } from "../sketchlib/primitives/Rigid.js";
+import { style, xform } from "../sketchlib/primitives/shorthand.js";
 import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
 import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
-import { Transform } from "../sketchlib/primitives/Transform.js";
-import { range } from "../sketchlib/range.js";
 import { Style } from "../sketchlib/Style.js";
 import { Tween } from "../sketchlib/Tween.js";
 import { GuitarDiagram, NECK_WIDTH, STRING_LENGTH } from "./GuitarDiagram.js";
@@ -61,7 +60,7 @@ const HARMONIC_LABELS = new GroupPrimitive(LABELS, {
 });
 
 // Move the fretboard and strings so its center
-const TRANSLATE_CENTER = new Transform(
+const TRANSLATE_CENTER = Rigid.translation(
   new Direction(WIDTH / 2 - NECK_WIDTH / 2, 0),
 );
 

@@ -9,7 +9,7 @@ import { Mask } from "../sketchlib/primitives/ClipMask.js";
 import { ClipPrimitive } from "../sketchlib/primitives/ClipPrimitive.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { Rect } from "../sketchlib/primitives/Rect.js";
-import { Transform } from "../sketchlib/primitives/Transform.js";
+import { Rigid } from "../sketchlib/primitives/Rigid.js";
 import { Style } from "../sketchlib/Style.js";
 
 /**
@@ -18,7 +18,7 @@ import { Style } from "../sketchlib/Style.js";
 export class PianoRoll {
   /**
    * Constructor
-   * @param {AbsInterval<Note>[]} notes
+   * @param {AbsInterval<Note<number>>[]} notes
    * @param {number} y
    * @param {number} velocity
    * @param {[number, number]} pitch_range
@@ -46,7 +46,7 @@ export class PianoRoll {
       return new AbsInterval(rect, interval.start_time, interval.end_time);
     });
 
-    this.translation = new Transform(Direction.ZERO);
+    this.translation = Rigid.translation(Direction.ZERO);
     this.rects = new GroupPrimitive(this.rects, {
       style: note_style,
       transform: this.translation,

@@ -1,8 +1,8 @@
 import { Style } from "../Style.js";
 import { GroupPrimitive } from "./GroupPrimitive.js";
 import { Primitive } from "./Primitive.js";
+import { Rigid } from "./Rigid.js";
 import { SimpleGroupPrimitive } from "./SimpleGroupPrimitive.js";
-import { Transform } from "./Transform.js";
 
 /**
  * Shorthand for creating a GroupPrimitive that just groups primitives with
@@ -29,11 +29,11 @@ export function style(primitives, style_descriptor) {
 /**
  * Apply a transformation to one or more primitives, creating a group
  * @param {Primitive | Primitive[]} primitives The primitive(s) to group
- * @param {Transform} transform The transform to apply
+ * @param {Rigid} transformation The transformation to apply
  * @returns {GroupPrimitive} The transformed group of primitives
  */
-export function xform(primitives, transform) {
+export function xform(primitives, transformation) {
   return new GroupPrimitive(primitives, {
-    transform,
+    transform: transformation,
   });
 }

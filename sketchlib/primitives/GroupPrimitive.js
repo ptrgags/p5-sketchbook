@@ -6,8 +6,8 @@ import { Style } from "../Style.js";
 import { svg_tag } from "../svg/svg_tag.js";
 import { ToSVG } from "../svg/ToSVG.js";
 import { Primitive } from "./Primitive.js";
+import { Rigid } from "./Rigid.js";
 import { TextStyle } from "./TextStyle.js";
-import { Transform } from "./Transform.js";
 
 /**
  * Apply a Style as SVG attributes
@@ -32,7 +32,7 @@ function apply_svg_style(attributes, style) {
  * @typedef {{
  *  style?: Style,
  *  text_style?: TextStyle,
- *  transform?: Transform
+ *  transform?: Rigid
  * }} GroupSettings
  */
 

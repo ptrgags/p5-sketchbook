@@ -5,7 +5,6 @@ import { ClipPrimitive } from "../../sketchlib/primitives/ClipPrimitive.js";
 import { GroupPrimitive } from "../../sketchlib/primitives/GroupPrimitive.js";
 import { Rect } from "../../sketchlib/primitives/Rect.js";
 import { group, style } from "../../sketchlib/primitives/shorthand.js";
-import { Transform } from "../../sketchlib/primitives/Transform.js";
 import { Style } from "../../sketchlib/Style.js";
 import { Tween } from "../../sketchlib/Tween.js";
 import { Animated } from "../../sketchlib/animation/Animated.js";
@@ -18,6 +17,7 @@ import { Sequential } from "../../sketchlib/music/Timeline.js";
 import { Rational } from "../../sketchlib/Rational.js";
 import { PALETTE_CORAL, PALETTE_ROCK, Values } from "../theme_colors.js";
 import { make_stripes } from "./stripes.js";
+import { Rigid } from "../../sketchlib/primitives/Rigid.js";
 
 const FALL_DURATION = 1;
 const HIT_TIMES = [
@@ -157,7 +157,7 @@ class BrickWall {
     // ---BOTTOM---
     const brick_shape = group(...this.bricks.map((x) => x.primitive));
     const drop_shadow = new GroupPrimitive(brick_shape, {
-      transform: new Transform(DROP_SHADOW_OFFSET),
+      transform: Rigid.translation(DROP_SHADOW_OFFSET),
       style: STYLE_DROP_SHADOW,
     });
     const striped_bricks = new ClipPrimitive(
