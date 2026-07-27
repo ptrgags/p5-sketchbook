@@ -32,6 +32,7 @@ export const sketch = (p) => {
 
   p.setup = () => {
     canvas = p.createCanvas(WIDTH, HEIGHT).elt;
+    p.pixelDensity(1);
     init_meters(state.meters);
   };
 

@@ -28,6 +28,7 @@ const CLOCK = new Clock();
 export const sketch = (p) => {
   p.setup = () => {
     const canvas = p.createCanvas(WIDTH, HEIGHT).elt;
+    p.pixelDensity(1);
 
     MOUSE.setup(canvas);
     MOUSE.callbacks = [ELLIPTIC_CAM];

@@ -164,6 +164,7 @@ export const sketch = (p) => {
 
   p.setup = () => {
     canvas = p.createCanvas(500, 700).elt;
+    p.pixelDensity(1);
     document.getElementById("export").addEventListener("click", (e) => {
       const tileset = serialize_tileset(TILES);
       you_wouldnt_download_a_json(tileset, "coral_tiles.json");

@@ -236,6 +236,7 @@ export const sketch = (p) => {
   let show_arrows = false;
   p.setup = () => {
     canvas = p.createCanvas(WIDTH, HEIGHT).elt;
+    p.pixelDensity(1);
     prevent_mobile_scroll(canvas);
 
     const checkbox = document.getElementById("arrows");

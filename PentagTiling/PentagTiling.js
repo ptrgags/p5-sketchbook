@@ -209,6 +209,7 @@ export const sketch = (p) => {
   let canvas;
   p.setup = () => {
     canvas = p.createCanvas(WIDTH, HEIGHT).elt;
+    p.pixelDensity(1);
   };
 
   p.draw = () => {

@@ -16,7 +16,7 @@ import { HourSelector } from "./HourSelector.js";
 import { WakingHours } from "./WakingHours.js";
 import { WakingHoursSummary } from "./WakingHoursSummary.js";
 
-const DEBUG = true;
+const DEBUG = false;
 
 const HAND = new LineSegment(
   DIAL_CENTER,
@@ -72,7 +72,10 @@ const MOUSE = new CanvasMouseHandler();
 const COORDS = new DebugCoordinates();
 const DEBUG_GRID = new DebugGrid(100, 25);
 
-// @ts-ignore
+/**
+ *
+ * @param {import("p5").default} p
+ */
 export const sketch = (p) => {
   /**
    * @type {HourSelector | Bezel | undefined}
@@ -103,11 +106,15 @@ export const sketch = (p) => {
   };
 
   MOUSE.mouse_moved(p, (mouse) => {
+    COORDS.mouse_coords = mouse.mouse_coords;
+
     clear_highlights();
     update_highlights(mouse.mouse_coords);
   });
 
   MOUSE.mouse_pressed(p, (mouse) => {
+    COORDS.mouse_coords = mouse.mouse_coords;
+
     // if we clicked one of the drag handles, start editing the corresponding time
     // else if we clicked the bezel, start editing the corresponding time
     clear_highlights();
@@ -123,6 +130,7 @@ export const sketch = (p) => {
   });
 
   MOUSE.mouse_dragged(p, (mouse) => {
+    COORDS.mouse_coords = mouse.mouse_coords;
     if (selected_object) {
       selected_object.move(mouse.mouse_coords);
     }
@@ -131,6 +139,7 @@ export const sketch = (p) => {
   });
 
   MOUSE.mouse_released(p, (mouse) => {
+    COORDS.mouse_coords = mouse.mouse_coords;
     selected_object = undefined;
 
     clear_highlights();
