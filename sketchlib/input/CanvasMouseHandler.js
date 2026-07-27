@@ -91,7 +91,7 @@ export class CanvasMouseHandler {
    * as usual
    *
    * Note that this assumes the default canvas dimensions of WIDTH and HEIGHT
-   * @param {import("p5")} p the p5.js element
+   * @param {import("p5").default} p the p5.js element
    * @param {MouseCallback} callback The callback to call when the mouse is pressed on the canvas
    */
   mouse_pressed(p, callback) {
@@ -113,8 +113,7 @@ export class CanvasMouseHandler {
 
   /**
    * Similar to mouse_pressed but for the mouse released event
-   * @param {import("p5")} p the p5.js element
-   *
+   * @param {import("p5").default} p the p5.js element
    * @param {MouseCallback} callback The callback to call when the mouse is pressed on the canvas
    */
   mouse_released(p, callback) {
@@ -143,7 +142,7 @@ export class CanvasMouseHandler {
    * - If the mouse is hovering over the canvas, prevent the default behavior
    * - Always call the callback, but include the in-canvas state
    *
-   * @param {import("p5")} p the p5.js element
+   * @param {import("p5").default} p the p5.js element
    * @param {MouseCallback} callback The callback to call when the mouse is moved on the canvas
    */
   mouse_moved(p, callback) {
@@ -169,7 +168,7 @@ export class CanvasMouseHandler {
 
   /**
    * Similar to mouse_moved, but now the mouse is pressed
-   * @param {import("p5")} p the p5.js element
+   * @param {import("p5").default} p the p5.js element
    * @param {MouseCallback} callback The callback to call when the mouse is dragged on the canvas
    */
   mouse_dragged(p, callback) {
