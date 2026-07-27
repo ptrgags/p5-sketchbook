@@ -144,18 +144,10 @@ function init_sprites(p) {
 
 // @ts-ignore
 export const sketch = (p) => {
-  p.preload = () => {
-    IMGS.preload(p);
-  };
+  p.setup = async () => {
+    await IMGS.preload(p);
 
-  p.setup = () => {
-    p.createCanvas(
-      WIDTH,
-      HEIGHT,
-      undefined,
-      document.getElementById("sketch-canvas"),
-    );
-
+    p.createCanvas(WIDTH, HEIGHT);
     p.pixelDensity(1);
 
     init_sprites(p);

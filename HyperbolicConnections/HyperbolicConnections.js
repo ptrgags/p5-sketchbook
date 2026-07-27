@@ -23,7 +23,7 @@ const MAX_CHUNK_LENGTH = 8;
 //const PALETTE = new Palette("https://coolors.co/007f5f-2b9348-55a630-80b918-aacc00-bfd200-d4d700-dddf00-eeef20-ffff3f")
 // blues
 const PALETTE = new Palette(
-  "https://coolors.co/000000-7400b8-6930c3-5e60ce-5390d9-4ea8de-48bfe3-56cfe1-64dfdf-72efdd-80ffdb"
+  "https://coolors.co/000000-7400b8-6930c3-5e60ce-5390d9-4ea8de-48bfe3-56cfe1-64dfdf-72efdd-80ffdb",
 );
 // maroon and blue
 //const PALETTE = new Palette("https://coolors.co/780000-c1121f-fdf0d5-003049-669bbc");
@@ -73,11 +73,12 @@ export const sketch = (p) => {
     boundary.print();
 
     canvas = p.createCanvas(500, 700, p.WEBGL).elt;
+    p.pixelDensity(1);
     prevent_mobile_scroll(canvas);
 
     poincare_shader = p.createShader(
       VERTEX_SHADER,
-      FRAGMENT_SHADER(PAIR_COUNT)
+      FRAGMENT_SHADER(PAIR_COUNT),
     );
     p.shader(poincare_shader);
     set_uniforms(poincare_shader, geometry);

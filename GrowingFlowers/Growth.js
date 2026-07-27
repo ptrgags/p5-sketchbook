@@ -1,3 +1,4 @@
+import { Color } from "../sketchlib/Color.js";
 import { Grid, Index2D } from "../sketchlib/Grid.js";
 
 const MAX_GROWTH_STEPS = 2000;
@@ -85,7 +86,7 @@ export class Growth {
 
     // Neighbors are only valid if that grid cell is empty
     const valid_neighbors = possible_neighbors.filter(
-      (index) => this.grid.get(index) === undefined
+      (index) => this.grid.get(index) === undefined,
     );
 
     // For the first few steps, make the chance of skipping low
@@ -100,7 +101,7 @@ export class Growth {
 
       this.grid.set(
         neighbor_index,
-        new Node(neighbor_index, current_index, this.growth_step)
+        new Node(neighbor_index, current_index, this.growth_step),
       );
       this.frontier.push(neighbor_index);
       added_branches = true;
@@ -126,6 +127,13 @@ export class Growth {
     }
   }
 
+  /**
+   *
+   * @param {import("p5")} p
+   * @param {number} spacing
+   * @param {Color} stem_color
+   * @param {Color} flower_color
+   */
   draw(p, spacing, stem_color, flower_color) {
     const flowers = [];
     for (const node of this.grid) {
@@ -134,7 +142,7 @@ export class Growth {
       }
 
       // Draw a stem connecting this node to the parent
-      p.fill(stem_color);
+      p.fill(stem_color.r, stem_color.g, stem_color.b);
       p.noFill();
       if (node.parent_index !== undefined) {
         const { i, j } = node.index;
@@ -148,7 +156,7 @@ export class Growth {
       }
     }
 
-    p.fill(flower_color);
+    p.fill(flower_color.r, flower_color.g, flower_color.b);
     p.noStroke();
     for (const flower_node of flowers) {
       // Only draw the flower if the node has been around for a while

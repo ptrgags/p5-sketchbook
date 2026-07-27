@@ -19,7 +19,7 @@ import { Point } from "../../sketchlib/pga2d/Point.js";
 export class Primitive {
   /**
    * Draw the primitive to the screen
-   * @param {import("p5") | import("p5").Graphics} p the p5.js instance
+   * @param {import("p5").default | import("p5").default.Graphics} p the p5.js instance
    */
   draw(p) {}
 }

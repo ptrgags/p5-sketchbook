@@ -68,12 +68,8 @@ export const sketch = (p) => {
   let show_tiles_only = false;
 
   p.setup = () => {
-    p.createCanvas(
-      WIDTH,
-      HEIGHT,
-      undefined,
-      document.getElementById("sketch-canvas"),
-    );
+    p.createCanvas(WIDTH, HEIGHT);
+    p.pixelDensity(1);
 
     const checkbox = document.getElementById("tiles-only");
     checkbox?.addEventListener("change", (e) => {
@@ -89,8 +85,6 @@ export const sketch = (p) => {
           : DEFAULT_CURSOR_SPEED;
       }
     });
-
-    p.pixelDensity(1);
 
     const gfx_offscreen = p.createGraphics(WIDTH, HEIGHT);
     drawing_offscreen = new Drawing(gfx_offscreen, Point.ORIGIN);

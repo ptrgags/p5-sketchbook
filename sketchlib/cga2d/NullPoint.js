@@ -68,11 +68,13 @@ export class NullPoint {
    * @returns {boolean}
    */
   equals(other) {
-    if (this.point === undefined) {
-      return this.point === other.point;
+    if (this.point && other.point) {
+      return this.point.equals(other.point);
     }
 
-    return this.point.equals(other.point);
+    // at least one of the two points is undefined, so they can only be
+    // equal if they BOTH are undefined
+    return this.point === other.point;
   }
 
   /**

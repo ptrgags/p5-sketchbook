@@ -128,6 +128,7 @@ export const sketch = (p) => {
 
   p.setup = () => {
     p.createCanvas(W, H);
+    p.pixelDensity(1);
 
     initial_conditions(state);
     p.background(0);

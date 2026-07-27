@@ -42,13 +42,13 @@ function draw_rib(p, parent, rib) {
     parent.y,
     -parent.x,
     UNIT_LENGTH * RIB_SCALE * tip.y,
-    UNIT_LENGTH * RIB_SCALE * -tip.x
+    UNIT_LENGTH * RIB_SCALE * -tip.x,
   );
   p.line(
     parent.y,
     -parent.x,
     UNIT_LENGTH * RIB_SCALE * -tip.y,
-    UNIT_LENGTH * RIB_SCALE * -tip.x
+    UNIT_LENGTH * RIB_SCALE * -tip.x,
   );
 }
 
@@ -59,6 +59,7 @@ export const sketch = (p) => {
 
   p.setup = () => {
     p.createCanvas(500, 700);
+    p.pixelDensity(1);
 
     ribs.push(new Rib(0, GROWTH_RATE));
   };

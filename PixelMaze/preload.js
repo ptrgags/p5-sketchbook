@@ -1,9 +1,8 @@
-function preload_images(p, manifest, resources) {
-  for (const [id, url] of Object.entries(manifest)) {
-    resources[id] = p.loadImage(url);
-  }
-}
+export async function preload_p5_resources(p, manifest, resources) {
+  const images = resources.images;
+  const promises = Object.entries(manifest.images).map(async ([id, url]) => {
+    images[id] = await p.loadImage(url);
+  });
 
-export function preload_p5_resources(p, manifest, resources) {
-  preload_images(p, manifest.images, resources.images);
+  await Promise.all(promises);
 }

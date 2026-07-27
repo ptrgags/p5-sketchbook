@@ -79,15 +79,20 @@ export const sketch = (p) => {
   };
 
   let current_sprite;
+  /**
+   * @type {P5Tilemap}
+   */
   let tilemap;
+  /**
+   * @type {Player}
+   */
   let player;
 
-  p.preload = () => {
-    preload_p5_resources(p, RESOURCE_MANIFEST, p5_resources);
-  };
+  p.setup = async () => {
+    await preload_p5_resources(p, RESOURCE_MANIFEST, p5_resources);
 
-  p.setup = () => {
     canvas = p.createCanvas(WIDTH, HEIGHT).elt;
+    p.pixelDensity(1);
 
     parse_resources(RESOURCE_MANIFEST, p5_resources, resources);
 

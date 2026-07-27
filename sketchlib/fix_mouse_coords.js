@@ -4,6 +4,10 @@ import { Point } from "../sketchlib/pga2d/Point.js";
  * In my CSS I use object-fit: contain to scale the canvases while
  * maintaining aspect ratio and canvas resolution. p5 is not aware
  * of this and computes e.g. the mouse coordinates incorrectly
+ *
+ * IMPORTANT: to use this, make sure the sketch is set to use pixelDensity(1),
+ * else calculations may be incorrect
+ *
  * @param {HTMLCanvasElement} canvas The HTML canvas used by p5
  * @param {number} mouse_x the mouseX coordinate from p5
  * @param {number} mouse_y the mouseY coordinate from p5
@@ -15,14 +19,10 @@ export function fix_mouse_coords(canvas, mouse_x, mouse_y) {
     return new Point(0, 0);
   }
 
-  // This is what p5.js uses for its pixel ratio. I needed to use this
-  // since one of my monitors has a devicePixelRatio of 1.5, but p5.js
-  // rounds this up to 2
-  const pixel_ratio = Math.ceil(window.devicePixelRatio) || 1;
-
   // Get the resolution of the canvas' pixel data
-  const canvas_width = canvas.width / pixel_ratio;
-  const canvas_height = canvas.height / pixel_ratio;
+  // This assumes pixelDensity is set to 1 (which I usually do)
+  const canvas_width = canvas.width;
+  const canvas_height = canvas.height;
   const aspect_ratio = canvas_width / canvas_height;
 
   const bounding_rect = canvas.getBoundingClientRect();

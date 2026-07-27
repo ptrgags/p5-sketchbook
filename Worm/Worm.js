@@ -13,6 +13,7 @@ export const sketch = (p) => {
   let mouse = INITIAL_POSITION;
   p.setup = () => {
     canvas = p.createCanvas(WIDTH, HEIGHT).elt;
+    p.pixelDensity(1);
     prevent_mobile_scroll(canvas);
   };
 

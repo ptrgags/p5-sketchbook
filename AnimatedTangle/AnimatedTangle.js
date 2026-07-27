@@ -20,10 +20,12 @@ import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { BRICKS } from "./patterns/brick_wall.js";
 import { DOORS } from "./patterns/doors.js";
 import { AnimationGroup } from "../sketchlib/animation/AnimationGroup.js";
-import { DebugCoordinates } from "./DebugCoordinates.js";
-import { DebugGrid } from "./DebugGrid.js";
+import { DebugCoordinates } from "../sketchlib/primitives/DebugCoordinates.js";
+import { DebugGrid } from "../sketchlib/primitives/DebugGrid.js";
 import { KeywordRecognizer } from "../sketchlib/KeywordRecognizer.js";
 import { trace_primitive } from "../sketchlib/perf/trace_primitive.js";
+
+const DEBUG = false;
 
 /**
  * Shorthand for making arrays of points
@@ -143,7 +145,7 @@ const BACKGROUND_STRIPES = style(
   STYLE_BACKGROUND_STRIPES,
 );
 
-const COORDS = new DebugCoordinates();
+const COORDS = new DebugCoordinates(Point.ORIGIN);
 const DEBUG_GRID = new DebugGrid(100, 25);
 
 const SLASH = new KeywordRecognizer();
@@ -154,14 +156,14 @@ SLASH.register(["Slash", "KeyT", "KeyR", "KeyA", "KeyC", "KeyE"], () => {
   console.log(trace);
 });
 
+/**
+ *
+ * @param {import('p5').default} p
+ */
 export const sketch = (p) => {
   p.setup = () => {
-    p.createCanvas(
-      WIDTH,
-      HEIGHT,
-      undefined,
-      document.getElementById("sketch-canvas"),
-    );
+    p.createCanvas(WIDTH, HEIGHT);
+    p.pixelDensity(1);
   };
 
   p.draw = () => {
@@ -175,10 +177,12 @@ export const sketch = (p) => {
     TANGLE.draw(p);
 
     // debug overlay
-    /*
-    DEBUG_GRID.draw(p);
-    COORDS.draw(p);
-    */
+    if (DEBUG) {
+      DEBUG_GRID.draw(p);
+
+      COORDS.mouse_coords = new Point(p.mouseX, p.mouseY);
+      COORDS.draw(p);
+    }
   };
 
   p.keyReleased = (/** @type {KeyboardEvent} */ e) => {

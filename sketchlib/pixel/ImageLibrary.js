@@ -18,15 +18,19 @@ export class ImageLibrary {
   }
 
   /**
-   * Call this in preload
+   * Await this in setup()
    * @param {import("p5")} p
    */
-  preload(p) {
+  async preload(p) {
+    const promises = [];
+
     for (const [id, url] of Object.entries(this.manifest)) {
-      // preload changed in p5.js 2.0 so the type hints are wonky
-      // @ts-ignore
-      this.images[id] = p.loadImage(url);
+      const load_func = async () => {
+        this.images[id] = await p.loadImage(url);
+      };
+      promises.push(load_func());
     }
+    await Promise.all(promises);
   }
 
   /**

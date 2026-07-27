@@ -1,3 +1,4 @@
+import { Color } from "../sketchlib/Color.js";
 import { Growth } from "./Growth.js";
 
 const WIDTH = 500;
@@ -11,6 +12,23 @@ const GRID_WIDTH_PX = SPACING * (GRID_WIDTH - 1);
 const GRID_HEIGHT_PX = SPACING * (GRID_HEIGHT - 1);
 const OFFSET_X = (WIDTH - GRID_WIDTH_PX) / 2;
 const OFFSET_Y = (HEIGHT - GRID_HEIGHT_PX) / 2;
+
+// Draw the bottom-most stem in green
+const STEM_COLOR = new Color(33, 112, 37);
+const FLOWER_COLORS = [
+  // Purple
+  new Color(148, 3, 252),
+  // Red
+  new Color(255, 0, 0),
+  // Pale blue
+  new Color(173, 224, 237),
+  // Yellow
+  new Color(255, 208, 38),
+  // Blue
+  new Color(34, 5, 255),
+  // Orange
+  new Color(255, 149, 0),
+];
 
 const FLOWERPOT = {
   x: 25 - 4,
@@ -28,24 +46,13 @@ const START_Y = FLOWERPOT.y - 2;
 const GROWTH = new Growth(GRID_WIDTH, START_Y + 1, START_X, START_Y);
 
 export const sketch = (p) => {
-  const FLOWER_COLORS = [
-    // Purple
-    p.color(148, 3, 252),
-    // Red
-    p.color(255, 0, 0),
-    // Pale blue
-    p.color(173, 224, 237),
-    // Yellow
-    p.color(255, 208, 38),
-    // Blue
-    p.color(34, 5, 255),
-    // Orange
-    p.color(255, 149, 0),
-  ];
-
+  /**
+   * @type {Color}
+   */
   let flower_color;
   p.setup = () => {
     p.createCanvas(WIDTH, HEIGHT);
+    p.pixelDensity(1);
     flower_color = p.random(FLOWER_COLORS);
   };
 
@@ -59,16 +66,14 @@ export const sketch = (p) => {
     p.stroke(71, 52, 26);
     p.strokeWeight(8);
 
-    // Draw the bottom-most stem in green
-    const STEM_COLOR = p.color(33, 112, 37);
-    p.stroke(STEM_COLOR);
+    p.stroke(STEM_COLOR.r, STEM_COLOR.g, STEM_COLOR.b);
     p.strokeWeight(4);
     p.noFill();
     p.line(
       START_X * SPACING,
       START_Y * SPACING,
       START_X * SPACING,
-      (START_Y + 2) * SPACING
+      (START_Y + 2) * SPACING,
     );
 
     GROWTH.draw(p, SPACING, STEM_COLOR, flower_color);
@@ -81,13 +86,13 @@ export const sketch = (p) => {
       (FLOWERPOT.x + 1) * SPACING,
       FLOWERPOT.y * SPACING,
       (FLOWERPOT.width - 2) * SPACING,
-      FLOWERPOT.height * SPACING
+      FLOWERPOT.height * SPACING,
     );
     p.rect(
       FLOWERPOT.x * SPACING,
       FLOWERPOT.y * SPACING,
       FLOWERPOT.width * SPACING,
-      SPACING
+      SPACING,
     );
 
     p.pop();

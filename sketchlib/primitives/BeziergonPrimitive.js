@@ -44,14 +44,25 @@ export class BeziergonPrimitive {
 
   /**
    *
-   * @param {import("p5")} p p5.js instance
+   * @param {import("p5").default} p p5.js instance
    */
   draw(p) {
-    p.beginShape();
-    const first_point = this.curves[0].a;
-    p.vertex(first_point.x, first_point.y);
+    // If we don't have at least one cur
+    if (this.curves.length === 0) {
+      return;
+    }
+
+    p.beginShape(p.PATH);
+
+    // in p5.js 2.0 bezierVertex works differently. You set the start
+    // point (`a` for the first curve), then `b, c, d` for all curves.
+    const start = this.curves[0].a;
+    p.bezierVertex(start.x, start.y);
+
     for (const { b, c, d } of this) {
-      p.bezierVertex(b.x, b.y, c.x, c.y, d.x, d.y);
+      p.bezierVertex(b.x, b.y);
+      p.bezierVertex(c.x, c.y);
+      p.bezierVertex(d.x, d.y);
     }
     p.endShape(p.CLOSE);
   }

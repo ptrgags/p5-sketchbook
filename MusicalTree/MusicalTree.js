@@ -48,19 +48,14 @@ class MusicalTreeAnimation {
 
 /**
  *
- * @param {import("p5")} p
+ * @param {import("p5").default} p
  */
 export const sketch = (p) => {
   /** @type {PlayButtonScene | SoundScene} */
   let scene = new PlayButtonScene(SOUND);
   p.setup = () => {
-    const canvas = p.createCanvas(
-      WIDTH,
-      HEIGHT,
-      undefined,
-      // @ts-ignore
-      document.getElementById("sketch-canvas"),
-    ).elt;
+    const canvas = p.createCanvas(WIDTH, HEIGHT).elt;
+    p.pixelDensity(1);
 
     MOUSE.setup(canvas);
     MOUSE.callbacks = scene.mouse_callbacks;

@@ -62,6 +62,7 @@ function draw_tiling(p, depth) {
 export const sketch = (p) => {
   p.setup = () => {
     p.createCanvas(500, 700);
+    p.pixelDensity(1);
     tile = new PrimroseTile(p);
   };
 
