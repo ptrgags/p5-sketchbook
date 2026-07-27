@@ -146,7 +146,13 @@ export class Approxodrome {
         );
       },
       fixed_points,
-    );
+    ).filter((x) => {
+      // Temporary workaround for https://github.com/ptrgags/p5-sketchbook/issues/542
+      if (isNaN(x.a.x) || isNaN(x.b.x)) {
+        return false;
+      }
+      return true;
+    });
     this.primitive = group(...segments);
   }
 
