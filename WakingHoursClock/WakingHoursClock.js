@@ -4,6 +4,8 @@ import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { CanvasMouseHandler } from "../sketchlib/input/CanvasMouseHandler.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
+import { DebugCoordinates } from "../sketchlib/primitives/DebugCoordinates.js";
+import { DebugGrid } from "../sketchlib/primitives/DebugGrid.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
@@ -13,6 +15,8 @@ import { DayDivisions } from "./DayDivisions.js";
 import { HourSelector } from "./HourSelector.js";
 import { WakingHours } from "./WakingHours.js";
 import { WakingHoursSummary } from "./WakingHoursSummary.js";
+
+const DEBUG = true;
 
 const HAND = new LineSegment(
   DIAL_CENTER,
@@ -65,6 +69,9 @@ function update_highlights(mouse_coords) {
 
 const MOUSE = new CanvasMouseHandler();
 
+const COORDS = new DebugCoordinates();
+const DEBUG_GRID = new DebugGrid(100, 25);
+
 // @ts-ignore
 export const sketch = (p) => {
   /**
@@ -87,6 +94,12 @@ export const sketch = (p) => {
     update_hands();
 
     SCENE.draw(p);
+
+    // debug overlay
+    if (DEBUG) {
+      DEBUG_GRID.draw(p);
+      COORDS.draw(p);
+    }
   };
 
   MOUSE.mouse_moved(p, (mouse) => {

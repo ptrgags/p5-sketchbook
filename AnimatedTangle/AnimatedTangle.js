@@ -20,10 +20,12 @@ import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { BRICKS } from "./patterns/brick_wall.js";
 import { DOORS } from "./patterns/doors.js";
 import { AnimationGroup } from "../sketchlib/animation/AnimationGroup.js";
-import { DebugCoordinates } from "./DebugCoordinates.js";
-import { DebugGrid } from "./DebugGrid.js";
+import { DebugCoordinates } from "../sketchlib/primitives/DebugCoordinates.js";
+import { DebugGrid } from "../sketchlib/primitives/DebugGrid.js";
 import { KeywordRecognizer } from "../sketchlib/KeywordRecognizer.js";
 import { trace_primitive } from "../sketchlib/perf/trace_primitive.js";
+
+const DEBUG = true;
 
 /**
  * Shorthand for making arrays of points
@@ -171,10 +173,10 @@ export const sketch = (p) => {
     TANGLE.draw(p);
 
     // debug overlay
-    /*
-    DEBUG_GRID.draw(p);
-    COORDS.draw(p);
-    */
+    if (DEBUG) {
+      DEBUG_GRID.draw(p);
+      COORDS.draw(p);
+    }
   };
 
   p.keyReleased = (/** @type {KeyboardEvent} */ e) => {

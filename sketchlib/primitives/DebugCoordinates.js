@@ -1,4 +1,4 @@
-import { Primitive } from "../sketchlib/primitives/Primitive.js";
+import { Primitive } from "./Primitive.js";
 
 /**
  * Draw the mouse coordinates on the canvas. This assumes the sketch is
@@ -6,6 +6,10 @@ import { Primitive } from "../sketchlib/primitives/Primitive.js";
  * @implements {Primitive}
  */
 export class DebugCoordinates {
+  /**
+   *
+   * @param {import("p5").default} p
+   */
   draw(p) {
     const mouse_x = Math.floor(p.mouseX);
     const mouse_y = Math.floor(p.mouseY);
@@ -14,6 +18,7 @@ export class DebugCoordinates {
     p.textSize(16);
 
     p.fill(16);
+    p.noStroke();
     p.rect(mouse_x, mouse_y - 16, 75, 24);
 
     p.fill(200);
