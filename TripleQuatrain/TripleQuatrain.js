@@ -6,11 +6,11 @@ import { Point } from "../sketchlib/pga2d/Point.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { Rect, SCREEN_RECT } from "../sketchlib/primitives/Rect.js";
+import { Rigid } from "../sketchlib/primitives/Rigid.js";
 import { group, style, xform } from "../sketchlib/primitives/shorthand.js";
 import { SimpleGroupPrimitive } from "../sketchlib/primitives/SimpleGroupPrimitive.js";
 import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
 import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
-import { Transform } from "../sketchlib/primitives/Transform.js";
 import { Random } from "../sketchlib/random.js";
 import { Style } from "../sketchlib/Style.js";
 
@@ -157,7 +157,7 @@ function rand_section() {
     );
     labels.push(text);
 
-    const offset = new Transform(new Direction(0, i * MEASURE_SIZE.y));
+    const offset = Rigid.translation(new Direction(0, i * MEASURE_SIZE.y));
     const translated_line = xform(unique_lines[index], offset);
     line_groups.push(translated_line);
   }
@@ -192,7 +192,7 @@ function rand_song() {
     );
     labels.push(text);
 
-    const offset = new Transform(
+    const offset = Rigid.translation(
       new Direction(0, (SECTION_STRIDE * i + 1) * MEASURE_SIZE.y),
     );
     const translated_section = xform(unique_sections[index], offset);
@@ -223,7 +223,7 @@ const offset = center_rect(
   MEASURE_SIZE.mul_components(new Direction(9, 20)),
 ).position.to_direction();
 
-const SCENE = xform(rand_song(), new Transform(offset));
+const SCENE = xform(rand_song(), Rigid.translation(offset));
 
 // @ts-ignore
 export const sketch = (p) => {
