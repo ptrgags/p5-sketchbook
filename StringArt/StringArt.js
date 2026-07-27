@@ -104,6 +104,7 @@ export const sketch = (p) => {
 
   p.setup = () => {
     p.createCanvas(WIDTH, HEIGHT);
+    p.pixelDensity(1);
 
     // Configure the UI elements in the HTML page
     polynomial_div.innerText = poly.to_string();

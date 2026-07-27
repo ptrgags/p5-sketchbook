@@ -1,3 +1,4 @@
+import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
 import { PhyllotaxisPalette } from "../sketchlib/PhyllotaxisPalette.js";
 
 const PRIMORDIUM_CREATION_PERIOD = 10;
@@ -7,7 +8,8 @@ export const sketch = (p) => {
   let primordia_count = 2;
   let palette = new PhyllotaxisPalette(primordia_count);
   p.setup = () => {
-    p.createCanvas(500, 700);
+    p.createCanvas(WIDTH, HEIGHT);
+    p.pixelDensity(1);
   };
 
   p.draw = () => {

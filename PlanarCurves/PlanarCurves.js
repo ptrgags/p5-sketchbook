@@ -62,14 +62,15 @@ function init_curves() {
       position,
       angle,
       PARAMETERS.palette.colors[i],
-      PARAMETERS.curvature_func
+      PARAMETERS.curvature_func,
     );
   }
 }
 
 export const sketch = (p) => {
   p.setup = () => {
-    const canvas = p.createCanvas(500, 700);
+    p.createCanvas(500, 700);
+    p.pixelDensity(1);
     init_curves();
   };
 

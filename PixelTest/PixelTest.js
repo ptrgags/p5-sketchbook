@@ -231,6 +231,7 @@ export const sketch = (p) => {
     await IMGS.preload(p);
 
     p.createCanvas(WIDTH, HEIGHT);
+    p.pixelDensity(1);
 
     p.noSmooth();
     p.pixelDensity(1);

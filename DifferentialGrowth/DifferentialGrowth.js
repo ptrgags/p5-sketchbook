@@ -51,6 +51,7 @@ export const sketch = (p) => {
   let simulation_step = 0;
   p.setup = () => {
     p.createCanvas(WIDTH, HEIGHT);
+    p.pixelDensity(1);
     p.background(128);
 
     expect_element("toggle-ref-geom", HTMLButtonElement).addEventListener(

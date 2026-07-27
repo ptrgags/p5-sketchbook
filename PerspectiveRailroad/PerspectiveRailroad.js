@@ -305,6 +305,7 @@ export const sketch = (p) => {
   let animation_finished = false;
   p.setup = () => {
     p.createCanvas(WIDTH, HEIGHT);
+    p.pixelDensity(1);
 
     BACKGROUND.draw(p);
   };

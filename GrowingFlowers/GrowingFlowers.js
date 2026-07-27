@@ -52,6 +52,7 @@ export const sketch = (p) => {
   let flower_color;
   p.setup = () => {
     p.createCanvas(WIDTH, HEIGHT);
+    p.pixelDensity(1);
     flower_color = p.random(FLOWER_COLORS);
   };
 

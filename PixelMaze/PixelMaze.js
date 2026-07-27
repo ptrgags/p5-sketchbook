@@ -92,6 +92,7 @@ export const sketch = (p) => {
     await preload_p5_resources(p, RESOURCE_MANIFEST, p5_resources);
 
     canvas = p.createCanvas(WIDTH, HEIGHT).elt;
+    p.pixelDensity(1);
 
     parse_resources(RESOURCE_MANIFEST, p5_resources, resources);
 

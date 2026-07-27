@@ -22,7 +22,7 @@ const SOUND = new SoundManager(Tone, SOUND_MANIFEST);
 
 /**
  *
- * @param {import("p5")} p
+ * @param {import("p5").default} p
  */
 export const sketch = (p) => {
   /** @type {PlayButtonScene | SoundScene} */

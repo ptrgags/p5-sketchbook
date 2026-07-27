@@ -48,7 +48,7 @@ class MusicalTreeAnimation {
 
 /**
  *
- * @param {import("p5")} p
+ * @param {import("p5").default} p
  */
 export const sketch = (p) => {
   /** @type {PlayButtonScene | SoundScene} */
