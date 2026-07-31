@@ -1,3 +1,4 @@
+import { PDFPrimitive } from "../pdf/PDFPrimitive.js";
 import {
   PrimitiveCollectionStats,
   RenderStats,
@@ -29,6 +30,51 @@ function apply_svg_style(attributes, style) {
 }
 
 /**
+ *
+ * @param {import("pdf-lib")} pdf
+ * @param {import("pdf-lib").PDFPage} page
+ * @param {Style} style
+ */
+function apply_pdf_style(pdf, page, style) {
+  const operators = [];
+
+  if (style.stroke) {
+    const { r, g, b } = style.stroke;
+    operators.push(pdf.setStrokingRgbColor(r / 255, g / 255, b / 255));
+  }
+
+  if (style.fill) {
+    const { r, g, b } = style.fill;
+    operators.push(pdf.setFillingRgbColor(r / 255, g / 255, b / 255));
+  }
+
+  if (style.stroke_width) {
+    operators.push(pdf.setLineWidth(style.stroke_width));
+  }
+
+  page.pushOperators(...operators);
+}
+
+/**
+ *
+ * @param {import("pdf-lib")} pdf
+ * @param {import("pdf-lib").PDFPage} page
+ * @param {Rigid} transform
+ */
+function apply_pdf_transform(pdf, page, transform) {
+  const operators = [
+    pdf.translate(transform.translation.x, transform.translation.y),
+    pdf.rotateRadians(transform.rotation),
+  ];
+
+  if (transform.flip) {
+    operators.push(pdf.scale(1, -1));
+  }
+
+  page.pushOperators(...operators);
+}
+
+/**
  * @typedef {{
  *  style?: Style,
  *  text_style?: TextStyle,
@@ -46,6 +92,7 @@ function apply_svg_style(attributes, style) {
  * @implements {Primitive}
  * @implements {PrimitiveCollectionStats}
  * @implements {ToSVG}
+ * @implements {PDFPrimitive}
  */
 export class GroupPrimitive {
   /**
@@ -83,7 +130,7 @@ export class GroupPrimitive {
   /**
    * Draw a group primitive. This will always push a new drawing state, apply
    * any settings, and pop at the end.
-   * @param {import("p5")} p p5.js library
+   * @param {import("p5").default} p p5.js library
    */
   draw(p) {
     if (this.primitives.length === 0) {
@@ -163,5 +210,35 @@ export class GroupPrimitive {
     }
 
     return g;
+  }
+
+  /**
+   *
+   * @param {import("pdf-lib")} pdf
+   * @param {import("pdf-lib").PDFPage} page
+   */
+  draw_pdf(pdf, page) {
+    if (this.style) {
+      apply_pdf_style(pdf, page, this.style);
+    }
+
+    if (this.transform) {
+      apply_pdf_transform(pdf, page, this.transform);
+    }
+
+    if (this.text_style) {
+      throw new Error("not implemented");
+    }
+
+    page.pushOperators(pdf.pushGraphicsState());
+    for (const child of this.primitives) {
+      if (!PDFPrimitive.is_pdf_compatible(child)) {
+        console.warn("PDF export: skipping child", child);
+        continue;
+      }
+
+      child.draw_pdf(pdf, page);
+    }
+    page.pushOperators(pdf.popGraphicsState());
   }
 }

@@ -76,12 +76,26 @@ export class Rect {
 
   /**
    * Draw a rectangle to the screen
-   * @param {import("p5")} p p5.js library
+   * @param {import("p5").default} p p5.js library
    */
   draw(p) {
     const { x, y } = this.position;
     const { x: w, y: h } = this.dimensions;
     p.rect(x, y, w, h);
+  }
+
+  /**
+   *
+   * @param {import("pdf-lib")} pdf
+   * @param {import("pdf-lib").PDFPage} page
+   */
+  draw_pdf(pdf, page) {
+    const { x, y } = this.position;
+    const { x: w, y: h } = this.dimensions;
+    // TODO: maybe wrap page, pdf in a context object that tracks things
+    // like which fill/stroke operation to use for the latest style
+    // might need to track a stack.
+    page.pushOperators(pdf.rectangle(x, y, w, h), pdf.fillAndStroke());
   }
 
   /**
