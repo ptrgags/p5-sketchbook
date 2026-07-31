@@ -48,6 +48,10 @@ SLASH.register(["Slash", "KeyZ", "KeyI", "KeyN", "KeyE"], async () => {
   console.log(PDFLib);
   const document = await PDF.PDFDocument.create();
   const page = document.addPage([PAGE_SIZE.x, PAGE_SIZE.y]);
+
+  SCENE.draw_pdf(PDF, page);
+
+  /*
   page.drawText("WELCOME TO THE PRINTER", {
     x: 0.5 * INCH,
     y: 0.2 * INCH,
