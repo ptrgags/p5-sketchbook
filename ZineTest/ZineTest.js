@@ -38,26 +38,58 @@ const TITLE = new GroupPrimitive(DUMMY_TEXT, {
   text_style: TEXT_STYLE_TITLE,
 });
 
-const PANEL_RECT = new Rect(Point.ORIGIN, PANEL_SIZE);
-const PAGES = [];
-for (let i = 0; i < 4; i++) {
-  for (let j = 0; j < 2; j++) {
-    const offset = PANEL_SIZE.mul_components(new Direction(i, j));
-    const trans = Rigid.translation(offset);
-    const node = xform(group(PANEL_RECT, TITLE_BG, TITLE), trans);
-    PAGES.push(node);
-  }
-}
-const COLORED_PAGES = style(
-  PAGES,
-  new Style({
-    stroke: Color.BLUE,
-    width: 5,
-    fill: new Color(0xfe, 0xae, 0x8b),
+const PANEL_XFORMS = [
+  // front panel is the bottom right corner
+  Rigid.translation(new Direction(3 * PANEL_SIZE.x, 0)),
+  // next four panels are upside-down in the top row,
+  // continuing CCW around the page
+  new Rigid({
+    rotation: Math.PI,
+    translation: PANEL_SIZE.mul_components(new Direction(4, 2)),
   }),
-);
+  new Rigid({
+    rotation: Math.PI,
+    translation: PANEL_SIZE.mul_components(new Direction(3, 2)),
+  }),
+  new Rigid({
+    rotation: Math.PI,
+    translation: PANEL_SIZE.mul_components(new Direction(2, 2)),
+  }),
+  new Rigid({
+    rotation: Math.PI,
+    translation: PANEL_SIZE.mul_components(new Direction(1, 2)),
+  }),
+  // last 3 pages are right-side up in the bottom row
+  Rigid.IDENTITY,
+  Rigid.translation(new Direction(PANEL_SIZE.x, 0)),
+  Rigid.translation(new Direction(2 * PANEL_SIZE.x, 0)),
+];
 
-const SCENE = xform(COLORED_PAGES, Rigid.translation(MARGIN_SIZE));
+const STYLE_PANEL = new Style({
+  stroke: Color.BLUE,
+  width: 5,
+  fill: new Color(0xfe, 0xae, 0x8b),
+});
+const PANEL_RECT = new Rect(Point.ORIGIN, PANEL_SIZE);
+const PANEL_BG = style([PANEL_RECT, TITLE_BG], STYLE_PANEL);
+
+const PAGES = [
+  group(),
+  group(),
+  group(),
+  group(),
+  group(),
+  group(),
+  group(),
+  group(),
+];
+
+const SCENE = xform(
+  PAGES.map((x, i) => {
+    return xform(group(PANEL_BG, x), PANEL_XFORMS[i]);
+  }),
+  Rigid.translation(MARGIN_SIZE),
+);
 
 // /trace logs a trace of the scene for investigating performance issues.
 SLASH.register(["Slash", "KeyZ", "KeyI", "KeyN", "KeyE"], async () => {
