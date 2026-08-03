@@ -5,9 +5,12 @@ import { griderator } from "../sketchlib/Grid.js";
 import { KeywordRecognizer } from "../sketchlib/KeywordRecognizer.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
+import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { Rect } from "../sketchlib/primitives/Rect.js";
 import { Rigid } from "../sketchlib/primitives/Rigid.js";
-import { style, xform } from "../sketchlib/primitives/shorthand.js";
+import { group, style, xform } from "../sketchlib/primitives/shorthand.js";
+import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
+import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
 import { Style } from "../sketchlib/Style.js";
 
 const PDF = /** @type {import("pdf-lib")} */ (PDFLib);
@@ -21,13 +24,27 @@ const PANEL_SIZE = new Direction(2.5, 3.5).scale(INCH);
 const ZINE_SIZE = PANEL_SIZE.mul_components(new Direction(4, 2));
 const MARGIN_SIZE = PAGE_SIZE.sub(ZINE_SIZE).scale(0.5);
 
+const TITLE_BG_SIZE = new Direction(2.5, 0.75).scale(INCH);
+const TITLE_BG = new Rect(Point.ORIGIN, TITLE_BG_SIZE);
+
+const TEXT_STYLE_TITLE = new TextStyle(14, "center", "center");
+const STYLE_TEXT = Style.flat(Color.BLACK);
+const DUMMY_TEXT = new TextPrimitive(
+  "TITLE",
+  new Point((2.5 * INCH) / 2, (0.75 * INCH) / 2),
+);
+const TITLE = new GroupPrimitive(DUMMY_TEXT, {
+  style: STYLE_TEXT,
+  text_style: TEXT_STYLE_TITLE,
+});
+
 const PANEL_RECT = new Rect(Point.ORIGIN, PANEL_SIZE);
 const PAGES = [];
 for (let i = 0; i < 4; i++) {
   for (let j = 0; j < 2; j++) {
     const offset = PANEL_SIZE.mul_components(new Direction(i, j));
     const trans = Rigid.translation(offset);
-    const node = xform(PANEL_RECT, trans);
+    const node = xform(group(PANEL_RECT, TITLE_BG, TITLE), trans);
     PAGES.push(node);
   }
 }

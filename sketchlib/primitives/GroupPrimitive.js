@@ -59,6 +59,18 @@ function apply_pdf_style(pdf, page, style) {
  *
  * @param {import("pdf-lib")} pdf
  * @param {import("pdf-lib").PDFPage} page
+ * @param {TextStyle} text_style
+ */
+function apply_pdf_text_style(pdf, page, text_style) {
+  // TODO: there isn't a built-in way to do text alignment??? wtf
+
+  page.pushOperators(pdf.setFontAndSize("Helvetica", text_style.size));
+}
+
+/**
+ *
+ * @param {import("pdf-lib")} pdf
+ * @param {import("pdf-lib").PDFPage} page
  * @param {Rigid} transform
  */
 function apply_pdf_transform(pdf, page, transform) {
@@ -228,7 +240,7 @@ export class GroupPrimitive {
     }
 
     if (this.text_style) {
-      throw new Error("not implemented");
+      apply_pdf_text_style(pdf, page, this.text_style);
     }
 
     for (const child of this.primitives) {
