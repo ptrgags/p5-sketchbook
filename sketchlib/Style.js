@@ -87,7 +87,7 @@ export class Style {
 
   /**
    * Apply stroke, fill and stroke weight
-   * @param {import("p5")} p p5js context
+   * @param {import("p5").default} p p5js context
    */
   apply(p) {
     if (this.stroke && !is_nearly(this.stroke.a, 0)) {

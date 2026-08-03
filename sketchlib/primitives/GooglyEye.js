@@ -2,7 +2,9 @@ import { Direction } from "../../sketchlib/pga2d/Direction.js";
 import { Point } from "../../sketchlib/pga2d/Point.js";
 import { Color } from "../Color.js";
 import { Style } from "../Style.js";
+import { Circle } from "./Circle.js";
 import { Primitive } from "./Primitive.js";
+import { group, style } from "./shorthand.js";
 
 const SCLERA_COLOR = 255;
 const PUPIL_COLOR = 0;
@@ -60,7 +62,7 @@ export class GooglyEye {
 
   /**
    * Draw the eye
-   * @param {import("p5")} p The p5.js library
+   * @param {import("p5").default} p The p5.js library
    */
   draw(p) {
     STYLE_SCLERA.apply(p);
@@ -69,5 +71,22 @@ export class GooglyEye {
     // Draw the pupil
     STYLE_PUPIL.apply(p);
     p.circle(this.pupil_center.x, this.pupil_center.y, 2 * this.pupil_radius);
+  }
+
+  /**
+   *
+   * @param {import("pdf-lib")} pdf
+   * @param {import("pdf-lib").PDFPage} page
+   */
+  draw_pdf(pdf, page) {
+    // workaround for now until I get better circle rendering options.
+    const sclera = new Circle(this.position, this.sclera_radius);
+    const pupil = new Circle(this.pupil_center, this.pupil_radius);
+
+    const styled = group(
+      style(sclera, Style.flat(Color.WHITE)),
+      style(pupil, Style.flat(Color.BLACK)),
+    );
+    styled.draw_pdf(pdf, page);
   }
 }

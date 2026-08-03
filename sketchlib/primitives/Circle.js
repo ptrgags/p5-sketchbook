@@ -20,7 +20,7 @@ export class Circle {
 
   /**
    * Draw a circle
-   * @param {import("p5")} p The p5.js library
+   * @param {import("p5").default} p The p5.js library
    */
   draw(p) {
     const { x, y } = this.center;
@@ -35,6 +35,26 @@ export class Circle {
       cy: y.toString(),
       r: this.radius.toString(),
     });
+  }
+
+  /**
+   *
+   * @param {import("pdf-lib")} pdf
+   * @param {import("pdf-lib").PDFPage} page
+   */
+  draw_pdf(pdf, page) {
+    const { x, y } = this.center;
+    const r = this.radius;
+    // wow apparently circles/ellipses don't exist in PDF! You approximate
+    // them with bezier curves.
+    page.pushOperators(
+      pdf.moveTo(x + r, y),
+      pdf.appendBezierCurve(x + r, y + r, x + r, y + r, x, y + r),
+      pdf.appendBezierCurve(x - r, y + r, x - r, y + r, x - r, y),
+      pdf.appendBezierCurve(x - r, y - r, x - r, y - r, x, y - r),
+      pdf.appendBezierCurve(x + r, y - r, x + r, y - r, x + r, y),
+      pdf.fillAndStroke(),
+    );
   }
 
   /**

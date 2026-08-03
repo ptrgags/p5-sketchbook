@@ -5,6 +5,8 @@ import { griderator } from "../sketchlib/Grid.js";
 import { KeywordRecognizer } from "../sketchlib/KeywordRecognizer.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
+import { Circle } from "../sketchlib/primitives/Circle.js";
+import { GooglyEye } from "../sketchlib/primitives/GooglyEye.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { Rect } from "../sketchlib/primitives/Rect.js";
 import { Rigid } from "../sketchlib/primitives/Rigid.js";
@@ -66,16 +68,48 @@ const PANEL_XFORMS = [
 ];
 
 const STYLE_PANEL = new Style({
-  stroke: Color.BLUE,
+  stroke: Color.BLACK,
   width: 5,
-  fill: new Color(0xfe, 0xae, 0x8b),
+  fill: Color.WHITE,
+  //fill: new Color(0xfe, 0xae, 0x8b),
 });
 const PANEL_RECT = new Rect(Point.ORIGIN, PANEL_SIZE);
 const PANEL_BG = style([PANEL_RECT, TITLE_BG], STYLE_PANEL);
 
+const STYLE_FACE = new Style({
+  stroke: Color.BLACK,
+  width: 2,
+  fill: Color.WHITE,
+});
+const STYLE_MOUTH = Style.flat(Color.BLACK);
+
+const GUY_CENTER = new Point(0.5 * INCH, 1.5 * INCH);
+const EYE_DIR = new Direction(1, 1).normalize();
+const LIL_GUY = group(
+  style(new Circle(GUY_CENTER, 0.5 * INCH), STYLE_FACE),
+  new GooglyEye(
+    GUY_CENTER.add(new Direction(-0.2 * INCH, 0.2 * INCH)),
+    EYE_DIR,
+    0.1 * INCH,
+    0.05 * INCH,
+  ),
+  new GooglyEye(
+    GUY_CENTER.add(new Direction(0.2 * INCH, 0.2 * INCH)),
+    EYE_DIR,
+    0.1 * INCH,
+    0.05 * INCH,
+  ),
+  style(
+    new Circle(GUY_CENTER.add(new Direction(0, -0.2 * INCH)), 0.1 * INCH),
+    STYLE_MOUTH,
+  ),
+);
+
+const BASIC_SHAPES = group(LIL_GUY);
+
 const PAGES = [
   group(),
-  group(),
+  BASIC_SHAPES,
   group(),
   group(),
   group(),
