@@ -218,6 +218,7 @@ export class GroupPrimitive {
    * @param {import("pdf-lib").PDFPage} page
    */
   draw_pdf(pdf, page) {
+    page.pushOperators(pdf.pushGraphicsState());
     if (this.style) {
       apply_pdf_style(pdf, page, this.style);
     }
@@ -230,7 +231,6 @@ export class GroupPrimitive {
       throw new Error("not implemented");
     }
 
-    page.pushOperators(pdf.pushGraphicsState());
     for (const child of this.primitives) {
       if (!PDFPrimitive.is_pdf_compatible(child)) {
         console.warn("PDF export: skipping child", child);
