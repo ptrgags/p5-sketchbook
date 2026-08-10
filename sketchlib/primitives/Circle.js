@@ -20,7 +20,7 @@ export class Circle {
 
   /**
    * Draw a circle
-   * @param {import("p5")} p The p5.js library
+   * @param {import("p5").default} p The p5.js library
    */
   draw(p) {
     const { x, y } = this.center;
@@ -35,6 +35,36 @@ export class Circle {
       cy: y.toString(),
       r: this.radius.toString(),
     });
+  }
+
+  /**
+   *
+   * @param {import("pdf-lib")} pdf
+   * @param {import("pdf-lib").PDFPage} page
+   */
+  draw_pdf(pdf, page) {
+    const { x, y } = this.center;
+    // To get a bezier curve to approximate a quarter of a unit circle,
+    // the points will be (1, 0), (1, X), (X, 1), (0, 1) where X is
+    // some unknown tangent length.
+    //
+    // If we require that bezier(0.5) = (sqrt(2)/2, sqrt(2/2)), we can solve
+    // for X. I'll save you the algebra, the result is X=4/3(sqrt(2) - 1)
+    //
+    // see https://www.desmos.com/calculator/jlwvp6lopb for a visualization.
+    const tangent_length = (4 * (Math.sqrt(2) - 1)) / 3;
+    const r = this.radius;
+    const t = this.radius * tangent_length;
+    // wow apparently circles/ellipses don't exist in PDF! You approximate
+    // them with bezier curves.
+    page.pushOperators(
+      pdf.moveTo(x + r, y),
+      pdf.appendBezierCurve(x + r, y + t, x + t, y + r, x, y + r),
+      pdf.appendBezierCurve(x - t, y + r, x - r, y + t, x - r, y),
+      pdf.appendBezierCurve(x - r, y - t, x - t, y - r, x, y - r),
+      pdf.appendBezierCurve(x + t, y - r, x + r, y - t, x + r, y),
+      pdf.fillAndStroke(),
+    );
   }
 
   /**

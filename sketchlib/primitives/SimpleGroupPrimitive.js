@@ -1,3 +1,4 @@
+import { PDFPrimitive } from "../pdf/PDFPrimitive.js";
 import {
   PrimitiveCollectionStats,
   RenderStats,
@@ -12,6 +13,7 @@ import { Primitive } from "./Primitive.js";
  * @implements {Primitive}
  * @implements {PrimitiveCollectionStats}
  * @implements {ToSVG}
+ * @implements {PDFPrimitive}
  */
 export class SimpleGroupPrimitive {
   /**
@@ -38,7 +40,7 @@ export class SimpleGroupPrimitive {
 
   /**
    * Draw the primitives. This does not push/pop
-   * @param {import("p5")} p
+   * @param {import("p5").default} p
    */
   draw(p) {
     for (const child of this.children) {
@@ -62,6 +64,22 @@ export class SimpleGroupPrimitive {
       g.appendChild(child_svg);
     }
     return g;
+  }
+
+  /**
+   *
+   * @param {import("pdf-lib")} pdf
+   * @param {import("pdf-lib").PDFPage} page
+   */
+  draw_pdf(pdf, page) {
+    for (const child of this.children) {
+      if (!PDFPrimitive.is_pdf_compatible(child)) {
+        console.warn("PDF export: skipping child", child);
+        continue;
+      }
+
+      child.draw_pdf(pdf, page);
+    }
   }
 
   /**
