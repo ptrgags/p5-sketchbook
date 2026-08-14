@@ -9,7 +9,7 @@
       src="../libraries/p5.min.js"
     ></script>
     <script type="module">
-      import { sketch } from "./TEMPLATE.js";
+      import { sketch } from "./DX7PatchViewer.js";
       import "../sketchlib/sketchbook-navbar.js";
       const p5_sketch = new p5(sketch, "sketch");
     </script>
@@ -20,6 +20,14 @@
     <div class="container">
       <h1>DX7PatchViewer (2026-08)</h1>
       <div id="sketch"></div>
+      <div class="controls">
+        <div>
+          <label for="sysex">Import DX7 .syx file</label>
+          <br />
+          <input type="file" name="sysex" id="sysex" accept=".syx" />
+          <p class="errors" id="errors"></p>
+        </div>
+      </div>
       <div class="description">DESCRIPTION GOES HERE</div>
     </div>
   </body>
