@@ -17,22 +17,35 @@ const SCALING_CURVES = ["-LIN", "-EXP", "+EXP", "+LIN"];
 
 /**
  *
+ * @param {DataView} view arbitrary data view with envelope data
+ * @param {number} start_index Index where the envelope starts
+ * @returns
+ */
+function dx7_parse_env(view, start_index) {
+  const r1 = view.getUint8(start_index + 0);
+  const r2 = view.getUint8(start_index + 1);
+  const r3 = view.getUint8(start_index + 2);
+  const r4 = view.getUint8(start_index + 3);
+  const rates = [r1, r2, r3, r4];
+
+  const l1 = view.getUint8(start_index + 4);
+  const l2 = view.getUint8(start_index + 5);
+  const l3 = view.getUint8(start_index + 6);
+  const l4 = view.getUint8(start_index + 7);
+  const levels = [l1, l2, l3, l4];
+
+  return { rates, levels };
+}
+
+/**
+ *
  * @param {DataView} view
+ * @param {number} index Operator index 1-6
  * @returns {*}
  */
 function dx7_parse_op(view, index) {
-  const r1 = view.getUint8(0);
-  const r2 = view.getUint8(1);
-  const r3 = view.getUint8(2);
-  const r4 = view.getUint8(3);
-  const rates = [r1, r2, r3, r4];
-
-  const l1 = view.getUint8(4);
-  const l2 = view.getUint8(5);
-  const l3 = view.getUint8(6);
-  const l4 = view.getUint8(7);
-  const levels = [l1, l2, l3, l4];
-
+  const env = dx7_parse_env(view, 0);
+  // 39 = C3
   const breakpoint = view.getUint8(8);
   const left_depth = view.getUint8(9);
   const right_depth = view.getUint8(10);
@@ -43,8 +56,8 @@ function dx7_parse_op(view, index) {
   // TODO: detune, vel sens, output level, freq coarse, freq fine
 
   return {
-    name: `OP ${index + 1}`,
-    env: { rates, levels },
+    name: `OP ${index}`,
+    env,
     scaling: {
       breakpoint,
       left: {
@@ -82,24 +95,38 @@ function dx7_parse_name(voice_view) {
  */
 function dx7_parse_voice(view) {
   const operators = new Array(6);
-  const OP_LENGTH = 16;
+  const OP_LENGTH = 17;
   for (let i = 0; i < operators.length; i++) {
     const op_view = new DataView(
       view.buffer,
       view.byteOffset + i * OP_LENGTH,
       OP_LENGTH,
     );
-    operators[i] = dx7_parse_op(op_view, i);
+    operators[i] = dx7_parse_op(op_view, 6 - i);
   }
+  // the operators are listed in reverse order in the SYSEX file
+  operators.reverse();
 
-  // TODO: pitch env
+  const PITCH_ENV_START = 102;
+  const pitch_env = dx7_parse_env(view, PITCH_ENV_START);
+
   const algorithm = view.getUint8(110) + 1;
-  // TODO: osc key sync, LFO, transpose
+
+  const sync_feedback = view.getUint8(111);
+  const osc_key_sync = sync_feedback >> 3;
+  const feedback = sync_feedback & 0b111;
+
+  // TODO: osc key sync, LFO
+  const transpose = view.getUint8(117);
   const name = dx7_parse_name(view);
 
   return {
     operators,
+    pitch_env,
     algorithm,
+    osc_key_sync,
+    feedback,
+    transpose,
     name,
   };
 }
