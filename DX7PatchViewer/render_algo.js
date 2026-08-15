@@ -9,12 +9,10 @@ import {
 } from "../sketchlib/music/Timeline.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
-import { Point } from "../sketchlib/pga2d/Point.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { Primitive } from "../sketchlib/primitives/Primitive.js";
 import { Rect } from "../sketchlib/primitives/Rect.js";
-import { Rigid } from "../sketchlib/primitives/Rigid.js";
-import { group, style, xform } from "../sketchlib/primitives/shorthand.js";
+import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 import { Operator } from "./algos.js";
 
