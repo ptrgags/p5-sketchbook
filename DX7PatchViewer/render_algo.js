@@ -1,16 +1,41 @@
+import { Color } from "../sketchlib/Color.js";
+import { HEIGHT, WIDTH } from "../sketchlib/dimensions.js";
+import { griderator } from "../sketchlib/Grid.js";
 import {
   Gap,
   Parallel,
   Sequential,
   TimeInterval,
 } from "../sketchlib/music/Timeline.js";
+import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Primitive } from "../sketchlib/primitives/Primitive.js";
 import { Rect } from "../sketchlib/primitives/Rect.js";
 import { Rigid } from "../sketchlib/primitives/Rigid.js";
-import { group, xform } from "../sketchlib/primitives/shorthand.js";
+import { group, style, xform } from "../sketchlib/primitives/shorthand.js";
+import { Style } from "../sketchlib/Style.js";
 import { Operator } from "./algos.js";
+
+const OP_SLOT_DIMENSIONS = new Direction(WIDTH / 4, HEIGHT / 7);
+
+/** @type {Rect[]} */
+const OP_SLOT_RECTS = [];
+griderator(6, 4, (i, j) => {
+  const rect = new Rect(
+    OP_SLOT_DIMENSIONS.mul_components(new Direction(j, i)).to_point(),
+    OP_SLOT_DIMENSIONS,
+  );
+  OP_SLOT_RECTS.push(rect);
+});
+
+const OP_SLOTS = style(
+  OP_SLOT_RECTS,
+  new Style({
+    stroke: Oklch.grey(0.1),
+    fill: Oklch.grey(0.25),
+  }),
+);
 
 const OP_DIMENSIONS = new Direction(50, 50);
 const RECT_OP = new Rect(Point.ORIGIN, new Direction(35, 35));
@@ -74,5 +99,5 @@ function layout_rects(algorithm) {
  */
 export function render_algo(algorithm) {
   const [, primitive] = layout_rects(algorithm);
-  return primitive;
+  return group(OP_SLOTS, primitive);
 }
