@@ -83,7 +83,7 @@ export class GroupPrimitive {
   /**
    * Draw a group primitive. This will always push a new drawing state, apply
    * any settings, and pop at the end.
-   * @param {import("p5")} p p5.js library
+   * @param {import("p5").default} p p5.js library
    */
   draw(p) {
     if (this.primitives.length === 0) {

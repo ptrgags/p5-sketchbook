@@ -1,5 +1,7 @@
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { expect_element } from "../sketchlib/dom/expect_element.js";
+import { ALGORITHMS } from "./algos.js";
+import { render_algo } from "./render_algo.js";
 
 function clear_errors() {
   expect_element("errors", HTMLParagraphElement).innerText = "";
@@ -193,6 +195,8 @@ async function import_dx7_data(file_list) {
 // @ts-ignore
 export const sketch = (p) => {
   let import_input;
+  let algo = 0;
+  let algo_prim = render_algo(ALGORITHMS[algo]);
 
   p.setup = () => {
     p.createCanvas(WIDTH, HEIGHT);
@@ -215,5 +219,14 @@ export const sketch = (p) => {
 
   p.draw = () => {
     p.background(0);
+    p.fill(127, 127, 0);
+    algo_prim.draw(p);
+
+    p.text(`${algo}`, 0, 400);
+  };
+
+  p.mouseReleased = () => {
+    algo = (algo + 1) % 32;
+    algo_prim = render_algo(ALGORITHMS[algo]);
   };
 };
