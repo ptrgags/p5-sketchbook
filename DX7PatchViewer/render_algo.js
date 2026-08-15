@@ -38,9 +38,9 @@ const OP_SLOTS = style(
   }),
 );
 
-const OP_DIMENSIONS = new Direction(50, 50);
+const OP_DIMENSIONS = new Direction(WIDTH / 6, HEIGHT / 8);
 
-const STYLE_OP_CARD = Style.flat(Color.CYAN);
+const STYLE_OP_CARD = Style.flat(Color.YELLOW);
 
 class OperatorPrimitive {
   /**
@@ -150,11 +150,127 @@ function layout_rects(algorithm) {
 }
 
 /**
+ * @enum {number}
+ */
+const OpConnectionType = {
+  CARRIER: 0,
+  MODULATOR: 1,
+  FEEDBACK: 2,
+};
+
+class OpConnection {
+  /**
+   * Constructor
+   * @param {number} src Source
+   * @param {number | undefined} dst Destination. For carriers this will be undefined.
+   * @param {OpConnectionType} connection_type
+   */
+  constructor(src, dst, connection_type) {
+    this.a = src;
+    this.b = dst;
+    this.type = connection_type;
+  }
+}
+
+/**
+ * @template T
+ * @param {T[]} arr
+ * @returns {T}
+ */
+function expect_last(arr) {
+  const last = arr.at(-1);
+  if (!last) {
+    throw new Error(`expected at least one element: ${arr}`);
+  }
+  return last;
+}
+
+/**
+ *
+ * @param {import("../sketchlib/music/Timeline.js").Timeline<Operator>} src
+ * @param {import("../sketchlib/music/Timeline.js").Timeline<Operator>} dst
+ * @returns {Generator<OpConnection>}
+ */
+function* modulate(src, dst) {
+  const MOD = OpConnectionType.MODULATOR;
+
+  if (src instanceof TimeInterval && dst instanceof TimeInterval) {
+    yield new OpConnection(src.value.num, dst.value.num, MOD);
+  } else if (src instanceof TimeInterval && dst instanceof Sequential) {
+    yield* modulate(src, dst.children[0]);
+  } else if (src instanceof TimeInterval && dst instanceof Parallel) {
+    for (const child of dst.children) {
+      yield* modulate(src, child);
+    }
+  } else if (src instanceof Sequential && dst instanceof TimeInterval) {
+    const last = expect_last(src.children);
+    yield* modulate(last, dst);
+  } else if (src instanceof Sequential && dst instanceof Sequential) {
+    const last = expect_last(src.children);
+    yield* modulate(last, dst.children[0]);
+  } else if (src instanceof Sequential && dst instanceof Parallel) {
+    const last = expect_last(src.children);
+    for (const child of dst.children) {
+      yield* modulate(last, child);
+    }
+  } else if (src instanceof Parallel && dst instanceof TimeInterval) {
+    for (const child of src.children) {
+      yield* modulate(child, dst);
+    }
+  } else if (src instanceof Parallel && dst instanceof Sequential) {
+    for (const child of src.children) {
+      yield* modulate(child, dst.children[0]);
+    }
+  } else if (src instanceof Parallel && dst instanceof Parallel) {
+    for (const src_child of src.children) {
+      for (const dst_child of dst.children) {
+        yield* modulate(src_child, dst_child);
+      }
+    }
+  }
+}
+
+/**
+ * Connect operators. This only handles operators
+ * @param {import("../sketchlib/music/Timeline.js").Timeline<Operator>} algorithm
+ * @returns {Generator<OpConnection>}
+ */
+function* connect_operators(algorithm) {
+  if (algorithm instanceof TimeInterval) {
+    const op = algorithm.value;
+
+    // One operator will receives feedback from itself or another operator
+    // ahead of it in the same stack.
+    if (op.feedback_from !== undefined) {
+      yield new OpConnection(
+        op.feedback_from,
+        op.num,
+        OpConnectionType.FEEDBACK,
+      );
+    }
+  } else if (algorithm instanceof Sequential) {
+    const children = algorithm.children;
+    for (let i = 0; i < children.length - 1; i++) {
+      yield* modulate(children[i + 1], children[i]);
+    }
+  } else if (algorithm instanceof Parallel) {
+    for (const child of algorithm.children) {
+      yield* connect_operators(child);
+    }
+  }
+}
+
+/**
  *
  * @param {import("../sketchlib/music/Timeline.js").Timeline<Operator>} algorithm
  */
 export function render_algo(algorithm) {
   const [, primitives] = layout_rects(algorithm);
-  console.log(primitives);
+
+  const connections = connect_operators(algorithm).toArray();
+
+  //const by_operator_number = primitives.sort((a, b) => a.num - b.num);
+
+  console.log(primitives, connections);
   return group(OP_SLOTS, ...primitives);
 }
