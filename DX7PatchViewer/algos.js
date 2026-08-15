@@ -13,7 +13,7 @@ export class Operator {
    */
   constructor(num, feedback_from) {
     this.num = num;
-    this.feedback = feedback_from;
+    this.feedback_from = feedback_from;
   }
 }
 

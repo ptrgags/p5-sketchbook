@@ -222,7 +222,7 @@ export const sketch = (p) => {
     p.fill(127, 127, 0);
     algo_prim.draw(p);
 
-    p.text(`${algo}`, 0, 400);
+    p.text(`${algo + 1}`, 0, 600);
   };
 
   p.mouseReleased = () => {
