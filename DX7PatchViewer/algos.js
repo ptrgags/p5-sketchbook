@@ -4,7 +4,7 @@ import {
   TimeInterval,
 } from "../sketchlib/music/Timeline.js";
 import { Rational } from "../sketchlib/Rational.js";
-import { FMAlgorithm } from "./render_algo.js";
+import { FMAlgorithm } from "./FMAlgorithm.js";
 
 export class Operator {
   /**
