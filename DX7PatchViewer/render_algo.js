@@ -10,13 +10,18 @@ import {
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
+import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { Primitive } from "../sketchlib/primitives/Primitive.js";
 import { Rect } from "../sketchlib/primitives/Rect.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
+import { SimpleGroupPrimitive } from "../sketchlib/primitives/SimpleGroupPrimitive.js";
+import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
 import { Style } from "../sketchlib/Style.js";
 import { Operator } from "./algos.js";
 
 const OP_SLOT_DIMENSIONS = new Direction(WIDTH / 4, HEIGHT / 7);
+
+const STYLE_TEXT = Style.flat(Color.RED);
 
 /** @type {Rect[]} */
 const OP_SLOT_RECTS = [];
@@ -50,10 +55,14 @@ class OperatorPrimitive {
     this.feedback_from = operator.feedback_from;
     this.row = 0;
     this.col = 0;
+
+    this.card = style(Primitive.EMPTY, STYLE_OP_CARD);
+    this.text = style(Primitive.EMPTY, STYLE_TEXT);
+
     /**
-     * @type {GroupPrimitive}
+     * @type {SimpleGroupPrimitive}
      */
-    this.primitive = style(Primitive.EMPTY, STYLE_OP_CARD);
+    this.primitive = group(this.card, this.text);
   }
 
   /**
@@ -70,7 +79,15 @@ class OperatorPrimitive {
       OP_SLOT_DIMENSIONS,
     );
 
-    this.primitive.regroup(align_rect(bound_rect, OP_DIMENSIONS));
+    const card_rect = align_rect(bound_rect, OP_DIMENSIONS);
+
+    const title = new TextPrimitive(
+      `OP ${this.num}`,
+      card_rect.position.add(Direction.DIR_Y.scale(12)),
+    );
+
+    this.card.regroup(card_rect);
+    this.text.regroup(title);
   }
 
   /**
@@ -146,6 +163,8 @@ function layout_rects(algorithm) {
 
   throw new Error("Impossible!");
 }
+
+const STYLE_LINES = Style.lines(Color.WHITE, 2);
 
 /**
  * @enum {number}
@@ -267,8 +286,30 @@ export function render_algo(algorithm) {
 
   const connections = connect_operators(algorithm).toArray();
 
-  //const by_operator_number = primitives.sort((a, b) => a.num - b.num);
+  const by_operator_number = primitives.sort((a, b) => a.num - b.num);
+  /**
+   * @type {LineSegment[]}
+   */
+  const connectors = [];
+  for (const connection of connections) {
+    const op_a = by_operator_number[connection.a - 1];
+    const op_b = by_operator_number[(connection.b ?? 1) - 1];
+    connectors.push(
+      new LineSegment(
+        OP_SLOT_DIMENSIONS.mul_components(
+          new Direction(op_a.col + 0.5, op_a.row + 0.5),
+        ).to_point(),
+        OP_SLOT_DIMENSIONS.mul_components(
+          new Direction(op_b.col + 0.5, op_b.row + 0.5),
+        ).to_point(),
+      ),
+    );
+  }
 
-  console.log(primitives, connections);
-  return group(OP_SLOTS, ...primitives);
+  console.log(
+    primitives,
+    connections,
+    connectors.map((x) => [x.a.toString(), x.b.toString()]),
+  );
+  return group(OP_SLOTS, style(connectors, STYLE_LINES), ...primitives);
 }
