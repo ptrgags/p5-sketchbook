@@ -12,6 +12,7 @@ import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
+import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
 import { Primitive } from "../sketchlib/primitives/Primitive.js";
 import { Rect } from "../sketchlib/primitives/Rect.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
@@ -255,17 +256,8 @@ function* modulate(src, dst) {
  */
 function* connect_operators(algorithm) {
   if (algorithm instanceof TimeInterval) {
-    const op = algorithm.value;
-
-    // One operator will receives feedback from itself or another operator
-    // ahead of it in the same stack.
-    if (op.feedback_from !== undefined) {
-      yield new OpConnection(
-        op.feedback_from,
-        op.num,
-        OpConnectionType.FEEDBACK,
-      );
-    }
+    // feedback loops will be handled elsewhere
+    return;
   } else if (algorithm instanceof Sequential) {
     const children = algorithm.children;
     for (let i = 0; i < children.length - 1; i++) {
@@ -318,6 +310,52 @@ function make_carrier_prim(primitives) {
 
 /**
  *
+ * @param {OperatorPrimitive[]} primitives
+ * @returns {[number, number]} (src, dst) operator numbers
+ */
+function find_feedback(primitives) {
+  for (const primitive of primitives) {
+    if (primitive.feedback_from !== undefined) {
+      return [primitive.feedback_from, primitive.num];
+    }
+  }
+  throw new Error("missing feedback loop");
+}
+
+/**
+ * Draw lines indicating the feedback loop
+ * @param {OperatorPrimitive[]} sorted_primitives
+ * @returns {PolygonPrimitive}
+ */
+function make_feedback_prim(sorted_primitives) {
+  const [src, dst] = find_feedback(sorted_primitives);
+
+  const src_op = sorted_primitives[src - 1];
+  const dst_op = sorted_primitives[dst - 1];
+
+  const src_x = (src_op.col + 0.5) * OP_SLOT_DIMENSIONS.x;
+  const dst_x = (dst_op.col + 0.5) * OP_SLOT_DIMENSIONS.x;
+  const dst_right = (dst_op.col + 1) * OP_SLOT_DIMENSIONS.x;
+
+  // in all 32 of the DX7 algorithms, the feedback loop will be in the same
+  // vertical stack of operators, so the row numbers will match
+  const card_center_y = (src_op.row + 0.5) * OP_SLOT_DIMENSIONS.y;
+  const slot_bottom = (src_op.row + 1) * OP_SLOT_DIMENSIONS.y;
+
+  return new PolygonPrimitive(
+    [
+      new Point(src_x, card_center_y),
+      new Point(src_x, slot_bottom),
+      new Point(dst_right, slot_bottom),
+      new Point(dst_right, card_center_y),
+      new Point(dst_x, card_center_y),
+    ],
+    false,
+  );
+}
+
+/**
+ *
  * @param {import("../sketchlib/music/Timeline.js").Timeline<Operator>} algorithm
  */
 export function render_algo(algorithm) {
@@ -328,6 +366,9 @@ export function render_algo(algorithm) {
   const carrier_lines = make_carrier_prim(primitives);
 
   const by_operator_number = primitives.sort((a, b) => a.num - b.num);
+
+  const feedback_loop = make_feedback_prim(by_operator_number);
+
   /**
    * @type {LineSegment[]}
    */
@@ -354,7 +395,7 @@ export function render_algo(algorithm) {
   );
   return group(
     OP_SLOTS,
-    style([carrier_lines, ...connectors], STYLE_LINES),
+    style([carrier_lines, feedback_loop, ...connectors], STYLE_LINES),
     ...primitives,
   );
 }
