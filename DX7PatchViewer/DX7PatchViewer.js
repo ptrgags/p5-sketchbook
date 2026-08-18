@@ -54,12 +54,36 @@ function dx7_parse_op(view, index) {
   const left_curve = scaling_curves & 0b11;
   const right_curve = (scaling_curves >> 2) & 0b11;
 
-  // TODO: detune, vel sens, output level, freq coarse, freq fine
+  const detune_scale = view.getUint8(12);
+  const rate_scale = detune_scale & 0b111;
+  const detune = detune_scale >> 3;
+
+  const sensitivity = view.getUint8(13);
+  const amp_mod_sensitivity = sensitivity & 0b11;
+  const key_vel_sensitivity = sensitivity >> 2;
+
+  const level = view.getUint8(14);
+
+  const coarse_mode = view.getUint8(15);
+  const osc_mode = coarse_mode & 0b1;
+  const freq_coarse = coarse_mode >> 1;
+
+  const freq_fine = view.getUint8(16);
 
   return {
     name: `OP ${index}`,
     env,
+    level,
+    amp_mod_sensitivity,
+    key_vel_sensitivity,
+    freq: {
+      mode: osc_mode,
+      detune,
+      coarse: freq_coarse,
+      fine: freq_fine,
+    },
     scaling: {
+      rate_scale,
       breakpoint,
       left: {
         depth: left_depth,
