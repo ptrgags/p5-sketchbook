@@ -194,49 +194,6 @@ function expect_last(arr) {
 }
 
 /**
- *
- * @param {import("../sketchlib/music/Timeline.js").Timeline<Operator>} src
- * @param {import("../sketchlib/music/Timeline.js").Timeline<Operator>} dst
- * @returns {Generator<OpConnection>}
- */
-function* old_modulate(src, dst) {
-  if (src instanceof TimeInterval && dst instanceof TimeInterval) {
-    yield new OpConnection(src.value.num, dst.value.num);
-  } else if (src instanceof TimeInterval && dst instanceof Sequential) {
-    yield* old_modulate(src, dst.children[0]);
-  } else if (src instanceof TimeInterval && dst instanceof Parallel) {
-    for (const child of dst.children) {
-      yield* old_modulate(src, child);
-    }
-  } else if (src instanceof Sequential && dst instanceof TimeInterval) {
-    const last = expect_last(src.children);
-    yield* old_modulate(last, dst);
-  } else if (src instanceof Sequential && dst instanceof Sequential) {
-    const last = expect_last(src.children);
-    yield* old_modulate(last, dst.children[0]);
-  } else if (src instanceof Sequential && dst instanceof Parallel) {
-    const last = expect_last(src.children);
-    for (const child of dst.children) {
-      yield* old_modulate(last, child);
-    }
-  } else if (src instanceof Parallel && dst instanceof TimeInterval) {
-    for (const child of src.children) {
-      yield* old_modulate(child, dst);
-    }
-  } else if (src instanceof Parallel && dst instanceof Sequential) {
-    for (const child of src.children) {
-      yield* old_modulate(child, dst.children[0]);
-    }
-  } else if (src instanceof Parallel && dst instanceof Parallel) {
-    for (const src_child of src.children) {
-      for (const dst_child of dst.children) {
-        yield* old_modulate(src_child, dst_child);
-      }
-    }
-  }
-}
-
-/**
  * Gather up all of the values at one end of the timeline
  *
  * @template T
@@ -261,7 +218,8 @@ function* get_ends(timeline, seq_end) {
 }
 
 /**
- *
+ * Connect two adjacent sets of operators in a stack. This handles
+ * one-to-one, one-to-many, many-to-one, and many-to-many (even though the last is not actually used in the DX7 algos)
  * @param {import("../sketchlib/music/Timeline.js").Timeline<Operator>} src
  * @param {import("../sketchlib/music/Timeline.js").Timeline<Operator>} dst
  * @returns {Generator<OpConnection>}
