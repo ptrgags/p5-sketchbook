@@ -374,24 +374,37 @@ function make_feedback_prim(sorted_ops) {
 }
 
 /**
- *
- * @param {import("../sketchlib/music/Timeline.js").Timeline<Operator>} algorithm
+ * @implements {Primitive}
  */
-export function render_algo(algorithm) {
-  const [, primitives] = layout_rects(algorithm);
-  const connections = connect_operators(algorithm).toArray();
-  const by_operator_number = primitives.sort((a, b) => a.num - b.num);
+export class FMAlgorithm {
+  /**
+   * Constructor
+   * @param {import("../sketchlib/music/Timeline.js").Timeline<Operator>} algorithm
+   */
+  constructor(algorithm) {
+    const [, primitives] = layout_rects(algorithm);
+    const connections = connect_operators(algorithm).toArray();
+    const by_operator_number = primitives.sort((a, b) => a.num - b.num);
 
-  const connection_lines = make_connection_prims(
-    connections,
-    by_operator_number,
-  );
-  const carrier_lines = make_carrier_prim(primitives);
-  const feedback_loop = make_feedback_prim(by_operator_number);
+    const connection_lines = make_connection_prims(
+      connections,
+      by_operator_number,
+    );
+    const carrier_lines = make_carrier_prim(primitives);
+    const feedback_loop = make_feedback_prim(by_operator_number);
 
-  return group(
-    OP_SLOTS,
-    style([carrier_lines, feedback_loop, ...connection_lines], STYLE_LINES),
-    ...primitives,
-  );
+    this.primitive = group(
+      OP_SLOTS,
+      style([carrier_lines, feedback_loop, ...connection_lines], STYLE_LINES),
+      ...primitives,
+    );
+  }
+
+  /**
+   *
+   * @param {import("p5").default} p
+   */
+  draw(p) {
+    this.primitive.draw(p);
+  }
 }

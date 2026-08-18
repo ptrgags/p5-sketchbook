@@ -4,6 +4,7 @@ import {
   TimeInterval,
 } from "../sketchlib/music/Timeline.js";
 import { Rational } from "../sketchlib/Rational.js";
+import { FMAlgorithm } from "./render_algo.js";
 
 export class Operator {
   /**
@@ -209,6 +210,10 @@ const ALGO31 = new Parallel(
 
 const ALGO32 = new Parallel(op(1), op(2), op(3), op(4), op(5), op(6, 6));
 
+/**
+ * Pre-render all 32 algorithm types
+ * @type {FMAlgorithm[]}
+ */
 export const ALGORITHMS = [
   ALGO1,
   ALGO2,
@@ -242,4 +247,4 @@ export const ALGORITHMS = [
   ALGO30,
   ALGO31,
   ALGO32,
-];
+].map((x) => new FMAlgorithm(x));
