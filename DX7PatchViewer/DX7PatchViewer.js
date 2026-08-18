@@ -1,5 +1,12 @@
+import { Color } from "../sketchlib/Color.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { expect_element } from "../sketchlib/dom/expect_element.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
+import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
+import { group } from "../sketchlib/primitives/shorthand.js";
+import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
+import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
+import { Style } from "../sketchlib/Style.js";
 import { ALGORITHMS } from "./algos.js";
 
 function clear_errors() {
@@ -97,10 +104,58 @@ function dx7_parse_op(view, index) {
   };
 }
 
+const DX7FreqMode = {
+  RATIO: 0,
+  FIXED: 1,
+};
+
+/**
+ *
+ * @param {number} detune
+ * @returns {String}
+ */
+function format_detune(detune) {
+  if (detune == 0) {
+    return "";
+  }
+
+  if (detune < 0) {
+    return ` ${detune}`;
+  }
+
+  return ` +${detune}`;
+}
+
+/**
+ *
+ * @param {*} freq
+ * @returns {string}
+ */
+function format_freq(freq) {
+  const detune = freq.detune - 7;
+
+  if (freq.mode === DX7FreqMode.RATIO) {
+    const coarse = freq.coarse === 0 ? 0.5 : freq.coarse;
+    const fine = freq.fine;
+    const ratio = coarse + fine;
+    return `${ratio.toFixed(2)}${format_detune(detune)}`;
+  }
+
+  const power_of_10 = freq.coarse % 4;
+  const base_hz = 10 ** power_of_10;
+  // By observing values in Dexed, I see that the fine knob is measured in
+  // units of 10^(1/100). Kinda like cents but... in base 10. Is there a name
+  // for that?
+  const scale_factor = 10 ** (freq.fine / 100);
+  const hz = base_hz * scale_factor;
+
+  return `${hz.toPrecision(6)} Hz ${format_detune(detune)}`;
+}
+
 /**
  *
  * @param {DataView} voice_view
- * @returns {String}
+ * @returns {string}
  */
 function dx7_parse_name(voice_view) {
   const NAME_START = 118;
@@ -111,6 +166,26 @@ function dx7_parse_name(voice_view) {
     name_chars[i] = name_str;
   }
   return name_chars.join("");
+}
+
+class OperatorInfo {
+  /**
+   *
+   * @param {*} operator
+   * @param {Point} position
+   */
+  constructor(operator, position) {
+    const text = `${operator.name}\nf = ${format_freq(operator.freq)}\nlevel=${operator.level}`;
+    this.primitive = new TextPrimitive(text, position);
+  }
+
+  /**
+   *
+   * @param {import("p5").default} p
+   */
+  draw(p) {
+    this.primitive.draw(p);
+  }
 }
 
 /**
@@ -215,6 +290,11 @@ async function import_dx7_data(file_list) {
   return dx7_parse_voice_dump(buffer);
 }
 
+const OPERATOR_LABELS = new GroupPrimitive([], {
+  style: Style.flat(Color.RED),
+  text_style: new TextStyle(12, "left", "top"),
+});
+
 // @ts-ignore
 export const sketch = (p) => {
   let import_input;
@@ -225,12 +305,21 @@ export const sketch = (p) => {
    */
   let cartridge = undefined;
   let patch = 0;
+  let patch_name = "";
 
   function load_patch() {
     if (cartridge) {
-      const voice = cartridge.voices[patch];
-      algo = voice.algorithm - 1;
+      const instrument = cartridge.voices[patch];
+      algo = instrument.algorithm - 1;
       algo_prim = ALGORITHMS[algo];
+      patch_name = instrument.name;
+
+      const voice_prims = instrument.operators.map((v, i) => {
+        const card_rect = algo_prim.get_operator_rect(i);
+        return new OperatorInfo(v, card_rect.position);
+      });
+
+      OPERATOR_LABELS.regroup(...voice_prims);
     }
   }
 
@@ -259,8 +348,9 @@ export const sketch = (p) => {
     p.background(0);
     p.fill(127, 127, 0);
     algo_prim.draw(p);
+    OPERATOR_LABELS.draw(p);
 
-    p.text(`Patch: ${patch + 1}`, 0, 612);
+    p.text(`Patch: ${patch + 1} (${patch_name})`, 0, 612);
     p.text(`Algo: ${algo + 1}`, 0, 624);
   };
 

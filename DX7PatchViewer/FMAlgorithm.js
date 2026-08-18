@@ -58,13 +58,15 @@ class OperatorPrimitive {
     this.row = 0;
     this.col = 0;
 
+    // Store a reference so the caller can tell where to put text
+    // for this operator.
+    this.rect = new Rect(Point.ORIGIN, Direction.ZERO);
     this.card = style(Primitive.EMPTY, STYLE_OP_CARD);
-    this.text = style(Primitive.EMPTY, STYLE_TEXT);
 
     /**
      * @type {SimpleGroupPrimitive}
      */
-    this.primitive = group(this.card, this.text);
+    this.primitive = group(this.card);
   }
 
   /**
@@ -88,8 +90,8 @@ class OperatorPrimitive {
       card_rect.position.add(Direction.DIR_Y.scale(12)),
     );
 
+    this.rect = card_rect;
     this.card.regroup(card_rect);
-    this.text.regroup(title);
   }
 
   /**
@@ -384,20 +386,28 @@ export class FMAlgorithm {
   constructor(algorithm) {
     const [, primitives] = layout_rects(algorithm);
     const connections = connect_operators(algorithm).toArray();
-    const by_operator_number = primitives.sort((a, b) => a.num - b.num);
+    this.by_operator_number = primitives.sort((a, b) => a.num - b.num);
 
     const connection_lines = make_connection_prims(
       connections,
-      by_operator_number,
+      this.by_operator_number,
     );
     const carrier_lines = make_carrier_prim(primitives);
-    const feedback_loop = make_feedback_prim(by_operator_number);
+    const feedback_loop = make_feedback_prim(this.by_operator_number);
 
     this.primitive = group(
       OP_SLOTS,
       style([carrier_lines, feedback_loop, ...connection_lines], STYLE_LINES),
       ...primitives,
     );
+  }
+
+  /**
+   *
+   * @param {number} index Operator index (0-5)
+   */
+  get_operator_rect(index) {
+    return this.by_operator_number[index].rect;
   }
 
   /**
