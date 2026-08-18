@@ -194,8 +194,21 @@ async function import_dx7_data(file_list) {
 // @ts-ignore
 export const sketch = (p) => {
   let import_input;
-  let algo = 6;
+  let algo = 0;
   let algo_prim = ALGORITHMS[algo];
+  /**
+   * @type {any}
+   */
+  let cartridge = undefined;
+  let patch = 0;
+
+  function load_patch() {
+    if (cartridge) {
+      const voice = cartridge.voices[patch];
+      algo = voice.algorithm - 1;
+      algo_prim = ALGORITHMS[algo];
+    }
+  }
 
   p.setup = () => {
     p.createCanvas(WIDTH, HEIGHT);
@@ -206,8 +219,10 @@ export const sketch = (p) => {
       clear_errors();
 
       try {
-        const dx7_data = await import_dx7_data(e.target.files);
-        console.log(dx7_data);
+        patch = 0;
+        cartridge = await import_dx7_data(e.target.files);
+        load_patch();
+        console.log(cartridge);
       } catch (err) {
         console.error(err);
         const msg = err instanceof Error ? err.message : "unknown error";
@@ -221,11 +236,16 @@ export const sketch = (p) => {
     p.fill(127, 127, 0);
     algo_prim.draw(p);
 
-    p.text(`Algo: ${algo + 1}`, 0, 600);
+    p.text(`Patch: ${patch + 1}`, 0, 612);
+    p.text(`Algo: ${algo + 1}`, 0, 624);
   };
 
   p.mouseReleased = () => {
-    algo = (algo + 1) % 32;
-    algo_prim = ALGORITHMS[algo];
+    if (!cartridge) {
+      return;
+    }
+
+    patch = (patch + 1) % 32;
+    load_patch();
   };
 };
