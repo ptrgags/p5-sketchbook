@@ -195,7 +195,7 @@ async function import_dx7_data(file_list) {
 // @ts-ignore
 export const sketch = (p) => {
   let import_input;
-  let algo = 0;
+  let algo = 6;
   let algo_prim = render_algo(ALGORITHMS[algo]);
 
   p.setup = () => {

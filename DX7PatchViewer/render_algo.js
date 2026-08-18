@@ -199,39 +199,84 @@ function expect_last(arr) {
  * @param {import("../sketchlib/music/Timeline.js").Timeline<Operator>} dst
  * @returns {Generator<OpConnection>}
  */
-function* modulate(src, dst) {
+function* old_modulate(src, dst) {
   if (src instanceof TimeInterval && dst instanceof TimeInterval) {
     yield new OpConnection(src.value.num, dst.value.num);
   } else if (src instanceof TimeInterval && dst instanceof Sequential) {
-    yield* modulate(src, dst.children[0]);
+    yield* old_modulate(src, dst.children[0]);
   } else if (src instanceof TimeInterval && dst instanceof Parallel) {
     for (const child of dst.children) {
-      yield* modulate(src, child);
+      yield* old_modulate(src, child);
     }
   } else if (src instanceof Sequential && dst instanceof TimeInterval) {
     const last = expect_last(src.children);
-    yield* modulate(last, dst);
+    yield* old_modulate(last, dst);
   } else if (src instanceof Sequential && dst instanceof Sequential) {
     const last = expect_last(src.children);
-    yield* modulate(last, dst.children[0]);
+    yield* old_modulate(last, dst.children[0]);
   } else if (src instanceof Sequential && dst instanceof Parallel) {
     const last = expect_last(src.children);
     for (const child of dst.children) {
-      yield* modulate(last, child);
+      yield* old_modulate(last, child);
     }
   } else if (src instanceof Parallel && dst instanceof TimeInterval) {
     for (const child of src.children) {
-      yield* modulate(child, dst);
+      yield* old_modulate(child, dst);
     }
   } else if (src instanceof Parallel && dst instanceof Sequential) {
     for (const child of src.children) {
-      yield* modulate(child, dst.children[0]);
+      yield* old_modulate(child, dst.children[0]);
     }
   } else if (src instanceof Parallel && dst instanceof Parallel) {
     for (const src_child of src.children) {
       for (const dst_child of dst.children) {
-        yield* modulate(src_child, dst_child);
+        yield* old_modulate(src_child, dst_child);
       }
+    }
+  }
+}
+
+/**
+ * Gather up all of the values at one end of the timeline
+ *
+ * @template T
+ * @param {import("../sketchlib/music/Timeline.js").Timeline<T>} timeline
+ * @param {"first" | "last"} seq_end Whether to take the first or last element from Sequential timelines
+ * @returns {Generator<T>}
+ */
+function* get_ends(timeline, seq_end) {
+  if (timeline instanceof TimeInterval) {
+    yield timeline.value;
+  } else if (timeline instanceof Sequential) {
+    const index = seq_end === "first" ? 0 : -1;
+    const end = timeline.children.at(index);
+    if (end) {
+      yield* get_ends(end, seq_end);
+    }
+  } else if (timeline instanceof Parallel) {
+    for (const lane of timeline.children) {
+      yield* get_ends(lane, seq_end);
+    }
+  }
+}
+
+/**
+ *
+ * @param {import("../sketchlib/music/Timeline.js").Timeline<Operator>} src
+ * @param {import("../sketchlib/music/Timeline.js").Timeline<Operator>} dst
+ * @returns {Generator<OpConnection>}
+ */
+function* connect_pair(src, dst) {
+  const src_ends = get_ends(src, "first")
+    .map((x) => x.num)
+    .toArray();
+  const dst_ends = get_ends(dst, "last")
+    .map((x) => x.num)
+    .toArray();
+
+  for (const src_op of src_ends) {
+    for (const dst_op of dst_ends) {
+      yield new OpConnection(src_op, dst_op);
     }
   }
 }
@@ -242,15 +287,15 @@ function* modulate(src, dst) {
  * @returns {Generator<OpConnection>}
  */
 function* connect_operators(algorithm) {
-  if (algorithm instanceof TimeInterval) {
-    // feedback loops will be handled elsewhere
-    return;
-  } else if (algorithm instanceof Sequential) {
+  if (algorithm instanceof Sequential) {
     const children = algorithm.children;
     for (let i = 0; i < children.length - 1; i++) {
-      yield* modulate(children[i + 1], children[i]);
+      yield* connect_pair(children[i + 1], children[i]);
     }
-  } else if (algorithm instanceof Parallel) {
+  }
+
+  // recurse
+  if (algorithm instanceof Sequential || algorithm instanceof Parallel) {
     for (const child of algorithm.children) {
       yield* connect_operators(child);
     }
