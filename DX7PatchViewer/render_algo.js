@@ -9,6 +9,7 @@ import {
 } from "../sketchlib/music/Timeline.js";
 import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
+import { Point } from "../sketchlib/pga2d/Point.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { LineSegment } from "../sketchlib/primitives/LineSegment.js";
 import { Primitive } from "../sketchlib/primitives/Primitive.js";
@@ -279,12 +280,52 @@ function* connect_operators(algorithm) {
 
 /**
  *
+ * @param {OperatorPrimitive[]} primitives
+ * @returns {SimpleGroupPrimitive}
+ */
+function make_carrier_prim(primitives) {
+  const X_VERTICAL = 0.1 * OP_SLOT_DIMENSIONS.x;
+  const X_CARD_CENTER = 0.5 * OP_SLOT_DIMENSIONS.x;
+
+  let min_row = 7;
+  let max_row = 0;
+  const horizontal_lines = [];
+  for (const primitive of primitives) {
+    // Only the first column of operators are connected to the audio output
+    // and thus are the "carrier" signals for the frequency modulation.
+    if (primitive.col !== 0) {
+      continue;
+    }
+
+    const row = primitive.row;
+
+    min_row = Math.min(min_row, row);
+    max_row = Math.max(max_row, row);
+
+    const y = (row + 0.5) * OP_SLOT_DIMENSIONS.y;
+    horizontal_lines.push(
+      new LineSegment(new Point(X_VERTICAL, y), new Point(X_CARD_CENTER, y)),
+    );
+  }
+
+  const vertical_line = new LineSegment(
+    new Point(X_VERTICAL, (min_row + 0.5) * OP_SLOT_DIMENSIONS.y),
+    new Point(X_VERTICAL, (max_row + 0.5) * OP_SLOT_DIMENSIONS.y),
+  );
+
+  return group(...horizontal_lines, vertical_line);
+}
+
+/**
+ *
  * @param {import("../sketchlib/music/Timeline.js").Timeline<Operator>} algorithm
  */
 export function render_algo(algorithm) {
   const [, primitives] = layout_rects(algorithm);
 
   const connections = connect_operators(algorithm).toArray();
+
+  const carrier_lines = make_carrier_prim(primitives);
 
   const by_operator_number = primitives.sort((a, b) => a.num - b.num);
   /**
@@ -311,5 +352,9 @@ export function render_algo(algorithm) {
     connections,
     connectors.map((x) => [x.a.toString(), x.b.toString()]),
   );
-  return group(OP_SLOTS, style(connectors, STYLE_LINES), ...primitives);
+  return group(
+    OP_SLOTS,
+    style([carrier_lines, ...connectors], STYLE_LINES),
+    ...primitives,
+  );
 }
