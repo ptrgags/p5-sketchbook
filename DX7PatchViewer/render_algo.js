@@ -168,26 +168,15 @@ function layout_rects(algorithm) {
 
 const STYLE_LINES = Style.lines(Color.WHITE, 2);
 
-/**
- * @enum {number}
- */
-const OpConnectionType = {
-  CARRIER: 0,
-  MODULATOR: 1,
-  FEEDBACK: 2,
-};
-
 class OpConnection {
   /**
    * Constructor
-   * @param {number} src Source
-   * @param {number | undefined} dst Destination. For carriers this will be undefined.
-   * @param {OpConnectionType} connection_type
+   * @param {number} src Source operator number (1-6)
+   * @param {number} dst Destination operator number (1-6)
    */
-  constructor(src, dst, connection_type) {
-    this.a = src;
-    this.b = dst;
-    this.type = connection_type;
+  constructor(src, dst) {
+    this.src = src;
+    this.dst = dst;
   }
 }
 
@@ -211,10 +200,8 @@ function expect_last(arr) {
  * @returns {Generator<OpConnection>}
  */
 function* modulate(src, dst) {
-  const MOD = OpConnectionType.MODULATOR;
-
   if (src instanceof TimeInterval && dst instanceof TimeInterval) {
-    yield new OpConnection(src.value.num, dst.value.num, MOD);
+    yield new OpConnection(src.value.num, dst.value.num);
   } else if (src instanceof TimeInterval && dst instanceof Sequential) {
     yield* modulate(src, dst.children[0]);
   } else if (src instanceof TimeInterval && dst instanceof Parallel) {
@@ -271,6 +258,35 @@ function* connect_operators(algorithm) {
 }
 
 /**
+ * Make a path between each operator, with turns drawn as right angles.
+ * @param {OpConnection[]} connections
+ * @param {OperatorPrimitive[]} sorted_ops
+ */
+function make_connection_prims(connections, sorted_ops) {
+  return connections.map(({ src, dst }) => {
+    const op_src = sorted_ops[src - 1];
+    const op_dst = sorted_ops[dst - 1];
+
+    const src_x = (op_src.col + 0.5) * OP_SLOT_DIMENSIONS.x;
+    const middle_x = op_src.col * OP_SLOT_DIMENSIONS.x;
+    const dst_x = (op_dst.col + 0.5) * OP_SLOT_DIMENSIONS.x;
+
+    const src_y = (op_src.row + 0.5) * OP_SLOT_DIMENSIONS.y;
+    const dst_y = (op_dst.row + 0.5) * OP_SLOT_DIMENSIONS.y;
+
+    return new PolygonPrimitive(
+      [
+        new Point(src_x, src_y),
+        new Point(middle_x, src_y),
+        new Point(middle_x, dst_y),
+        new Point(dst_x, dst_y),
+      ],
+      false,
+    );
+  });
+}
+
+/**
  *
  * @param {OperatorPrimitive[]} primitives
  * @returns {SimpleGroupPrimitive}
@@ -324,14 +340,14 @@ function find_feedback(primitives) {
 
 /**
  * Draw lines indicating the feedback loop
- * @param {OperatorPrimitive[]} sorted_primitives
+ * @param {OperatorPrimitive[]} sorted_ops
  * @returns {PolygonPrimitive}
  */
-function make_feedback_prim(sorted_primitives) {
-  const [src, dst] = find_feedback(sorted_primitives);
+function make_feedback_prim(sorted_ops) {
+  const [src, dst] = find_feedback(sorted_ops);
 
-  const src_op = sorted_primitives[src - 1];
-  const dst_op = sorted_primitives[dst - 1];
+  const src_op = sorted_ops[src - 1];
+  const dst_op = sorted_ops[dst - 1];
 
   const src_x = (src_op.col + 0.5) * OP_SLOT_DIMENSIONS.x;
   const dst_x = (dst_op.col + 0.5) * OP_SLOT_DIMENSIONS.x;
@@ -360,42 +376,19 @@ function make_feedback_prim(sorted_primitives) {
  */
 export function render_algo(algorithm) {
   const [, primitives] = layout_rects(algorithm);
-
   const connections = connect_operators(algorithm).toArray();
-
-  const carrier_lines = make_carrier_prim(primitives);
-
   const by_operator_number = primitives.sort((a, b) => a.num - b.num);
 
+  const connection_lines = make_connection_prims(
+    connections,
+    by_operator_number,
+  );
+  const carrier_lines = make_carrier_prim(primitives);
   const feedback_loop = make_feedback_prim(by_operator_number);
 
-  /**
-   * @type {LineSegment[]}
-   */
-  const connectors = [];
-  for (const connection of connections) {
-    const op_a = by_operator_number[connection.a - 1];
-    const op_b = by_operator_number[(connection.b ?? 1) - 1];
-    connectors.push(
-      new LineSegment(
-        OP_SLOT_DIMENSIONS.mul_components(
-          new Direction(op_a.col + 0.5, op_a.row + 0.5),
-        ).to_point(),
-        OP_SLOT_DIMENSIONS.mul_components(
-          new Direction(op_b.col + 0.5, op_b.row + 0.5),
-        ).to_point(),
-      ),
-    );
-  }
-
-  console.log(
-    primitives,
-    connections,
-    connectors.map((x) => [x.a.toString(), x.b.toString()]),
-  );
   return group(
     OP_SLOTS,
-    style([carrier_lines, feedback_loop, ...connectors], STYLE_LINES),
+    style([carrier_lines, feedback_loop, ...connection_lines], STYLE_LINES),
     ...primitives,
   );
 }
