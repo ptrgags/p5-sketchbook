@@ -21,7 +21,7 @@ export class ShowHidePrimitive {
 
   /**
    * Draw primitives[i] whenever show_hide[i] is true
-   * @param {import("p5")} p The p5.js instance
+   * @param {import("p5").default} p The p5.js instance
    */
   draw(p) {
     for (const [i, child] of this.primitives.entries()) {
