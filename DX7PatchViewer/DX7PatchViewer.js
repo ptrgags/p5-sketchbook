@@ -1,6 +1,10 @@
 import { Color } from "../sketchlib/Color.js";
 import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { expect_element } from "../sketchlib/dom/expect_element.js";
+import { CanvasMouseHandler } from "../sketchlib/input/CanvasMouseHandler.js";
+import { TouchButton } from "../sketchlib/input/TouchButton.js";
+import { mod } from "../sketchlib/mod.js";
+import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { Rect, SCREEN_RECT } from "../sketchlib/primitives/Rect.js";
@@ -85,6 +89,15 @@ const TEXT_GLOBAL = new TextPrimitive("", new Point(0, 612));
 
 const ALGORITHM_SLOT = group();
 
+const MOUSE = new CanvasMouseHandler();
+const THIRD_SCREEN = new Direction(WIDTH / 3, HEIGHT);
+
+// Virtual touch buttons for left and right keys on mobile.
+const TOUCH_LEFT = new TouchButton(new Rect(Point.ORIGIN, THIRD_SCREEN));
+const TOUCH_RIGHT = new TouchButton(
+  new Rect(new Point((2 * WIDTH) / 3, 0), THIRD_SCREEN),
+);
+
 const SCENE = group(
   ALGORITHM_SLOT,
   OPERATOR_LABELS,
@@ -102,18 +115,18 @@ export const sketch = (p) => {
    * @type {DX7Cartridge | undefined}
    */
   let cartridge = undefined;
-  let patch = 0;
-  let patch_name = "";
+  let voice = 0;
+  let voice_name = "";
 
   function load_patch() {
     if (!cartridge) {
       return;
     }
 
-    const instrument = cartridge.voices[patch];
+    const instrument = cartridge.voices[voice];
     const algo = instrument.algorithm - 1;
     const algo_prim = ALGORITHMS[algo];
-    patch_name = instrument.name;
+    voice_name = instrument.name;
 
     ALGORITHM_SLOT.regroup(algo_prim);
 
@@ -124,21 +137,43 @@ export const sketch = (p) => {
 
     OPERATOR_LABELS.regroup(...voice_prims);
 
-    const feedback = cartridge.voices[patch].feedback ?? 0;
+    const feedback = cartridge.voices[voice].feedback ?? 0;
 
-    TEXT_GLOBAL.text = `Patch ${patch + 1}: ${patch_name}\nAlgo: ${algo + 1} Feedback ${feedback}`;
+    TEXT_GLOBAL.text = `Voice ${voice + 1}: ${voice_name}\nAlgo: ${algo + 1} Feedback ${feedback}`;
+  }
+
+  /**
+   * Cycle through the 32 voices
+   * @param {1 | -1} delta
+   * @returns
+   */
+  function cycle_voice(delta) {
+    if (!cartridge) {
+      return;
+    }
+
+    const VOICE_COUNT = 32;
+    voice += delta;
+    voice = mod(voice, VOICE_COUNT);
+    load_patch();
   }
 
   p.setup = () => {
-    p.createCanvas(WIDTH, HEIGHT);
+    const canvas = p.createCanvas(WIDTH, HEIGHT).elt;
     p.pixelDensity(1);
+
+    MOUSE.setup(canvas);
+    MOUSE.callbacks = [TOUCH_LEFT, TOUCH_RIGHT];
+
+    TOUCH_LEFT.events.addEventListener("released", () => cycle_voice(-1));
+    TOUCH_RIGHT.events.addEventListener("released", () => cycle_voice(1));
 
     import_input = expect_element("sysex", HTMLInputElement);
     import_input.addEventListener("input", async (e) => {
       clear_errors();
 
       try {
-        patch = 0;
+        voice = 0;
         // @ts-ignore
         cartridge = await import_dx7_data(e.target?.files ?? []);
         load_patch();
@@ -162,7 +197,9 @@ export const sketch = (p) => {
       return;
     }
 
-    patch = (patch + 1) % 32;
+    voice = (voice + 1) % 32;
     load_patch();
   };
+
+  MOUSE.configure_callbacks(p);
 };
