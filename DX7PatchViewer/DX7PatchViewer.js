@@ -16,6 +16,7 @@ import { Style } from "../sketchlib/Style.js";
 import { ALGORITHMS } from "./algos.js";
 import { decode_dx7 } from "./decode_dx7.js";
 import { DX7Cartridge } from "./DX7Cartridge.js";
+import { DX7EnvelopeVisualizer } from "./DX7EnvelopeVisualizer.js";
 import { DX7Operator } from "./DX7Operator.js";
 import { DX7OperatorVisualizer } from "./DX7OperatorVisualizer.js";
 
@@ -79,6 +80,8 @@ const TOUCH_RIGHT = new TouchButton(
   new Rect(new Point((2 * WIDTH) / 3, 0), THIRD_SCREEN),
 );
 
+const PITCH_ENV = group();
+
 const SCENE = group(
   ALGORITHM_SLOT,
   OPERATOR_LABELS,
@@ -86,6 +89,7 @@ const SCENE = group(
     style: Style.flat(Color.WHITE),
     text_style: TEXT_STYLE_GLOBAL,
   }),
+  PITCH_ENV,
   SHOW_INSTRUCTIONS,
 );
 
@@ -96,31 +100,39 @@ export const sketch = (p) => {
    * @type {DX7Cartridge | undefined}
    */
   let cartridge = undefined;
-  let voice = 0;
-  let voice_name = "";
+  let selected_voice = 0;
 
   function load_patch() {
     if (!cartridge) {
       return;
     }
 
-    const instrument = cartridge.voices[voice];
-    const algo = instrument.algorithm - 1;
+    const voice = cartridge.voices[selected_voice];
+    const algo = voice.algorithm - 1;
     const algo_prim = ALGORITHMS[algo];
-    voice_name = instrument.name;
-
     ALGORITHM_SLOT.regroup(algo_prim);
 
-    const voice_prims = instrument.operators.map((v, i) => {
+    const pitch_env = new DX7EnvelopeVisualizer(
+      voice.pitch_env,
+      new Rect(
+        new Point((3 * WIDTH) / 4, (6 * HEIGHT) / 7),
+        new Direction(WIDTH / 4, HEIGHT / 7),
+      ),
+      0.5,
+    );
+
+    PITCH_ENV.regroup(pitch_env);
+
+    const voice_prims = voice.operators.map((v, i) => {
       const card_rect = algo_prim.get_operator_rect(i);
       return new DX7OperatorVisualizer(v, card_rect);
     });
 
     OPERATOR_LABELS.regroup(...voice_prims);
 
-    const feedback = cartridge.voices[voice].feedback ?? 0;
+    const feedback = cartridge.voices[selected_voice].feedback ?? 0;
 
-    TEXT_GLOBAL.text = `Voice ${voice + 1}: ${voice_name}\nAlgo: ${algo + 1} Feedback ${feedback}`;
+    TEXT_GLOBAL.text = `Voice ${selected_voice + 1}: ${voice.name}\nAlgo: ${algo + 1} Feedback ${feedback}`;
   }
 
   /**
@@ -134,8 +146,8 @@ export const sketch = (p) => {
     }
 
     const VOICE_COUNT = 32;
-    voice += delta;
-    voice = mod(voice, VOICE_COUNT);
+    selected_voice += delta;
+    selected_voice = mod(selected_voice, VOICE_COUNT);
     load_patch();
   }
 
@@ -154,7 +166,7 @@ export const sketch = (p) => {
       clear_errors();
 
       try {
-        voice = 0;
+        selected_voice = 0;
         // @ts-ignore
         cartridge = await import_dx7_data(e.target?.files ?? []);
         load_patch();
@@ -178,7 +190,7 @@ export const sketch = (p) => {
       return;
     }
 
-    voice = (voice + 1) % 32;
+    selected_voice = (selected_voice + 1) % 32;
     load_patch();
   };
 

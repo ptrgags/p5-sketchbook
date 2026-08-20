@@ -29,26 +29,27 @@ function render_line(uv_coords, bounds) {
  *
  * @param {Direction[]} uv_coords
  * @param {Rect} bounds
+ * @param {number} home_v Normalized v-value for the "home" position. For regular envelopes this is 1, for pitch envelopes this is 0.5
  * @returns {Primitive}
  */
-function render_areas(uv_coords, bounds) {
+function render_areas(uv_coords, bounds, home_v) {
   const [a, b, c, d, e, f] = uv_coords.map((uv) =>
     bounds.position.add(bounds.dimensions.mul_components(uv)),
   );
 
-  const [b_bottom, c_bottom, d_bottom, e_bottom] = uv_coords
-    .slice(1, 6)
-    .map((uv) => {
+  const [a_home, b_home, c_home, d_home, e_home, f_home] = uv_coords.map(
+    (uv) => {
       return bounds.position.add(
-        new Direction(uv.x * bounds.dimensions.x, bounds.dimensions.y),
+        new Direction(uv.x * bounds.dimensions.x, home_v * bounds.dimensions.y),
       );
-    });
+    },
+  );
 
-  const area1 = new PolygonPrimitive([a, b, b_bottom], true);
-  const area2 = new PolygonPrimitive([b, c, c_bottom, b_bottom], true);
-  const area3 = new PolygonPrimitive([c, d, d_bottom, c_bottom], true);
-  const area4 = new PolygonPrimitive([d, e, e_bottom, d_bottom], true);
-  const area5 = new PolygonPrimitive([e, f, e_bottom], true);
+  const area1 = new PolygonPrimitive([a, b, b_home, a_home], true);
+  const area2 = new PolygonPrimitive([b, c, c_home, b_home], true);
+  const area3 = new PolygonPrimitive([c, d, d_home, c_home], true);
+  const area4 = new PolygonPrimitive([d, e, e_home, d_home], true);
+  const area5 = new PolygonPrimitive([e, f, f_home, e_home], true);
   const areas = [area1, area2, area3, area4, area5];
 
   return group(...areas.map((x, i) => style(x, Style.flat(AREA_GRADIENT[i]))));
@@ -81,8 +82,9 @@ export class DX7EnvelopeVisualizer {
    * Constructor
    * @param {DX7Envelope} envelope
    * @param {Rect} bounds
+   * @param {number} [home_v=1] Normalized v-value for the "home" position. For regular envelopes this is 1, for pitch envelopes this is 0.5
    */
-  constructor(envelope, bounds) {
+  constructor(envelope, bounds, home_v = 1) {
     const { rates, levels } = envelope;
     const [r1, r2, r3, r4] = rates;
     const [l1, l2, l3, l4] = levels;
@@ -105,7 +107,7 @@ export class DX7EnvelopeVisualizer {
     const uvs = u_values.map((u, i) => new Direction(u, 1.0 - v_values[i]));
 
     const polyline = render_line(uvs, bounds);
-    const areas = render_areas(uvs, bounds);
+    const areas = render_areas(uvs, bounds, home_v);
 
     this.primitive = group(
       style(bounds, Style.flat(Color.BLACK)),

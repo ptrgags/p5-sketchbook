@@ -42,6 +42,7 @@ export class DX7Voice {
     this.name = sanitize_name(options.name);
     this.algorithm = options.algorithm;
     this.operators = options.operators;
+    this.pitch_env = options.pitch_env;
     this.feedback = options.feedback;
     this.transpose = options.transpose;
   }
