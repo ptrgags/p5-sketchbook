@@ -16,6 +16,10 @@ export class DX7Envelope {
     this.rates = rates;
     this.levels = levels;
   }
+
+  toString() {
+    `R:${this.rates} L: ${this.levels}`;
+  }
 }
 
 DX7Envelope.DEFAULT_ENV = Object.freeze(

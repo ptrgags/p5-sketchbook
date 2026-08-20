@@ -1,6 +1,7 @@
 import { DX7Cartridge } from "./DX7Cartridge.js";
 import { DX7Envelope } from "./DX7Envelope.js";
 import { DX7FreqSettings } from "./DX7FreqSettings.js";
+import { DX7KeyLevelScaling, DX7ScalingCurve } from "./DX7KeyLevelScaling.js";
 import { DX7Operator } from "./DX7Operator.js";
 import { DX7Voice } from "./DX7Voice.js";
 
@@ -25,8 +26,6 @@ function decode_envelope(view, start_index) {
 
   return new DX7Envelope(rates, levels);
 }
-
-const SCALING_CURVES = ["-LIN", "-EXP", "+EXP", "+LIN"];
 
 /**
  *
@@ -60,6 +59,8 @@ function decode_operator(view, num) {
 
   const freq_fine = view.getUint8(16);
 
+  const left_scaling_curve = new DX7ScalingCurve(left_curve, left_depth);
+  const right_scaling_curve = new DX7ScalingCurve(right_curve, right_depth);
   return new DX7Operator({
     num,
     envelope,
@@ -67,18 +68,12 @@ function decode_operator(view, num) {
     amp_mod_sensitivity,
     key_vel_sensitivity,
     freq: new DX7FreqSettings(osc_mode, detune, freq_coarse, freq_fine),
-    scaling: {
+    key_scaling: new DX7KeyLevelScaling(
       rate_scale,
       breakpoint,
-      left: {
-        depth: left_depth,
-        curve: SCALING_CURVES[left_curve],
-      },
-      right: {
-        depth: right_depth,
-        curve: SCALING_CURVES[right_curve],
-      },
-    },
+      left_scaling_curve,
+      right_scaling_curve,
+    ),
   });
 }
 

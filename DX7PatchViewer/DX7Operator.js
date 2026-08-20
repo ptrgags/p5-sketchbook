@@ -1,5 +1,6 @@
 import { DX7Envelope } from "./DX7Envelope.js";
 import { DX7FreqSettings } from "./DX7FreqSettings.js";
+import { DX7KeyLevelScaling } from "./DX7KeyLevelScaling.js";
 
 /**
  * @typedef {{
@@ -9,6 +10,7 @@ import { DX7FreqSettings } from "./DX7FreqSettings.js";
  *  freq: DX7FreqSettings,
  *  amp_mod_sensitivity: number,
  *  key_vel_sensitivity: number,
+ *  key_scaling: DX7KeyLevelScaling
  * }} DX7OperatorOptions
  */
 
@@ -24,6 +26,7 @@ export class DX7Operator {
     this.level = options.level;
     this.freq = options.freq;
     this.amp_mod_sensitivity = options.amp_mod_sensitivity;
+    this.key_scaling = options.key_scaling;
   }
 
   /**
@@ -42,6 +45,7 @@ export class DX7Operator {
       freq: DX7FreqSettings.INIT,
       amp_mod_sensitivity: 0,
       key_vel_sensitivity: 0,
+      key_scaling: DX7KeyLevelScaling.INIT,
     });
   }
 }

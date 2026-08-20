@@ -85,11 +85,6 @@ class OperatorPrimitive {
 
     const card_rect = align_rect(bound_rect, OP_DIMENSIONS);
 
-    const title = new TextPrimitive(
-      `OP ${this.num}`,
-      card_rect.position.add(Direction.DIR_Y.scale(12)),
-    );
-
     this.rect = card_rect;
     this.card.regroup(card_rect);
   }
