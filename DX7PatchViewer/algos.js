@@ -6,11 +6,21 @@ import {
 import { Rational } from "../sketchlib/Rational.js";
 import { FMAlgorithm } from "./FMAlgorithm.js";
 
+/*
+ * This file is for encoding the 32 FM algorithms found in the Yamaha DX7,
+ * Dexed, and the M-Vave FM-1
+ *
+ * For the visualization of this, see FMAlgorithm
+ */
+
+/**
+ * FM operator in the algorithm diagram
+ */
 export class Operator {
   /**
-   *
-   * @param {number} num
-   * @param {number} [feedback_from]
+   * Constructor
+   * @param {number} num Operator number 1-6
+   * @param {number} [feedback_from] Number of the operator that sends feedback to this operator.
    */
   constructor(num, feedback_from) {
     this.num = num;
@@ -21,7 +31,7 @@ export class Operator {
 /**
  * Shorthand for making an operator and wrapping it in a dummy TimeInterval
  * so we can use Timeline
- * @param {number} num
+ * @param {number} num Operator number 1-6
  * @param {number} [feedback_from]
  * @returns {TimeInterval<Operator>}
  */
