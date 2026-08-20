@@ -8,6 +8,8 @@ import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
 import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
 import { Style } from "../sketchlib/Style.js";
 import { ALGORITHMS } from "./algos.js";
+import { decode_dx7 } from "./decode_dx7.js";
+import { DX7Cartridge } from "./DX7Cartridge.js";
 
 function clear_errors() {
   expect_element("errors", HTMLParagraphElement).innerText = "";
@@ -152,25 +154,9 @@ function format_freq(freq) {
   return `${hz.toPrecision(6)} Hz ${format_detune(detune)}`;
 }
 
-/**
- *
- * @param {DataView} voice_view
- * @returns {string}
- */
-function dx7_parse_name(voice_view) {
-  const NAME_START = 118;
-  const name_chars = new Array(10);
-  for (let i = 0; i < name_chars.length; i++) {
-    const name_ord = voice_view.getUint8(NAME_START + i);
-    const name_str = String.fromCharCode(name_ord);
-    name_chars[i] = name_str;
-  }
-  return name_chars.join("");
-}
-
 class OperatorInfo {
   /**
-   *
+   * Constructor
    * @param {*} operator
    * @param {Point} position
    */
@@ -189,93 +175,8 @@ class OperatorInfo {
 }
 
 /**
- *
- * @param {DataView} view
- * @returns {*}
- */
-function dx7_parse_voice(view) {
-  const operators = new Array(6);
-  const OP_LENGTH = 17;
-  for (let i = 0; i < operators.length; i++) {
-    const op_view = new DataView(
-      view.buffer,
-      view.byteOffset + i * OP_LENGTH,
-      OP_LENGTH,
-    );
-    operators[i] = dx7_parse_op(op_view, 6 - i);
-  }
-  // the operators are listed in reverse order in the SYSEX file
-  operators.reverse();
-
-  const PITCH_ENV_START = 102;
-  const pitch_env = dx7_parse_env(view, PITCH_ENV_START);
-
-  const algorithm = view.getUint8(110) + 1;
-
-  const sync_feedback = view.getUint8(111);
-  const osc_key_sync = sync_feedback >> 3;
-  const feedback = sync_feedback & 0b111;
-
-  // TODO: osc key sync, LFO
-  const transpose = view.getUint8(117);
-  const name = dx7_parse_name(view);
-
-  return {
-    operators,
-    pitch_env,
-    algorithm,
-    osc_key_sync,
-    feedback,
-    transpose,
-    name,
-  };
-}
-
-/**
- *
- * @see {@link https://homepages.abdn.ac.uk/d.j.benson/pages/dx7/sysex-format.txt | DX7 Sysex Format article}
- * @param {ArrayBuffer} buffer
- * @returns {*}
- */
-function dx7_parse_voice_dump(buffer) {
-  const data_view = new DataView(buffer);
-  const status_byte = data_view.getUint8(0);
-  const id_num = data_view.getUint8(1);
-  const sub_status = data_view.getUint8(2);
-  const format_number = data_view.getUint8(3);
-  const byte_count_msb = data_view.getUint8(4);
-  const byte_count_lsb = data_view.getUint8(5);
-  const byte_count = (byte_count_msb << 7) | byte_count_lsb; // double check this
-
-  const FIRST_VOICE_OFFSET = 6;
-  const VOICE_LENGTH = 128;
-  const voices = new Array(32);
-  for (let i = 0; i < 32; i++) {
-    const voice_view = new DataView(
-      buffer,
-      FIRST_VOICE_OFFSET + VOICE_LENGTH * i,
-      VOICE_LENGTH,
-    );
-    const voice = dx7_parse_voice(voice_view);
-    voices[i] = voice;
-  }
-
-  // TODO: checksum, F7 end sysex byte
-
-  return {
-    total_byte_length: buffer.byteLength,
-    status_byte,
-    id_num,
-    sub_status,
-    format_number,
-    byte_count,
-    voices,
-  };
-}
-
-/**
  * @param {File[]} file_list
- * @returns {Promise<*>}
+ * @returns {Promise<DX7Cartridge>}
  */
 async function import_dx7_data(file_list) {
   if (file_list.length === 0) {
@@ -287,7 +188,7 @@ async function import_dx7_data(file_list) {
   const file = file_list[0];
   const buffer = await file.arrayBuffer();
 
-  return dx7_parse_voice_dump(buffer);
+  return decode_dx7(buffer);
 }
 
 const OPERATOR_LABELS = new GroupPrimitive([], {
