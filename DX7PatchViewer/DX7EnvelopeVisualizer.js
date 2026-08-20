@@ -1,11 +1,17 @@
 import { Color } from "../sketchlib/Color.js";
+import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
+import { Primitive } from "../sketchlib/primitives/Primitive.js";
 import { Rect } from "../sketchlib/primitives/Rect.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
 import { DX7Envelope } from "./DX7Envelope.js";
+
+const AREA_GRADIENT = "9c528b-007ea7-77cbb9-f57200-f9dc5c"
+  .split("-")
+  .map((x) => Color.from_hex_code(x));
 
 /**
  *
@@ -17,13 +23,41 @@ function render_line(uv_coords, bounds) {
   const points = uv_coords.map((uv) =>
     bounds.position.add(bounds.dimensions.mul_components(uv)),
   );
-  console.log(points.map((x) => x.toString()));
 
   return new PolygonPrimitive(points, false);
 }
 
-const TIME_MAX = 30;
-const TIME_SUSTAIN = 10;
+/**
+ *
+ * @param {Direction[]} uv_coords
+ * @param {Rect} bounds
+ * @returns {Primitive}
+ */
+function render_areas(uv_coords, bounds) {
+  const [a, b, c, d, e, f] = uv_coords.map((uv) =>
+    bounds.position.add(bounds.dimensions.mul_components(uv)),
+  );
+
+  const [b_bottom, c_bottom, d_bottom, e_bottom] = uv_coords
+    .slice(1, 6)
+    .map((uv) => {
+      return bounds.position.add(
+        new Direction(uv.x * bounds.dimensions.x, bounds.dimensions.y),
+      );
+    });
+
+  const area1 = new PolygonPrimitive([a, b, b_bottom], true);
+  const area2 = new PolygonPrimitive([b, c, c_bottom, b_bottom], true);
+  const area3 = new PolygonPrimitive([c, d, d_bottom, c_bottom], true);
+  const area4 = new PolygonPrimitive([d, e, e_bottom, d_bottom], true);
+  const area5 = new PolygonPrimitive([e, f, e_bottom], true);
+  const areas = [area1, area2, area3, area4, area5];
+
+  return group(...areas.map((x, i) => style(x, Style.flat(AREA_GRADIENT[i]))));
+}
+
+const TIME_MAX = 10;
+const TIME_SUSTAIN = 5;
 
 const LEVEL_MAX = 99;
 
@@ -71,12 +105,13 @@ export class DX7EnvelopeVisualizer {
     ].map((x) => x / total_time);
     const v_values = [l4, l1, l2, l3, l3, l4].map((x) => x / LEVEL_MAX);
     const uvs = u_values.map((u, i) => new Direction(u, 1.0 - v_values[i]));
-    console.log(uvs.map((uv) => uv.y));
 
     const polyline = render_line(uvs, bounds);
+    const areas = render_areas(uvs, bounds);
 
     this.primitive = group(
-      style(bounds, Style.flat(Color.BLUE)),
+      style(bounds, Style.flat(Color.BLACK)),
+      areas,
       style(polyline, Style.lines(Color.WHITE)),
     );
   }
