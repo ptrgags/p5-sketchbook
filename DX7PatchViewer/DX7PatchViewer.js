@@ -17,6 +17,7 @@ import { ALGORITHMS } from "./algos.js";
 import { decode_dx7 } from "./decode_dx7.js";
 import { DX7Cartridge } from "./DX7Cartridge.js";
 import { DX7Operator } from "./DX7Operator.js";
+import { DX7OperatorVisualizer } from "./DX7OperatorVisualizer.js";
 
 function clear_errors() {
   expect_element("errors", HTMLParagraphElement).innerText = "";
@@ -28,26 +29,6 @@ function clear_errors() {
  */
 function show_error(message) {
   expect_element("errors", HTMLParagraphElement).innerText = message;
-}
-
-class OperatorInfo {
-  /**
-   * Constructor
-   * @param {DX7Operator} operator
-   * @param {Point} position
-   */
-  constructor(operator, position) {
-    const text = `${operator.name}    L:${operator.level}\nf:${operator.freq}\n${operator.envelope}\n${operator.key_scaling}`;
-    this.primitive = new TextPrimitive(text, position);
-  }
-
-  /**
-   *
-   * @param {import("p5").default} p
-   */
-  draw(p) {
-    this.primitive.draw(p);
-  }
 }
 
 /**
@@ -132,7 +113,7 @@ export const sketch = (p) => {
 
     const voice_prims = instrument.operators.map((v, i) => {
       const card_rect = algo_prim.get_operator_rect(i);
-      return new OperatorInfo(v, card_rect.position);
+      return new DX7OperatorVisualizer(v, card_rect);
     });
 
     OPERATOR_LABELS.regroup(...voice_prims);
