@@ -1,7 +1,5 @@
 import { Color } from "../sketchlib/Color.js";
-import { Oklch } from "../sketchlib/Oklch.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
-import { Point } from "../sketchlib/pga2d/Point.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
 import { Primitive } from "../sketchlib/primitives/Primitive.js";
 import { Rect } from "../sketchlib/primitives/Rect.js";
