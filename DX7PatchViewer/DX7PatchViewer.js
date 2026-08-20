@@ -30,7 +30,7 @@ class OperatorInfo {
    * @param {Point} position
    */
   constructor(operator, position) {
-    const text = `${operator.name}\nf = ${operator.freq}\nlevel=${operator.level}\nenv=${operator.envelope}\nkey=${operator.key_scaling}`;
+    const text = `${operator.name}    L:${operator.level}\nf:${operator.freq}\n${operator.envelope}\n${operator.key_scaling}`;
     this.primitive = new TextPrimitive(text, position);
   }
 

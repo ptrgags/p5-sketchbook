@@ -18,7 +18,7 @@ export class DX7Envelope {
   }
 
   toString() {
-    return `R:${this.rates} L: ${this.levels}`;
+    return `R:${this.rates}\nL: ${this.levels}`;
   }
 }
 

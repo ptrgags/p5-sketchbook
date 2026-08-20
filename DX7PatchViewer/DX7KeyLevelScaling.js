@@ -26,6 +26,10 @@ export class DX7ScalingCurve {
   }
 
   toString() {
+    if (this.depth === 0) {
+      return ``;
+    }
+
     return `${CURVE_NAMES[this.curve]}(${this.depth})`;
   }
 }
@@ -65,7 +69,29 @@ export class DX7KeyLevelScaling {
   }
 
   toString() {
-    return `<--${this.left_curve}--${this.breakpoint_name}(${this.rate_scale})-->${this.right_curve}`;
+    if (this.rate_scale === 0) {
+      return "";
+    }
+
+    let left_curve = this.left_curve.toString();
+    let right_curve = this.right_curve.toString();
+
+    if (left_curve !== "") {
+      left_curve = `${left_curve}<-`;
+    }
+    if (right_curve !== "") {
+      right_curve = `->${right_curve}`;
+    }
+
+    // TODO: Is this correct? when both depths are set to 0, rate scaling
+    // should in theory do nothing. Weirdly, a lot of built-in patches
+    // trigger this case
+    if (left_curve === "" && right_curve === "") {
+      console.warn("rate scale set but not left/right depth??");
+      return "";
+    }
+
+    return `${left_curve}${this.breakpoint_name}(${this.rate_scale})${right_curve}`;
   }
 }
 DX7KeyLevelScaling.INIT = Object.freeze(

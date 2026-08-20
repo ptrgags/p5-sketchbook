@@ -21,12 +21,15 @@ export class DX7Operator {
    */
   constructor(options) {
     this.num = options.num;
-    this.name = `OP ${options.num}`;
     this.envelope = options.envelope;
     this.level = options.level;
     this.freq = options.freq;
     this.amp_mod_sensitivity = options.amp_mod_sensitivity;
     this.key_scaling = options.key_scaling;
+  }
+
+  get name() {
+    return `OP ${this.num}`;
   }
 
   /**
