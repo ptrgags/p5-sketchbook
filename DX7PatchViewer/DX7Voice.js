@@ -35,8 +35,13 @@ export class DX7Voice {
    * @param {DX7VoiceOptions} options
    */
   constructor(options) {
+    if (options.operators.length !== 6) {
+      throw new Error("There must be exactly 6 operators");
+    }
+
     this.name = sanitize_name(options.name);
     this.algorithm = options.algorithm;
+    this.operators = options.operators;
     this.feedback = options.feedback;
     this.transpose = options.transpose;
   }

@@ -1,5 +1,6 @@
 import { DX7Cartridge } from "./DX7Cartridge.js";
 import { DX7Envelope } from "./DX7Envelope.js";
+import { DX7FreqSettings } from "./DX7FreqSettings.js";
 import { DX7Operator } from "./DX7Operator.js";
 import { DX7Voice } from "./DX7Voice.js";
 
@@ -65,12 +66,7 @@ function decode_operator(view, num) {
     level,
     amp_mod_sensitivity,
     key_vel_sensitivity,
-    freq: {
-      mode: osc_mode,
-      detune,
-      coarse: freq_coarse,
-      fine: freq_fine,
-    },
+    freq: new DX7FreqSettings(osc_mode, detune, freq_coarse, freq_fine),
     scaling: {
       rate_scale,
       breakpoint,

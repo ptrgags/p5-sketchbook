@@ -3,13 +3,13 @@ import { WIDTH, HEIGHT } from "../sketchlib/dimensions.js";
 import { expect_element } from "../sketchlib/dom/expect_element.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
-import { group } from "../sketchlib/primitives/shorthand.js";
 import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
 import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
 import { Style } from "../sketchlib/Style.js";
 import { ALGORITHMS } from "./algos.js";
 import { decode_dx7 } from "./decode_dx7.js";
 import { DX7Cartridge } from "./DX7Cartridge.js";
+import { DX7Operator } from "./DX7Operator.js";
 
 function clear_errors() {
   expect_element("errors", HTMLParagraphElement).innerText = "";
@@ -23,62 +23,14 @@ function show_error(message) {
   expect_element("errors", HTMLParagraphElement).innerText = message;
 }
 
-const DX7FreqMode = {
-  RATIO: 0,
-  FIXED: 1,
-};
-
-/**
- *
- * @param {number} detune
- * @returns {String}
- */
-function format_detune(detune) {
-  if (detune == 0) {
-    return "";
-  }
-
-  if (detune < 0) {
-    return ` ${detune}`;
-  }
-
-  return ` +${detune}`;
-}
-
-/**
- *
- * @param {*} freq
- * @returns {string}
- */
-function format_freq(freq) {
-  const detune = freq.detune - 7;
-
-  if (freq.mode === DX7FreqMode.RATIO) {
-    const coarse = freq.coarse === 0 ? 0.5 : freq.coarse;
-    const fine = freq.fine;
-    const ratio = coarse + fine;
-    return `${ratio.toFixed(2)}${format_detune(detune)}`;
-  }
-
-  const power_of_10 = freq.coarse % 4;
-  const base_hz = 10 ** power_of_10;
-  // By observing values in Dexed, I see that the fine knob is measured in
-  // units of 10^(1/100). Kinda like cents but... in base 10. Is there a name
-  // for that?
-  const scale_factor = 10 ** (freq.fine / 100);
-  const hz = base_hz * scale_factor;
-
-  return `${hz.toPrecision(6)} Hz ${format_detune(detune)}`;
-}
-
 class OperatorInfo {
   /**
    * Constructor
-   * @param {*} operator
+   * @param {DX7Operator} operator
    * @param {Point} position
    */
   constructor(operator, position) {
-    const text = `${operator.name}\nf = ${format_freq(operator.freq)}\nlevel=${operator.level}`;
+    const text = `${operator.name}\nf = ${operator.freq.toString()}\nlevel=${operator.level}`;
     this.primitive = new TextPrimitive(text, position);
   }
 
@@ -119,7 +71,7 @@ export const sketch = (p) => {
   let algo = 0;
   let algo_prim = ALGORITHMS[algo];
   /**
-   * @type {any}
+   * @type {DX7Cartridge | undefined}
    */
   let cartridge = undefined;
   let patch = 0;
@@ -168,7 +120,7 @@ export const sketch = (p) => {
     algo_prim.draw(p);
     OPERATOR_LABELS.draw(p);
 
-    p.text(`Patch: ${patch + 1} (${patch_name})`, 0, 612);
+    p.text(`Patch ${patch + 1}: ${patch_name}`, 0, 612);
     p.text(`Algo: ${algo + 1}`, 0, 624);
   };
 
