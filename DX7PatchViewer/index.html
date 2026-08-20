@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../libraries/p5.min.js"
+    ></script>
+    <script type="module">
+      import { sketch } from "./DX7PatchViewer.js";
+      import "../sketchlib/sketchbook-navbar.js";
+      const p5_sketch = new p5(sketch, "sketch");
+    </script>
+    <link rel="stylesheet" href="../styles/layout.css" />
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>DX7 Patch Viewer (2026-08)</h1>
+      <div id="sketch"></div>
+      <div class="controls">
+        <div>
+          <label for="sysex">Import DX7 .syx file</label>
+          <br />
+          <input type="file" name="sysex" id="sysex" accept=".syx" />
+          <p class="errors" id="errors"></p>
+        </div>
+      </div>
+      <div class="description">
+        <p>
+          Instructions: Load a .syx cartridge file (e.g. exported from
+          <a href="https://asb2m10.github.io/dexed/">Dexed</a>) with the file
+          picker. Then navigate through the voices by clicking the left/right
+          sides of the canvas.
+        </p>
+        <p>
+          This sketch makes a diagram of FM (frequency modulation) synthesis
+          patches. I wanted to make a layout that shows the parameters in the
+          context of the algorithm diagram. The intent is to make it easier to
+          study patches when learning FM synthesis.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

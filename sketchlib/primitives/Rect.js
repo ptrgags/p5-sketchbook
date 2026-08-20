@@ -76,7 +76,7 @@ export class Rect {
 
   /**
    * Draw a rectangle to the screen
-   * @param {import("p5")} p p5.js library
+   * @param {import("p5").default} p p5.js library
    */
   draw(p) {
     const { x, y } = this.position;

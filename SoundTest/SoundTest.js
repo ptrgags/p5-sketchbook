@@ -222,7 +222,7 @@ const CURSOR = style(
 );
 
 function clear_errors() {
-  expect_element("id", HTMLParagraphElement).innerText = "";
+  expect_element("errors", HTMLParagraphElement).innerText = "";
 }
 
 /**
@@ -230,7 +230,7 @@ function clear_errors() {
  * @param {string} message
  */
 function show_error(message) {
-  expect_element("id", HTMLParagraphElement).innerText = message;
+  expect_element("errors", HTMLParagraphElement).innerText = message;
 }
 
 const SLASH = new KeywordRecognizer();

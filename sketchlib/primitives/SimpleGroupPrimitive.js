@@ -38,7 +38,7 @@ export class SimpleGroupPrimitive {
 
   /**
    * Draw the primitives. This does not push/pop
-   * @param {import("p5")} p
+   * @param {import("p5").default} p
    */
   draw(p) {
     for (const child of this.children) {

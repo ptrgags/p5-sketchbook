@@ -19,7 +19,7 @@ export class TextPrimitive {
 
   /**
    * Draw the text to the screen.
-   * @param {import("p5")} p p5.js context
+   * @param {import("p5").default} p p5.js context
    */
   draw(p) {
     const { x, y } = this.position;

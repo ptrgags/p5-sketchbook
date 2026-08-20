@@ -21,7 +21,7 @@ export class LineSegment {
 
   /**
    * Draw a line segment
-   * @param {import("p5")} p The p5.js library
+   * @param {import("p5").default} p The p5.js library
    */
   draw(p) {
     const a = this.a;
