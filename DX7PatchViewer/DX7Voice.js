@@ -1,3 +1,6 @@
+import { DX7Envelope } from "./DX7Envelope.js";
+import { DX7Operator } from "./DX7Operator.js";
+
 /**
  * Names in DX7 must be exactly 10 ASCII characters long. This takes
  * a string and enforces this.
@@ -44,8 +47,15 @@ DX7Voice.INIT = Object.freeze(
     name: "INIT",
     algorithm: 0,
     feedback: 0,
-    operators: [],
-    pitch_env: undefined,
+    operators: [
+      DX7Operator.init(1),
+      DX7Operator.init(2),
+      DX7Operator.init(3),
+      DX7Operator.init(4),
+      DX7Operator.init(5),
+      DX7Operator.init(6),
+    ],
+    pitch_env: DX7Envelope.DEFAULT_PITCH,
     osc_key_sync: true,
     transpose: 0,
   }),

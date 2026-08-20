@@ -1,5 +1,90 @@
 import { DX7Cartridge } from "./DX7Cartridge.js";
+import { DX7Envelope } from "./DX7Envelope.js";
+import { DX7Operator } from "./DX7Operator.js";
 import { DX7Voice } from "./DX7Voice.js";
+
+/**
+ * Decode an envelope
+ * @param {DataView} view arbitrary data view with envelope data
+ * @param {number} start_index Index where the envelope starts
+ * @returns {DX7Envelope}
+ */
+function decode_envelope(view, start_index) {
+  const r1 = view.getUint8(start_index + 0);
+  const r2 = view.getUint8(start_index + 1);
+  const r3 = view.getUint8(start_index + 2);
+  const r4 = view.getUint8(start_index + 3);
+  const rates = [r1, r2, r3, r4];
+
+  const l1 = view.getUint8(start_index + 4);
+  const l2 = view.getUint8(start_index + 5);
+  const l3 = view.getUint8(start_index + 6);
+  const l4 = view.getUint8(start_index + 7);
+  const levels = [l1, l2, l3, l4];
+
+  return new DX7Envelope(rates, levels);
+}
+
+const SCALING_CURVES = ["-LIN", "-EXP", "+EXP", "+LIN"];
+
+/**
+ *
+ * @param {DataView} view
+ * @param {number} num Operator number 1-6
+ * @returns {DX7Operator}
+ */
+function decode_operator(view, num) {
+  const envelope = decode_envelope(view, 0);
+  // 39 = C3
+  const breakpoint = view.getUint8(8);
+  const left_depth = view.getUint8(9);
+  const right_depth = view.getUint8(10);
+  const scaling_curves = view.getUint8(11);
+  const left_curve = scaling_curves & 0b11;
+  const right_curve = (scaling_curves >> 2) & 0b11;
+
+  const detune_scale = view.getUint8(12);
+  const rate_scale = detune_scale & 0b111;
+  const detune = detune_scale >> 3;
+
+  const sensitivity = view.getUint8(13);
+  const amp_mod_sensitivity = sensitivity & 0b11;
+  const key_vel_sensitivity = sensitivity >> 2;
+
+  const level = view.getUint8(14);
+
+  const coarse_mode = view.getUint8(15);
+  const osc_mode = coarse_mode & 0b1;
+  const freq_coarse = coarse_mode >> 1;
+
+  const freq_fine = view.getUint8(16);
+
+  return new DX7Operator({
+    num,
+    envelope,
+    level,
+    amp_mod_sensitivity,
+    key_vel_sensitivity,
+    freq: {
+      mode: osc_mode,
+      detune,
+      coarse: freq_coarse,
+      fine: freq_fine,
+    },
+    scaling: {
+      rate_scale,
+      breakpoint,
+      left: {
+        depth: left_depth,
+        curve: SCALING_CURVES[left_curve],
+      },
+      right: {
+        depth: right_depth,
+        curve: SCALING_CURVES[right_curve],
+      },
+    },
+  });
+}
 
 /**
  * Grab the 10 character name from the sysex dump
@@ -31,13 +116,13 @@ function decode_voice(voice_view) {
       voice_view.byteOffset + i * OP_LENGTH,
       OP_LENGTH,
     );
-    operators[i] = dx7_parse_op(op_view, 6 - i);
+    operators[i] = decode_operator(op_view, 6 - i);
   }
   // the operators are listed in reverse order in the SYSEX file
   operators.reverse();
 
   const PITCH_ENV_START = 102;
-  const pitch_env = dx7_parse_env(voice_view, PITCH_ENV_START);
+  const pitch_env = decode_envelope(voice_view, PITCH_ENV_START);
 
   const algorithm = voice_view.getUint8(110) + 1;
 
