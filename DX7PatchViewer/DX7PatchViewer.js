@@ -120,8 +120,13 @@ export const sketch = (p) => {
     algo_prim.draw(p);
     OPERATOR_LABELS.draw(p);
 
-    p.text(`Patch ${patch + 1}: ${patch_name}`, 0, 612);
-    p.text(`Algo: ${algo + 1}`, 0, 624);
+    const feedback = cartridge?.voices[patch].feedback ?? 0;
+
+    p.text(
+      `Patch ${patch + 1}: ${patch_name}\nAlgo: ${algo + 1} Feedback ${feedback}`,
+      0,
+      612,
+    );
   };
 
   p.mouseReleased = () => {
