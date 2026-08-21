@@ -1,0 +1,127 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../libraries/p5.min.js"
+    ></script>
+
+    <link rel="stylesheet" href="../styles/layout.css" />
+    <style>
+      select {
+        width: 250px;
+      }
+
+      .horizontal {
+        display: flex;
+        flex-direction: row;
+        align-items: start;
+      }
+
+      .vertical {
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+      }
+
+      .vertical-center {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .vertical-space {
+        height: 100px;
+      }
+    </style>
+    <script type="module">
+      import { DX7CartridgeOrganizer } from "./DX7CartridgeOrganizer.js";
+
+      const ORGANIZER = new DX7CartridgeOrganizer();
+
+      window.addEventListener("load", () => {
+        ORGANIZER.init_ui();
+      });
+    </script>
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>🧪DX7 Cartridge Organizer (2026-08)</h1>
+      <div class="horizontal">
+        <div class="vertical">
+          <p>Loaded Voices</p>
+          <select id="voices" size="32"></select>
+          <label for="import">Import Cartridge (.syx)</label>
+          <input id="import" accept=".syx" type="file" />
+        </div>
+        <div class="vertical">
+          <div class="vertical-space"></div>
+          <button id="add" disabled>Add</button>
+        </div>
+        <div class="vertical-center">
+          <div class="vertical-space"></div>
+          <button id="move-up" disabled>⬆</button>
+          <button id="move-down" disabled>⬇</button>
+          <button id="delete" disabled>❌</button>
+        </div>
+        <div class="vertical">
+          <p>Cartridge (up to 32 voices)</p>
+          <select id="cartridge" size="32"></select>
+          <div class="horizontal">
+            <input type="text" id="voice-name" maxlength="10" disabled />
+            <button id="rename" disabled>Rename</button>
+          </div>
+          <button id="export" disabled>Export Cartridge</button>
+        </div>
+      </div>
+      <div class="description">
+        <p>
+          🚧 Right now this is just the UI for voice management, the export
+          button is not yet implemented.
+        </p>
+        <p>Instructions:</p>
+        <ol>
+          <li>
+            Load one or more DX7 cartridge file(s) (e.g. exported from
+            <a href="https://asb2m10.github.io/dexed/">Dexed</a>) using the file
+            input under the left column. This will add voices to the list.
+          </li>
+          <li>Select a voice from the left column.</li>
+          <li>
+            Press the Add button to add the voice to the end of the list on the
+            right. NOTE: a cartridge holds no more than 32 voices.
+          </li>
+          <li>
+            (Optional) Rename a voice by selecting it, editing the name in the
+            text box, and pressing the Rename button. NOTE: DX7 voice names are
+            limited to 10 ASCII characters.
+          </li>
+          <li>
+            (Optional) Reorder voice in the right column by selecting one and
+            pressing the up/down arrow buttons.
+          </li>
+          <li>
+            (Optional) Remove a voice from the right column by selecting it and
+            pressing the ❌ button.
+          </li>
+          <li>
+            (🚧 NOT YET IMPLEMENTED!) Press the Export button to bundle the
+            voices from the right column into a DX7 .syx file and download it.
+            NOTE: The cartridge will always contain 32 voices. The end of the
+            list will be padded with default sine wave voices titled "--INIT--".
+          </li>
+        </ol>
+        <p>
+          This page is not a p5.js sketch, but rather is a companion tool for
+          <a href="./DX7PatchViewer">DX7 Patch Viewer</a>. It lets you import
+          voices from one or more `.syx` files and reorganize them into a
+          cartridge of 32 voices. The result can be loaded in Dexed.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
