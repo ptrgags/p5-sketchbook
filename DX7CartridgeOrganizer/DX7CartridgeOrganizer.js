@@ -92,16 +92,19 @@ export class DX7CartridgeOrganizer {
       move_down_button.disabled = !can_move_down;
     };
 
-    cartridge_select.addEventListener("input", () => {
-      update_move_buttons();
-
-      delete_button.disabled = false;
-
+    const update_voice_name = () => {
       const index = cartridge_select.selectedIndex;
       const voice = this.cartridge_voices[index];
 
       voice_name_text.value = voice.name;
       voice_name_text.disabled = false;
+    };
+
+    cartridge_select.addEventListener("input", () => {
+      update_move_buttons();
+      update_voice_name();
+
+      delete_button.disabled = false;
 
       // Uncomment when I'm ready to do the exporting
       // rename_button.disabled = false;
@@ -135,6 +138,7 @@ export class DX7CartridgeOrganizer {
       cartridge_select.selectedIndex = index_b;
 
       update_move_buttons();
+      update_voice_name();
     };
 
     move_up_button.addEventListener("click", () => {
@@ -158,17 +162,26 @@ export class DX7CartridgeOrganizer {
       cartridge_select.removeChild(option);
 
       if (is_last) {
+        // we removed the last voice from the list, so now most of the
+        // controls can be turned off
         move_up_button.disabled = true;
         move_down_button.disabled = true;
         delete_button.disabled = true;
+        voice_name_text.value = "";
         voice_name_text.disabled = true;
         export_button.disabled = true;
         rename_button.disabled = true;
       } else {
+        // Update UI buttons
         cartridge_select.selectedIndex =
           index < this.cartridge_voices.length ? index : index - 1;
         update_move_buttons();
+        update_voice_name();
       }
+
+      // since we just removed a voice, there will always be < 32 voices
+      // so we can add more.
+      add_button.disabled = false;
     });
   }
 }
