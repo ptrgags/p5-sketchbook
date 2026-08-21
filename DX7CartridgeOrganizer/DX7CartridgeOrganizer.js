@@ -1,6 +1,7 @@
 import { decode_dx7 } from "../DX7PatchViewer/decode_dx7.js";
 import { DX7Voice } from "../DX7PatchViewer/DX7Voice.js";
 import { expect_element } from "../sketchlib/dom/expect_element.js";
+import { decode_opm } from "./decode_opm.js";
 
 /**
  *
@@ -47,8 +48,17 @@ export class DX7CartridgeOrganizer {
         throw new Error("Please select a DX7 cartridge file (.syx)");
       }
 
-      const [syx_file] = files;
-      const syx_buffer = await syx_file.arrayBuffer();
+      const [file] = files;
+
+      if (file.name.endsWith(".opm")) {
+        const opm_text = await file.text();
+        const voices = decode_opm(opm_text);
+        console.log(voices);
+        return;
+      }
+
+      // Otherwise it's a .syx file
+      const syx_buffer = await file.arrayBuffer();
 
       const dx7_cartridge = decode_dx7(syx_buffer);
       this.voices.push(...dx7_cartridge.voices);

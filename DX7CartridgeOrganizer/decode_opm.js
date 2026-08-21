@@ -20,7 +20,7 @@ function decode_name(name_line) {
  * @returns {OPMLFO}
  */
 function decode_lfo(lfo_line) {
-  const [magic, lfreq, amd, pmd, wf, nfreq] = lfo_line.split(" ");
+  const [magic, lfreq, amd, pmd, wf, nfreq] = lfo_line.split(/ +/);
   if (magic !== "LFO:") {
     throw new Error("LFO line must start with 'LFO:'");
   }
@@ -41,7 +41,7 @@ function decode_lfo(lfo_line) {
  */
 function decode_op(op_line) {
   const [magic, ar, d1r, d2r, rr, d1l, tl, ks, mul, dt1, dt2, ams_en] =
-    op_line.split(" ");
+    op_line.split(/ +/);
 
   if (!/[MC][12]:/.test(magic)) {
     throw new Error("operator line must start with one of M1:/C1:/M2:/C2:");
@@ -72,9 +72,9 @@ function decode_op(op_line) {
  * @returns {OPMChannel}
  */
 function decode_ch(ch_line) {
-  const [magic, pan, fl, con, ams, pms, slot, ne] = ch_line.split(" ");
+  const [magic, pan, fl, con, ams, pms, slot, ne] = ch_line.split(/ +/);
 
-  if (magic !== "CH: ") {
+  if (magic !== "CH:") {
     throw new Error("channel line must start with CH:");
   }
 
@@ -119,7 +119,7 @@ export function decode_voice(voice_lines) {
 /**
  *
  * @param {string} opm_text
- * @returns {}
+ * @returns {OPMVoice[]}
  */
 export function decode_opm(opm_text) {
   const lines = opm_text.split("\n");
@@ -132,5 +132,5 @@ export function decode_opm(opm_text) {
     }
   }
 
-  return;
+  return voices;
 }
