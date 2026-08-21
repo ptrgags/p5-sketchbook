@@ -72,7 +72,7 @@ export class DX7Voice {
 
 DX7Voice.INIT = Object.freeze(
   new DX7Voice({
-    name: "INIT",
+    name: "--INIT--",
     algorithm: 0,
     feedback: 0,
     operators: [
