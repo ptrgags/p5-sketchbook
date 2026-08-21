@@ -43,8 +43,26 @@ export class DX7Voice {
     this.algorithm = options.algorithm;
     this.operators = options.operators;
     this.pitch_env = options.pitch_env;
+    this.osc_key_sync = options.osc_key_sync;
     this.feedback = options.feedback;
     this.transpose = options.transpose;
+  }
+
+  /**
+   * Rename a voice, returning a copy
+   * @param {string} name
+   * @returns {DX7Voice}
+   */
+  rename(name) {
+    return new DX7Voice({
+      name,
+      algorithm: this.algorithm,
+      operators: this.operators,
+      pitch_env: this.pitch_env,
+      osc_key_sync: this.osc_key_sync,
+      feedback: this.feedback,
+      transpose: this.transpose,
+    });
   }
 }
 
