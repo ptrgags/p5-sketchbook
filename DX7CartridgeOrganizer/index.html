@@ -54,24 +54,20 @@
         </div>
         <div class="vertical">
           <div class="vertical-space"></div>
-          <button id="add">>></button>
+          <button id="add" disabled>>></button>
         </div>
 
         <div class="vertical">
           <div class="vertical-space"></div>
-          <button id="move-up">⇧</button>
-          <button id="move-down">⇩</button>
+          <button id="move-up" disabled>⇧</button>
+          <button id="move-down" disabled>⇩</button>
         </div>
         <div class="vertical">
           <p>Cartridge (up to 32 voices)</p>
-          <select id="cartridge" size="32">
-            <option>Foo</option>
-            <option>Bar</option>
-            <option>Baz</option>
-          </select>
+          <select id="cartridge" size="32"></select>
           <div class="horizontal">
-            <input type="text" id="voice-name" />
-            <button id="rename">Rename</button>
+            <input type="text" id="voice-name" disabled />
+            <button id="rename" disabled>Rename</button>
           </div>
           <button id="export" disabled>Export Cartridge</button>
         </div>

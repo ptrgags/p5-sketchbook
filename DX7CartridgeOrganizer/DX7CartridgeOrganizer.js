@@ -18,6 +18,11 @@ export class DX7CartridgeOrganizer {
      * @type {DX7Voice[]}
      */
     this.voices = [];
+
+    /**
+     * @type {number | undefined}
+     */
+    this.add_index = undefined;
   }
 
   init_ui() {
@@ -33,7 +38,7 @@ export class DX7CartridgeOrganizer {
     const export_button = expect_element("export", HTMLButtonElement);
 
     // When a new syx file is imported, add the voices to the list
-    import_input.addEventListener("input", async (e) => {
+    import_input.addEventListener("input", async () => {
       const files = import_input.files;
       if (!files || files.length === 0) {
         throw new Error("Please select a DX7 cartridge file (.syx)");
@@ -49,10 +54,29 @@ export class DX7CartridgeOrganizer {
 
       for (const [i, voice] of this.voices.entries()) {
         const option = document.createElement("option");
-        option.innerHTML = `${i + 1}: ${voice.name}`;
-        option.value = `i`;
+        option.innerHTML = voice.name;
+        option.value = i.toString();
         voices_select.appendChild(option);
       }
+    });
+
+    // When a voice is selected, light up the add button
+    voices_select.addEventListener("input", () => {
+      this.add_index = voices_select.selectedIndex;
+      add_button.disabled = false;
+    });
+
+    add_button.addEventListener("click", () => {
+      if (!this.add_index) {
+        return;
+      }
+
+      const voice = this.voices[this.add_index];
+
+      const option = document.createElement("option");
+      option.innerHTML = voice.name;
+      option.value = this.add_index.toString();
+      cartridge_select.appendChild(option);
     });
   }
 }
