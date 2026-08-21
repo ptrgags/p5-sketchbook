@@ -21,4 +21,5 @@ export const OPERATOR_COUNT = 6;
 
 export const NAME_LENGTH = 10;
 
+export const TRAILER_OFFSET = HEADER_LENGTH + DATA_LENGTH;
 export const STATUS_END = 0xf7;

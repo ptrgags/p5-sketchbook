@@ -15,6 +15,8 @@ import {
   OPERATOR_LENGTH,
   NAME_LENGTH,
   VOICE_START,
+  TRAILER_OFFSET,
+  STATUS_END,
 } from "../sketchlib/dx7/dx7_constants.js";
 
 /**
@@ -145,6 +147,14 @@ export function encode_dx7(cartridge) {
   for (const [i, voice] of cartridge.voices.entries()) {
     encode_voice(voice, bytes, VOICE_START + i * VOICE_LENGTH);
   }
+
+  let checksum = 0;
+  for (let i = VOICE_START; i < TRAILER_OFFSET; i++) {
+    checksum += bytes[i];
+  }
+
+  bytes[TRAILER_OFFSET] = checksum & 0b1111111;
+  bytes[TRAILER_OFFSET + 1] = STATUS_END;
 
   return bytes.buffer;
 }
