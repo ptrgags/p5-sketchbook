@@ -63,9 +63,14 @@ export class DX7CartridgeOrganizer {
       }
     });
 
+    const update_add_button = () => {
+      const has_room_for_more = this.cartridge_voices.length < 32;
+      add_button.disabled = !has_room_for_more;
+    };
+
     // When a voice is selected, light up the add button
     voices_select.addEventListener("input", () => {
-      add_button.disabled = false;
+      update_add_button();
     });
 
     add_button.addEventListener("click", () => {
@@ -81,6 +86,9 @@ export class DX7CartridgeOrganizer {
       cartridge_select.appendChild(option);
 
       export_button.disabled = false;
+
+      // if we filled up the cartridge, disable this button
+      update_add_button();
     });
 
     const update_move_buttons = () => {
@@ -179,9 +187,8 @@ export class DX7CartridgeOrganizer {
         update_voice_name();
       }
 
-      // since we just removed a voice, there will always be < 32 voices
-      // so we can add more.
-      add_button.disabled = false;
+      // Since we removed a voice, there will always be room for more!
+      update_add_button();
     });
   }
 }
