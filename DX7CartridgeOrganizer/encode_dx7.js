@@ -171,5 +171,7 @@ export function encode_dx7_file(cartridge, filename) {
   }
 
   // TODO: What MIME type?
-  return new File([encode_dx7(cartridge)], filename);
+  return new File([encode_dx7(cartridge)], filename, {
+    type: "application/octet-stream",
+  });
 }
