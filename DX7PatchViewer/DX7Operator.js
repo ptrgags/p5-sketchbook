@@ -10,7 +10,8 @@ import { DX7KeyLevelScaling } from "./DX7KeyLevelScaling.js";
  *  freq: DX7FreqSettings,
  *  amp_mod_sensitivity: number,
  *  key_vel_sensitivity: number,
- *  key_scaling: DX7KeyLevelScaling
+ *  key_rate_scaling: number,
+ *  key_level_scaling: DX7KeyLevelScaling
  * }} DX7OperatorOptions
  */
 
@@ -25,7 +26,9 @@ export class DX7Operator {
     this.level = options.level;
     this.freq = options.freq;
     this.amp_mod_sensitivity = options.amp_mod_sensitivity;
-    this.key_scaling = options.key_scaling;
+    this.key_rate_scaling = options.key_rate_scaling;
+    this.key_vel_sensitivity = options.key_vel_sensitivity;
+    this.key_level_scaling = options.key_level_scaling;
   }
 
   get name() {
@@ -48,7 +51,8 @@ export class DX7Operator {
       freq: DX7FreqSettings.INIT,
       amp_mod_sensitivity: 0,
       key_vel_sensitivity: 0,
-      key_scaling: DX7KeyLevelScaling.INIT,
+      key_rate_scaling: 0,
+      key_level_scaling: DX7KeyLevelScaling.INIT,
     });
   }
 }
