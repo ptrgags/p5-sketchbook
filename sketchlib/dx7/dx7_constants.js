@@ -14,6 +14,8 @@ export const ID_YAMAHA = 67;
 export const SUB_STATUS = 0;
 export const FORMAT_32_VOICES = 9;
 
+export const VOICE_START = 6;
+
 export const OPERATOR_LENGTH = 17;
 export const OPERATOR_COUNT = 6;
 

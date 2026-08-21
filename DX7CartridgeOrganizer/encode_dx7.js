@@ -14,6 +14,7 @@ import {
   VOICE_LENGTH,
   OPERATOR_LENGTH,
   NAME_LENGTH,
+  VOICE_START,
 } from "../sketchlib/dx7/dx7_constants.js";
 
 /**
@@ -142,7 +143,7 @@ export function encode_dx7(cartridge) {
   bytes[5] = DATA_LENGTH & 0b111_1111;
 
   for (const [i, voice] of cartridge.voices.entries()) {
-    encode_voice(voice, bytes, i * VOICE_LENGTH);
+    encode_voice(voice, bytes, VOICE_START + i * VOICE_LENGTH);
   }
 
   return bytes.buffer;

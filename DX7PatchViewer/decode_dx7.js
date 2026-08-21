@@ -7,6 +7,7 @@ import {
   STATUS_START,
   SUB_STATUS,
   VOICE_LENGTH,
+  VOICE_START,
 } from "../sketchlib/dx7/dx7_constants.js";
 import { DX7Cartridge } from "./DX7Cartridge.js";
 import { DX7Envelope } from "./DX7Envelope.js";
@@ -218,12 +219,11 @@ export function decode_dx7(buffer) {
     throw new Error(`incorrect data length for 32 voices: ${byte_count}`);
   }
 
-  const FIRST_VOICE_OFFSET = 6;
   const voices = new Array(32);
   for (let i = 0; i < 32; i++) {
     const voice_view = new DataView(
       buffer,
-      FIRST_VOICE_OFFSET + VOICE_LENGTH * i,
+      VOICE_START + VOICE_LENGTH * i,
       VOICE_LENGTH,
     );
     const voice = decode_voice(voice_view);
