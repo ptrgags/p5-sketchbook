@@ -54,14 +54,15 @@ export class DX7CartridgeOrganizer {
         const opm_text = await file.text();
         const voices = decode_opm(opm_text);
         console.log(voices);
-        return;
+        this.voices.push(...voices.map((v) => v.to_dx7_voice()));
+      } else {
+        // .syx file
+        const syx_buffer = await file.arrayBuffer();
+        const dx7_cartridge = decode_dx7(syx_buffer);
+        this.voices.push(...dx7_cartridge.voices);
       }
 
       // Otherwise it's a .syx file
-      const syx_buffer = await file.arrayBuffer();
-
-      const dx7_cartridge = decode_dx7(syx_buffer);
-      this.voices.push(...dx7_cartridge.voices);
 
       clear_children(voices_select);
 
