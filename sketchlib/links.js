@@ -2,6 +2,7 @@
 export const LINKS = [
   {
     title: "DX7 Patch Viewer",
+    link: "./DX7PatchViewer",
     year: "2026-08",
     is_lab: true,
   },
