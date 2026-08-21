@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="../libraries/p5.min.js"
+    ></script>
+    <script type="module"></script>
+    <link rel="stylesheet" href="../styles/layout.css" />
+    <style>
+      select {
+        width: 250px;
+      }
+
+      .horizontal {
+        display: flex;
+        flex-direction: row;
+        align-items: start;
+      }
+
+      .vertical {
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+      }
+
+      .vertical-space {
+        height: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>🧪DX7 Cartridge Organizer (2026-08)</h1>
+      <div class="horizontal">
+        <div class="vertical">
+          <p>Loaded Voices</p>
+          <select id="voices" size="32">
+            <option>Foo</option>
+            <option>Bar</option>
+            <option>Baz</option>
+          </select>
+          <label for="import">Import Cartridge (.syx)</label>
+          <input id="import" accept=".syx" type="file" />
+        </div>
+        <div class="vertical">
+          <div class="vertical-space"></div>
+          <button id="add">>></button>
+        </div>
+
+        <div class="vertical">
+          <div class="vertical-space"></div>
+          <button id="move-up">⇧</button>
+          <button id="move-down">⇩</button>
+        </div>
+        <div class="vertical">
+          <p>Cartridge (up to 32 voices)</p>
+          <select id="cartridge" size="32">
+            <option>Foo</option>
+            <option>Bar</option>
+            <option>Baz</option>
+          </select>
+          <div class="horizontal">
+            <input type="text" id="patch-name" />
+            <button id="rename">Rename</button>
+          </div>
+          <button disabled>Export Cartridge</button>
+        </div>
+      </div>
+      <div class="description">
+        <p>
+          🚧 Right now this is just the UI for patch management, the export is
+          not yet implemented.
+        </p>
+        <p>
+          This page is not a p5.js sketch, but rather is a companion tool for
+          <a href="./DX7PatchViewer">DX7 Patch Viewer</a>. It lets you import
+          voices from one or more `.syx` files and reorganize them into a
+          cartridge of 32 voices. The result can be loaded in Dexed.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
