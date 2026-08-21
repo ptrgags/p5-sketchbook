@@ -34,6 +34,7 @@ export class DX7CartridgeOrganizer {
     const add_button = expect_element("add", HTMLButtonElement);
     const move_up_button = expect_element("move-up", HTMLButtonElement);
     const move_down_button = expect_element("move-down", HTMLButtonElement);
+    const delete_button = expect_element("delete", HTMLButtonElement);
     const cartridge_select = expect_element("cartridge", HTMLSelectElement);
     const voice_name_text = expect_element("voice-name", HTMLInputElement);
     const rename_button = expect_element("rename", HTMLButtonElement);
@@ -82,9 +83,19 @@ export class DX7CartridgeOrganizer {
       export_button.disabled = false;
     });
 
+    const update_move_buttons = () => {
+      const index = cartridge_select.selectedIndex;
+      const can_move_up = index > 0;
+      const can_move_down = index < this.cartridge_voices.length - 1;
+
+      move_up_button.disabled = !can_move_up;
+      move_down_button.disabled = !can_move_down;
+    };
+
     cartridge_select.addEventListener("input", () => {
-      move_up_button.disabled = false;
-      move_down_button.disabled = false;
+      update_move_buttons();
+
+      delete_button.disabled = false;
 
       const index = cartridge_select.selectedIndex;
       const voice = this.cartridge_voices[index];
@@ -104,6 +115,38 @@ export class DX7CartridgeOrganizer {
 
       const voice = this.cartridge_voices[index];
       this.cartridge_voices[index] = voice.rename(new_name);
+    });
+
+    /**
+     *
+     * @param {number} index_a
+     * @param {number} index_b
+     */
+    const swap_cartridge_voices = (index_a, index_b) => {
+      const voices = this.cartridge_voices;
+      [voices[index_a], voices[index_b]] = [voices[index_b], voices[index_a]];
+
+      const children = [...cartridge_select.children];
+      [children[index_a], children[index_b]] = [
+        children[index_b],
+        children[index_a],
+      ];
+      cartridge_select.replaceChildren(...children);
+      cartridge_select.selectedIndex = index_b;
+
+      update_move_buttons();
+    };
+
+    move_up_button.addEventListener("click", () => {
+      const index_a = cartridge_select.selectedIndex;
+      const index_b = index_a - 1;
+      swap_cartridge_voices(index_a, index_b);
+    });
+
+    move_down_button.addEventListener("click", () => {
+      const index_a = cartridge_select.selectedIndex;
+      const index_b = index_a + 1;
+      swap_cartridge_voices(index_a, index_b);
     });
   }
 }

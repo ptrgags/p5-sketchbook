@@ -27,6 +27,12 @@
         align-items: start;
       }
 
+      .vertical-center {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
       .vertical-space {
         height: 100px;
       }
@@ -56,10 +62,11 @@
           <div class="vertical-space"></div>
           <button id="add" disabled>>></button>
         </div>
-        <div class="vertical">
+        <div class="vertical-center">
           <div class="vertical-space"></div>
-          <button id="move-up" disabled>⇧</button>
-          <button id="move-down" disabled>⇩</button>
+          <button id="move-up" disabled>⬆</button>
+          <button id="move-down" disabled>⬇</button>
+          <button id="delete" disabled>❌</button>
         </div>
         <div class="vertical">
           <p>Cartridge (up to 32 voices)</p>
