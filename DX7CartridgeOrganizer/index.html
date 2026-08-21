@@ -8,7 +8,7 @@
       type="text/javascript"
       src="../libraries/p5.min.js"
     ></script>
-    <script type="module"></script>
+
     <link rel="stylesheet" href="../styles/layout.css" />
     <style>
       select {
@@ -31,6 +31,15 @@
         height: 100px;
       }
     </style>
+    <script type="module">
+      import { DX7CartridgeOrganizer } from "./DX7CartridgeOrganizer.js";
+
+      const ORGANIZER = new DX7CartridgeOrganizer();
+
+      window.addEventListener("load", () => {
+        ORGANIZER.init_ui();
+      });
+    </script>
   </head>
   <body>
     <sketchbook-navbar></sketchbook-navbar>
@@ -39,11 +48,7 @@
       <div class="horizontal">
         <div class="vertical">
           <p>Loaded Voices</p>
-          <select id="voices" size="32">
-            <option>Foo</option>
-            <option>Bar</option>
-            <option>Baz</option>
-          </select>
+          <select id="voices" size="32"></select>
           <label for="import">Import Cartridge (.syx)</label>
           <input id="import" accept=".syx" type="file" />
         </div>
@@ -65,10 +70,10 @@
             <option>Baz</option>
           </select>
           <div class="horizontal">
-            <input type="text" id="patch-name" />
+            <input type="text" id="voice-name" />
             <button id="rename">Rename</button>
           </div>
-          <button disabled>Export Cartridge</button>
+          <button id="export" disabled>Export Cartridge</button>
         </div>
       </div>
       <div class="description">
