@@ -1,4 +1,5 @@
 import { DX7Envelope } from "./DX7Envelope.js";
+import { DX7LFO } from "./DX7LFO.js";
 import { DX7Operator } from "./DX7Operator.js";
 
 /**
@@ -20,6 +21,7 @@ function sanitize_name(raw_name) {
  *  algorithm: number,
  *  operators: DX7Operator[],
  *  pitch_env: DX7Envelope,
+ *  lfo: DX7LFO,
  *  osc_key_sync: boolean,
  *  feedback: number,
  *  transpose: number
@@ -43,6 +45,7 @@ export class DX7Voice {
     this.algorithm = options.algorithm;
     this.operators = options.operators;
     this.pitch_env = options.pitch_env;
+    this.lfo = options.lfo;
     this.osc_key_sync = options.osc_key_sync;
     this.feedback = options.feedback;
     this.transpose = options.transpose;
@@ -59,6 +62,7 @@ export class DX7Voice {
       algorithm: this.algorithm,
       operators: this.operators,
       pitch_env: this.pitch_env,
+      lfo: this.lfo,
       osc_key_sync: this.osc_key_sync,
       feedback: this.feedback,
       transpose: this.transpose,
@@ -68,7 +72,7 @@ export class DX7Voice {
 
 DX7Voice.INIT = Object.freeze(
   new DX7Voice({
-    name: "INIT",
+    name: "--INIT--",
     algorithm: 0,
     feedback: 0,
     operators: [
@@ -80,6 +84,7 @@ DX7Voice.INIT = Object.freeze(
       DX7Operator.init(6),
     ],
     pitch_env: DX7Envelope.DEFAULT_PITCH,
+    lfo: DX7LFO.INIT,
     osc_key_sync: true,
     transpose: 0,
   }),
