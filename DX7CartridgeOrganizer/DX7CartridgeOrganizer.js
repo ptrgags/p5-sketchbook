@@ -148,5 +148,27 @@ export class DX7CartridgeOrganizer {
       const index_b = index_a + 1;
       swap_cartridge_voices(index_a, index_b);
     });
+
+    delete_button.addEventListener("click", () => {
+      const index = cartridge_select.selectedIndex;
+      const is_last = this.cartridge_voices.length === 1;
+
+      this.cartridge_voices.splice(index, 1);
+      const option = cartridge_select.children[index];
+      cartridge_select.removeChild(option);
+
+      if (is_last) {
+        move_up_button.disabled = true;
+        move_down_button.disabled = true;
+        delete_button.disabled = true;
+        voice_name_text.disabled = true;
+        export_button.disabled = true;
+        rename_button.disabled = true;
+      } else {
+        cartridge_select.selectedIndex =
+          index < this.cartridge_voices.length ? index : index - 1;
+        update_move_buttons();
+      }
+    });
   }
 }
