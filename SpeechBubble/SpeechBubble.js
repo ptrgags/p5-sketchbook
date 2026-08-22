@@ -77,7 +77,7 @@ const SVG_ELLIPSIS = style(ELLIPSIS_PRINT, STYLE_ELLIPSIS);
 
 const SLASH = new KeywordRecognizer();
 // export SVG version of ellipse
-SLASH.register(["Slash", "KeyS", "KeyV", "KeyG"], () => {
+SLASH.slash("/svg", () => {
   const outline_file = encode_svg_file(
     SVG_OUTLINE,
     "speech-bubble-outline.svg",
