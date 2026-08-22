@@ -1,3 +1,4 @@
+import { ToJSON } from "../json/ToJSON.js";
 import {
   PrimitiveCollectionStats,
   RenderStats,
@@ -12,6 +13,7 @@ import { Primitive } from "./Primitive.js";
  * @implements {Primitive}
  * @implements {PrimitiveCollectionStats}
  * @implements {ToSVG}
+ * @implements {ToJSON}
  */
 export class SimpleGroupPrimitive {
   /**
@@ -62,6 +64,20 @@ export class SimpleGroupPrimitive {
       g.appendChild(child_svg);
     }
     return g;
+  }
+
+  to_json() {
+    const child_objects = [];
+    for (const child of this.children) {
+      if (!ToJSON.is_json_compatible(child)) {
+        console.warn("JSON export: skipping child", child);
+        continue;
+      }
+
+      child_objects.push(child.to_json());
+    }
+
+    return { type: "group", children: child_objects };
   }
 
   /**

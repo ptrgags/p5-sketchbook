@@ -4,10 +4,12 @@ import { HEIGHT, WIDTH } from "../dimensions.js";
 import { clamp } from "../clamp.js";
 import { Grid } from "../Grid.js";
 import { Primitive } from "./Primitive.js";
+import { ToJSON } from "../json/ToJSON.js";
 
 /**
  * Rectangle
  * @implements {Primitive}
+ * @implements {ToJSON}
  */
 export class Rect {
   /**
@@ -139,6 +141,12 @@ export class Rect {
     });
 
     return result;
+  }
+
+  to_json() {
+    const { x, y } = this.position;
+    const { x: w, y: h } = this.dimensions;
+    return { type: "rect", x, y, w, h };
   }
 }
 

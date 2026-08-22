@@ -1,3 +1,4 @@
+import { ToJSON } from "../json/ToJSON.js";
 import {
   PrimitiveCollectionStats,
   RenderStats,
@@ -46,6 +47,7 @@ function apply_svg_style(attributes, style) {
  * @implements {Primitive}
  * @implements {PrimitiveCollectionStats}
  * @implements {ToSVG}
+ * @implements {ToJSON}
  */
 export class GroupPrimitive {
   /**
@@ -163,5 +165,39 @@ export class GroupPrimitive {
     }
 
     return g;
+  }
+
+  to_json() {
+    const children = [];
+    for (const child of this.primitives) {
+      if (!ToJSON.is_json_compatible(child)) {
+        console.warn("JSON export: skipping child", child);
+        continue;
+      }
+
+      children.push(child.to_json());
+    }
+
+    /**
+     * @type {any}
+     */
+    const result = {
+      type: "group",
+      children,
+    };
+
+    if (this.transform) {
+      throw new Error("not implemented: JSON transformations");
+    }
+
+    if (this.text_style) {
+      throw new Error("not implemented: JSON text style");
+    }
+
+    if (this.style) {
+      result.style = this.style.to_json();
+    }
+
+    return result;
   }
 }
