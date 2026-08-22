@@ -3,20 +3,41 @@ import { Color } from "../sketchlib/Color.js";
 import { fix_mouse_coords } from "../sketchlib/fix_mouse_coords.js";
 import { InteractiveMosaic } from "./InteractiveMosaic.js";
 import { prevent_mobile_scroll } from "../sketchlib/prevent_mobile_scroll.js";
+import { expect_element } from "../sketchlib/dom/expect_element.js";
+import { KeywordRecognizer } from "../sketchlib/KeywordRecognizer.js";
 
-//const INITIAL_COLORS = ["#231f20", "#bb4430", "#7ebdc2", "#f3dfa2"];
 // clouds, sky, grass, dirt
 const INITIAL_COLORS = ["#ccf0ef", "#5697d8", "#456538", "#633912"];
 
+const SLASH = new KeywordRecognizer();
+
+// Colors of actual LEGO tiles I use for the IRL mosaics
+const PRESET_COLORS = [
+  "#05131d", // black
+  "#562d80", // purple
+  "#f8fc0d", // vibrant yellow
+  "#ffffff", // white
+  "#720e0f", // dark red
+  "#0a3463", // dark blue
+  "#fe8a18", // orange
+  "#008f9b", // dark turquoise
+].map(Color.from_hex_code);
+
+/**
+ * @param {import("p5").default} p
+ */
 export const sketch = (p) => {
+  /**
+   * @type {HTMLCanvasElement}
+   */
   let canvas;
 
-  const colors = INITIAL_COLORS.map((x) => Color.from_hex_code(x));
+  const colors = INITIAL_COLORS.map(Color.from_hex_code);
   const mosaic = new InteractiveMosaic(colors);
 
   function init_color_pickers() {
     for (const [i, color] of colors.entries()) {
-      const color_picker = document.getElementById(`color-${i}`);
+      const color_picker = expect_element(`color-${i}`, HTMLInputElement);
       /** @ts-ignore */
       color_picker.value = color.to_hex_code();
       color_picker.addEventListener("input", (e) => {
@@ -28,8 +49,26 @@ export const sketch = (p) => {
     }
   }
 
+  // Add slash commands /colorij where
+  // i is the color slot 0-3
+  // j is the index in the palette 0-7
+  // these will load preset colors
+  function init_preset_colors() {
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 8; j++) {
+        SLASH.slash(`/color${i}${j}`, () => {
+          const color_picker = expect_element(`color-${i}`, HTMLInputElement);
+          const color = PRESET_COLORS[j];
+          color_picker.value = color.to_hex_code();
+          mosaic.update_color(i, color);
+        });
+      }
+    }
+  }
+
   function init_image_save_button() {
-    document.getElementById("save-image").addEventListener("click", () => {
+    const save_button = expect_element("save-image", HTMLButtonElement);
+    save_button.addEventListener("click", () => {
       const colors = mosaic.get_colors();
       const width = 16;
       const image = p.createImage(width, width);
@@ -52,6 +91,7 @@ export const sketch = (p) => {
 
     init_color_pickers();
     init_image_save_button();
+    init_preset_colors();
   };
 
   p.draw = () => {
@@ -73,5 +113,9 @@ export const sketch = (p) => {
 
   p.mouseReleased = () => {
     mosaic.mouse_release();
+  };
+
+  p.keyReleased = (/** @type {KeyboardEvent} */ e) => {
+    SLASH.input(e.code);
   };
 };
