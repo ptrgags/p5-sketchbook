@@ -77,11 +77,11 @@ export const sketch = (p) => {
       }
     }
 
-    SLASH.slash(`/export`, () => {
+    SLASH.slash(`/snap`, () => {
       const grid = mosaic.grid_primitive;
       const json_file = new File(
         [JSON.stringify(grid.to_json())],
-        "mosaic.json",
+        "mosaic.scene.json",
         {
           type: "application/json",
         },
