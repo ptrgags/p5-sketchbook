@@ -1,6 +1,7 @@
 import { Oklch } from "./Oklch.js";
 import { Color } from "./Color.js";
 import { is_nearly } from "./is_nearly.js";
+import { ToJSON } from "./json/ToJSON.js";
 
 /**
  * Convert from a variety of color formats to a sRGB color
@@ -28,6 +29,7 @@ function to_srgb(color) {
 
 /**
  * A Style describes the stroke/fill properties of drawing primitives
+ * @implements {ToJSON}
  */
 export class Style {
   /**
@@ -87,7 +89,7 @@ export class Style {
 
   /**
    * Apply stroke, fill and stroke weight
-   * @param {import("p5")} p p5js context
+   * @param {import("p5").default} p p5js context
    */
   apply(p) {
     if (this.stroke && !is_nearly(this.stroke.a, 0)) {
@@ -105,6 +107,43 @@ export class Style {
     }
 
     p.strokeWeight(this.stroke_width);
+  }
+
+  to_json() {
+    /**
+     * @type {any}
+     */
+    const result = {
+      type: "style",
+      width: this.width,
+    };
+
+    if (this.stroke) {
+      result.stroke = this.stroke.to_hex_code();
+    }
+
+    if (this.fill) {
+      result.fill = this.fill.to_hex_code();
+    }
+
+    return result;
+  }
+
+  /**
+   *
+   * @param {any} obj
+   * @returns {Style}
+   */
+  static from_json(obj) {
+    if (obj.type !== "style") {
+      throw new Error("type must be 'style'");
+    }
+
+    const width = obj.width;
+    const stroke = obj.stroke ? Color.from_hex_code(obj.stroke) : undefined;
+    const fill = obj.fill ? Color.from_hex_code(obj.fill) : undefined;
+
+    return new Style({ width, stroke, fill });
   }
 
   /**

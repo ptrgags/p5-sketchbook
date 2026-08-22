@@ -5,6 +5,7 @@ import { InteractiveMosaic } from "./InteractiveMosaic.js";
 import { prevent_mobile_scroll } from "../sketchlib/prevent_mobile_scroll.js";
 import { expect_element } from "../sketchlib/dom/expect_element.js";
 import { KeywordRecognizer } from "../sketchlib/KeywordRecognizer.js";
+import { download_file } from "../sketchlib/dom/download_file.js";
 
 // clouds, sky, grass, dirt
 const INITIAL_COLORS = ["#ccf0ef", "#5697d8", "#456538", "#633912"];
@@ -75,6 +76,18 @@ export const sketch = (p) => {
         });
       }
     }
+
+    SLASH.slash(`/snap`, () => {
+      const grid = mosaic.grid_primitive;
+      const json_file = new File(
+        [JSON.stringify(grid.to_json())],
+        "mosaic.scene.json",
+        {
+          type: "application/json",
+        },
+      );
+      download_file(json_file);
+    });
   }
 
   function init_image_save_button() {

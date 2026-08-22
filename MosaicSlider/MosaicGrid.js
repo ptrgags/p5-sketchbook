@@ -10,6 +10,7 @@ import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { Rect } from "../sketchlib/primitives/Rect.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { Point } from "../sketchlib/pga2d/Point.js";
+import { SimpleGroupPrimitive } from "../sketchlib/primitives/SimpleGroupPrimitive.js";
 
 const ROWS = 16;
 const COLS = 16;
@@ -132,9 +133,12 @@ export class MosaicGrid {
   /**
    * Create the primitive. Call this only when the grid state changes.
    * @private
-   * @returns {GroupPrimitive} The rendering primitive for the current state of the grid.
+   * @returns {SimpleGroupPrimitive} The rendering primitive for the current state of the grid.
    */
   create_primitive() {
+    /**
+     * @type {Rect[][]}
+     */
     const by_colors = [[], [], [], [], []];
     this.grid.for_each((index, color_index) => {
       if (color_index === undefined) {
@@ -263,13 +267,5 @@ export class MosaicGrid {
       this.primitive = this.create_primitive();
       this.primitive_dirty = false;
     }
-  }
-
-  /**
-   * The primitives to render
-   * @returns {GroupPrimitive} The primitive to render
-   */
-  render() {
-    return this.primitive;
   }
 }
