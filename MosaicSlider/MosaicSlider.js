@@ -18,8 +18,8 @@ const SLASH = new KeywordRecognizer();
 const PRESET_COLORS = [
   "#05131d", // black
   "#562d80", // purple
-  "#f8fc0d", // vibrant yellow
   "#ffffff", // white
+  "#f8fc0d", // vibrant yellow
   "#720e0f", // dark red
   "#0a3463", // dark blue
   "#fe8a18", // orange
@@ -52,11 +52,19 @@ export const sketch = (p) => {
     }
   }
 
+  function show_slash_help() {
+    const key_div = expect_element("slash-help", HTMLDivElement);
+    key_div.style.display = "block";
+  }
+
   // Add slash commands /colorij where
   // i is the color slot 0-3
   // j is the index in the palette 0-7
   // these will load preset colors
-  function init_preset_colors() {
+  function init_slash_commands() {
+    SLASH.slash(`/key`, show_slash_help);
+    SLASH.slash(`/color`, show_slash_help);
+
     for (let i = 0; i < 4; i++) {
       for (let j = 0; j < 8; j++) {
         SLASH.slash(`/color${i}${j}`, () => {
@@ -94,7 +102,7 @@ export const sketch = (p) => {
 
     init_color_pickers();
     init_image_save_button();
-    init_preset_colors();
+    init_slash_commands();
   };
 
   p.draw = () => {
