@@ -20,6 +20,34 @@ export class KeywordRecognizer {
   }
 
   /**
+   * Shorthand for setting up slash commands
+   * e.g. /debug gets registered as [Slash, KeyD, KeyE, KeyB, KeyU, KeyG]
+   * @param {String} slash_command The slash command. It must begin with /
+   * @param {function(): void} callback The callback to register
+   */
+  slash(slash_command, callback) {
+    if (!slash_command.startsWith("/")) {
+      throw new Error("slash_command must begin with a /");
+    }
+
+    const upper = slash_command.toUpperCase();
+    const keyword = [];
+    for (const c of upper) {
+      if (c === "/") {
+        keyword.push("Slash");
+      } else if (/[A-Z]/.test(c)) {
+        keyword.push(`Key${c}`);
+      } else if (/[0-9]/.test(c)) {
+        keyword.push(`Digit${c}`);
+      } else {
+        throw new Error(`unsupported symbol '${c}' in slash command`);
+      }
+    }
+
+    this.register(keyword, callback);
+  }
+
+  /**
    * Input the next key or other input symbol
    * @param {string} symbol Next input symbol (e.g. a keyboard code)
    */
