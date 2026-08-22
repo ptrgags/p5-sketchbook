@@ -12,6 +12,9 @@ const INITIAL_COLORS = ["#ccf0ef", "#5697d8", "#456538", "#633912"];
 const SLASH = new KeywordRecognizer();
 
 // Colors of actual LEGO tiles I use for the IRL mosaics
+// I used https://rebrickable.com/colors/ for the hex codes
+// and https://v2.bricklink.com/en-us/catalog/color-guide to check if I
+// selected the right shades
 const PRESET_COLORS = [
   "#05131d", // black
   "#562d80", // purple
