@@ -9,7 +9,7 @@
       src="../libraries/p5.min.js"
     ></script>
     <script type="module">
-      import { sketch } from "./ImportScene.js";
+      import { sketch } from "./SnapshotViewer.js";
       import "../sketchlib/sketchbook-navbar.js";
       const p5_sketch = new p5(sketch, "sketch");
     </script>
@@ -18,7 +18,7 @@
   <body>
     <sketchbook-navbar></sketchbook-navbar>
     <div class="container">
-      <h1>🧪Import Scene (2026-08)</h1>
+      <h1>🧪Scene Snapshot Viewer (2026-08)</h1>
       <div id="sketch"></div>
       <div class="controls">
         <label for="import">Import JSON scene</label>
@@ -27,7 +27,8 @@
         <p class="errors" id="errors"></p>
       </div>
       <div class="description">
-        Tool for importing a scene from JSON and rendering it
+        Prototype of importing a scene from a JSON description. Right now this
+        only works with Mosaic Slider.
       </div>
     </div>
   </body>
