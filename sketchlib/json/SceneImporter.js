@@ -3,6 +3,22 @@ import { Primitive } from "../primitives/Primitive.js";
 import { Rect } from "../primitives/Rect.js";
 import { SimpleGroupPrimitive } from "../primitives/SimpleGroupPrimitive.js";
 
+/**
+ * @type {{[type: string]: function(any): Primitive}}
+ */
+const PARSERS = {
+  rect: Rect.from_json,
+};
+
+/**
+ * Object that can import a scene from JSON.
+ *
+ * This is still at the prototype stage, details are subject to change. Use
+ * at your own risk!
+ *
+ * Right now this doesn't really need to be a class. However, in the future
+ * some sketches with custom primitives may need to register more parsers.
+ */
 export class SceneImporter {
   /**
    *
@@ -10,14 +26,21 @@ export class SceneImporter {
    * @returns {Primitive}
    */
   parse_json(scene) {
+    if (!scene.type) {
+      throw new Error(`scene.type must be specified!: ${scene.type}`);
+    }
+
     if (scene.type === "group") {
       // Groups need careful treatment since the inner types are dynamic
       return this.parse_group(scene);
-    } else if (scene.type === "rect") {
-      return Rect.from_json(scene);
     }
 
-    throw new Error(`unsupported scene JSON: ${scene.type}`);
+    const parse_func = PARSERS[scene.type];
+    if (!parse_func) {
+      throw new Error(`unsupported scene JSON: ${scene.type}`);
+    }
+
+    return parse_func(scene);
   }
 
   /**
