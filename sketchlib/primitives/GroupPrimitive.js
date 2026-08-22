@@ -1,3 +1,4 @@
+import { SceneImporter } from "../json/SceneImporter.js";
 import { ToJSON } from "../json/ToJSON.js";
 import {
   PrimitiveCollectionStats,
@@ -199,5 +200,21 @@ export class GroupPrimitive {
     }
 
     return result;
+  }
+
+  /**
+   *
+   * @param {SceneImporter} importer
+   * @param {any} obj
+   * @returns {GroupPrimitive}
+   */
+  static from_json(importer, obj) {
+    const style = obj.style ? Style.from_json(obj.style) : undefined;
+    const children = obj.children.map(importer.parse_json);
+
+    return new GroupPrimitive(children, {
+      style,
+      // TODO: transform, text_style
+    });
   }
 }

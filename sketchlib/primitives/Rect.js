@@ -148,6 +148,20 @@ export class Rect {
     const { x: w, y: h } = this.dimensions;
     return { type: "rect", x, y, w, h };
   }
+
+  /**
+   *
+   * @param {any} obj
+   * @returns {Rect}
+   */
+  static from_json(obj) {
+    if (obj.type !== "rect") {
+      throw new Error("obj.type must be 'rect'");
+    }
+
+    const { x, y, w, h } = obj;
+    return new Rect(new Point(x, y), new Direction(w, h));
+  }
 }
 
 /**

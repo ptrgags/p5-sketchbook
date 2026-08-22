@@ -115,7 +115,7 @@ export class Style {
      */
     const result = {
       type: "style",
-      stroke_width: this.stroke_width,
+      width: this.width,
     };
 
     if (this.stroke) {
@@ -127,6 +127,23 @@ export class Style {
     }
 
     return result;
+  }
+
+  /**
+   *
+   * @param {any} obj
+   * @returns {Style}
+   */
+  static from_json(obj) {
+    if (obj.type !== "style") {
+      throw new Error("type must be 'style'");
+    }
+
+    const width = obj.width;
+    const stroke = obj.stroke ? Color.from_hex_code(obj.stroke) : undefined;
+    const fill = obj.fill ? Color.from_hex_code(obj.fill) : undefined;
+
+    return new Style({ width, stroke, fill });
   }
 
   /**
