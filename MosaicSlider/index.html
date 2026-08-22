@@ -19,13 +19,35 @@
         padding: 10px;
         text-align: center;
       }
+
+      .hidden {
+        display: none;
+      }
     </style>
   </head>
   <body>
     <sketchbook-navbar></sketchbook-navbar>
     <div class="container">
-      <h1>Mosaic Slider (2025)</h1>
+      <h1>Mosaic Slider (2025, 2026-08)</h1>
       <div id="sketch"></div>
+      <div id="slash-help" class="hidden">
+        <h2>Slash Command Help</h2>
+        <p>
+          <kbd>/color[slot:0-3][color:0-7]</kbd> - set one of the 4 color slots
+          to a preset color (chosen to match my IRL LEGO bricks)
+        </p>
+        <p>
+          LEGO brick color key:<br />
+          0=black <br />
+          1=purple <br />
+          2=white <br />
+          3=vibrant yellow <br />
+          4=dark red <br />
+          5=dark blue <br />
+          6=orange <br />
+          7=dark turquoise <br />
+        </p>
+      </div>
       <div class="controls">
         <input id="color-0" type="color" />
         <input id="color-1" type="color" />
