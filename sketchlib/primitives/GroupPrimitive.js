@@ -9,6 +9,7 @@ import { svg_tag } from "../svg/svg_tag.js";
 import { ToSVG } from "../svg/ToSVG.js";
 import { Primitive } from "./Primitive.js";
 import { Rigid } from "./Rigid.js";
+import { SimpleGroupPrimitive } from "./SimpleGroupPrimitive.js";
 import { TextStyle } from "./TextStyle.js";
 
 /**
@@ -204,15 +205,19 @@ export class GroupPrimitive {
 
   /**
    *
-   * @param {SceneImporter} importer
    * @param {any} obj
-   * @returns {GroupPrimitive}
+   * @param {Primitive[]} parsed_children Children parsed from the JSON file
+   * @returns {GroupPrimitive | SimpleGroupPrimitive}
    */
-  static from_json(importer, obj) {
-    const style = obj.style ? Style.from_json(obj.style) : undefined;
-    const children = obj.children.map(importer.parse_json);
+  static from_json(obj, parsed_children) {
+    // No styling, just simple grouping, so use the simpler version of
+    // this class.
+    if (!obj.style && !obj.transform && !obj.text_style) {
+      return new SimpleGroupPrimitive(...parsed_children);
+    }
 
-    return new GroupPrimitive(children, {
+    const style = obj.style ? Style.from_json(obj.style) : undefined;
+    return new GroupPrimitive(parsed_children, {
       style,
       // TODO: transform, text_style
     });
