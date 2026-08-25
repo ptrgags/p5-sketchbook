@@ -4,6 +4,7 @@ import { DX7KeyLevelScaling } from "../../DX7PatchViewer/DX7KeyLevelScaling.js";
 import { DX7LFO } from "../../DX7PatchViewer/DX7LFO.js";
 import { DX7Operator } from "../../DX7PatchViewer/DX7Operator.js";
 import { DX7Voice } from "../../DX7PatchViewer/DX7Voice.js";
+import { dx7_checksum } from "./dx7_checksum.js";
 import {
   TOTAL_LENGTH,
   STATUS_START,
@@ -17,6 +18,7 @@ import {
   VOICE_START,
   TRAILER_OFFSET,
   STATUS_END,
+  VOICE_COUNT,
 } from "./dx7_constants.js";
 
 /**
@@ -148,12 +150,14 @@ export function encode_dx7(cartridge) {
     encode_voice(voice, bytes, VOICE_START + i * VOICE_LENGTH);
   }
 
-  let checksum = 0;
-  for (let i = VOICE_START; i < TRAILER_OFFSET; i++) {
-    checksum += bytes[i];
-  }
+  const data_bytes = new Uint8Array(
+    bytes.buffer,
+    VOICE_START,
+    VOICE_COUNT * VOICE_LENGTH,
+  );
+  const checksum = dx7_checksum(data_bytes);
 
-  bytes[TRAILER_OFFSET] = checksum & 0b1111111;
+  bytes[TRAILER_OFFSET] = checksum;
   bytes[TRAILER_OFFSET + 1] = STATUS_END;
 
   return bytes.buffer;
