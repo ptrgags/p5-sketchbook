@@ -14,7 +14,7 @@ import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
 import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
 import { Style } from "../sketchlib/Style.js";
 import { ALGORITHMS } from "./algos.js";
-import { decode_dx7 } from "./decode_dx7.js";
+import { decode_dx7 } from "../sketchlib/dx7/decode_dx7.js";
 import { DX7Cartridge } from "./DX7Cartridge.js";
 import { DX7EnvelopeVisualizer } from "./DX7EnvelopeVisualizer.js";
 import { DX7Operator } from "./DX7Operator.js";

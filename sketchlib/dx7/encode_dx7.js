@@ -1,9 +1,9 @@
-import { DX7Cartridge } from "../DX7PatchViewer/DX7Cartridge.js";
-import { DX7Envelope } from "../DX7PatchViewer/DX7Envelope.js";
-import { DX7KeyLevelScaling } from "../DX7PatchViewer/DX7KeyLevelScaling.js";
-import { DX7LFO } from "../DX7PatchViewer/DX7LFO.js";
-import { DX7Operator } from "../DX7PatchViewer/DX7Operator.js";
-import { DX7Voice } from "../DX7PatchViewer/DX7Voice.js";
+import { DX7Cartridge } from "../../DX7PatchViewer/DX7Cartridge.js";
+import { DX7Envelope } from "../../DX7PatchViewer/DX7Envelope.js";
+import { DX7KeyLevelScaling } from "../../DX7PatchViewer/DX7KeyLevelScaling.js";
+import { DX7LFO } from "../../DX7PatchViewer/DX7LFO.js";
+import { DX7Operator } from "../../DX7PatchViewer/DX7Operator.js";
+import { DX7Voice } from "../../DX7PatchViewer/DX7Voice.js";
 import {
   TOTAL_LENGTH,
   STATUS_START,
@@ -17,7 +17,7 @@ import {
   VOICE_START,
   TRAILER_OFFSET,
   STATUS_END,
-} from "../sketchlib/dx7/dx7_constants.js";
+} from "./dx7_constants.js";
 
 /**
  * Write an envelope (or pitch envelope) to the buffer

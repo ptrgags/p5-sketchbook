@@ -1,9 +1,9 @@
-import { decode_dx7 } from "../DX7PatchViewer/decode_dx7.js";
+import { decode_dx7 } from "../sketchlib/dx7/decode_dx7.js";
 import { DX7Cartridge } from "../DX7PatchViewer/DX7Cartridge.js";
 import { DX7Voice } from "../DX7PatchViewer/DX7Voice.js";
 import { download_file } from "../sketchlib/dom/download_file.js";
 import { expect_element } from "../sketchlib/dom/expect_element.js";
-import { encode_dx7_file } from "./encode_dx7.js";
+import { encode_dx7_file } from "../sketchlib/dx7/encode_dx7.js";
 
 /**
  *
