@@ -102,7 +102,7 @@ describe("DX7Voice", () => {
     });
 
     expect(voice.transpose).toEqual(3);
-    expect(voice.transpose_display).toEqual(-4);
+    expect(voice.transpose_display).toEqual(-21);
   });
 
   it("rename returns same voice with different name", () => {

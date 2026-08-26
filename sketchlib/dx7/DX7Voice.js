@@ -61,11 +61,11 @@ export class DX7Voice {
   }
 
   /**
-   * Get the human-readable transpose from -7 to 7
+   * Get the human-readable transpose from -24 to +24
    * @type {number}
    */
   get transpose_display() {
-    return this.transpose - 7;
+    return this.transpose - 24;
   }
 
   /**
