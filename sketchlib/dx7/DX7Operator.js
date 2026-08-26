@@ -10,7 +10,8 @@ import { DX7KeyLevelScaling } from "./DX7KeyLevelScaling.js";
  *  freq: DX7FreqSettings,
  *  amp_mod_sensitivity: number,
  *  key_vel_sensitivity: number,
- *  key_scaling: DX7KeyLevelScaling
+ *  key_rate_scaling: number,
+ *  key_level_scaling: DX7KeyLevelScaling
  * }} DX7OperatorOptions
  */
 
@@ -25,7 +26,9 @@ export class DX7Operator {
     this.level = options.level;
     this.freq = options.freq;
     this.amp_mod_sensitivity = options.amp_mod_sensitivity;
-    this.key_scaling = options.key_scaling;
+    this.key_rate_scaling = options.key_rate_scaling;
+    this.key_vel_sensitivity = options.key_vel_sensitivity;
+    this.key_level_scaling = options.key_level_scaling;
   }
 
   get name() {
@@ -34,13 +37,11 @@ export class DX7Operator {
 
   /**
    * Initialize an operator to default settings
-   * @param {number} num
+   * @param {number} num Number of the operator 1-6
+   * @param {number} level Output level from 0 to 99
    * @returns {DX7Operator}
    */
-  static init(num) {
-    // Only Operator 1 is audible by default
-    const level = num === 0 ? 99 : 0;
-
+  static init(num, level) {
     return new DX7Operator({
       num,
       envelope: DX7Envelope.DEFAULT_ENV,
@@ -48,7 +49,8 @@ export class DX7Operator {
       freq: DX7FreqSettings.INIT,
       amp_mod_sensitivity: 0,
       key_vel_sensitivity: 0,
-      key_scaling: DX7KeyLevelScaling.INIT,
+      key_rate_scaling: 0,
+      key_level_scaling: DX7KeyLevelScaling.INIT,
     });
   }
 }

@@ -1,7 +1,10 @@
-import { decode_dx7 } from "../DX7PatchViewer/decode_dx7.js";
-import { DX7Voice } from "../DX7PatchViewer/DX7Voice.js";
+import { decode_dx7 } from "../sketchlib/dx7/decode_dx7.js";
+import { download_file } from "../sketchlib/dom/download_file.js";
 import { expect_element } from "../sketchlib/dom/expect_element.js";
 import { decode_opm } from "./decode_opm.js";
+import { encode_dx7_file } from "../sketchlib/dx7/encode_dx7.js";
+import { DX7Voice } from "../sketchlib/dx7/DX7Voice.js";
+import { DX7Cartridge } from "../sketchlib/dx7/DX7Cartridge.js";
 
 /**
  *
@@ -126,7 +129,7 @@ export class DX7CartridgeOrganizer {
       delete_button.disabled = false;
 
       // Uncomment when I'm ready to do the exporting
-      // rename_button.disabled = false;
+      rename_button.disabled = false;
     });
 
     rename_button.addEventListener("click", () => {
@@ -200,6 +203,12 @@ export class DX7CartridgeOrganizer {
 
       // Since we removed a voice, there will always be room for more!
       update_add_button();
+    });
+
+    export_button.addEventListener("click", () => {
+      const cartridge = new DX7Cartridge(this.cartridge_voices);
+      const file = encode_dx7_file(cartridge, "cartridge.syx");
+      download_file(file);
     });
   }
 }

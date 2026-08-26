@@ -14,11 +14,10 @@ import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
 import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
 import { Style } from "../sketchlib/Style.js";
 import { ALGORITHMS } from "./algos.js";
-import { decode_dx7 } from "./decode_dx7.js";
-import { DX7Cartridge } from "./DX7Cartridge.js";
+import { decode_dx7 } from "../sketchlib/dx7/decode_dx7.js";
 import { DX7EnvelopeVisualizer } from "./DX7EnvelopeVisualizer.js";
-import { DX7Operator } from "./DX7Operator.js";
 import { DX7OperatorVisualizer } from "./DX7OperatorVisualizer.js";
+import { DX7Cartridge } from "../sketchlib/dx7/DX7Cartridge.js";
 
 function clear_errors() {
   expect_element("errors", HTMLParagraphElement).innerText = "";
@@ -108,7 +107,7 @@ export const sketch = (p) => {
     }
 
     const voice = cartridge.voices[selected_voice];
-    const algo = voice.algorithm - 1;
+    const algo = voice.algorithm;
     const algo_prim = ALGORITHMS[algo];
     ALGORITHM_SLOT.regroup(algo_prim);
 
@@ -132,7 +131,7 @@ export const sketch = (p) => {
 
     const feedback = cartridge.voices[selected_voice].feedback ?? 0;
 
-    TEXT_GLOBAL.text = `Voice ${selected_voice + 1}: ${voice.name}\nAlgo: ${algo + 1} Feedback ${feedback}`;
+    TEXT_GLOBAL.text = `Voice ${selected_voice + 1}: ${voice.name}\nAlgo: ${algo + 1} Feedback ${feedback}\nTranspose: ${voice.transpose_display}`;
   }
 
   /**
