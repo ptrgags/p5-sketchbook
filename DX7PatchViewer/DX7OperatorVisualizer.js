@@ -30,7 +30,7 @@ export class DX7OperatorVisualizer {
       env_bounds,
     );
 
-    const text = `${operator.name}    L:${operator.level}\nf:${operator.freq}\n${operator.key_scaling}`;
+    const text = `${operator.name}    L:${operator.level}\nf:${operator.freq}\n${operator.key_level_scaling}\nRS:${operator.key_rate_scaling}`;
     this.primitive = group(
       new GroupPrimitive(new TextPrimitive(text, bounds.position), {
         style: Style.flat(Color.BLACK),

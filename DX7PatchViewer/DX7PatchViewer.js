@@ -107,7 +107,7 @@ export const sketch = (p) => {
     }
 
     const voice = cartridge.voices[selected_voice];
-    const algo = voice.algorithm - 1;
+    const algo = voice.algorithm;
     const algo_prim = ALGORITHMS[algo];
     ALGORITHM_SLOT.regroup(algo_prim);
 
@@ -131,7 +131,7 @@ export const sketch = (p) => {
 
     const feedback = cartridge.voices[selected_voice].feedback ?? 0;
 
-    TEXT_GLOBAL.text = `Voice ${selected_voice + 1}: ${voice.name}\nAlgo: ${algo + 1} Feedback ${feedback}`;
+    TEXT_GLOBAL.text = `Voice ${selected_voice + 1}: ${voice.name}\nAlgo: ${algo + 1} Feedback ${feedback}\nTranspose: ${voice.transpose_display}`;
   }
 
   /**
