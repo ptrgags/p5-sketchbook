@@ -37,13 +37,11 @@ export class DX7Operator {
 
   /**
    * Initialize an operator to default settings
-   * @param {number} num
+   * @param {number} num Number of the operator 1-6
+   * @param {number} level Output level from 0 to 99
    * @returns {DX7Operator}
    */
-  static init(num) {
-    // Only Operator 1 is audible by default
-    const level = num === 0 ? 99 : 0;
-
+  static init(num, level) {
     return new DX7Operator({
       num,
       envelope: DX7Envelope.DEFAULT_ENV,

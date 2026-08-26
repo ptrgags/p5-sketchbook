@@ -34,7 +34,7 @@ function sanitize_name(raw_name) {
 export class DX7Voice {
   /**
    * Constructor
-   * @param {DX7VoiceOptions} options
+   * @param {DX7VoiceOptions} options Options. note that values are stored in packed format like in the binary
    */
   constructor(options) {
     if (options.operators.length !== 6) {
@@ -48,7 +48,24 @@ export class DX7Voice {
     this.lfo = options.lfo;
     this.osc_key_sync = options.osc_key_sync;
     this.feedback = options.feedback;
+    // note: this is stored as 0-14, but this.transpose_display converts to -7-7
     this.transpose = options.transpose;
+  }
+
+  /**
+   * Return the human-readable algorithm number from 1-32
+   * @type {number}
+   */
+  get algorithm_display() {
+    return this.algorithm + 1;
+  }
+
+  /**
+   * Get the human-readable transpose from -7 to 7
+   * @type {number}
+   */
+  get transpose_display() {
+    return this.transpose - 7;
   }
 
   /**
@@ -76,16 +93,17 @@ DX7Voice.INIT = Object.freeze(
     algorithm: 0,
     feedback: 0,
     operators: [
-      DX7Operator.init(1),
-      DX7Operator.init(2),
-      DX7Operator.init(3),
-      DX7Operator.init(4),
-      DX7Operator.init(5),
-      DX7Operator.init(6),
+      DX7Operator.init(1, 99),
+      DX7Operator.init(2, 0),
+      DX7Operator.init(3, 0),
+      DX7Operator.init(4, 0),
+      DX7Operator.init(5, 0),
+      DX7Operator.init(6, 0),
     ],
     pitch_env: DX7Envelope.DEFAULT_PITCH,
     lfo: DX7LFO.INIT,
     osc_key_sync: true,
-    transpose: 0,
+    // transpose 0 is stored unsigned as 7
+    transpose: 7,
   }),
 );

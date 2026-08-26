@@ -1,5 +1,5 @@
-import { MIDIPitch } from "../sketchlib/music/MIDIPitch.js";
-import { A_1 } from "../sketchlib/music/pitches.js";
+import { MIDIPitch } from "../music/MIDIPitch.js";
+import { A_1 } from "../music/pitches.js";
 
 /**
  * There are four keyboard scaling types, -LIN, -EXP, +EXP, +LIN
