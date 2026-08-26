@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { DX7Cartridge } from "../../DX7PatchViewer/DX7Cartridge.js";
+import { DX7Cartridge } from "./DX7Cartridge.js";
 import { decode_dx7 } from "./decode_dx7.js";
 import { encode_dx7 } from "./encode_dx7.js";
 import {
@@ -11,7 +11,7 @@ import {
   SUB_STATUS,
   VOICE_COUNT,
 } from "./dx7_constants.js";
-import { DX7ScalingCurveType } from "../../DX7PatchViewer/DX7KeyLevelScaling.js";
+import { DX7ScalingCurveType } from "./DX7KeyLevelScaling.js";
 import { dx7_checksum } from "./dx7_checksum.js";
 
 const HEADER = [

@@ -12,17 +12,14 @@ import {
   VOICE_LENGTH,
   VOICE_START,
 } from "./dx7_constants.js";
-import { DX7Cartridge } from "../../DX7PatchViewer/DX7Cartridge.js";
-import { DX7Envelope } from "../../DX7PatchViewer/DX7Envelope.js";
-import { DX7FreqSettings } from "../../DX7PatchViewer/DX7FreqSettings.js";
-import {
-  DX7KeyLevelScaling,
-  DX7ScalingCurve,
-} from "../../DX7PatchViewer/DX7KeyLevelScaling.js";
-import { DX7LFO } from "../../DX7PatchViewer/DX7LFO.js";
-import { DX7Operator } from "../../DX7PatchViewer/DX7Operator.js";
-import { DX7Voice } from "../../DX7PatchViewer/DX7Voice.js";
 import { dx7_checksum } from "./dx7_checksum.js";
+import { DX7Envelope } from "./DX7Envelope.js";
+import { DX7Operator } from "./DX7Operator.js";
+import { DX7LFO } from "./DX7LFO.js";
+import { DX7KeyLevelScaling, DX7ScalingCurve } from "./DX7KeyLevelScaling.js";
+import { DX7FreqSettings } from "./DX7FreqSettings.js";
+import { DX7Voice } from "./DX7Voice.js";
+import { DX7Cartridge } from "./DX7Cartridge.js";
 
 /**
  * Decode an envelope

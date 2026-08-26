@@ -1,4 +1,5 @@
 import { Color } from "../sketchlib/Color.js";
+import { DX7Operator } from "../sketchlib/dx7/DX7Operator.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { Rect } from "../sketchlib/primitives/Rect.js";
@@ -6,7 +7,6 @@ import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { TextPrimitive } from "../sketchlib/primitives/TextPrimitive.js";
 import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
 import { Style } from "../sketchlib/Style.js";
-import { DX7Operator } from "./DX7Operator.js";
 import { DX7EnvelopeVisualizer } from "./DX7EnvelopeVisualizer.js";
 
 const TEXT_STYLE_OP = new TextStyle(12, "left", "top");

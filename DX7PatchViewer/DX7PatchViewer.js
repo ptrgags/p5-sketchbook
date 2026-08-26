@@ -15,10 +15,9 @@ import { TextStyle } from "../sketchlib/primitives/TextStyle.js";
 import { Style } from "../sketchlib/Style.js";
 import { ALGORITHMS } from "./algos.js";
 import { decode_dx7 } from "../sketchlib/dx7/decode_dx7.js";
-import { DX7Cartridge } from "./DX7Cartridge.js";
 import { DX7EnvelopeVisualizer } from "./DX7EnvelopeVisualizer.js";
-import { DX7Operator } from "./DX7Operator.js";
 import { DX7OperatorVisualizer } from "./DX7OperatorVisualizer.js";
+import { DX7Cartridge } from "../sketchlib/dx7/DX7Cartridge.js";
 
 function clear_errors() {
   expect_element("errors", HTMLParagraphElement).innerText = "";
