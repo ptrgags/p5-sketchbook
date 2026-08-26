@@ -190,7 +190,7 @@ function make_cartridge_bytes(...voices) {
 
   const checksum = dx7_checksum(new Uint8Array(data));
 
-  bytes.push(checksum, STATUS_END);
+  bytes.push(...data, checksum, STATUS_END);
   return new Uint8Array(bytes);
 }
 
