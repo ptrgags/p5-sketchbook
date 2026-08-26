@@ -4,7 +4,7 @@
  * Fixed sets a fixed value in Hertz
  * @enum {number}
  */
-const DX7FreqMode = {
+export const DX7FreqMode = {
   RATIO: 0,
   FIXED: 1,
 };

@@ -36,6 +36,24 @@ export class DX7Operator {
   }
 
   /**
+   * Create a copy of this operator with a new number
+   * @param {number} num
+   * @returns {DX7Operator}
+   */
+  renumber(num) {
+    return new DX7Operator({
+      num,
+      envelope: this.envelope,
+      level: this.level,
+      freq: this.freq,
+      amp_mod_sensitivity: this.amp_mod_sensitivity,
+      key_rate_scaling: this.key_rate_scaling,
+      key_vel_sensitivity: this.key_vel_sensitivity,
+      key_level_scaling: this.key_level_scaling,
+    });
+  }
+
+  /**
    * Initialize an operator to default settings
    * @param {number} num Number of the operator 1-6
    * @param {number} level Output level from 0 to 99

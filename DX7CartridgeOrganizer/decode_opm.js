@@ -58,7 +58,7 @@ function decode_op(op_line) {
   return new OPMOperator({
     envelope,
     total_level: parseInt(tl),
-    keyboard_scaling: parseInt(ks),
+    keyboard_rate_scaling: parseInt(ks),
     multiplier: parseInt(mul),
     detune1: parseInt(dt1),
     detune2: parseInt(dt2),
