@@ -144,7 +144,7 @@ export function encode_dx7(cartridge) {
   bytes[2] = SUB_STATUS;
   bytes[3] = FORMAT_32_VOICES;
   bytes[4] = DATA_LENGTH >> 7;
-  bytes[5] = DATA_LENGTH & 0b111_1111;
+  bytes[5] = DATA_LENGTH & 0b1111111;
 
   for (const [i, voice] of cartridge.voices.entries()) {
     encode_voice(voice, bytes, VOICE_START + i * VOICE_LENGTH);
