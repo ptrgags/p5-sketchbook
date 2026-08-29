@@ -67,12 +67,14 @@ export class ZinePrimitive {
       pdf.lib.pushGraphicsState(),
       // we want a y-down coordinate system in the bottom right-hand
       // coordinate
-      //pdf.lib.translate(3 * ZINE_PAGE_SIZE.x, 4 * ZINE_PAGE_SIZE.y),
+      pdf.lib.translate(3 * ZINE_PAGE_SIZE.x, ZINE_PAGE_SIZE.y),
+      pdf.lib.scale(SCALE_FACTOR, -SCALE_FACTOR),
       //pdf.lib.scale(SCALE_FACTOR, -SCALE_FACTOR),
 
       pdf.lib.setStrokingRgbColor(0.0, 0.0, 0.0),
       pdf.lib.setFillingRgbColor(1.0, 0.0, 0.0),
-      pdf.lib.rectangle(0, 0, 100, 100),
+      // rectangles in _pixels_
+      pdf.lib.rectangle(0, 0, 400, 600),
       pdf.lib.fillAndStroke(),
     );
     //this.pages.front.draw_pdf(pdf);
