@@ -22,6 +22,11 @@ const IMPORTER = new SceneImporter();
 export class SnapshotZineMaker {
   constructor() {
     this.zine = new ZinePrimitive();
+
+    /**
+     * @type {string[]}
+     */
+    this.old_urls = [];
   }
 
   init_ui() {
@@ -46,7 +51,34 @@ export class SnapshotZineMaker {
   }
 
   async update_preview() {
+    // Free the data for previous PDF files
+    if (this.old_urls.length > 0) {
+      this.old_urls.forEach(URL.revokeObjectURL);
+      this.old_urls.length = 0;
+    }
+
     const file = await make_pdf(this.zine, "zine.pdf");
-    download_file(file);
+
+    const url = URL.createObjectURL(file);
+    this.old_urls.push(url);
+
+    const preview_object = document.createElement("object");
+    preview_object.setAttribute("type", "application/pdf");
+    preview_object.setAttribute("width", "800");
+    preview_object.setAttribute("height", "1000");
+    preview_object.setAttribute("data", url);
+
+    const output_div = expect_element("output", HTMLDivElement);
+    output_div.replaceChildren(preview_object);
+  }
+
+  /**
+   *
+   * @param {ArrayBuffer} buffer
+   */
+  download(buffer) {
+    const file = new File([buffer], "zine.pdf", {
+      type: "application/pdf",
+    });
   }
 }
