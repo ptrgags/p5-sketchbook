@@ -29,6 +29,60 @@ const ZINE_PAGE_SIZE = new Direction(2.5 * PPI_PDF, 3.5 * PPI_PDF);
  */
 
 /**
+ * @type {{
+ *  page: keyof ZinePages,
+ *  origin_x: number
+ *  rotate: boolean
+ * }[]}
+ */
+const LAYOUT = [
+  {
+    page: "front",
+    // all of the origin points are on the center line of the
+    // document. also, this is measured in pages
+    origin_x: 3,
+    // if true, rotate the coordinate system 180 degrees
+    // this is due the way a zine is folded
+    rotate: false,
+  },
+  {
+    page: "page1",
+    origin_x: 4,
+    rotate: true,
+  },
+  {
+    page: "page2",
+    origin_x: 3,
+    rotate: true,
+  },
+  {
+    page: "page3",
+    origin_x: 2,
+    rotate: true,
+  },
+  {
+    page: "page4",
+    origin_x: 1,
+    rotate: true,
+  },
+  {
+    page: "page5",
+    origin_x: 0,
+    rotate: false,
+  },
+  {
+    page: "page6",
+    origin_x: 1,
+    rotate: false,
+  },
+  {
+    page: "back",
+    origin_x: 2,
+    rotate: false,
+  },
+];
+
+/**
  * @implements {PDFPrimitive}
  */
 export class ZinePrimitive {
@@ -50,7 +104,7 @@ export class ZinePrimitive {
 
   /**
    *
-   * @param {string} id
+   * @param {keyof ZinePages} id
    * @param {PDFPrimitive} contents
    */
   set_page(id, contents) {
@@ -62,6 +116,43 @@ export class ZinePrimitive {
    * @param {PDFContext} pdf
    */
   draw_pdf(pdf) {
+    // push state
+    // translate to origin
+    // rotate 180 if needed
+    // scale by scale factor (can be combined with rotation)
+    // <draw page>
+    // pop state
+
+    for (const page_layout of LAYOUT) {
+      // PDF uses a y-up coordinate system but screens use y-down
+      // so for right-side up pages we want to flip y.
+      // however, if the page is rotated, we flip x instead.
+      const x_dir = page_layout.rotate ? -1 : 1;
+      const y_dir = page_layout.rotate ? 1 : -1;
+
+      pdf.page.pushOperators(
+        pdf.lib.pushGraphicsState(),
+
+        pdf.lib.translate(
+          page_layout.origin_x * ZINE_PAGE_SIZE.x,
+          ZINE_PAGE_SIZE.y,
+        ),
+        pdf.lib.scale(x_dir * SCALE_FACTOR, y_dir * SCALE_FACTOR),
+
+        // TEMP: Draw a rectangle from the top left corner of the page
+        // covering most of the page. This is to make sure we positioned
+        // the coordinate system correctly.
+        pdf.lib.setStrokingRgbColor(0.0, 0.0, 0.0),
+        pdf.lib.setFillingRgbColor(1.0, 0.0, 0.0),
+        // Note: this is drawn in _pixel_ coordinates!
+        pdf.lib.rectangle(0, 0, 400, 600),
+        pdf.lib.fillAndStroke(),
+
+        pdf.lib.popGraphicsState(),
+      );
+    }
+
+    /*
     // front cover
     pdf.page.pushOperators(
       pdf.lib.pushGraphicsState(),
@@ -79,5 +170,6 @@ export class ZinePrimitive {
     );
     //this.pages.front.draw_pdf(pdf);
     pdf.page.pushOperators(pdf.lib.popGraphicsState());
+    */
   }
 }

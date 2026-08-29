@@ -6,6 +6,9 @@ import { Primitive } from "../sketchlib/primitives/Primitive.js";
 import { group } from "../sketchlib/primitives/shorthand.js";
 import { ZinePrimitive } from "./ZinePrimitive.js";
 
+/**
+ * @type {(keyof import("./ZinePrimitive.js").ZinePages)[]}
+ */
 const PAGE_NAMES = [
   "front",
   "page1",
@@ -70,15 +73,5 @@ export class SnapshotZineMaker {
 
     const output_div = expect_element("output", HTMLDivElement);
     output_div.replaceChildren(preview_object);
-  }
-
-  /**
-   *
-   * @param {ArrayBuffer} buffer
-   */
-  download(buffer) {
-    const file = new File([buffer], "zine.pdf", {
-      type: "application/pdf",
-    });
   }
 }
