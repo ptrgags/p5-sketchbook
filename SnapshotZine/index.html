@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script type="module">
+      import { SnapshotZineMaker } from "./SnapshotZineMaker.js";
+
+      const ZINE_MAKER = new SnapshotZineMaker();
+
+      window.addEventListener("load", () => {
+        ZINE_MAKER.init_ui();
+      });
+    </script>
+    <link rel="stylesheet" href="../styles/layout.css" />
+  </head>
+  <body>
+    <sketchbook-navbar></sketchbook-navbar>
+    <div class="container">
+      <h1>🧪Scene Snapshot Zine Maker (2026-08)</h1>
+      <div class="vertical">
+        <label for="front">Front Cover</label>
+        <input
+          type="file"
+          name="front"
+          id="import-front"
+          accept=".scene.json"
+        />
+        <label for="page1">Page 1</label>
+        <input
+          type="file"
+          name="page1"
+          id="import-page1"
+          accept=".scene.json"
+        />
+        <label for="page2">Page 2</label>
+        <input
+          type="file"
+          name="page2"
+          id="import-page2"
+          accept=".scene.json"
+        />
+        <label for="page3">Page 3</label>
+        <input
+          type="file"
+          name="page3"
+          id="import-page3"
+          accept=".scene.json"
+        />
+        <label for="page4">Page 4</label>
+        <input
+          type="file"
+          name="page4"
+          id="import-page4"
+          accept=".scene.json"
+        />
+        <label for="page5">Page 5</label>
+        <input
+          type="file"
+          name="page5"
+          id="import-page5"
+          accept=".scene.json"
+        />
+        <label for="page6">Page 6</label>
+        <input
+          type="file"
+          name="page6"
+          id="import-page6"
+          accept=".scene.json"
+        />
+        <label for="back">Back Cover</label>
+        <input type="file" name="back" id="import-back" accept=".scene.json" />
+      </div>
+      <div class="description">
+        Import up to 8 .scene.json files (exported from other sketches) and
+        create a mini zine printout!
+      </div>
+      <div id="output"></div>
+    </div>
+  </body>
+</html>

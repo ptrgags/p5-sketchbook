@@ -1,4 +1,5 @@
 import { ToJSON } from "../json/ToJSON.js";
+import { PDFPrimitive } from "../pdf/PDFPrimitive.js";
 import {
   PrimitiveCollectionStats,
   RenderStats,
@@ -45,6 +46,14 @@ export class SimpleGroupPrimitive {
   draw(p) {
     for (const child of this.children) {
       child.draw(p);
+    }
+  }
+
+  draw_pdf(pdf) {
+    for (const child of this.children) {
+      if (PDFPrimitive.is_pdf_compatible(child)) {
+        child.draw_pdf(pdf);
+      }
     }
   }
 
