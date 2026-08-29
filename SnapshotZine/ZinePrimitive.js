@@ -139,37 +139,16 @@ export class ZinePrimitive {
         ),
         pdf.lib.scale(x_dir * SCALE_FACTOR, y_dir * SCALE_FACTOR),
 
-        // TEMP: Draw a rectangle from the top left corner of the page
-        // covering most of the page. This is to make sure we positioned
-        // the coordinate system correctly.
+        // draw the page boundary
         pdf.lib.setStrokingRgbColor(0.0, 0.0, 0.0),
-        pdf.lib.setFillingRgbColor(1.0, 0.0, 0.0),
-        // Note: this is drawn in _pixel_ coordinates!
-        pdf.lib.rectangle(0, 0, 400, 600),
-        pdf.lib.fillAndStroke(),
-
-        pdf.lib.popGraphicsState(),
+        pdf.lib.rectangle(0, 0, 500, 700),
+        pdf.lib.stroke(),
       );
+
+      const primitive = this.pages[page_layout.page];
+      primitive.draw_pdf(pdf);
+
+      pdf.page.pushOperators(pdf.lib.popGraphicsState());
     }
-
-    /*
-    // front cover
-    pdf.page.pushOperators(
-      pdf.lib.pushGraphicsState(),
-      // we want a y-down coordinate system in the bottom right-hand
-      // coordinate
-      pdf.lib.translate(3 * ZINE_PAGE_SIZE.x, ZINE_PAGE_SIZE.y),
-      pdf.lib.scale(SCALE_FACTOR, -SCALE_FACTOR),
-      //pdf.lib.scale(SCALE_FACTOR, -SCALE_FACTOR),
-
-      pdf.lib.setStrokingRgbColor(0.0, 0.0, 0.0),
-      pdf.lib.setFillingRgbColor(1.0, 0.0, 0.0),
-      // rectangles in _pixels_
-      pdf.lib.rectangle(0, 0, 400, 600),
-      pdf.lib.fillAndStroke(),
-    );
-    //this.pages.front.draw_pdf(pdf);
-    pdf.page.pushOperators(pdf.lib.popGraphicsState());
-    */
   }
 }

@@ -1,4 +1,5 @@
 import { ToJSON } from "../json/ToJSON.js";
+import { PDFContext } from "../pdf/PDFContext.js";
 import { PDFPrimitive } from "../pdf/PDFPrimitive.js";
 import {
   PrimitiveCollectionStats,
@@ -15,6 +16,7 @@ import { Primitive } from "./Primitive.js";
  * @implements {PrimitiveCollectionStats}
  * @implements {ToSVG}
  * @implements {ToJSON}
+ * @implements {PDFPrimitive}
  */
 export class SimpleGroupPrimitive {
   /**
@@ -49,11 +51,17 @@ export class SimpleGroupPrimitive {
     }
   }
 
+  /**
+   *
+   * @param {PDFContext} pdf
+   */
   draw_pdf(pdf) {
     for (const child of this.children) {
-      if (PDFPrimitive.is_pdf_compatible(child)) {
-        child.draw_pdf(pdf);
+      if (!PDFPrimitive.is_pdf_compatible(child)) {
+        console.warn("PDF export: skipping child", child);
+        continue;
       }
+      child.draw_pdf(pdf);
     }
   }
 

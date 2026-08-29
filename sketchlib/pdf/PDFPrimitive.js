@@ -15,6 +15,6 @@ export class PDFPrimitive {
    * @returns {obj is PDFPrimitive}
    */
   static is_pdf_compatible(obj) {
-    return obj.is_pdf_compatible !== undefined;
+    return obj.draw_pdf !== undefined;
   }
 }
