@@ -95,27 +95,24 @@ const LUT_SCALING_CURVES = {
 };
 
 /**
- * 
- * @param {string[]} level_scaling_cells 
+ *
+ * @param {string[]} level_scaling_cells
  * @returns {DX7KeyLevelScaling}
  */
 function parse_level_scaling(level_scaling_cells) {
-const breakpoint = DX7KeyLevelScaling.breakpoint_from_note_name(
-    level_scaling_cells[0],
+  const breakpoint_name = level_scaling_cells[0];
+  const breakpoint = DX7KeyLevelScaling.breakpoint_from_note_name(
+    breakpoint_name === "N/A" ? "A-1" : breakpoint_name,
   );
   const left_depth = parse_num(level_scaling_cells[1], 0);
   const right_depth = parse_num(level_scaling_cells[2], 0);
-  const left_curve_type = LUT_SCALING_CURVES [level_scaling_cells[3]];
+  const left_curve_type = LUT_SCALING_CURVES[level_scaling_cells[3]];
   const right_curve_type = LUT_SCALING_CURVES[level_scaling_cells[4]];
 
+  const left_curve = new DX7ScalingCurve(left_curve_type, left_depth);
+  const right_curve = new DX7ScalingCurve(right_curve_type, right_depth);
 
-  const left_curve = new DX7ScalingCurve(left_curve_type, left_depth),
-      const right_curve = new DX7ScalingCurve(right_curve_type, right_depth),
-
-    return new DX7KeyLevelScaling(
-      breakpoint,
-        left_curve, right_curve
-    )
+  return new DX7KeyLevelScaling(breakpoint, left_curve, right_curve);
 }
 
 /**
@@ -138,7 +135,9 @@ function parse_operator(operator_cells, num) {
     operator_cells.slice(5, 5 + LENGTH_ENVELOPE),
     DX7Envelope.DEFAULT_ENV,
   );
-  const key_level_scaling = parse_level_scaling(operator_cells.slice(13, 13 + LENGTH_LEVEL_SCALING))
+  const key_level_scaling = parse_level_scaling(
+    operator_cells.slice(13, 13 + LENGTH_LEVEL_SCALING),
+  );
   const key_rate_scaling = parse_num(operator_cells[10], 0);
   const amp_mod_sensitivity = parse_num(operator_cells[11], 0);
   const key_vel_sensitivity = parse_num(operator_cells[12], 0);
@@ -148,7 +147,7 @@ function parse_operator(operator_cells, num) {
     envelope,
     level,
     freq: new DX7FreqSettings(mode, detune, coarse, fine),
-    key_level_scaling, 
+    key_level_scaling,
     key_rate_scaling,
     amp_mod_sensitivity,
     key_vel_sensitivity,
@@ -211,20 +210,24 @@ function parse_voice(line, start_indices) {
  * @return {DX7Voice[]}
  */
 export function dx7_from_csv(csv_text) {
-  const [category_line, header_line, ...voice_lines] = csv_text.split("\n");
+  const [category_line, header_line, ...voice_lines] = csv_text.split(/\r?\n/);
+  const category_cells = category_line.split(",");
+  const header_cells = header_line.split(",");
 
   const start_indices = {
-    name: header_line.indexOf("Name"),
-    global: category_line.indexOf("GLOBAL"),
-    op1: category_line.indexOf("OP 1"),
-    op2: category_line.indexOf("OP 2"),
-    op3: category_line.indexOf("OP 3"),
-    op4: category_line.indexOf("OP 4"),
-    op5: category_line.indexOf("OP 5"),
-    op6: category_line.indexOf("OP 6"),
-    lfo: header_line.indexOf("LFO"),
-    pitch_env: header_line.indexOf("Pitch EG"),
+    name: header_cells.indexOf("Name"),
+    global: category_cells.indexOf("GLOBAL"),
+    op1: category_cells.indexOf("OP 1"),
+    op2: category_cells.indexOf("OP 2"),
+    op3: category_cells.indexOf("OP 3"),
+    op4: category_cells.indexOf("OP 4"),
+    op5: category_cells.indexOf("OP 5"),
+    op6: category_cells.indexOf("OP 6"),
+    lfo: category_cells.indexOf("LFO"),
+    pitch_env: category_cells.indexOf("Pitch EG"),
   };
 
-  return voice_lines.map((line) => parse_voice(line, start_indices));
+  return voice_lines
+    .filter((line) => line !== "" && !line.startsWith(","))
+    .map((line) => parse_voice(line, start_indices));
 }

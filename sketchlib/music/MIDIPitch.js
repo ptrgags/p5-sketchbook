@@ -89,11 +89,11 @@ export class MIDIPitch {
    * @returns {number} MIDI pitch number in [0, 127]
    */
   static parse_pitch(pitch_name) {
-    const regex = /([A-G]#)(-?\d)/;
+    const regex = /([A-G]#?)(-?\d)/;
     const groups = regex.exec(pitch_name);
 
     if (groups === null) {
-      throw new Error("not a valid pitch name");
+      throw new Error(`not a valid pitch name, ${pitch_name}`);
     }
 
     const pitch_class = PITCH_CLASS_LABELS.indexOf(groups[1]);
