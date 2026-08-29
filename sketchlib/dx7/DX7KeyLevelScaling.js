@@ -79,6 +79,16 @@ export class DX7KeyLevelScaling {
 
     return `${left_curve}${this.breakpoint_name}${right_curve}`;
   }
+
+  /**
+   * Convert a note name to a breakpoint number
+   * @param {string} note_name
+   * @returns {number} breakpoint number used in this class
+   */
+  static breakpoint_from_note_name(note_name) {
+    const midi_breakpoint = MIDIPitch.parse_pitch(note_name);
+    return midi_breakpoint - A_1;
+  }
 }
 DX7KeyLevelScaling.INIT = Object.freeze(
   new DX7KeyLevelScaling(0, DX7ScalingCurve.INIT, DX7ScalingCurve.INIT),

@@ -82,4 +82,28 @@ export class MIDIPitch {
     const pitch_label = PITCH_CLASS_LABELS[pitch_class];
     return `${pitch_label}${octave}`;
   }
+
+  /**
+   * Parse a string like "A#5" into its MIDI pitch number
+   * @param {string} pitch_name Pitch name
+   * @returns {number} MIDI pitch number in [0, 127]
+   */
+  static parse_pitch(pitch_name) {
+    const regex = /([A-G]#)(-?\d)/;
+    const groups = regex.exec(pitch_name);
+
+    if (groups === null) {
+      throw new Error("not a valid pitch name");
+    }
+
+    const pitch_class = PITCH_CLASS_LABELS.indexOf(groups[1]);
+    const octave = parseInt(groups[2]);
+    const midi_pitch = this.from_pitch_octave(pitch_class, octave);
+
+    if (midi_pitch < 0 || midi_pitch > 127) {
+      throw new Error(`note out of range!, ${pitch_name}`);
+    }
+
+    return midi_pitch;
+  }
 }
