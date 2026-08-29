@@ -129,30 +129,33 @@ export class GroupPrimitive {
       return;
     }
 
+    pdf.push_state();
+
     if (this.transform) {
       throw new Error("pdf transform");
     }
 
     if (this.style) {
-      throw new Error("pdf style");
+      pdf.push_style(this.style);
     }
 
-    if (this.text_style)
-      for (const child of this.primitives) {
-        if (!PDFPrimitive.is_pdf_compatible(child)) {
-          console.warn("PDF export: skipping child", child);
-          continue;
-        }
-        child.draw_pdf(pdf);
+    if (this.text_style) {
+      throw new Error("pdf text style");
+    }
+
+    for (const child of this.primitives) {
+      if (!PDFPrimitive.is_pdf_compatible(child)) {
+        console.warn("PDF export: skipping child", child);
+        continue;
       }
+      child.draw_pdf(pdf);
+    }
 
     if (this.style) {
-      throw new Error("pdf style");
+      pdf.pop_style();
     }
 
-    if (this.transform) {
-      throw new Error("pdf transform");
-    }
+    pdf.pop_state();
   }
 
   /**
