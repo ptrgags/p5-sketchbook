@@ -5,11 +5,14 @@ import { clamp } from "../clamp.js";
 import { Grid } from "../Grid.js";
 import { Primitive } from "./Primitive.js";
 import { ToJSON } from "../json/ToJSON.js";
+import { PDFPrimitive } from "../pdf/PDFPrimitive.js";
+import { PDFContext } from "../pdf/PDFContext.js";
 
 /**
  * Rectangle
  * @implements {Primitive}
  * @implements {ToJSON}
+ * @implements {PDFPrimitive}
  */
 export class Rect {
   /**
@@ -84,6 +87,19 @@ export class Rect {
     const { x, y } = this.position;
     const { x: w, y: h } = this.dimensions;
     p.rect(x, y, w, h);
+  }
+
+  /**
+   * Draw the rectangle
+   * @param {PDFContext} pdf
+   */
+  draw_pdf(pdf) {
+    const { x, y } = this.position;
+    const { x: w, y: h } = this.dimensions;
+    pdf.page.pushOperators(
+      pdf.lib.rectangle(x, y, w, h),
+      pdf.current_draw_command,
+    );
   }
 
   /**
