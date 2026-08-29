@@ -1,5 +1,7 @@
 import { SceneImporter } from "../json/SceneImporter.js";
 import { ToJSON } from "../json/ToJSON.js";
+import { PDFContext } from "../pdf/PDFContext.js";
+import { PDFPrimitive } from "../pdf/PDFPrimitive.js";
 import {
   PrimitiveCollectionStats,
   RenderStats,
@@ -50,6 +52,7 @@ function apply_svg_style(attributes, style) {
  * @implements {PrimitiveCollectionStats}
  * @implements {ToSVG}
  * @implements {ToJSON}
+ * @implements {PDFPrimitive}
  */
 export class GroupPrimitive {
   /**
@@ -115,6 +118,44 @@ export class GroupPrimitive {
     if (this.transform) {
       p.pop();
     }
+  }
+
+  /**
+   *
+   * @param {PDFContext} pdf
+   */
+  draw_pdf(pdf) {
+    if (this.primitives.length === 0) {
+      return;
+    }
+
+    pdf.push_state();
+
+    if (this.transform) {
+      throw new Error("pdf transform");
+    }
+
+    if (this.style) {
+      pdf.push_style(this.style);
+    }
+
+    if (this.text_style) {
+      throw new Error("pdf text style");
+    }
+
+    for (const child of this.primitives) {
+      if (!PDFPrimitive.is_pdf_compatible(child)) {
+        console.warn("PDF export: skipping child", child);
+        continue;
+      }
+      child.draw_pdf(pdf);
+    }
+
+    if (this.style) {
+      pdf.pop_style();
+    }
+
+    pdf.pop_state();
   }
 
   /**

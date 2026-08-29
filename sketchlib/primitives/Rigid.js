@@ -120,7 +120,7 @@ export class Rigid {
 
   /**
    * Apply the transformations to p5
-   * @param {import("p5")} p
+   * @param {import("p5").default} p
    */
   apply(p) {
     p.translate(this.translation.x, this.translation.y);
