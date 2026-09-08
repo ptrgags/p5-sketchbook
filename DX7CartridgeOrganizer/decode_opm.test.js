@@ -1,9 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { DX7Voice } from "../sketchlib/dx7/DX7Voice.js";
-import { DX7LFO } from "../sketchlib/dx7/DX7LFO.js";
-import { DX7Envelope } from "../sketchlib/dx7/DX7Envelope.js";
 import { decode_opm } from "./decode_opm.js";
-import { DX7Operator } from "../sketchlib/dx7/DX7Operator.js";
 import { OPMVoice } from "./OPMVoice.js";
 import { OPMLFO, OPMLFOWaveform } from "./OPMLFO.js";
 import { OPMChannel } from "./OPMChannel.js";

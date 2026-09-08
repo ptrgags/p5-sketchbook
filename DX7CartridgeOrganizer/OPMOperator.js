@@ -46,11 +46,13 @@ export class OPMOperator {
     // TODO: I still haven't determined how this is computed
     const fine = 0;
 
+    const level = MAP_LEVEL.get_value(this.total_level);
+
     return new DX7Operator({
       // the number will be overridden by OPMVoice
       num: 1,
       envelope: this.envelope.to_dx7_env(),
-      level: MAP_LEVEL.get_value(this.total_level),
+      level: Math.round(level),
       freq: new DX7FreqSettings(DX7FreqMode.RATIO, 0, coarse, fine),
       key_rate_scaling: MAP_RATE_SCALE.get_value(this.keyboard_rate_scaling),
       amp_mod_sensitivity: this.amp_mod_sensitivity_enable ? 3 : 0,
