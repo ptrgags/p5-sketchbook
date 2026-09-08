@@ -243,26 +243,25 @@ const SAMPLE_NOTE = "A2";
 // several instead.
 const CYCLE_COUNT = 100;
 
-// /trace logs a trace of the scene for investigating performance issues.
-SLASH.register(["Slash", "KeyS", "KeyI", "KeyN", "KeyE"], () => {
+SLASH.slash("/sine", () => {
   const samples = sample_n_cycles(sine, SAMPLE_FREQ, CYCLE_COUNT);
   const wav_file = encode_wav_file(samples, `sine-${SAMPLE_NOTE}.wav`);
   download_file(wav_file);
 });
 
-SLASH.register(["Slash", "KeyS", "KeyA", "KeyW"], () => {
+SLASH.slash("/saw", () => {
   const samples = sample_n_cycles(sawtooth, SAMPLE_FREQ, CYCLE_COUNT);
   const wav_file = encode_wav_file(samples, `saw-${SAMPLE_NOTE}.wav`);
   download_file(wav_file);
 });
 
-SLASH.register(["Slash", "KeyT", "KeyR", "KeyI"], () => {
+SLASH.slash("/tri", () => {
   const samples = sample_n_cycles(triangle, SAMPLE_FREQ, CYCLE_COUNT);
   const wav_file = encode_wav_file(samples, `tri-${SAMPLE_NOTE}.wav`);
   download_file(wav_file);
 });
 
-SLASH.register(["Slash", "KeyS", "KeyQ", "KeyR"], () => {
+SLASH.slash("/sqr", () => {
   const samples = sample_n_cycles(square, SAMPLE_FREQ, CYCLE_COUNT);
   const wav_file = encode_wav_file(samples, `square-${SAMPLE_NOTE}.wav`);
   download_file(wav_file);

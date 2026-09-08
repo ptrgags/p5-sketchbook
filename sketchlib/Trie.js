@@ -6,7 +6,7 @@ export class Trie {
    * Constructor
    * @param {string} symbol The symbol for this node
    * @param {T} [value] A value to store in the node
-   * @param {Trie[]} [children=[]] Children nodes
+   * @param {Trie<T>[]} [children=[]] Children nodes
    */
   constructor(symbol, value, children = []) {
     this.symbol = symbol;

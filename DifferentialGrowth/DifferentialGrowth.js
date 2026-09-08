@@ -63,7 +63,7 @@ export const sketch = (p) => {
 
     // Typing /ref toggles the reference geometry as well. This is
     // an initial test of KeywordRecognizer for debug tools
-    SLASH.register(["Slash", "KeyR", "KeyE", "KeyF"], () => {
+    SLASH.slash("/ref", () => {
       show_ref_geometry = !show_ref_geometry;
     });
   };
