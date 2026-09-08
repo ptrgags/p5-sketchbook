@@ -123,7 +123,8 @@ function parse_level_scaling(level_scaling_cells) {
  */
 function parse_operator(operator_cells, num) {
   const level = parse_num(operator_cells[0], 0);
-  const detune = parse_num(operator_cells[1], 0);
+  // in the CSV, detune is from -7 to 7, but the patch stores this unsigned 0-14
+  const detune = parse_num(operator_cells[1], 0) + 7;
   const coarse = parse_num(operator_cells[2], 1);
   const fine = parse_num(operator_cells[3], 0);
   // The FM-1 labels it as Fix, but I usually write Fixed so
@@ -138,9 +139,9 @@ function parse_operator(operator_cells, num) {
   const key_level_scaling = parse_level_scaling(
     operator_cells.slice(13, 13 + LENGTH_LEVEL_SCALING),
   );
-  const key_rate_scaling = parse_num(operator_cells[10], 0);
-  const amp_mod_sensitivity = parse_num(operator_cells[11], 0);
-  const key_vel_sensitivity = parse_num(operator_cells[12], 0);
+  const key_rate_scaling = parse_num(operator_cells[18], 0);
+  const amp_mod_sensitivity = parse_num(operator_cells[19], 0);
+  const key_vel_sensitivity = parse_num(operator_cells[20], 0);
 
   return new DX7Operator({
     num,
