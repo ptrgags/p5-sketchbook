@@ -66,6 +66,7 @@ export class DX7KeyLevelScaling {
     return MIDIPitch.format_pitch(this.#breakpoint_midi);
   }
 
+  // Temporary
   toString() {
     let left_curve = this.left_curve.toString();
     let right_curve = this.right_curve.toString();
