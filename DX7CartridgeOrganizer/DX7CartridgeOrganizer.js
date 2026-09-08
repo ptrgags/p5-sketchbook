@@ -196,7 +196,7 @@ export class DX7CartridgeOrganizer {
     });
 
     export_button.addEventListener("click", () => {
-      const cartridge = new DX7Cartridge(this.cartridge_voices);
+      const cartridge = new DX7Cartridge(...this.cartridge_voices);
       const file = encode_dx7_file(cartridge, "cartridge.syx");
       download_file(file);
     });

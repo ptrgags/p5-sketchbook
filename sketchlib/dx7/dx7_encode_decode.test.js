@@ -331,7 +331,7 @@ describe("decode_dx7", () => {
 
     const result = decode_dx7(cartridge.buffer);
 
-    const expected = new DX7Cartridge([]);
+    const expected = new DX7Cartridge();
     expect(result).toEqual(expected);
   });
 
@@ -340,14 +340,14 @@ describe("decode_dx7", () => {
 
     const result = decode_dx7(voice.buffer);
 
-    const expected = new DX7Cartridge([NONTRIVIAL_VOICE]);
+    const expected = new DX7Cartridge(NONTRIVIAL_VOICE);
     expect(result).toEqual(expected);
   });
 });
 
 describe("encode_dx7", () => {
   it("with init cartridge encodes correctly", () => {
-    const cartridge = new DX7Cartridge([]);
+    const cartridge = new DX7Cartridge();
 
     const result = new Uint8Array(encode_dx7(cartridge));
 
@@ -356,7 +356,7 @@ describe("encode_dx7", () => {
   });
 
   it("with nontrivial voice encodes correctly", () => {
-    const cartridge = new DX7Cartridge([NONTRIVIAL_VOICE]);
+    const cartridge = new DX7Cartridge(NONTRIVIAL_VOICE);
 
     const result = new Uint8Array(encode_dx7(cartridge));
 
@@ -367,7 +367,7 @@ describe("encode_dx7", () => {
 
 describe("dx7 integration", () => {
   it("encode then decode is identity", () => {
-    const cartridge = new DX7Cartridge([]);
+    const cartridge = new DX7Cartridge();
 
     const result = decode_dx7(encode_dx7(cartridge));
 

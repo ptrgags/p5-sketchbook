@@ -253,7 +253,5 @@ export function decode_dx7(buffer) {
     throw new Error(`incorrect end byte, ${end_status}`);
   }
 
-  // TODO: handle checksum, F7 end sysex byte
-
-  return new DX7Cartridge(voices);
+  return new DX7Cartridge(...voices);
 }

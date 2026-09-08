@@ -10,7 +10,7 @@ export class DX7Cartridge {
    * Constructor
    * @param {DX7Voice[]} voices An array of voices. If there are less than 32, the rest will be filled in with an INIT patch
    */
-  constructor(voices) {
+  constructor(...voices) {
     while (voices.length < 32) {
       voices.push(DX7Voice.INIT);
     }
