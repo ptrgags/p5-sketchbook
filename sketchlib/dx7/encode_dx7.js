@@ -127,7 +127,7 @@ function encode_voice(voice, bytes, offset) {
 
   encode_lfo(voice.lfo, bytes, offset + 112);
 
-  bytes[offset + 117] = voice.transpose + 24;
+  bytes[offset + 117] = voice.transpose;
 
   encode_name(voice.name, bytes, offset + 118);
 }

@@ -11,8 +11,17 @@ import {
   SUB_STATUS,
   VOICE_COUNT,
 } from "./dx7_constants.js";
-import { DX7ScalingCurveType } from "./DX7KeyLevelScaling.js";
+import {
+  DX7KeyLevelScaling,
+  DX7ScalingCurve,
+  DX7ScalingCurveType,
+} from "./DX7KeyLevelScaling.js";
 import { dx7_checksum } from "./dx7_checksum.js";
+import { DX7Envelope } from "./DX7Envelope.js";
+import { DX7Voice } from "./DX7Voice.js";
+import { DX7LFO, DX7LFOType } from "./DX7LFO.js";
+import { DX7Operator } from "./DX7Operator.js";
+import { DX7FreqMode, DX7FreqSettings } from "./DX7FreqSettings.js";
 
 const HEADER = [
   STATUS_START,
@@ -23,76 +32,92 @@ const HEADER = [
   DATA_LENGTH & 0b1111111,
 ];
 
-const DEFAULT_ENVELOPE = [
+const DEFAULT_ENVELOPE_BYTES = [
   // rates
   99, 99, 99, 99,
   // levels
   99, 99, 99, 0,
 ];
-// non-trivial envelope
-const PLUCK_ENV = [
+// nontrivial envelope
+const PLUCK_ENV_BYTES = [
   // rates
   99, 99, 25, 25,
   // levels
   99, 99, 0, 0,
 ];
 
-const DEFAULT_PITCH_ENV = [
+const DEFAULT_ENVELOPE = DX7Envelope.DEFAULT_ENV;
+const PLUCK_ENVELOPE = new DX7Envelope([99, 99, 25, 25], [99, 99, 0, 0]);
+
+const DEFAULT_PITCH_ENV_BYTES = [
   // rates
   99, 99, 99, 99,
   // levels
   50, 50, 50, 50,
 ];
 // non-trivial pitch envelope
-const PITCH_SWELL = [
+const PITCH_SWELL_BYTES = [
   // rates
   50, 99, 50, 50,
   // levels
   99, 99, 50, 50,
 ];
+const DEFAULT_PITCH_ENVELOPE = DX7Envelope.DEFAULT_PITCH;
+const PITCH_SWELL_ENVELOPE = new DX7Envelope(
+  [50, 99, 50, 50],
+  [99, 99, 50, 50],
+);
 
-const DEFAULT_SCALING = [0, 0, 0, 0, 0];
-const SCALING_INCREASE = [
+const DEFAULT_SCALING_BYTES = [0, 0, 0, 0];
+const SCALING_INCREASE_BYTES = [
   // breakpoint note
   50,
-  //
+  // left depth
   99,
+  // right depth
   50,
   // right curve | left curve
   (DX7ScalingCurveType.NEG_LIN << 2) | DX7ScalingCurveType.POS_EXP,
 ];
 
-const DEFAULT_OPERATOR = [
-  ...DEFAULT_ENVELOPE,
-  ...DEFAULT_SCALING,
+const DEFAULT_SCALING = DX7KeyLevelScaling.INIT;
+const SCALING_INCREASE = new DX7KeyLevelScaling(
+  50,
+  new DX7ScalingCurve(DX7ScalingCurveType.POS_EXP, 99),
+  new DX7ScalingCurve(DX7ScalingCurveType.NEG_LIN, 50),
+);
+
+const DEFAULT_OPERATOR_BYTES = [
+  ...DEFAULT_ENVELOPE_BYTES,
+  ...DEFAULT_SCALING_BYTES,
   // detune = 0, key_rate_scaling = 0
   0,
   // key vel sensitivity = 0, amp mod sensitivity = 0
   0,
-  // 0 level
+  // level = 99
+  99,
+  // coarse = 1, mode = ratio = 0
+  1 << 1,
+  // fine = 0
+  0,
+];
+const DEFAULT_SILENT_OPERATOR_BYTES = [
+  ...DEFAULT_ENVELOPE_BYTES,
+  ...DEFAULT_SCALING_BYTES,
+  // detune = 0, key_rate_scaling = 0
+  0,
+  // key vel sensitivity = 0, amp mod sensitivity = 0
+  0,
+  // level = 0
   0,
   // coarse = 1, mode = ratio = 0
   1 << 1,
   // fine = 0
   0,
 ];
-const DEFAULT_SILENT_OPERATOR = [
-  ...DEFAULT_ENVELOPE,
-  ...DEFAULT_SCALING,
-  // detune = 0, key_rate_scaling = 0
-  0,
-  // key vel sensitivity = 0, amp mod sensitivity = 0
-  0,
-  // 0 level
-  0,
-  // coarse = 1, mode = ratio = 0
-  1 << 1,
-  // fine = 0
-  0,
-];
-const NON_TRIVIAL_OPERATOR = [
-  ...PLUCK_ENV,
-  ...SCALING_INCREASE,
+const NONTRIVIAL_OPERATOR_BYTES = [
+  ...PLUCK_ENV_BYTES,
+  ...SCALING_INCREASE_BYTES,
   // detune = +7 (stored as 14), key_rate_scaling = 3
   14 << 3 || 3,
   // key vel sensitivity = 2, amp mod sensitivity = 3
@@ -104,8 +129,21 @@ const NON_TRIVIAL_OPERATOR = [
   // fine = 25
   25,
 ];
+// these will be renumbered when used
+const DEFAULT_OPERATOR = DX7Operator.init(1, 99);
+const DEFAULT_SILENT_OPERATOR = DX7Operator.init(1, 0);
+const NONTRIVIAL_OPERATOR = new DX7Operator({
+  num: 1,
+  envelope: PLUCK_ENVELOPE,
+  level: 75,
+  freq: new DX7FreqSettings(DX7FreqMode.RATIO, 14, 0, 25),
+  amp_mod_sensitivity: 3,
+  key_vel_sensitivity: 2,
+  key_rate_scaling: 3,
+  key_level_scaling: SCALING_INCREASE,
+});
 
-const DEFAULT_LFO = [
+const DEFAULT_LFO_BYTES = [
   // speed
   35,
   // delay
@@ -117,8 +155,9 @@ const DEFAULT_LFO = [
   // mod sensititvity = 0, wave = TRI = 0, key sync = 0
   0,
 ];
+const DEFAULT_LFO = DX7LFO.INIT;
 
-const SAW_LFO = [
+const SAW_LFO_BYTES = [
   // speed
   60,
   // delay = 10
@@ -127,9 +166,19 @@ const SAW_LFO = [
   50,
   // amp mod depth = 75
   75,
-  // mod sensitivity = 4, wave = saw down = 1, key sync = 1
+  // mod sensitivity = 4, wave = saw down = 1, key sync = true
   (4 << 5) | (1 << 1) | 1,
 ];
+
+const SAW_LFO = new DX7LFO({
+  speed: 60,
+  delay: 10,
+  pitch_mod_depth: 50,
+  amp_mod_depth: 75,
+  pitch_mod_sensitivity: 4,
+  wave: DX7LFOType.SAW_DOWN,
+  keyboard_sync: true,
+});
 
 const DEFAULT_NAME = ["-", "-", "I", "N", "I", "T", "-", "-", " ", " "].map(
   (x) => x.charCodeAt(0),
@@ -138,19 +187,21 @@ const DEFAULT_NAME = ["-", "-", "I", "N", "I", "T", "-", "-", " ", " "].map(
 /**
  * @type {number[]}
  */
-const INIT_VOICE = [
-  ...DEFAULT_OPERATOR,
-  ...DEFAULT_SILENT_OPERATOR,
-  ...DEFAULT_SILENT_OPERATOR,
-  ...DEFAULT_SILENT_OPERATOR,
-  ...DEFAULT_SILENT_OPERATOR,
-  ...DEFAULT_SILENT_OPERATOR,
-  ...DEFAULT_PITCH_ENV,
+const INIT_VOICE_BYTES = [
+  ...DEFAULT_OPERATOR_BYTES,
+  ...DEFAULT_SILENT_OPERATOR_BYTES,
+  ...DEFAULT_SILENT_OPERATOR_BYTES,
+  ...DEFAULT_SILENT_OPERATOR_BYTES,
+  ...DEFAULT_SILENT_OPERATOR_BYTES,
+  ...DEFAULT_SILENT_OPERATOR_BYTES,
+  ...DEFAULT_PITCH_ENV_BYTES,
   // algorithm 1 (stored as 0)
   0,
   // key sync 0, feedback 0
   0,
-  ...DEFAULT_LFO,
+  // transpose -12 semitones, this is stored as -12 - 24 = -36
+  -36,
+  ...DEFAULT_LFO_BYTES,
   ...DEFAULT_NAME,
 ];
 
@@ -158,20 +209,41 @@ const NONTRIVIAL_NAME = ["N", "O", "N", "T", "R", "I", "V", "I", "A", "L"].map(
   (x) => x.charCodeAt(0),
 );
 
-const NONTRIVIAL_VOICE = [
-  ...NON_TRIVIAL_OPERATOR,
-  ...DEFAULT_SILENT_OPERATOR,
-  ...NON_TRIVIAL_OPERATOR,
-  ...DEFAULT_OPERATOR,
-  ...DEFAULT_SILENT_OPERATOR,
-  ...DEFAULT_SILENT_OPERATOR,
+const NONTRIVIAL_VOICE_BYTES = [
+  ...NONTRIVIAL_OPERATOR_BYTES,
+  ...DEFAULT_SILENT_OPERATOR_BYTES,
+  ...NONTRIVIAL_OPERATOR_BYTES,
+  ...DEFAULT_OPERATOR_BYTES,
+  ...DEFAULT_SILENT_OPERATOR_BYTES,
+  ...DEFAULT_SILENT_OPERATOR_BYTES,
+  ...PITCH_SWELL_BYTES,
   // algorithm 32 (stored as 31)
   31,
   // key sync = 1, feedback = 7
   (1 << 3) | 7,
-  ...SAW_LFO,
+  ...SAW_LFO_BYTES,
+  // transpose +12 semitones, this is stored as 12 - 24 = -12
+  -12,
   ...NONTRIVIAL_NAME,
 ];
+
+const NONTRIVIAL_VOICE = new DX7Voice({
+  name: "NONTRIVIAL",
+  algorithm: 31,
+  feedback: 7,
+  operators: [
+    NONTRIVIAL_OPERATOR.renumber(1),
+    DEFAULT_SILENT_OPERATOR.renumber(2),
+    NONTRIVIAL_OPERATOR.renumber(3),
+    DEFAULT_OPERATOR.renumber(4),
+    DEFAULT_SILENT_OPERATOR.renumber(5),
+    DEFAULT_SILENT_OPERATOR.renumber(6),
+  ],
+  pitch_env: PITCH_SWELL_ENVELOPE,
+  lfo: SAW_LFO,
+  transpose: -12,
+  osc_key_sync: true,
+});
 
 /**
  * Combine cartridge parts into a
@@ -185,7 +257,7 @@ function make_cartridge_bytes(...voices) {
 
   const remaining_voices = VOICE_COUNT - voices.length;
   for (let i = 0; i < remaining_voices; i++) {
-    data.push(...INIT_VOICE);
+    data.push(...INIT_VOICE_BYTES);
   }
 
   const checksum = dx7_checksum(new Uint8Array(data));
@@ -249,6 +321,24 @@ describe("decode_dx7", () => {
       return decode_dx7(bad_checksum.buffer);
     }).toThrowError("balkwjdfkljasd");
   });
+
+  it("with init voice parses correctly", () => {
+    const cartridge = make_cartridge_bytes().slice();
+
+    const result = decode_dx7(cartridge.buffer);
+
+    const expected = new DX7Cartridge([]);
+    expect(result).toEqual(expected);
+  });
+
+  it("with nontrivial voice parses correctly", () => {
+    const voice = make_cartridge_bytes(NONTRIVIAL_VOICE_BYTES).slice();
+
+    const result = decode_dx7(voice.buffer);
+
+    const expected = new DX7Cartridge([NONTRIVIAL_VOICE]);
+    expect(result).toEqual(expected);
+  });
 });
 
 describe("encode_dx7", () => {});
@@ -263,7 +353,7 @@ describe("dx7 integration", () => {
   });
 
   it("decode then encode is identity", () => {
-    const bytes = make_cartridge_bytes(NONTRIVIAL_VOICE).slice();
+    const bytes = make_cartridge_bytes(NONTRIVIAL_VOICE_BYTES).slice();
 
     const result = encode_dx7(decode_dx7(bytes.buffer));
     const bytes_array = new Uint8Array(bytes);
