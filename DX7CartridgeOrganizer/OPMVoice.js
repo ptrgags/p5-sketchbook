@@ -108,7 +108,7 @@ export class OPMVoice {
       // so use defaults
       pitch_env: DX7Envelope.DEFAULT_PITCH,
       osc_key_sync: true,
-      transpose: 24, // transpose is stored unsigned, so this is 0 - 24
+      transpose: 24, // transpose is stored unsigned 0-48, so 0 is stored as 0+24=24
     });
   }
 }
