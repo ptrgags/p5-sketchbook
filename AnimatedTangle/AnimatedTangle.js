@@ -145,13 +145,13 @@ const BACKGROUND_STRIPES = style(
   STYLE_BACKGROUND_STRIPES,
 );
 
-const COORDS = new DebugCoordinates(Point.ORIGIN);
+const COORDS = new DebugCoordinates();
 const DEBUG_GRID = new DebugGrid(100, 25);
 
 const SLASH = new KeywordRecognizer();
 
 // /trace logs a trace of the scene for investigating performance issues.
-SLASH.register(["Slash", "KeyT", "KeyR", "KeyA", "KeyC", "KeyE"], () => {
+SLASH.slash("/trace", () => {
   const trace = trace_primitive(TANGLE);
   console.log(trace);
 });

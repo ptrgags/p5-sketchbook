@@ -1,8 +1,10 @@
 import { Point } from "../sketchlib/pga2d/Point.js";
 import { Color } from "../sketchlib/Color.js";
-import { GroupPrimitive } from "../sketchlib/primitives/GroupPrimitive.js";
 import { group } from "../sketchlib/primitives/shorthand.js";
 import { MosaicGrid } from "./MosaicGrid.js";
+import { Primitive } from "../sketchlib/primitives/Primitive.js";
+import { SimpleGroupPrimitive } from "../sketchlib/primitives/SimpleGroupPrimitive.js";
+import { Index2D } from "../sketchlib/Grid.js";
 
 const SliderState = {
   IDLE: 0,
@@ -26,7 +28,13 @@ export class InteractiveMosaic {
     this.grid = new MosaicGrid(colors);
     this.state = SliderState.IDLE;
 
+    /**
+     * @type {Index2D | undefined}
+     */
     this.src_index = undefined;
+    /**
+     * @type {Index2D | undefined}
+     */
     this.dst_index = undefined;
 
     this.frame = 0;
@@ -63,7 +71,7 @@ export class InteractiveMosaic {
     this.mouse = mouse;
     this.mouse_down = true;
 
-    if (this.state !== SliderState.SELECTING) {
+    if (this.state !== SliderState.SELECTING || !this.src_index) {
       return;
     }
 
@@ -141,15 +149,22 @@ export class InteractiveMosaic {
   /**
    * Render the mosaic and possibly the swapped pixel animation
    * @param {number} frame the current frame number
-   * @returns {GroupPrimitive} All the primitives to draw this frame.
+   * @returns {Primitive} All the primitives to draw this frame.
    */
   render(frame) {
-    const grid = this.grid.render();
+    const grid = this.grid.primitive;
 
     if (this.swap_pair) {
       return group(grid, this.swap_pair.render(frame));
     }
     return grid;
+  }
+
+  /**
+   * @returns {SimpleGroupPrimitive}
+   */
+  get grid_primitive() {
+    return this.grid.primitive;
   }
 
   /**

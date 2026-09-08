@@ -4,10 +4,12 @@ import { HEIGHT, WIDTH } from "../dimensions.js";
 import { clamp } from "../clamp.js";
 import { Grid } from "../Grid.js";
 import { Primitive } from "./Primitive.js";
+import { ToJSON } from "../json/ToJSON.js";
 
 /**
  * Rectangle
  * @implements {Primitive}
+ * @implements {ToJSON}
  */
 export class Rect {
   /**
@@ -139,6 +141,26 @@ export class Rect {
     });
 
     return result;
+  }
+
+  to_json() {
+    const { x, y } = this.position;
+    const { x: w, y: h } = this.dimensions;
+    return { type: "rect", x, y, w, h };
+  }
+
+  /**
+   *
+   * @param {any} obj
+   * @returns {Rect}
+   */
+  static from_json(obj) {
+    if (obj.type !== "rect") {
+      throw new Error("obj.type must be 'rect'");
+    }
+
+    const { x, y, w, h } = obj;
+    return new Rect(new Point(x, y), new Direction(w, h));
   }
 }
 
