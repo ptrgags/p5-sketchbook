@@ -4,6 +4,7 @@ import { expect_element } from "../sketchlib/dom/expect_element.js";
 import { encode_dx7_file } from "../sketchlib/dx7/encode_dx7.js";
 import { DX7Voice } from "../sketchlib/dx7/DX7Voice.js";
 import { DX7Cartridge } from "../sketchlib/dx7/DX7Cartridge.js";
+import { dx7_from_csv } from "../sketchlib/dx7/dx7_csv.js";
 
 /**
  *
@@ -50,12 +51,16 @@ export class DX7CartridgeOrganizer {
         throw new Error("Please select a DX7 cartridge file (.syx)");
       }
 
-      const [syx_file] = files;
-      console.log(syx_file);
-      const syx_buffer = await syx_file.arrayBuffer();
-
-      const dx7_cartridge = decode_dx7(syx_buffer);
-      this.voices.push(...dx7_cartridge.voices);
+      const [file] = files;
+      if (file.name.endsWith(".csv")) {
+        const csv_text = await file.text();
+        const voices = dx7_from_csv(csv_text);
+        this.voices.push(...voices);
+      } else {
+        const syx_buffer = await file.arrayBuffer();
+        const dx7_cartridge = decode_dx7(syx_buffer);
+        this.voices.push(...dx7_cartridge.voices);
+      }
 
       clear_children(voices_select);
 
