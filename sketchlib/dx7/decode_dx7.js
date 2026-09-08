@@ -28,19 +28,9 @@ import { DX7Cartridge } from "./DX7Cartridge.js";
  * @returns {DX7Envelope}
  */
 function decode_envelope(bytes, offset) {
-  const r1 = bytes[offset + 0];
-  const r2 = bytes[offset + 1];
-  const r3 = bytes[offset + 2];
-  const r4 = bytes[offset + 3];
-  const rates = [r1, r2, r3, r4];
-
-  const l1 = bytes[offset + 4];
-  const l2 = bytes[offset + 5];
-  const l3 = bytes[offset + 6];
-  const l4 = bytes[offset + 7];
-  const levels = [l1, l2, l3, l4];
-
-  return new DX7Envelope(rates, levels);
+  const rates = bytes.slice(offset, offset + 4);
+  const levels = bytes.slice(offset + 4, offset + 8);
+  return new DX7Envelope([...rates], [...levels]);
 }
 
 /**
