@@ -55,7 +55,7 @@ export class DX7KeyLevelScaling {
    * Convert breakpoint MIDI
    * @type {number}
    */
-  get breakpoint_midi() {
+  get #breakpoint_midi() {
     return A_1 + this.breakpoint;
   }
 
@@ -63,7 +63,7 @@ export class DX7KeyLevelScaling {
    * Format the breakpoint as a MIDI note
    */
   get breakpoint_name() {
-    return MIDIPitch.format_pitch(this.breakpoint_midi);
+    return MIDIPitch.format_pitch(this.#breakpoint_midi);
   }
 
   toString() {
