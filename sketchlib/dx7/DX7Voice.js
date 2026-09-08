@@ -114,7 +114,7 @@ DX7Voice.INIT = Object.freeze(
     pitch_env: DX7Envelope.DEFAULT_PITCH,
     lfo: DX7LFO.INIT,
     osc_key_sync: true,
-    // transpose 0 is stored unsigned as 7
-    transpose: 7,
+    // transpose 0 is stored unsigned as 24
+    transpose: 24,
   }),
 );

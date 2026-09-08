@@ -113,7 +113,9 @@ function encode_name(name, bytes, offset) {
  */
 function encode_voice(voice, bytes, offset) {
   for (const [i, operator] of voice.operators.entries()) {
-    const operator_offset = offset + i * OPERATOR_LENGTH;
+    // For whatever reason, the operators are stored in reverse order in the
+    // sysex dump, hence the (5 - i) to write in reverse order
+    const operator_offset = offset + (5 - i) * OPERATOR_LENGTH;
     encode_operator(operator, bytes, operator_offset);
   }
 

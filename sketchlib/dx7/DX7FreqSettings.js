@@ -30,7 +30,7 @@ export class DX7FreqSettings {
   /**
    * Constructor
    * @param {DX7FreqMode} mode
-   * @param {number} detune
+   * @param {number} detune Detune value stored unsigned as 0-14
    * @param {number} coarse
    * @param {number} fine
    */
@@ -68,5 +68,5 @@ export class DX7FreqSettings {
 }
 
 DX7FreqSettings.INIT = Object.freeze(
-  new DX7FreqSettings(DX7FreqMode.RATIO, 0, 1, 0),
+  new DX7FreqSettings(DX7FreqMode.RATIO, 0 + 7, 1, 0),
 );

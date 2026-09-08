@@ -153,7 +153,7 @@ function decode_voice(voice_bytes) {
     );
     operators[i] = decode_operator(op_bytes, 6 - i);
   }
-  // the operators are listed in reverse order in the SYSEX file
+  // The operators are listed in reverse order in the SYSEX file
   operators.reverse();
 
   const PITCH_ENV_START = 102;
