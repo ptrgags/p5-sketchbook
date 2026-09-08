@@ -1,11 +1,11 @@
 import { Color } from "../sketchlib/Color.js";
+import { DX7Envelope } from "../sketchlib/dx7/DX7Envelope.js";
 import { Direction } from "../sketchlib/pga2d/Direction.js";
 import { PolygonPrimitive } from "../sketchlib/primitives/PolygonPrimitive.js";
 import { Primitive } from "../sketchlib/primitives/Primitive.js";
 import { Rect } from "../sketchlib/primitives/Rect.js";
 import { group, style } from "../sketchlib/primitives/shorthand.js";
 import { Style } from "../sketchlib/Style.js";
-import { DX7Envelope } from "./DX7Envelope.js";
 
 const AREA_GRADIENT = "9c528b-007ea7-77cbb9-f57200-f9dc5c"
   .split("-")

@@ -1,4 +1,5 @@
 import { DX7Envelope } from "./DX7Envelope.js";
+import { DX7LFO } from "./DX7LFO.js";
 import { DX7Operator } from "./DX7Operator.js";
 
 /**
@@ -20,6 +21,7 @@ function sanitize_name(raw_name) {
  *  algorithm: number,
  *  operators: DX7Operator[],
  *  pitch_env: DX7Envelope,
+ *  lfo: DX7LFO,
  *  osc_key_sync: boolean,
  *  feedback: number,
  *  transpose: number
@@ -32,20 +34,49 @@ function sanitize_name(raw_name) {
 export class DX7Voice {
   /**
    * Constructor
-   * @param {DX7VoiceOptions} options
+   * @param {DX7VoiceOptions} options Options. note that values are stored in packed format like in the binary
    */
   constructor(options) {
     if (options.operators.length !== 6) {
       throw new Error("There must be exactly 6 operators");
     }
 
+    options.operators.map((x, i) => {
+      if (x.num !== i + 1) {
+        throw new Error("operators must be listed in sorted order");
+      }
+    });
+
     this.name = sanitize_name(options.name);
     this.algorithm = options.algorithm;
     this.operators = options.operators;
     this.pitch_env = options.pitch_env;
+    this.lfo = options.lfo;
     this.osc_key_sync = options.osc_key_sync;
     this.feedback = options.feedback;
+    // note: this is stored as 0-48, but transpose_display converts it to -24-24
     this.transpose = options.transpose;
+  }
+
+  /**
+   * Return the human-readable algorithm number from 1-32
+   * @type {number}
+   */
+  get algorithm_display() {
+    return this.algorithm + 1;
+  }
+
+  /**
+   * Get the human-readable transpose from -24 to +24
+   * @type {string}
+   */
+  get transpose_display() {
+    const signed_transpose = this.transpose - 24;
+    if (signed_transpose > 0) {
+      return `+${signed_transpose}`;
+    } else {
+      return `${signed_transpose}`;
+    }
   }
 
   /**
@@ -59,6 +90,7 @@ export class DX7Voice {
       algorithm: this.algorithm,
       operators: this.operators,
       pitch_env: this.pitch_env,
+      lfo: this.lfo,
       osc_key_sync: this.osc_key_sync,
       feedback: this.feedback,
       transpose: this.transpose,
@@ -68,19 +100,21 @@ export class DX7Voice {
 
 DX7Voice.INIT = Object.freeze(
   new DX7Voice({
-    name: "INIT",
+    name: "--INIT--",
     algorithm: 0,
     feedback: 0,
     operators: [
-      DX7Operator.init(1),
-      DX7Operator.init(2),
-      DX7Operator.init(3),
-      DX7Operator.init(4),
-      DX7Operator.init(5),
-      DX7Operator.init(6),
+      DX7Operator.init(1, 99),
+      DX7Operator.init(2, 0),
+      DX7Operator.init(3, 0),
+      DX7Operator.init(4, 0),
+      DX7Operator.init(5, 0),
+      DX7Operator.init(6, 0),
     ],
     pitch_env: DX7Envelope.DEFAULT_PITCH,
+    lfo: DX7LFO.INIT,
     osc_key_sync: true,
-    transpose: 0,
+    // transpose 0 is stored unsigned as 24
+    transpose: 24,
   }),
 );
