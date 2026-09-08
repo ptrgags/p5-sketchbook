@@ -41,6 +41,12 @@ export class DX7Voice {
       throw new Error("There must be exactly 6 operators");
     }
 
+    options.operators.map((x, i) => {
+      if (x.num !== i + 1) {
+        throw new Error("operators must be listed in sorted order");
+      }
+    });
+
     this.name = sanitize_name(options.name);
     this.algorithm = options.algorithm;
     this.operators = options.operators;
@@ -48,7 +54,7 @@ export class DX7Voice {
     this.lfo = options.lfo;
     this.osc_key_sync = options.osc_key_sync;
     this.feedback = options.feedback;
-    // note: this is stored as 0-14, but this.transpose_display converts to -7-7
+    // note: this is stored as 0-48, but transpose_display converts it to -24-24
     this.transpose = options.transpose;
   }
 
@@ -62,10 +68,15 @@ export class DX7Voice {
 
   /**
    * Get the human-readable transpose from -24 to +24
-   * @type {number}
+   * @type {string}
    */
   get transpose_display() {
-    return this.transpose - 24;
+    const signed_transpose = this.transpose - 24;
+    if (signed_transpose > 0) {
+      return `+${signed_transpose}`;
+    } else {
+      return `${signed_transpose}`;
+    }
   }
 
   /**
@@ -103,7 +114,7 @@ DX7Voice.INIT = Object.freeze(
     pitch_env: DX7Envelope.DEFAULT_PITCH,
     lfo: DX7LFO.INIT,
     osc_key_sync: true,
-    // transpose 0 is stored unsigned as 7
-    transpose: 7,
+    // transpose 0 is stored unsigned as 24
+    transpose: 24,
   }),
 );

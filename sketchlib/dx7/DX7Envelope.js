@@ -26,5 +26,5 @@ DX7Envelope.DEFAULT_ENV = Object.freeze(
   new DX7Envelope([99, 99, 99, 99], [99, 99, 99, 0]),
 );
 DX7Envelope.DEFAULT_PITCH = Object.freeze(
-  new DX7Envelope([50, 50, 50, 50], [99, 99, 99, 99]),
+  new DX7Envelope([99, 99, 99, 99], [50, 50, 50, 50]),
 );

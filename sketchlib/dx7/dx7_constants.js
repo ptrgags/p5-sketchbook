@@ -23,3 +23,12 @@ export const NAME_LENGTH = 10;
 
 export const TRAILER_OFFSET = HEADER_LENGTH + DATA_LENGTH;
 export const STATUS_END = 0xf7;
+
+export const HEADER_BYTES = [
+  STATUS_START,
+  ID_YAMAHA,
+  SUB_STATUS,
+  FORMAT_32_VOICES,
+  DATA_LENGTH >> 7,
+  DATA_LENGTH & 0b1111111,
+];

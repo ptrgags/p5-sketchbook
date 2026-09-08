@@ -49,6 +49,22 @@ describe("DX7Voice", () => {
     }).toThrowError("There must be exactly 6 operators");
   });
 
+  it("with unsorted operators throws error", () => {
+    expect(() => {
+      return new DX7Voice({
+        ...DEFAULT_SETTINGS,
+        operators: [
+          DX7Operator.init(2, 0),
+          DX7Operator.init(4, 0),
+          DX7Operator.init(1, 99),
+          DX7Operator.init(6, 0),
+          DX7Operator.init(5, 0),
+          DX7Operator.init(3, 0),
+        ],
+      });
+    }).toThrowError("operators must be listed in sorted order");
+  });
+
   it("with long name truncates to 10 characters", () => {
     const voice = new DX7Voice({
       ...DEFAULT_SETTINGS,
@@ -102,7 +118,7 @@ describe("DX7Voice", () => {
     });
 
     expect(voice.transpose).toEqual(3);
-    expect(voice.transpose_display).toEqual(-21);
+    expect(voice.transpose_display).toEqual("-21");
   });
 
   it("rename returns same voice with different name", () => {

@@ -28,19 +28,9 @@ import { DX7Cartridge } from "./DX7Cartridge.js";
  * @returns {DX7Envelope}
  */
 function decode_envelope(bytes, offset) {
-  const r1 = bytes[offset + 0];
-  const r2 = bytes[offset + 1];
-  const r3 = bytes[offset + 2];
-  const r4 = bytes[offset + 3];
-  const rates = [r1, r2, r3, r4];
-
-  const l1 = bytes[offset + 4];
-  const l2 = bytes[offset + 5];
-  const l3 = bytes[offset + 6];
-  const l4 = bytes[offset + 7];
-  const levels = [l1, l2, l3, l4];
-
-  return new DX7Envelope(rates, levels);
+  const rates = bytes.slice(offset, offset + 4);
+  const levels = bytes.slice(offset + 4, offset + 8);
+  return new DX7Envelope([...rates], [...levels]);
 }
 
 /**
@@ -153,7 +143,7 @@ function decode_voice(voice_bytes) {
     );
     operators[i] = decode_operator(op_bytes, 6 - i);
   }
-  // the operators are listed in reverse order in the SYSEX file
+  // The operators are listed in reverse order in the SYSEX file
   operators.reverse();
 
   const PITCH_ENV_START = 102;
@@ -253,7 +243,5 @@ export function decode_dx7(buffer) {
     throw new Error(`incorrect end byte, ${end_status}`);
   }
 
-  // TODO: handle checksum, F7 end sysex byte
-
-  return new DX7Cartridge(voices);
+  return new DX7Cartridge(...voices);
 }
