@@ -1,6 +1,7 @@
 import { decode_dx7 } from "../sketchlib/dx7/decode_dx7.js";
 import { download_file } from "../sketchlib/dom/download_file.js";
 import { expect_element } from "../sketchlib/dom/expect_element.js";
+import { decode_opm } from "./decode_opm.js";
 import { encode_dx7_file } from "../sketchlib/dx7/encode_dx7.js";
 import { DX7Voice } from "../sketchlib/dx7/DX7Voice.js";
 import { DX7Cartridge } from "../sketchlib/dx7/DX7Cartridge.js";
@@ -52,11 +53,18 @@ export class DX7CartridgeOrganizer {
       }
 
       const [file] = files;
-      if (file.name.endsWith(".csv")) {
+
+      if (file.name.endsWith(".opm")) {
+        const opm_text = await file.text();
+        const voices = decode_opm(opm_text);
+        console.log(voices);
+        this.voices.push(...voices.map((v) => v.to_dx7_voice()));
+      } else if (file.name.endsWith(".csv")) {
         const csv_text = await file.text();
         const voices = dx7_from_csv(csv_text);
         this.voices.push(...voices);
       } else {
+        // .syx file
         const syx_buffer = await file.arrayBuffer();
         const dx7_cartridge = decode_dx7(syx_buffer);
         this.voices.push(...dx7_cartridge.voices);
