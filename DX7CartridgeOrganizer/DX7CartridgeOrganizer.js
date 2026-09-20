@@ -98,6 +98,13 @@ export class DX7CartridgeOrganizer {
 
       // if we filled up the cartridge, disable this button
       update_add_button();
+
+      // Also increment the selectedIndex on the left so you can
+      // continue to press the add button
+      voices_select.selectedIndex = Math.min(
+        voices_select.selectedIndex + 1,
+        this.voices.length - 1,
+      );
     });
 
     const update_move_buttons = () => {

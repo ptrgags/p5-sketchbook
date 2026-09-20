@@ -94,6 +94,50 @@ const LUT_SCALING_CURVES = {
   "N/A": DX7ScalingCurveType.NEG_LIN,
 };
 
+const BREAKPOINT_REGEX = /([A-G]#?)(-?\d)/;
+const BREAKPOINT_PITCH_ORDER = [
+  "A",
+  "A#",
+  "B",
+  "C",
+  "C#",
+  "D",
+  "D#",
+  "E",
+  "F",
+  "F#",
+  "G",
+  "G#",
+];
+
+/**
+ * The FM-1 doesn't display octave numbers correctly. It assumes that an
+ * octave starts at A when it really should be C. This function
+ * @param {string} breakpoint_name The breakpoint name. If it's N/A, the value will be assumed to be A-1
+ * @returns {number} breakpoint value 0-99
+ */
+function parse_breakpoint(breakpoint_name) {
+  if (breakpoint_name === "N/A") {
+    breakpoint_name = "A-1";
+  }
+
+  const groups = BREAKPOINT_REGEX.exec(breakpoint_name);
+
+  if (groups === null) {
+    throw new Error(`invalid pitch name, ${breakpoint_name}`);
+  }
+
+  const pitch_class = BREAKPOINT_PITCH_ORDER.indexOf(groups[1]);
+  const octave = parseInt(groups[2]);
+  const breakpoint_value = 12 * (octave + 1) + pitch_class;
+
+  if (breakpoint_value < 0 || breakpoint_value > 127) {
+    throw new Error(`breakpoint out of range!, ${breakpoint_name}`);
+  }
+
+  return breakpoint_value;
+}
+
 /**
  *
  * @param {string[]} level_scaling_cells
@@ -101,9 +145,7 @@ const LUT_SCALING_CURVES = {
  */
 function parse_level_scaling(level_scaling_cells) {
   const breakpoint_name = level_scaling_cells[0];
-  const breakpoint = DX7KeyLevelScaling.breakpoint_from_note_name(
-    breakpoint_name === "N/A" ? "A-1" : breakpoint_name,
-  );
+  const breakpoint = parse_breakpoint(breakpoint_name);
   const left_depth = parse_num(level_scaling_cells[1], 0);
   const right_depth = parse_num(level_scaling_cells[2], 0);
   const left_curve_type = LUT_SCALING_CURVES[level_scaling_cells[3]];
