@@ -46,6 +46,10 @@ export class DX7KeyLevelScaling {
    * @param {DX7ScalingCurve} right_curve
    */
   constructor(breakpoint, left_curve, right_curve) {
+    if (breakpoint < 0 || breakpoint > 99) {
+      throw new Error("breakpoint must be in [0, 99]");
+    }
+
     this.breakpoint = breakpoint;
     this.left_curve = left_curve;
     this.right_curve = right_curve;
@@ -83,12 +87,17 @@ export class DX7KeyLevelScaling {
 
   /**
    * Convert a note name to a breakpoint number
-   * @param {string} note_name
+   * @param {string} note_name The note name of the breakpoint
    * @returns {number} breakpoint number used in this class
    */
   static breakpoint_from_note_name(note_name) {
     const midi_breakpoint = MIDIPitch.parse_pitch(note_name);
-    return midi_breakpoint - A_1;
+    const breakpoint = midi_breakpoint - A_1;
+    if (breakpoint < 0 || breakpoint > 99) {
+      throw new Error("breakpoint must be in [A-1, C8]");
+    }
+
+    return breakpoint;
   }
 }
 DX7KeyLevelScaling.INIT = Object.freeze(

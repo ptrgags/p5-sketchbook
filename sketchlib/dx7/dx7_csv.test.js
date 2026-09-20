@@ -102,11 +102,12 @@ const PIANO1 = new DX7Voice({
       level: 79,
       freq: new DX7FreqSettings(DX7FreqMode.RATIO, 14, 1, 0),
       envelope: new DX7Envelope([95, 29, 20, 50], [99, 95, 0, 0]),
-      // A-1 is breakpoint 0
       key_level_scaling: new DX7KeyLevelScaling(
-        // D2 is 2 octaves and 5 semitones above A-1
-        // that's 2 * 12 + 5 = 24 + 5 = 29
-        29,
+        // The CSV file follows the FM-1 conventions which uses incorrect
+        // octave numbers. So D2 in the CSV is really D4!
+        // D3 is 3 octaves and 5 semitones above A-1
+        // that's 3 * 12 + 5 = 36 + 5 = 41
+        41,
         new DX7ScalingCurve(DX7ScalingCurveType.NEG_LIN, 0),
         new DX7ScalingCurve(DX7ScalingCurveType.NEG_LIN, 19),
       ),
