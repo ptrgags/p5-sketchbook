@@ -10,7 +10,7 @@
   "author": "Peter Gagliardi",
   "license": "Apache-2.0",
   "devDependencies": {
-    "p5": "^2.3.1",
+    "p5": "^2.4.0",
     "tone": "^15.2.6",
     "vitest": "^5.0.0"
   }
